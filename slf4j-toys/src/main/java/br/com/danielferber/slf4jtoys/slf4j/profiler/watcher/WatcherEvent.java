@@ -15,7 +15,8 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Parser;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.LoggerMessageReader;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.LoggerMessageWriter;
 import java.io.IOException;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;
@@ -35,8 +36,9 @@ import javax.persistence.Id;
 public class WatcherEvent {
 
     private static final String COUNTER = "c";
-    private static final String UUID = "uuid";
+    private static final String UUID = "u";
     private static final String MEMORY = "m";
+    private static final String TIME = "t";
     private static final String HEAP = "h";
     private static final String NON_HEAP = "nh";
     private static final String FINALIZATION_COUNT = "fc";
@@ -44,7 +46,6 @@ public class WatcherEvent {
     private static final String COMPILATION_TIME = "ct";
     private static final String GARBAGE_COLLECTOR = "gc";
     private static final String SYSTEM_LOAD = "sl";
-    private static final String TIME = "t";
     private static final String[] MEMORY_UNITS = new String[]{"B", "kB", "MB", "GB"};
     private static final double[] MEMORY_FACTORS = new double[]{1000.0, 1000.0, 1000.0};
     @Id
@@ -60,8 +61,8 @@ public class WatcherEvent {
     /**
      * An arbitraty ID for the watcher.
      */
-    @Column(nullable = false, length = 300)
-    protected String name;
+//    @Column(nullable = false, length = 300)
+//    protected String name;
     /**
      * How many times the watch has executed.
      */
@@ -82,22 +83,21 @@ public class WatcherEvent {
     protected long nonHeap_init = 0;
     protected long nonHeap_max = 0;
     protected long nonHeap_used = 0;
-    protected int objectPendingFinalizationCount = 0;
-    protected int classLoading_loaded = 0;
+    protected long objectPendingFinalizationCount = 0;
+    protected long classLoading_loaded = 0;
     protected long classLoading_total = 0;
     protected long classLoading_unloaded = 0;
     protected long compilationTime = 0;
     protected long garbageCollector_count = 0;
     protected long garbageCollector_time = 0;
-    protected double systemLoad = 0.0;
     protected long runtime_freeMemory = 0;
     protected long runtime_maxMemory = 0;
     protected long runtime_totalMemory = 0;
+    protected double systemLoad = 0.0;
 
-    public String getName() {
-        return name;
-    }
-
+//    public String getName() {
+//        return name;
+//    }
     public long getCounter() {
         return counter;
     }
@@ -142,11 +142,11 @@ public class WatcherEvent {
         return nonHeap_used;
     }
 
-    public int getObjectPendingFinalizationCount() {
+    public long getObjectPendingFinalizationCount() {
         return objectPendingFinalizationCount;
     }
 
-    public int getClassLoading_loaded() {
+    public long getClassLoading_loaded() {
         return classLoading_loaded;
     }
 
@@ -186,24 +186,24 @@ public class WatcherEvent {
         return runtime_totalMemory;
     }
 
-    public long getusedMemory() {
+    public long getUsedMemory() {
         return runtime_totalMemory - runtime_freeMemory;
     }
 
     public static void readableString(WatcherEvent watcher, StringBuilder buffer) {
         if (watcher.runtime_freeMemory > 0 || watcher.runtime_maxMemory > 0 || watcher.runtime_totalMemory > 0) {
             buffer.append("Memory status: ");
-            buffer.append(Parser.bestUnit(watcher.runtime_freeMemory, WatcherEvent.MEMORY_UNITS, WatcherEvent.MEMORY_FACTORS));
+            buffer.append(LoggerMessageReader.bestUnit(watcher.runtime_totalMemory - watcher.runtime_freeMemory, WatcherEvent.MEMORY_UNITS, WatcherEvent.MEMORY_FACTORS));
             buffer.append(' ');
-            buffer.append(Parser.bestUnit(watcher.runtime_totalMemory, WatcherEvent.MEMORY_UNITS, WatcherEvent.MEMORY_FACTORS));
+            buffer.append(LoggerMessageReader.bestUnit(watcher.runtime_totalMemory, WatcherEvent.MEMORY_UNITS, WatcherEvent.MEMORY_FACTORS));
             buffer.append(' ');
-            buffer.append(Parser.bestUnit(watcher.runtime_maxMemory, WatcherEvent.MEMORY_UNITS, WatcherEvent.MEMORY_FACTORS));
+            buffer.append(LoggerMessageReader.bestUnit(watcher.runtime_maxMemory, WatcherEvent.MEMORY_UNITS, WatcherEvent.MEMORY_FACTORS));
         } else {
             buffer.append("No memory status.");
         }
     }
 
-    protected void update() {
+    protected void collectData() {
         counter++;
 
         MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
@@ -250,140 +250,69 @@ public class WatcherEvent {
         systemLoad = os.getSystemLoadAverage();
     }
 
-    public static void writeToString(Parser p, WatcherEvent e, StringBuilder buffer) {
-        buffer.append(p.DATA_OPEN);
-
-        /* name */
-        buffer.append(e.name);
+    public static void writeToString(LoggerMessageWriter p, WatcherEvent e, StringBuilder buffer) {
+        p.openData();
 
         /* counter */
         if (e.counter > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.COUNTER);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.counter);
+            p.property(WatcherEvent.COUNTER, e.counter);
         }
 
         /* time */
-        if (e.counter > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.TIME);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.time);
+        if (e.time > 0) {
+            p.property(WatcherEvent.TIME, e.time);
         }
-
         /* uuid */
         if (e.uuid != null) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.UUID);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.uuid);
+            p.property(WatcherEvent.UUID, e.uuid);
         }
-
 
         /* memory usage */
         if (e.runtime_freeMemory > 0 || e.runtime_totalMemory > 0 || e.runtime_maxMemory > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.MEMORY);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.runtime_freeMemory);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.runtime_totalMemory);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.runtime_maxMemory);
+            p.property(WatcherEvent.MEMORY, e.runtime_totalMemory - e.runtime_freeMemory, e.runtime_totalMemory, e.runtime_maxMemory);
         }
 
         /* heap usage */
         if (e.heap_commited > 0 || e.heap_init > 0 || e.heap_max > 0 || e.heap_used > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.HEAP);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.heap_commited);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.heap_init);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.heap_max);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.heap_used);
+            p.property(WatcherEvent.HEAP, e.heap_commited, e.heap_init, e.heap_max, e.heap_used);
         }
 
-        /* non usage */
+        /* non heap usage */
         if (e.nonHeap_commited > 0 || e.nonHeap_init > 0 || e.nonHeap_max > 0 || e.nonHeap_used > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.NON_HEAP);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.nonHeap_commited);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.nonHeap_init);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.nonHeap_max);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.nonHeap_used);
+            p.property(WatcherEvent.NON_HEAP, e.nonHeap_commited, e.nonHeap_init, e.nonHeap_max, e.nonHeap_used);
         }
 
         /* objectPendingFinalizationCount */
         if (e.objectPendingFinalizationCount > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.FINALIZATION_COUNT);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.objectPendingFinalizationCount);
+            p.property(WatcherEvent.FINALIZATION_COUNT, e.objectPendingFinalizationCount);
         }
 
         /* class loading */
         if (e.classLoading_loaded > 0 || e.classLoading_total > 0 || e.classLoading_unloaded > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.CLASS_LOADING);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.classLoading_total);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.classLoading_loaded);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.classLoading_unloaded);
+            p.property(WatcherEvent.CLASS_LOADING, e.classLoading_total, e.classLoading_loaded, e.classLoading_unloaded);
         }
 
         /* compiler */
         if (e.compilationTime > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.COMPILATION_TIME);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.compilationTime);
+            p.property(WatcherEvent.COMPILATION_TIME, e.compilationTime);
         }
 
         /* garbage collector. */
         if (e.garbageCollector_count > 0 || e.garbageCollector_time > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.GARBAGE_COLLECTOR);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.garbageCollector_count);
-            buffer.append(p.PROPERTY_DIV);
-            buffer.append(e.garbageCollector_time);
+            p.property(WatcherEvent.GARBAGE_COLLECTOR, e.garbageCollector_count, e.garbageCollector_time);
         }
 
         /* system load */
         if (e.systemLoad > 0) {
-            buffer.append(p.PROPERTY_SEPARATOR);
-            buffer.append(p.PROPERTY_SPACE);
-            buffer.append(WatcherEvent.SYSTEM_LOAD);
-            buffer.append(p.PROPERTY_EQUALS);
-            buffer.append(e.systemLoad);
+            p.property(WatcherEvent.SYSTEM_LOAD, e.systemLoad);
         }
 
-        buffer.append(p.DATA_CLOSE);
+        buffer.append(p.syntax.DATA_CLOSE);
     }
 
-    public static void readFromString(Parser p, WatcherEvent e, String encodedData) throws IOException {
+    public static void readFromString(LoggerMessageReader p, WatcherEvent e, String encodedData) throws IOException {
         /* Reseta todos os atributos. */
-        e.name = null;
+//        e.name = null;
         e.counter = 0;
 
         e.time = 0;
@@ -407,7 +336,7 @@ public class WatcherEvent {
         p.reset(encodedData);
 
         /* O nome é obrigatório. */
-        e.name = p.readIdentifierString();
+//        e.name = p.readIdentifierString();
 
         if (!p.readOptionalOperator(';')) {
             return;
@@ -424,39 +353,39 @@ public class WatcherEvent {
                 e.time = p.readLong();
             } else if (WatcherEvent.MEMORY.equals(propertyName)) {
                 e.runtime_freeMemory = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.runtime_totalMemory = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.runtime_totalMemory = p.readLong();
             } else if (WatcherEvent.HEAP.equals(propertyName)) {
                 e.heap_commited = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.heap_init = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.heap_max = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.heap_used = p.readLong();
             } else if (WatcherEvent.NON_HEAP.equals(propertyName)) {
                 e.nonHeap_commited = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.nonHeap_init = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.nonHeap_max = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.nonHeap_used = p.readLong();
             } else if (WatcherEvent.FINALIZATION_COUNT.equals(propertyName)) {
                 e.objectPendingFinalizationCount = p.readInt();
             } else if (WatcherEvent.CLASS_LOADING.equals(propertyName)) {
                 e.classLoading_total = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.classLoading_loaded = p.readInt();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.classLoading_unloaded = p.readLong();
             } else if (WatcherEvent.COMPILATION_TIME.equals(propertyName)) {
                 e.compilationTime = p.readLong();
             } else if (WatcherEvent.GARBAGE_COLLECTOR.equals(propertyName)) {
                 e.garbageCollector_count = p.readLong();
-                p.readOperator(p.PROPERTY_DIV);
+                p.readOperator(p.syntax.PROPERTY_DIV);
                 e.garbageCollector_time = p.readLong();
             } else {
                 // property desconhecida, ignora
@@ -476,7 +405,7 @@ public class WatcherEvent {
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (counter ^ (counter >>> 32));
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
+//        result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
         return result;
     }
@@ -526,13 +455,13 @@ public class WatcherEvent {
         if (heap_used != other.heap_used) {
             return false;
         }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
+//        if (name == null) {
+//            if (other.name != null) {
+//                return false;
+//            }
+//        } else if (!name.equals(other.name)) {
+//            return false;
+//        }
         if (nonHeap_commited != other.nonHeap_commited) {
             return false;
         }
@@ -576,6 +505,6 @@ public class WatcherEvent {
 
     @Override
     public String toString() {
-        return this.uuid + ":" + this.name + ":" + this.counter;
+        return this.uuid + ":" + this.counter;
     }
 }

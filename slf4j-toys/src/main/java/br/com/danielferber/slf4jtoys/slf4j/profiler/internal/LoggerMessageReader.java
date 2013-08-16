@@ -18,43 +18,20 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 import java.io.EOFException;
 import java.io.IOException;
 
-public class Parser {
+public class LoggerMessageReader {
 
     /* Internal parser state. */
     private int start;
     private String charsString;
     private char[] chars;
     private int lenght;
-    /* Symbols used in parseable messages. */
-    public char STRING_QUOTE = '\\';
-    public char STRING_DELIM = '"';
-    public char MAP_CLOSE = ']';
-    public char MAP_OPEN = '[';
-    public char MAP_SPACE = ' ';
-    public char MAP_SEPARATOR = ',';
-    public char MAP_EQUAL = ':';
-    public char PROPERTY_DIV = '|';
-    public char PROPERTY_EQUALS = '=';
-    public char PROPERTY_SPACE = ' ';
-    public char PROPERTY_SEPARATOR = ';';
-    public char DATA_OPEN = '(';
-    public char DATA_CLOSE = ')';
-    /* Time units used in parseable messages. */
-    public static final double[] TIME_FACTORS = new double[]{1000.0, 1000.0, 1000.0, 60.0, 60.0};
-    public static final String[] TIME_UNITS = new String[]{"ns", "us", "ms", "s", "m", "h"};
-    /* Other? */
-    private static String STRING_DELIM_QUOTED_STR;
-    private static String STRING_DELIM_STR;
+    /* Syntax definition. */
+    private final Syntax syntax;
 
-    public Parser() {
+    public LoggerMessageReader(Syntax syntax) {
         super();
-        reset();
-    }
-
-    public void writeQuotedString(StringBuilder sb, String string) {
-        sb.append(STRING_DELIM);
-        sb.append(string.replace(Parser.STRING_DELIM_STR, Parser.STRING_DELIM_QUOTED_STR));
-        sb.append(STRING_DELIM);
+        this.syntax = syntax;
+        this.syntax.reset();
     }
 
     public String readQuotedString() throws IOException {
@@ -62,7 +39,7 @@ public class Parser {
             throw new EOFException();
         }
         char c = chars[start];
-        if (c != STRING_DELIM) {
+        if (c != syntax.STRING_DELIM) {
             throw new IOException("missing quotes");
         }
         start++;
@@ -70,21 +47,21 @@ public class Parser {
         StringBuilder sb = new StringBuilder();
         while (end < lenght) {
             c = chars[end];
-            if (c == STRING_DELIM) {
+            if (c == syntax.STRING_DELIM) {
                 sb.append(charsString.substring(start, end));
                 start = end + 1;
                 break;
-            } else if (c == STRING_QUOTE) {
+            } else if (c == syntax.STRING_QUOTE) {
                 sb.append(charsString.substring(start, end));
                 start = end + 1;
                 if (start >= lenght) {
                     throw new EOFException();
                 }
                 c = chars[start];
-                if (c == STRING_DELIM) {
-                    sb.append(STRING_DELIM);
+                if (c == syntax.STRING_DELIM) {
+                    sb.append(syntax.STRING_DELIM);
                 } else {
-                    sb.append(STRING_QUOTE);
+                    sb.append(syntax.STRING_QUOTE);
                     sb.append(c);
                 }
                 start++;
@@ -264,30 +241,6 @@ public class Parser {
         start = 0;
         lenght = chars.length;
         charsString = encodedData;
-        reset();
-
-    }
-
-    protected void reset() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(STRING_DELIM);
-        Parser.STRING_DELIM_STR = sb.toString();
-        sb = new StringBuilder();
-        sb.append(STRING_QUOTE);
-        sb.append(STRING_DELIM);
-        Parser.STRING_DELIM_QUOTED_STR = sb.toString();
-    }
-
-    public static String bestUnit(double value, String[] timeUnits, double[] timeFactors) {
-        int last = timeUnits.length - 1;
-        int index = 0;
-        double limit = timeFactors[index] * 1.1;
-        double modifiedValue = value;
-        while (index != last && modifiedValue > limit) {
-            modifiedValue /= timeFactors[index];
-            limit = timeFactors[index] * 1.1;
-            index++;
-        }
-        return String.format("%.1f%s", modifiedValue, timeUnits[index]);
+        syntax.reset();
     }
 }

@@ -15,27 +15,25 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Parser;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.LoggerMessageWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Session;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax;
 import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 public class Watcher extends WatcherEvent {
+    public static final Marker WATCHER_MARKER = MarkerFactory.getMarker("WATCHER");
     private final Logger logger;
     private final WatcherTask watcherTask;
-    public static final Marker WATCHER_MARKER = MarkerFactory.getMarker("WATCHER");
-    /**
-     * Configuração padrão do parser usado para ler novamente a mensagem do log.
-     */
-    private static final Parser parser = new Parser();
+    private final LoggerMessageWriter writer = new LoggerMessageWriter(new Syntax());
 
     public class WatcherTask extends TimerTask {
 
         @Override
         public void run() {
-            Watcher.this.update();
+            Watcher.this.collectData();
 
             if (logger.isInfoEnabled()) {
                 final StringBuilder buffer = new StringBuilder();
@@ -44,7 +42,7 @@ public class Watcher extends WatcherEvent {
             }
             if (logger.isTraceEnabled()) {
                 final StringBuilder buffer = new StringBuilder();
-                WatcherEvent.writeToString(Watcher.parser, Watcher.this, buffer);
+                writeToString(Watcher.this.writer, Watcher.this, buffer);
                 logger.trace(Watcher.WATCHER_MARKER, buffer.toString());
             }
         }
@@ -53,10 +51,12 @@ public class Watcher extends WatcherEvent {
     protected Watcher(final Logger logger) {
         super();
         this.logger = logger;
+        this.uuid = Session.uuid;
         this.watcherTask = new WatcherTask();
     }
 
     public Watcher start() {
+        logger.info("Watcher started. uuid={}", uuid);
         try {
             Session.timer.scheduleAtFixedRate(watcherTask, 1000, 1000);
         } catch (IllegalStateException e) {
@@ -67,6 +67,7 @@ public class Watcher extends WatcherEvent {
 
     public Watcher stop() {
         watcherTask.cancel();
+        logger.info("Watcher stopped. uuid={}", uuid);
         return this;
     }
 
