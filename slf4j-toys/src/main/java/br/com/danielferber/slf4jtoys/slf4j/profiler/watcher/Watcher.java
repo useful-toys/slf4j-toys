@@ -23,26 +23,31 @@ import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+/**
+ *
+ * @author Daniel Felix Ferber
+ */
 public class Watcher extends WatcherEvent {
+
     public static final Marker WATCHER_MARKER = MarkerFactory.getMarker("WATCHER");
     private final Logger logger;
     private final WatcherTask watcherTask;
-    private final LoggerMessageWriter writer = new LoggerMessageWriter(new Syntax());
 
     public class WatcherTask extends TimerTask {
+        private final LoggerMessageWriter writer = new LoggerMessageWriter();
 
         @Override
         public void run() {
-            Watcher.this.collectData();
-
             if (logger.isInfoEnabled()) {
+                Watcher.this.collectData();
                 final StringBuilder buffer = new StringBuilder();
-                WatcherEvent.readableString(Watcher.this, buffer);
+                Watcher.this.readableString(buffer);
                 logger.info(buffer.toString());
             }
             if (logger.isTraceEnabled()) {
                 final StringBuilder buffer = new StringBuilder();
-                writeToString(Watcher.this.writer, Watcher.this, buffer);
+                writer.reset(buffer);
+                WatcherLogMessageHelper.writeToString(writer, Watcher.this);
                 logger.trace(Watcher.WATCHER_MARKER, buffer.toString());
             }
         }
@@ -57,10 +62,12 @@ public class Watcher extends WatcherEvent {
 
     public Watcher start() {
         logger.info("Watcher started. uuid={}", uuid);
-        try {
-            Session.timer.scheduleAtFixedRate(watcherTask, 1000, 1000);
-        } catch (IllegalStateException e) {
-            /* WatcherTask já estava programada. */
+        if (logger.isInfoEnabled()) {
+            try {
+                Session.timer.scheduleAtFixedRate(watcherTask, 1000, 1000);
+            } catch (IllegalStateException e) {
+                /* WatcherTask já estava programada. */
+            }
         }
         return this;
     }
@@ -70,5 +77,4 @@ public class Watcher extends WatcherEvent {
         logger.info("Watcher stopped. uuid={}", uuid);
         return this;
     }
-
 }

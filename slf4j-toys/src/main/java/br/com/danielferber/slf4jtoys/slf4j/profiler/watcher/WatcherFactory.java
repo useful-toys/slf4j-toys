@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 
 /**
  *
- * @author x7ws - Daniel Felix Ferber
+ * @author Daniel Felix Ferber
  */
 public final class WatcherFactory {
 

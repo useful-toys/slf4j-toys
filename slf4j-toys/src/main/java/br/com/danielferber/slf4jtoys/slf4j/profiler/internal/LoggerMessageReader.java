@@ -15,31 +15,154 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax.DATA_CLOSE;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax.DATA_OPEN;
 import java.io.EOFException;
 import java.io.IOException;
 
 public class LoggerMessageReader {
 
     /* Internal parser state. */
+    private boolean firstProperty = true;
+    private boolean firstValue = true;
     private int start;
     private String charsString;
     private char[] chars;
     private int lenght;
-    /* Syntax definition. */
-    private final Syntax syntax;
 
-    public LoggerMessageReader(Syntax syntax) {
+    public LoggerMessageReader() {
         super();
-        this.syntax = syntax;
-        this.syntax.reset();
     }
 
-    public String readQuotedString() throws IOException {
+    public static String extractPlausibleMessage(char prefix, String s) {
+        int i = s.indexOf(DATA_OPEN);
+        if (i <= 0) {
+            return null;
+        }
+        if (s.charAt(i - 1) != prefix) {
+            return null;
+        }
+        i++;
+        int j = s.indexOf(DATA_CLOSE);
+        if (j == -1) {
+            return null;
+        }
+        if (i > j) {
+            return null;
+        }
+        return s.substring(i, j);
+    }
+
+    public LoggerMessageReader reset(String encodedData) {
+        firstProperty = true;
+        firstValue = true;
+        chars = encodedData.toCharArray();
+        start = 0;
+        lenght = chars.length;
+        charsString = encodedData;
+        return this;
+    }
+
+    public boolean hasMore() {
+        return start < lenght;
+    }
+
+    public String readIdentifier() throws IOException {
+        if (! firstProperty) {
+            readOperator(Syntax.PROPERTY_SEPARATOR);
+        } else {
+            firstProperty = false;
+        }
+        firstValue = true;
+        
         if (start >= lenght) {
             throw new EOFException();
         }
+
         char c = chars[start];
-        if (c != syntax.STRING_DELIM) {
+        if (!Character.isJavaIdentifierStart(c)) {
+            throw new IOException("invalid identifier");
+        }
+        int end = start + 1;
+        while (end < lenght) {
+            c = chars[end];
+            if (!Character.isJavaIdentifierPart(c)) {
+                break;
+            }
+            end++;
+        }
+
+        String substring = charsString.substring(start, end);
+        start = end;
+        return substring;
+    }
+
+    public String readString() throws IOException {
+        if (!firstValue) {
+            readOperator(Syntax.PROPERTY_EQUALS);
+        } else {
+            readOperator(Syntax.PROPERTY_DIV);
+            firstValue = false;
+        }
+
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+
+        int end = start;
+        while (end < lenght) {
+            char c = chars[end];
+            if (c == Syntax.PROPERTY_DIV || c == Syntax.PROPERTY_SEPARATOR) {
+                break;
+            }
+            end++;
+        }
+
+        String substring = charsString.substring(start, end);
+        start = end;
+        return substring;
+    }
+
+    public long readLong() throws IOException {
+        try {
+            return Long.parseLong(readString());
+        } catch (NumberFormatException e) {
+            throw new IOException("invalid long", e);
+        }
+    }
+    
+    public double readDouble() throws IOException {
+        try {
+            return Double.parseDouble(readString());
+        } catch (NumberFormatException e) {
+            throw new IOException("invalid double", e);
+        }
+    }
+
+    protected void readOperator(char operator) throws IOException {
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+        char c = chars[start++];
+        if (c != operator) {
+            throw new IOException("missing '" + operator + "'");
+        }
+    }
+
+    public String readQuotedString() throws IOException {
+        if (!firstValue) {
+            readOperator(Syntax.PROPERTY_EQUALS);
+        } else {
+            readOperator(Syntax.PROPERTY_DIV);
+            firstValue = false;
+        }
+
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+
+        char c = chars[start];
+        if (c != Syntax.STRING_DELIM) {
             throw new IOException("missing quotes");
         }
         start++;
@@ -47,21 +170,21 @@ public class LoggerMessageReader {
         StringBuilder sb = new StringBuilder();
         while (end < lenght) {
             c = chars[end];
-            if (c == syntax.STRING_DELIM) {
+            if (c == Syntax.STRING_DELIM) {
                 sb.append(charsString.substring(start, end));
                 start = end + 1;
                 break;
-            } else if (c == syntax.STRING_QUOTE) {
+            } else if (c == Syntax.STRING_QUOTE) {
                 sb.append(charsString.substring(start, end));
                 start = end + 1;
                 if (start >= lenght) {
                     throw new EOFException();
                 }
                 c = chars[start];
-                if (c == syntax.STRING_DELIM) {
-                    sb.append(syntax.STRING_DELIM);
+                if (c == Syntax.STRING_DELIM) {
+                    sb.append(Syntax.STRING_DELIM);
                 } else {
-                    sb.append(syntax.STRING_QUOTE);
+                    sb.append(Syntax.STRING_QUOTE);
                     sb.append(c);
                 }
                 start++;
@@ -74,173 +197,5 @@ public class LoggerMessageReader {
             throw new EOFException();
         }
         return sb.toString();
-    }
-
-    public String readUuid() throws EOFException {
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-
-        int end = start;
-        while (end < lenght) {
-            char c = chars[end];
-            if (!Character.isJavaIdentifierPart(c) && c != '.') {
-                break;
-            }
-            end++;
-        }
-
-        String substring = charsString.substring(start, end);
-        start = end;
-        return substring;
-    }
-
-    public String readIdentifierString() throws IOException {
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-
-        char c = chars[start];
-        if (!Character.isJavaIdentifierStart(c)) {
-            throw new IOException("invalid identifier");
-        }
-        int end = start + 1;
-        while (end < lenght) {
-            c = chars[end];
-            if (!Character.isJavaIdentifierPart(c) && c != '.') {
-                break;
-            }
-            end++;
-        }
-
-        String substring = charsString.substring(start, end);
-        start = end;
-        return substring;
-    }
-
-    public void readOperator(char operator) throws IOException {
-        while (start < lenght && Character.isWhitespace(chars[start])) {
-            start++;
-        }
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-        char c = chars[start++];
-        if (c != operator) {
-            throw new IOException("missing '" + operator + "'");
-        }
-        while (start < lenght && Character.isWhitespace(chars[start])) {
-            start++;
-        }
-    }
-
-    public boolean readOptionalOperator(char operator) {
-        while (start < lenght && Character.isWhitespace(chars[start])) {
-            start++;
-        }
-        if (start >= lenght) {
-            return false;
-        }
-        char c = chars[start];
-        if (c != operator) {
-            return false;
-        }
-        start++;
-        while (start < lenght && Character.isWhitespace(chars[start])) {
-            start++;
-        }
-        return true;
-    }
-
-    public long readLong() throws IOException {
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-
-        char c = chars[start];
-        int end;
-        if (c == '-') {
-            // Se for sinal de menos, então testa um caractere a mais para obter o dígito.
-            if ((start + 1) >= lenght) {
-                throw new EOFException();
-            }
-            c = chars[start + 1];
-            end = start + 2;
-        } else {
-            end = start + 1;
-        }
-        if (!Character.isDigit(c)) {
-            throw new NumberFormatException();
-        }
-
-        while (end < lenght) {
-            c = chars[end];
-            if (!Character.isDigit(c)) {
-                break;
-            }
-            end++;
-        }
-
-        String substring = charsString.substring(start, end);
-        start = end;
-        long valor;
-        try {
-            valor = Long.parseLong(substring);
-        } catch (NumberFormatException e) {
-            throw new IOException(e);
-        }
-        return valor;
-    }
-
-    public int readInt() throws IOException {
-        return (int) readLong();
-    }
-
-    public double readDouble() throws IOException {
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-
-        char c = chars[start];
-        int end;
-        if (c == '-') {
-            // Se for sinal de menos, então testa um caractere a mais para obter o dígito.
-            if ((start + 1) >= lenght) {
-                throw new EOFException();
-            }
-            c = chars[start + 1];
-            end = start + 2;
-        } else {
-            end = start + 1;
-        }
-        if (!Character.isDigit(c) && c != '.') {
-            throw new NumberFormatException();
-        }
-
-        while (end < lenght) {
-            c = chars[end];
-            if (!Character.isDigit(c) && c != '.') {
-                break;
-            }
-            end++;
-        }
-
-        String substring = charsString.substring(start, end);
-        start = end;
-        double valor;
-        try {
-            valor = Double.parseDouble(substring);
-        } catch (NumberFormatException e) {
-            throw new IOException(e);
-        }
-        return valor;
-    }
-
-    public void reset(String encodedData) {
-        chars = encodedData.toCharArray();
-        start = 0;
-        lenght = chars.length;
-        charsString = encodedData;
-        syntax.reset();
     }
 }
