@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.danielferber.slf4jtoys.slf4j.loggerfactory;
+package br.com.danielferber.slf4jtoys.slf4j.logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.danielferber.slf4jtoys.slf4j.loggerfactory;
+package br.com.danielferber.slf4jtoys.slf4j.logger;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -70,7 +70,7 @@ public class LoggerFactory {
      * @returns Instância do logger.
      */
     public static Logger getLogger(Class<?> clazz, String name) {
-        return org.slf4j.LoggerFactory.getLogger(clazz.getName() + "." + name);
+        return org.slf4j.LoggerFactory.getLogger(clazz.getName() + '.' + name);
     }
 
     /**
@@ -82,7 +82,7 @@ public class LoggerFactory {
      * @returns Instância do logger.
      */
     public static Logger getLogger(Logger logger, String name) {
-        return org.slf4j.LoggerFactory.getLogger(logger.getName() + "." + name);
+        return org.slf4j.LoggerFactory.getLogger(logger.getName() + '.' + name);
     }
 
     /**
