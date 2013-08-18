@@ -19,9 +19,9 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
  *
  * @author Daniel Felix Ferber
  */
-public final class ReadableMessageWriter {
+public final class ReadableMessage {
 
-    private ReadableMessageWriter() {
+    private ReadableMessage() {
     }
 
     public static final double[] TIME_FACTORS = new double[]{1000.0, 1000.0, 1000.0, 60.0, 60.0};

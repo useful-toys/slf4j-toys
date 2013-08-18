@@ -15,112 +15,35 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.ReadableMessageWriter;
-import java.lang.management.ClassLoadingMXBean;
-import java.lang.management.CompilationMXBean;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryUsage;
-import java.lang.management.OperatingSystemMXBean;
-import java.util.List;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemStatusData;
 
 /**
  *
  * @author Daniel Felix Ferber
  */
-public class WatcherEvent {
+public class WatcherEvent extends SystemStatusData {
+
     /**
-     * How many times the watch has executed.
+     * Unique ID of session that is collecting system status data.
      */
-    protected long counter = 0;
     protected String uuid;
     /**
-     * When the watcher last executed.
+     * How many times this watcher collection system status data since its creation.
+     */
+    protected long counter = 0;
+    /**
+     * When system this status data was collected.
      */
     protected long time = 0;
 
-    /* MemoryMXBean */
-    protected long heap_commited = 0;
-    protected long heap_init = 0;
-    protected long heap_max = 0;
-    protected long heap_used = 0;
-    protected long nonHeap_commited = 0;
-    protected long nonHeap_init = 0;
-    protected long nonHeap_max = 0;
-    protected long nonHeap_used = 0;
-    protected long objectPendingFinalizationCount = 0;
-    protected long classLoading_loaded = 0;
-    protected long classLoading_total = 0;
-    protected long classLoading_unloaded = 0;
-    protected long compilationTime = 0;
-    protected long garbageCollector_count = 0;
-    protected long garbageCollector_time = 0;
-    protected long runtime_freeMemory = 0;
-    protected long runtime_maxMemory = 0;
-    protected long runtime_totalMemory = 0;
-    protected double systemLoad = 0.0;
-
-    public void collectData() {
-        counter++;
-
-        MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
-
-        time = System.nanoTime();
-
-        Runtime runtime = Runtime.getRuntime();
-        runtime_freeMemory = runtime.freeMemory();
-        runtime_maxMemory = runtime.maxMemory();
-        runtime_totalMemory = runtime.totalMemory();
-
-        MemoryUsage heapUsage = memory.getHeapMemoryUsage();
-        heap_commited = heapUsage.getCommitted();
-        heap_init = heapUsage.getInit();
-        heap_max = heapUsage.getMax();
-        heap_used = heapUsage.getUsed();
-
-        MemoryUsage nonHeapUsage = memory.getHeapMemoryUsage();
-        nonHeap_commited = nonHeapUsage.getCommitted();
-        nonHeap_init = nonHeapUsage.getInit();
-        nonHeap_max = nonHeapUsage.getMax();
-        nonHeap_used = nonHeapUsage.getUsed();
-
-        objectPendingFinalizationCount = memory.getObjectPendingFinalizationCount();
-
-        ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
-        classLoading_loaded = classLoading.getLoadedClassCount();
-        classLoading_total = classLoading.getTotalLoadedClassCount();
-        classLoading_unloaded = classLoading.getUnloadedClassCount();
-
-        CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
-        compilationTime = compilation.getTotalCompilationTime();
-
-        List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
-
-        garbageCollector_count = 0;
-        garbageCollector_time = 0;
-        for (GarbageCollectorMXBean garbageCollector : garbageCollectors) {
-            garbageCollector_count += garbageCollector.getCollectionCount();
-            garbageCollector_time += garbageCollector.getCollectionTime();
-        }
-
-        OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-        systemLoad = os.getSystemLoadAverage();
+    @Override
+    public void reset() {
+        super.reset();
+        this.uuid = null;
+        this.counter = 0;
+        this.time = 0;
     }
-
-    public void readableString(StringBuilder builder) {
-        if (this.runtime_freeMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
-            builder.append("Memory status: ");
-            builder.append(ReadableMessageWriter.bestUnit(this.runtime_totalMemory - this.runtime_freeMemory, ReadableMessageWriter.MEMORY_UNITS, ReadableMessageWriter.MEMORY_FACTORS));
-            builder.append(' ');
-            builder.append(ReadableMessageWriter.bestUnit(this.runtime_totalMemory, ReadableMessageWriter.MEMORY_UNITS, ReadableMessageWriter.MEMORY_FACTORS));
-            builder.append(' ');
-            builder.append(ReadableMessageWriter.bestUnit(this.runtime_maxMemory, ReadableMessageWriter.MEMORY_UNITS, ReadableMessageWriter.MEMORY_FACTORS));
-        } else {
-            builder.append("No memory status.");
-        }
-    }
-
+    
     @Override
     public int hashCode() {
         final int prime = 31;

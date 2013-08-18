@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
+package br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec;
 
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax.DATA_CLOSE;
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax.DATA_OPEN;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.Syntax.DATA_CLOSE;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.Syntax.DATA_OPEN;
 import java.io.EOFException;
 import java.io.IOException;
 
-public class LoggerMessageReader {
+public class MessageReader {
 
     /* Internal parser state. */
     private boolean firstProperty = true;
@@ -30,11 +30,7 @@ public class LoggerMessageReader {
     private char[] chars;
     private int lenght;
 
-    public LoggerMessageReader() {
-        super();
-    }
-
-    public static String extractPlausibleMessage(char prefix, String s) {
+    protected static String extractPlausibleMessage(char prefix, String s) {
         int i = s.indexOf(DATA_OPEN);
         if (i <= 0) {
             return null;
@@ -52,8 +48,10 @@ public class LoggerMessageReader {
         }
         return s.substring(i, j);
     }
+    
+    
 
-    public LoggerMessageReader reset(String encodedData) {
+    public MessageReader reset(String encodedData) {
         firstProperty = true;
         firstValue = true;
         chars = encodedData.toCharArray();

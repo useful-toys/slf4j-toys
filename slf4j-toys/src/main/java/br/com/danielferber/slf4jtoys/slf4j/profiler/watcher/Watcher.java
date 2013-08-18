@@ -15,7 +15,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.LoggerMessageWriter;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Session;
 import java.util.TimerTask;
 import org.slf4j.Logger;
@@ -28,22 +28,23 @@ public class Watcher extends WatcherEvent {
 
     private final Logger logger;
     private final WatcherTask watcherTask;
+    private static final LoggerMessageCodec loggerMessageCodec = new LoggerMessageCodec();
 
     public class WatcherTask extends TimerTask {
-        private final LoggerMessageWriter writer = new LoggerMessageWriter();
+        private final MessageWriter writer = new MessageWriter();
 
         @Override
         public void run() {
             if (logger.isInfoEnabled()) {
-                Watcher.this.collectData();
+                time = System.nanoTime();
+                collectSystemStatus();
                 final StringBuilder buffer = new StringBuilder();
-                Watcher.this.readableString(buffer);
+                readableString(buffer);
                 logger.info(buffer.toString());
             }
             if (logger.isTraceEnabled()) {
                 final StringBuilder buffer = new StringBuilder();
-                writer.reset(buffer);
-                WatcherLogMessageHelper.writeToString(writer, Watcher.this);
+                loggerMessageCodec.writeLogMessage(buffer, writer, Watcher.this);
                 logger.trace(Slf4JMarkers.WATCHER_MARKER, buffer.toString());
             }
         }

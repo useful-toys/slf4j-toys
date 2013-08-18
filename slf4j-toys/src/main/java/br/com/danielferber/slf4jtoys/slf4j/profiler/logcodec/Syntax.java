@@ -1,6 +1,6 @@
 /*
  */
-package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
+package br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec;
 
 /**
  *

@@ -13,64 +13,64 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
+package br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec;
 
-public class LoggerMessageWriter {
+public class MessageWriter {
 
     /* Internal parser state. */
     private boolean firstProperty;
     StringBuilder builder;
     
-    public LoggerMessageWriter reset(StringBuilder builder) {
+    public MessageWriter reset(StringBuilder builder) {
         firstProperty = true;
         this.builder = builder;
         return this;
     }
 
-    public LoggerMessageWriter writeQuotedString(final String string) {
+    public MessageWriter writeQuotedString(final String string) {
         builder.append(Syntax.STRING_DELIM);
         builder.append(string.replace(Syntax.STRING_DELIM_STR, Syntax.STRING_DELIM_QUOTED_STR));
         builder.append(Syntax.STRING_DELIM);
         return this;
     }
 
-    public LoggerMessageWriter openData(char c) {
+    public MessageWriter openData(char c) {
         builder.append(c);
         builder.append(Syntax.DATA_OPEN);
         return this;
     }
 
-    public LoggerMessageWriter closeData() {
+    public MessageWriter closeData() {
         builder.append(Syntax.DATA_CLOSE);
         return this;
     }
 
-    public LoggerMessageWriter property(String name, long value) {
+    public MessageWriter property(String name, long value) {
         property(name, Long.toString(value));
         return this;
     }
 
-    public LoggerMessageWriter property(String name, long value1, long value2) {
+    public MessageWriter property(String name, long value1, long value2) {
         property(name, Long.toString(value1), Long.toString(value2));
         return this;
     }
 
-    public LoggerMessageWriter property(String name, long value1, long value2, long value3) {
+    public MessageWriter property(String name, long value1, long value2, long value3) {
         property(name, Long.toString(value1), Long.toString(value2), Long.toString(value3));
         return this;
     }
 
-    public LoggerMessageWriter property(String name, long value1, long value2, long value3, long value4) {
+    public MessageWriter property(String name, long value1, long value2, long value3, long value4) {
         property(name, Long.toString(value1), Long.toString(value2), Long.toString(value3), Long.toString(value4));
         return this;
     }
 
-    public LoggerMessageWriter property(String name, double value) {
+    public MessageWriter property(String name, double value) {
         property(name, Double.toString(value));
         return this;
     }
 
-    public LoggerMessageWriter property(String name, String value) {
+    public MessageWriter property(String name, String value) {
         if (!firstProperty) {
             builder.append(Syntax.PROPERTY_SEPARATOR);
         } else {
@@ -82,7 +82,7 @@ public class LoggerMessageWriter {
         return this;
     }
 
-    public LoggerMessageWriter property(String name, String value1, String value2) {
+    public MessageWriter property(String name, String value1, String value2) {
         if (!firstProperty) {
             builder.append(Syntax.PROPERTY_SEPARATOR);
         } else {
@@ -96,7 +96,7 @@ public class LoggerMessageWriter {
         return this;
     }
 
-    public LoggerMessageWriter property(String name, String value1, String value2, String value3) {
+    public MessageWriter property(String name, String value1, String value2, String value3) {
         if (!firstProperty) {
             builder.append(Syntax.PROPERTY_SEPARATOR);
         } else {
@@ -112,7 +112,7 @@ public class LoggerMessageWriter {
         return this;
     }
 
-    public LoggerMessageWriter property(String name, String value1, String value2, String value3, String value4) {
+    public MessageWriter property(String name, String value1, String value2, String value3, String value4) {
         if (!firstProperty) {
             builder.append(Syntax.PROPERTY_SEPARATOR);
         } else {
