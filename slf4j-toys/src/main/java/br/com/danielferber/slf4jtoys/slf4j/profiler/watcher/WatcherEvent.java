@@ -61,7 +61,7 @@ public class WatcherEvent {
     protected long runtime_totalMemory = 0;
     protected double systemLoad = 0.0;
 
-    protected void collectData() {
+    public void collectData() {
         counter++;
 
         MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
