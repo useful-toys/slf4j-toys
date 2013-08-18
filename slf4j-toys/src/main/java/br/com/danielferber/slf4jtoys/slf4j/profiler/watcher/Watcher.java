@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Daniel Felix Ferber
+ * Copyright 2013 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,8 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.LoggerMessageWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Session;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax;
 import java.util.TimerTask;
 import org.slf4j.Logger;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 /**
  *
@@ -29,7 +26,6 @@ import org.slf4j.MarkerFactory;
  */
 public class Watcher extends WatcherEvent {
 
-    public static final Marker WATCHER_MARKER = MarkerFactory.getMarker("WATCHER");
     private final Logger logger;
     private final WatcherTask watcherTask;
 
@@ -48,7 +44,7 @@ public class Watcher extends WatcherEvent {
                 final StringBuilder buffer = new StringBuilder();
                 writer.reset(buffer);
                 WatcherLogMessageHelper.writeToString(writer, Watcher.this);
-                logger.trace(Watcher.WATCHER_MARKER, buffer.toString());
+                logger.trace(Slf4JMarkers.WATCHER_MARKER, buffer.toString());
             }
         }
     }
