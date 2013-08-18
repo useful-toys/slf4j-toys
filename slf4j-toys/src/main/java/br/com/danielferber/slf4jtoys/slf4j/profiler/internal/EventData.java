@@ -4,10 +4,12 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Daniel
  */
-public interface EventData {
+public interface EventData extends Serializable {
     void reset();
 }

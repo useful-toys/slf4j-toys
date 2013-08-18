@@ -13,10 +13,10 @@ import org.slf4j.MarkerFactory;
  */
 public class Slf4JMarkers {
     public static final Marker START_MARKER = MarkerFactory.getMarker("METER_START");
-    public static final Marker START_WATCH_MARKER = MarkerFactory.getMarker("WATCHER_START");
     public static final Marker OK_MARKER = MarkerFactory.getMarker("METER_OK");
-    public static final Marker OK_WATCH_MARKER = MarkerFactory.getMarker("WATCHER_OK");
     public static final Marker FAIL_MARKER = MarkerFactory.getMarker("METER_FAIL");
-    public static final Marker FAIL_WATCH_MARKER = MarkerFactory.getMarker("WATCHER_FAIL");
     public static final Marker FINALIZED_MARKER = MarkerFactory.getMarker("METER_FINALIZED");
+    public static final Marker INCONSISTENT_START = MarkerFactory.getMarker("METER_INCONSISTENT_START");
+    public static final Marker INCONSISTENT_OK = MarkerFactory.getMarker("METER_INCONSISTENT_OK");
+    public static final Marker INCONSISTENT_FAIL = MarkerFactory.getMarker("METER_INCONSISTENT_FAIL");
 }

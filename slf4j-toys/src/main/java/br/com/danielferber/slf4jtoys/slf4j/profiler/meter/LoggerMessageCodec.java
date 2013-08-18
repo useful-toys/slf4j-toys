@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author Daniel Felix Ferber
  */
-public class MeterLogMessageHelper {
+public class LoggerMessageCodec {
 
     private static final String UUID = "uuid";
     private static final String COUNTER = "c";

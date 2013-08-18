@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
+package br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec;
 
+import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageReader;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -22,14 +23,14 @@ import static org.junit.Assert.*;
  *
  * @author Daniel Felix Ferber
  */
-public class LoggerMessageReaderTest {
+public class MessageReaderTest {
 
     @Test
     public void testExtractPlausibleMessage1() {
         char prefix = 'M';
         String input = "bla bla bla";
-        String expected = null;
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String expected = null; 
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
 
@@ -38,7 +39,7 @@ public class LoggerMessageReaderTest {
         char prefix = 'M';
         String input = "bla M( bla bla";
         String expected = null;
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
 
@@ -47,7 +48,7 @@ public class LoggerMessageReaderTest {
         char prefix = 'M';
         String input = "bla bla ) bla";
         String expected = null;
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
 
@@ -56,7 +57,7 @@ public class LoggerMessageReaderTest {
         char prefix = 'M';
         String input = "bla M(BLA) bla";
         String expected = "BLA";
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
 
@@ -65,7 +66,7 @@ public class LoggerMessageReaderTest {
         char prefix = 'M';
         String input = "bla M() bla";
         String expected = "";
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
 
@@ -74,7 +75,7 @@ public class LoggerMessageReaderTest {
         char prefix = 'M';
         String input = "M(BLA BLA BLA)";
         String expected = "BLA BLA BLA";
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
 
@@ -83,7 +84,7 @@ public class LoggerMessageReaderTest {
         char prefix = 'M';
         String input = "bla M(BLA BLA BLA)";
         String expected = "BLA BLA BLA";
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
 
@@ -92,7 +93,7 @@ public class LoggerMessageReaderTest {
         char prefix = 'M';
         String input = "bla ) bla M( bla";
         String expected = null;
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
     
@@ -101,7 +102,7 @@ public class LoggerMessageReaderTest {
         char prefix = 'M';
         String input = "bla bla bla (";
         String expected = null;
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
     
@@ -110,7 +111,7 @@ public class LoggerMessageReaderTest {
         char prefix = 'M';
         String input = "( bla bla bla bla";
         String expected = null;
-        String output = LoggerMessageReader.extractPlausibleMessage(prefix, input);
+        String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
 }

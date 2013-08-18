@@ -4,22 +4,24 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.ReadableMessageWriter;
-import java.io.Serializable;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.ReadableMessage;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemStatusData;
 import java.util.Map;
 
-public class MeterEvent implements Serializable {
+public class MeterEvent extends SystemStatusData {
 
-
+    /**
+     * Unique ID of session that reporting jobs.
+     */
+    protected String uuid;
+    /**
+     * How many times this job has benn reported since session creation.
+     */
+    protected long counter = 0;
     /**
      * An arbitraty ID for the job.
      */
     protected String name;
-    /**
-     * How many times the job has executed.
-     */
-    protected long counter = 0;
-    protected String uuid;
     /**
      * When the job was created/scheduled.
      */
@@ -50,22 +52,34 @@ public class MeterEvent implements Serializable {
     protected long threadStopId;
     protected String threadStartName;
     protected String threadStopName;
-    protected int threadDepth;
-    protected long depthCount;
-    protected long depthContext;
+//    protected int threadDepth;
+//    protected long depthCount;
+//    protected long depthContext;
     protected Map<String, String> context;
 
-    public static void readableString(MeterEvent meter, StringBuilder buffer) {
-        if (meter.message != null) {
-            buffer.append(meter.message);
+    public StringBuilder readableString(StringBuilder buffer) {
+        if (stopTime != 0) {
+            buffer.append(success ? "OK" : "Failed");
+        } else if (startTime != 0) {
+            buffer.append("Started");
         } else {
-            buffer.append(meter.name);
+            buffer.append("Scheduled");
         }
-        if (meter.startTime > 0 && meter.stopTime > 0) {
-            buffer.append(" ");
-            long duration = meter.stopTime - meter.startTime;
-            buffer.append(ReadableMessageWriter.bestUnit(duration, ReadableMessageWriter.TIME_UNITS, ReadableMessageWriter.TIME_FACTORS));
+        buffer.append(": ");
+        buffer.append(this.name);
+        if (this.message != null) {
+            buffer.append("; ");
+            buffer.append(this.message);
         }
+        if (this.startTime > 0) {
+            buffer.append("; ");
+            buffer.append(ReadableMessage.bestUnit(getExecutionTime(), ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
+        } else {
+            buffer.append("; ");
+            buffer.append(ReadableMessage.bestUnit(getWaitingTime(), ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
+        }
+        buffer.append("; ");
+        return super.readableString(buffer);
     }
 
     @Override
