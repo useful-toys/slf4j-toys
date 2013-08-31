@@ -26,7 +26,7 @@ import org.slf4j.Logger;
  */
 public class Watcher extends WatcherEvent {
 
-    private final Logger logger;
+    private Logger logger;
     private final WatcherTask watcherTask;
     private static final LoggerMessageCodec loggerMessageCodec = new LoggerMessageCodec();
 
@@ -45,7 +45,7 @@ public class Watcher extends WatcherEvent {
             if (logger.isTraceEnabled()) {
                 final StringBuilder buffer = new StringBuilder();
                 loggerMessageCodec.writeLogMessage(buffer, writer, Watcher.this);
-                logger.trace(Slf4JMarkers.WATCHER_MARKER, buffer.toString());
+                logger.trace(Slf4JMarkers.WATCHER, buffer.toString());
             }
         }
     }
@@ -55,6 +55,10 @@ public class Watcher extends WatcherEvent {
         this.logger = logger;
         this.uuid = Session.uuid;
         this.watcherTask = new WatcherTask();
+    }
+    
+    protected void setLogger(Logger logger) {
+        this.logger = logger;
     }
 
     public Watcher start() {

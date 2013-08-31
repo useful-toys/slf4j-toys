@@ -41,7 +41,7 @@ public class Meter extends MeterEvent {
 
     public Meter setMessage(String message, Object... args) {
         try {
-            this.message = String.format(message, args);
+            this.description = String.format(message, args);
         } catch (IllegalFormatException e) {
             logger.warn("Meter.setMessage(...)", e);
         }
@@ -106,7 +106,7 @@ public class Meter extends MeterEvent {
             if (logger.isTraceEnabled()) {
                 StringBuilder buffer = new StringBuilder();
                 loggerMessageCodec.writeLogMessage(buffer, writer, Meter.this);
-                logger.trace(Slf4JMarkers.START_MARKER, buffer.toString());
+                logger.trace(Slf4JMarkers.START, buffer.toString());
             }
             startTime = System.nanoTime();
         } catch (Throwable t) {
@@ -155,7 +155,7 @@ public class Meter extends MeterEvent {
             if (logger.isTraceEnabled()) {
                 StringBuilder buffer = new StringBuilder();
                 loggerMessageCodec.writeLogMessage(buffer, writer, Meter.this);
-                logger.trace(Slf4JMarkers.OK_MARKER, buffer.toString());
+                logger.trace(Slf4JMarkers.OK, buffer.toString());
             }
         } catch (Throwable t) {
             logger.error("Excetion thrown in Meter", t);
@@ -207,7 +207,7 @@ public class Meter extends MeterEvent {
             if (logger.isTraceEnabled()) {
                 StringBuilder buffer = new StringBuilder();
                 loggerMessageCodec.writeLogMessage(buffer, writer, Meter.this);
-                logger.trace(Slf4JMarkers.FAIL_MARKER, buffer.toString());
+                logger.trace(Slf4JMarkers.FAIL, buffer.toString());
             }
         } catch (Throwable t) {
             logger.error("Excetion thrown in Meter", t);

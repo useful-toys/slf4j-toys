@@ -25,14 +25,14 @@ import java.io.IOException;
  */
 public abstract class LoggerMessageCodec<T extends SystemStatusData> extends br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageCodec<T> {
 
-    private static final String MEMORY = "m";
-    private static final String HEAP = "h";
-    private static final String NON_HEAP = "nh";
-    private static final String FINALIZATION_COUNT = "fc";
-    private static final String CLASS_LOADING = "cl";
-    private static final String COMPILATION_TIME = "ct";
-    private static final String GARBAGE_COLLECTOR = "gc";
-    private static final String SYSTEM_LOAD = "sl";
+    protected static final String MEMORY = "m";
+    protected static final String HEAP = "h";
+    protected static final String NON_HEAP = "nh";
+    protected static final String FINALIZATION_COUNT = "fc";
+    protected static final String CLASS_LOADING = "cl";
+    protected static final String COMPILATION_TIME = "ct";
+    protected static final String GARBAGE_COLLECTOR = "gc";
+    protected static final String SYSTEM_LOAD = "sl";
 
     protected LoggerMessageCodec(char messagePrefix) {
         super(messagePrefix);

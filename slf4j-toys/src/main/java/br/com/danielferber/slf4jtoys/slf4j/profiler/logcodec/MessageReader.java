@@ -19,6 +19,9 @@ import static br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.Syntax.DATA_
 import static br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.Syntax.DATA_OPEN;
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class MessageReader {
 
@@ -48,8 +51,6 @@ public class MessageReader {
         }
         return s.substring(i, j);
     }
-    
-    
 
     public MessageReader reset(String encodedData) {
         firstProperty = true;
@@ -66,13 +67,13 @@ public class MessageReader {
     }
 
     public String readIdentifier() throws IOException {
-        if (! firstProperty) {
+        if (!firstProperty) {
             readOperator(Syntax.PROPERTY_SEPARATOR);
         } else {
             firstProperty = false;
         }
         firstValue = true;
-        
+
         if (start >= lenght) {
             throw new EOFException();
         }
@@ -128,10 +129,34 @@ public class MessageReader {
             throw new IOException("invalid long", e);
         }
     }
-    
+
+    public long readLongOrZero() throws IOException {
+        try {
+            final String str = readString();
+            if (str.isEmpty()) {
+                return 0L;
+            }
+            return Long.parseLong(str);
+        } catch (NumberFormatException e) {
+            throw new IOException("invalid long", e);
+        }
+    }
+
     public double readDouble() throws IOException {
         try {
             return Double.parseDouble(readString());
+        } catch (NumberFormatException e) {
+            throw new IOException("invalid double", e);
+        }
+    }
+
+    public double readDoubleOrZero() throws IOException {
+        try {
+            final String str = readString();
+            if (str.isEmpty()) {
+                return 0F;
+            }
+            return Double.parseDouble(str);
         } catch (NumberFormatException e) {
             throw new IOException("invalid double", e);
         }
@@ -143,7 +168,7 @@ public class MessageReader {
         }
         char c = chars[start++];
         if (c != operator) {
-            throw new IOException("missing '" + operator + "'");
+            throw new IOException("expected: " + operator);
         }
     }
 
@@ -161,7 +186,7 @@ public class MessageReader {
 
         char c = chars[start];
         if (c != Syntax.STRING_DELIM) {
-            throw new IOException("missing quotes");
+            throw new IOException("expected: " + Syntax.STRING_DELIM);
         }
         start++;
         int end = start;
@@ -195,5 +220,47 @@ public class MessageReader {
             throw new EOFException();
         }
         return sb.toString();
+    }
+
+    public Map<String, String> readMap() throws IOException {
+        if (!firstValue) {
+            readOperator(Syntax.PROPERTY_EQUALS);
+        } else {
+            readOperator(Syntax.PROPERTY_DIV);
+            firstValue = false;
+        }
+
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+        char c = chars[start];
+        if (c != Syntax.MAP_OPEN) {
+            throw new IOException("expected: " + Syntax.MAP_OPEN);
+        }
+        start++;
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+        c = chars[start];
+        if (c == Syntax.MAP_CLOSE) {
+            return Collections.EMPTY_MAP;
+        }
+        Map<String, String> map = new TreeMap<String, String>();
+        do {
+            String key = readString();
+            readOperator(Syntax.MAP_EQUAL);
+            String value = readQuotedString();
+            map.put(key, value);
+            c = chars[start];
+            start++;
+            if (start >= lenght) {
+                throw new EOFException();
+            }
+        } while (c == Syntax.MAP_SEPARATOR);
+        if (c != Syntax.MAP_CLOSE) {
+            throw new IOException("expected: " + Syntax.MAP_CLOSE);
+        }
+        start++;
+        return map;
     }
 }

@@ -13,7 +13,7 @@ public class MeterEvent extends SystemStatusData {
     /**
      * Unique ID of session that reporting jobs.
      */
-    protected String uuid;
+    protected String uuid = null;
     /**
      * How many times this job has benn reported since session creation.
      */
@@ -21,11 +21,16 @@ public class MeterEvent extends SystemStatusData {
     /**
      * An arbitraty ID for the job.
      */
-    protected String name;
-    /**
+    protected String name = null;
+     /**
+     * An arbitrary short, human readable message to describe the task being
+     * measured.
+     */
+    protected String description = null;
+   /**
      * When the job was created/scheduled.
      */
-    protected long createTime;
+    protected long createTime = 0;
     /**
      * When the job started execution.
      */
@@ -35,28 +40,61 @@ public class MeterEvent extends SystemStatusData {
      */
     protected long stopTime = 0;
     /**
-     * An arbitrary short, human readable message to describe the task being
-     * measured.
-     */
-    protected String message;
-    /**
      * An arbitrary exception to signal that the task failed.
      */
-    protected String exceptionClass;
-    protected String exceptionMessage;
+    protected String exceptionClass = null;
+    /**
+     * Message of arbitrary exception to signal that the task failed.
+     */
+    protected String exceptionMessage = null;
     /**
      * If the job completed successfully, as expected (true) or failed (false).
      */
     protected boolean success = false;
-    protected long threadStartId;
-    protected long threadStopId;
-    protected String threadStartName;
-    protected String threadStopName;
+    /**
+     * Thread that notified job start.
+     */
+    protected long threadStartId = 0;
+    /**
+     * Thread that notified job stop.
+     */
+    protected long threadStopId = 0;
+    /**
+     * Thread that notified job start.
+     */
+    protected String threadStartName = null;
+    /**
+     * Thread that notified job stop.
+     */
+    protected String threadStopName = null;
 //    protected int threadDepth;
 //    protected long depthCount;
 //    protected long depthContext;
+    /**
+     * Additionala meta data describing the job.
+     */
     protected Map<String, String> context;
 
+    @Override
+    public void reset() {
+        super.reset();
+        this.uuid = null;
+        this.counter = 0;
+        this.name = null;
+        this.createTime = 0;
+        this.startTime = 0;
+        this.stopTime = 0;
+        this.description = null;
+        this.exceptionClass = null;
+        this.exceptionMessage = null;
+        this.success = false;
+        this.threadStartId = 0;
+        this.threadStopId = 0;
+        this.threadStartName = null;
+        this.threadStopName = null;
+    }
+
+    @Override
     public StringBuilder readableString(StringBuilder buffer) {
         if (stopTime != 0) {
             buffer.append(success ? "OK" : "Failed");
@@ -67,9 +105,9 @@ public class MeterEvent extends SystemStatusData {
         }
         buffer.append(": ");
         buffer.append(this.name);
-        if (this.message != null) {
+        if (this.description != null) {
             buffer.append("; ");
-            buffer.append(this.message);
+            buffer.append(this.description);
         }
         if (this.startTime > 0) {
             buffer.append("; ");

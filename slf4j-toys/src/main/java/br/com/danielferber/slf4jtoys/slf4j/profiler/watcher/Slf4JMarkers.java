@@ -13,5 +13,5 @@ import org.slf4j.MarkerFactory;
  */
 public class Slf4JMarkers {
 
-    public static final Marker WATCHER_MARKER = MarkerFactory.getMarker("WATCHER");
+    public static final Marker WATCHER = MarkerFactory.getMarker("WATCHER");
 }

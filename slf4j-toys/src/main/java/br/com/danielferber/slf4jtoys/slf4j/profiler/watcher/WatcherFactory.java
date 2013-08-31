@@ -14,20 +14,17 @@ public final class WatcherFactory {
     private WatcherFactory() {
         // Impede instâncias
     }
+    private static Watcher INSTANCE = new Watcher(LoggerFactory.getLogger("watcher"));
 
-    public static Watcher getWatcher(final String name) {
-        return new Watcher(LoggerFactory.getLogger(name));
+    public static Watcher getInstance() {
+        return INSTANCE;
     }
 
-    public static Watcher getWatcher(final Class<?> clazz) {
-        return new Watcher(LoggerFactory.getLogger(clazz));
+    public static void setLogger(String name) {
+        INSTANCE.setLogger(LoggerFactory.getLogger(name));
     }
 
-    public static Watcher getWatcher(final Class<?> clazz, final String name) {
-        return new Watcher(LoggerFactory.getLogger(clazz, name));
-    }
-
-    public static Watcher getWatcher(final Logger logger, final String name) {
-        return new Watcher(LoggerFactory.getLogger(logger, name));
+    public static void setLogger(Class<?> clazz) {
+        INSTANCE.setLogger(LoggerFactory.getLogger(clazz));
     }
 }

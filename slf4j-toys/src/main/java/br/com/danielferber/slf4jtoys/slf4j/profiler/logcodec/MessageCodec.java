@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public abstract class MessageCodec<T extends EventData> {
 
-    private final char messagePrefix;
+    protected final char messagePrefix;
 
     protected MessageCodec(char messagePrefix) {
         this.messagePrefix = messagePrefix;

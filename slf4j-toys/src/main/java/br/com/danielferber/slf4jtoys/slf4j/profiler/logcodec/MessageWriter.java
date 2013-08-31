@@ -15,12 +15,14 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec;
 
+import java.util.Map;
+
 public class MessageWriter {
 
     /* Internal parser state. */
     private boolean firstProperty;
     StringBuilder builder;
-    
+
     public MessageWriter reset(StringBuilder builder) {
         firstProperty = true;
         this.builder = builder;
@@ -127,6 +129,27 @@ public class MessageWriter {
         builder.append(value3);
         builder.append(Syntax.PROPERTY_DIV);
         builder.append(value4);
+        return this;
+    }
+
+    public MessageWriter property(String name, Map<String, String> map) {
+        if (!firstProperty) {
+            builder.append(Syntax.PROPERTY_SEPARATOR);
+        } else {
+            firstProperty = false;
+        }
+        builder.append(name);
+        builder.append(Syntax.PROPERTY_EQUALS);
+        builder.append(Syntax.MAP_OPEN);
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            builder.append(key);
+            builder.append(Syntax.MAP_SEPARATOR);
+            writeQuotedString(value);
+        }
+        builder.append(Syntax.MAP_CLOSE);
+
         return this;
     }
 }

@@ -17,7 +17,6 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemStatusData;
 import java.io.IOException;
 
 /**
@@ -35,17 +34,17 @@ public class LoggerMessageCodec extends br.com.danielferber.slf4jtoys.slf4j.prof
     }
 
     public void writeProperties(MessageWriter w, WatcherEvent e) {
-        /* uuid */
+        /* Session ID */
         if (e.uuid != null) {
             w.property(UUID, e.uuid);
         }
 
-        /* counter */
+        /* Event counter */
         if (e.counter > 0) {
             w.property(COUNTER, e.counter);
         }
 
-        /* time */
+        /* Time */
         if (e.time > 0) {
             w.property(TIME, e.time);
         }
