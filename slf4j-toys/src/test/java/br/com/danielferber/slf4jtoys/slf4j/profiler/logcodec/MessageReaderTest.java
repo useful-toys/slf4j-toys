@@ -15,7 +15,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageReader;
+import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -29,7 +29,7 @@ public class MessageReaderTest {
     public void testExtractPlausibleMessage1() {
         char prefix = 'M';
         String input = "bla bla bla";
-        String expected = null; 
+        String expected = null;
         String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
@@ -96,7 +96,7 @@ public class MessageReaderTest {
         String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
-    
+
     @Test
     public void testExtractPlausibleMessage9() {
         char prefix = 'M';
@@ -105,13 +105,68 @@ public class MessageReaderTest {
         String output = MessageReader.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
-    
+
     @Test
     public void testExtractPlausibleMessage10() {
         char prefix = 'M';
         String input = "( bla bla bla bla";
         String expected = null;
         String output = MessageReader.extractPlausibleMessage(prefix, input);
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testReadIdentifier1() throws IOException {
+        String input = "abc=def";
+        String expected = "abc";
+        String output = new MessageReader().reset(input).readIdentifier();
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testReadIdentifier2() throws IOException {
+        String input = "ab1=def";
+        String expected = "ab1";
+        String output = new MessageReader().reset(input).readIdentifier();
+        assertEquals(expected, output);
+    }
+
+    @Test(expected = IOException.class)
+    public void testReadIdentifier3() throws IOException {
+        String input = " def";
+        String expected = null;
+        String output = new MessageReader().reset(input).readIdentifier();
+        assertEquals(expected, output);
+    }
+
+    @Test(expected = IOException.class)
+    public void testReadIdentifier4() throws IOException {
+        String input = "1abc def";
+        String expected = "abc";
+        String output = new MessageReader().reset(input).readIdentifier();
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testReadString1() throws IOException {
+        String input = "=abc def";
+        String expected = "abc";
+        String output = new MessageReader().reset(input).readString();
+        assertEquals(expected, output);
+    }
+
+    @Test(expected = IOException.class)
+    public void testReadString2() throws IOException {
+        String input = " def";
+        String expected = null;
+        String output = new MessageReader().reset(input).readString();
+        assertEquals(expected, output);
+    }
+    
+    public void testReadString3() throws IOException {
+        String input = "=def";
+        String expected = "def";
+        String output = new MessageReader().reset(input).readString();
         assertEquals(expected, output);
     }
 }

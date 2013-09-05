@@ -97,7 +97,7 @@ public class MessageReader {
     }
 
     public String readString() throws IOException {
-        if (!firstValue) {
+        if (firstValue) {
             readOperator(Syntax.PROPERTY_EQUALS);
         } else {
             readOperator(Syntax.PROPERTY_DIV);

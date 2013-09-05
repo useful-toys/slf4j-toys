@@ -141,11 +141,17 @@ public class MessageWriter {
         builder.append(name);
         builder.append(Syntax.PROPERTY_EQUALS);
         builder.append(Syntax.MAP_OPEN);
+        boolean firstEntry = true;
         for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (!firstEntry) {
+                builder.append(Syntax.MAP_SEPARATOR);
+            } else {
+                firstEntry = false;
+            }
             String key = entry.getKey();
             String value = entry.getValue();
             builder.append(key);
-            builder.append(Syntax.MAP_SEPARATOR);
+            builder.append(Syntax.MAP_EQUAL);
             writeQuotedString(value);
         }
         builder.append(Syntax.MAP_CLOSE);

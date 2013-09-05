@@ -4,7 +4,8 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
+import java.util.Map;
+import java.util.TreeMap;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -135,6 +136,38 @@ public class MessageWriterTest {
         String expected = "a=0|1|2|3;b=4|5|6|7";
         StringBuilder sb = new StringBuilder();
         MessageWriter instance = new MessageWriter().reset(sb).property("a", 0, 1, 2, 3).property("b", 4, 5, 6, 7);
+        String output = sb.toString();
+        assertEquals(expected, output);
+    }
+    
+    @Test
+    public void testWriterMap1() {
+        String expected = "[]";
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> m = new TreeMap<String, String>();
+        MessageWriter instance = new MessageWriter().reset(sb).property("m", m);
+        String output = sb.toString();
+        assertEquals(expected, output);
+    }
+    
+        @Test
+    public void testWriterMap2() {
+        String expected = "m=[a:\"b\"]";
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> m = new TreeMap<String, String>();
+        m.put("a", "b");
+        MessageWriter instance = new MessageWriter().reset(sb).property("m", m);
+        String output = sb.toString();
+        assertEquals(expected, output);
+    }
+     @Test
+    public void testWriterMap3() {
+        String expected = "m=[a:\"b\",c:\"d\"]";
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> m = new TreeMap<String, String>();
+        m.put("a", "b");
+        m.put("c", "d");
+        MessageWriter instance = new MessageWriter().reset(sb).property("m", m);
         String output = sb.toString();
         assertEquals(expected, output);
     }
