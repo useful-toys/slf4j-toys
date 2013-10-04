@@ -20,10 +20,7 @@ import java.io.PrintStream;
 import java.util.Locale;
 
 /**
- * Outputstream que descarta todo conteúdo.
- * <p>
- * É utilizado para otimizar {@link LoggerOutputStream} quando a prioridade do
- * logger encapsulado não permite escrever o conteúdo no logger.
+ * OutputStream that discards everything.
  *
  * @author Daniel Felix Ferber
  *
@@ -36,153 +33,153 @@ class NullPrintStream extends PrintStream {
 
     @Override
     public void write(byte[] b) throws IOException {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void write(int b) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void write(byte[] buf, int off, int len) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void print(Object obj) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void print(String s) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void print(boolean b) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void print(char c) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void print(char[] s) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void print(double d) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void print(float f) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void print(int i) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void print(long l) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public PrintStream printf(String format, Object... args) {
-        // ignorar
+        // ignore
         return this;
     }
 
     @Override
     public PrintStream printf(Locale l, String format, Object... args) {
-        // ignorar
+        // ignore
         return this;
     }
 
     @Override
     public void println() {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void println(Object x) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void println(String x) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void println(boolean x) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void println(char x) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void println(char[] x) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void println(double x) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void println(float x) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void println(int x) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public void println(long x) {
-        // ignorar
+        // ignore
     }
 
     @Override
     public PrintStream append(CharSequence csq) {
-        // ignorar
+        // ignore
         return this;
     }
 
     @Override
     public PrintStream append(char c) {
-        // ignorar
+        // ignore
         return this;
     }
 
     @Override
     public PrintStream append(CharSequence csq, int start, int end) {
-        // ignorar
+        // ignore
         return this;
     }
 
     @Override
     public PrintStream format(String format, Object... args) {
-        // ignorar
+        // ignore
         return this;
     }
 
     @Override
     public PrintStream format(Locale l, String format, Object... args) {
-        // ignorar
+        // ignore
         return this;
     }
 }

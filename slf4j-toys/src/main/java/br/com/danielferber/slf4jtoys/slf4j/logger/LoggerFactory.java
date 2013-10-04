@@ -17,77 +17,85 @@ package br.com.danielferber.slf4jtoys.slf4j.logger;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
+import static org.slf4j.LoggerFactory.getILoggerFactory;
 
 /**
- * Alternativa ao {@link org.slf4j.LoggerFactory}, com métodos mais específicos
- * e práticos.
+ * An alternative to {@link org.slf4j.LoggerFactory}, with additional useful
+ * methods.
  *
  * @author Daniel Felix Ferber
  */
 public class LoggerFactory {
 
     /**
-     * Obtém o logger com hierarquia associada ao nome. Equivalente a
+     * Returns a logger named according to the name parameter using the
+     * statically bound {@link ILoggerFactory} instance. Equivalent to
      * {@link org.slf4j.LoggerFactory#getLogger(String)}.
      * <p>
-     * Usado tipicamente para declarar loggers especiais da aplicação, cujo nome
-     * não segue a convenção de nome igual ao nome 'fully qualified' da classe.
+     * Recommended to get a special purpose logger defined by the application,
+     * whose name does not follow de fully qualified name convention and that
+     * tracks some globally available feature.
      *
-     * @param name Nome do logger, que é uma hierarquia separada por pontos.
-     * @returns logger Instância do logger.
+     * @param name The name of the logger.
+     * @return the logger
      */
     public static Logger getLogger(String name) {
-        return org.slf4j.LoggerFactory.getLogger(name);
+        return getILoggerFactory().getLogger(name);
     }
 
     /**
-     * Obtém o logger com hierarquia associada com uma determinada classe
-     * através do nome 'fully qualified' da classe. Equivalente a
-     * {@link org.slf4j.LoggerFactory#getLogger(Class)}.
+     * Returns a logger named according to the class passed as parameter, using
+     * the statically bound {@link ILoggerFactory} instance.
      * <p>
-     * Usado tipicamente para declarar o logger das atividades executadas por
-     * uma classe.
+     * Recommended to get a logger that tracks features provided by the class.
      *
-     * @param name Classe.
-     * @returns Instância do logger.
+     * @param clazz the returned logger will be named after clazz
+     * @return the logger
      */
     public static Logger getLogger(Class<?> clazz) {
-        return org.slf4j.LoggerFactory.getLogger(clazz);
+        return getILoggerFactory().getLogger(clazz.getName());
     }
 
     /**
-     * Obtém o logger com hierarquia abaixo da hierarquia associada com uma
-     * determinada classe.
+     * Returns a logger named according to the operation or feature and provided
+     * by the class passed as parameter, using the statically bound
+     * {@link ILoggerFactory} instance.
      * <p>
-     * Usado tipicamente para declarar loggers específicos por atividade de uma
-     * classe. Desta forma é possível controlar o log individualmente por
-     * atividade. Para cada atividade de interesse é declarado um logger
-     * específico dentro da hierarquia do logger da classe.
+     * Recommended to get a logger that tracks separatedly a specific operation
+     * or feature provided by the class.
      *
-     * @param name Nome da hierarquia abaixo da classe.
-     * @param clazz Classe.
-     * @returns Instância do logger.
+     * @param clazz the returned logger will be named after clazz
+     * @param name the name of the operation or feature provided by the class.
+     * @return the logger
      */
     public static Logger getLogger(Class<?> clazz, String name) {
-        return org.slf4j.LoggerFactory.getLogger(clazz.getName() + '.' + name);
+        return getILoggerFactory().getLogger(clazz.getName() + '.' + name);
     }
 
     /**
-     * Obtém o logger com hierarquia abaixo da hierarquia associada com um
-     * logger existente.
+     * Returns a logger named according to and operation or feature tracked by
+     * the the logger passed as parameter, using the statically bound
+     * {@link ILoggerFactory} instance.
      *
-     * @param name Nome da hierarquia abaixo da classe.
-     * @param logger Logger existente.
-     * @returns Instância do logger.
+     * Recommended to get a logger that tracks separatedly a step, operation or
+     * feature being reported by an existing logger.
+     *
+     * @param clazz the returned logger will be named after logger
+     * @param name the name of the operation provided by the class.
+     * @return the logger
      */
     public static Logger getLogger(Logger logger, String name) {
-        return org.slf4j.LoggerFactory.getLogger(logger.getName() + '.' + name);
+        return getILoggerFactory().getLogger(logger.getName() + '.' + name);
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de rastreamento.
+     * Returns a {@link PrintStream} whose close and flush write text to a trace
+     * logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static PrintStream getTracePrintStream(final Logger logger) {
         if (!logger.isTraceEnabled()) {
@@ -97,8 +105,11 @@ public class LoggerFactory {
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de depuração.
+     * Returns a {@link PrintStream} whose close and flush write text to a debug
+     * logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static PrintStream getDebugPrintStream(final Logger logger) {
         if (!logger.isDebugEnabled()) {
@@ -108,8 +119,11 @@ public class LoggerFactory {
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de informação.
+     * Returns a {@link PrintStream} whose close and flush write text to a info
+     * logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static PrintStream getInfoPrintStream(final Logger logger) {
         if (!logger.isInfoEnabled()) {
@@ -119,8 +133,11 @@ public class LoggerFactory {
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de advertência.
+     * Returns a {@link PrintStream} whose close and flush write text to a warn
+     * logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static PrintStream getWarnPrintStream(final Logger logger) {
         if (!logger.isWarnEnabled()) {
@@ -130,8 +147,11 @@ public class LoggerFactory {
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de erro.
+     * Returns a {@link PrintStream} whose close and flush write text to a error
+     * logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static PrintStream getErrorPrintStream(final Logger logger) {
         if (!logger.isErrorEnabled()) {
@@ -141,14 +161,17 @@ public class LoggerFactory {
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de rastreamento.
+     * Returns a {@link PrintStream} whose close and flush write unformatted
+     * data to a trace logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static OutputStream getTraceOutputStream(final Logger logger) {
         if (!logger.isTraceEnabled()) {
             return new NullOutputStream();
         }
-        return new LoggerOutputStream(logger) {
+        return new LoggerOutputStream() {
             @Override
             protected void writeToLogger() {
                 logger.trace(extractString());
@@ -157,14 +180,17 @@ public class LoggerFactory {
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de depuração.
+     * Returns a {@link PrintStream} whose close and flush write unformatted
+     * data to a debug logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static OutputStream getDebugOutputStream(final Logger logger) {
         if (!logger.isDebugEnabled()) {
             return new NullOutputStream();
         }
-        return new LoggerOutputStream(logger) {
+        return new LoggerOutputStream() {
             @Override
             protected void writeToLogger() {
                 logger.debug(extractString());
@@ -173,14 +199,17 @@ public class LoggerFactory {
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de informação.
+     * Returns a {@link PrintStream} whose close and flush write unformatted
+     * data to a info logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static OutputStream getInfoOutputStream(final Logger logger) {
         if (!logger.isInfoEnabled()) {
             return new NullOutputStream();
         }
-        return new LoggerOutputStream(logger) {
+        return new LoggerOutputStream() {
             @Override
             protected void writeToLogger() {
                 logger.info(extractString());
@@ -189,14 +218,17 @@ public class LoggerFactory {
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de advertência.
+     * Returns a {@link PrintStream} whose close and flush write unformatted
+     * data to a warn logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static OutputStream getWarnOutputStream(final Logger logger) {
         if (!logger.isWarnEnabled()) {
             return new NullOutputStream();
         }
-        return new LoggerOutputStream(logger) {
+        return new LoggerOutputStream() {
             @Override
             protected void writeToLogger() {
                 logger.warn(extractString());
@@ -205,14 +237,17 @@ public class LoggerFactory {
     }
 
     /**
-     * Obtém um {@link PrintStream} cujo conteúdo será redicionado para um
-     * logger, com prioridade de erro.
+     * Returns a {@link PrintStream} whose close and flush write unformatted
+     * data to a error logger.
+     *
+     * @param logger the logger written to.
+     * @return the PrintStream
      */
     public static OutputStream getErrorOutputStream(final Logger logger) {
         if (!logger.isErrorEnabled()) {
             return new NullOutputStream();
         }
-        return new LoggerOutputStream(logger) {
+        return new LoggerOutputStream() {
             @Override
             protected void writeToLogger() {
                 logger.error(extractString());

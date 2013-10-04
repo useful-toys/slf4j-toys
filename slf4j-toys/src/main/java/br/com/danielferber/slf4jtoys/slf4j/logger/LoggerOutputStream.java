@@ -18,52 +18,26 @@ package br.com.danielferber.slf4jtoys.slf4j.logger;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import org.slf4j.Logger;
 
 /**
- * Outputstream que escreve seu conteúdo para um logger. O conteúdo é escrito no
- * logger ao chamar os métodos {@link #close()} ou {@link #flush()}. Para obter
- * instâncias deste stream, utilize um dos métodos  {@link #getDebugOutputStream(Logger)}, {@link #getErrorOutputStream(Logger)}, {@link #getInfoOutputStream(Logger)},
- * {@link #getTraceOutputStream(Logger)} ou {@link #getWarnOutputStream(Logger)}
- * pois não existe construtor público.
+ * Common implementation of an outputstream that redirects the written data to a
+ * logger whenever {@link #close()} or {@link #flush()} is called.
  * <p>
- * Deve ser utilizado apenas para escrever conteúdo com tamanho moderado, pois
- * todo conteúdo permanece temporariamente em buffer.
+ * Instance of this class are obtained by calling factory methods from
+ * {@link LoggerFactory}.
  * <p>
- * Para escrever mensagens formatadas, pode-se encapsular este
- * {@link OutputStream} como {@link PrintStream} ou {@link PrintWriter}.
- * <p>
- * <b>Detalhe de implementação:</b> Não é possível criar instâncias desta
- * classe, pois
+ * Intended for moderated amount of data, that is buffered before being
+ * redirected to the logger.
  *
  * @author Daniel Felix Ferber
  */
-public abstract class LoggerOutputStream extends OutputStream {
+abstract class LoggerOutputStream extends OutputStream {
 
     /**
-     * Logger para onde será escrito o conteúdo.
-     */
-    private final Logger logger;
-    /**
-     * Buffer que acumula temporariamente o conteúdo.
+     * Buffer that buffers data until it is redirected to the logger.
      */
     private final ByteArrayOutputStream os = new ByteArrayOutputStream(0x3FFF);
-
-    /**
-     * Construtor padrão. As instâncias de fato devem implementar
-     * {@link #writeToLogger()} de acordo com a prioridade do logger.
-     * Infelizmente, o {@link Logger} não permite representar a prioridade de um
-     * logger, de forma que é necessário criar uma instância específica para a
-     * prioridade desejada.
-     *
-     * @param logger Logger que receberá o conteúdo.
-     */
-    protected LoggerOutputStream(final Logger logger) {
-        super();
-        this.logger = logger;
-    }
 
     @Override
     public void close() throws IOException {
@@ -92,14 +66,8 @@ public abstract class LoggerOutputStream extends OutputStream {
         os.write(b, off, len);
     }
 
-    /**
-     * Escreve o conteúdo para o logger de acordo com a prioridade desejada.
-     */
     protected abstract void writeToLogger();
 
-    /**
-     * @return O conteúdo acumulado pelo OutputStream.
-     */
     protected String extractString() {
         return os.toString();
     }

@@ -19,11 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Outputstream que descarta todo conteúdo.
- * <p>
- * É utilizado para otimizar {@link LoggerOutputStream} quando a prioridade do
- * logger encapsulado não permite escrever o conteúdo no logger.
- *
+ * Outputstream that discards everything.
  * @author Daniel Felix Ferber
  *
  */
@@ -33,16 +29,16 @@ class NullOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        // Ingora todo conteúdo.
+        // ignore
     }
 
     @Override
     public void write(byte[] b) throws IOException {
-        // Ingora todo conteúdo.
+        // ignore
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        // Ingora todo conteúdo.
+        // ignore
     }
 }
