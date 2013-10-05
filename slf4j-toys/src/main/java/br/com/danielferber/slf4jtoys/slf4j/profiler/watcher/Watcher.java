@@ -16,7 +16,7 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Session;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import java.util.TimerTask;
 import org.slf4j.Logger;
 
@@ -53,7 +53,7 @@ public class Watcher extends WatcherEvent {
     protected Watcher(final Logger logger) {
         super();
         this.logger = logger;
-        this.uuid = Session.uuid;
+        this.uuid = ProfilingSession.uuid;
         this.watcherTask = new WatcherTask();
     }
     
@@ -61,21 +61,5 @@ public class Watcher extends WatcherEvent {
         this.logger = logger;
     }
 
-    public Watcher start() {
-        logger.info("Watcher started. uuid={}", uuid);
-        if (logger.isInfoEnabled()) {
-            try {
-                Session.timer.scheduleAtFixedRate(watcherTask, 1000, 1000);
-            } catch (IllegalStateException e) {
-                /* WatcherTask já estava programada. */
-            }
-        }
-        return this;
-    }
 
-    public Watcher stop() {
-        watcherTask.cancel();
-        logger.info("Watcher stopped. uuid={}", uuid);
-        return this;
-    }
 }
