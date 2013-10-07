@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Daniel Felix Ferber
+ * Copyright 2013 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,17 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec;
 
 import java.util.Map;
 
+/**
+ * Provides methods that implement recurrent serialization patterns
+ * <p>
+ * To ease serialization of one event and to reduce the amount of parameters,
+ * MessageWriter keeps state of the serialization of the event. Thus, the
+ * instance might be shared and reused to reduce object creation overhead, as
+ * long as events are serialized one after the other and within the same
+ * thread.
+ *
+ * @author Daniel Felix Ferber
+ */
 public class MessageWriter {
 
     /* Internal parser state. */

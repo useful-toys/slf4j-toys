@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Daniel Felix Ferber
+ * Copyright 2013 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,19 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Provides methods that implement recurrent deserialization patterns. The
+ * methods consist of a simplified parser of patterns produced by
+ * {@link MessageWriter}
+ * <p>
+ * To ease deserialization of one event and to reduce the amount of parameters,
+ * MessageReader keeps state of the deserialization of the event. Thus, the
+ * instance might be shared and reused to reduce object creation overhead, as
+ * long as events are deserialized one after the other and within the same
+ * thread.
+ *
+ * @author Daniel Felix Ferber
+ */
 public class MessageReader {
 
     /* Internal parser state. */
@@ -66,6 +79,11 @@ public class MessageReader {
         return start < lenght;
     }
 
+    /**
+     * Read an identifier that defines the next incomming property.
+     * @return The name of the property.
+     * @throws IOException Incomming chars are not a valid property identifier.
+     */
     public String readIdentifier() throws IOException {
         if (!firstProperty) {
             readOperator(Syntax.PROPERTY_SEPARATOR);
