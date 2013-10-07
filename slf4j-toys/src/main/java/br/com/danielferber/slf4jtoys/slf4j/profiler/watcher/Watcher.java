@@ -17,49 +17,41 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
-import java.util.TimerTask;
 import org.slf4j.Logger;
 
 /**
  *
  * @author Daniel Felix Ferber
  */
-public class Watcher extends WatcherEvent {
+public class Watcher extends WatcherEvent implements Runnable {
 
     private Logger logger;
-    private final WatcherTask watcherTask;
+    private final MessageWriter writer = new MessageWriter();
     private static final LoggerMessageCodec loggerMessageCodec = new LoggerMessageCodec();
-
-    public class WatcherTask extends TimerTask {
-        private final MessageWriter writer = new MessageWriter();
-
-        @Override
-        public void run() {
-            if (logger.isInfoEnabled()) {
-                time = System.nanoTime();
-                collectSystemStatus();
-                final StringBuilder buffer = new StringBuilder();
-                readableString(buffer);
-                logger.info(buffer.toString());
-            }
-            if (logger.isTraceEnabled()) {
-                final StringBuilder buffer = new StringBuilder();
-                loggerMessageCodec.writeLogMessage(buffer, writer, Watcher.this);
-                logger.trace(Slf4JMarkers.WATCHER, buffer.toString());
-            }
+    
+    @Override
+    public void run() {
+        time = System.nanoTime();
+        collectSystemStatus();
+        {
+            final StringBuilder buffer = new StringBuilder();
+            this.readableString(buffer);
+            logger.info(buffer.toString());
+        }
+        if (logger.isTraceEnabled()) {
+            final StringBuilder buffer = new StringBuilder();
+            loggerMessageCodec.writeLogMessage(buffer, writer, this);
+            logger.trace(Slf4JMarkers.WATCHER, buffer.toString());
         }
     }
 
-    protected Watcher(final Logger logger) {
+    public Watcher(final Logger logger) {
         super();
         this.logger = logger;
         this.uuid = ProfilingSession.uuid;
-        this.watcherTask = new WatcherTask();
     }
-    
+
     protected void setLogger(Logger logger) {
         this.logger = logger;
     }
-
-
 }

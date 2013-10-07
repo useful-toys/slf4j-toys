@@ -15,10 +15,13 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler;
 
+import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.watcher.Watcher;
-import java.util.Timer;
 import java.util.UUID;
-import org.slf4j.Logger;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Profiling session for the current JVM. Stores the UUID logged on each message
@@ -27,30 +30,37 @@ import org.slf4j.Logger;
  * @author Daniel Felix Ferber
  */
 public class ProfilingSession {
-    private static Logger logger;
 
     private ProfilingSession() {
         // prevent instances
     }
 
     public static final String uuid = UUID.randomUUID().toString().replace('-', '.');
-    public static final Timer timer = new Timer("br.com.danielferber.slf4jtoys.slf4j");
+    public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    public static ScheduledFuture<?> scheduledWatcher;
 
-    public Watcher start() {
-        logger.info("Watcher started. uuid={}", uuid);
-        if (logger.isInfoEnabled()) {
-            try {
-                ProfilingSession.timer.scheduleAtFixedRate(watcherTask, 1000, 1000);
-            } catch (IllegalStateException e) {
-                /* WatcherTask já estava programada. */
-            }
+    public static synchronized void startWatcher() {
+        if (scheduledWatcher == null) {
+            Watcher watcher = new Watcher(LoggerFactory.getLogger("watcher"));
+            scheduledWatcher = executor.scheduleAtFixedRate(watcher, getProperty("watcher.initialDelay", 5), getProperty("watcher.period", 5), TimeUnit.SECONDS);
         }
-        return this;
     }
 
-    public Watcher stop() {
-        watcherTask.cancel();
-        logger.info("Watcher stopped. uuid={}", uuid);
-        return this;
+    public static synchronized void stopWatcher() {
+        if (scheduledWatcher != null) {
+            scheduledWatcher.cancel(true);
+        }
+    }
+
+    public static int getProperty(String name, int defaultValue) {
+        String value = System.getProperty(name);
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 }

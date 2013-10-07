@@ -4,10 +4,8 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Session;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.watcher.Watcher;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.watcher.WatcherEvent;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +27,7 @@ public class Meter extends MeterEvent {
     public Meter(Logger logger, String name) {
         this.name = name;
         this.logger = logger;
-        this.uuid = Session.uuid;
+        this.uuid = ProfilingSession.uuid;
         eventCounterByName.putIfAbsent(name, new AtomicLong(0));
         this.counter = eventCounterByName.get(name).incrementAndGet();
         createTime = System.nanoTime();

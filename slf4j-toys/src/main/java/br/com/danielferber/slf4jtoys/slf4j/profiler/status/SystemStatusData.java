@@ -41,7 +41,7 @@ public class SystemStatusData implements EventData {
     protected long runtime_totalMemory = 0;
     protected double systemLoad = 0.0;
 
-    protected StringBuilder readableString(StringBuilder builder) {
+    public StringBuilder readableString(StringBuilder builder) {
         if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
             builder.append("Memory: ");
             builder.append(ReadableMessage.bestUnit(this.runtime_usedMemory, ReadableMessage.MEMORY_UNITS, ReadableMessage.MEMORY_FACTORS));
