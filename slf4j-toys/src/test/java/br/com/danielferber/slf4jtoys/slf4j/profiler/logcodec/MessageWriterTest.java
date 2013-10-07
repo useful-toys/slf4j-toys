@@ -142,7 +142,7 @@ public class MessageWriterTest {
     
     @Test
     public void testWriterMap1() {
-        String expected = "[]";
+        String expected = "m=[]";
         StringBuilder sb = new StringBuilder();
         Map<String, String> m = new TreeMap<String, String>();
         MessageWriter instance = new MessageWriter().reset(sb).property("m", m);

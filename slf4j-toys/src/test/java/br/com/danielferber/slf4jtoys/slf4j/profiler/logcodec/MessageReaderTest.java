@@ -134,22 +134,18 @@ public class MessageReaderTest {
     @Test(expected = IOException.class)
     public void testReadIdentifier3() throws IOException {
         String input = " def";
-        String expected = null;
         String output = new MessageReader().reset(input).readIdentifier();
-        assertEquals(expected, output);
     }
 
     @Test(expected = IOException.class)
     public void testReadIdentifier4() throws IOException {
         String input = "1abc def";
-        String expected = "abc";
         String output = new MessageReader().reset(input).readIdentifier();
-        assertEquals(expected, output);
     }
 
     @Test
     public void testReadString1() throws IOException {
-        String input = "=abc def";
+        String input = "=abc;def";
         String expected = "abc";
         String output = new MessageReader().reset(input).readString();
         assertEquals(expected, output);
@@ -158,9 +154,7 @@ public class MessageReaderTest {
     @Test(expected = IOException.class)
     public void testReadString2() throws IOException {
         String input = " def";
-        String expected = null;
         String output = new MessageReader().reset(input).readString();
-        assertEquals(expected, output);
     }
     
     public void testReadString3() throws IOException {
