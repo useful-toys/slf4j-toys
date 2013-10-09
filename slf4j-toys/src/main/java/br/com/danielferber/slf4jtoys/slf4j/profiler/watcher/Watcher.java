@@ -15,7 +15,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import org.slf4j.Logger;
 
@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 public class Watcher extends WatcherEvent implements Runnable {
 
     private Logger logger;
-    private final MessageWriter writer = new MessageWriter();
+    private final EventWriter writer = new EventWriter();
     private static final LoggerMessageCodec loggerMessageCodec = new LoggerMessageCodec();
     
     @Override

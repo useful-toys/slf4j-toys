@@ -5,7 +5,7 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 public class Meter extends MeterEvent {
 
     private final Logger logger;
-    private final MessageWriter writer = new MessageWriter();
+    private final EventWriter writer = new EventWriter();
     private static final LoggerMessageCodec loggerMessageCodec = new LoggerMessageCodec();
     /**
      * How many times each event has been executed.

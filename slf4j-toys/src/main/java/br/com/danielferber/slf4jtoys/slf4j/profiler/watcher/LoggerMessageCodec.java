@@ -15,8 +15,8 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageReader;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import java.io.IOException;
 
 /**
@@ -33,7 +33,7 @@ public class LoggerMessageCodec extends br.com.danielferber.slf4jtoys.slf4j.prof
         super('W');
     }
 
-    public void writeProperties(MessageWriter w, WatcherEvent e) {
+    public void writeProperties(EventWriter w, WatcherEvent e) {
         /* Session ID */
         if (e.uuid != null) {
             w.property(UUID, e.uuid);
@@ -53,7 +53,7 @@ public class LoggerMessageCodec extends br.com.danielferber.slf4jtoys.slf4j.prof
     }
 
     @Override
-    protected boolean readProperty(MessageReader p, String propertyName, WatcherEvent e) throws IOException {
+    protected boolean readProperty(EventReader p, String propertyName, WatcherEvent e) throws IOException {
         if (COUNTER.equals(propertyName)) {
             e.counter = p.readLong();
             return true;

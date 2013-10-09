@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author Daniel
  */
-public class SystemStatusData implements EventData {
+public class SystemStatusData extends EventData {
 
     protected long heap_commited = 0;
     protected long heap_init = 0;

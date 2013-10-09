@@ -15,8 +15,8 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.status;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageReader;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.MessageWriter;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import java.io.IOException;
 
 /**
@@ -38,7 +38,7 @@ public abstract class LoggerMessageCodec<T extends SystemStatusData> extends br.
         super(messagePrefix);
     }
     
-    protected void writeProperties(MessageWriter w, T e) {
+    protected void writeProperties(EventWriter w, T e) {
 
         /* memory usage */
         if (e.runtime_usedMemory > 0 || e.runtime_totalMemory > 0 || e.runtime_maxMemory > 0) {
@@ -80,10 +80,10 @@ public abstract class LoggerMessageCodec<T extends SystemStatusData> extends br.
             w.property(SYSTEM_LOAD, e.systemLoad);
         }
 
-        w.closeData();
+        w.closeMessage();
     }
 
-    protected boolean readProperty(MessageReader p, String propertyName, T e) throws IOException {
+    protected boolean readProperty(EventReader p, String propertyName, T e) throws IOException {
         if (MEMORY.equals(propertyName)) {
             e.runtime_usedMemory = p.readLong();
             e.runtime_totalMemory = p.readLong();

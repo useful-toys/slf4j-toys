@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec;
+package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.Syntax.DATA_CLOSE;
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.logcodec.Syntax.DATA_OPEN;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax.MESSAGE_CLOSE;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax.MESSAGE_OPEN;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Collections;
@@ -26,17 +27,19 @@ import java.util.TreeMap;
 /**
  * Provides methods that implement recurrent deserialization patterns. The
  * methods consist of a simplified parser of patterns produced by
- * {@link MessageWriter}
+ * {@link MessageWriter}.
  * <p>
  * To ease deserialization of one event and to reduce the amount of parameters,
- * MessageReader keeps state of the deserialization of the event. Thus, the
- * instance might be shared and reused to reduce object creation overhead, as
- * long as events are deserialized one after the other and within the same
- * thread.
+ * EventReader keeps state of the deserialization of the event. For sake of
+ * simplicity, the EventReader automatically consumes separators.
+ * <p>
+ * Thus, the instance might be shared and reused to reduce object creation
+ * overhead, as long as events are deserialized one after the other and within
+ * the same thread.
  *
  * @author Daniel Felix Ferber
  */
-public class MessageReader {
+public class EventReader {
 
     /* Internal parser state. */
     private boolean firstProperty = true;
@@ -46,26 +49,9 @@ public class MessageReader {
     private char[] chars;
     private int lenght;
 
-    protected static String extractPlausibleMessage(char prefix, String s) {
-        int i = s.indexOf(DATA_OPEN);
-        if (i <= 0) {
-            return null;
-        }
-        if (s.charAt(i - 1) != prefix) {
-            return null;
-        }
-        i++;
-        int j = s.indexOf(DATA_CLOSE);
-        if (j == -1) {
-            return null;
-        }
-        if (i > j) {
-            return null;
-        }
-        return s.substring(i, j);
-    }
+    
 
-    public MessageReader reset(String encodedData) {
+    public EventReader reset(String encodedData) {
         firstProperty = true;
         firstValue = true;
         chars = encodedData.toCharArray();
@@ -81,10 +67,11 @@ public class MessageReader {
 
     /**
      * Read an identifier that defines the next incomming property.
+     *
      * @return The name of the property.
      * @throws IOException Incomming chars are not a valid property identifier.
      */
-    public String readIdentifier() throws IOException {
+    public String readPropertyName() throws IOException {
         if (!firstProperty) {
             readOperator(Syntax.PROPERTY_SEPARATOR);
         } else {
@@ -131,6 +118,11 @@ public class MessageReader {
             char c = chars[end];
             if (c == Syntax.PROPERTY_DIV || c == Syntax.PROPERTY_SEPARATOR) {
                 break;
+            } else if (c == Syntax.QUOTE) {
+                end++;
+                if (end >= lenght) {
+                    throw new EOFException();
+                }
             }
             end++;
         }
@@ -190,55 +182,55 @@ public class MessageReader {
         }
     }
 
-    public String readQuotedString() throws IOException {
-        if (!firstValue) {
-            readOperator(Syntax.PROPERTY_EQUALS);
-        } else {
-            readOperator(Syntax.PROPERTY_DIV);
-            firstValue = false;
-        }
-
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-
-        char c = chars[start];
-        if (c != Syntax.STRING_DELIM) {
-            throw new IOException("expected: " + Syntax.STRING_DELIM);
-        }
-        start++;
-        int end = start;
-        StringBuilder sb = new StringBuilder();
-        while (end < lenght) {
-            c = chars[end];
-            if (c == Syntax.STRING_DELIM) {
-                sb.append(charsString.substring(start, end));
-                start = end + 1;
-                break;
-            } else if (c == Syntax.STRING_QUOTE) {
-                sb.append(charsString.substring(start, end));
-                start = end + 1;
-                if (start >= lenght) {
-                    throw new EOFException();
-                }
-                c = chars[start];
-                if (c == Syntax.STRING_DELIM) {
-                    sb.append(Syntax.STRING_DELIM);
-                } else {
-                    sb.append(Syntax.STRING_QUOTE);
-                    sb.append(c);
-                }
-                start++;
-                end = start + 1;
-            } else {
-                end++;
-            }
-        }
-        if (end >= lenght) {
-            throw new EOFException();
-        }
-        return sb.toString();
-    }
+//    public String readQuotedString() throws IOException {
+//        if (!firstValue) {
+//            readOperator(Syntax.PROPERTY_EQUALS);
+//        } else {
+//            readOperator(Syntax.PROPERTY_DIV);
+//            firstValue = false;
+//        }
+//
+//        if (start >= lenght) {
+//            throw new EOFException();
+//        }
+//
+//        char c = chars[start];
+//        if (c != Syntax.STRING_DELIM) {
+//            throw new IOException("expected: " + Syntax.STRING_DELIM);
+//        }
+//        start++;
+//        int end = start;
+//        StringBuilder sb = new StringBuilder();
+//        while (end < lenght) {
+//            c = chars[end];
+//            if (c == Syntax.STRING_DELIM) {
+//                sb.append(charsString.substring(start, end));
+//                start = end + 1;
+//                break;
+//            } else if (c == Syntax.STRING_QUOTE) {
+//                sb.append(charsString.substring(start, end));
+//                start = end + 1;
+//                if (start >= lenght) {
+//                    throw new EOFException();
+//                }
+//                c = chars[start];
+//                if (c == Syntax.STRING_DELIM) {
+//                    sb.append(Syntax.STRING_DELIM);
+//                } else {
+//                    sb.append(Syntax.STRING_QUOTE);
+//                    sb.append(c);
+//                }
+//                start++;
+//                end = start + 1;
+//            } else {
+//                end++;
+//            }
+//        }
+//        if (end >= lenght) {
+//            throw new EOFException();
+//        }
+//        return sb.toString();
+//    }
 
     public Map<String, String> readMap() throws IOException {
         if (!firstValue) {
@@ -267,7 +259,7 @@ public class MessageReader {
         do {
             String key = readString();
             readOperator(Syntax.MAP_EQUAL);
-            String value = readQuotedString();
+            String value = readString();
             map.put(key, value);
             c = chars[start];
             start++;
