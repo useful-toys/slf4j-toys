@@ -6,7 +6,6 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  *
@@ -14,29 +13,37 @@ import java.util.Map;
  */
 public abstract class EventData extends Patterns implements Serializable {
 
+    private final char messagePrefix;
+
+    protected EventData(char messagePrefix) {
+        this.messagePrefix = messagePrefix;
+    }
+
     protected abstract void reset();
 
-     /**
-     * Writes the event into the supplied StringBuilder. 
+    public abstract StringBuilder readableString(StringBuilder builder);
+
+    /**
+     * Writes the event into the supplied StringBuilder.
      *
      * @param sb The shared StringBuilder that receives the encoded message.
+     * @return 
      */
-    public final void write(StringBuilder sb) {
+    public final StringBuilder write(StringBuilder sb) {
         EventWriter w = new EventWriter(sb);
-        w.open(getHeaderChar());
+        w.open(messagePrefix);
         writeProperties(w);
         w.close();
+        return sb;
     }
 
     /**
      * Implementation shall resort to the supplied MessageWRiter encode each
      * relevant property.
      *
-     * @param w The shared MessageWriter
+     * @param w The shared EventWriter
      */
     protected abstract void writeProperties(EventWriter w);
-
-    protected abstract char getHeaderChar();
 
     /**
      * Read the event from the supplied string message. If the method fails to
@@ -49,7 +56,7 @@ public abstract class EventData extends Patterns implements Serializable {
      * @throws IOException
      */
     public final boolean read(String message) throws IOException {
-        String plausibleMessage = Patterns.extractPlausibleMessage(getHeaderChar(), message);
+        String plausibleMessage = Patterns.extractPlausibleMessage(messagePrefix, message);
         if (plausibleMessage == null) {
             return false;
         }

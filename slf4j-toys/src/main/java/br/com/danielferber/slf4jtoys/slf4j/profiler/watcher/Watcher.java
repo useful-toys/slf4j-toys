@@ -15,7 +15,6 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import org.slf4j.Logger;
 
@@ -25,25 +24,7 @@ import org.slf4j.Logger;
  */
 public class Watcher extends WatcherEvent implements Runnable {
 
-    private Logger logger;
-    private final EventWriter writer = new EventWriter();
-    private static final LoggerMessageCodec loggerMessageCodec = new LoggerMessageCodec();
-    
-    @Override
-    public void run() {
-        time = System.nanoTime();
-        collectSystemStatus();
-        {
-            final StringBuilder buffer = new StringBuilder();
-            this.readableString(buffer);
-            logger.info(buffer.toString());
-        }
-        if (logger.isTraceEnabled()) {
-            final StringBuilder buffer = new StringBuilder();
-            loggerMessageCodec.writeLogMessage(buffer, writer, this);
-            logger.trace(Slf4JMarkers.WATCHER, buffer.toString());
-        }
-    }
+    private final Logger logger;
 
     public Watcher(final Logger logger) {
         super();
@@ -51,7 +32,16 @@ public class Watcher extends WatcherEvent implements Runnable {
         this.uuid = ProfilingSession.uuid;
     }
 
-    protected void setLogger(Logger logger) {
-        this.logger = logger;
+    @Override
+    public void run() {
+        time = System.nanoTime();
+
+        if (logger.isInfoEnabled()) {
+            collectSystemStatus();
+            logger.info(readableString(new StringBuilder()).toString());
+        }
+        if (logger.isTraceEnabled()) {
+            logger.trace(Slf4JMarkers.WATCHER, write(new StringBuilder()).toString());
+        }
     }
 }

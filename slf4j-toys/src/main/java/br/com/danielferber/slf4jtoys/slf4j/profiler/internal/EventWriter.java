@@ -18,15 +18,15 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-public class EventWriter extends Patterns {
+public final class EventWriter extends Patterns {
     private transient boolean firstProperty;
     private transient final StringBuilder builder;
 
-    public EventWriter(StringBuilder builder) {
+    EventWriter(StringBuilder builder) {
         this.builder = builder;
     }
 
-    public final void open(char id) {
+    void open(char id) {
         firstProperty = true;
         builder.append(id);
         builder.append(MESSAGE_OPEN);
@@ -36,32 +36,32 @@ public class EventWriter extends Patterns {
         builder.append(MESSAGE_CLOSE);
     }
     
-    public final EventWriter property(String name, long value) {
+    public EventWriter property(String name, long value) {
         property(name, Long.toString(value));
         return this;
     }
 
-    public final EventWriter property(String name, long value1, long value2) {
+    public EventWriter property(String name, long value1, long value2) {
         property(name, Long.toString(value1), Long.toString(value2));
         return this;
     }
 
-    public final EventWriter property(String name, long value1, long value2, long value3) {
+    public EventWriter property(String name, long value1, long value2, long value3) {
         property(name, Long.toString(value1), Long.toString(value2), Long.toString(value3));
         return this;
     }
 
-    public final EventWriter property(String name, long value1, long value2, long value3, long value4) {
+    public EventWriter property(String name, long value1, long value2, long value3, long value4) {
         property(name, Long.toString(value1), Long.toString(value2), Long.toString(value3), Long.toString(value4));
         return this;
     }
 
-    public final EventWriter property(String name, double value) {
+    public EventWriter property(String name, double value) {
         property(name, Double.toString(value));
         return this;
     }
 
-    public final EventWriter property(String name, String value) {
+    public EventWriter property(String name, String value) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -73,7 +73,7 @@ public class EventWriter extends Patterns {
         return this;
     }
 
-    public final EventWriter property(String name, String value1, String value2) {
+    public EventWriter property(String name, String value1, String value2) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -87,7 +87,7 @@ public class EventWriter extends Patterns {
         return this;
     }
 
-    public final EventWriter property(String name, String value1, String value2, String value3) {
+    public EventWriter property(String name, String value1, String value2, String value3) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -103,7 +103,7 @@ public class EventWriter extends Patterns {
         return this;
     }
 
-    public final EventWriter property(String name, String value1, String value2, String value3, String value4) {
+    public EventWriter property(String name, String value1, String value2, String value3, String value4) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -121,7 +121,7 @@ public class EventWriter extends Patterns {
         return this;
     }
 
-    public final EventWriter property(String name, Map<String, String> map) {
+    public EventWriter property(String name, Map<String, String> map) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -149,12 +149,10 @@ public class EventWriter extends Patterns {
     }
 
     void writePropertyValue(String value) {
-        Matcher matcher = encodePropertyValuePattern.matcher(value);
-        builder.append(matcher.replaceAll(encodeReplacement));
+        builder.append(encodePropertyValuePattern.matcher(value).replaceAll(encodeReplacement));
     }
 
     void writeMapValue(String value) {
-        Matcher matcher = encodeMapValuePattern.matcher(value);
-        builder.append(matcher.replaceAll(encodeReplacement));
+        builder.append(encodeMapValuePattern.matcher(value).replaceAll(encodeReplacement));
     }
 }

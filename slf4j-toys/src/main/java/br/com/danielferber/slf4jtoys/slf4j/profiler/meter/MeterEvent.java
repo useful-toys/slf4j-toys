@@ -4,11 +4,18 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.ReadableMessage;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemStatusData;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemStatusEventData;
+import java.io.IOException;
 import java.util.Map;
 
-public class MeterEvent extends SystemStatusData {
+public class MeterEvent extends SystemStatusEventData {
+
+    protected MeterEvent() {
+        super('M');
+    }
 
     /**
      * Unique ID of session that reporting jobs.
@@ -22,12 +29,12 @@ public class MeterEvent extends SystemStatusData {
      * An arbitraty ID for the job.
      */
     protected String name = null;
-     /**
+    /**
      * An arbitrary short, human readable message to describe the task being
      * measured.
      */
     protected String description = null;
-   /**
+    /**
      * When the job was created/scheduled.
      */
     protected long createTime = 0;
@@ -182,5 +189,108 @@ public class MeterEvent extends SystemStatusData {
     @Override
     public String toString() {
         return this.uuid + ":" + this.name + ":" + this.counter;
+    }
+
+    protected static final String UUID = "uuid";
+    protected static final String COUNTER = "c";
+    protected static final String NAME = "n";
+    protected static final String DESCRIPTION = "d";
+    protected static final String CREATE_TIME = "t0";
+    protected static final String START_TIME = "t1";
+    protected static final String STOP_TIME = "t2";
+    protected static final String EXCEPTION = "e";
+    protected static final String THREAD = "e";
+    protected static final String CONTEXT = "ctx";
+
+    @Override
+    public void writeProperties(EventWriter w) {
+        /* Session ID */
+        if (this.uuid != null) {
+            w.property(UUID, this.uuid);
+        }
+
+        /* Event counter */
+        if (this.counter > 0) {
+            w.property(COUNTER, this.counter);
+        }
+
+        /* Name and description */
+        if (this.name != null) {
+            w.property(NAME, this.name);
+        }
+        if (this.description != null) {
+            w.property(DESCRIPTION, this.description);
+        }
+
+        /* Create, start, stop time. */
+        if (this.createTime != 0) {
+            w.property(CREATE_TIME, this.createTime);
+        }
+        if (this.startTime != 0) {
+            w.property(START_TIME, this.startTime);
+        }
+        if (this.stopTime != 0) {
+            w.property(STOP_TIME, this.stopTime);
+        }
+
+        /* Excetion */
+        if (this.exceptionClass != null) {
+            w.property(EXCEPTION, this.exceptionClass.getClass().getName(), this.exceptionMessage != null ? this.exceptionMessage : "");
+        }
+
+        /* Thread info */
+        if (this.threadStartId != 0 || this.threadStopId != 0 || this.threadStartName != null || this.threadStopName != null) {
+            w.property(THREAD,
+                    this.threadStartId != 0 ? Long.toString(this.threadStartId) : "",
+                    this.threadStartName != null ? this.threadStartName : "",
+                    this.threadStopId != 0 ? Long.toString(this.threadStopId) : "",
+                    this.threadStopName != null ? this.threadStopName : "");
+        }
+
+        /* Context */
+        if (this.context != null && !this.context.isEmpty()) {
+            w.property(CONTEXT, this.context);
+        }
+
+        super.writeProperties(w);
+    }
+
+    @Override
+    protected boolean readProperty(EventReader r, String propertyName) throws IOException {
+        if (COUNTER.equals(propertyName)) {
+            this.counter = r.readLong();
+            return true;
+        } else if (UUID.equals(propertyName)) {
+            this.uuid = r.readString();
+            return true;
+        } else if (NAME.equals(propertyName)) {
+            this.name = r.readString();
+            return true;
+        } else if (DESCRIPTION.equals(propertyName)) {
+            this.description = r.readString();
+            return true;
+        } else if (CREATE_TIME.equals(propertyName)) {
+            this.createTime = r.readLong();
+            return true;
+        } else if (START_TIME.equals(propertyName)) {
+            this.startTime = r.readLong();
+            return true;
+        } else if (STOP_TIME.equals(propertyName)) {
+            this.stopTime = r.readLong();
+            return true;
+        } else if (EXCEPTION.equals(propertyName)) {
+            this.exceptionClass = r.readString();
+            this.exceptionMessage = r.readString();
+            return true;
+        } else if (THREAD.equals(propertyName)) {
+            this.threadStartId = r.readLongOrZero();
+            this.threadStopId = r.readLongOrZero();
+            this.threadStartName = r.readString();
+            this.threadStopName = r.readString();
+            return true;
+        } else if (CONTEXT.equals(propertyName)) {
+            this.context = r.readMap();
+        }
+        return super.readProperty(r, propertyName);
     }
 }

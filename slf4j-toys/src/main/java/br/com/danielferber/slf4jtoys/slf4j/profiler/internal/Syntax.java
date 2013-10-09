@@ -15,9 +15,6 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
-import java.awt.geom.QuadCurve2D;
-import java.util.regex.Pattern;
-
 /**
  * Defines symbols used to serialize data into log messages.
  *

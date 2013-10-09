@@ -15,13 +15,20 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemStatusData;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemStatusEventData;
+import java.io.IOException;
 
 /**
  *
  * @author Daniel Felix Ferber
  */
-public class WatcherEvent extends SystemStatusData {
+public class WatcherEvent extends SystemStatusEventData {
+
+    protected WatcherEvent() {
+        super('W');
+    }
 
     /**
      * Unique ID of session that is collecting system status data.
@@ -79,5 +86,44 @@ public class WatcherEvent extends SystemStatusData {
     @Override
     public String toString() {
         return this.uuid + ":" + this.counter;
+    }
+    
+    private static final String COUNTER = "c";
+    private static final String UUID = "u";
+    private static final String TIME = "t";
+
+    @Override
+    protected void writeProperties(EventWriter w) {
+        /* Session ID */
+        if (this.uuid != null) {
+            w.property(UUID, this.uuid);
+        }
+
+        /* Event counter */
+        if (this.counter > 0) {
+            w.property(COUNTER, this.counter);
+        }
+
+        /* Time */
+        if (this.time > 0) {
+            w.property(TIME, this.time);
+        }
+
+        super.writeProperties(w);
+    }
+
+    @Override
+    protected boolean readProperty(EventReader p, String propertyName) throws IOException {
+        if (COUNTER.equals(propertyName)) {
+            this.counter = p.readLong();
+            return true;
+        } else if (UUID.equals(propertyName)) {
+            this.uuid = p.readString();
+            return true;
+        } else if (TIME.equals(propertyName)) {
+            this.time = p.readLong();
+            return true;
+        }
+        return super.readProperty(p, propertyName);
     }
 }

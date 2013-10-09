@@ -5,7 +5,6 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,14 +16,13 @@ import org.slf4j.Logger;
 public class Meter extends MeterEvent {
 
     private final Logger logger;
-    private final EventWriter writer = new EventWriter();
-    private static final LoggerMessageCodec loggerMessageCodec = new LoggerMessageCodec();
     /**
      * How many times each event has been executed.
      */
     private static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
 
     public Meter(Logger logger, String name) {
+        super();
         this.name = name;
         this.logger = logger;
         this.uuid = ProfilingSession.uuid;
@@ -102,10 +100,9 @@ public class Meter extends MeterEvent {
                 logger.debug(readableString(new StringBuilder()).toString());
             }
             if (logger.isTraceEnabled()) {
-                StringBuilder buffer = new StringBuilder();
-                loggerMessageCodec.writeLogMessage(buffer, writer, Meter.this);
-                logger.trace(Slf4JMarkers.START, buffer.toString());
+                logger.trace(Slf4JMarkers.START, write(new StringBuilder()).toString());
             }
+
             startTime = System.nanoTime();
         } catch (Throwable t) {
             logger.error("Excetion thrown in Meter", t);
@@ -149,11 +146,8 @@ public class Meter extends MeterEvent {
                 collectSystemStatus();
                 logger.info(readableString(new StringBuilder()).toString());
             }
-
             if (logger.isTraceEnabled()) {
-                StringBuilder buffer = new StringBuilder();
-                loggerMessageCodec.writeLogMessage(buffer, writer, Meter.this);
-                logger.trace(Slf4JMarkers.OK, buffer.toString());
+                logger.trace(Slf4JMarkers.OK, write(new StringBuilder()).toString());
             }
         } catch (Throwable t) {
             logger.error("Excetion thrown in Meter", t);
@@ -200,12 +194,9 @@ public class Meter extends MeterEvent {
             if (logger.isWarnEnabled()) {
                 collectSystemStatus();
                 logger.warn(readableString(new StringBuilder()).toString());
-
             }
             if (logger.isTraceEnabled()) {
-                StringBuilder buffer = new StringBuilder();
-                loggerMessageCodec.writeLogMessage(buffer, writer, Meter.this);
-                logger.trace(Slf4JMarkers.FAIL, buffer.toString());
+                logger.trace(Slf4JMarkers.FAIL, write(new StringBuilder()).toString());
             }
         } catch (Throwable t) {
             logger.error("Excetion thrown in Meter", t);
