@@ -41,7 +41,7 @@ public class ProfilingSession {
 
     public static synchronized void startWatcher() {
         if (scheduledWatcher == null) {
-            Watcher watcher = new Watcher(LoggerFactory.getLogger("watcher"));
+            Watcher watcher = new Watcher(LoggerFactory.getLogger(getProperty("watcher.name", "watcher")));
             scheduledWatcher = executor.scheduleAtFixedRate(watcher, getProperty("watcher.initialDelay", 5), getProperty("watcher.period", 5), TimeUnit.SECONDS);
         }
     }
@@ -52,6 +52,11 @@ public class ProfilingSession {
         }
     }
 
+    public static String getProperty(String name, String defaultValue) {
+        String value = System.getProperty(name);
+        return value == null ? defaultValue : value;
+    }
+    
     public static int getProperty(String name, int defaultValue) {
         String value = System.getProperty(name);
         if (value == null) {
