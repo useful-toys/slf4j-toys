@@ -22,8 +22,8 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
  */
 interface Syntax {
     /* Message delimiter symbols. */
-    static final char MESSAGE_OPEN = '(';
-    static final char MESSAGE_CLOSE = ')';
+    static final char MESSAGE_OPEN = '{';
+    static final char MESSAGE_CLOSE = '}';
     
     /* Map delimiter symbols. */
     static final char MAP_CLOSE = ']';

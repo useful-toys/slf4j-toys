@@ -40,7 +40,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageNotFound2() {
         char prefix = 'M';
-        String input = "bla M(bla bla";
+        String input = "bla M{bla bla";
         String expected = null;
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -49,7 +49,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageNotFound3() {
         char prefix = 'M';
-        String input = "bla bla) bla";
+        String input = "bla bla} bla";
         String expected = null;
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -58,7 +58,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageNotFound4() {
         char prefix = 'M';
-        String input = "bla ) bla M( bla";
+        String input = "bla } bla M{ bla";
         String expected = null;
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -67,7 +67,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageFound1() {
         char prefix = 'M';
-        String input = "bla M(BLA) bla";
+        String input = "bla M{BLA} bla";
         String expected = "BLA";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -76,7 +76,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageFound2() {
         char prefix = 'M';
-        String input = "bla M() bla";
+        String input = "bla M{} bla";
         String expected = "";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -85,7 +85,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageFound3() {
         char prefix = 'M';
-        String input = "M(BLA BLA BLA)";
+        String input = "M{BLA BLA BLA}";
         String expected = "BLA BLA BLA";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -94,7 +94,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageFound4() {
         char prefix = 'M';
-        String input = "bla M(BLA BLA BLA)";
+        String input = "bla M{BLA BLA BLA}";
         String expected = "BLA BLA BLA";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -103,7 +103,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageFound5() {
         char prefix = 'M';
-        String input = "M(BLA BLA BLA) BLA";
+        String input = "M{BLA BLA BLA} BLA";
         String expected = "BLA BLA BLA";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -112,7 +112,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuoted1() {
         char prefix = 'M';
-        String input = "bla M(BLA\\) bla";
+        String input = "bla M{BLA\\} bla";
         String expected = null;
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -121,7 +121,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuoted2() {
         char prefix = 'M';
-        String input = "bla M(\\) bla";
+        String input = "bla M{\\} bla";
         String expected = null;
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -130,7 +130,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuoted3() {
         char prefix = 'M';
-        String input = "M(BLA BLA BLA\\)";
+        String input = "M{BLA BLA BLA\\}";
         String expected = null;
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -139,7 +139,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuoted4() {
         char prefix = 'M';
-        String input = "bla M(BLA BLA BLA\\)";
+        String input = "bla M{BLA BLA BLA\\}";
         String expected = null;
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -148,7 +148,7 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuoate5() {
         char prefix = 'M';
-        String input = "M(BLA BLA BLA\\) BLA";
+        String input = "M{BLA BLA BLA\\} BLA";
         String expected = null;
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
@@ -157,8 +157,8 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuotedFound1() {
         char prefix = 'M';
-        String input = "bla M(BLA\\)) bla";
-        String expected = "BLA\\)";
+        String input = "bla M{BLA\\}} bla";
+        String expected = "BLA\\}";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
@@ -166,8 +166,8 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuotedFound2() {
         char prefix = 'M';
-        String input = "bla M(\\)) bla";
-        String expected = "\\)";
+        String input = "bla M{\\}} bla";
+        String expected = "\\}";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
@@ -175,8 +175,8 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuotedFound3() {
         char prefix = 'M';
-        String input = "M(BLA (BLA\\) BLA)";
-        String expected = "BLA (BLA\\) BLA";
+        String input = "M{BLA {BLA\\} BLA}";
+        String expected = "BLA {BLA\\} BLA";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
@@ -184,8 +184,8 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuotedFound4() {
         char prefix = 'M';
-        String input = "BLA M(BLA (BLA\\) BLA)";
-        String expected = "BLA (BLA\\) BLA";
+        String input = "BLA M{BLA {BLA\\} BLA}";
+        String expected = "BLA {BLA\\} BLA";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
@@ -193,8 +193,8 @@ public class PatternsTest {
     @Test
     public void testExtractPlausibleMessageQuotedFound5() {
         char prefix = 'M';
-        String input = "M(BLA (BLA\\) BLA) BLA";
-        String expected = "BLA (BLA\\) BLA";
+        String input = "M{BLA {BLA\\} BLA} BLA";
+        String expected = "BLA {BLA\\} BLA";
         String output = Patterns.extractPlausibleMessage(prefix, input);
         assertEquals(expected, output);
     }
