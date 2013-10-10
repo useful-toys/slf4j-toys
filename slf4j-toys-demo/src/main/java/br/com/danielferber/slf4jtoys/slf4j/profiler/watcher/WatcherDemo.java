@@ -2,7 +2,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Session;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 
 /**
  *
@@ -11,13 +11,12 @@ import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Session;
 public class WatcherDemo {
 
     public static void main(String[] args) {
-        Watcher watcher = WatcherFactory.getWatcher("watcher").start();
+        ProfilingSession.startWatcher();
         try {
-            Thread.sleep(5000);
+            Thread.sleep(15000);
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
-        watcher.stop();
-        Session.timer.cancel();
+        ProfilingSession.stopWatcher();
     }
 }
