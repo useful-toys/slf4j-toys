@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Daniel Felix Ferber
+ * Copyright 2013 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -24,7 +23,7 @@ import static org.junit.Assert.*;
  *
  * @author Daniel Felix Ferber
  */
-public class MessageReaderTest {
+public class EventReaderTest {
 
    
 

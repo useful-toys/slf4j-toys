@@ -16,7 +16,6 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
 import java.util.Map;
-import java.util.regex.Matcher;
 
 public final class EventWriter extends Patterns {
     private transient boolean firstProperty;

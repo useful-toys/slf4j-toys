@@ -15,9 +15,6 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax;
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax.MESSAGE_CLOSE;
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax.MESSAGE_OPEN;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Collections;
