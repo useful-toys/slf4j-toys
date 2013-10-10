@@ -23,11 +23,11 @@ public final class EventWriter extends Patterns {
     private transient final StringBuilder builder;
 
     EventWriter(StringBuilder builder) {
+        firstProperty = true;
         this.builder = builder;
     }
 
     void open(char id) {
-        firstProperty = true;
         builder.append(id);
         builder.append(MESSAGE_OPEN);
     }
