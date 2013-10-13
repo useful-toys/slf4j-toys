@@ -46,7 +46,18 @@ public class Meter extends MeterEvent {
         return logger;
     }
 
-    public Meter setMessage(String message, Object... args) {
+    // ========================================================================
+    
+    public Meter sub(String name) {
+        final Meter m = MeterFactory.getMeter(this.logger.getName() + '.' + name);
+        if (this.context != null) {
+            m.context = new HashMap<String, String>(this.context);
+        }
+        return m;
+    }
+    
+    // ========================================================================
+    public Meter m(String message, Object... args) {
         try {
             this.description = String.format(message, args);
         } catch (IllegalFormatException e) {
@@ -55,7 +66,7 @@ public class Meter extends MeterEvent {
         return this;
     }
 
-    public Meter put(String name) {
+    public Meter ctx(String name) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -63,7 +74,7 @@ public class Meter extends MeterEvent {
         return this;
     }
 
-    public Meter put(String name, String value) {
+    public Meter ctx(String name, String value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -71,7 +82,7 @@ public class Meter extends MeterEvent {
         return this;
     }
 
-    public Meter remove(String name) {
+    public Meter unctx(String name) {
         if (context == null) {
             return this;
         }
@@ -99,12 +110,13 @@ public class Meter extends MeterEvent {
                 logger.error(Slf4JMarkers.INCONSISTENT_START, "Inconsistent Meter start()", new Exception("Meter.start(...): startTime != 0"));
             }
             if (name != null) {
-                put(name, value);
+                ctx(name, value);
             }
 
             Thread currentThread = Thread.currentThread();
             this.threadStartId = currentThread.getId();
             this.threadStartName = currentThread.getName();
+            this.startTime = System.nanoTime();
 
             if (logger.isDebugEnabled()) {
                 collectSystemStatus();
@@ -114,7 +126,6 @@ public class Meter extends MeterEvent {
                 logger.trace(Slf4JMarkers.START, write(new StringBuilder()).toString());
             }
 
-            startTime = System.nanoTime();
         } catch (Throwable t) {
             logger.error("Excetion thrown in Meter", t);
         }
@@ -145,7 +156,7 @@ public class Meter extends MeterEvent {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, "Inconsistent Meter ok()", new Exception("Meter.stop(...): startTime == 0"));
             }
             if (name != null) {
-                put(name, value);
+                ctx(name, value);
             }
             success = true;
 
@@ -215,6 +226,7 @@ public class Meter extends MeterEvent {
         return this;
     }
 
+    // ========================================================================
     @Override
     protected void finalize() throws Throwable {
         if (stopTime == 0) {

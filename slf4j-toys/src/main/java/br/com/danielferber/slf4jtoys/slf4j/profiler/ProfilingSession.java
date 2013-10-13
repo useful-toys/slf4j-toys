@@ -35,8 +35,8 @@ public class ProfilingSession {
         // prevent instances
     }
 
-    public static final String uuid = UUID.randomUUID().toString().replace('-', '.');
-    public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    public static final String uuid = UUID.randomUUID().toString().replace("-", "");
+    public static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     public static ScheduledFuture<?> scheduledWatcher;
 
     public static synchronized void startWatcher() {
@@ -49,6 +49,19 @@ public class ProfilingSession {
     public static synchronized void stopWatcher() {
         if (scheduledWatcher != null) {
             scheduledWatcher.cancel(true);
+        }
+    }
+    
+    public static  synchronized void startExecutor() {
+        if (executor == null) {
+            executor = Executors.newSingleThreadScheduledExecutor();
+        }
+    }
+    
+    public static synchronized void stopExecutor() {
+        if (executor != null) {
+            executor.shutdownNow();
+            executor = null;
         }
     }
 

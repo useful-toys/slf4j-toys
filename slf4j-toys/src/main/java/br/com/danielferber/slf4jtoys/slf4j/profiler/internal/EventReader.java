@@ -46,8 +46,6 @@ public class EventReader {
     private char[] chars;
     private int lenght;
 
-    
-
     public EventReader reset(String encodedData) {
         firstProperty = true;
         firstValue = true;
@@ -178,56 +176,6 @@ public class EventReader {
             throw new IOException("expected: " + operator);
         }
     }
-
-//    public String readQuotedString() throws IOException {
-//        if (!firstValue) {
-//            readOperator(Syntax.PROPERTY_EQUALS);
-//        } else {
-//            readOperator(Syntax.PROPERTY_DIV);
-//            firstValue = false;
-//        }
-//
-//        if (start >= lenght) {
-//            throw new EOFException();
-//        }
-//
-//        char c = chars[start];
-//        if (c != Syntax.STRING_DELIM) {
-//            throw new IOException("expected: " + Syntax.STRING_DELIM);
-//        }
-//        start++;
-//        int end = start;
-//        StringBuilder sb = new StringBuilder();
-//        while (end < lenght) {
-//            c = chars[end];
-//            if (c == Syntax.STRING_DELIM) {
-//                sb.append(charsString.substring(start, end));
-//                start = end + 1;
-//                break;
-//            } else if (c == Syntax.STRING_QUOTE) {
-//                sb.append(charsString.substring(start, end));
-//                start = end + 1;
-//                if (start >= lenght) {
-//                    throw new EOFException();
-//                }
-//                c = chars[start];
-//                if (c == Syntax.STRING_DELIM) {
-//                    sb.append(Syntax.STRING_DELIM);
-//                } else {
-//                    sb.append(Syntax.STRING_QUOTE);
-//                    sb.append(c);
-//                }
-//                start++;
-//                end = start + 1;
-//            } else {
-//                end++;
-//            }
-//        }
-//        if (end >= lenght) {
-//            throw new EOFException();
-//        }
-//        return sb.toString();
-//    }
 
     public Map<String, String> readMap() throws IOException {
         if (!firstValue) {
