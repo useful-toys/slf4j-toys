@@ -16,6 +16,8 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 
-public class Meter extends MeterEvent {
+public class Meter extends MeterEvent implements Closeable {
 
     private final Logger logger;
     /**
@@ -47,7 +49,6 @@ public class Meter extends MeterEvent {
     }
 
     // ========================================================================
-    
     public Meter sub(String name) {
         final Meter m = MeterFactory.getMeter(this.logger.getName() + '.' + name);
         if (this.context != null) {
@@ -55,8 +56,13 @@ public class Meter extends MeterEvent {
         }
         return m;
     }
-    
+
     // ========================================================================
+    public Meter m(String message) {
+        this.description = message;
+        return this;
+    }
+
     public Meter m(String message, Object... args) {
         try {
             this.description = String.format(message, args);
@@ -233,5 +239,11 @@ public class Meter extends MeterEvent {
             failImpl(null, null, null);
         }
         super.finalize();
+    }
+
+    public void close() throws IOException {
+        if (stopTime == 0) {
+            failImpl(null, null, null);
+        }
     }
 }
