@@ -122,10 +122,10 @@ public class MeterEvent extends SystemStatusEventData {
             buffer.append("Scheduled");
         }
         buffer.append(": ");
-        buffer.append(this.name);
         if (this.description != null) {
-            buffer.append("; ");
             buffer.append(this.description);
+        } else {
+            buffer.append(this.name);
         }
         if (this.startTime > 0) {
             buffer.append("; ");
