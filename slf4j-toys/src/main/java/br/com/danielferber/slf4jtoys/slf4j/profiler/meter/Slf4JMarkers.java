@@ -25,6 +25,7 @@ import org.slf4j.MarkerFactory;
 public class Slf4JMarkers {
     public static final Marker START = MarkerFactory.getMarker("METER_START");
     public static final Marker OK = MarkerFactory.getMarker("METER_OK");
+    public static final Marker SLOW_OK = MarkerFactory.getMarker("METER_SLOW_OK");
     public static final Marker FAIL = MarkerFactory.getMarker("METER_FAIL");
     public static final Marker INCONSISTENT_FINALIZED = MarkerFactory.getMarker("METER_INCONSISTENT_FINALIZED");
     public static final Marker INCONSISTENT_START = MarkerFactory.getMarker("METER_INCONSISTENT_START");

@@ -33,6 +33,7 @@ public class Meter extends MeterEvent implements Closeable {
      * How many times each event has been executed.
      */
     private static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
+    private long timeLimit = 0;
 
     public Meter(Logger logger, String name) {
         super();
@@ -55,6 +56,11 @@ public class Meter extends MeterEvent implements Closeable {
             m.context = new HashMap<String, String>(this.context);
         }
         return m;
+    }
+
+    public Meter limit(long timeLimit) {
+        this.timeLimit = timeLimit;
+        return this;
     }
 
     // ========================================================================
@@ -174,7 +180,9 @@ public class Meter extends MeterEvent implements Closeable {
                 collectSystemStatus();
                 logger.info(readableString(new StringBuilder()).toString());
             }
-            if (logger.isTraceEnabled()) {
+            if (startTime != 0 && timeLimit != 0 && stopTime - startTime > timeLimit) {
+                logger.trace(Slf4JMarkers.SLOW_OK, write(new StringBuilder()).toString());
+            } else if (logger.isTraceEnabled()) {
                 logger.trace(Slf4JMarkers.OK, write(new StringBuilder()).toString());
             }
         } catch (Throwable t) {
