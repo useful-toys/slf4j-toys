@@ -27,7 +27,11 @@ public final class ReadableMessage {
     public static final double[] TIME_FACTORS = new double[]{1000.0, 1000.0, 1000.0, 60.0, 60.0};
     public static final String[] TIME_UNITS = new String[]{"ns", "us", "ms", "s", "m", "h"};
     public static final String[] MEMORY_UNITS = new String[]{"B", "kB", "MB", "GB"};
-    public static final double[] MEMORY_FACTORS = new double[]{1000.0, 1000.0, 1000.0};
+    public static final double[] MEMORY_FACTORS = new double[]{1000.0, 1000.0, 1000.0};    
+    public static final String[] ITERATIONS_PER_TIME_UNITS = new String[]{"/s", "k/s", "M/s"};
+    public static final double[] ITERATIONS_PER_TIME_FACTORS = new double[]{1000.0, 1000.0, 1000.0};
+    public static final String[] ITERATIONS_UNITS = new String[]{"", "k", "M"};
+    public static final double[] ITERATIONS_FACTORS = new double[]{1000.0, 1000.0, 1000.0};
 
     public static String bestUnit(double value, String[] timeUnits, double[] timeFactors) {
         int last = timeUnits.length - 1;

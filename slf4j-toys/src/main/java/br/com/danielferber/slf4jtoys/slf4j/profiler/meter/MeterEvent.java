@@ -27,7 +27,6 @@ public class MeterEvent extends SystemStatusEventData {
     protected MeterEvent() {
         super('M');
     }
-
     /**
      * Unique ID of session that reporting jobs.
      */
@@ -57,6 +56,10 @@ public class MeterEvent extends SystemStatusEventData {
      * When the job finished execution.
      */
     protected long stopTime = 0;
+    /**
+     * How many iteration were run by the operation.
+     */
+    protected long iterations = 0;
     /**
      * An arbitrary exception to signal that the task failed.
      */
@@ -130,6 +133,16 @@ public class MeterEvent extends SystemStatusEventData {
         if (this.startTime > 0) {
             buffer.append("; ");
             buffer.append(ReadableMessage.bestUnit(getExecutionTime(), ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
+            if (this.iterations > 0) {
+                buffer.append("; ");
+                buffer.append(ReadableMessage.bestUnit(this.iterations,  ReadableMessage.ITERATIONS_UNITS, ReadableMessage.ITERATIONS_FACTORS));
+                buffer.append(' ');
+                final float iterationsPerSecond = getIterationsPerSecond();
+                buffer.append(ReadableMessage.bestUnit(iterationsPerSecond, ReadableMessage.ITERATIONS_PER_TIME_UNITS, ReadableMessage.ITERATIONS_PER_TIME_FACTORS));
+                buffer.append(' ');
+                final float nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
+                buffer.append(ReadableMessage.bestUnit(nanoSecondsPerIteration, ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
+            }
         } else {
             buffer.append("; ");
             buffer.append(ReadableMessage.bestUnit(getWaitingTime(), ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
@@ -181,9 +194,6 @@ public class MeterEvent extends SystemStatusEventData {
     }
 
     public long getExecutionTime() {
-        if (startTime == 0) {
-            return 0;
-        }
         if (stopTime == 0) {
             return System.nanoTime() - startTime;
         }
@@ -197,11 +207,21 @@ public class MeterEvent extends SystemStatusEventData {
         return startTime - createTime;
     }
 
+    public float getIterationsPerSecond() {
+        if (iterations == 0 || startTime == 0) {
+            return 0;
+        }
+        float executionTimeNS = getExecutionTime();
+        if (executionTimeNS == 0) {
+            return 0;
+        }
+        return ((float) this.iterations) / executionTimeNS * 1000000000;
+    }
+
     @Override
     public String toString() {
         return this.uuid + ":" + this.name + ":" + this.counter;
     }
-
     protected static final String UUID = "uuid";
     protected static final String COUNTER = "c";
     protected static final String NAME = "n";
@@ -209,6 +229,7 @@ public class MeterEvent extends SystemStatusEventData {
     protected static final String CREATE_TIME = "t0";
     protected static final String START_TIME = "t1";
     protected static final String STOP_TIME = "t2";
+    protected static final String ITERATIONS = "i";
     protected static final String EXCEPTION = "e";
     protected static final String THREAD = "e";
     protected static final String CONTEXT = "ctx";
@@ -242,6 +263,9 @@ public class MeterEvent extends SystemStatusEventData {
         }
         if (this.stopTime != 0) {
             w.property(STOP_TIME, this.stopTime);
+        }
+        if (this.iterations != 0) {
+            w.property(ITERATIONS, this.iterations);
         }
 
         /* Excetion */
@@ -288,6 +312,9 @@ public class MeterEvent extends SystemStatusEventData {
             return true;
         } else if (STOP_TIME.equals(propertyName)) {
             this.stopTime = r.readLong();
+            return true;
+        } else if (ITERATIONS.equals(propertyName)) {
+            this.iterations = r.readLong();
             return true;
         } else if (EXCEPTION.equals(propertyName)) {
             this.exceptionClass = r.readString();

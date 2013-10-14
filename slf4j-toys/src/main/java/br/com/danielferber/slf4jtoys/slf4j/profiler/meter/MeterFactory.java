@@ -17,7 +17,6 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -102,6 +102,21 @@ public class Meter extends MeterEvent implements Closeable {
         return this;
     }
 
+    public Meter inc() {
+        this.iterations++;
+        return this;
+    }
+
+    public Meter inc(long i) {
+        this.iterations += i;
+        return this;
+    }
+
+    public Meter interations(long i) {
+        this.iterations = i;
+        return this;
+    }
+
     // ========================================================================
     public Meter start() {
         return startImpl(null, null);
