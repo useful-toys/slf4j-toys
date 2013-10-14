@@ -21,12 +21,13 @@ import java.io.Serializable;
 /**
  *
  * @author Daniel
- */
-public abstract class EventData extends Patterns implements Serializable {
+ */ 
+public abstract class EventData extends PatternDefinition implements Serializable {
 
     private final char messagePrefix;
 
     protected EventData(char messagePrefix) {
+        super();
         this.messagePrefix = messagePrefix;
     }
 
@@ -67,7 +68,7 @@ public abstract class EventData extends Patterns implements Serializable {
      * @throws IOException
      */
     public final boolean read(String message) throws IOException {
-        String plausibleMessage = Patterns.extractPlausibleMessage(messagePrefix, message);
+        String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);
         if (plausibleMessage == null) {
             return false;
         }

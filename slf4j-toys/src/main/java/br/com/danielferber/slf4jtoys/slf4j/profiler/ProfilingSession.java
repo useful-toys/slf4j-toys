@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Daniel Felix Ferber
  */
-public class ProfilingSession {
+public final class ProfilingSession {
 
     private ProfilingSession() {
         // prevent instances

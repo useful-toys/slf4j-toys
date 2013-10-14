@@ -153,7 +153,7 @@ public class Meter extends MeterEvent implements Closeable {
                 logger.trace(Slf4JMarkers.START, write(new StringBuilder()).toString());
             }
 
-        } catch (Throwable t) {
+        } catch (Exception t) {
             logger.error("Excetion thrown in Meter", t);
         }
         return this;
@@ -200,7 +200,7 @@ public class Meter extends MeterEvent implements Closeable {
             } else if (logger.isTraceEnabled()) {
                 logger.trace(Slf4JMarkers.OK, write(new StringBuilder()).toString());
             }
-        } catch (Throwable t) {
+        } catch (Exception t) {
             logger.error("Excetion thrown in Meter", t);
         }
         return this;
@@ -249,7 +249,7 @@ public class Meter extends MeterEvent implements Closeable {
             if (logger.isTraceEnabled()) {
                 logger.trace(Slf4JMarkers.FAIL, write(new StringBuilder()).toString());
             }
-        } catch (Throwable t) {
+        } catch (Exception t) {
             logger.error("Excetion thrown in Meter", t);
         }
         return this;

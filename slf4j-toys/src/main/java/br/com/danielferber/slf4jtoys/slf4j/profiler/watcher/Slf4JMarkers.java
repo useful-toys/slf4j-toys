@@ -22,7 +22,10 @@ import org.slf4j.MarkerFactory;
  *
  * @author Daniel Felix Ferber
  */
-public class Slf4JMarkers {
-
+public final class Slf4JMarkers {
+    private Slf4JMarkers() {
+        //nothing
+    }
+    
     public static final Marker WATCHER = MarkerFactory.getMarker("WATCHER");
 }

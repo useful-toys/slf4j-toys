@@ -17,11 +17,12 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
 import java.util.Map;
 
-public final class EventWriter extends Patterns {
+public final class EventWriter extends PatternDefinition {
     private transient boolean firstProperty;
     private transient final StringBuilder builder;
 
     EventWriter(StringBuilder builder) {
+        super();
         firstProperty = true;
         this.builder = builder;
     }

@@ -18,7 +18,6 @@ package br.com.danielferber.slf4jtoys.slf4j.logger;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import org.slf4j.Logger;
 
 /**
  * Common implementation of an outputstream that redirects the written data to a

@@ -15,7 +15,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.Syntax.PROPERTY_DIV;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.PROPERTY_DIV;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  *
  * @author Daniel
  */
-public class Patterns implements Syntax {
+class PatternDefinition extends SyntaxDefinition {
 
     static final Pattern encodePropertyValuePattern = quotedCharsPattern(PROPERTY_DIV, PROPERTY_SEPARATOR, MESSAGE_CLOSE, QUOTE);
     static final Pattern encodeMapValuePattern = quotedCharsPattern(MAP_CLOSE, MAP_SEPARATOR, MESSAGE_CLOSE, QUOTE);

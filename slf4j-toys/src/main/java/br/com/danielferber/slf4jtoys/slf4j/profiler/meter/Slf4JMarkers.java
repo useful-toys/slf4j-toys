@@ -22,7 +22,11 @@ import org.slf4j.MarkerFactory;
  *
  * @author Daniel Felix Ferber
  */
-public class Slf4JMarkers {
+public final class Slf4JMarkers {
+    private Slf4JMarkers() {
+        // nothing
+    }
+    
     public static final Marker START = MarkerFactory.getMarker("METER_START");
     public static final Marker OK = MarkerFactory.getMarker("METER_OK");
     public static final Marker SLOW_OK = MarkerFactory.getMarker("METER_SLOW_OK");

@@ -68,7 +68,7 @@ public class EventReader {
      */
     public String readPropertyName() throws IOException {
         if (!firstProperty) {
-            readOperator(Syntax.PROPERTY_SEPARATOR);
+            readOperator(SyntaxDefinition.PROPERTY_SEPARATOR);
         } else {
             firstProperty = false;
         }
@@ -98,9 +98,9 @@ public class EventReader {
 
     public String readString() throws IOException {
         if (firstValue) {
-            readOperator(Syntax.PROPERTY_EQUALS);
+            readOperator(SyntaxDefinition.PROPERTY_EQUALS);
         } else {
-            readOperator(Syntax.PROPERTY_DIV);
+            readOperator(SyntaxDefinition.PROPERTY_DIV);
             firstValue = false;
         }
 
@@ -111,9 +111,9 @@ public class EventReader {
         int end = start;
         while (end < lenght) {
             char c = chars[end];
-            if (c == Syntax.PROPERTY_DIV || c == Syntax.PROPERTY_SEPARATOR) {
+            if (c == SyntaxDefinition.PROPERTY_DIV || c == SyntaxDefinition.PROPERTY_SEPARATOR) {
                 break;
-            } else if (c == Syntax.QUOTE) {
+            } else if (c == SyntaxDefinition.QUOTE) {
                 end++;
                 if (end >= lenght) {
                     throw new EOFException();
@@ -179,9 +179,9 @@ public class EventReader {
 
     public Map<String, String> readMap() throws IOException {
         if (!firstValue) {
-            readOperator(Syntax.PROPERTY_EQUALS);
+            readOperator(SyntaxDefinition.PROPERTY_EQUALS);
         } else {
-            readOperator(Syntax.PROPERTY_DIV);
+            readOperator(SyntaxDefinition.PROPERTY_DIV);
             firstValue = false;
         }
 
@@ -189,21 +189,21 @@ public class EventReader {
             throw new EOFException();
         }
         char c = chars[start];
-        if (c != Syntax.MAP_OPEN) {
-            throw new IOException("expected: " + Syntax.MAP_OPEN);
+        if (c != SyntaxDefinition.MAP_OPEN) {
+            throw new IOException("expected: " + SyntaxDefinition.MAP_OPEN);
         }
         start++;
         if (start >= lenght) {
             throw new EOFException();
         }
         c = chars[start];
-        if (c == Syntax.MAP_CLOSE) {
+        if (c == SyntaxDefinition.MAP_CLOSE) {
             return Collections.EMPTY_MAP;
         }
         Map<String, String> map = new TreeMap<String, String>();
         do {
             String key = readString();
-            readOperator(Syntax.MAP_EQUAL);
+            readOperator(SyntaxDefinition.MAP_EQUAL);
             String value = readString();
             map.put(key, value);
             c = chars[start];
@@ -211,9 +211,9 @@ public class EventReader {
             if (start >= lenght) {
                 throw new EOFException();
             }
-        } while (c == Syntax.MAP_SEPARATOR);
-        if (c != Syntax.MAP_CLOSE) {
-            throw new IOException("expected: " + Syntax.MAP_CLOSE);
+        } while (c == SyntaxDefinition.MAP_SEPARATOR);
+        if (c != SyntaxDefinition.MAP_CLOSE) {
+            throw new IOException("expected: " + SyntaxDefinition.MAP_CLOSE);
         }
         start++;
         return map;

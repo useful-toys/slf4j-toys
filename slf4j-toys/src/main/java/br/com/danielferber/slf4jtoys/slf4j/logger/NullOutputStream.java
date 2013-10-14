@@ -25,6 +25,7 @@ import java.io.OutputStream;
  */
 class NullOutputStream extends OutputStream {
     NullOutputStream() {
+        super();
     }
 
     @Override
