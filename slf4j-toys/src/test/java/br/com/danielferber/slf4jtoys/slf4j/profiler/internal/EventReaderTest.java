@@ -46,13 +46,13 @@ public class EventReaderTest {
     @Test(expected = IOException.class)
     public void testReadIdentifier3() throws IOException {
         String input = " def";
-        String output = new EventReader().reset(input).readPropertyName();
+        new EventReader().reset(input).readPropertyName();
     }
 
     @Test(expected = IOException.class)
     public void testReadIdentifier4() throws IOException {
         String input = "1abc def";
-        String output = new EventReader().reset(input).readPropertyName();
+        new EventReader().reset(input).readPropertyName();
     }
 
     @Test
@@ -66,7 +66,7 @@ public class EventReaderTest {
     @Test(expected = IOException.class)
     public void testReadString2() throws IOException {
         String input = " def";
-        String output = new EventReader().reset(input).readString();
+        new EventReader().reset(input).readString();
     }
     
     public void testReadString3() throws IOException {

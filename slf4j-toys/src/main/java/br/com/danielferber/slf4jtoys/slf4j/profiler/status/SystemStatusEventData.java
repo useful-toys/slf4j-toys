@@ -195,7 +195,7 @@ public abstract class SystemStatusEventData extends EventData {
         if (MEMORY.equals(propertyName)) {
             this.runtime_usedMemory = r.readLong();
             this.runtime_totalMemory = r.readLong();
-            this.runtime_totalMemory = r.readLong();
+            this.runtime_maxMemory = r.readLong();
             return true;
         } else if (HEAP.equals(propertyName)) {
             this.heap_commited = r.readLong();

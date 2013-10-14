@@ -36,8 +36,8 @@ public class ProfilingSession {
     }
 
     public static final String uuid = UUID.randomUUID().toString().replace("-", "");
-    public static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    public static ScheduledFuture<?> scheduledWatcher;
+    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    static ScheduledFuture<?> scheduledWatcher;
 
     public static synchronized void startWatcher() {
         if (scheduledWatcher == null) {

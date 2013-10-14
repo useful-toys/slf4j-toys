@@ -44,4 +44,16 @@ public class Watcher extends WatcherEvent implements Runnable {
             logger.trace(Slf4JMarkers.WATCHER, write(new StringBuilder()).toString());
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+    
+    
 }
