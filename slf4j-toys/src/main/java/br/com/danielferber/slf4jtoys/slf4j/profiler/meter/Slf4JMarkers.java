@@ -27,10 +27,14 @@ public final class Slf4JMarkers {
         // nothing
     }
     
-    public static final Marker START = MarkerFactory.getMarker("METER_START");
-    public static final Marker OK = MarkerFactory.getMarker("METER_OK");
-    public static final Marker SLOW_OK = MarkerFactory.getMarker("METER_SLOW_OK");
-    public static final Marker FAIL = MarkerFactory.getMarker("METER_FAIL");
+    public static final Marker DATA_START = MarkerFactory.getMarker("METER_DATA_START");
+    public static final Marker DATA_OK = MarkerFactory.getMarker("METER_DATA_OK");
+    public static final Marker DATA_SLOW_OK = MarkerFactory.getMarker("METER_DATA_SLOW_OK");
+    public static final Marker DATA_FAIL = MarkerFactory.getMarker("METER_DATA_FAIL");
+    public static final Marker MSG_START = MarkerFactory.getMarker("METER_MSG_START");
+    public static final Marker MSG_OK = MarkerFactory.getMarker("METER_MSG_OK");
+    public static final Marker MSG_SLOW_OK = MarkerFactory.getMarker("METER_MSG_SLOW_OK");
+    public static final Marker MSG_FAIL = MarkerFactory.getMarker("METER_MSG_FAIL");
     public static final Marker INCONSISTENT_FINALIZED = MarkerFactory.getMarker("METER_INCONSISTENT_FINALIZED");
     public static final Marker INCONSISTENT_START = MarkerFactory.getMarker("METER_INCONSISTENT_START");
     public static final Marker INCONSISTENT_OK = MarkerFactory.getMarker("METER_INCONSISTENT_OK");

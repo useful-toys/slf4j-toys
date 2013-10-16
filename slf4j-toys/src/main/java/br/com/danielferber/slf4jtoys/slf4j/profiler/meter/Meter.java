@@ -147,10 +147,10 @@ public class Meter extends MeterEvent implements Closeable {
 
             if (logger.isDebugEnabled()) {
                 collectSystemStatus();
-                logger.debug(readableString(new StringBuilder()).toString());
+                logger.debug(Slf4JMarkers.MSG_START, readableString(new StringBuilder()).toString());
             }
             if (logger.isTraceEnabled()) {
-                logger.trace(Slf4JMarkers.START, write(new StringBuilder()).toString());
+                logger.trace(Slf4JMarkers.DATA_START, write(new StringBuilder()).toString());
             }
 
         } catch (Exception t) {
@@ -193,12 +193,12 @@ public class Meter extends MeterEvent implements Closeable {
 
             if (logger.isInfoEnabled()) {
                 collectSystemStatus();
-                logger.info(readableString(new StringBuilder()).toString());
+                logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
             }
             if (startTime != 0 && timeLimit != 0 && stopTime - startTime > timeLimit) {
-                logger.trace(Slf4JMarkers.SLOW_OK, write(new StringBuilder()).toString());
+                logger.trace(Slf4JMarkers.DATA_SLOW_OK, write(new StringBuilder()).toString());
             } else if (logger.isTraceEnabled()) {
-                logger.trace(Slf4JMarkers.OK, write(new StringBuilder()).toString());
+                logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder()).toString());
             }
         } catch (Exception t) {
             logger.error("Excetion thrown in Meter", t);
@@ -244,10 +244,10 @@ public class Meter extends MeterEvent implements Closeable {
 
             if (logger.isWarnEnabled()) {
                 collectSystemStatus();
-                logger.warn(readableString(new StringBuilder()).toString());
+                logger.warn(Slf4JMarkers.MSG_FAIL, readableString(new StringBuilder()).toString());
             }
             if (logger.isTraceEnabled()) {
-                logger.trace(Slf4JMarkers.FAIL, write(new StringBuilder()).toString());
+                logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder()).toString());
             }
         } catch (Exception t) {
             logger.error("Excetion thrown in Meter", t);
