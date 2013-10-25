@@ -93,6 +93,11 @@ public class Meter extends MeterEvent implements Closeable {
         context.put(name, value);
         return this;
     }
+    
+    public Meter ctx(String name, int value) {
+        ctx(name, Integer.toString(value));
+        return this;
+    }
 
     public Meter unctx(String name) {
         if (context == null) {
@@ -170,6 +175,10 @@ public class Meter extends MeterEvent implements Closeable {
 
     public Meter ok(String name, String value) {
         return okImpl(name, value);
+    }
+    
+    public Meter ok(String name, int value) {
+        return okImpl(name, Integer.toString(value));
     }
 
     protected Meter okImpl(String name, String value) {
