@@ -135,7 +135,7 @@ public class MeterEvent extends SystemStatusEventData {
             buffer.append(ReadableMessage.bestUnit(getExecutionTime(), ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
             if (this.iterations > 0) {
                 buffer.append("; ");
-                buffer.append(ReadableMessage.bestUnit(this.iterations,  ReadableMessage.ITERATIONS_UNITS, ReadableMessage.ITERATIONS_FACTORS));
+                buffer.append(ReadableMessage.bestUnit(this.iterations, ReadableMessage.ITERATIONS_UNITS, ReadableMessage.ITERATIONS_FACTORS));
                 buffer.append(' ');
                 final float iterationsPerSecond = getIterationsPerSecond();
                 buffer.append(ReadableMessage.bestUnit(iterationsPerSecond, ReadableMessage.ITERATIONS_PER_TIME_UNITS, ReadableMessage.ITERATIONS_PER_TIME_FACTORS));
@@ -147,8 +147,13 @@ public class MeterEvent extends SystemStatusEventData {
             buffer.append("; ");
             buffer.append(ReadableMessage.bestUnit(getWaitingTime(), ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
         }
-        buffer.append("; ");
-        return super.readableString(buffer);
+        if (this.runtime_usedMemory > 0) {
+            buffer.append("; ");
+            buffer.append(ReadableMessage.bestUnit(this.runtime_usedMemory, ReadableMessage.MEMORY_UNITS, ReadableMessage.MEMORY_FACTORS));
+
+        }
+//        return super.readableString(buffer);
+        return buffer;
     }
 
     @Override
