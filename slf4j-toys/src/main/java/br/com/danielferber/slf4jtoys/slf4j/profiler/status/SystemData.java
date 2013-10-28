@@ -18,7 +18,7 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.status;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventData;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.ReadableMessage;
+import br.com.danielferber.slf4jtoys.slf4j.utils.ReadableMessage;
 import java.io.IOException;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;
@@ -33,9 +33,9 @@ import java.util.List;
  *
  * @author Daniel
  */
-public abstract class SystemStatusEventData extends EventData {
+public abstract class SystemData extends EventData {
 
-    protected SystemStatusEventData(char messagePrefix) {
+    protected SystemData(char messagePrefix) {
         super(messagePrefix);
     }
 

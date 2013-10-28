@@ -17,14 +17,14 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.ReadableMessage;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemStatusEventData;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemData;
+import br.com.danielferber.slf4jtoys.slf4j.utils.ReadableMessage;
 import java.io.IOException;
 import java.util.Map;
 
-public class MeterEvent extends SystemStatusEventData {
+public class MeterData extends SystemData {
 
-    protected MeterEvent() {
+    protected MeterData() {
         super('M');
     }
     /**
@@ -177,7 +177,7 @@ public class MeterEvent extends SystemStatusEventData {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        MeterEvent other = (MeterEvent) obj;
+        MeterData other = (MeterData) obj;
         if (counter != other.counter) {
             return false;
         }

@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 
-public class Meter extends MeterEvent implements Closeable {
+public class Meter extends MeterData implements Closeable {
 
     private final Logger logger;
     /**

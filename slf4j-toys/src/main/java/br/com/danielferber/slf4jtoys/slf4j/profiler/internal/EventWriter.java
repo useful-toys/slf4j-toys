@@ -16,8 +16,10 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
 import java.util.Map;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.PatternDefinition.*;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.*;
 
-public final class EventWriter extends PatternDefinition {
+public final class EventWriter {
     private transient boolean firstProperty;
     private transient final StringBuilder builder;
 

@@ -22,7 +22,7 @@ import java.io.Serializable;
  *
  * @author Daniel
  */ 
-public abstract class EventData extends PatternDefinition implements Serializable {
+public abstract class EventData implements Serializable {
 
     private final char messagePrefix;
 

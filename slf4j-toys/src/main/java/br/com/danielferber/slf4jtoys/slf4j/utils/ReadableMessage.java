@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
+package br.com.danielferber.slf4jtoys.slf4j.utils;
 
 /**
  *

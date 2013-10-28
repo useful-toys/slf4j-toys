@@ -17,16 +17,16 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemStatusEventData;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemData;
 import java.io.IOException;
 
 /**
  *
  * @author Daniel Felix Ferber
  */
-public class WatcherEvent extends SystemStatusEventData {
+public class WatcherData extends SystemData {
 
-    protected WatcherEvent() {
+    protected WatcherData() {
         super('W');
     }
 
@@ -71,7 +71,7 @@ public class WatcherEvent extends SystemStatusEventData {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        WatcherEvent other = (WatcherEvent) obj;
+        WatcherData other = (WatcherData) obj;
         if (counter != other.counter) {
             return false;
         }

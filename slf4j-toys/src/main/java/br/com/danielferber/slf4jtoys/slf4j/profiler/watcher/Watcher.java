@@ -22,7 +22,7 @@ import org.slf4j.Logger;
  *
  * @author Daniel Felix Ferber
  */
-public class Watcher extends WatcherEvent implements Runnable {
+public class Watcher extends WatcherData implements Runnable {
 
     private final Logger logger;
 
