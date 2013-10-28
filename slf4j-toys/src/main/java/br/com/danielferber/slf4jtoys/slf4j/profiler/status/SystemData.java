@@ -18,7 +18,7 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.status;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventData;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
-import br.com.danielferber.slf4jtoys.slf4j.utils.ReadableMessage;
+import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
 import java.io.IOException;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;
@@ -63,11 +63,11 @@ public abstract class SystemData extends EventData {
     public StringBuilder readableString(StringBuilder builder) {
         if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
             builder.append("Memory: ");
-            builder.append(ReadableMessage.bestUnit(this.runtime_usedMemory, ReadableMessage.MEMORY_UNITS, ReadableMessage.MEMORY_FACTORS));
+            builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
             builder.append(' ');
-            builder.append(ReadableMessage.bestUnit(this.runtime_totalMemory, ReadableMessage.MEMORY_UNITS, ReadableMessage.MEMORY_FACTORS));
+            builder.append(UnitFormatter.bytes(this.runtime_totalMemory));
             builder.append(' ');
-            builder.append(ReadableMessage.bestUnit(this.runtime_maxMemory, ReadableMessage.MEMORY_UNITS, ReadableMessage.MEMORY_FACTORS));
+            builder.append(UnitFormatter.bytes(this.runtime_maxMemory));
         } else {
             builder.append("No memory status.");
         }

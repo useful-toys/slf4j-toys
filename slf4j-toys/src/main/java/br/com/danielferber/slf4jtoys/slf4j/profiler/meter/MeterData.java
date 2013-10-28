@@ -18,7 +18,7 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemData;
-import br.com.danielferber.slf4jtoys.slf4j.utils.ReadableMessage;
+import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
 import java.io.IOException;
 import java.util.Map;
 
@@ -132,24 +132,24 @@ public class MeterData extends SystemData {
         }
         if (this.startTime > 0) {
             buffer.append("; ");
-            buffer.append(ReadableMessage.bestUnit(getExecutionTime(), ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
+            buffer.append(UnitFormatter.nanoseconds(getExecutionTime()));
             if (this.iterations > 0) {
                 buffer.append("; ");
-                buffer.append(ReadableMessage.bestUnit(this.iterations, ReadableMessage.ITERATIONS_UNITS, ReadableMessage.ITERATIONS_FACTORS));
+                buffer.append(UnitFormatter.iterations(this.iterations));
                 buffer.append(' ');
-                final float iterationsPerSecond = getIterationsPerSecond();
-                buffer.append(ReadableMessage.bestUnit(iterationsPerSecond, ReadableMessage.ITERATIONS_PER_TIME_UNITS, ReadableMessage.ITERATIONS_PER_TIME_FACTORS));
+                final double iterationsPerSecond = getIterationsPerSecond();
+                buffer.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
                 buffer.append(' ');
-                final float nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
-                buffer.append(ReadableMessage.bestUnit(nanoSecondsPerIteration, ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
+                final double nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
+                buffer.append(UnitFormatter.nanoseconds(nanoSecondsPerIteration));
             }
         } else {
             buffer.append("; ");
-            buffer.append(ReadableMessage.bestUnit(getWaitingTime(), ReadableMessage.TIME_UNITS, ReadableMessage.TIME_FACTORS));
+            buffer.append(UnitFormatter.nanoseconds(getWaitingTime()));
         }
         if (this.runtime_usedMemory > 0) {
             buffer.append("; ");
-            buffer.append(ReadableMessage.bestUnit(this.runtime_usedMemory, ReadableMessage.MEMORY_UNITS, ReadableMessage.MEMORY_FACTORS));
+            buffer.append(UnitFormatter.nanoseconds(this.runtime_usedMemory));
 
         }
 //        return super.readableString(buffer);
@@ -212,7 +212,7 @@ public class MeterData extends SystemData {
         return startTime - createTime;
     }
 
-    public float getIterationsPerSecond() {
+    public double getIterationsPerSecond() {
         if (iterations == 0 || startTime == 0) {
             return 0;
         }
@@ -220,7 +220,7 @@ public class MeterData extends SystemData {
         if (executionTimeNS == 0) {
             return 0;
         }
-        return ((float) this.iterations) / executionTimeNS * 1000000000;
+        return ((double) this.iterations) / executionTimeNS * 1000000000;
     }
 
     @Override
