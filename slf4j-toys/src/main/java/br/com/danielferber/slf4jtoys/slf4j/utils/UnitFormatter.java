@@ -27,17 +27,38 @@ public final class UnitFormatter {
     private static final double[] TIME_FACTORS = new double[]{1000.0, 1000.0, 1000.0, 60.0, 60.0};
     private static final String[] TIME_UNITS = new String[]{"ns", "us", "ms", "s", "m", "h"};
     private static final String[] MEMORY_UNITS = new String[]{"B", "kB", "MB", "GB"};
-    private static final double[] MEMORY_FACTORS = new double[]{1000.0, 1000.0, 1000.0};    
+    private static final double[] MEMORY_FACTORS = new double[]{1000.0, 1000.0, 1000.0};
     private static final String[] ITERATIONS_PER_TIME_UNITS = new String[]{"/s", "k/s", "M/s"};
     private static final double[] ITERATIONS_PER_TIME_FACTORS = new double[]{1000.0, 1000.0, 1000.0};
     private static final String[] ITERATIONS_UNITS = new String[]{"", "k", "M"};
     private static final double[] ITERATIONS_FACTORS = new double[]{1000.0, 1000.0, 1000.0};
 
-    private static String bestUnit(double value, String[] timeUnits, double[] timeFactors) {
-        if (value == 0.0) {
-            return "0"+timeUnits[0];
+    private static String longUnit(long lvalue, String[] timeUnits, double[] timeFactors) {
+        if (lvalue == 0.0) {
+            return "0" + timeUnits[0];
         }
-        
+
+        int index = 0;
+        double limit = timeFactors[index] * 1.1;
+        double modifiedValue = lvalue;
+        if (modifiedValue <= limit) {
+            return String.format("%d%s", lvalue, timeUnits[index]);
+        }
+
+        int last = timeUnits.length - 1;
+        do {
+            modifiedValue /= timeFactors[index];
+            limit = timeFactors[index] * 1.1;
+            index++;
+        } while (index != last && modifiedValue > limit);
+        return String.format("%.1f%s", modifiedValue, timeUnits[index]);
+    }
+
+    private static String doubleUnit(double value, String[] timeUnits, double[] timeFactors) {
+        if (value == 0.0) {
+            return "0" + timeUnits[0];
+        }
+
         int last = timeUnits.length - 1;
         int index = 0;
         double limit = timeFactors[index] * 1.1;
@@ -49,24 +70,24 @@ public final class UnitFormatter {
         }
         return String.format("%.1f%s", modifiedValue, timeUnits[index]);
     }
-    
+
     public static String bytes(long value) {
-        return bestUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
+        return longUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
     }
-    
+
     public static String nanoseconds(long value) {
-        return bestUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
+        return longUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
     }
-    
+
     public static String nanoseconds(double value) {
-        return bestUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
+        return doubleUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
     }
-    
+
     public static String iterations(double value) {
-        return bestUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
+        return doubleUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
     }
 
     public static String iterationsPerSecond(double value) {
-        return bestUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
+        return doubleUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
     }
 }
