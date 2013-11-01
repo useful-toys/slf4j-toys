@@ -15,7 +15,6 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData.MEMORY;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -107,17 +106,18 @@ public abstract class EventData implements Serializable {
         if (eventPosition != other.eventPosition) {
             return false;
         }
-        if (eventCategory == null && other.eventCategory != null) {
-            return false;
+        if (eventCategory == null) {
+            if (other.eventCategory != null) {
+                return false;
+            }
         } else if (!eventCategory.equals(other.eventCategory)) {
             return false;
         }
-        if (sessionUuid == null && other.sessionUuid != null) {
-            return false;
+        if (sessionUuid == null) {
+            if (other.sessionUuid != null) {
+                return false;
+            }
         } else if (!sessionUuid.equals(other.sessionUuid)) {
-            return false;
-        }
-        if (time != other.time) {
             return false;
         }
         return true;
@@ -132,9 +132,33 @@ public abstract class EventData implements Serializable {
      * @return <code>true</code> if all attributes are equal between the *
      * events; <code>false</code> otherwise.
      */
-    protected boolean isCompletelyEqualsTo(Object other) {
-        return this.equals(other);
+    boolean isCompletelyEqualsTo(EventData other) {
+        if (other == null) {
+            throw new IllegalArgumentException();
+        }
+        if (eventPosition != other.eventPosition) {
+            return false;
+        }
+        if (eventCategory == null) {
+            if (other.eventCategory != null) {
+                return false;
+            }
+        } else if (!eventCategory.equals(other.eventCategory)) {
+            return false;
+        }
+        if (sessionUuid == null) {
+            if (other.sessionUuid != null) {
+                return false;
+            }
+        } else if (!sessionUuid.equals(other.sessionUuid)) {
+            return false;
+        }
+        if (time != other.time) {
+            return false;
+        }
+        return true;
     }
+    
     protected static final String SESSION_UUID = "s";
     protected static final String EVENT_POSITION = "p";
     protected static final String EVENT_CATEGORY = "c";
@@ -178,12 +202,12 @@ public abstract class EventData implements Serializable {
 
         /* Event category */
         if (this.eventCategory != null) {
-            w.property(EVENT_POSITION, this.eventCategory);
+            w.property(EVENT_CATEGORY, this.eventCategory);
         }
 
         /* Event position */
         if (this.eventPosition > 0) {
-            w.property(EVENT_CATEGORY, this.eventPosition);
+            w.property(EVENT_POSITION, this.eventPosition);
         }
 
         /* Event time */
@@ -200,8 +224,8 @@ public abstract class EventData implements Serializable {
      *
      * @param message The string that is supposed to contain an encoded string
      * representation of the event.
-     * @return <code>true</code> if an event was successfully
-     * read; <code>false</code> otherwise.
+     * @return <code>true</code> if an event was successfully read;
+     * <code>false</code> otherwise.
      */
     public final boolean read(String message, char messagePrefix) {
         String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);
@@ -210,7 +234,7 @@ public abstract class EventData implements Serializable {
         }
         reset();
         EventReader eventReader = new EventReader();
-        eventReader.reset(message);
+        eventReader.reset(plausibleMessage);
 
         try {
             while (eventReader.hasMore()) {
