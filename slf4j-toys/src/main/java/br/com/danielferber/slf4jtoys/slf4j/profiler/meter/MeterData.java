@@ -86,7 +86,7 @@ public class MeterData extends SystemData {
     protected Map<String, String> context;
 
     @Override
-    public void reset() {
+    protected void resetImpl() {
         super.reset();
         this.createTime = 0;
         this.startTime = 0;

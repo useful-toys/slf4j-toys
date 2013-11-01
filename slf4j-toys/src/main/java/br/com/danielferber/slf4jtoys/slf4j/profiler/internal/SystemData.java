@@ -15,7 +15,6 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
-import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
 import java.io.IOException;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;
@@ -58,7 +57,7 @@ public abstract class SystemData extends EventData {
     protected double systemLoad = 0.0;
 
     @Override
-    public void reset() {
+    protected void resetImpl() {
         this.heap_commited = 0;
         this.heap_init = 0;
         this.heap_max = 0;
@@ -74,7 +73,73 @@ public abstract class SystemData extends EventData {
         this.compilationTime = 0;
         this.garbageCollector_count = 0;
         this.garbageCollector_time = 0;
+        this.runtime_usedMemory = 0;
+        this.runtime_maxMemory = 0;
+        this.runtime_totalMemory = 0;
         this.systemLoad = 0;
+    }
+
+    @Override
+    protected boolean isCompletelyEqualsImpl(EventData obj) {
+        final SystemData other = (SystemData) obj;
+        if (this.heap_commited != other.heap_commited) {
+            return false;
+        }
+        if (this.heap_init != other.heap_init) {
+            return false;
+        }
+        if (this.heap_max != other.heap_max) {
+            return false;
+        }
+        if (this.heap_used != other.heap_used) {
+            return false;
+        }
+        if (this.nonHeap_commited != other.nonHeap_commited) {
+            return false;
+        }
+        if (this.nonHeap_init != other.nonHeap_init) {
+            return false;
+        }
+        if (this.nonHeap_max != other.nonHeap_max) {
+            return false;
+        }
+        if (this.nonHeap_used != other.nonHeap_used) {
+            return false;
+        }
+        if (this.objectPendingFinalizationCount != other.objectPendingFinalizationCount) {
+            return false;
+        }
+        if (this.classLoading_loaded != other.classLoading_loaded) {
+            return false;
+        }
+        if (this.classLoading_total != other.classLoading_total) {
+            return false;
+        }
+        if (this.classLoading_unloaded != other.classLoading_unloaded) {
+            return false;
+        }
+        if (this.compilationTime != other.compilationTime) {
+            return false;
+        }
+        if (this.garbageCollector_count != other.garbageCollector_count) {
+            return false;
+        }
+        if (this.garbageCollector_time != other.garbageCollector_time) {
+            return false;
+        }
+        if (this.runtime_usedMemory != other.runtime_usedMemory) {
+            return false;
+        }
+        if (this.runtime_maxMemory != other.runtime_maxMemory) {
+            return false;
+        }
+        if (this.runtime_totalMemory != other.runtime_totalMemory) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.systemLoad) != Double.doubleToLongBits(other.systemLoad)) {
+            return false;
+        }
+        return true;
     }
 
     protected void collectSystemStatus() {
@@ -208,73 +273,5 @@ public abstract class SystemData extends EventData {
             return true;
         }
         return false;
-    }
-
-    public boolean isCompletelyEqualsTo(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SystemData other = (SystemData) obj;
-        if (this.heap_commited != other.heap_commited) {
-            return false;
-        }
-        if (this.heap_init != other.heap_init) {
-            return false;
-        }
-        if (this.heap_max != other.heap_max) {
-            return false;
-        }
-        if (this.heap_used != other.heap_used) {
-            return false;
-        }
-        if (this.nonHeap_commited != other.nonHeap_commited) {
-            return false;
-        }
-        if (this.nonHeap_init != other.nonHeap_init) {
-            return false;
-        }
-        if (this.nonHeap_max != other.nonHeap_max) {
-            return false;
-        }
-        if (this.nonHeap_used != other.nonHeap_used) {
-            return false;
-        }
-        if (this.objectPendingFinalizationCount != other.objectPendingFinalizationCount) {
-            return false;
-        }
-        if (this.classLoading_loaded != other.classLoading_loaded) {
-            return false;
-        }
-        if (this.classLoading_total != other.classLoading_total) {
-            return false;
-        }
-        if (this.classLoading_unloaded != other.classLoading_unloaded) {
-            return false;
-        }
-        if (this.compilationTime != other.compilationTime) {
-            return false;
-        }
-        if (this.garbageCollector_count != other.garbageCollector_count) {
-            return false;
-        }
-        if (this.garbageCollector_time != other.garbageCollector_time) {
-            return false;
-        }
-        if (this.runtime_usedMemory != other.runtime_usedMemory) {
-            return false;
-        }
-        if (this.runtime_maxMemory != other.runtime_maxMemory) {
-            return false;
-        }
-        if (this.runtime_totalMemory != other.runtime_totalMemory) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.systemLoad) != Double.doubleToLongBits(other.systemLoad)) {
-            return false;
-        }
-        return true;
     }
 }

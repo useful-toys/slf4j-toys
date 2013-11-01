@@ -45,14 +45,4 @@ public class WatcherData extends SystemData {
         }
         return builder;
     }
-
-    @Override
-    protected void writePropertiesImpl(EventWriter eventWriter) {
-        super.writePropertiesImpl(eventWriter);
-    }
-
-    @Override
-    protected boolean readPropertyImpl(EventReader eventReader, String key) throws IOException {
-        return super.readPropertyImpl(eventReader, key);
-    }
 }
