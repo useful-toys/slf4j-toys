@@ -15,6 +15,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventData;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData;
@@ -87,11 +88,12 @@ public class MeterData extends SystemData {
 
     @Override
     protected void resetImpl() {
-        super.reset();
+        super.resetImpl();
+        this.description = null;
         this.createTime = 0;
         this.startTime = 0;
         this.stopTime = 0;
-        this.description = null;
+        this.iterations = 0;
         this.exceptionClass = null;
         this.exceptionMessage = null;
         this.success = false;
@@ -99,8 +101,54 @@ public class MeterData extends SystemData {
         this.threadStopId = 0;
         this.threadStartName = null;
         this.threadStopName = null;
+        this.context = null;
     }
 
+    @Override
+    protected boolean isCompletelyEqualsImpl(EventData obj) {
+        final MeterData other = (MeterData) obj;
+        if ((this.description == null) ? (other.description != null) : !this.description.equals(other.description)) {
+            return false;
+        }
+        if (this.createTime != other.createTime) {
+            return false;
+        }
+        if (this.startTime != other.startTime) {
+            return false;
+        }
+        if (this.stopTime != other.stopTime) {
+            return false;
+        }
+        if (this.iterations != other.iterations) {
+            return false;
+        }
+        if ((this.exceptionClass == null) ? (other.exceptionClass != null) : !this.exceptionClass.equals(other.exceptionClass)) {
+            return false;
+        }
+        if ((this.exceptionMessage == null) ? (other.exceptionMessage != null) : !this.exceptionMessage.equals(other.exceptionMessage)) {
+            return false;
+        }
+        if (this.success != other.success) {
+            return false;
+        }
+        if (this.threadStartId != other.threadStartId) {
+            return false;
+        }
+        if (this.threadStopId != other.threadStopId) {
+            return false;
+        }
+        if ((this.threadStartName == null) ? (other.threadStartName != null) : !this.threadStartName.equals(other.threadStartName)) {
+            return false;
+        }
+        if ((this.threadStopName == null) ? (other.threadStopName != null) : !this.threadStopName.equals(other.threadStopName)) {
+            return false;
+        }
+        if (this.context != other.context && (this.context == null || !this.context.equals(other.context))) {
+            return false;
+        }
+        return super.isCompletelyEqualsImpl(obj);
+    }
+    
     @Override
     public StringBuilder readableString(StringBuilder buffer) {
         if (stopTime != 0) {
@@ -250,4 +298,10 @@ public class MeterData extends SystemData {
         }
         return super.readPropertyImpl(r, propertyName);
     }
+
+    void resetBridge() {
+        this.reset();
+    }
+    
+    
 }

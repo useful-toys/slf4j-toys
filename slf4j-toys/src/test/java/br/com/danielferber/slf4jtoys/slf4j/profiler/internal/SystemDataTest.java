@@ -233,7 +233,7 @@ public class SystemDataTest {
         System.out.println(s);
 
         SystemData b = createSystemData();
-        b.read(s, 'S');
+        assertTrue(b.read(s, 'S'));
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));

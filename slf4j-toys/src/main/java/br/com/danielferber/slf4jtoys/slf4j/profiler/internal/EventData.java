@@ -135,7 +135,7 @@ public abstract class EventData implements Serializable {
      * @return <code>true</code> if all attributes are equal between the *
      * events; <code>false</code> otherwise.
      */
-    protected final boolean isCompletelyEqualsTo(EventData other) {
+    public final boolean isCompletelyEqualsTo(EventData other) {
         if (other == null) {
             throw new IllegalArgumentException();
         }

@@ -271,6 +271,9 @@ public abstract class SystemData extends EventData {
             this.garbageCollector_count = r.readLong();
             this.garbageCollector_time = r.readLong();
             return true;
+        } else if (SYSTEM_LOAD.equals(propertyName)) {
+            this.systemLoad = r.readDouble();
+            return true;
         }
         return false;
     }
