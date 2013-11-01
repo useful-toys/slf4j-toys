@@ -100,9 +100,9 @@ public class EventReader {
     public String readString() throws IOException {
         if (firstValue) {
             readOperator(PROPERTY_EQUALS);
+            firstValue = false;
         } else {
             readOperator(PROPERTY_DIV);
-            firstValue = false;
         }
 
         if (start >= lenght) {
@@ -179,44 +179,86 @@ public class EventReader {
     }
 
     public Map<String, String> readMap() throws IOException {
-        if (!firstValue) {
+        if (firstValue) {
             readOperator(PROPERTY_EQUALS);
+            firstValue = false;
         } else {
             readOperator(PROPERTY_DIV);
-            firstValue = false;
         }
+
+        readOperator(MAP_OPEN);
 
         if (start >= lenght) {
             throw new EOFException();
         }
         char c = chars[start];
-        if (c != MAP_OPEN) {
-            throw new IOException("expected: " + MAP_OPEN);
-        }
-        start++;
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-        c = chars[start];
         if (c == MAP_CLOSE) {
+            start++;
             return Collections.EMPTY_MAP;
         }
         Map<String, String> map = new TreeMap<String, String>();
         do {
-            String key = readString();
+            String key = readMapKey();
             readOperator(MAP_EQUAL);
-            String value = readString();
+            String value = readMapValue();
             map.put(key, value);
             c = chars[start];
-            start++;
             if (start >= lenght) {
                 throw new EOFException();
             }
-        } while (c == MAP_SEPARATOR);
-        if (c != MAP_CLOSE) {
-            throw new IOException("expected: " + MAP_CLOSE);
-        }
-        start++;
+        } while (c != MAP_CLOSE);
+                
+        readOperator(MAP_CLOSE);
+
         return map;
     }
+
+    public String readMapKey() throws IOException {
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+
+        int end = start;
+        while (end < lenght) {
+            char c = chars[end];
+            if (c == MAP_EQUAL) {
+                break;
+            } else if (c == QUOTE) {
+                end++;
+                if (end >= lenght) {
+                    throw new EOFException();
+                }
+            }
+            end++;
+        }
+
+        String substring = charsString.substring(start, end);
+        start = end;
+        return substring;
+    }
+
+    public String readMapValue() throws IOException {
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+
+        int end = start;
+        while (end < lenght) {
+            char c = chars[end];
+            if (c == MAP_SEPARATOR || c == MAP_CLOSE) {
+                break;
+            } else if (c == QUOTE) {
+                end++;
+                if (end >= lenght) {
+                    throw new EOFException();
+                }
+            }
+            end++;
+        }
+
+        String substring = charsString.substring(start, end);
+        start = end;
+        return substring;
+    }
+
 }

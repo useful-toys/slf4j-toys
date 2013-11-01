@@ -50,12 +50,15 @@ public abstract class EventData implements Serializable {
      * Reverts all event attributes to their constructor initial value. Useful
      * to reuse the event instance and avoid creation of new objects.
      */
-    protected void reset() {
+    protected final void reset() {
         this.sessionUuid = null;
         this.eventCategory = null;
         this.eventPosition = 0;
         this.time = 0;
+        this.resetImpl();
     }
+
+    protected abstract void resetImpl();
 
     @Override
     public final int hashCode() {
@@ -132,7 +135,7 @@ public abstract class EventData implements Serializable {
      * @return <code>true</code> if all attributes are equal between the *
      * events; <code>false</code> otherwise.
      */
-    boolean isCompletelyEqualsTo(EventData other) {
+    protected final boolean isCompletelyEqualsTo(EventData other) {
         if (other == null) {
             throw new IllegalArgumentException();
         }
@@ -156,9 +159,11 @@ public abstract class EventData implements Serializable {
         if (time != other.time) {
             return false;
         }
-        return true;
+        return isCompletelyEqualsImpl(other);
     }
-    
+
+    protected abstract boolean isCompletelyEqualsImpl(EventData other);
+
     protected static final String SESSION_UUID = "s";
     protected static final String EVENT_POSITION = "p";
     protected static final String EVENT_CATEGORY = "c";
@@ -239,8 +244,10 @@ public abstract class EventData implements Serializable {
         try {
             while (eventReader.hasMore()) {
                 String key = eventReader.readPropertyName();
-                if (!readKeyProperties(eventReader, key) && !readPropertyImpl(eventReader, key)) {
-                    return false;
+                if (! readKeyProperties(eventReader, key)) {
+                    if (!readPropertyImpl(eventReader, key)) {
+                        return false;
+                    }
                 }
             }
             return true;

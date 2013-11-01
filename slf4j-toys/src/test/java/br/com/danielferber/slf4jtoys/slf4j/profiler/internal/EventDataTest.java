@@ -181,12 +181,13 @@ public class EventDataTest {
     @Test
     public void writeReadTest1() {
         EventData a = createEventData();
-        
+
         String s = a.write(new StringBuilder(), 'E').toString();
-        
+        System.out.println(s);
+
         EventData b = createEventData();
         b.read(s, 'E');
-        
+
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
     }
@@ -200,10 +201,11 @@ public class EventDataTest {
         a.time = 2;
 
         String s = a.write(new StringBuilder(), 'E').toString();
+        System.out.println(s);
 
         EventData b = createEventData();
         assertTrue(b.read(s, 'E'));
-        
+
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
     }
@@ -224,6 +226,16 @@ public class EventDataTest {
             @Override
             protected boolean readPropertyImpl(EventReader r, String key) throws IOException {
                 return false;
+            }
+
+            @Override
+            protected void resetImpl() {
+                // empty
+            }
+
+            @Override
+            protected boolean isCompletelyEqualsImpl(EventData other) {
+                return true;
             }
         };
     }

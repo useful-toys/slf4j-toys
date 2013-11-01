@@ -16,6 +16,7 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
 import java.io.IOException;
+import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -24,8 +25,6 @@ import static org.junit.Assert.*;
  * @author Daniel Felix Ferber
  */
 public class EventReaderTest {
-
-   
 
     @Test
     public void testReadIdentifier1() throws IOException {
@@ -68,11 +67,37 @@ public class EventReaderTest {
         String input = " def";
         new EventReader().reset(input).readString();
     }
-    
+
+    @Test
     public void testReadString3() throws IOException {
         String input = "=def";
         String expected = "def";
         String output = new EventReader().reset(input).readString();
         assertEquals(expected, output);
+    }
+
+    @Test
+    public void testReadString4() throws IOException {
+        String input = "=def|ghi|jkl";
+        final EventReader r = new EventReader().reset(input);
+        assertEquals("def", r.readString());
+        assertEquals("ghi", r.readString());
+        assertEquals("jkl", r.readString());
+    }
+
+    @Test
+    public void testReadMap1() throws IOException {
+        String input = "=[]";
+        final EventReader r = new EventReader().reset(input);
+        final Map<String, String> m = r.readMap();
+        assertEquals(0, m.size());
+    }
+
+    @Test
+    public void testReadMap2() throws IOException {
+        String input = "=[a:b]";
+        final EventReader r = new EventReader().reset(input);
+        final Map<String, String> m = r.readMap();
+        assertEquals(1, m.size());
     }
 }
