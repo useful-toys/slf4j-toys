@@ -99,5 +99,19 @@ public class EventReaderTest {
         final EventReader r = new EventReader().reset(input);
         final Map<String, String> m = r.readMap();
         assertEquals(1, m.size());
+        assertTrue(m.containsKey("a"));
+        assertEquals("b", m.get("a"));
+    }
+
+    @Test
+    public void testReadMap3() throws IOException {
+        String input = "=[a:b,c:d]";
+        final EventReader r = new EventReader().reset(input);
+        final Map<String, String> m = r.readMap();
+        assertEquals(2, m.size());
+        assertTrue(m.containsKey("a"));
+        assertEquals("b", m.get("a"));
+        assertTrue(m.containsKey("c"));
+        assertEquals("d", m.get("c"));
     }
 }

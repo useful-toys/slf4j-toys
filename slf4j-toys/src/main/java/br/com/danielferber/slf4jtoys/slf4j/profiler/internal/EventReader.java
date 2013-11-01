@@ -69,63 +69,22 @@ public class EventReader {
      */
     public String readPropertyName() throws IOException {
         if (!firstProperty) {
-            readOperator(PROPERTY_SEPARATOR);
+            readSymbol(PROPERTY_SEPARATOR);
         } else {
             firstProperty = false;
         }
         firstValue = true;
-
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-
-        char c = chars[start];
-        if (!Character.isJavaIdentifierStart(c)) {
-            throw new IOException("invalid identifier");
-        }
-        int end = start + 1;
-        while (end < lenght) {
-            c = chars[end];
-            if (!Character.isJavaIdentifierPart(c)) {
-                break;
-            }
-            end++;
-        }
-
-        String substring = charsString.substring(start, end);
-        start = end;
-        return substring;
+        return readPropertyKey();
     }
 
     public String readString() throws IOException {
         if (firstValue) {
-            readOperator(PROPERTY_EQUALS);
+            readSymbol(PROPERTY_EQUALS);
             firstValue = false;
         } else {
-            readOperator(PROPERTY_DIV);
+            readSymbol(PROPERTY_DIV);
         }
-
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-
-        int end = start;
-        while (end < lenght) {
-            char c = chars[end];
-            if (c == PROPERTY_DIV || c == PROPERTY_SEPARATOR) {
-                break;
-            } else if (c == QUOTE) {
-                end++;
-                if (end >= lenght) {
-                    throw new EOFException();
-                }
-            }
-            end++;
-        }
-
-        String substring = charsString.substring(start, end);
-        start = end;
-        return substring;
+        return readPropertyValue();
     }
 
     public long readLong() throws IOException {
@@ -168,7 +127,7 @@ public class EventReader {
         }
     }
 
-    protected void readOperator(char operator) throws IOException {
+    protected void readSymbol(char operator) throws IOException {
         if (start >= lenght) {
             throw new EOFException();
         }
@@ -178,56 +137,84 @@ public class EventReader {
         }
     }
 
-    public Map<String, String> readMap() throws IOException {
-        if (firstValue) {
-            readOperator(PROPERTY_EQUALS);
-            firstValue = false;
-        } else {
-            readOperator(PROPERTY_DIV);
-        }
-
-        readOperator(MAP_OPEN);
-
+    protected boolean readOptionalSymbol(char operator) throws IOException {
         if (start >= lenght) {
             throw new EOFException();
         }
         char c = chars[start];
-        if (c == MAP_CLOSE) {
+        if (c == operator) {
             start++;
+            return true;
+        }
+        return false;
+    }
+
+    public Map<String, String> readMap() throws IOException {
+        if (firstValue) {
+            readSymbol(PROPERTY_EQUALS);
+            firstValue = false;
+        } else {
+            readSymbol(PROPERTY_DIV);
+        }
+
+        readSymbol(MAP_OPEN);
+
+        if (readOptionalSymbol(MAP_CLOSE)) {
             return Collections.EMPTY_MAP;
         }
+
         Map<String, String> map = new TreeMap<String, String>();
         do {
             String key = readMapKey();
-            readOperator(MAP_EQUAL);
+            readSymbol(MAP_EQUAL);
             String value = readMapValue();
             map.put(key, value);
-            c = chars[start];
-            if (start >= lenght) {
-                throw new EOFException();
-            }
-        } while (c != MAP_CLOSE);
-                
-        readOperator(MAP_CLOSE);
+        } while (readOptionalSymbol(MAP_SEPARATOR));
+
+        readSymbol(MAP_CLOSE);
 
         return map;
     }
 
-    public String readMapKey() throws IOException {
+    protected String readMapKey() throws IOException {
         if (start >= lenght) {
             throw new EOFException();
         }
 
-        int end = start;
+        return readStringImp(MAP_EQUAL, 0);
+    }
+
+    protected String readMapValue() throws IOException {
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+
+        return readStringImp(MAP_SEPARATOR, MAP_CLOSE);
+
+    }
+
+    protected String readPropertyValue() throws EOFException {
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+
+        return readStringImp(PROPERTY_DIV, PROPERTY_SEPARATOR);
+    }
+
+    protected String readPropertyKey() throws EOFException, IOException {
+        if (start >= lenght) {
+            throw new EOFException();
+        }
+
+        char c = chars[start];
+        if (!Character.isJavaIdentifierStart(c)) {
+            throw new IOException("invalid identifier");
+        }
+        int end = start + 1;
         while (end < lenght) {
-            char c = chars[end];
-            if (c == MAP_EQUAL) {
+            c = chars[end];
+            if (!Character.isJavaIdentifierPart(c)) {
                 break;
-            } else if (c == QUOTE) {
-                end++;
-                if (end >= lenght) {
-                    throw new EOFException();
-                }
             }
             end++;
         }
@@ -237,28 +224,26 @@ public class EventReader {
         return substring;
     }
 
-    public String readMapValue() throws IOException {
-        if (start >= lenght) {
-            throw new EOFException();
-        }
-
+    private String readStringImp(char delimiter1, int delimiter2) throws EOFException {
+        StringBuilder sb = new StringBuilder();
         int end = start;
         while (end < lenght) {
             char c = chars[end];
-            if (c == MAP_SEPARATOR || c == MAP_CLOSE) {
+            if (c == delimiter1 || c == delimiter2) {
                 break;
             } else if (c == QUOTE) {
+                sb.append(charsString.substring(start, end));
                 end++;
                 if (end >= lenght) {
                     throw new EOFException();
                 }
+                start = end;
             }
             end++;
         }
 
-        String substring = charsString.substring(start, end);
+        sb.append(charsString.substring(start, end));
         start = end;
-        return substring;
+        return sb.toString();
     }
-
 }
