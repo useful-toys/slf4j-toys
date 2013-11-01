@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.danielferber.slf4jtoys.slf4j.profiler.status;
+package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventData;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
 import java.io.IOException;
 import java.lang.management.ClassLoadingMXBean;
@@ -30,15 +27,16 @@ import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
 
 /**
+ * Augments the EventData with status information collected from the virtual
+ * machine.
  *
- * @author Daniel
+ * @author Daniel Felix Ferber
  */
 public abstract class SystemData extends EventData {
 
-    protected SystemData(char messagePrefix) {
-        super(messagePrefix);
+    protected SystemData() {
+        super();
     }
-
     protected long heap_commited = 0;
     protected long heap_init = 0;
     protected long heap_max = 0;
@@ -58,21 +56,6 @@ public abstract class SystemData extends EventData {
     protected long runtime_maxMemory = 0;
     protected long runtime_totalMemory = 0;
     protected double systemLoad = 0.0;
-
-    @Override
-    public StringBuilder readableString(StringBuilder builder) {
-        if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
-            builder.append("Memory: ");
-            builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
-            builder.append(' ');
-            builder.append(UnitFormatter.bytes(this.runtime_totalMemory));
-            builder.append(' ');
-            builder.append(UnitFormatter.bytes(this.runtime_maxMemory));
-        } else {
-            builder.append("No memory status.");
-        }
-        return builder;
-    }
 
     @Override
     public void reset() {
@@ -136,7 +119,6 @@ public abstract class SystemData extends EventData {
         OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
         systemLoad = os.getSystemLoadAverage();
     }
-    
     static final String MEMORY = "m";
     static final String HEAP = "h";
     static final String NON_HEAP = "nh";
@@ -147,7 +129,7 @@ public abstract class SystemData extends EventData {
     static final String SYSTEM_LOAD = "sl";
 
     @Override
-    protected void writeProperties(EventWriter w) {
+    protected void writePropertiesImpl(EventWriter w) {
         /* memory usage */
         if (this.runtime_usedMemory > 0 || this.runtime_totalMemory > 0 || this.runtime_maxMemory > 0) {
             w.property(MEMORY, this.runtime_usedMemory, this.runtime_totalMemory, this.runtime_maxMemory);
@@ -191,7 +173,7 @@ public abstract class SystemData extends EventData {
     }
 
     @Override
-    protected boolean readProperty(EventReader r, String propertyName) throws IOException {
+    protected boolean readPropertyImpl(EventReader r, String propertyName) throws IOException {
         if (MEMORY.equals(propertyName)) {
             this.runtime_usedMemory = r.readLong();
             this.runtime_totalMemory = r.readLong();
@@ -224,7 +206,75 @@ public abstract class SystemData extends EventData {
             this.garbageCollector_count = r.readLong();
             this.garbageCollector_time = r.readLong();
             return true;
-        } 
+        }
         return false;
+    }
+
+    public boolean isCompletelyEqualsTo(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SystemData other = (SystemData) obj;
+        if (this.heap_commited != other.heap_commited) {
+            return false;
+        }
+        if (this.heap_init != other.heap_init) {
+            return false;
+        }
+        if (this.heap_max != other.heap_max) {
+            return false;
+        }
+        if (this.heap_used != other.heap_used) {
+            return false;
+        }
+        if (this.nonHeap_commited != other.nonHeap_commited) {
+            return false;
+        }
+        if (this.nonHeap_init != other.nonHeap_init) {
+            return false;
+        }
+        if (this.nonHeap_max != other.nonHeap_max) {
+            return false;
+        }
+        if (this.nonHeap_used != other.nonHeap_used) {
+            return false;
+        }
+        if (this.objectPendingFinalizationCount != other.objectPendingFinalizationCount) {
+            return false;
+        }
+        if (this.classLoading_loaded != other.classLoading_loaded) {
+            return false;
+        }
+        if (this.classLoading_total != other.classLoading_total) {
+            return false;
+        }
+        if (this.classLoading_unloaded != other.classLoading_unloaded) {
+            return false;
+        }
+        if (this.compilationTime != other.compilationTime) {
+            return false;
+        }
+        if (this.garbageCollector_count != other.garbageCollector_count) {
+            return false;
+        }
+        if (this.garbageCollector_time != other.garbageCollector_time) {
+            return false;
+        }
+        if (this.runtime_usedMemory != other.runtime_usedMemory) {
+            return false;
+        }
+        if (this.runtime_maxMemory != other.runtime_maxMemory) {
+            return false;
+        }
+        if (this.runtime_totalMemory != other.runtime_totalMemory) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.systemLoad) != Double.doubleToLongBits(other.systemLoad)) {
+            return false;
+        }
+        return true;
     }
 }

@@ -17,7 +17,8 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemData;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData;
+import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
 import java.io.IOException;
 
 /**
@@ -27,103 +28,31 @@ import java.io.IOException;
 public class WatcherData extends SystemData {
 
     protected WatcherData() {
-        super('W');
-    }
-
-    /**
-     * Unique ID of session that is collecting system status data.
-     */
-    protected String uuid;
-    /**
-     * How many times this watcher collection system status data since its creation.
-     */
-    protected long counter = 0;
-    /**
-     * When system this status data was collected.
-     */
-    protected long time = 0;
-
-    @Override
-    public void reset() {
-        super.reset();
-        this.uuid = null;
-        this.counter = 0;
-        this.time = 0;
-    }
-    
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (counter ^ (counter >>> 32));
-        result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
-        return result;
+        super();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
+    public StringBuilder readableString(StringBuilder builder) {
+        if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
+            builder.append("Memory: ");
+            builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
+            builder.append(' ');
+            builder.append(UnitFormatter.bytes(this.runtime_totalMemory));
+            builder.append(' ');
+            builder.append(UnitFormatter.bytes(this.runtime_maxMemory));
+        } else {
+            builder.append("No memory status.");
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        WatcherData other = (WatcherData) obj;
-        if (counter != other.counter) {
-            return false;
-        }
-        if (uuid == null) {
-            return false;
-        } else if (!uuid.equals(other.uuid)) {
-            return false;
-        }
-        return true;
+        return builder;
     }
 
     @Override
-    public String toString() {
-        return this.uuid + ":" + this.counter;
-    }
-    
-    private static final String COUNTER = "c";
-    private static final String UUID = "u";
-    private static final String TIME = "t";
-
-    @Override
-    protected void writeProperties(EventWriter w) {
-        /* Session ID */
-        if (this.uuid != null) {
-            w.property(UUID, this.uuid);
-        }
-
-        /* Event counter */
-        if (this.counter > 0) {
-            w.property(COUNTER, this.counter);
-        }
-
-        /* Time */
-        if (this.time > 0) {
-            w.property(TIME, this.time);
-        }
-
-        super.writeProperties(w);
+    protected void writePropertiesImpl(EventWriter eventWriter) {
+        super.writePropertiesImpl(eventWriter);
     }
 
     @Override
-    protected boolean readProperty(EventReader p, String propertyName) throws IOException {
-        if (COUNTER.equals(propertyName)) {
-            this.counter = p.readLong();
-            return true;
-        } else if (UUID.equals(propertyName)) {
-            this.uuid = p.readString();
-            return true;
-        } else if (TIME.equals(propertyName)) {
-            this.time = p.readLong();
-            return true;
-        }
-        return super.readProperty(p, propertyName);
+    protected boolean readPropertyImpl(EventReader eventReader, String key) throws IOException {
+        return super.readPropertyImpl(eventReader, key);
     }
 }

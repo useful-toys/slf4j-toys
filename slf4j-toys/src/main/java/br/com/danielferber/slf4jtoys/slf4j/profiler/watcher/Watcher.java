@@ -29,7 +29,7 @@ public class Watcher extends WatcherData implements Runnable {
     public Watcher(final Logger logger) {
         super();
         this.logger = logger;
-        this.uuid = ProfilingSession.uuid;
+        this.sessionUuid = ProfilingSession.uuid;
     }
 
     @Override
@@ -41,19 +41,7 @@ public class Watcher extends WatcherData implements Runnable {
             logger.info(readableString(new StringBuilder()).toString());
         }
         if (logger.isTraceEnabled()) {
-            logger.trace(Slf4JMarkers.WATCHER, write(new StringBuilder()).toString());
+            logger.trace(Slf4JMarkers.WATCHER, write(new StringBuilder(), 'W').toString());
         }
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-    
-    
 }

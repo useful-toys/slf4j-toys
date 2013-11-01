@@ -17,7 +17,7 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.status.SystemData;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData;
 import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
 import java.io.IOException;
 import java.util.Map;
@@ -25,20 +25,9 @@ import java.util.Map;
 public class MeterData extends SystemData {
 
     protected MeterData() {
-        super('M');
+        super();
     }
-    /**
-     * Unique ID of session that reporting jobs.
-     */
-    protected String uuid = null;
-    /**
-     * How many times this job has benn reported since session creation.
-     */
-    protected long counter = 0;
-    /**
-     * An arbitraty ID for the job.
-     */
-    protected String name = null;
+
     /**
      * An arbitrary short, human readable message to describe the task being
      * measured.
@@ -99,9 +88,6 @@ public class MeterData extends SystemData {
     @Override
     public void reset() {
         super.reset();
-        this.uuid = null;
-        this.counter = 0;
-        this.name = null;
         this.createTime = 0;
         this.startTime = 0;
         this.stopTime = 0;
@@ -128,7 +114,7 @@ public class MeterData extends SystemData {
         if (this.description != null) {
             buffer.append(this.description);
         } else {
-            buffer.append(this.name);
+            buffer.append(this.eventCategory);
         }
         if (this.startTime > 0) {
             buffer.append("; ");
@@ -156,48 +142,6 @@ public class MeterData extends SystemData {
         return buffer;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (counter ^ (counter >>> 32));
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        MeterData other = (MeterData) obj;
-        if (counter != other.counter) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (uuid == null) {
-            if (other.uuid != null) {
-                return false;
-            }
-        } else if (!uuid.equals(other.uuid)) {
-            return false;
-        }
-        return true;
-    }
-
     public long getExecutionTime() {
         if (stopTime == 0) {
             return System.nanoTime() - startTime;
@@ -223,38 +167,17 @@ public class MeterData extends SystemData {
         return ((double) this.iterations) / executionTimeNS * 1000000000;
     }
 
-    @Override
-    public String toString() {
-        return this.uuid + ":" + this.name + ":" + this.counter;
-    }
-    protected static final String UUID = "uuid";
-    protected static final String COUNTER = "c";
-    protected static final String NAME = "n";
     protected static final String DESCRIPTION = "d";
     protected static final String CREATE_TIME = "t0";
     protected static final String START_TIME = "t1";
     protected static final String STOP_TIME = "t2";
     protected static final String ITERATIONS = "i";
     protected static final String EXCEPTION = "e";
-    protected static final String THREAD = "e";
+    protected static final String THREAD = "th";
     protected static final String CONTEXT = "ctx";
 
     @Override
-    public void writeProperties(EventWriter w) {
-        /* Session ID */
-        if (this.uuid != null) {
-            w.property(UUID, this.uuid);
-        }
-
-        /* Event counter */
-        if (this.counter > 0) {
-            w.property(COUNTER, this.counter);
-        }
-
-        /* Name and description */
-        if (this.name != null) {
-            w.property(NAME, this.name);
-        }
+    public void writePropertiesImpl(EventWriter w) {
         if (this.description != null) {
             w.property(DESCRIPTION, this.description);
         }
@@ -292,21 +215,12 @@ public class MeterData extends SystemData {
             w.property(CONTEXT, this.context);
         }
 
-        super.writeProperties(w);
+        super.writePropertiesImpl(w);
     }
 
     @Override
-    protected boolean readProperty(EventReader r, String propertyName) throws IOException {
-        if (COUNTER.equals(propertyName)) {
-            this.counter = r.readLong();
-            return true;
-        } else if (UUID.equals(propertyName)) {
-            this.uuid = r.readString();
-            return true;
-        } else if (NAME.equals(propertyName)) {
-            this.name = r.readString();
-            return true;
-        } else if (DESCRIPTION.equals(propertyName)) {
+    protected boolean readPropertyImpl(EventReader r, String propertyName) throws IOException {
+        if (DESCRIPTION.equals(propertyName)) {
             this.description = r.readString();
             return true;
         } else if (CREATE_TIME.equals(propertyName)) {
@@ -334,6 +248,6 @@ public class MeterData extends SystemData {
         } else if (CONTEXT.equals(propertyName)) {
             this.context = r.readMap();
         }
-        return super.readProperty(r, propertyName);
+        return super.readPropertyImpl(r, propertyName);
     }
 }

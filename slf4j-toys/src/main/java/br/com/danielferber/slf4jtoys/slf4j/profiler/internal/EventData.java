@@ -15,85 +15,243 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData.MEMORY;
 import java.io.IOException;
 import java.io.Serializable;
 
 /**
  *
  * @author Daniel
- */ 
+ */
 public abstract class EventData implements Serializable {
 
-    private final char messagePrefix;
+//    private final char messagePrefix;
+    /**
+     * Unique ProfilingSession UUID.
+     */
+    protected String sessionUuid = null;
+    /**
+     * Identifier that categorizes events into groups.
+     */
+    protected String eventCategory = null;
+    /**
+     * The event position within the category.
+     */
+    protected long eventPosition = 0;
+    /**
+     * Timestamp when the event data was collected.
+     */
+    protected long time = 0;
 
-    protected EventData(char messagePrefix) {
+    protected EventData() {
         super();
-        this.messagePrefix = messagePrefix;
-    }
-
-    protected abstract void reset();
-
-    public abstract StringBuilder readableString(StringBuilder builder);
-
-    /**
-     * Writes the event into the supplied StringBuilder.
-     *
-     * @param sb The shared StringBuilder that receives the encoded message.
-     * @return 
-     */
-    public final StringBuilder write(StringBuilder sb) {
-        EventWriter w = new EventWriter(sb);
-        w.open(messagePrefix);
-        writeProperties(w);
-        w.close();
-        return sb;
     }
 
     /**
-     * Implementation shall resort to the supplied MessageWRiter encode each
-     * relevant property.
-     *
-     * @param w The shared EventWriter
+     * Reverts all event attributes to their constructor initial value. Useful
+     * to reuse the event instance and avoid creation of new objects.
      */
-    protected abstract void writeProperties(EventWriter w);
+    protected void reset() {
+        this.sessionUuid = null;
+        this.eventCategory = null;
+        this.eventPosition = 0;
+        this.time = 0;
+    }
 
-    /**
-     * Read the event from the supplied string message. If the method fails to
-     * recognize the message, then method returns false and might have load
-     * inconsistent data into the supplied event.
-     *
-     * @param message The string that is supposed to contain a serialized event
-     * @return true the string message contains a serialized event, false
-     * otherwise
-     * @throws IOException
-     */
-    public final boolean read(String message) throws IOException {
-        String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);
-        if (plausibleMessage == null) {
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((sessionUuid == null) ? 0 : sessionUuid.hashCode());
+        result = prime * result + ((eventCategory == null) ? 0 : eventCategory.hashCode());
+        result = prime * result + (int) (eventPosition ^ (eventPosition >>> 32));
+        return result;
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        reset();
-        EventReader r = new EventReader();
-        r.reset(message);
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        EventData other = (EventData) obj;
+        return this.isSameAs(other);
+    }
 
-        while (r.hasMore()) {
-            String propertyName = r.readPropertyName();
-            if (!readProperty(r, propertyName)) {
-                throw new IOException("unknown property");
-            }
+    @Override
+    public final String toString() {
+        if (sessionUuid != null) {
+            return this.sessionUuid + ":" + this.eventPosition;
+        } else {
+            return Long.toString(this.eventPosition);
+        }
+    }
+
+    /**
+     * Indicates whether this event represents the same as the given argument,
+     * based on session uuid, category and position.
+     *
+     * @param other the event with which to compare
+     * @return <code>true</code> if this event represents the same * * * * * *
+     * as <code>other</code> argument; <code>false</code> otherwise.
+     */
+    public final boolean isSameAs(EventData other) {
+        if (other == null) {
+            throw new IllegalArgumentException();
+        }
+        if (eventPosition != other.eventPosition) {
+            return false;
+        }
+        if (eventCategory == null && other.eventCategory != null) {
+            return false;
+        } else if (!eventCategory.equals(other.eventCategory)) {
+            return false;
+        }
+        if (sessionUuid == null && other.sessionUuid != null) {
+            return false;
+        } else if (!sessionUuid.equals(other.sessionUuid)) {
+            return false;
+        }
+        if (time != other.time) {
+            return false;
         }
         return true;
     }
 
     /**
+     * Indicates weather all event collected attributes are equal than the
+     * attributes collected by the event given as argument. Used only in unit
+     * tests.
      *
-     * Implementation shall resort to the supplied MessageReader to decode data
-     * for one individual property.
-     *
-     * @param r The helper EventReader parsing the message
-     * @param propertyName The property to be extracted from the string
-     * @return true if the property was recognized, false otherwise
-     * @throws IOException
+     * @param other the event with which to compare
+     * @return <code>true</code> if all attributes are equal between the *
+     * events; <code>false</code> otherwise.
      */
-    protected abstract boolean readProperty(EventReader r, String propertyName) throws IOException;
+    protected boolean isCompletelyEqualsTo(Object other) {
+        return this.equals(other);
+    }
+    protected static final String SESSION_UUID = "s";
+    protected static final String EVENT_POSITION = "p";
+    protected static final String EVENT_CATEGORY = "c";
+    private static final String EVENT_TIME = "t";
+
+    /**
+     * Writes a concise, human readable string representation of the event into
+     * the supplied StringBuilder.
+     *
+     * @param builder The StringBuilder that receives the string representation
+     * @return The StringBuilder passed as argument to allow chained
+     * StringBuilder method calls.
+     */
+    public abstract StringBuilder readableString(StringBuilder builder);
+
+    /**
+     * Writes an encoded string representation of the event into the supplied
+     * StringBuilder.
+     *
+     * @param builder The StringBuilder that receives the encoded
+     * representation.
+     * @param messagePrefix A prefix character used by an parser to recognize
+     * the encoded message.
+     * @return The StringBuilder passed as argument to allow chained
+     * StringBuilder method calls.
+     */
+    public final StringBuilder write(StringBuilder sb, char messagePrefix) {
+        EventWriter w = new EventWriter(sb);
+        w.open(messagePrefix);
+        writeKeyProperties(w);
+        writePropertiesImpl(w);
+        w.close();
+        return sb;
+    }
+
+    private void writeKeyProperties(EventWriter w) {
+        /* Session UUID */
+        if (this.sessionUuid != null) {
+            w.property(SESSION_UUID, this.sessionUuid);
+        }
+
+        /* Event category */
+        if (this.eventCategory != null) {
+            w.property(EVENT_POSITION, this.eventCategory);
+        }
+
+        /* Event position */
+        if (this.eventPosition > 0) {
+            w.property(EVENT_CATEGORY, this.eventPosition);
+        }
+
+        /* Event time */
+        if (this.time > 0) {
+            w.property(EVENT_TIME, this.time);
+        }
+    }
+
+    protected abstract void writePropertiesImpl(EventWriter w);
+
+    /**
+     * Reads an events from the encoded string representation. If no event data
+     * is recognized, then inconsistent data might have been loaded.
+     *
+     * @param message The string that is supposed to contain an encoded string
+     * representation of the event.
+     * @return <code>true</code> if an event was successfully
+     * read; <code>false</code> otherwise.
+     */
+    public final boolean read(String message, char messagePrefix) {
+        String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);
+        if (plausibleMessage == null) {
+            return false;
+        }
+        reset();
+        EventReader eventReader = new EventReader();
+        eventReader.reset(message);
+
+        try {
+            while (eventReader.hasMore()) {
+                String key = eventReader.readPropertyName();
+                if (!readKeyProperties(eventReader, key) && !readPropertyImpl(eventReader, key)) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private boolean readKeyProperties(EventReader eventReader, String key) throws IOException {
+        if (SESSION_UUID.equals(key)) {
+            this.sessionUuid = eventReader.readString();
+            return true;
+        } else if (EVENT_POSITION.equals(key)) {
+            this.eventPosition = eventReader.readLong();
+            return true;
+        } else if (EVENT_CATEGORY.equals(key)) {
+            this.eventCategory = eventReader.readString();
+            return true;
+        } else if (EVENT_TIME.equals(key)) {
+            this.time = eventReader.readLong();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *
+     * Implementation shall provide an implementation that reads one or more
+     * values (via given EventReader) from the encoded string and assign them to
+     * the property represented by the given key.
+     *
+     * @param r The EventReader that is parsing the message.
+     * @param key The key that represents the property.
+     * @return true if the key was recognized, false otherwise.
+     * @throws IOException the EventReader failed to parse the encoded string.
+     */
+    protected abstract boolean readPropertyImpl(EventReader r, String key) throws IOException;
 }
