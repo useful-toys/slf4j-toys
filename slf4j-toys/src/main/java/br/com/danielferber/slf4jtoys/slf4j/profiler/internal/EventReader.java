@@ -87,6 +87,10 @@ public class EventReader {
         return readPropertyValue();
     }
 
+    public boolean readBoolean() throws IOException {
+        return Boolean.parseBoolean(readString());
+    }
+
     public long readLong() throws IOException {
         try {
             return Long.parseLong(readString());

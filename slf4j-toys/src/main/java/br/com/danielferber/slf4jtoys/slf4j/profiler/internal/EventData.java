@@ -241,9 +241,10 @@ public abstract class EventData implements Serializable {
         EventReader eventReader = new EventReader();
         eventReader.reset(plausibleMessage);
 
+        String key = null;
         try {
             while (eventReader.hasMore()) {
-                String key = eventReader.readPropertyName();
+                key = eventReader.readPropertyName();
                 if (! readKeyProperties(eventReader, key)) {
                     if (!readPropertyImpl(eventReader, key)) {
                         return false;

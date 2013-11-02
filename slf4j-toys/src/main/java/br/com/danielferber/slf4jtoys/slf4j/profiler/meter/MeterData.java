@@ -28,7 +28,6 @@ public class MeterData extends SystemData {
     protected MeterData() {
         super();
     }
-
     /**
      * An arbitrary short, human readable message to describe the task being
      * measured.
@@ -148,7 +147,7 @@ public class MeterData extends SystemData {
         }
         return super.isCompletelyEqualsImpl(obj);
     }
-    
+
     @Override
     public StringBuilder readableString(StringBuilder buffer) {
         if (stopTime != 0) {
@@ -183,8 +182,7 @@ public class MeterData extends SystemData {
         }
         if (this.runtime_usedMemory > 0) {
             buffer.append("; ");
-            buffer.append(UnitFormatter.nanoseconds(this.runtime_usedMemory));
-
+            buffer.append(UnitFormatter.bytes(this.runtime_usedMemory));
         }
 //        return super.readableString(buffer);
         return buffer;
@@ -214,13 +212,13 @@ public class MeterData extends SystemData {
         }
         return ((double) this.iterations) / executionTimeNS * 1000000000;
     }
-
     protected static final String DESCRIPTION = "d";
     protected static final String CREATE_TIME = "t0";
     protected static final String START_TIME = "t1";
     protected static final String STOP_TIME = "t2";
     protected static final String ITERATIONS = "i";
     protected static final String EXCEPTION = "e";
+    protected static final String SUCCESS = "ok";
     protected static final String THREAD = "th";
     protected static final String CONTEXT = "ctx";
 
@@ -246,8 +244,10 @@ public class MeterData extends SystemData {
 
         /* Excetion */
         if (this.exceptionClass != null) {
-            w.property(EXCEPTION, this.exceptionClass.getClass().getName(), this.exceptionMessage != null ? this.exceptionMessage : "");
+            w.property(EXCEPTION, this.exceptionClass, this.exceptionMessage != null ? this.exceptionMessage : "");
         }
+
+        w.property(SUCCESS, success);
 
         /* Thread info */
         if (this.threadStartId != 0 || this.threadStopId != 0 || this.threadStartName != null || this.threadStopName != null) {
@@ -287,14 +287,18 @@ public class MeterData extends SystemData {
             this.exceptionClass = r.readString();
             this.exceptionMessage = r.readString();
             return true;
+        } else if (SUCCESS.equals(propertyName)) {
+            this.success = r.readBoolean();
+            return true;
         } else if (THREAD.equals(propertyName)) {
             this.threadStartId = r.readLongOrZero();
-            this.threadStopId = r.readLongOrZero();
             this.threadStartName = r.readString();
+            this.threadStopId = r.readLongOrZero();
             this.threadStopName = r.readString();
             return true;
         } else if (CONTEXT.equals(propertyName)) {
             this.context = r.readMap();
+            return true;
         }
         return super.readPropertyImpl(r, propertyName);
     }
@@ -302,6 +306,4 @@ public class MeterData extends SystemData {
     void resetBridge() {
         this.reset();
     }
-    
-    
 }

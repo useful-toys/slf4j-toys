@@ -15,6 +15,8 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.utils;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  *
  * @author Daniel Felix Ferber
@@ -76,11 +78,11 @@ public final class UnitFormatter {
     }
 
     public static String nanoseconds(long value) {
-        return longUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
+        return longUnit(value, TIME_UNITS, TIME_FACTORS);
     }
 
     public static String nanoseconds(double value) {
-        return doubleUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
+        return doubleUnit(value, TIME_UNITS, TIME_FACTORS);
     }
 
     public static String iterations(double value) {

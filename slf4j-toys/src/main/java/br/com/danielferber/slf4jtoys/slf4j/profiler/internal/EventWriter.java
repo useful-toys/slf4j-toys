@@ -20,6 +20,7 @@ import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.PatternDefin
 import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.*;
 
 public final class EventWriter {
+
     private transient boolean firstProperty;
     private transient final StringBuilder builder;
 
@@ -33,11 +34,16 @@ public final class EventWriter {
         builder.append(id);
         builder.append(MESSAGE_OPEN);
     }
-    
+
     void close() {
         builder.append(MESSAGE_CLOSE);
     }
-    
+
+    public EventWriter property(String name, boolean value) {
+        property(name, Boolean.toString(value));
+        return this;
+    }
+
     public EventWriter property(String name, long value) {
         property(name, Long.toString(value));
         return this;
