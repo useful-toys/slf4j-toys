@@ -93,7 +93,7 @@ public class Meter extends MeterData implements Closeable {
         context.put(name, value);
         return this;
     }
-    
+
     public Meter ctx(String name, int value) {
         ctx(name, Integer.toString(value));
         return this;
@@ -176,7 +176,7 @@ public class Meter extends MeterData implements Closeable {
     public Meter ok(String name, String value) {
         return okImpl(name, value);
     }
-    
+
     public Meter ok(String name, int value) {
         return okImpl(name, Integer.toString(value));
     }
@@ -185,11 +185,11 @@ public class Meter extends MeterData implements Closeable {
         assert createTime != 0;
         try {
             if (stopTime != 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Inconsistent Meter ok()", new Exception("Meter.stop(...): stopTime != 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Inconsistent Meter)", new Exception("Meter.okImpl(...): stopTime != 0"));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Inconsistent Meter ok()", new Exception("Meter.stop(...): startTime == 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Inconsistent Meter", new Exception("Meter.okImpl(...): startTime == 0"));
             }
             if (name != null) {
                 ctx(name, value);
@@ -232,11 +232,11 @@ public class Meter extends MeterData implements Closeable {
         try {
             assert createTime != 0;
             if (stopTime != 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Inconsistent Meter", new Exception("Meter.stop(...): stopTime != 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Inconsistent Meter", new Exception("Meter.failImpl(...): stopTime != 0"));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Inconsistent Meter", new Exception("Meter.stop(...): startTime == 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Inconsistent Meter", new Exception("Meter.failImpl(...): startTime == 0"));
             }
             if (name != null) {
                 context.put(name, value);
@@ -268,7 +268,7 @@ public class Meter extends MeterData implements Closeable {
     @Override
     protected void finalize() throws Throwable {
         if (stopTime == 0) {
-            failImpl(null, null, null);
+            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, "Inconsistent Meter", new Exception("Meter.finalize(...): stopTime == 0"));
         }
         super.finalize();
     }

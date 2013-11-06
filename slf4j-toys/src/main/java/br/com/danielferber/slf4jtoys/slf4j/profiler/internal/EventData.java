@@ -46,6 +46,24 @@ public abstract class EventData implements Serializable {
         super();
     }
 
+    public String getSessionUuid() {
+        return sessionUuid;
+    }
+
+    public String getEventCategory() {
+        return eventCategory;
+    }
+
+    public long getEventPosition() {
+        return eventPosition;
+    }
+
+    public long getTime() {
+        return time;
+    }
+    
+    
+
     /**
      * Reverts all event attributes to their constructor initial value. Useful
      * to reuse the event instance and avoid creation of new objects.

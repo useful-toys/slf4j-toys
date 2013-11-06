@@ -21,11 +21,12 @@ import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData;
 import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 public class MeterData extends SystemData {
 
-    protected MeterData() {
+    public MeterData() {
         super();
     }
     /**
@@ -85,6 +86,57 @@ public class MeterData extends SystemData {
      */
     protected Map<String, String> context;
 
+    public String getDescription() {
+        return description;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public long getStopTime() {
+        return stopTime;
+    }
+
+    public long getIterations() {
+        return iterations;
+    }
+
+    public String getExceptionClass() {
+        return exceptionClass;
+    }
+
+    public String getExceptionMessage() {
+        return exceptionMessage;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public long getThreadStartId() {
+        return threadStartId;
+    }
+
+    public long getThreadStopId() {
+        return threadStopId;
+    }
+
+    public String getThreadStartName() {
+        return threadStartName;
+    }
+
+    public Map<String, String> getContext() {
+        if (context == null) {
+            return null;
+        }
+        return Collections.unmodifiableMap(context);
+    }
+    
     @Override
     protected void resetImpl() {
         super.resetImpl();
