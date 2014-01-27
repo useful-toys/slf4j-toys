@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 public class Meter extends MeterData implements Closeable {
 
     private final Logger logger;
+    private static final String NULL_VALUE = "<null>";
     /**
      * How many times each event has been executed.
      */
@@ -86,6 +87,94 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    public Meter ctx(String name, int value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, Integer.toString(value));
+        return this;
+    }
+
+    public Meter ctx(String name, long value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, Long.toString(value));
+        return this;
+    }
+
+    public Meter ctx(String name, boolean value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, Boolean.toString(value));
+        return this;
+    }
+
+    public Meter ctx(String name, float value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, Float.toString(value));
+        return this;
+    }
+
+    public Meter ctx(String name, double value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, Double.toString(value));
+        return this;
+    }
+
+    public Meter ctx(String name, Integer value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, value == null ? NULL_VALUE : value.toString());
+        return this;
+    }
+
+    public Meter ctx(String name, Long value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, value == null ? NULL_VALUE : value.toString());
+        return this;
+    }
+
+    public Meter ctx(String name, Boolean value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, value == null ? NULL_VALUE : value.toString());
+        return this;
+    }
+
+    public Meter ctx(String name, Float value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, value == null ? NULL_VALUE : value.toString());
+        return this;
+    }
+
+    public Meter ctx(String name, Double value) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, value == null ? NULL_VALUE : value.toString());
+        return this;
+    }
+
+    public Meter ctx(String name, Object object) {
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        context.put(name, object == null ? NULL_VALUE : object.toString());
+        return this;
+    }
+
     public Meter ctx(String name, String value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -94,8 +183,8 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
-    public Meter ctx(String name, int value) {
-        ctx(name, Integer.toString(value));
+    public Meter ctx(String name, String format, Object... objects) {
+        ctx(name, String.format(format, objects));
         return this;
     }
 
@@ -124,25 +213,10 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     public Meter start() {
-        return startImpl(null, null);
-    }
-
-    public Meter start(String name) {
-        return startImpl(name, null);
-    }
-
-    public Meter start(String name, String value) {
-        return startImpl(name, value);
-    }
-
-    protected Meter startImpl(String name, String value) {
         assert createTime != 0;
         try {
             if (startTime != 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_START, "Inconsistent Meter start()", new Exception("Meter.start(...): startTime != 0"));
-            }
-            if (name != null) {
-                ctx(name, value);
             }
 
             Thread currentThread = Thread.currentThread();
@@ -166,22 +240,6 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     public Meter ok() {
-        return this.ok(null, null);
-    }
-
-    public Meter ok(String name) {
-        return this.ok(name, null);
-    }
-
-    public Meter ok(String name, String value) {
-        return okImpl(name, value);
-    }
-
-    public Meter ok(String name, int value) {
-        return okImpl(name, Integer.toString(value));
-    }
-
-    protected Meter okImpl(String name, String value) {
         assert createTime != 0;
         try {
             if (stopTime != 0) {
@@ -190,9 +248,6 @@ public class Meter extends MeterData implements Closeable {
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, "Inconsistent Meter", new Exception("Meter.okImpl(...): startTime == 0"));
-            }
-            if (name != null) {
-                ctx(name, value);
             }
             success = true;
 
@@ -217,18 +272,6 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     public Meter fail(Throwable throwable) {
-        return this.fail(throwable, null, null);
-    }
-
-    public Meter fail(Throwable throwable, String name) {
-        return this.fail(throwable, name, null);
-    }
-
-    public Meter fail(Throwable throwable, String name, String value) {
-        return failImpl(throwable, name, value);
-    }
-
-    protected Meter failImpl(Throwable throwable, String name, String value) {
         try {
             assert createTime != 0;
             if (stopTime != 0) {
@@ -237,9 +280,6 @@ public class Meter extends MeterData implements Closeable {
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Inconsistent Meter", new Exception("Meter.failImpl(...): startTime == 0"));
-            }
-            if (name != null) {
-                context.put(name, value);
             }
             if (throwable != null) {
                 exceptionClass = throwable.getClass().getName();
@@ -275,7 +315,7 @@ public class Meter extends MeterData implements Closeable {
 
     public void close() throws IOException {
         if (stopTime == 0) {
-            failImpl(null, null, null);
+            fail(null);
         }
     }
 }
