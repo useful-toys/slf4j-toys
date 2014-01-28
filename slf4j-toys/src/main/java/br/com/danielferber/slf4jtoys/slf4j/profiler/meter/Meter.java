@@ -233,7 +233,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
         } catch (Exception t) {
-            logger.error("Excetion thrown in Meter", t);
+            logger.error("Exception thrown in Meter", t);
         }
         return this;
     }
@@ -265,7 +265,7 @@ public class Meter extends MeterData implements Closeable {
                 logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());
             }
         } catch (Exception t) {
-            logger.error("Excetion thrown in Meter", t);
+            logger.error("Exception thrown in Meter", t);
         }
         return this;
     }
@@ -299,7 +299,7 @@ public class Meter extends MeterData implements Closeable {
                 logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder(), 'M').toString());
             }
         } catch (Exception t) {
-            logger.error("Excetion thrown in Meter", t);
+            logger.error("Exception thrown in Meter", t);
         }
         return this;
     }
