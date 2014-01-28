@@ -74,7 +74,7 @@ public class Meter extends MeterData implements Closeable {
         try {
             this.description = String.format(message, args);
         } catch (IllegalFormatException e) {
-            logger.warn("Meter.setMessage(...)", e);
+            logger.error("Illegal string format in Meter.setMessage(message, args...)", e);
         }
         return this;
     }
@@ -184,7 +184,14 @@ public class Meter extends MeterData implements Closeable {
     }
 
     public Meter ctx(String name, String format, Object... objects) {
-        ctx(name, String.format(format, objects));
+        if (context == null) {
+            this.context = new HashMap<String, String>();
+        }
+        try {
+            ctx(name, String.format(format, objects));
+        } catch (IllegalFormatException e) {
+            logger.error("Illegal string format in Meter.ctx(name, format, objects...)", e);
+        }
         return this;
     }
 
@@ -216,7 +223,8 @@ public class Meter extends MeterData implements Closeable {
         assert createTime != 0;
         try {
             if (startTime != 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_START, "Inconsistent Meter start()", new Exception("Meter.start(...): startTime != 0"));
+                /* Log exception to provide stacktrace to inconsistent meter call. */
+                logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter already started.", new Exception("Meter.start(): startTime != 0"));
             }
 
             Thread currentThread = Thread.currentThread();
@@ -233,7 +241,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
         } catch (Exception t) {
-            logger.error("Exception thrown in Meter", t);
+            logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter start threw exception.", t);
         }
         return this;
     }
@@ -243,11 +251,13 @@ public class Meter extends MeterData implements Closeable {
         assert createTime != 0;
         try {
             if (stopTime != 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Inconsistent Meter)", new Exception("Meter.okImpl(...): stopTime != 0"));
+                /* Log exception to provide stacktrace to inconsistent meter call. */
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter already refused or confirmed.", new Exception("Meter.ok(...): stopTime != 0"));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Inconsistent Meter", new Exception("Meter.okImpl(...): startTime == 0"));
+                /* Log exception to provide stacktrace to inconsistent meter call. */
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmed but not started.", new Exception("Meter.ok(...): startTime == 0"));
             }
             success = true;
 
@@ -265,7 +275,7 @@ public class Meter extends MeterData implements Closeable {
                 logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());
             }
         } catch (Exception t) {
-            logger.error("Exception thrown in Meter", t);
+            logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmation threw exception.", t);
         }
         return this;
     }
@@ -275,11 +285,13 @@ public class Meter extends MeterData implements Closeable {
         try {
             assert createTime != 0;
             if (stopTime != 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Inconsistent Meter", new Exception("Meter.failImpl(...): stopTime != 0"));
+                /* Log exception to provide stacktrace to inconsistent meter call. */
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter already refused or confirmed.", new Exception("Meter.fail(): stopTime != 0"));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Inconsistent Meter", new Exception("Meter.failImpl(...): startTime == 0"));
+                /* Log exception to provide stacktrace to inconsistent meter call. */
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refused, but not started.", new Exception("Meter.fail(): startTime == 0"));
             }
             if (throwable != null) {
                 exceptionClass = throwable.getClass().getName();
@@ -307,12 +319,16 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
     @Override
     protected void finalize() throws Throwable {
+        /* Check for meters being finalized without stopTime. Such
+         * meters have been forgotten to confirm or to refuse. */
         if (stopTime == 0) {
-            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, "Inconsistent Meter", new Exception("Meter.finalize(...): stopTime == 0"));
+            /* Log exception to provide stacktrace to inconsistent meter call. */
+            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, "Meter finalized but not refused nor confirmed.", new Exception("Meter.finalize(): stopTime == 0"));
         }
         super.finalize();
     }
 
+    // ========================================================================
     @Override
     public void close() throws IOException {
         if (stopTime == 0) {
