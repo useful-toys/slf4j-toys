@@ -313,6 +313,7 @@ public class Meter extends MeterData implements Closeable {
         super.finalize();
     }
 
+    @Override
     public void close() throws IOException {
         if (stopTime == 0) {
             fail(null);
