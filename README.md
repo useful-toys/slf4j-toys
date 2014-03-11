@@ -4,7 +4,6 @@
  * Consistent and predictable logger naming convention;
  * Operation demarcation and performance measure; 
  * Application resource usage;
- * Data and state logged using properties;
  * Large data logged using formatted print streams;
  * Parsable message for later analysis.
 
@@ -16,7 +15,7 @@ The **LoggerFactory substitute** eases the consistent and predictable logger nam
 
 The `getLogger(Class<?> clazz, String name)` helps to fine tune loggers for specific operations or features of interest provided by your class. For example, you could define loggers to separately track `open()` and `close()` methods.
 
-For a consistent  and predictable logger convention, I suggest creating a logger hierarchy that describes features groups, features and operations. For example, instead of *com.company.application.authentication.dao.hibernate.UserDAOImpl*, one could use *authentication.persistence.hibernate.user*: shorter and more intuitive. The suggested hierarchy is defined purely on and hierarchy of short and self describing names, instand of class hierarchy. One each level, define a logger based on the parent level logger by calling `getLogger(Logger logger, String name)`. This protects your logging configuration against refactoring as the logger name is preserved.
+For a consistent  and predictable logger convention, I suggest creating a logger hierarchy that describes features groups, features and operations. For example, instead of *com.company.application.authentication.dao.hibernate.UserDAOImpl*, one could use *authentication.persistence.hibernate.user*: shorter, more intuitive and does not leak implementation details. The suggested hierarchy is defined purely on and hierarchy of short and self describing names, instand of class hierarchy. One each level, define a logger based on the parent level logger by calling `getLogger(Logger logger, String name)`. This protects your logging configuration against refactoring as the logger name is preserved.
 
 ## Operation demarcation and performance measure ##
 
