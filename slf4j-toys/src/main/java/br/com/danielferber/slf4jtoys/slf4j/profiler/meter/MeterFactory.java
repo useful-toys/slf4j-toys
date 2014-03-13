@@ -15,62 +15,45 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
+import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MeterFactory {
 
-    private static final Map<String, String> context = new TreeMap<String, String>();
+//    private static final Map<String, String> context = new TreeMap<String, String>();
 
     public static Meter getMeter(String name) {
-        return new Meter(LoggerFactory.getLogger(name), name);
+        return new Meter(LoggerFactory.getLogger(name));
     }
 
     public static Meter getMeter(Class<?> clazz) {
-        return new Meter(LoggerFactory.getLogger(clazz), clazz.getName());
+        return new Meter(LoggerFactory.getLogger(clazz));
     }
 
-    public static Meter getMeter(Class<?> clazz, String name) {
-        return new Meter(LoggerFactory.getLogger(clazz), (clazz.getName() + "." + name));
+    public static Meter getMeter(Class<?> clazz, String operationId) {
+        return new Meter(LoggerFactory.getLogger(clazz, operationId));
     }
 
-    public static Meter getMeter(Logger logger, String name) {
-        return new Meter(logger, (logger.getName() + "." + name));
+    public static Meter getMeter(Logger logger, String operationId) {
+        return new Meter(LoggerFactory.getLogger(logger, operationId));
     }
 
-//	public static Meter getMeter(Class<?> clazz, Operation operation) {
-//		String instanceName = clazz.getName()+"."+operation.getName();
-//		Meter meter = new Meter(LoggerFactory.getLogger(clazz), instanceName);
-//		if (OperationWithMessage.class.isAssignableFrom(operation.getClass())) {
-//			meter.setMessage(((OperationWithMessage) operation).getMessage());
-//		}
-//		return meter;
-//	}
+//    public static void put(String name) {
+//        context.put(name, null);
+//    }
 //
-//	public static Meter getMeter(Logger logger, Operation operation) {
-//		String instanceName = logger.getName()+"."+operation.getName();
-//		Meter meter = new Meter(logger, instanceName);
-//		if (OperationWithMessage.class.isAssignableFrom(operation.getClass())) {
-//			meter.setMessage(((OperationWithMessage) operation).getMessage());
-//		}
-//		return meter;
-//	}
-    public static void put(String name) {
-        context.put(name, null);
-    }
-
-    public static void put(String name, String value) {
-        context.put(name, value);
-    }
-
-    public static void remove(String name) {
-        context.remove(name);
-    }
-
-    static Map<String, String> getContext() {
-        return context;
-    }
+//    public static void put(String name, String value) {
+//        context.put(name, value);
+//    }
+//
+//    public static void remove(String name) {
+//        context.remove(name);
+//    }
+//
+//    static Map<String, String> getContext() {
+//        return context;
+//    }
 }

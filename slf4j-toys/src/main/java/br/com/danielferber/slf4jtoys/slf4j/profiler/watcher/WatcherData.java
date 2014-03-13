@@ -15,11 +15,8 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData;
 import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
-import java.io.IOException;
 
 /**
  *

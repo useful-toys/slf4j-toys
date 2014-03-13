@@ -30,11 +30,14 @@ public class Watcher extends WatcherData implements Runnable {
         super();
         this.logger = logger;
         this.sessionUuid = ProfilingSession.uuid;
+        this.eventPosition = 0;
+        this.eventCategory = logger.getName();
     }
 
     @Override
     public void run() {
         time = System.nanoTime();
+        eventPosition++;
 
         if (logger.isInfoEnabled()) {
             collectSystemStatus();

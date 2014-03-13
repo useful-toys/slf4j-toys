@@ -209,12 +209,12 @@ public class MeterData extends SystemData {
         } else {
             buffer.append("Scheduled");
         }
-        buffer.append(": ");
         if (this.description != null) {
+            buffer.append(": ");
             buffer.append(this.description);
-        } else {
+        } /* else {
             buffer.append(this.eventCategory);
-        }
+        } */
         if (this.startTime > 0) {
             buffer.append("; ");
             buffer.append(UnitFormatter.nanoseconds(getExecutionTime()));

@@ -36,13 +36,13 @@ public class Meter extends MeterData implements Closeable {
     private static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
     private long timeLimit = 0;
 
-    public Meter(Logger logger, String name) {
+    public Meter(Logger logger) {
         super();
         this.sessionUuid = ProfilingSession.uuid;
         this.logger = logger;
-        this.eventCategory = name;
-        eventCounterByName.putIfAbsent(name, new AtomicLong(0));
-        this.eventPosition = eventCounterByName.get(name).incrementAndGet();
+        this.eventCategory = logger.getName();
+        eventCounterByName.putIfAbsent(this.eventCategory, new AtomicLong(0));
+        this.eventPosition = eventCounterByName.get(this.eventCategory).incrementAndGet();
         this.createTime = System.nanoTime();
     }
 
@@ -52,7 +52,7 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     public Meter sub(String name) {
-        final Meter m = MeterFactory.getMeter(this.logger.getName() + '.' + name);
+        final Meter m = MeterFactory.getMeter(eventCategory + '.' + name);
         if (this.context != null) {
             m.context = new HashMap<String, String>(this.context);
         }
