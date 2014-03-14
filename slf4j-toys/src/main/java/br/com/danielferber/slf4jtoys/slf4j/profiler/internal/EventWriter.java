@@ -148,8 +148,10 @@ public final class EventWriter {
             String key = entry.getKey();
             String value = entry.getValue();
             builder.append(key);
-            builder.append(MAP_EQUAL);
-            writeMapValue(value);
+            if (value != null) {
+                builder.append(MAP_EQUAL);
+                writeMapValue(value);
+            }
         }
         builder.append(MAP_CLOSE);
 

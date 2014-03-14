@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  */
 class PatternDefinition extends SyntaxDefinition {
 
-    static final Pattern encodePropertyValuePattern = quotedCharsPattern(PROPERTY_DIV, PROPERTY_SEPARATOR, MESSAGE_CLOSE, QUOTE);
+    static final Pattern encodePropertyValuePattern = quotedCharsPattern(PROPERTY_DIV, PROPERTY_SEPARATOR, MESSAGE_CLOSE, QUOTE, MAP_CLOSE, MAP_SEPARATOR);
     static final Pattern encodeMapValuePattern = quotedCharsPattern(MAP_CLOSE, MAP_SEPARATOR, MESSAGE_CLOSE, QUOTE);
     static final String encodeReplacement = "\\" + QUOTE + "$1";
 

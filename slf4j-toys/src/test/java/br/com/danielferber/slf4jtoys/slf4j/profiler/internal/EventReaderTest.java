@@ -114,4 +114,38 @@ public class EventReaderTest {
         assertTrue(m.containsKey("c"));
         assertEquals("d", m.get("c"));
     }
+    
+    @Test
+    public void testReadMap4() throws IOException {
+        String input = "=[a]";
+        final EventReader r = new EventReader().reset(input);
+        final Map<String, String> m = r.readMap();
+        assertEquals(1, m.size());
+        assertTrue(m.containsKey("a"));
+        assertEquals(null, m.get("a"));
+    }
+    
+        @Test
+    public void testReadMap5() throws IOException {
+        String input = "=[a,c:d]";
+        final EventReader r = new EventReader().reset(input);
+        final Map<String, String> m = r.readMap();
+        assertEquals(2, m.size());
+        assertTrue(m.containsKey("a"));
+        assertEquals(null, m.get("a"));
+        assertTrue(m.containsKey("c"));
+        assertEquals("d", m.get("c"));
+    }
+
+    @Test
+    public void testReadMap6() throws IOException {
+        String input = "=[a:b,c]";
+        final EventReader r = new EventReader().reset(input);
+        final Map<String, String> m = r.readMap();
+        assertEquals(2, m.size());
+        assertTrue(m.containsKey("a"));
+        assertEquals("b", m.get("a"));
+        assertTrue(m.containsKey("c"));
+        assertEquals(null, m.get("c"));
+    }
 }

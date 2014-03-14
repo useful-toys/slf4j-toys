@@ -26,6 +26,7 @@ import org.junit.Before;
  * @author Daniel
  */
 public class EventWriterTest {
+
     private StringBuilder sb;
     private EventWriter instance;
 
@@ -64,7 +65,7 @@ public class EventWriterTest {
         assertEquals(expected, output);
     }
 
-  @Test
+    @Test
     public void testWriteMapValue1() {
         String input = "ABC";
         String expected = "ABC";
@@ -183,4 +184,37 @@ public class EventWriterTest {
         String output = sb.toString();
         assertEquals(expected, output);
     }
+
+    @Test
+    public void testWriterMap4() {
+        String expected = "m=[a]";
+        Map<String, String> m = new TreeMap<String, String>();
+        m.put("a", null);
+        instance.property("m", m);
+        String output = sb.toString();
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testWriterMap5() {
+        String expected = "m=[a,c:d]";
+        Map<String, String> m = new TreeMap<String, String>();
+        m.put("a", null);
+        m.put("c", "d");
+        instance.property("m", m);
+        String output = sb.toString();
+        assertEquals(expected, output);
+    }
+
+    @Test
+    public void testWriterMap6() {
+        String expected = "m=[a:b,c]";
+        Map<String, String> m = new TreeMap<String, String>();
+        m.put("a", "b");
+        m.put("c", null);
+        instance.property("m", m);
+        String output = sb.toString();
+        assertEquals(expected, output);
+    }
+
 }

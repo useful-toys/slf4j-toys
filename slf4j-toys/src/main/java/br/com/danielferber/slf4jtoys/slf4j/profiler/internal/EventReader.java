@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.*;
+import javax.print.DocFlavor;
 
 /**
  * Provides methods that implement recurrent deserialization patterns. The
@@ -170,8 +171,10 @@ public class EventReader {
         Map<String, String> map = new TreeMap<String, String>();
         do {
             String key = readMapKey();
-            readSymbol(MAP_EQUAL);
-            String value = readMapValue();
+            String value = null;
+            if (readOptionalSymbol(MAP_EQUAL)) {
+                value = readMapValue();
+            }
             map.put(key, value);
         } while (readOptionalSymbol(MAP_SEPARATOR));
 
@@ -185,7 +188,7 @@ public class EventReader {
             throw new EOFException();
         }
 
-        return readStringImp(MAP_EQUAL, 0);
+        return readStringImp(MAP_EQUAL, MAP_SEPARATOR, MAP_CLOSE);
     }
 
     protected String readMapValue() throws IOException {
@@ -193,7 +196,7 @@ public class EventReader {
             throw new EOFException();
         }
 
-        return readStringImp(MAP_SEPARATOR, MAP_CLOSE);
+        return readStringImp(MAP_SEPARATOR, MAP_CLOSE, Character.MIN_VALUE);
 
     }
 
@@ -202,7 +205,7 @@ public class EventReader {
             throw new EOFException();
         }
 
-        return readStringImp(PROPERTY_DIV, PROPERTY_SEPARATOR);
+        return readStringImp(PROPERTY_DIV, PROPERTY_SEPARATOR, Character.MIN_VALUE);
     }
 
     protected String readPropertyKey() throws EOFException, IOException {
@@ -228,12 +231,12 @@ public class EventReader {
         return substring;
     }
 
-    private String readStringImp(char delimiter1, int delimiter2) throws EOFException {
+    private String readStringImp(char delimiter1, char delimiter2, char delimiter3) throws EOFException {
         StringBuilder sb = new StringBuilder();
         int end = start;
         while (end < lenght) {
             char c = chars[end];
-            if (c == delimiter1 || c == delimiter2) {
+            if (c == delimiter1 || c == delimiter2 || c == delimiter3) {
                 break;
             } else if (c == QUOTE) {
                 sb.append(charsString.substring(start, end));
