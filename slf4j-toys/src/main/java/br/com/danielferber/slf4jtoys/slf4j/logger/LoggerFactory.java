@@ -82,7 +82,7 @@ public class LoggerFactory {
      * Recommended to get a logger that tracks separatedly a step, operation or
      * feature being reported by an existing logger.
      *
-     * @param clazz the returned logger will be named after logger
+     * @param logger the returned logger will be named after logger
      * @param name the name of the operation provided by the class.
      * @return the logger
      */
@@ -91,8 +91,8 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write text to a trace
-     * logger.
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a trace logger.
      *
      * @param logger the logger written to.
      * @return the PrintStream
@@ -105,8 +105,8 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write text to a debug
-     * logger.
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a debug logger.
      *
      * @param logger the logger written to.
      * @return the PrintStream
@@ -119,8 +119,8 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write text to a info
-     * logger.
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a info logger.
      *
      * @param logger the logger written to.
      * @return the PrintStream
@@ -133,8 +133,8 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write text to a warn
-     * logger.
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a warn logger.
      *
      * @param logger the logger written to.
      * @return the PrintStream
@@ -147,8 +147,8 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write text to a error
-     * logger.
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a error logger.
      *
      * @param logger the logger written to.
      * @return the PrintStream
@@ -161,8 +161,8 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write unformatted
-     * data to a trace logger.
+     * Returns a {@link PrintStream} whose close and flush methods write
+     * unformatted data to a trace logger.
      *
      * @param logger the logger written to.
      * @return the PrintStream
@@ -180,8 +180,8 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write unformatted
-     * data to a debug logger.
+     * Returns a {@link PrintStream} whose close and flush methods write
+     * unformatted data to a debug logger.
      *
      * @param logger the logger written to.
      * @return the PrintStream
@@ -218,8 +218,8 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write unformatted
-     * data to a warn logger.
+     * Returns a {@link PrintStream} whose close and flush methods write
+     * unformatted data to a warn logger.
      *
      * @param logger the logger written to.
      * @return the PrintStream
@@ -237,8 +237,8 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write unformatted
-     * data to a error logger.
+     * Returns a {@link PrintStream} whose close and flush methods write
+     * unformatted data to a error logger.
      *
      * @param logger the logger written to.
      * @return the PrintStream
@@ -254,4 +254,126 @@ public class LoggerFactory {
             }
         };
     }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a trace logger.
+     *
+     * @param logger the PrintStream logger will be named after this logger
+     * @param name the name of the operation or feature for the PrintStream.
+     * @return the PrintStream
+     */
+    public static PrintStream getTracePrintStream(final Logger logger, String name) {
+        return getTracePrintStream(LoggerFactory.getLogger(logger, name));
+    }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a debug logger.
+     *
+     * @param logger the PrintStream logger will be named after this logger
+     * @param name the name of the operation or feature for the PrintStream.
+     * @return the PrintStream
+     */
+    public static PrintStream getDebugPrintStream(final Logger logger, String name) {
+        return getDebugPrintStream(LoggerFactory.getLogger(logger, name));
+    }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a info logger.
+     *
+     * @param logger the PrintStream logger will be named after this logger
+     * @param name the name of the operation or feature for the PrintStream.
+     * @return the PrintStream
+     */
+    public static PrintStream getInfoPrintStream(final Logger logger, String name) {
+        return getInfoPrintStream(LoggerFactory.getLogger(logger, name));
+    }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a warn logger.
+     *
+     * @param logger the PrintStream logger will be named after this logger
+     * @param name the name of the operation or feature for the PrintStream.
+     * @return the PrintStream
+     */
+    public static PrintStream getWarnPrintStream(final Logger logger, String name) {
+        return getWarnPrintStream(LoggerFactory.getLogger(logger, name));
+    }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush methods write text to
+     * a error logger.
+     *
+     * @param logger the PrintStream logger will be named after this logger
+     * @param name the name of the operation or feature for the PrintStream.
+     * @return the PrintStream
+     */
+    public static PrintStream getErrorPrintStream(final Logger logger, String name) {
+        return getErrorPrintStream(LoggerFactory.getLogger(logger, name));
+    }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush methods write
+     * unformatted data to a trace logger.
+     *
+     * @param logger the OutputStream logger will be named after this logger
+     * @param name the name of the operation or feature for the OutputStream.
+     * @return the OutputStream
+     */
+    public static OutputStream getTraceOutputStream(final Logger logger, String name) {
+        return getTraceOutputStream(LoggerFactory.getLogger(logger, name));
+
+    }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush methods write
+     * unformatted data to a debug logger.
+     *
+     * @param logger the OutputStream logger will be named after this logger
+     * @param name the name of the operation or feature for the OutputStream.
+     * @return the OutputStream
+     */
+    public static OutputStream getDebugOutputStream(final Logger logger, String name) {
+        return getDebugOutputStream(LoggerFactory.getLogger(logger, name));
+    }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush write unformatted
+     * data to a info logger.
+     *
+     * @param logger the OutputStream logger will be named after this logger
+     * @param name the name of the operation or feature for the OutputStream.
+     * @return the OutputStream
+     */
+    public static OutputStream getInfoOutputStream(final Logger logger, String name) {
+        return getInfoOutputStream(LoggerFactory.getLogger(logger, name));
+    }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush methods write
+     * unformatted data to a warn logger.
+     *
+     * @param logger the OutputStream logger will be named after this logger
+     * @param name the name of the operation or feature for the OutputStream.
+     * @return the OutputStream
+     */
+    public static OutputStream getWarnOutputStream(final Logger logger, String name) {
+        return getWarnOutputStream(LoggerFactory.getLogger(logger, name));
+    }
+
+    /**
+     * Returns a {@link PrintStream} whose close and flush methods write
+     * unformatted data to a error logger.
+     *
+     * @param logger the OutputStream logger will be named after this logger
+     * @param name the name of the operation or feature for the OutputStream.
+     * @return the OutputStream
+     */
+    public static OutputStream getErrorOutputStream(final Logger logger, String name) {
+        return getErrorOutputStream(LoggerFactory.getLogger(logger, name));
+    }
+
 }

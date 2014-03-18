@@ -4,7 +4,7 @@
 
   <groupId>br.com.danielferber.toys</groupId>
   <artifactId>slf4j-toys</artifactId>
-  <version>1.1</version>
+  <version>1.2</version>
   <packaging>jar</packaging>
 
   <name>slf4j-toys</name>
