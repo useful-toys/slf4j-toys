@@ -202,12 +202,12 @@ public abstract class SystemData extends EventData {
 
         /* heap usage */
         if (this.heap_commited > 0 || this.heap_init > 0 || this.heap_max > 0 || this.heap_used > 0) {
-            w.property(HEAP, this.heap_commited, this.heap_init, this.heap_max, this.heap_used);
+            w.property(HEAP, this.heap_init, this.heap_used, this.heap_commited, this.heap_max);
         }
 
         /* non heap usage */
         if (this.nonHeap_commited > 0 || this.nonHeap_init > 0 || this.nonHeap_max > 0 || this.nonHeap_used > 0) {
-            w.property(NON_HEAP, this.nonHeap_commited, this.nonHeap_init, this.nonHeap_max, this.nonHeap_used);
+            w.property(NON_HEAP, this.nonHeap_init, this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
         }
 
         /* objectPendingFinalizationCount */
@@ -245,16 +245,16 @@ public abstract class SystemData extends EventData {
             this.runtime_maxMemory = r.readLong();
             return true;
         } else if (HEAP.equals(propertyName)) {
-            this.heap_commited = r.readLong();
             this.heap_init = r.readLong();
-            this.heap_max = r.readLong();
             this.heap_used = r.readLong();
+            this.heap_commited = r.readLong();
+            this.heap_max = r.readLong();
             return true;
         } else if (NON_HEAP.equals(propertyName)) {
-            this.nonHeap_commited = r.readLong();
             this.nonHeap_init = r.readLong();
-            this.nonHeap_max = r.readLong();
             this.nonHeap_used = r.readLong();
+            this.nonHeap_commited = r.readLong();
+            this.nonHeap_max = r.readLong();
             return true;
         } else if (FINALIZATION_COUNT.equals(propertyName)) {
             this.objectPendingFinalizationCount = r.readLong();
