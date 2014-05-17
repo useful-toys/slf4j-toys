@@ -37,11 +37,11 @@ public abstract class SystemData extends EventData {
         super();
     }
     protected long heap_commited = 0;
-    protected long heap_init = 0;
+//    protected long heap_init = 0;
     protected long heap_max = 0;
     protected long heap_used = 0;
     protected long nonHeap_commited = 0;
-    protected long nonHeap_init = 0;
+//    protected long nonHeap_init = 0;
     protected long nonHeap_max = 0;
     protected long nonHeap_used = 0;
     protected long objectPendingFinalizationCount = 0;
@@ -59,11 +59,11 @@ public abstract class SystemData extends EventData {
     @Override
     protected void resetImpl() {
         this.heap_commited = 0;
-        this.heap_init = 0;
+//        this.heap_init = 0;
         this.heap_max = 0;
         this.heap_used = 0;
         this.nonHeap_commited = 0;
-        this.nonHeap_init = 0;
+//        this.nonHeap_init = 0;
         this.nonHeap_max = 0;
         this.nonHeap_used = 0;
         this.objectPendingFinalizationCount = 0;
@@ -85,9 +85,9 @@ public abstract class SystemData extends EventData {
         if (this.heap_commited != other.heap_commited) {
             return false;
         }
-        if (this.heap_init != other.heap_init) {
-            return false;
-        }
+//        if (this.heap_init != other.heap_init) {
+//            return false;
+//        }
         if (this.heap_max != other.heap_max) {
             return false;
         }
@@ -97,9 +97,9 @@ public abstract class SystemData extends EventData {
         if (this.nonHeap_commited != other.nonHeap_commited) {
             return false;
         }
-        if (this.nonHeap_init != other.nonHeap_init) {
-            return false;
-        }
+//        if (this.nonHeap_init != other.nonHeap_init) {
+//            return false;
+//        }
         if (this.nonHeap_max != other.nonHeap_max) {
             return false;
         }
@@ -152,13 +152,13 @@ public abstract class SystemData extends EventData {
 
         MemoryUsage heapUsage = memory.getHeapMemoryUsage();
         heap_commited = heapUsage.getCommitted();
-        heap_init = heapUsage.getInit();
+//        heap_init = heapUsage.getInit();
         heap_max = heapUsage.getMax();
         heap_used = heapUsage.getUsed();
 
         MemoryUsage nonHeapUsage = memory.getHeapMemoryUsage();
         nonHeap_commited = nonHeapUsage.getCommitted();
-        nonHeap_init = nonHeapUsage.getInit();
+//        nonHeap_init = nonHeapUsage.getInit();
         nonHeap_max = nonHeapUsage.getMax();
         nonHeap_used = nonHeapUsage.getUsed();
 
@@ -201,13 +201,13 @@ public abstract class SystemData extends EventData {
         }
 
         /* heap usage */
-        if (this.heap_commited > 0 || this.heap_init > 0 || this.heap_max > 0 || this.heap_used > 0) {
-            w.property(HEAP, this.heap_init, this.heap_used, this.heap_commited, this.heap_max);
+        if (this.heap_commited > 0 || /*this.heap_init > 0 || */this.heap_max > 0 || this.heap_used > 0) {
+            w.property(HEAP, /*this.heap_init, */this.heap_used, this.heap_commited, this.heap_max);
         }
 
         /* non heap usage */
-        if (this.nonHeap_commited > 0 || this.nonHeap_init > 0 || this.nonHeap_max > 0 || this.nonHeap_used > 0) {
-            w.property(NON_HEAP, this.nonHeap_init, this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
+        if (this.nonHeap_commited > 0 || /*this.nonHeap_init > 0 || */this.nonHeap_max > 0 || this.nonHeap_used > 0) {
+            w.property(NON_HEAP, /*this.nonHeap_init, */this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
         }
 
         /* objectPendingFinalizationCount */
@@ -245,13 +245,13 @@ public abstract class SystemData extends EventData {
             this.runtime_maxMemory = r.readLong();
             return true;
         } else if (HEAP.equals(propertyName)) {
-            this.heap_init = r.readLong();
+//            this.heap_init = r.readLong();
             this.heap_used = r.readLong();
             this.heap_commited = r.readLong();
             this.heap_max = r.readLong();
             return true;
         } else if (NON_HEAP.equals(propertyName)) {
-            this.nonHeap_init = r.readLong();
+//            this.nonHeap_init = r.readLong();
             this.nonHeap_used = r.readLong();
             this.nonHeap_commited = r.readLong();
             this.nonHeap_max = r.readLong();

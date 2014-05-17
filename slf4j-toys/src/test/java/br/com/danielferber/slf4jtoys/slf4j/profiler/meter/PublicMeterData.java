@@ -22,13 +22,13 @@ public class PublicMeterData extends MeterData {
         this.heap_commited = heap_commited;
     }
 
-    public long getHeap_init() {
-        return heap_init;
-    }
+//    public long getHeap_init() {
+//        return heap_init;
+//    }
 
-    public void setHeap_init(long heap_init) {
-        this.heap_init = heap_init;
-    }
+//    public void setHeap_init(long heap_init) {
+//        this.heap_init = heap_init;
+//    }
 
     public long getHeap_max() {
         return heap_max;
@@ -54,13 +54,13 @@ public class PublicMeterData extends MeterData {
         this.nonHeap_commited = nonHeap_commited;
     }
 
-    public long getNonHeap_init() {
-        return nonHeap_init;
-    }
+//    public long getNonHeap_init() {
+//        return nonHeap_init;
+//    }
 
-    public void setNonHeap_init(long nonHeap_init) {
-        this.nonHeap_init = nonHeap_init;
-    }
+//    public void setNonHeap_init(long nonHeap_init) {
+//        this.nonHeap_init = nonHeap_init;
+//    }
 
     public long getNonHeap_max() {
         return nonHeap_max;

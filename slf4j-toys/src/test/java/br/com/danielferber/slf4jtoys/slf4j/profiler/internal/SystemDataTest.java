@@ -23,11 +23,11 @@ public class SystemDataTest {
         SystemData b = createSystemData();
 
         b.heap_commited = 1;
-        b.heap_init = 2;
+//        b.heap_init = 2;
         b.heap_max = 3;
         b.heap_used = 4;
         b.nonHeap_commited = 5;
-        b.nonHeap_init = 6;
+//        b.nonHeap_init = 6;
         b.nonHeap_max = 7;
         b.nonHeap_used = 8;
         b.objectPendingFinalizationCount = 9;
@@ -60,11 +60,11 @@ public class SystemDataTest {
         assertTrue(b.isCompletelyEqualsTo(a));
 
         a.heap_commited = 1;
-        a.heap_init = 2;
+//        a.heap_init = 2;
         a.heap_max = 3;
         a.heap_used = 4;
         a.nonHeap_commited = 5;
-        a.nonHeap_init = 6;
+//        a.nonHeap_init = 6;
         a.nonHeap_max = 7;
         a.nonHeap_used = 8;
         a.objectPendingFinalizationCount = 9;
@@ -80,11 +80,11 @@ public class SystemDataTest {
         a.systemLoad = 1.0;
 
         b.heap_commited = 1;
-        b.heap_init = 2;
+//        b.heap_init = 2;
         b.heap_max = 3;
         b.heap_used = 4;
         b.nonHeap_commited = 5;
-        b.nonHeap_init = 6;
+//        b.nonHeap_init = 6;
         b.nonHeap_max = 7;
         b.nonHeap_used = 8;
         b.objectPendingFinalizationCount = 9;
@@ -111,12 +111,12 @@ public class SystemDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
 
         b.heap_commited = 1;
-        b.heap_init = 22;
+//        b.heap_init = 22;
 
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
+//        assertFalse(a.isCompletelyEqualsTo(b));
+//        assertFalse(b.isCompletelyEqualsTo(a));
 
-        b.heap_init = 2;
+//        b.heap_init = 2;
         b.heap_max = 33;
 
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -135,12 +135,12 @@ public class SystemDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
 
         b.nonHeap_commited = 5;
-        b.nonHeap_init = 66;
+//        b.nonHeap_init = 66;
 
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
+//        assertFalse(a.isCompletelyEqualsTo(b));
+//        assertFalse(b.isCompletelyEqualsTo(a));
 
-        b.nonHeap_init = 6;
+//        b.nonHeap_init = 6;
         b.nonHeap_max = 77;
 
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -249,11 +249,11 @@ public class SystemDataTest {
         a.time = 2222;
 
         a.heap_commited = 1;
-        a.heap_init = 2;
+//        a.heap_init = 2;
         a.heap_max = 3;
         a.heap_used = 4;
         a.nonHeap_commited = 5;
-        a.nonHeap_init = 6;
+//        a.nonHeap_init = 6;
         a.nonHeap_max = 7;
         a.nonHeap_used = 8;
         a.objectPendingFinalizationCount = 9;

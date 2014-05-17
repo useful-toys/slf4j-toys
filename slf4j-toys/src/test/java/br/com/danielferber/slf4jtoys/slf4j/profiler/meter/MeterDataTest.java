@@ -187,11 +187,11 @@ public class MeterDataTest {
         a.setTime(2222);
 
         a.setHeap_commited(11);
-        a.setHeap_init(22);
+//        a.setHeap_init(22);
         a.setHeap_max(33);
         a.setHeap_used(44);
         a.setNonHeap_commited(55); 
-        a.setNonHeap_init(66);
+//        a.setNonHeap_init(66);
         a.setNonHeap_max(77);
         a.setNonHeap_used(88);
         a.setObjectPendingFinalizationCount(99);
