@@ -42,7 +42,7 @@ public final class ProfilingSession {
     public static synchronized void startWatcher() {
         if (scheduledWatcher == null) {
             Watcher watcher = new Watcher(LoggerFactory.getLogger(getProperty("watcher.name", "watcher")));
-            scheduledWatcher = executor.scheduleAtFixedRate(watcher, getProperty("watcher.initialDelay", 5), getProperty("watcher.period", 5), TimeUnit.SECONDS);
+            scheduledWatcher = executor.scheduleAtFixedRate(watcher, getProperty("watcher.initialDelay", 15), getProperty("watcher.period", 15), TimeUnit.SECONDS);
         }
     }
 
