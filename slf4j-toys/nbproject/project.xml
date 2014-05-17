@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.java.j2seproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
-            <name>slf4j-toys</name>
+            <name>slf4j-toys-1.1</name>
             <source-roots>
                 <root id="src.java.dir"/>
             </source-roots>
