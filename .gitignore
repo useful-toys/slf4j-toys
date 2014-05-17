@@ -3,6 +3,5 @@ build/
 dist/
 bin/
 private/
-nbproject/private/
 
 /.project
