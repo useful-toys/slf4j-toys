@@ -29,7 +29,7 @@ public class MeterDataTest {
         b.createTime = 1;
         b.startTime = 2;
         b.stopTime = 3;
-        b.iterations = 4;
+        b.currentIteration = 4;
         b.exceptionClass = "Exception";
         b.exceptionMessage = "b";
         b.success = true;
@@ -62,7 +62,7 @@ public class MeterDataTest {
         a.createTime = 1;
         a.startTime = 2;
         a.stopTime = 3;
-        a.iterations = 4;
+        a.currentIteration = 4;
         a.exceptionClass = "Exception";
         a.exceptionMessage = "b";
         a.success = true;
@@ -78,7 +78,7 @@ public class MeterDataTest {
         b.createTime = 1;
         b.startTime = 2;
         b.stopTime = 3;
-        b.iterations = 4;
+        b.currentIteration = 4;
         b.exceptionClass = "Exception";
         b.exceptionMessage = "b";
         b.success = true;
@@ -113,10 +113,10 @@ public class MeterDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
         b.stopTime = 3;
 
-        b.iterations = 44;
+        b.currentIteration = 44;
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.iterations = 4;
+        b.currentIteration = 4;
 
         b.exceptionClass = "ExceptionException";
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -210,7 +210,7 @@ public class MeterDataTest {
         a.createTime = 1;
         a.startTime = 2;
         a.stopTime = 3;
-        a.iterations = 4;
+        a.currentIteration = 4;
         a.exceptionClass = "Exception";
         a.exceptionMessage = "b";
         a.success = true;

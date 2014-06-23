@@ -204,17 +204,22 @@ public class Meter extends MeterData implements Closeable {
     }
 
     public Meter inc() {
-        this.iterations++;
+        this.currentIteration++;
         return this;
     }
 
-    public Meter inc(long i) {
-        this.iterations += i;
+    public Meter incBy(long i) {
+        this.currentIteration += i;
         return this;
     }
 
-    public Meter interations(long i) {
-        this.iterations = i;
+    public Meter incTo(long i) {
+        this.currentIteration = i;
+        return this;
+    }
+    
+     public Meter iterations(long i) {
+        this.currentIteration = i;
         return this;
     }
 
