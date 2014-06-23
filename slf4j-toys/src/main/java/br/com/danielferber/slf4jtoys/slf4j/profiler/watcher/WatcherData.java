@@ -23,6 +23,7 @@ import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
  * @author Daniel Felix Ferber
  */
 public class WatcherData extends SystemData {
+	private static final long serialVersionUID = 1L;
 
     protected WatcherData() {
         super();

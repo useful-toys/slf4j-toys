@@ -15,9 +15,20 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.PatternDefinition.encodeMapValuePattern;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.PatternDefinition.encodePropertyValuePattern;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.PatternDefinition.encodeReplacement;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MAP_CLOSE;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MAP_EQUAL;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MAP_OPEN;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MAP_SEPARATOR;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MESSAGE_CLOSE;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MESSAGE_OPEN;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.PROPERTY_DIV;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.PROPERTY_EQUALS;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.PROPERTY_SEPARATOR;
+
 import java.util.Map;
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.PatternDefinition.*;
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.*;
 
 public final class EventWriter {
 

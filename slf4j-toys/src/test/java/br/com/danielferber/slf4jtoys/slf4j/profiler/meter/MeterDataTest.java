@@ -7,7 +7,6 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.meter.MeterData;
 import java.util.HashMap;
-import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -234,7 +233,8 @@ public class MeterDataTest {
 
     private PublicMeterData createMeterData() {
         return new PublicMeterData() {
-            @Override
+        	private static final long serialVersionUID = 1L;
+        	@Override
             public StringBuilder readableString(StringBuilder builder) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }

@@ -9,6 +9,7 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
  * @author X7WS
  */
 public class PublicMeterData extends MeterData {
+	private static final long serialVersionUID = 1L;
 
     public PublicMeterData() {
         super();
@@ -166,7 +167,8 @@ public class PublicMeterData extends MeterData {
         this.systemLoad = systemLoad;
     }
 
-    public String getSessionUuid() {
+    @Override
+	public String getSessionUuid() {
         return sessionUuid;
     }
 
@@ -174,7 +176,8 @@ public class PublicMeterData extends MeterData {
         this.sessionUuid = sessionUuid;
     }
 
-    public String getEventCategory() {
+    @Override
+	public String getEventCategory() {
         return eventCategory;
     }
 
@@ -182,7 +185,8 @@ public class PublicMeterData extends MeterData {
         this.eventCategory = eventCategory;
     }
 
-    public long getEventPosition() {
+    @Override
+	public long getEventPosition() {
         return eventPosition;
     }
 
@@ -190,7 +194,8 @@ public class PublicMeterData extends MeterData {
         this.eventPosition = eventPosition;
     }
 
-    public long getTime() {
+    @Override
+	public long getTime() {
         return time;
     }
 

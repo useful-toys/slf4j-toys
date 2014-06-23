@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 
 public class Meter extends MeterData implements Closeable {
+	private static final long serialVersionUID = 1L;
 
     private final Logger logger;
     private static final String NULL_VALUE = "<null>";

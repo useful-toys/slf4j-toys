@@ -280,7 +280,8 @@ public class SystemDataTest {
 
     private SystemData createSystemData() {
         return new SystemData() {
-            @Override
+        	private static final long serialVersionUID = 1L;
+        	@Override
             public StringBuilder readableString(StringBuilder builder) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }

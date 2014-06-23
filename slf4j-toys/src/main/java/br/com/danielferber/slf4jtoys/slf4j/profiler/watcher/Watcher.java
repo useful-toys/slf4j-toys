@@ -23,6 +23,7 @@ import org.slf4j.Logger;
  * @author Daniel Felix Ferber
  */
 public class Watcher extends WatcherData implements Runnable {
+	private static final long serialVersionUID = 1L;
 
     private final Logger logger;
 

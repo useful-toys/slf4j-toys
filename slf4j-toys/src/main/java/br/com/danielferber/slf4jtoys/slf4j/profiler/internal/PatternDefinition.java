@@ -15,7 +15,6 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.PROPERTY_DIV;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

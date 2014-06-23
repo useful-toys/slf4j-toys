@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Map;
 
 public class MeterData extends SystemData {
+	private static final long serialVersionUID = 1L;
 
     public MeterData() {
         super();

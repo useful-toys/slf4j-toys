@@ -16,9 +16,6 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.slf4j.Logger;
 
 public class MeterFactory {

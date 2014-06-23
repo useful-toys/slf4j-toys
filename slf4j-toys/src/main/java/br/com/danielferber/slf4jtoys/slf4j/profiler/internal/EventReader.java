@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.*;
-import javax.print.DocFlavor;
 
 /**
  * Provides methods that implement recurrent deserialization patterns. The
@@ -165,7 +164,7 @@ public class EventReader {
         readSymbol(MAP_OPEN);
 
         if (readOptionalSymbol(MAP_CLOSE)) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
 
         Map<String, String> map = new TreeMap<String, String>();

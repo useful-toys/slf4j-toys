@@ -23,8 +23,7 @@ import java.io.Serializable;
  * @author Daniel
  */
 public abstract class EventData implements Serializable {
-
-//    private final char messagePrefix;
+	private static final long serialVersionUID = 1L;
     /**
      * Unique ProfilingSession UUID.
      */

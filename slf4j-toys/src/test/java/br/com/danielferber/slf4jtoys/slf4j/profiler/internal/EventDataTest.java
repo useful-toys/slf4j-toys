@@ -212,6 +212,7 @@ public class EventDataTest {
 
     private EventData createEventData() {
         return new EventData() {
+        	private static final long serialVersionUID = 1L;
 
             @Override
             public StringBuilder readableString(StringBuilder builder) {
