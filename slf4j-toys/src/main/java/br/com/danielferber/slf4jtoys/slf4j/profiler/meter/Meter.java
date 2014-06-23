@@ -35,6 +35,9 @@ public class Meter extends MeterData implements Closeable {
      */
     private static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
     private long timeLimit = 0;
+    transient long lastProgressTime = 0;
+    transient long lastProgressIteration = 0;
+    transient long limitProgressTime = 2000;
 
     public Meter(Logger logger) {
         super();
@@ -219,7 +222,7 @@ public class Meter extends MeterData implements Closeable {
     }
     
      public Meter iterations(long i) {
-        this.currentIteration = i;
+        this.expectedIteration = i;
         return this;
     }
 
@@ -235,7 +238,8 @@ public class Meter extends MeterData implements Closeable {
             Thread currentThread = Thread.currentThread();
             this.threadStartId = currentThread.getId();
             this.threadStartName = currentThread.getName();
-            this.startTime = System.nanoTime();
+            this.lastProgressTime = this.startTime = System.nanoTime();
+            
 
             if (logger.isDebugEnabled()) {
                 collectSystemStatus();
@@ -250,6 +254,26 @@ public class Meter extends MeterData implements Closeable {
         }
         return this;
     }
+    
+    // ========================================================================
+	public void progress() {
+		long now;
+		if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > limitProgressTime) {
+			lastProgressIteration = currentIteration;
+			lastProgressTime = now;
+			
+			if (logger.isInfoEnabled()) {
+                collectSystemStatus();
+                logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
+            }
+            if (startTime != 0 && timeLimit != 0 && now - startTime > timeLimit) {
+                logger.trace(Slf4JMarkers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString());
+            } else if (logger.isTraceEnabled()) {
+                logger.trace(Slf4JMarkers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
+            }
+		}
+	}
+
 
     // ========================================================================
     public Meter ok() {
@@ -340,4 +364,5 @@ public class Meter extends MeterData implements Closeable {
             fail(null);
         }
     }
+
 }

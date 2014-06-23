@@ -38,7 +38,7 @@ public class WatcherDemo {
         try {
             for (int i = 0; i < 1000; i++) {
                 Thread.sleep(10+random.nextInt(10));
-                m.inc();
+                m.inc().progress();
             }
             m.ok();
         } catch (Exception e) {

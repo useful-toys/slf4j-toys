@@ -216,8 +216,15 @@ public class MeterData extends SystemData {
     public StringBuilder readableString(StringBuilder buffer) {
         if (stopTime != 0) {
             buffer.append(success ? "OK" : "Failed");
-        } else if (startTime != 0) {
+        } else if (startTime != 0 && currentIteration == 0) {
             buffer.append("Started");
+        } else if (startTime != 0) {
+        	buffer.append("Progress ");
+            buffer.append(UnitFormatter.iterations(this.currentIteration));
+            if (this.expectedIteration > 0) {
+               buffer.append('/');
+                buffer.append(UnitFormatter.iterations(this.expectedIteration)); 
+            }
         } else {
             buffer.append("Scheduled");
         }
@@ -233,12 +240,6 @@ public class MeterData extends SystemData {
             buffer.append(UnitFormatter.nanoseconds(getExecutionTime()));
             if (this.currentIteration > 0) {
                 buffer.append("; ");
-                buffer.append(UnitFormatter.iterations(this.currentIteration));
-                if (this.expectedIteration > 0) {
-                   buffer.append('/');
-                    buffer.append(UnitFormatter.iterations(this.expectedIteration)); 
-                }
-                buffer.append(' ');
                 final double iterationsPerSecond = getIterationsPerSecond();
                 buffer.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
                 buffer.append(' ');
