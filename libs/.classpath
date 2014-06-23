@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar"/>
+	<classpathentry exported="true" kind="lib" path="JUnit-4.11/hamcrest-core-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="JUnit-4.11/junit-4.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="Slf4j-1.7.7/slf4j-api-1.7.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="Slf4j-1.7.7/slf4j-simple-1.7.7.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

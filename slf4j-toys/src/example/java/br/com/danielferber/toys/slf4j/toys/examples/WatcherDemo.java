@@ -1,6 +1,6 @@
 /*
  */
-package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
+package br.com.danielferber.toys.slf4j.toys.examples;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.meter.Meter;
