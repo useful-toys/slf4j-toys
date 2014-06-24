@@ -353,7 +353,7 @@ public class Meter extends MeterData implements Closeable {
          * meters have been forgotten to confirm or to refuse. */
         if (stopTime == 0) {
             /* Log exception to provide stacktrace to inconsistent meter call. */
-            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, "Meter finalized but not refused nor confirmed.", new Exception("Meter.finalize(): stopTime == 0"));
+            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, "Meter finalized but not refused nor confirmed: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.finalize(): stopTime == 0"));
         }
         super.finalize();
     }
@@ -365,5 +365,4 @@ public class Meter extends MeterData implements Closeable {
             fail(null);
         }
     }
-
 }
