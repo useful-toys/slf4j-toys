@@ -1,5 +1,5 @@
 #FindBugs User Preferences
-#Mon Jun 23 16:42:31 BRT 2014
+#Mon Jun 23 17:58:29 BRT 2014
 cloud_id=edu.umd.cs.findbugs.cloud.doNothingCloud
 detectorAppendingToAnObjectOutputStream=AppendingToAnObjectOutputStream|true
 detectorAtomicityProblem=AtomicityProblem|true
@@ -55,6 +55,7 @@ detectorFindOpenStream=FindOpenStream|true
 detectorFindPuzzlers=FindPuzzlers|true
 detectorFindRefComparison=FindRefComparison|true
 detectorFindReturnRef=FindReturnRef|true
+detectorFindRoughConstants=FindRoughConstants|true
 detectorFindRunInvocations=FindRunInvocations|true
 detectorFindSelfComparison=FindSelfComparison|true
 detectorFindSelfComparison2=FindSelfComparison2|true
@@ -76,6 +77,7 @@ detectorHugeSharedStringConstants=HugeSharedStringConstants|true
 detectorIDivResultCastToDouble=IDivResultCastToDouble|true
 detectorIncompatMask=IncompatMask|true
 detectorInconsistentAnnotations=InconsistentAnnotations|true
+detectorInefficientIndexOf=InefficientIndexOf|true
 detectorInefficientMemberAccess=InefficientMemberAccess|false
 detectorInefficientToArray=InefficientToArray|true
 detectorInfiniteLoop=InfiniteLoop|true
@@ -97,6 +99,7 @@ detectorMutableStaticFields=MutableStaticFields|true
 detectorNaming=Naming|true
 detectorNoteUnconditionalParamDerefs=NoteUnconditionalParamDerefs|true
 detectorNumberConstructor=NumberConstructor|true
+detectorOptionalReturnNull=OptionalReturnNull|true
 detectorOverridingEqualsNotSymmetrical=OverridingEqualsNotSymmetrical|true
 detectorPreferZeroLengthArrays=PreferZeroLengthArrays|true
 detectorPublicSemaphores=PublicSemaphores|false
@@ -127,7 +130,7 @@ detectorWaitInLoop=WaitInLoop|true
 detectorWrongMapIterator=WrongMapIterator|true
 detectorXMLFactoryBypass=XMLFactoryBypass|true
 detector_threshold=2
-effort=default
-filter_settings=Medium|BAD_PRACTICE,CORRECTNESS,MALICIOUS_CODE,MT_CORRECTNESS,PERFORMANCE,SECURITY,STYLE|false|15
+effort=max
+filter_settings=Medium|BAD_PRACTICE,CORRECTNESS,MALICIOUS_CODE,MT_CORRECTNESS,PERFORMANCE,SECURITY,STYLE|false|20
 filter_settings_neg=EXPERIMENTAL,NOISE,I18N|
-run_at_full_build=false
+run_at_full_build=true
