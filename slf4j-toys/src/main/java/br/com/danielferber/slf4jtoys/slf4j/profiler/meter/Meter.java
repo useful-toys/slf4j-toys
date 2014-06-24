@@ -251,7 +251,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
         } catch (Exception t) {
-            logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter start threw exception.", t);
+            logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter start threw exception: "+this.eventCategory+":"+this.eventPosition, t);
         }
         return this;
     }
@@ -304,7 +304,7 @@ public class Meter extends MeterData implements Closeable {
                 logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());
             }
         } catch (Exception t) {
-            logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmation threw exception.", t);
+            logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmation threw exception: "+this.eventCategory+":"+this.eventPosition, t);
         }
         return this;
     }
@@ -340,7 +340,7 @@ public class Meter extends MeterData implements Closeable {
                 logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder(), 'M').toString());
             }
         } catch (Exception t) {
-            logger.error("Exception thrown in Meter", t);
+            logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refusal threw exception: "+this.eventCategory+":"+this.eventPosition, t);
         }
         return this;
     }
