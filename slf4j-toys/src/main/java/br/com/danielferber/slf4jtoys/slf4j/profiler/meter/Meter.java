@@ -282,12 +282,12 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter already refused or confirmed.", new Exception("Meter.ok(...): stopTime != 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter already refused or confirmed: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.ok(...): stopTime != 0"));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmed but not started.", new Exception("Meter.ok(...): startTime == 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmed but not started: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.ok(...): startTime == 0"));
             }
             success = true;
 
