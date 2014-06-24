@@ -316,12 +316,12 @@ public class Meter extends MeterData implements Closeable {
             assert createTime != 0;
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter already refused or confirmed.", new Exception("Meter.fail(): stopTime != 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter already refused or confirmed: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.fail(): stopTime != 0"));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refused, but not started.", new Exception("Meter.fail(): startTime == 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refused, but not started: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.fail(): startTime == 0"));
             }
             if (throwable != null) {
                 exceptionClass = throwable.getClass().getName();
