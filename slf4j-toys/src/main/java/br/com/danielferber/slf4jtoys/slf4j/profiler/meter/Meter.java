@@ -27,9 +27,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 
 public class Meter extends MeterData implements Closeable {
-	private static final long serialVersionUID = 1L;
 
-	transient private final Logger logger;
+    private static final long serialVersionUID = 1L;
+    transient private final Logger logger;
     private static final String NULL_VALUE = "<null>";
     /**
      * How many times each event has been executed.
@@ -221,8 +221,8 @@ public class Meter extends MeterData implements Closeable {
         this.currentIteration = i;
         return this;
     }
-    
-     public Meter iterations(long i) {
+
+    public Meter iterations(long i) {
         this.expectedIteration = i;
         return this;
     }
@@ -233,14 +233,14 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (startTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter already started.", new Exception("Meter.start(): startTime != 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter already started: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.start(): startTime != 0"));
             }
 
             Thread currentThread = Thread.currentThread();
             this.threadStartId = currentThread.getId();
             this.threadStartName = currentThread.getName();
             this.lastProgressTime = this.startTime = System.nanoTime();
-            
+
 
             if (logger.isDebugEnabled()) {
                 collectSystemStatus();
@@ -255,15 +255,15 @@ public class Meter extends MeterData implements Closeable {
         }
         return this;
     }
-    
+
     // ========================================================================
-	public void progress() {
-		long now;
-		if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > limitProgressTime) {
-			lastProgressIteration = currentIteration;
-			lastProgressTime = now;
-			
-			if (logger.isInfoEnabled()) {
+    public void progress() {
+        long now;
+        if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > limitProgressTime) {
+            lastProgressIteration = currentIteration;
+            lastProgressTime = now;
+
+            if (logger.isInfoEnabled()) {
                 collectSystemStatus();
                 logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
             }
@@ -272,9 +272,8 @@ public class Meter extends MeterData implements Closeable {
             } else if (logger.isTraceEnabled()) {
                 logger.trace(Slf4JMarkers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
             }
-		}
-	}
-
+        }
+    }
 
     // ========================================================================
     public Meter ok() {
@@ -282,12 +281,12 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter already refused or confirmed: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.ok(...): stopTime != 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter already refused or confirmed: " + this.eventCategory + ":" + this.eventPosition, new Exception("Meter.ok(...): stopTime != 0"));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmed but not started: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.ok(...): startTime == 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmed but not started: " + this.eventCategory + ":" + this.eventPosition, new Exception("Meter.ok(...): startTime == 0"));
             }
             success = true;
 
@@ -316,12 +315,12 @@ public class Meter extends MeterData implements Closeable {
             assert createTime != 0;
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter already refused or confirmed: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.fail(): stopTime != 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter already refused or confirmed: " + this.eventCategory + ":" + this.eventPosition, new Exception("Meter.fail(): stopTime != 0"));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refused, but not started: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.fail(): startTime == 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refused, but not started: " + this.eventCategory + ":" + this.eventPosition, new Exception("Meter.fail(): startTime == 0"));
             }
             if (throwable != null) {
                 exceptionClass = throwable.getClass().getName();
@@ -353,7 +352,7 @@ public class Meter extends MeterData implements Closeable {
          * meters have been forgotten to confirm or to refuse. */
         if (stopTime == 0) {
             /* Log exception to provide stacktrace to inconsistent meter call. */
-            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, "Meter finalized but not refused nor confirmed: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.finalize(): stopTime == 0"));
+            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, "Meter finalized but not refused nor confirmed: " + this.eventCategory + ":" + this.eventPosition, new Exception("Meter.finalize(): stopTime == 0"));
         }
         super.finalize();
     }
