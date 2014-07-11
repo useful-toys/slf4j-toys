@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Common implementation of an outputstream that redirects the written data to a
+ * An outputstream that redirects the written data to a
  * logger whenever {@link #close()} or {@link #flush()} is called.
  * <p>
  * Instance of this class are obtained by calling factory methods from
