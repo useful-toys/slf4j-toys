@@ -38,7 +38,7 @@ public class Meter extends MeterData implements Closeable {
     private long timeLimit = 0;
     transient long lastProgressTime = 0;
     transient long lastProgressIteration = 0;
-    transient long limitProgressTime = 2000;
+    transient long limitProgressTime = 2000000;
 
     public Meter(Logger logger) {
         super();
