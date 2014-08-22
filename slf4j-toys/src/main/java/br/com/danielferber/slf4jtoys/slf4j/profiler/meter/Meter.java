@@ -44,6 +44,11 @@ public class Meter extends MeterData implements Closeable {
     transient long lastProgressIteration = 0;
     transient long limitProgressTime = 2000000;
 
+    /**
+     * Creates a new meter.
+     *
+     * @param logger
+     */
     public Meter(Logger logger) {
         super();
         this.sessionUuid = ProfilingSession.uuid;
@@ -54,11 +59,25 @@ public class Meter extends MeterData implements Closeable {
         this.createTime = System.nanoTime();
     }
 
+    /**
+     * Logger that receives messages from this meter.
+     *
+     * @return
+     */
     public Logger getLogger() {
         return logger;
     }
 
     // ========================================================================
+    /**
+     * Creates a new mwter whose name is under the hierarchy of this meter.
+     * Useful if a large task may be subdivided into smaller task and reported
+     * individually. The new meter uses the name of this meter, appended my its
+     * name, similar as logger do.
+     *
+     * @param name
+     * @return
+     */
     public Meter sub(String name) {
         final Meter m = MeterFactory.getMeter(eventCategory + '.' + name);
         if (this.context != null) {
@@ -67,17 +86,28 @@ public class Meter extends MeterData implements Closeable {
         return m;
     }
 
-    public Meter limit(long timeLimit) {
-        this.timeLimit = timeLimit;
-        return this;
-    }
-
     // ========================================================================
+    /**
+     * Configures the meter with a human readable message that explains the task
+     * purpose.
+     *
+     * @param message fixed message
+     * @return reference to the meter itself.
+     */
     public Meter m(String message) {
         this.description = message;
         return this;
     }
 
+    /**
+     * Configures the meter with a human readable message that explains the task
+     * purpose.
+     *
+     * @param message message format ({@link String#format(java.lang.String, java.lang.Object...)
+     * })
+     * @param args message arguments
+     * @return reference to the meter itself.
+     */
     public Meter m(String message, Object... args) {
         try {
             this.description = String.format(message, args);
@@ -87,6 +117,40 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Configures the meter with an threshold for reasonable, typical execution
+     * time for the task represented by the meter.
+     *
+     * @param timeLimit time threshold
+     * @return reference to the meter itself.
+     */
+    public Meter limit(long timeLimit) {
+        this.timeLimit = timeLimit;
+        return this;
+    }
+
+    /**
+     * Configures the meter as representing a task made up of iterations or
+     * steps. Such meters are allows to call {@link #progress() } an arbitrarily
+     * number of times between {@link #start() } and {@link #ok() }/{@link #fail(java.lang.Throwable)
+     * } method calls.
+     *
+     * @param i Number of expected iterations or steps that make up the task
+     * @return reference to the meter itself.
+     */
+    public Meter iterations(long i) {
+        this.expectedIteration = i;
+        return this;
+    }
+
+    // ========================================================================
+    /**
+     * Adds an entry to the context map. The entry has no value and is
+     * interpreted as a marker.
+     *
+     * @param name key of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -95,6 +159,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, int value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -103,6 +174,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, long value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -111,6 +189,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, boolean value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -119,6 +204,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, float value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -127,6 +219,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, double value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -135,6 +234,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, Integer value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -143,6 +249,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, Long value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -151,6 +264,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, Boolean value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -159,6 +279,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, Float value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -167,6 +294,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, Double value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -175,6 +309,14 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param object object which string representation is used for the value of
+     * the entry to add
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, Object object) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -183,6 +325,13 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map.
+     *
+     * @param name key of the entry to add.
+     * @param value value of the entry to add.
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, String value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -191,6 +340,16 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Adds an entry to the context map. The entry value is made up of a
+     * formatted message with arguments.
+     *
+     * @param name key of the entry to add.
+     * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)
+     * })
+     * @param objects message arguments
+     * @return reference to the meter itself.
+     */
     public Meter ctx(String name, String format, Object... objects) {
         if (context == null) {
             this.context = new HashMap<String, String>();
@@ -203,6 +362,12 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Removes an entry from the context map.
+     *
+     * @param name key of the entry to remove.
+     * @return reference to the meter itself.
+     */
     public Meter unctx(String name) {
         if (context == null) {
             return this;
@@ -211,27 +376,15 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
-    public Meter inc() {
-        this.currentIteration++;
-        return this;
-    }
-
-    public Meter incBy(long i) {
-        this.currentIteration += i;
-        return this;
-    }
-
-    public Meter incTo(long i) {
-        this.currentIteration = i;
-        return this;
-    }
-
-    public Meter iterations(long i) {
-        this.expectedIteration = i;
-        return this;
-    }
-
     // ========================================================================
+    /**
+     * Notifies the meter in order to claim immediate execution start of the
+     * task represented by the meter. Sends a message to logger using debug
+     * level. Sends a message with system status and partial context to log
+     * using trace level.
+     *
+     * @return reference to the meter itself.
+     */
     public Meter start() {
         assert createTime != 0;
         try {
@@ -261,11 +414,46 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Allow dispatching information about successful completion of iterations
-     * or steps making up the task represented by the meter. Only applicable for
-     * tasks with known number of iterations or steps. Only produces a message
-     * if progress was observed and periodically, to minimize performance
-     * degradation.
+     * Notifies the meter that one more iteration or step completed that make up
+     * the task successfully.
+     *
+     * @return reference to the meter itself.
+     */
+    public Meter inc() {
+        this.currentIteration++;
+        return this;
+    }
+
+    /**
+     * Notifies the meter that more of iterations or steps that make up the task
+     * completed successfully.
+     *
+     * @param i the number of iterations or steps
+     * @return reference to the meter itself.
+     */
+    public Meter incBy(long i) {
+        this.currentIteration += i;
+        return this;
+    }
+
+    /**
+     * Notifies the meter that a number of iterations or steps that make up the
+     * task already completed successfully.
+     *
+     * @param i the number of iterations or steps
+     * @return reference to the meter itself.
+     */
+    public Meter incTo(long i) {
+        this.currentIteration = i;
+        return this;
+    }
+
+    /**
+     * Allow informing about successful completion of iterations or steps making
+     * up the task represented by the meter. Only applicable for meters that
+     * called {@link #iterations(long i)} before calling {@link #start() }.
+     * Sends a message to logger using info level, only periodically and if
+     * progress was observed, to minimize performance degradation.
      *
      * @return reference to the meter itself.
      */
@@ -296,7 +484,10 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
     /**
      * Confirms the meter in order to claim successful completion of the task
-     * represented by the meter.
+     * represented by the meter. Sends a message to logger using info level.
+     * Sends a message with system status and partial context to log using trace
+     * level. Sends a message if the task executed for more time than the
+     * optionally configured time threshold.
      *
      * @return reference to the meter itself.
      */
@@ -337,7 +528,9 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
     /**
      * Refuses the meter in order to claim incomplete or inconsistent execution
-     * of the task represented by the meter. 
+     * of the task represented by the meter. Sends a message with the the
+     * exception to logger using warn level. Sends a message with system status,
+     * statistics and complete context to log using trace level.
      *
      * @param throwable Exception that represents the failure. MAy be null if no
      * exception applies.
