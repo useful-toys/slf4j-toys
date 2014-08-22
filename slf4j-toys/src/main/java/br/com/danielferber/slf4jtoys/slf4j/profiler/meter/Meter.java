@@ -254,7 +254,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
         } catch (Exception t) {
-            logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter start threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
+            logger.error(Slf4JMarkers.BUG, "Meter start threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
         return this;
     }
@@ -270,20 +270,25 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter progress() {
-        long now;
-        if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > limitProgressTime) {
-            lastProgressIteration = currentIteration;
-            lastProgressTime = now;
+        try {
+            long now;
+            if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > limitProgressTime) {
+                lastProgressIteration = currentIteration;
+                lastProgressTime = now;
 
-            if (logger.isInfoEnabled()) {
-                collectSystemStatus();
-                logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
+                if (logger.isInfoEnabled()) {
+                    collectSystemStatus();
+                    logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
+                }
+                if (startTime != 0 && timeLimit != 0 && now - startTime > timeLimit) {
+                    logger.trace(Slf4JMarkers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString());
+                } else if (logger.isTraceEnabled()) {
+                    logger.trace(Slf4JMarkers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
+                }
             }
-            if (startTime != 0 && timeLimit != 0 && now - startTime > timeLimit) {
-                logger.trace(Slf4JMarkers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString());
-            } else if (logger.isTraceEnabled()) {
-                logger.trace(Slf4JMarkers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
-            }
+        } catch (Exception t) {
+            /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
+            logger.error(Slf4JMarkers.BUG, "Meter confirmation threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
         return this;
     }
@@ -324,7 +329,7 @@ public class Meter extends MeterData implements Closeable {
             }
         } catch (Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
-            logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmation threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
+            logger.error(Slf4JMarkers.BUG, "Meter confirmation threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
         return this;
     }
@@ -332,7 +337,7 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
     /**
      * Refuses the meter in order to claim incomplete or inconsistent execution
-     * of the task represented by the meter.
+     * of the task represented by the meter. 
      *
      * @param throwable Exception that represents the failure. MAy be null if no
      * exception applies.
@@ -369,7 +374,7 @@ public class Meter extends MeterData implements Closeable {
             }
         } catch (Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
-            logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refusal threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
+            logger.error(Slf4JMarkers.BUG, "Meter refusal threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
         return this;
     }
