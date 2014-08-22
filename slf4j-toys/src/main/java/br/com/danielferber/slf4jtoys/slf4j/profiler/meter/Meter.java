@@ -26,6 +26,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 
+/**
+ *
+ * @author Daniel Felix Ferber
+ */
 public class Meter extends MeterData implements Closeable {
 
     private static final long serialVersionUID = 1L;
@@ -233,14 +237,13 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (startTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter already started: "+this.eventCategory+":"+this.eventPosition, new Exception("Meter.start(): startTime != 0"));
+                logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter already started: " + this.eventCategory + ":" + this.eventPosition, new Exception("Meter.start(): startTime != 0"));
             }
 
             Thread currentThread = Thread.currentThread();
             this.threadStartId = currentThread.getId();
             this.threadStartName = currentThread.getName();
             this.lastProgressTime = this.startTime = System.nanoTime();
-
 
             if (logger.isDebugEnabled()) {
                 collectSystemStatus();
@@ -251,12 +254,21 @@ public class Meter extends MeterData implements Closeable {
             }
 
         } catch (Exception t) {
-            logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter start threw exception: "+this.eventCategory+":"+this.eventPosition, t);
+            logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter start threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
         return this;
     }
 
     // ========================================================================
+    /**
+     * Allow dispatching information about successful completion of iterations
+     * or steps making up the task represented by the meter. Only applicable for
+     * tasks with known number of iterations or steps. Only produces a message
+     * if progress was observed and periodically, to minimize performance
+     * degradation.
+     *
+     * @return reference to the meter itself.
+     */
     public void progress() {
         long now;
         if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > limitProgressTime) {
@@ -276,6 +288,12 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+    /**
+     * Confirms the meter in order to claim successful completion of the task
+     * represented by the meter.
+     *
+     * @return reference to the meter itself.
+     */
     public Meter ok() {
         assert createTime != 0;
         try {
@@ -304,12 +322,21 @@ public class Meter extends MeterData implements Closeable {
                 logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());
             }
         } catch (Exception t) {
-            logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmation threw exception: "+this.eventCategory+":"+this.eventPosition, t);
+            /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
+            logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmation threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
         return this;
     }
 
     // ========================================================================
+    /**
+     * Refuses the meter in order to claim incomplete or inconsistent execution
+     * of the task represented by the meter.
+     *
+     * @param throwable Exception that represents the failure. MAy be null if no
+     * exception applies.
+     * @return reference to the meter itself.
+     */
     public Meter fail(Throwable throwable) {
         try {
             assert createTime != 0;
@@ -340,16 +367,20 @@ public class Meter extends MeterData implements Closeable {
                 logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder(), 'M').toString());
             }
         } catch (Exception t) {
-            logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refusal threw exception: "+this.eventCategory+":"+this.eventPosition, t);
+            /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
+            logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refusal threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
         return this;
     }
 
     // ========================================================================
+    /**
+     * Checks if meters the meter has been forgotten to be confirmed or refused.
+     * Useful to track those meters that do not follow the start(), ok()/fail()
+     * idiom for all execution flows
+     */
     @Override
     protected void finalize() throws Throwable {
-        /* Check for meters being finalized without stopTime. Such
-         * meters have been forgotten to confirm or to refuse. */
         if (stopTime == 0) {
             /* Log exception to provide stacktrace to inconsistent meter call. */
             logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, "Meter finalized but not refused nor confirmed: " + this.eventCategory + ":" + this.eventPosition, new Exception("Meter.finalize(): stopTime == 0"));
@@ -358,8 +389,12 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+    /**
+     * Compliance with {@link Closeable}. Assumes failure and refuses the meter
+     * if the meter has not yet been marked as confirmed.
+     */
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (stopTime == 0) {
             fail(null);
         }
