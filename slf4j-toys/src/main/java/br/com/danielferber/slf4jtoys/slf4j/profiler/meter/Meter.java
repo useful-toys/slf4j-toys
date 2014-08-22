@@ -269,7 +269,7 @@ public class Meter extends MeterData implements Closeable {
      *
      * @return reference to the meter itself.
      */
-    public void progress() {
+    public Meter progress() {
         long now;
         if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > limitProgressTime) {
             lastProgressIteration = currentIteration;
@@ -285,6 +285,7 @@ public class Meter extends MeterData implements Closeable {
                 logger.trace(Slf4JMarkers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
             }
         }
+        return this;
     }
 
     // ========================================================================
