@@ -23,7 +23,6 @@ public final class UnitFormatter {
 
     private UnitFormatter() {
     }
-
     private static final int[] TIME_FACTORS = new int[]{1000, 1000, 1000, 60, 60};
     private static final String[] TIME_UNITS = new String[]{"ns", "us", "ms", "s", "m", "h"};
     private static final String[] MEMORY_UNITS = new String[]{"B", "kB", "MB", "GB"};
@@ -40,33 +39,31 @@ public final class UnitFormatter {
             return String.format("%d%s", value, units[index]);
         }
 
-        int last = units.length - 1;
-        double doubleValue;
-        do {
+        int length = factors.length;
+        double doubleValue = value;
+
+        while (index < length && value >= (factors[index] + factors[index] / 10)) {
             doubleValue = (double) value / (double) factors[index];
             value /= factors[index];
-            limit = factors[index];
             index++;
-        } while (index != last && value >= limit);
-
+        }
         return String.format("%.1f%s", doubleValue, units[index]);
     }
 
+    static final double Epsylon = 0.001;
     static String doubleUnit(double value, String[] units, int[] factors) {
         if (value == 0.0) {
             return "0" + units[0];
         }
 
-        int last = units.length - 1;
         int index = 0;
-        double limit = factors[index] * 1.1;
-        double modifiedValue = value;
-        while (index != last && modifiedValue > limit) {
-            modifiedValue /= factors[index];
-            limit = factors[index] * 1.1;
+        int length = factors.length;
+
+        while (index < length && (value+Epsylon) >= (factors[index] + factors[index] / 10)) {
+            value /= factors[index];
             index++;
         }
-        return String.format("%.1f%s", modifiedValue, units[index]);
+        return String.format("%.1f%s", value, units[index]);
     }
 
     public static String bytes(long value) {

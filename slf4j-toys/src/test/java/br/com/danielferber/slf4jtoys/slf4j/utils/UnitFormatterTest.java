@@ -16,7 +16,6 @@ public class UnitFormatterTest {
 
     public UnitFormatterTest() {
     }
-
     private static final int[] FACTORS = new int[]{1000, 1000, 1000};
     private static final String[] UNITS = new String[]{"A", "B", "C"};
 
@@ -56,7 +55,9 @@ public class UnitFormatterTest {
         assertEquals("5,0B", UnitFormatter.longUnit(5010, UNITS, FACTORS));
         assertEquals("5,1B", UnitFormatter.longUnit(5050, UNITS, FACTORS));
         assertEquals("999,9B", UnitFormatter.longUnit(999900, UNITS, FACTORS));
-        assertEquals("1,0C", UnitFormatter.longUnit(1000000, UNITS, FACTORS));
+        assertEquals("1000,0B", UnitFormatter.longUnit(1000000, UNITS, FACTORS));
+        assertEquals("1,1C", UnitFormatter.longUnit(1100000, UNITS, FACTORS));
     }
+
 
 }
