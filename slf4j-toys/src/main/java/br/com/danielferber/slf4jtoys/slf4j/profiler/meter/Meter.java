@@ -33,16 +33,17 @@ import org.slf4j.Logger;
 public class Meter extends MeterData implements Closeable {
 
     private static final long serialVersionUID = 1L;
-    transient private final Logger logger;
+    private transient final Logger logger;
     private static final String NULL_VALUE = "<null>";
+    
     /**
      * How many times each event has been executed.
      */
     private static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
-    private long timeLimit = 0;
-    transient long lastProgressTime = 0;
-    transient long lastProgressIteration = 0;
-    transient long limitProgressTime = 2000000;
+    private long timeLimitNanoseconds = 0;
+    private transient long lastProgressTime = 0;
+    private transient long lastProgressIteration = 0;
+    private static long meterProgressPeriodNanoseconds = ProfilingSession.readMeterProgressPeriodProperty() * 1000 * 1000;
 
     /**
      * Creates a new meter.
@@ -121,11 +122,11 @@ public class Meter extends MeterData implements Closeable {
      * Configures the meter with an threshold for reasonable, typical execution
      * time for the task represented by the meter.
      *
-     * @param timeLimit time threshold
+     * @param timeLimitMilliseconds time threshold
      * @return reference to the meter itself.
      */
-    public Meter limit(long timeLimit) {
-        this.timeLimit = timeLimit;
+    public Meter limitMilliseconds(long timeLimitMilliseconds) {
+        this.timeLimitNanoseconds = timeLimitMilliseconds * 1000 * 1000;
         return this;
     }
 
@@ -460,7 +461,7 @@ public class Meter extends MeterData implements Closeable {
     public Meter progress() {
         try {
             long now;
-            if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > limitProgressTime) {
+            if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > meterProgressPeriodNanoseconds) {
                 lastProgressIteration = currentIteration;
                 lastProgressTime = now;
 
@@ -468,7 +469,7 @@ public class Meter extends MeterData implements Closeable {
                     collectSystemStatus();
                     logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
                 }
-                if (startTime != 0 && timeLimit != 0 && now - startTime > timeLimit) {
+                if (startTime != 0 && timeLimitNanoseconds != 0 && (now - startTime) > timeLimitNanoseconds) {
                     logger.trace(Slf4JMarkers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString());
                 } else if (logger.isTraceEnabled()) {
                     logger.trace(Slf4JMarkers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
@@ -513,7 +514,7 @@ public class Meter extends MeterData implements Closeable {
                 collectSystemStatus();
                 logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
             }
-            if (startTime != 0 && timeLimit != 0 && stopTime - startTime > timeLimit) {
+            if (startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds) {
                 logger.trace(Slf4JMarkers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString());
             } else if (logger.isTraceEnabled()) {
                 logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());

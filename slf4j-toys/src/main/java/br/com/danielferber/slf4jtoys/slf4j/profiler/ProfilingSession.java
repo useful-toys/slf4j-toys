@@ -17,6 +17,7 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler;
 
 import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.watcher.Watcher;
+
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,59 +27,109 @@ import java.util.concurrent.TimeUnit;
 /**
  * Profiling session for the current JVM. Stores the UUID logged on each message
  * on the current JVM. Keeps the timer calls the watcher periodically.
- *
+ * 
  * @author Daniel Felix Ferber
  */
 public final class ProfilingSession {
 
-    private ProfilingSession() {
-        // prevent instances
-    }
+	private ProfilingSession() {
+		// prevent instances
+	}
 
-    public static final String uuid = UUID.randomUUID().toString().replace("-", "");
-    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    static ScheduledFuture<?> scheduledWatcher;
+	public static final String uuid = UUID.randomUUID().toString().replace("-", "");
+	private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private static ScheduledFuture<?> scheduledWatcher;
 
-    public static synchronized void startWatcher() {
-        if (scheduledWatcher == null) {
-            Watcher watcher = new Watcher(LoggerFactory.getLogger(getProperty("watcher.name", "watcher")));
-            scheduledWatcher = executor.scheduleAtFixedRate(watcher, getProperty("watcher.initialDelay", 15), getProperty("watcher.period", 15), TimeUnit.SECONDS);
-        }
-    }
+	public static synchronized void startWatcher() {
+		if (scheduledWatcher == null) {
+			Watcher watcher = new Watcher(LoggerFactory.getLogger(getProperty("watcher.name", "watcher")));
+			scheduledWatcher = executor.scheduleAtFixedRate(watcher, readWatcherDelayMillisecondsProperty(), readWatcherPeriodMillisecondsProperty(), TimeUnit.MILLISECONDS);
+		}
+	}
 
-    public static synchronized void stopWatcher() {
-        if (scheduledWatcher != null) {
-            scheduledWatcher.cancel(true);
-        }
-    }
-    
-    public static  synchronized void startExecutor() {
-        if (executor == null) {
-            executor = Executors.newSingleThreadScheduledExecutor();
-        }
-    }
-    
-    public static synchronized void stopExecutor() {
-        if (executor != null) {
-            executor.shutdownNow();
-            executor = null;
-        }
-    }
+	public static synchronized void stopWatcher() {
+		if (scheduledWatcher != null) {
+			scheduledWatcher.cancel(true);
+		}
+	}
 
-    public static String getProperty(String name, String defaultValue) {
-        String value = System.getProperty(name);
-        return value == null ? defaultValue : value;
-    }
-    
-    public static int getProperty(String name, int defaultValue) {
-        String value = System.getProperty(name);
-        if (value == null) {
-            return defaultValue;
-        }
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
-    }
+	public static synchronized void startExecutor() {
+		if (executor == null) {
+			executor = Executors.newSingleThreadScheduledExecutor();
+		}
+	}
+
+	public static synchronized void stopExecutor() {
+		if (executor != null) {
+			executor.shutdownNow();
+			executor = null;
+		}
+	}
+
+	public static String getProperty(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		return value == null ? defaultValue : value;
+	}
+
+	public static int getProperty(String name, int defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			return defaultValue;
+		}
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+
+	public static long getProperty(String name, long defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			return defaultValue;
+		}
+		try {
+			return Long.parseLong(value);
+		} catch (NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+
+	public static long getMillisecondsProperty(String name, long defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			return defaultValue;
+		}
+		try {
+			int multiplicador = 1;
+			int suffixLength = 1;
+			if (value.endsWith("ms")) {
+				suffixLength = 2;
+			} else if (value.endsWith("s")) {
+				multiplicador = 1000;
+			} else if (value.endsWith("m")) {
+				multiplicador = 60 * 1000;
+			} else if (value.endsWith("h")) {
+				multiplicador = 60 * 60 * 1000;
+			} else {
+				return defaultValue;
+			}
+			return Long.parseLong(value.substring(0, value.length() - suffixLength)) * multiplicador;
+
+		} catch (NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+
+	public static long readMeterProgressPeriodProperty() {
+		return ProfilingSession.getMillisecondsProperty("meter.progress.period", 2000L);
+	}
+
+	public static long readWatcherPeriodMillisecondsProperty() {
+		return getMillisecondsProperty("watcher.period", 15000L);
+	}
+
+	public static long readWatcherDelayMillisecondsProperty() {
+		return getMillisecondsProperty("watcher.delay", 15000L);
+	}
 }
