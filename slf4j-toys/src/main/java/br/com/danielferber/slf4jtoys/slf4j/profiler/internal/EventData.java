@@ -60,8 +60,8 @@ public abstract class EventData implements Serializable {
     public long getTime() {
         return time;
     }
-    
-    
+
+
 
     /**
      * Reverts all event attributes to their constructor initial value. Useful
@@ -88,7 +88,7 @@ public abstract class EventData implements Serializable {
     }
 
     @Override
-    public final boolean equals(Object obj) {
+    public final boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -98,7 +98,7 @@ public abstract class EventData implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        EventData other = (EventData) obj;
+        final EventData other = (EventData) obj;
         return this.isSameAs(other);
     }
 
@@ -119,7 +119,7 @@ public abstract class EventData implements Serializable {
      * @return <code>true</code> if this event represents the same * * * * * *
      * as <code>other</code> argument; <code>false</code> otherwise.
      */
-    public final boolean isSameAs(EventData other) {
+    public final boolean isSameAs(final EventData other) {
         if (other == null) {
             throw new IllegalArgumentException();
         }
@@ -152,7 +152,7 @@ public abstract class EventData implements Serializable {
      * @return <code>true</code> if all attributes are equal between the *
      * events; <code>false</code> otherwise.
      */
-    public final boolean isCompletelyEqualsTo(EventData other) {
+    public final boolean isCompletelyEqualsTo(final EventData other) {
         if (other == null) {
             throw new IllegalArgumentException();
         }
@@ -207,8 +207,8 @@ public abstract class EventData implements Serializable {
      * @return The StringBuilder passed as argument to allow chained
      * StringBuilder method calls.
      */
-    public final StringBuilder write(StringBuilder sb, char messagePrefix) {
-        EventWriter w = new EventWriter(sb);
+    public final StringBuilder write(final StringBuilder sb, final char messagePrefix) {
+        final EventWriter w = new EventWriter(sb);
         w.open(messagePrefix);
         writeKeyProperties(w);
         writePropertiesImpl(w);
@@ -216,7 +216,7 @@ public abstract class EventData implements Serializable {
         return sb;
     }
 
-    private void writeKeyProperties(EventWriter w) {
+    private void writeKeyProperties(final EventWriter w) {
         /* Session UUID */
         if (this.sessionUuid != null) {
             w.property(SESSION_UUID, this.sessionUuid);
@@ -249,13 +249,13 @@ public abstract class EventData implements Serializable {
      * @return <code>true</code> if an event was successfully read;
      * <code>false</code> otherwise.
      */
-    public final boolean read(String message, char messagePrefix) {
-        String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);
+    public final boolean read(final String message, final char messagePrefix) {
+        final String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);
         if (plausibleMessage == null) {
             return false;
         }
         reset();
-        EventReader eventReader = new EventReader();
+        final EventReader eventReader = new EventReader();
         eventReader.reset(plausibleMessage);
 
         String key = null;
@@ -269,12 +269,12 @@ public abstract class EventData implements Serializable {
                 }
             }
             return true;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             return false;
         }
     }
 
-    private boolean readKeyProperties(EventReader eventReader, String key) throws IOException {
+    private boolean readKeyProperties(final EventReader eventReader, final String key) throws IOException {
         if (SESSION_UUID.equals(key)) {
             this.sessionUuid = eventReader.readString();
             return true;

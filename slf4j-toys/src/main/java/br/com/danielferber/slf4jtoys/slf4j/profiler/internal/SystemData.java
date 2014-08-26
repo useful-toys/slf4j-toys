@@ -81,7 +81,7 @@ public abstract class SystemData extends EventData {
     }
 
     @Override
-    protected boolean isCompletelyEqualsImpl(EventData obj) {
+    protected boolean isCompletelyEqualsImpl(final EventData obj) {
         final SystemData other = (SystemData) obj;
         if (this.heap_commited != other.heap_commited) {
             return false;
@@ -144,20 +144,20 @@ public abstract class SystemData extends EventData {
     }
 
     protected void collectSystemStatus() {
-        MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
+        final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
 
-        Runtime runtime = Runtime.getRuntime();
+        final Runtime runtime = Runtime.getRuntime();
         runtime_totalMemory = runtime.totalMemory();
         runtime_usedMemory = runtime_totalMemory - runtime.freeMemory();
         runtime_maxMemory = runtime.maxMemory();
 
-        MemoryUsage heapUsage = memory.getHeapMemoryUsage();
+        final MemoryUsage heapUsage = memory.getHeapMemoryUsage();
         heap_commited = heapUsage.getCommitted();
 //        heap_init = heapUsage.getInit();
         heap_max = heapUsage.getMax();
         heap_used = heapUsage.getUsed();
 
-        MemoryUsage nonHeapUsage = memory.getHeapMemoryUsage();
+        final MemoryUsage nonHeapUsage = memory.getHeapMemoryUsage();
         nonHeap_commited = nonHeapUsage.getCommitted();
 //        nonHeap_init = nonHeapUsage.getInit();
         nonHeap_max = nonHeapUsage.getMax();
@@ -165,24 +165,24 @@ public abstract class SystemData extends EventData {
 
         objectPendingFinalizationCount = memory.getObjectPendingFinalizationCount();
 
-        ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
+        final ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
         classLoading_loaded = classLoading.getLoadedClassCount();
         classLoading_total = classLoading.getTotalLoadedClassCount();
         classLoading_unloaded = classLoading.getUnloadedClassCount();
 
-        CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
+        final CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
         compilationTime = compilation.getTotalCompilationTime();
 
-        List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
+        final List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
 
         garbageCollector_count = 0;
         garbageCollector_time = 0;
-        for (GarbageCollectorMXBean garbageCollector : garbageCollectors) {
+        for (final GarbageCollectorMXBean garbageCollector : garbageCollectors) {
             garbageCollector_count += garbageCollector.getCollectionCount();
             garbageCollector_time += garbageCollector.getCollectionTime();
         }
 
-        OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
+        final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
         systemLoad = os.getSystemLoadAverage();
     }
     static final String MEMORY = "m";
@@ -195,7 +195,7 @@ public abstract class SystemData extends EventData {
     static final String SYSTEM_LOAD = "sl";
 
     @Override
-    protected void writePropertiesImpl(EventWriter w) {
+    protected void writePropertiesImpl(final EventWriter w) {
         /* memory usage */
         if (this.runtime_usedMemory > 0 || this.runtime_totalMemory > 0 || this.runtime_maxMemory > 0) {
             w.property(MEMORY, this.runtime_usedMemory, this.runtime_totalMemory, this.runtime_maxMemory);
@@ -239,7 +239,7 @@ public abstract class SystemData extends EventData {
     }
 
     @Override
-    protected boolean readPropertyImpl(EventReader r, String propertyName) throws IOException {
+    protected boolean readPropertyImpl(final EventReader r, final String propertyName) throws IOException {
         if (MEMORY.equals(propertyName)) {
             this.runtime_usedMemory = r.readLong();
             this.runtime_totalMemory = r.readLong();

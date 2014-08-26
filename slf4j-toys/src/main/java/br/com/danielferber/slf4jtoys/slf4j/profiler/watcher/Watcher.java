@@ -15,8 +15,9 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.watcher;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import org.slf4j.Logger;
+
+import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 
 /**
  *

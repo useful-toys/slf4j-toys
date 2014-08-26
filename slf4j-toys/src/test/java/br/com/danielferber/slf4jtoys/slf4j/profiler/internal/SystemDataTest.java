@@ -5,8 +5,10 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -19,8 +21,8 @@ public class SystemDataTest {
 
     @Test
     public void testResetImpl() {
-        SystemData a = createSystemData();
-        SystemData b = createSystemData();
+        final SystemData a = createSystemData();
+        final SystemData b = createSystemData();
 
         b.heap_commited = 1;
 //        b.heap_init = 2;
@@ -53,8 +55,8 @@ public class SystemDataTest {
 
     @Test
     public void testIsCompletelyEqualsImpl() {
-        SystemData a = createSystemData();
-        SystemData b = createSystemData();
+        final SystemData a = createSystemData();
+        final SystemData b = createSystemData();
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
@@ -227,12 +229,12 @@ public class SystemDataTest {
 
     @Test
     public void writeReadTest1() {
-        SystemData a = createSystemData();
+        final SystemData a = createSystemData();
 
-        String s = a.write(new StringBuilder(), 'S').toString();
+        final String s = a.write(new StringBuilder(), 'S').toString();
         System.out.println(s);
 
-        SystemData b = createSystemData();
+        final SystemData b = createSystemData();
         assertTrue(b.read(s, 'S'));
 
         assertTrue(a.isCompletelyEqualsTo(b));
@@ -241,7 +243,7 @@ public class SystemDataTest {
 
     @Test
     public void writeReadTest2() {
-        SystemData a = createSystemData();
+        final SystemData a = createSystemData();
 
         a.eventCategory = "aaaa";
         a.eventPosition = 1111;
@@ -268,10 +270,10 @@ public class SystemDataTest {
         a.runtime_totalMemory = 18;
         a.systemLoad = 1.0;
 
-        String s = a.write(new StringBuilder(), 'S').toString();
+        final String s = a.write(new StringBuilder(), 'S').toString();
         System.out.println(s);
 
-        SystemData b = createSystemData();
+        final SystemData b = createSystemData();
         assertTrue(b.read(s, 'S'));
 
         assertTrue(a.isCompletelyEqualsTo(b));
@@ -282,7 +284,7 @@ public class SystemDataTest {
         return new SystemData() {
         	private static final long serialVersionUID = 1L;
         	@Override
-            public StringBuilder readableString(StringBuilder builder) {
+            public StringBuilder readableString(final StringBuilder builder) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         };

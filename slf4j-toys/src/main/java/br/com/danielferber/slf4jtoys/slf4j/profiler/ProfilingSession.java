@@ -15,19 +15,19 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler;
 
-import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
-import br.com.danielferber.slf4jtoys.slf4j.profiler.watcher.Watcher;
-
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
+import br.com.danielferber.slf4jtoys.slf4j.profiler.watcher.Watcher;
+
 /**
  * Profiling session for the current JVM. Stores the UUID logged on each message
  * on the current JVM. Keeps the timer calls the watcher periodically.
- * 
+ *
  * @author Daniel Felix Ferber
  */
 public final class ProfilingSession {
@@ -42,7 +42,7 @@ public final class ProfilingSession {
 
 	public static synchronized void startWatcher() {
 		if (scheduledWatcher == null) {
-			Watcher watcher = new Watcher(LoggerFactory.getLogger(getProperty("watcher.name", "watcher")));
+			final Watcher watcher = new Watcher(LoggerFactory.getLogger(getProperty("watcher.name", "watcher")));
 			scheduledWatcher = executor.scheduleAtFixedRate(watcher, readWatcherDelayMillisecondsProperty(), readWatcherPeriodMillisecondsProperty(), TimeUnit.MILLISECONDS);
 		}
 	}
@@ -66,37 +66,37 @@ public final class ProfilingSession {
 		}
 	}
 
-	public static String getProperty(String name, String defaultValue) {
-		String value = System.getProperty(name);
+	public static String getProperty(final String name, final String defaultValue) {
+		final String value = System.getProperty(name);
 		return value == null ? defaultValue : value;
 	}
 
-	public static int getProperty(String name, int defaultValue) {
-		String value = System.getProperty(name);
+	public static int getProperty(final String name, final int defaultValue) {
+		final String value = System.getProperty(name);
 		if (value == null) {
 			return defaultValue;
 		}
 		try {
 			return Integer.parseInt(value);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return defaultValue;
 		}
 	}
 
-	public static long getProperty(String name, long defaultValue) {
-		String value = System.getProperty(name);
+	public static long getProperty(final String name, final long defaultValue) {
+		final String value = System.getProperty(name);
 		if (value == null) {
 			return defaultValue;
 		}
 		try {
 			return Long.parseLong(value);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return defaultValue;
 		}
 	}
 
-	public static long getMillisecondsProperty(String name, long defaultValue) {
-		String value = System.getProperty(name);
+	public static long getMillisecondsProperty(final String name, final long defaultValue) {
+		final String value = System.getProperty(name);
 		if (value == null) {
 			return defaultValue;
 		}
@@ -116,7 +116,7 @@ public final class ProfilingSession {
 			}
 			return Long.parseLong(value.substring(0, value.length() - suffixLength)) * multiplicador;
 
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return defaultValue;
 		}
 	}

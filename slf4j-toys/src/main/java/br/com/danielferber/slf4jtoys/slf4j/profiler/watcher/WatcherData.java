@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2013 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ public class WatcherData extends SystemData {
     }
 
     @Override
-    public StringBuilder readableString(StringBuilder builder) {
+    public StringBuilder readableString(final StringBuilder builder) {
         if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
             builder.append("Memory: ");
             builder.append(UnitFormatter.bytes(this.runtime_usedMemory));

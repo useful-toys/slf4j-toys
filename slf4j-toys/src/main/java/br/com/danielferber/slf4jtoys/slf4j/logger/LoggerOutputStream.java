@@ -82,7 +82,7 @@ abstract class LoggerOutputStream extends OutputStream {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         throw new UnsupportedOperationException();
     }
 }

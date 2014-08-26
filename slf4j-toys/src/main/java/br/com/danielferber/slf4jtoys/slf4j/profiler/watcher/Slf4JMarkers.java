@@ -26,6 +26,6 @@ public final class Slf4JMarkers {
     private Slf4JMarkers() {
         //nothing
     }
-    
+
     public static final Marker WATCHER = MarkerFactory.getMarker("WATCHER");
 }

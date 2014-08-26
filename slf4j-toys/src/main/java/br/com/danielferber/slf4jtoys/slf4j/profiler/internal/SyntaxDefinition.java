@@ -24,24 +24,24 @@ abstract class SyntaxDefinition {
     protected SyntaxDefinition() {
         // prevent instances
     }
-    
+
     /* Message delimiter symbols. */
     static final char MESSAGE_OPEN = '{';
     static final char MESSAGE_CLOSE = '}';
-    
+
     /* Map delimiter symbols. */
     static final char MAP_CLOSE = ']';
     static final char MAP_OPEN = '[';
     static final char MAP_SEPARATOR = ',';
     static final char MAP_EQUAL = ':';
-    
+
     /* Property delimiter symbols. */
     static final char PROPERTY_DIV = '|';
     static final char PROPERTY_EQUALS = '=';
     static final char PROPERTY_SEPARATOR = ';';
-    
+
     /* Property value quoting to prevent collision with other symbols. */
     static final char QUOTE = '\\';
 
-   
+
 }

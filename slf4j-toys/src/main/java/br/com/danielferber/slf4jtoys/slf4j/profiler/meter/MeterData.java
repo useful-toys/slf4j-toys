@@ -15,14 +15,15 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventData;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData;
 import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
 
 public class MeterData extends SystemData {
 	private static final long serialVersionUID = 1L;
@@ -166,7 +167,7 @@ public class MeterData extends SystemData {
     }
 
     @Override
-    protected boolean isCompletelyEqualsImpl(EventData obj) {
+    protected boolean isCompletelyEqualsImpl(final EventData obj) {
         final MeterData other = (MeterData) obj;
         if ((this.description == null) ? (other.description != null) : !this.description.equals(other.description)) {
             return false;
@@ -214,7 +215,7 @@ public class MeterData extends SystemData {
     }
 
     @Override
-    public StringBuilder readableString(StringBuilder buffer) {
+    public StringBuilder readableString(final StringBuilder buffer) {
         if (stopTime != 0) {
             buffer.append(success ? "OK" : "Failed");
         } else if (startTime != 0 && currentIteration == 0) {
@@ -224,7 +225,7 @@ public class MeterData extends SystemData {
             buffer.append(UnitFormatter.iterations(this.currentIteration));
             if (this.expectedIteration > 0) {
                buffer.append('/');
-                buffer.append(UnitFormatter.iterations(this.expectedIteration)); 
+                buffer.append(UnitFormatter.iterations(this.expectedIteration));
             }
         } else {
             buffer.append("Scheduled");
@@ -277,7 +278,7 @@ public class MeterData extends SystemData {
         if (currentIteration == 0 || startTime == 0) {
             return 0;
         }
-        float executionTimeNS = getExecutionTime();
+        final float executionTimeNS = getExecutionTime();
         if (executionTimeNS == 0) {
             return 0;
         }
@@ -295,7 +296,7 @@ public class MeterData extends SystemData {
     protected static final String CONTEXT = "ctx";
 
     @Override
-    public void writePropertiesImpl(EventWriter w) {
+    public void writePropertiesImpl(final EventWriter w) {
         if (this.description != null) {
             w.property(DESCRIPTION, this.description);
         }
@@ -342,7 +343,7 @@ public class MeterData extends SystemData {
     }
 
     @Override
-    protected boolean readPropertyImpl(EventReader r, String propertyName) throws IOException {
+    protected boolean readPropertyImpl(final EventReader r, final String propertyName) throws IOException {
         if (DESCRIPTION.equals(propertyName)) {
             this.description = r.readString();
             return true;

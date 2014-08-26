@@ -34,9 +34,9 @@ class PatternDefinition extends SyntaxDefinition {
     // see http://ad.hominem.org/log/2005/05/quoted_strings.php
     static final Pattern messagePattern = Pattern.compile("(.)" + "\\" + MESSAGE_OPEN + "([^\\" + MESSAGE_CLOSE + "\\" + QUOTE + "]*(?:\\" + QUOTE + ".[^\"\\" + QUOTE + "]*)*)\\" + MESSAGE_CLOSE);
 
-    private static Pattern quotedCharsPattern(char... chars) {
-        StringBuilder sb = new StringBuilder("([");
-        for (char c : chars) {
+    private static Pattern quotedCharsPattern(final char... chars) {
+        final StringBuilder sb = new StringBuilder("([");
+        for (final char c : chars) {
             sb.append('\\');
             sb.append(c);
         }
@@ -44,8 +44,8 @@ class PatternDefinition extends SyntaxDefinition {
         return Pattern.compile(sb.toString());
     }
 
-    static String extractPlausibleMessage(char prefix, String s) {
-        Matcher m = messagePattern.matcher(s);
+    static String extractPlausibleMessage(final char prefix, final String s) {
+        final Matcher m = messagePattern.matcher(s);
         if (m.find()) {
             if (m.group(1).charAt(0) == prefix) {
                 return m.group(2);

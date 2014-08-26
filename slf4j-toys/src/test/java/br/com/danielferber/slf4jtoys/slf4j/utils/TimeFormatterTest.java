@@ -5,6 +5,7 @@
 package br.com.danielferber.slf4jtoys.slf4j.utils;
 
 import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 /**
@@ -30,7 +31,7 @@ public class TimeFormatterTest {
         assertEquals("60,0m", UnitFormatter.nanoseconds(3600000000000L));
         assertEquals("1,2h", UnitFormatter.nanoseconds(4400000000000L));
     }
-    
+
     @Test
     public void testDoubleTimeUnit() {
         assertEquals("0ns", UnitFormatter.nanoseconds(0f));

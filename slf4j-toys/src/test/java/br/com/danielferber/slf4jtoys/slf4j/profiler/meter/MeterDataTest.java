@@ -5,10 +5,12 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.meter.MeterData;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -21,8 +23,8 @@ public class MeterDataTest {
 
     @Test
     public void testResetImpl() {
-        MeterData a = createMeterData();
-        MeterData b = createMeterData();
+        final MeterData a = createMeterData();
+        final MeterData b = createMeterData();
 
         b.description = "a";
         b.createTime = 1;
@@ -51,8 +53,8 @@ public class MeterDataTest {
 
     @Test
     public void testIsCompletelyEqualsImpl() {
-        MeterData a = createMeterData();
-        MeterData b = createMeterData();
+        final MeterData a = createMeterData();
+        final MeterData b = createMeterData();
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
@@ -164,12 +166,12 @@ public class MeterDataTest {
 
     @Test
     public void writeReadTest1() {
-        MeterData a = createMeterData();
+        final MeterData a = createMeterData();
 
-        String s = a.write(new StringBuilder(), 'M').toString();
+        final String s = a.write(new StringBuilder(), 'M').toString();
         System.out.println(s);
 
-        MeterData b = createMeterData();
+        final MeterData b = createMeterData();
         assertTrue(b.read(s, 'M'));
 
         assertTrue(a.isCompletelyEqualsTo(b));
@@ -178,7 +180,7 @@ public class MeterDataTest {
 
     @Test
     public void writeReadTest2() {
-        PublicMeterData a = createMeterData();
+        final PublicMeterData a = createMeterData();
 
         a.setEventCategory("aaaa");
         a.setEventPosition(1111);
@@ -189,7 +191,7 @@ public class MeterDataTest {
 //        a.setHeap_init(22);
         a.setHeap_max(33);
         a.setHeap_used(44);
-        a.setNonHeap_commited(55); 
+        a.setNonHeap_commited(55);
 //        a.setNonHeap_init(66);
         a.setNonHeap_max(77);
         a.setNonHeap_used(88);
@@ -204,7 +206,7 @@ public class MeterDataTest {
         a.setRuntime_maxMemory(1717);
         a.setRuntime_totalMemory(1818);
         a.setSystemLoad(1919.0);
-        
+
         a.description = "a";
         a.createTime = 1;
         a.startTime = 2;
@@ -221,10 +223,10 @@ public class MeterDataTest {
         a.context.put("e", "f");
         a.context.put("g", "h");
 
-        String s = a.write(new StringBuilder(), 'S').toString();
+        final String s = a.write(new StringBuilder(), 'S').toString();
         System.out.println(s);
 
-        MeterData b = createMeterData();
+        final MeterData b = createMeterData();
         assertTrue(b.read(s, 'S'));
 
         assertTrue(a.isCompletelyEqualsTo(b));
@@ -235,7 +237,7 @@ public class MeterDataTest {
         return new PublicMeterData() {
         	private static final long serialVersionUID = 1L;
         	@Override
-            public StringBuilder readableString(StringBuilder builder) {
+            public StringBuilder readableString(final StringBuilder builder) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         };

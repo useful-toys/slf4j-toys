@@ -15,11 +15,13 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.logger;
 
+import static org.slf4j.LoggerFactory.getILoggerFactory;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
+
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
-import static org.slf4j.LoggerFactory.getILoggerFactory;
 
 /**
  * An alternative to {@link org.slf4j.LoggerFactory}, with additional useful
@@ -41,7 +43,7 @@ public class LoggerFactory {
      * @param name The name of the logger.
      * @return the logger
      */
-    public static Logger getLogger(String name) {
+    public static Logger getLogger(final String name) {
         return getILoggerFactory().getLogger(name);
     }
 
@@ -54,7 +56,7 @@ public class LoggerFactory {
      * @param clazz the returned logger will be named after clazz
      * @return the logger
      */
-    public static Logger getLogger(Class<?> clazz) {
+    public static Logger getLogger(final Class<?> clazz) {
         return getILoggerFactory().getLogger(clazz.getName());
     }
 
@@ -70,7 +72,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature provided by the class.
      * @return the logger
      */
-    public static Logger getLogger(Class<?> clazz, String name) {
+    public static Logger getLogger(final Class<?> clazz, final String name) {
         return getILoggerFactory().getLogger(clazz.getName() + '.' + name);
     }
 
@@ -86,7 +88,7 @@ public class LoggerFactory {
      * @param name the name of the operation provided by the class.
      * @return the logger
      */
-    public static Logger getLogger(Logger logger, String name) {
+    public static Logger getLogger(final Logger logger, final String name) {
         return getILoggerFactory().getLogger(logger.getName() + '.' + name);
     }
 
@@ -263,7 +265,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the PrintStream.
      * @return the PrintStream
      */
-    public static PrintStream getTracePrintStream(final Logger logger, String name) {
+    public static PrintStream getTracePrintStream(final Logger logger, final String name) {
         return getTracePrintStream(LoggerFactory.getLogger(logger, name));
     }
 
@@ -275,7 +277,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the PrintStream.
      * @return the PrintStream
      */
-    public static PrintStream getDebugPrintStream(final Logger logger, String name) {
+    public static PrintStream getDebugPrintStream(final Logger logger, final String name) {
         return getDebugPrintStream(LoggerFactory.getLogger(logger, name));
     }
 
@@ -287,7 +289,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the PrintStream.
      * @return the PrintStream
      */
-    public static PrintStream getInfoPrintStream(final Logger logger, String name) {
+    public static PrintStream getInfoPrintStream(final Logger logger, final String name) {
         return getInfoPrintStream(LoggerFactory.getLogger(logger, name));
     }
 
@@ -299,7 +301,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the PrintStream.
      * @return the PrintStream
      */
-    public static PrintStream getWarnPrintStream(final Logger logger, String name) {
+    public static PrintStream getWarnPrintStream(final Logger logger, final String name) {
         return getWarnPrintStream(LoggerFactory.getLogger(logger, name));
     }
 
@@ -311,7 +313,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the PrintStream.
      * @return the PrintStream
      */
-    public static PrintStream getErrorPrintStream(final Logger logger, String name) {
+    public static PrintStream getErrorPrintStream(final Logger logger, final String name) {
         return getErrorPrintStream(LoggerFactory.getLogger(logger, name));
     }
 
@@ -323,7 +325,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the OutputStream.
      * @return the OutputStream
      */
-    public static OutputStream getTraceOutputStream(final Logger logger, String name) {
+    public static OutputStream getTraceOutputStream(final Logger logger, final String name) {
         return getTraceOutputStream(LoggerFactory.getLogger(logger, name));
 
     }
@@ -336,7 +338,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the OutputStream.
      * @return the OutputStream
      */
-    public static OutputStream getDebugOutputStream(final Logger logger, String name) {
+    public static OutputStream getDebugOutputStream(final Logger logger, final String name) {
         return getDebugOutputStream(LoggerFactory.getLogger(logger, name));
     }
 
@@ -348,7 +350,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the OutputStream.
      * @return the OutputStream
      */
-    public static OutputStream getInfoOutputStream(final Logger logger, String name) {
+    public static OutputStream getInfoOutputStream(final Logger logger, final String name) {
         return getInfoOutputStream(LoggerFactory.getLogger(logger, name));
     }
 
@@ -360,7 +362,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the OutputStream.
      * @return the OutputStream
      */
-    public static OutputStream getWarnOutputStream(final Logger logger, String name) {
+    public static OutputStream getWarnOutputStream(final Logger logger, final String name) {
         return getWarnOutputStream(LoggerFactory.getLogger(logger, name));
     }
 
@@ -372,7 +374,7 @@ public class LoggerFactory {
      * @param name the name of the operation or feature for the OutputStream.
      * @return the OutputStream
      */
-    public static OutputStream getErrorOutputStream(final Logger logger, String name) {
+    public static OutputStream getErrorOutputStream(final Logger logger, final String name) {
         return getErrorOutputStream(LoggerFactory.getLogger(logger, name));
     }
 

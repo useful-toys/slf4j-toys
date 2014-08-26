@@ -15,9 +15,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
-import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +23,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
+
+import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 
 /**
  *
@@ -35,7 +35,7 @@ public class Meter extends MeterData implements Closeable {
     private static final long serialVersionUID = 1L;
     private transient final Logger logger;
     private static final String NULL_VALUE = "<null>";
-    
+
     /**
      * How many times each event has been executed.
      */
@@ -50,7 +50,7 @@ public class Meter extends MeterData implements Closeable {
      *
      * @param logger
      */
-    public Meter(Logger logger) {
+    public Meter(final Logger logger) {
         super();
         this.sessionUuid = ProfilingSession.uuid;
         this.logger = logger;
@@ -79,7 +79,7 @@ public class Meter extends MeterData implements Closeable {
      * @param name
      * @return
      */
-    public Meter sub(String name) {
+    public Meter sub(final String name) {
         final Meter m = MeterFactory.getMeter(eventCategory + '.' + name);
         if (this.context != null) {
             m.context = new HashMap<String, String>(this.context);
@@ -95,7 +95,7 @@ public class Meter extends MeterData implements Closeable {
      * @param message fixed message
      * @return reference to the meter itself.
      */
-    public Meter m(String message) {
+    public Meter m(final String message) {
         this.description = message;
         return this;
     }
@@ -109,10 +109,10 @@ public class Meter extends MeterData implements Closeable {
      * @param args message arguments
      * @return reference to the meter itself.
      */
-    public Meter m(String message, Object... args) {
+    public Meter m(final String message, final Object... args) {
         try {
             this.description = String.format(message, args);
-        } catch (IllegalFormatException e) {
+        } catch (final IllegalFormatException e) {
             logger.error("Illegal string format in Meter.setMessage(message, args...)", e);
         }
         return this;
@@ -125,7 +125,7 @@ public class Meter extends MeterData implements Closeable {
      * @param timeLimitMilliseconds time threshold
      * @return reference to the meter itself.
      */
-    public Meter limitMilliseconds(long timeLimitMilliseconds) {
+    public Meter limitMilliseconds(final long timeLimitMilliseconds) {
         this.timeLimitNanoseconds = timeLimitMilliseconds * 1000 * 1000;
         return this;
     }
@@ -139,7 +139,7 @@ public class Meter extends MeterData implements Closeable {
      * @param i Number of expected iterations or steps that make up the task
      * @return reference to the meter itself.
      */
-    public Meter iterations(long i) {
+    public Meter iterations(final long i) {
         this.expectedIteration = i;
         return this;
     }
@@ -152,7 +152,7 @@ public class Meter extends MeterData implements Closeable {
      * @param name key of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name) {
+    public Meter ctx(final String name) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -167,7 +167,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, int value) {
+    public Meter ctx(final String name, final int value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -182,7 +182,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, long value) {
+    public Meter ctx(final String name, final long value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -197,7 +197,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, boolean value) {
+    public Meter ctx(final String name, final boolean value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -212,7 +212,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, float value) {
+    public Meter ctx(final String name, final float value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -227,7 +227,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, double value) {
+    public Meter ctx(final String name, final double value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -242,7 +242,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, Integer value) {
+    public Meter ctx(final String name, final Integer value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -257,7 +257,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, Long value) {
+    public Meter ctx(final String name, final Long value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -272,7 +272,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, Boolean value) {
+    public Meter ctx(final String name, final Boolean value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -287,7 +287,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, Float value) {
+    public Meter ctx(final String name, final Float value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -302,7 +302,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, Double value) {
+    public Meter ctx(final String name, final Double value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -318,7 +318,7 @@ public class Meter extends MeterData implements Closeable {
      * the entry to add
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, Object object) {
+    public Meter ctx(final String name, final Object object) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -333,7 +333,7 @@ public class Meter extends MeterData implements Closeable {
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, String value) {
+    public Meter ctx(final String name, final String value) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -351,13 +351,13 @@ public class Meter extends MeterData implements Closeable {
      * @param objects message arguments
      * @return reference to the meter itself.
      */
-    public Meter ctx(String name, String format, Object... objects) {
+    public Meter ctx(final String name, final String format, final Object... objects) {
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
         try {
             ctx(name, String.format(format, objects));
-        } catch (IllegalFormatException e) {
+        } catch (final IllegalFormatException e) {
             logger.error("Illegal string format in Meter.ctx(name, format, objects...)", e);
         }
         return this;
@@ -369,7 +369,7 @@ public class Meter extends MeterData implements Closeable {
      * @param name key of the entry to remove.
      * @return reference to the meter itself.
      */
-    public Meter unctx(String name) {
+    public Meter unctx(final String name) {
         if (context == null) {
             return this;
         }
@@ -394,7 +394,7 @@ public class Meter extends MeterData implements Closeable {
                 logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter already started: " + this.eventCategory + ":" + this.eventPosition, new Exception("Meter.start(): startTime != 0"));
             }
 
-            Thread currentThread = Thread.currentThread();
+            final Thread currentThread = Thread.currentThread();
             this.threadStartId = currentThread.getId();
             this.threadStartName = currentThread.getName();
             this.lastProgressTime = this.startTime = System.nanoTime();
@@ -407,7 +407,7 @@ public class Meter extends MeterData implements Closeable {
                 logger.trace(Slf4JMarkers.DATA_START, write(new StringBuilder(), 'M').toString());
             }
 
-        } catch (Exception t) {
+        } catch (final Exception t) {
             logger.error(Slf4JMarkers.BUG, "Meter start threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
         return this;
@@ -432,7 +432,7 @@ public class Meter extends MeterData implements Closeable {
      * @param i the number of iterations or steps
      * @return reference to the meter itself.
      */
-    public Meter incBy(long i) {
+    public Meter incBy(final long i) {
         this.currentIteration += i;
         return this;
     }
@@ -444,7 +444,7 @@ public class Meter extends MeterData implements Closeable {
      * @param i the number of iterations or steps
      * @return reference to the meter itself.
      */
-    public Meter incTo(long i) {
+    public Meter incTo(final long i) {
         this.currentIteration = i;
         return this;
     }
@@ -475,7 +475,7 @@ public class Meter extends MeterData implements Closeable {
                     logger.trace(Slf4JMarkers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
                 }
             }
-        } catch (Exception t) {
+        } catch (final Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
             logger.error(Slf4JMarkers.BUG, "Meter confirmation threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
@@ -506,7 +506,7 @@ public class Meter extends MeterData implements Closeable {
             }
             success = true;
 
-            Thread currentThread = Thread.currentThread();
+            final Thread currentThread = Thread.currentThread();
             this.threadStopId = currentThread.getId();
             this.threadStopName = currentThread.getName();
 
@@ -519,7 +519,7 @@ public class Meter extends MeterData implements Closeable {
             } else if (logger.isTraceEnabled()) {
                 logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());
             }
-        } catch (Exception t) {
+        } catch (final Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
             logger.error(Slf4JMarkers.BUG, "Meter confirmation threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }
@@ -537,7 +537,7 @@ public class Meter extends MeterData implements Closeable {
      * exception applies.
      * @return reference to the meter itself.
      */
-    public Meter fail(Throwable throwable) {
+    public Meter fail(final Throwable throwable) {
         try {
             assert createTime != 0;
             if (stopTime != 0) {
@@ -555,7 +555,7 @@ public class Meter extends MeterData implements Closeable {
             }
             success = false;
 
-            Thread currentThread = Thread.currentThread();
+            final Thread currentThread = Thread.currentThread();
             this.threadStopId = currentThread.getId();
             this.threadStopName = currentThread.getName();
 
@@ -566,7 +566,7 @@ public class Meter extends MeterData implements Closeable {
             if (logger.isTraceEnabled()) {
                 logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder(), 'M').toString());
             }
-        } catch (Exception t) {
+        } catch (final Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
             logger.error(Slf4JMarkers.BUG, "Meter refusal threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
         }

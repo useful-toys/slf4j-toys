@@ -15,12 +15,20 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MAP_CLOSE;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MAP_EQUAL;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MAP_OPEN;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.MAP_SEPARATOR;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.PROPERTY_DIV;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.PROPERTY_EQUALS;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.PROPERTY_SEPARATOR;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.QUOTE;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
-import static br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SyntaxDefinition.*;
 
 /**
  * Provides methods that implement recurrent deserialization patterns. The
@@ -47,7 +55,7 @@ public class EventReader {
     private char[] chars;
     private int lenght;
 
-    public EventReader reset(String encodedData) {
+    public EventReader reset(final String encodedData) {
         firstProperty = true;
         firstValue = true;
         chars = encodedData.toCharArray();
@@ -94,7 +102,7 @@ public class EventReader {
     public long readLong() throws IOException {
         try {
             return Long.parseLong(readString());
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw new IOException("invalid long", e);
         }
     }
@@ -106,7 +114,7 @@ public class EventReader {
                 return 0L;
             }
             return Long.parseLong(str);
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw new IOException("invalid long", e);
         }
     }
@@ -114,7 +122,7 @@ public class EventReader {
     public double readDouble() throws IOException {
         try {
             return Double.parseDouble(readString());
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw new IOException("invalid double", e);
         }
     }
@@ -126,26 +134,26 @@ public class EventReader {
                 return 0F;
             }
             return Double.parseDouble(str);
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw new IOException("invalid double", e);
         }
     }
 
-    protected void readSymbol(char operator) throws IOException {
+    protected void readSymbol(final char operator) throws IOException {
         if (start >= lenght) {
             throw new EOFException();
         }
-        char c = chars[start++];
+        final char c = chars[start++];
         if (c != operator) {
             throw new IOException("expected: " + operator);
         }
     }
 
-    protected boolean readOptionalSymbol(char operator) throws IOException {
+    protected boolean readOptionalSymbol(final char operator) throws IOException {
         if (start >= lenght) {
             throw new EOFException();
         }
-        char c = chars[start];
+        final char c = chars[start];
         if (c == operator) {
             start++;
             return true;
@@ -167,9 +175,9 @@ public class EventReader {
             return Collections.emptyMap();
         }
 
-        Map<String, String> map = new TreeMap<String, String>();
+        final Map<String, String> map = new TreeMap<String, String>();
         do {
-            String key = readMapKey();
+            final String key = readMapKey();
             String value = null;
             if (readOptionalSymbol(MAP_EQUAL)) {
                 value = readMapValue();
@@ -225,16 +233,16 @@ public class EventReader {
             end++;
         }
 
-        String substring = charsString.substring(start, end);
+        final String substring = charsString.substring(start, end);
         start = end;
         return substring;
     }
 
-    private String readStringImp(char delimiter1, char delimiter2, char delimiter3) throws EOFException {
-        StringBuilder sb = new StringBuilder();
+    private String readStringImp(final char delimiter1, final char delimiter2, final char delimiter3) throws EOFException {
+        final StringBuilder sb = new StringBuilder();
         int end = start;
         while (end < lenght) {
-            char c = chars[end];
+            final char c = chars[end];
             if (c == delimiter1 || c == delimiter2 || c == delimiter3) {
                 break;
             } else if (c == QUOTE) {

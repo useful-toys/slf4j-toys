@@ -19,7 +19,7 @@ public class PublicMeterData extends MeterData {
         return heap_commited;
     }
 
-    public void setHeap_commited(long heap_commited) {
+    public void setHeap_commited(final long heap_commited) {
         this.heap_commited = heap_commited;
     }
 
@@ -35,7 +35,7 @@ public class PublicMeterData extends MeterData {
         return heap_max;
     }
 
-    public void setHeap_max(long heap_max) {
+    public void setHeap_max(final long heap_max) {
         this.heap_max = heap_max;
     }
 
@@ -43,7 +43,7 @@ public class PublicMeterData extends MeterData {
         return heap_used;
     }
 
-    public void setHeap_used(long heap_used) {
+    public void setHeap_used(final long heap_used) {
         this.heap_used = heap_used;
     }
 
@@ -51,7 +51,7 @@ public class PublicMeterData extends MeterData {
         return nonHeap_commited;
     }
 
-    public void setNonHeap_commited(long nonHeap_commited) {
+    public void setNonHeap_commited(final long nonHeap_commited) {
         this.nonHeap_commited = nonHeap_commited;
     }
 
@@ -67,7 +67,7 @@ public class PublicMeterData extends MeterData {
         return nonHeap_max;
     }
 
-    public void setNonHeap_max(long nonHeap_max) {
+    public void setNonHeap_max(final long nonHeap_max) {
         this.nonHeap_max = nonHeap_max;
     }
 
@@ -75,7 +75,7 @@ public class PublicMeterData extends MeterData {
         return nonHeap_used;
     }
 
-    public void setNonHeap_used(long nonHeap_used) {
+    public void setNonHeap_used(final long nonHeap_used) {
         this.nonHeap_used = nonHeap_used;
     }
 
@@ -83,7 +83,7 @@ public class PublicMeterData extends MeterData {
         return objectPendingFinalizationCount;
     }
 
-    public void setObjectPendingFinalizationCount(long objectPendingFinalizationCount) {
+    public void setObjectPendingFinalizationCount(final long objectPendingFinalizationCount) {
         this.objectPendingFinalizationCount = objectPendingFinalizationCount;
     }
 
@@ -91,7 +91,7 @@ public class PublicMeterData extends MeterData {
         return classLoading_loaded;
     }
 
-    public void setClassLoading_loaded(long classLoading_loaded) {
+    public void setClassLoading_loaded(final long classLoading_loaded) {
         this.classLoading_loaded = classLoading_loaded;
     }
 
@@ -99,7 +99,7 @@ public class PublicMeterData extends MeterData {
         return classLoading_total;
     }
 
-    public void setClassLoading_total(long classLoading_total) {
+    public void setClassLoading_total(final long classLoading_total) {
         this.classLoading_total = classLoading_total;
     }
 
@@ -107,7 +107,7 @@ public class PublicMeterData extends MeterData {
         return classLoading_unloaded;
     }
 
-    public void setClassLoading_unloaded(long classLoading_unloaded) {
+    public void setClassLoading_unloaded(final long classLoading_unloaded) {
         this.classLoading_unloaded = classLoading_unloaded;
     }
 
@@ -115,7 +115,7 @@ public class PublicMeterData extends MeterData {
         return compilationTime;
     }
 
-    public void setCompilationTime(long compilationTime) {
+    public void setCompilationTime(final long compilationTime) {
         this.compilationTime = compilationTime;
     }
 
@@ -123,7 +123,7 @@ public class PublicMeterData extends MeterData {
         return garbageCollector_count;
     }
 
-    public void setGarbageCollector_count(long garbageCollector_count) {
+    public void setGarbageCollector_count(final long garbageCollector_count) {
         this.garbageCollector_count = garbageCollector_count;
     }
 
@@ -131,7 +131,7 @@ public class PublicMeterData extends MeterData {
         return garbageCollector_time;
     }
 
-    public void setGarbageCollector_time(long garbageCollector_time) {
+    public void setGarbageCollector_time(final long garbageCollector_time) {
         this.garbageCollector_time = garbageCollector_time;
     }
 
@@ -139,7 +139,7 @@ public class PublicMeterData extends MeterData {
         return runtime_usedMemory;
     }
 
-    public void setRuntime_usedMemory(long runtime_usedMemory) {
+    public void setRuntime_usedMemory(final long runtime_usedMemory) {
         this.runtime_usedMemory = runtime_usedMemory;
     }
 
@@ -147,7 +147,7 @@ public class PublicMeterData extends MeterData {
         return runtime_maxMemory;
     }
 
-    public void setRuntime_maxMemory(long runtime_maxMemory) {
+    public void setRuntime_maxMemory(final long runtime_maxMemory) {
         this.runtime_maxMemory = runtime_maxMemory;
     }
 
@@ -155,7 +155,7 @@ public class PublicMeterData extends MeterData {
         return runtime_totalMemory;
     }
 
-    public void setRuntime_totalMemory(long runtime_totalMemory) {
+    public void setRuntime_totalMemory(final long runtime_totalMemory) {
         this.runtime_totalMemory = runtime_totalMemory;
     }
 
@@ -163,7 +163,7 @@ public class PublicMeterData extends MeterData {
         return systemLoad;
     }
 
-    public void setSystemLoad(double systemLoad) {
+    public void setSystemLoad(final double systemLoad) {
         this.systemLoad = systemLoad;
     }
 
@@ -172,7 +172,7 @@ public class PublicMeterData extends MeterData {
         return sessionUuid;
     }
 
-    public void setSessionUuid(String sessionUuid) {
+    public void setSessionUuid(final String sessionUuid) {
         this.sessionUuid = sessionUuid;
     }
 
@@ -181,7 +181,7 @@ public class PublicMeterData extends MeterData {
         return eventCategory;
     }
 
-    public void setEventCategory(String eventCategory) {
+    public void setEventCategory(final String eventCategory) {
         this.eventCategory = eventCategory;
     }
 
@@ -190,7 +190,7 @@ public class PublicMeterData extends MeterData {
         return eventPosition;
     }
 
-    public void setEventPosition(long eventPosition) {
+    public void setEventPosition(final long eventPosition) {
         this.eventPosition = eventPosition;
     }
 
@@ -199,9 +199,9 @@ public class PublicMeterData extends MeterData {
         return time;
     }
 
-    public void setTime(long time) {
+    public void setTime(final long time) {
         this.time = time;
     }
-    
-    
+
+
 }

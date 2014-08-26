@@ -32,73 +32,73 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public void write(byte[] b) throws IOException {
+    public void write(final byte[] b) throws IOException {
         // ignore
     }
 
     @Override
-    public void write(int b) {
+    public void write(final int b) {
         // ignore
     }
 
     @Override
-    public void write(byte[] buf, int off, int len) {
+    public void write(final byte[] buf, final int off, final int len) {
         // ignore
     }
 
     @Override
-    public void print(Object obj) {
+    public void print(final Object obj) {
         // ignore
     }
 
     @Override
-    public void print(String s) {
+    public void print(final String s) {
         // ignore
     }
 
     @Override
-    public void print(boolean b) {
+    public void print(final boolean b) {
         // ignore
     }
 
     @Override
-    public void print(char c) {
+    public void print(final char c) {
         // ignore
     }
 
     @Override
-    public void print(char[] s) {
+    public void print(final char[] s) {
         // ignore
     }
 
     @Override
-    public void print(double d) {
+    public void print(final double d) {
         // ignore
     }
 
     @Override
-    public void print(float f) {
+    public void print(final float f) {
         // ignore
     }
 
     @Override
-    public void print(int i) {
+    public void print(final int i) {
         // ignore
     }
 
     @Override
-    public void print(long l) {
+    public void print(final long l) {
         // ignore
     }
 
     @Override
-    public PrintStream printf(String format, Object... args) {
+    public PrintStream printf(final String format, final Object... args) {
         // ignore
         return this;
     }
 
     @Override
-    public PrintStream printf(Locale l, String format, Object... args) {
+    public PrintStream printf(final Locale l, final String format, final Object... args) {
         // ignore
         return this;
     }
@@ -109,76 +109,76 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public void println(Object x) {
+    public void println(final Object x) {
         // ignore
     }
 
     @Override
-    public void println(String x) {
+    public void println(final String x) {
         // ignore
     }
 
     @Override
-    public void println(boolean x) {
+    public void println(final boolean x) {
         // ignore
     }
 
     @Override
-    public void println(char x) {
+    public void println(final char x) {
         // ignore
     }
 
     @Override
-    public void println(char[] x) {
+    public void println(final char[] x) {
         // ignore
     }
 
     @Override
-    public void println(double x) {
+    public void println(final double x) {
         // ignore
     }
 
     @Override
-    public void println(float x) {
+    public void println(final float x) {
         // ignore
     }
 
     @Override
-    public void println(int x) {
+    public void println(final int x) {
         // ignore
     }
 
     @Override
-    public void println(long x) {
+    public void println(final long x) {
         // ignore
     }
 
     @Override
-    public PrintStream append(CharSequence csq) {
-        // ignore
-        return this;
-    }
-
-    @Override
-    public PrintStream append(char c) {
+    public PrintStream append(final CharSequence csq) {
         // ignore
         return this;
     }
 
     @Override
-    public PrintStream append(CharSequence csq, int start, int end) {
+    public PrintStream append(final char c) {
         // ignore
         return this;
     }
 
     @Override
-    public PrintStream format(String format, Object... args) {
+    public PrintStream append(final CharSequence csq, final int start, final int end) {
         // ignore
         return this;
     }
 
     @Override
-    public PrintStream format(Locale l, String format, Object... args) {
+    public PrintStream format(final String format, final Object... args) {
+        // ignore
+        return this;
+    }
+
+    @Override
+    public PrintStream format(final Locale l, final String format, final Object... args) {
         // ignore
         return this;
     }

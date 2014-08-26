@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2013 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,26 +15,27 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
-import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
 import org.slf4j.Logger;
+
+import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
 
 public class MeterFactory {
 
 //    private static final Map<String, String> context = new TreeMap<String, String>();
 
-    public static Meter getMeter(String name) {
+    public static Meter getMeter(final String name) {
         return new Meter(LoggerFactory.getLogger(name));
     }
 
-    public static Meter getMeter(Class<?> clazz) {
+    public static Meter getMeter(final Class<?> clazz) {
         return new Meter(LoggerFactory.getLogger(clazz));
     }
 
-    public static Meter getMeter(Class<?> clazz, String operationId) {
+    public static Meter getMeter(final Class<?> clazz, final String operationId) {
         return new Meter(LoggerFactory.getLogger(clazz, operationId));
     }
 
-    public static Meter getMeter(Logger logger, String operationId) {
+    public static Meter getMeter(final Logger logger, final String operationId) {
         return new Meter(LoggerFactory.getLogger(logger, operationId));
     }
 

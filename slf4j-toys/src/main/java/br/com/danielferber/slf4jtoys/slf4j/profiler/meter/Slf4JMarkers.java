@@ -26,7 +26,7 @@ public final class Slf4JMarkers {
     private Slf4JMarkers() {
         // nothing
     }
-    
+
     public static final Marker DATA_START = MarkerFactory.getMarker("METER_DATA_START");
     public static final Marker DATA_OK = MarkerFactory.getMarker("METER_DATA_OK");
     public static final Marker DATA_SLOW_OK = MarkerFactory.getMarker("METER_DATA_SLOW_OK");

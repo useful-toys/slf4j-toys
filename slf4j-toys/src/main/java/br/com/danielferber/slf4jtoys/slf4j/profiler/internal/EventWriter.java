@@ -35,13 +35,13 @@ public final class EventWriter {
     private transient boolean firstProperty;
     private transient final StringBuilder builder;
 
-    EventWriter(StringBuilder builder) {
+    EventWriter(final StringBuilder builder) {
         super();
         firstProperty = true;
         this.builder = builder;
     }
 
-    void open(char id) {
+    void open(final char id) {
         builder.append(id);
         builder.append(MESSAGE_OPEN);
     }
@@ -50,37 +50,37 @@ public final class EventWriter {
         builder.append(MESSAGE_CLOSE);
     }
 
-    public EventWriter property(String name, boolean value) {
+    public EventWriter property(final String name, final boolean value) {
         property(name, Boolean.toString(value));
         return this;
     }
 
-    public EventWriter property(String name, long value) {
+    public EventWriter property(final String name, final long value) {
         property(name, Long.toString(value));
         return this;
     }
 
-    public EventWriter property(String name, long value1, long value2) {
+    public EventWriter property(final String name, final long value1, final long value2) {
         property(name, Long.toString(value1), Long.toString(value2));
         return this;
     }
 
-    public EventWriter property(String name, long value1, long value2, long value3) {
+    public EventWriter property(final String name, final long value1, final long value2, final long value3) {
         property(name, Long.toString(value1), Long.toString(value2), Long.toString(value3));
         return this;
     }
 
-    public EventWriter property(String name, long value1, long value2, long value3, long value4) {
+    public EventWriter property(final String name, final long value1, final long value2, final long value3, final long value4) {
         property(name, Long.toString(value1), Long.toString(value2), Long.toString(value3), Long.toString(value4));
         return this;
     }
 
-    public EventWriter property(String name, double value) {
+    public EventWriter property(final String name, final double value) {
         property(name, Double.toString(value));
         return this;
     }
 
-    public EventWriter property(String name, String value) {
+    public EventWriter property(final String name, final String value) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -92,7 +92,7 @@ public final class EventWriter {
         return this;
     }
 
-    public EventWriter property(String name, String value1, String value2) {
+    public EventWriter property(final String name, final String value1, final String value2) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -106,7 +106,7 @@ public final class EventWriter {
         return this;
     }
 
-    public EventWriter property(String name, String value1, String value2, String value3) {
+    public EventWriter property(final String name, final String value1, final String value2, final String value3) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -122,7 +122,7 @@ public final class EventWriter {
         return this;
     }
 
-    public EventWriter property(String name, String value1, String value2, String value3, String value4) {
+    public EventWriter property(final String name, final String value1, final String value2, final String value3, final String value4) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -140,7 +140,7 @@ public final class EventWriter {
         return this;
     }
 
-    public EventWriter property(String name, Map<String, String> map) {
+    public EventWriter property(final String name, final Map<String, String> map) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
         } else {
@@ -150,14 +150,14 @@ public final class EventWriter {
         builder.append(PROPERTY_EQUALS);
         builder.append(MAP_OPEN);
         boolean firstEntry = true;
-        for (Map.Entry<String, String> entry : map.entrySet()) {
+        for (final Map.Entry<String, String> entry : map.entrySet()) {
             if (!firstEntry) {
                 builder.append(MAP_SEPARATOR);
             } else {
                 firstEntry = false;
             }
-            String key = entry.getKey();
-            String value = entry.getValue();
+            final String key = entry.getKey();
+            final String value = entry.getValue();
             builder.append(key);
             if (value != null) {
                 builder.append(MAP_EQUAL);
@@ -169,11 +169,11 @@ public final class EventWriter {
         return this;
     }
 
-    void writePropertyValue(String value) {
+    void writePropertyValue(final String value) {
         builder.append(encodePropertyValuePattern.matcher(value).replaceAll(encodeReplacement));
     }
 
-    void writeMapValue(String value) {
+    void writeMapValue(final String value) {
         builder.append(encodeMapValuePattern.matcher(value).replaceAll(encodeReplacement));
     }
 }

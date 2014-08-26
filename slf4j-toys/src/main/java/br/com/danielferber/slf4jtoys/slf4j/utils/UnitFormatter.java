@@ -32,14 +32,14 @@ public final class UnitFormatter {
     private static final String[] ITERATIONS_UNITS = new String[]{"", "k", "M"};
     private static final int[] ITERATIONS_FACTORS = new int[]{1000, 1000, 1000};
 
-    static String longUnit(long value, String[] units, int[] factors) {
+    static String longUnit(long value, final String[] units, final int[] factors) {
         int index = 0;
-        int limit = factors[index] + factors[index] / 10;
+        final int limit = factors[index] + factors[index] / 10;
         if (value < limit) {
             return String.format("%d%s", value, units[index]);
         }
 
-        int length = factors.length;
+        final int length = factors.length;
         double doubleValue = value;
 
         while (index < length && value >= (factors[index] + factors[index] / 10)) {
@@ -51,13 +51,13 @@ public final class UnitFormatter {
     }
 
     static final double Epsylon = 0.001;
-    static String doubleUnit(double value, String[] units, int[] factors) {
+    static String doubleUnit(double value, final String[] units, final int[] factors) {
         if (value == 0.0) {
             return "0" + units[0];
         }
 
         int index = 0;
-        int length = factors.length;
+        final int length = factors.length;
 
         while (index < length && (value+Epsylon) >= (factors[index] + factors[index] / 10)) {
             value /= factors[index];
@@ -66,31 +66,31 @@ public final class UnitFormatter {
         return String.format("%.1f%s", value, units[index]);
     }
 
-    public static String bytes(long value) {
+    public static String bytes(final long value) {
         return longUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
     }
 
-    public static String nanoseconds(long value) {
+    public static String nanoseconds(final long value) {
         return longUnit(value, TIME_UNITS, TIME_FACTORS);
     }
 
-    public static String nanoseconds(double value) {
+    public static String nanoseconds(final double value) {
         return doubleUnit(value, TIME_UNITS, TIME_FACTORS);
     }
 
-    public static String iterations(long value) {
+    public static String iterations(final long value) {
         return longUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
     }
 
-    public static String iterations(double value) {
+    public static String iterations(final double value) {
         return doubleUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
     }
 
-    public static String iterationsPerSecond(long value) {
+    public static String iterationsPerSecond(final long value) {
         return longUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
     }
 
-    public static String iterationsPerSecond(double value) {
+    public static String iterationsPerSecond(final double value) {
         return doubleUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
     }
 }

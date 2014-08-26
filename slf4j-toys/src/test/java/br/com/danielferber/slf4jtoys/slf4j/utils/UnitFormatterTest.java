@@ -5,8 +5,9 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.utils;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

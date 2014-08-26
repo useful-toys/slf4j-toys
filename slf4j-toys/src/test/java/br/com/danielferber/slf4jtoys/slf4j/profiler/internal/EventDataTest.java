@@ -5,9 +5,12 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -20,8 +23,8 @@ public class EventDataTest {
 
     @Test
     public void isCompletelyEqualTest() {
-        EventData a = createEventData();
-        EventData b = createEventData();
+        final EventData a = createEventData();
+        final EventData b = createEventData();
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
@@ -65,8 +68,8 @@ public class EventDataTest {
 
     @Test
     public void resetTest() {
-        EventData a = createEventData();
-        EventData b = createEventData();
+        final EventData a = createEventData();
+        final EventData b = createEventData();
 
         b.eventCategory = "a";
         b.eventPosition = 1;
@@ -84,8 +87,8 @@ public class EventDataTest {
 
     @Test
     public void isSameAsTest() {
-        EventData a = createEventData();
-        EventData b = createEventData();
+        final EventData a = createEventData();
+        final EventData b = createEventData();
 
         assertTrue(a.isSameAs(b));
         assertTrue(b.isSameAs(a));
@@ -129,8 +132,8 @@ public class EventDataTest {
 
     @Test
     public void equalsHashTest() {
-        EventData a = createEventData();
-        EventData b = createEventData();
+        final EventData a = createEventData();
+        final EventData b = createEventData();
 
         assertTrue(a.equals(b));
         assertTrue(b.equals(a));
@@ -180,12 +183,12 @@ public class EventDataTest {
 
     @Test
     public void writeReadTest1() {
-        EventData a = createEventData();
+        final EventData a = createEventData();
 
-        String s = a.write(new StringBuilder(), 'E').toString();
+        final String s = a.write(new StringBuilder(), 'E').toString();
         System.out.println(s);
 
-        EventData b = createEventData();
+        final EventData b = createEventData();
         b.read(s, 'E');
 
         assertTrue(a.isCompletelyEqualsTo(b));
@@ -194,16 +197,16 @@ public class EventDataTest {
 
     @Test
     public void writeReadTest2() {
-        EventData a = createEventData();
+        final EventData a = createEventData();
         a.eventCategory = "a";
         a.eventPosition = 1;
         a.sessionUuid = "b";
         a.time = 2;
 
-        String s = a.write(new StringBuilder(), 'E').toString();
+        final String s = a.write(new StringBuilder(), 'E').toString();
         System.out.println(s);
 
-        EventData b = createEventData();
+        final EventData b = createEventData();
         assertTrue(b.read(s, 'E'));
 
         assertTrue(a.isCompletelyEqualsTo(b));
@@ -215,17 +218,17 @@ public class EventDataTest {
         	private static final long serialVersionUID = 1L;
 
             @Override
-            public StringBuilder readableString(StringBuilder builder) {
+            public StringBuilder readableString(final StringBuilder builder) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
-            protected void writePropertiesImpl(EventWriter w) {
+            protected void writePropertiesImpl(final EventWriter w) {
                 // empty
             }
 
             @Override
-            protected boolean readPropertyImpl(EventReader r, String key) throws IOException {
+            protected boolean readPropertyImpl(final EventReader r, final String key) throws IOException {
                 return false;
             }
 
@@ -235,7 +238,7 @@ public class EventDataTest {
             }
 
             @Override
-            protected boolean isCompletelyEqualsImpl(EventData other) {
+            protected boolean isCompletelyEqualsImpl(final EventData other) {
                 return true;
             }
         };
