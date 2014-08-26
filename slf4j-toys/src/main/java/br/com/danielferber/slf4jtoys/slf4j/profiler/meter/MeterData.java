@@ -23,10 +23,12 @@ import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventData;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData;
+import static br.com.danielferber.slf4jtoys.slf4j.profiler.meter.MeterData.SUCCESS;
 import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
 
 public class MeterData extends SystemData {
-	private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
 
     public MeterData() {
         super();
@@ -68,6 +70,10 @@ public class MeterData extends SystemData {
      * If the job completed successfully, as expected (true) or failed (false).
      */
     protected boolean success = false;
+    /**
+     * Time considered reasonable for successful execution.
+     */
+    protected long timeLimitNanoseconds = 0;
     /**
      * Thread that notified job start.
      */
@@ -128,6 +134,10 @@ public class MeterData extends SystemData {
         return success;
     }
 
+    public long getTimeLimitNanoseconds() {
+        return timeLimitNanoseconds;
+    }
+
     public long getThreadStartId() {
         return threadStartId;
     }
@@ -138,6 +148,10 @@ public class MeterData extends SystemData {
 
     public String getThreadStartName() {
         return threadStartName;
+    }
+
+    public String getThreadStopName() {
+        return threadStopName;
     }
 
     public Map<String, String> getContext() {
@@ -159,6 +173,7 @@ public class MeterData extends SystemData {
         this.exceptionClass = null;
         this.exceptionMessage = null;
         this.success = false;
+        this.timeLimitNanoseconds = 0;
         this.threadStartId = 0;
         this.threadStopId = 0;
         this.threadStartName = null;
@@ -196,6 +211,9 @@ public class MeterData extends SystemData {
         if (this.success != other.success) {
             return false;
         }
+        if (this.timeLimitNanoseconds != other.timeLimitNanoseconds) {
+            return false;
+        }
         if (this.threadStartId != other.threadStartId) {
             return false;
         }
@@ -217,14 +235,22 @@ public class MeterData extends SystemData {
     @Override
     public StringBuilder readableString(final StringBuilder buffer) {
         if (stopTime != 0) {
-            buffer.append(success ? "OK" : "Failed");
+            if (success) {
+                if (isSlow()) {
+                    buffer.append("SLOW");
+                } else {
+                    buffer.append("OK");
+                }
+            } else {
+                buffer.append("Failed");
+            }
         } else if (startTime != 0 && currentIteration == 0) {
             buffer.append("Started");
         } else if (startTime != 0) {
-        	buffer.append("Progress ");
+            buffer.append("Progress ");
             buffer.append(UnitFormatter.iterations(this.currentIteration));
             if (this.expectedIteration > 0) {
-               buffer.append('/');
+                buffer.append('/');
                 buffer.append(UnitFormatter.iterations(this.expectedIteration));
             }
         } else {
@@ -235,7 +261,7 @@ public class MeterData extends SystemData {
             buffer.append(this.description);
         } else {
             buffer.append(this.eventCategory);
-         }
+        }
 
         if (this.startTime > 0) {
             buffer.append("; ");
@@ -258,6 +284,10 @@ public class MeterData extends SystemData {
         }
 //        return super.readableString(buffer);
         return buffer;
+    }
+
+    public boolean isSlow() {
+        return timeLimitNanoseconds != 0 && stopTime != 0 && startTime != 0 && stopTime - startTime > timeLimitNanoseconds;
     }
 
     public long getExecutionTime() {
@@ -292,6 +322,7 @@ public class MeterData extends SystemData {
     protected static final String EXPECTED_ITERATION = "ei";
     protected static final String EXCEPTION = "e";
     protected static final String SUCCESS = "ok";
+    protected static final String LIMIT_TIME = "tl";
     protected static final String THREAD = "th";
     protected static final String CONTEXT = "ctx";
 
@@ -324,6 +355,9 @@ public class MeterData extends SystemData {
         }
 
         w.property(SUCCESS, success);
+        if (this.timeLimitNanoseconds != 0) {
+            w.property(LIMIT_TIME, timeLimitNanoseconds);
+        }
 
         /* Thread info */
         if (this.threadStartId != 0 || this.threadStopId != 0 || this.threadStartName != null || this.threadStopName != null) {
@@ -365,6 +399,9 @@ public class MeterData extends SystemData {
             return true;
         } else if (SUCCESS.equals(propertyName)) {
             this.success = r.readBoolean();
+            return true;
+        } else if (LIMIT_TIME.equals(propertyName)) {
+            this.timeLimitNanoseconds = r.readLong();
             return true;
         } else if (THREAD.equals(propertyName)) {
             this.threadStartId = r.readLongOrZero();

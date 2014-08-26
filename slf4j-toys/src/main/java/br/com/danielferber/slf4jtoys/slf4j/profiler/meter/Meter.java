@@ -40,7 +40,6 @@ public class Meter extends MeterData implements Closeable {
      * How many times each event has been executed.
      */
     private static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
-    private long timeLimitNanoseconds = 0;
     private transient long lastProgressTime = 0;
     private transient long lastProgressIteration = 0;
     private static long meterProgressPeriodNanoseconds = ProfilingSession.readMeterProgressPeriodProperty() * 1000 * 1000;
@@ -487,7 +486,7 @@ public class Meter extends MeterData implements Closeable {
      * Confirms the meter in order to claim successful completion of the task
      * represented by the meter. Sends a message to logger using info level.
      * Sends a message with system status and partial context to log using trace
-     * level. Sends a message if the task executed for more time than the
+     * level. Sends a warn message if the task executed for more time than the
      * optionally configured time threshold.
      *
      * @return reference to the meter itself.
@@ -510,14 +509,23 @@ public class Meter extends MeterData implements Closeable {
             this.threadStopId = currentThread.getId();
             this.threadStopName = currentThread.getName();
 
-            if (logger.isInfoEnabled()) {
-                collectSystemStatus();
-                logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
-            }
-            if (startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds) {
-                logger.trace(Slf4JMarkers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString());
-            } else if (logger.isTraceEnabled()) {
-                logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());
+            if (startTime != 0) {
+                if (logger.isWarnEnabled()) {
+                    collectSystemStatus();
+                }
+                final boolean warnSlowness = timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;            
+                if (warnSlowness && logger.isWarnEnabled()) {            
+                    logger.warn(Slf4JMarkers.MSG_SLOW_OK, readableString(new StringBuilder()).toString());
+                } else if (logger.isInfoEnabled()) {
+                    logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
+                }
+                if (logger.isTraceEnabled()) {
+                    if (warnSlowness) {
+                        logger.trace(Slf4JMarkers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString());
+                    } else {
+                        logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());
+                    }
+                }
             }
         } catch (final Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */

@@ -34,6 +34,7 @@ public class MeterDataTest {
         b.exceptionClass = "Exception";
         b.exceptionMessage = "b";
         b.success = true;
+        b.timeLimitNanoseconds = 10;
         b.threadStartId = 5;
         b.threadStopId = 6;
         b.threadStartName = "c";
@@ -67,6 +68,7 @@ public class MeterDataTest {
         a.exceptionClass = "Exception";
         a.exceptionMessage = "b";
         a.success = true;
+        a.timeLimitNanoseconds = 10;
         a.threadStartId = 5;
         a.threadStopId = 6;
         a.threadStartName = "c";
@@ -83,6 +85,7 @@ public class MeterDataTest {
         b.exceptionClass = "Exception";
         b.exceptionMessage = "b";
         b.success = true;
+        b.timeLimitNanoseconds = 10;
         b.threadStartId = 5;
         b.threadStopId = 6;
         b.threadStartName = "c";
@@ -133,6 +136,11 @@ public class MeterDataTest {
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
         b.success = true;
+
+        b.timeLimitNanoseconds = 100;
+        assertFalse(a.isCompletelyEqualsTo(b));
+        assertFalse(b.isCompletelyEqualsTo(a));
+        b.timeLimitNanoseconds = 10;
 
         b.threadStartId = 55;
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -215,6 +223,7 @@ public class MeterDataTest {
         a.exceptionClass = "Exception";
         a.exceptionMessage = "b";
         a.success = true;
+        a.timeLimitNanoseconds = 10;
         a.threadStartId = 5;
         a.threadStopId = 6;
         a.threadStartName = "c";
