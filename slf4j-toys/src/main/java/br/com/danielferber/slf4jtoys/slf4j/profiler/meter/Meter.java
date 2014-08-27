@@ -386,7 +386,6 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter start() {
-        assert createTime != 0;
         try {
             if (startTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
@@ -492,7 +491,6 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ok() {
-        assert createTime != 0;
         try {
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
@@ -513,8 +511,8 @@ public class Meter extends MeterData implements Closeable {
                 if (logger.isWarnEnabled()) {
                     collectSystemStatus();
                 }
-                final boolean warnSlowness = timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;            
-                if (warnSlowness && logger.isWarnEnabled()) {            
+                final boolean warnSlowness = timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
+                if (warnSlowness && logger.isWarnEnabled()) {
                     logger.warn(Slf4JMarkers.MSG_SLOW_OK, readableString(new StringBuilder()).toString());
                 } else if (logger.isInfoEnabled()) {
                     logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
@@ -535,6 +533,10 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+    public Meter fail() {
+        return fail(null);
+    }
+
     /**
      * Refuses the meter in order to claim incomplete or inconsistent execution
      * of the task represented by the meter. Sends a message with the the
@@ -547,7 +549,6 @@ public class Meter extends MeterData implements Closeable {
      */
     public Meter fail(final Throwable throwable) {
         try {
-            assert createTime != 0;
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
                 logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter already refused or confirmed: " + this.eventCategory + ":" + this.eventPosition, new Exception("Meter.fail(): stopTime != 0"));
