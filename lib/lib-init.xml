@@ -2,9 +2,7 @@
 <project name="opl-toys-2.0" default="lib-init" basedir="." >
     <description>Downloads dependencies</description>
 	<dirname property="lib.dir" file="${ant.file}" />
-    <property name="download.dir" value="${lib.dir}/download" />
-	
-	<echo message="${lib.dir}" />
+	<echo message="Libraries directory: ${lib.dir}" />
 
     <target name="lib-init" description="Download dependencies" >
     	<mkdir dir="${lib.dir}/Slf4j-1.7.7"/>
