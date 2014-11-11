@@ -70,9 +70,9 @@
     nbproject/build-impl.xml file. 
 
     -->
-    <target name="init-libs">
+    <target name="download-libs">
         <ant antfile="../lib/lib-init.xml" target="lib-init"/>
     </target>
     
-    <target name="-pre-compile" depends="init-libs" />
+    <target name="-pre-compile" depends="download-libs" />
 </project>
