@@ -32,7 +32,9 @@ import java.util.List;
  * @author Daniel Felix Ferber
  */
 public abstract class SystemData extends EventData {
-	private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
+    public static final boolean useMXBean = false;
 
     protected SystemData() {
         super();
@@ -144,46 +146,47 @@ public abstract class SystemData extends EventData {
     }
 
     protected void collectSystemStatus() {
-        final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
-
         final Runtime runtime = Runtime.getRuntime();
         runtime_totalMemory = runtime.totalMemory();
         runtime_usedMemory = runtime_totalMemory - runtime.freeMemory();
         runtime_maxMemory = runtime.maxMemory();
 
-        final MemoryUsage heapUsage = memory.getHeapMemoryUsage();
-        heap_commited = heapUsage.getCommitted();
+        if (useMXBean) {
+            final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
+            final MemoryUsage heapUsage = memory.getHeapMemoryUsage();
+            heap_commited = heapUsage.getCommitted();
 //        heap_init = heapUsage.getInit();
-        heap_max = heapUsage.getMax();
-        heap_used = heapUsage.getUsed();
+            heap_max = heapUsage.getMax();
+            heap_used = heapUsage.getUsed();
 
-        final MemoryUsage nonHeapUsage = memory.getHeapMemoryUsage();
-        nonHeap_commited = nonHeapUsage.getCommitted();
+            final MemoryUsage nonHeapUsage = memory.getHeapMemoryUsage();
+            nonHeap_commited = nonHeapUsage.getCommitted();
 //        nonHeap_init = nonHeapUsage.getInit();
-        nonHeap_max = nonHeapUsage.getMax();
-        nonHeap_used = nonHeapUsage.getUsed();
+            nonHeap_max = nonHeapUsage.getMax();
+            nonHeap_used = nonHeapUsage.getUsed();
 
-        objectPendingFinalizationCount = memory.getObjectPendingFinalizationCount();
+            objectPendingFinalizationCount = memory.getObjectPendingFinalizationCount();
 
-        final ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
-        classLoading_loaded = classLoading.getLoadedClassCount();
-        classLoading_total = classLoading.getTotalLoadedClassCount();
-        classLoading_unloaded = classLoading.getUnloadedClassCount();
+            final ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
+            classLoading_loaded = classLoading.getLoadedClassCount();
+            classLoading_total = classLoading.getTotalLoadedClassCount();
+            classLoading_unloaded = classLoading.getUnloadedClassCount();
 
-        final CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
-        compilationTime = compilation.getTotalCompilationTime();
+            final CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
+            compilationTime = compilation.getTotalCompilationTime();
 
-        final List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
+            final List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
 
-        garbageCollector_count = 0;
-        garbageCollector_time = 0;
-        for (final GarbageCollectorMXBean garbageCollector : garbageCollectors) {
-            garbageCollector_count += garbageCollector.getCollectionCount();
-            garbageCollector_time += garbageCollector.getCollectionTime();
+            garbageCollector_count = 0;
+            garbageCollector_time = 0;
+            for (final GarbageCollectorMXBean garbageCollector : garbageCollectors) {
+                garbageCollector_count += garbageCollector.getCollectionCount();
+                garbageCollector_time += garbageCollector.getCollectionTime();
+            }
+
+            final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
+            systemLoad = os.getSystemLoadAverage();
         }
-
-        final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-        systemLoad = os.getSystemLoadAverage();
     }
     static final String MEMORY = "m";
     static final String HEAP = "h";
@@ -202,13 +205,13 @@ public abstract class SystemData extends EventData {
         }
 
         /* heap usage */
-        if (this.heap_commited > 0 || /*this.heap_init > 0 || */this.heap_max > 0 || this.heap_used > 0) {
-            w.property(HEAP, /*this.heap_init, */this.heap_used, this.heap_commited, this.heap_max);
+        if (this.heap_commited > 0 || /*this.heap_init > 0 || */ this.heap_max > 0 || this.heap_used > 0) {
+            w.property(HEAP, /*this.heap_init, */ this.heap_used, this.heap_commited, this.heap_max);
         }
 
         /* non heap usage */
-        if (this.nonHeap_commited > 0 || /*this.nonHeap_init > 0 || */this.nonHeap_max > 0 || this.nonHeap_used > 0) {
-            w.property(NON_HEAP, /*this.nonHeap_init, */this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
+        if (this.nonHeap_commited > 0 || /*this.nonHeap_init > 0 || */ this.nonHeap_max > 0 || this.nonHeap_used > 0) {
+            w.property(NON_HEAP, /*this.nonHeap_init, */ this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
         }
 
         /* objectPendingFinalizationCount */
