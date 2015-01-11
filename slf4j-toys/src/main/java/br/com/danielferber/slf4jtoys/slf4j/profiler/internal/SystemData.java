@@ -15,6 +15,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.internal;
 
+import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import java.io.IOException;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;
@@ -34,17 +35,14 @@ import java.util.List;
 public abstract class SystemData extends EventData {
 
     private static final long serialVersionUID = 1L;
-    public static final boolean useMXBean = false;
 
     protected SystemData() {
         super();
     }
     protected long heap_commited = 0;
-//    protected long heap_init = 0;
     protected long heap_max = 0;
     protected long heap_used = 0;
     protected long nonHeap_commited = 0;
-//    protected long nonHeap_init = 0;
     protected long nonHeap_max = 0;
     protected long nonHeap_used = 0;
     protected long objectPendingFinalizationCount = 0;
@@ -88,9 +86,6 @@ public abstract class SystemData extends EventData {
         if (this.heap_commited != other.heap_commited) {
             return false;
         }
-//        if (this.heap_init != other.heap_init) {
-//            return false;
-//        }
         if (this.heap_max != other.heap_max) {
             return false;
         }
@@ -100,9 +95,6 @@ public abstract class SystemData extends EventData {
         if (this.nonHeap_commited != other.nonHeap_commited) {
             return false;
         }
-//        if (this.nonHeap_init != other.nonHeap_init) {
-//            return false;
-//        }
         if (this.nonHeap_max != other.nonHeap_max) {
             return false;
         }
@@ -151,17 +143,15 @@ public abstract class SystemData extends EventData {
         runtime_usedMemory = runtime_totalMemory - runtime.freeMemory();
         runtime_maxMemory = runtime.maxMemory();
 
-        if (useMXBean) {
+        if (ProfilingSession.useManagementFactory) {
             final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
             final MemoryUsage heapUsage = memory.getHeapMemoryUsage();
             heap_commited = heapUsage.getCommitted();
-//        heap_init = heapUsage.getInit();
             heap_max = heapUsage.getMax();
             heap_used = heapUsage.getUsed();
 
             final MemoryUsage nonHeapUsage = memory.getHeapMemoryUsage();
             nonHeap_commited = nonHeapUsage.getCommitted();
-//        nonHeap_init = nonHeapUsage.getInit();
             nonHeap_max = nonHeapUsage.getMax();
             nonHeap_used = nonHeapUsage.getUsed();
 
@@ -205,13 +195,13 @@ public abstract class SystemData extends EventData {
         }
 
         /* heap usage */
-        if (this.heap_commited > 0 || /*this.heap_init > 0 || */ this.heap_max > 0 || this.heap_used > 0) {
-            w.property(HEAP, /*this.heap_init, */ this.heap_used, this.heap_commited, this.heap_max);
+        if (this.heap_commited > 0 || this.heap_max > 0 || this.heap_used > 0) {
+            w.property(HEAP, this.heap_used, this.heap_commited, this.heap_max);
         }
 
         /* non heap usage */
-        if (this.nonHeap_commited > 0 || /*this.nonHeap_init > 0 || */ this.nonHeap_max > 0 || this.nonHeap_used > 0) {
-            w.property(NON_HEAP, /*this.nonHeap_init, */ this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
+        if (this.nonHeap_commited > 0 || this.nonHeap_max > 0 || this.nonHeap_used > 0) {
+            w.property(NON_HEAP, this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
         }
 
         /* objectPendingFinalizationCount */
@@ -249,13 +239,11 @@ public abstract class SystemData extends EventData {
             this.runtime_maxMemory = r.readLong();
             return true;
         } else if (HEAP.equals(propertyName)) {
-//            this.heap_init = r.readLong();
             this.heap_used = r.readLong();
             this.heap_commited = r.readLong();
             this.heap_max = r.readLong();
             return true;
         } else if (NON_HEAP.equals(propertyName)) {
-//            this.nonHeap_init = r.readLong();
             this.nonHeap_used = r.readLong();
             this.nonHeap_commited = r.readLong();
             this.nonHeap_max = r.readLong();
