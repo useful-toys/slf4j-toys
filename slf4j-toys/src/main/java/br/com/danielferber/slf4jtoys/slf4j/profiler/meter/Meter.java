@@ -15,16 +15,14 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
+import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import java.io.Closeable;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.slf4j.Logger;
-
-import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 
 /**
  *
@@ -606,6 +604,18 @@ public class Meter extends MeterData implements Closeable {
     public void close() {
         if (stopTime == 0) {
             fail(null);
+        }
+    }
+
+    // ========================================================================
+    public void run(Runnable runnable) {
+        this.start();
+        try {
+            runnable.run();
+            this.ok();
+        } catch (final Exception e) {
+            this.fail(e);
+            throw new RuntimeException(e);
         }
     }
 }

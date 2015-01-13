@@ -15,9 +15,8 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
-import org.slf4j.Logger;
-
 import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MeterFactory {
 
@@ -38,20 +37,4 @@ public class MeterFactory {
     public static Meter getMeter(final Logger logger, final String operationId) {
         return new Meter(LoggerFactory.getLogger(logger, operationId));
     }
-
-//    public static void put(String name) {
-//        context.put(name, null);
-//    }
-//
-//    public static void put(String name, String value) {
-//        context.put(name, value);
-//    }
-//
-//    public static void remove(String name) {
-//        context.remove(name);
-//    }
-//
-//    static Map<String, String> getContext() {
-//        return context;
-//    }
 }
