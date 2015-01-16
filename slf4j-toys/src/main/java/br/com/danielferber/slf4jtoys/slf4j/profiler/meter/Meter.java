@@ -20,9 +20,11 @@ import java.io.Closeable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.management.RuntimeErrorException;
 import org.slf4j.Logger;
 
 /**
@@ -610,33 +612,76 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     public void run(Runnable runnable) {
-        safeRun(RuntimeException.class, runnable);
-    }
-
-    public <T extends RuntimeException> void safeRun(Class exceptionClass, Runnable runnable) throws T {
         this.start();
         try {
             runnable.run();
             this.ok();
-        } catch (final Exception e) {
+        } catch (RuntimeException e) {
             this.fail(e);
-            final String message = "Failed: " + (this.description != null ? this.description : this.eventCategory);
-            try {
-                T exception = (T) exceptionClass.getConstructor(String.class, Throwable.class).newInstance(message, e);
-                throw exception;
-            } catch (NoSuchMethodException ex) {
-                logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
-            } catch (SecurityException ex) {
-                logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
-            } catch (InstantiationException ex) {
-                logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
-            } catch (IllegalAccessException ex) {
-                logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
-            } catch (IllegalArgumentException ex) {
-                logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
-            } catch (InvocationTargetException ex) {
-                logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
-            }
+            throw e;
         }
+    }
+
+    public <T> T call(Callable<T> callable) throws Exception {
+        this.start();
+        try {
+            T result = callable.call();
+            this.ok();
+            return result;
+        } catch (Exception e) {
+            this.fail(e);
+            throw e;
+        }
+    }
+
+    public <T> T safeCall(Callable<T> callable) {
+        this.start();
+        try {
+            T result = callable.call();
+            this.ok();
+            return result;
+        } catch (RuntimeException e) {
+            this.fail(e);
+            throw e;
+        } catch (Exception e) {
+            this.fail(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <E extends RuntimeException, T> T safeCall(Class<E> exceptionClass, Callable<T> callable) {
+        this.start();
+        try {
+            T result = callable.call();
+            this.ok();
+            return result;
+        } catch (RuntimeException e) {
+            this.fail(e);
+            throw e;
+        } catch (Exception e) {
+            this.fail(e);
+            throw convertException(exceptionClass, e);
+        }
+    }
+
+    private <T extends RuntimeException> RuntimeException convertException(Class<T> exceptionClass, Exception e) {
+        final String message = "Failed: " + (this.description != null ? this.description : this.eventCategory);
+        try {
+            RuntimeException exception = exceptionClass.getConstructor(String.class, Throwable.class).newInstance(message, e);
+            return exception;
+        } catch (NoSuchMethodException ex) {
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
+        } catch (SecurityException ex) {
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
+        } catch (InstantiationException ex) {
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
+        } catch (IllegalAccessException ex) {
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
+        } catch (IllegalArgumentException ex) {
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
+        } catch (InvocationTargetException ex) {
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, "Meter cannot create exception of type {}.", exceptionClass, e);
+        }
+        return new RuntimeException(e);
     }
 }
