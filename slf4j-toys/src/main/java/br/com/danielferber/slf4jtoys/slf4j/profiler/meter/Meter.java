@@ -24,7 +24,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.management.RuntimeErrorException;
 import org.slf4j.Logger;
 
 /**
@@ -544,7 +543,7 @@ public class Meter extends MeterData implements Closeable {
      * exception to logger using warn level. Sends a message with system status,
      * statistics and complete context to log using trace level.
      *
-     * @param throwable Exception that represents the failure. MAy be null if no
+     * @param throwable Exception that represents the failure. May be null if no
      * exception applies.
      * @return reference to the meter itself.
      */
