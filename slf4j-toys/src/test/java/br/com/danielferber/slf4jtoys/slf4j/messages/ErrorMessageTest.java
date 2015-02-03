@@ -83,7 +83,6 @@ public class ErrorMessageTest {
             protected void collectSystemStatus() {
                 throw new RuntimeException();
             }
-          
         };
         m.start();
         m.ok();
