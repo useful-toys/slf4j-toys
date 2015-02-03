@@ -4,6 +4,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.messages;
 
+import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.meter.Meter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.meter.MeterFactory;
 import org.junit.Test;
@@ -54,25 +55,38 @@ public class ErrorMessageTest {
         m.ok();
     }
 
-        @Test
+    @Test
     public void testMeterAlreadyStarted() {
         final Meter m = MeterFactory.getMeter("teste").start().start();
         m.ok();
     }
 
-            @Test
+    @Test
     public void testMeterNotRefusedNorConfirmed() throws InterruptedException {
         subMeterX();
         // Wait and force garbage colletor to finalize meter
-        System.gc(); 
+        System.gc();
         Thread.sleep(1000);
-        System.gc(); 
+        System.gc();
         Thread.sleep(1000);
         System.gc();
     }
 
     private void subMeterX() {
         final Meter m = MeterFactory.getMeter("teste").start();
+    }
+
+    @Test
+    public void testMeterInternalException() {
+        final Meter m = new Meter(LoggerFactory.getLogger("teste")) {
+            @Override
+            protected void collectSystemStatus() {
+                throw new RuntimeException();
+            }
+          
+        };
+        m.start();
+        m.ok();
     }
 
 }

@@ -393,7 +393,7 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (startTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter already started: " + this.eventCategory + ":" + this.eventPosition, new InconsistentMeterException("Meter.start(): startTime != 0", 2)
+                logger.error(Slf4JMarkers.INCONSISTENT_START, "Meter already started: {}/{}", this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.start(): startTime != 0", 2)
 //        return new Exception(message);
                 );
             }
@@ -412,7 +412,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
         } catch (final Exception t) {
-            logger.error(Slf4JMarkers.BUG, "Meter start threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
+            logger.error(Slf4JMarkers.BUG, "Meter start threw exception: {}/{}", this.eventCategory, this.eventPosition, t);
         }
         return this;
     }
@@ -481,7 +481,7 @@ public class Meter extends MeterData implements Closeable {
             }
         } catch (final Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
-            logger.error(Slf4JMarkers.BUG, "Meter confirmation threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
+            logger.error(Slf4JMarkers.BUG, "Meter confirmation threw exception: {}/{}", this.eventCategory, this.eventPosition, t);
         }
         return this;
     }
@@ -500,14 +500,14 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter already refused or confirmed: " + this.eventCategory + ":" + this.eventPosition, new InconsistentMeterException("Meter.ok(...): stopTime != 0", 4)
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter already refused or confirmed: {}/{}", this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.ok(...): stopTime != 0", 4)
 //        return new Exception(message);
                 );
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmed but not started: " + this.eventCategory + ":" + this.eventPosition, new InconsistentMeterException("Meter.ok(...): startTime == 0", 4)
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, "Meter confirmed but not started: {}/{}", this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.ok(...): startTime == 0", 4)
 //        return new Exception(message);
                 );
             }
@@ -537,7 +537,7 @@ public class Meter extends MeterData implements Closeable {
             }
         } catch (final Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
-            logger.error(Slf4JMarkers.BUG, "Meter confirmation threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
+            logger.error(Slf4JMarkers.BUG, "Meter confirmation threw exception: {}/{}", this.eventCategory, this.eventPosition, t);
         }
         return this;
     }
@@ -561,16 +561,12 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter already refused or confirmed: " + this.eventCategory + ":" + this.eventPosition, new InconsistentMeterException("Meter.fail(): stopTime != 0", 2)
-//        return new Exception(message);
-                );
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter already refused or confirmed: {}/{}", this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.fail(): stopTime != 0", 2));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refused, but not started: " + this.eventCategory + ":" + this.eventPosition, new InconsistentMeterException("Meter.fail(): startTime == 0", 2)
-//        return new Exception(message);
-                );
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, "Meter refused, but not started: {}/{}", this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.fail(): startTime == 0", 2));
             }
             if (throwable != null) {
                 exceptionClass = throwable.getClass().getName();
@@ -591,7 +587,7 @@ public class Meter extends MeterData implements Closeable {
             }
         } catch (final Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
-            logger.error(Slf4JMarkers.BUG, "Meter refusal threw exception: " + this.eventCategory + ":" + this.eventPosition, t);
+            logger.error(Slf4JMarkers.BUG, "Meter refusal threw exception: {}/{}", this.eventCategory, this.eventPosition, t);
         }
         return this;
     }
