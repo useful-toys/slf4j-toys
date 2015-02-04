@@ -41,6 +41,11 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_METER_REFUSED_BUT_NOT_STARTED = "Meter refused, but not started: {}/{}";
     private static final String ERROR_MSG_METER_FINALIZED_BUT_NOT_REFUSED_NOR_CONFI = "Meter finalized but not refused nor confirmed: {}/{}";
     private static final String ERROR_MSG_METHOD_THREW_EXCEPTION = "Meter.{}(...) method threw exception: {}/{}";
+    private static final String ERROR_MSG_ILLEGAL_ARGUMENT = "Illegal call to Meter.{}: {}.";
+    private static final String ERROR_MSG_NULL_ARGUMENT = "null argument";
+    private static final String ERROR_MSG_NON_POSITIVE_ARGUMENT = "non positive argument";
+    private static final String ERROR_MSG_ILLEGAL_STRING_FORMAT = "Illegal string format";
+    private static final String ERROR_MSG_NON_FORWARD_ITERATION= "Non forward iteration";
     private static final String MY_CLASS_NAME = Meter.class.getName();
 
     /**
@@ -92,6 +97,9 @@ public class Meter extends MeterData implements Closeable {
      * @return
      */
     public Meter sub(final String name) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "sub(name)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+        }
         final Meter m = MeterFactory.getMeter(eventCategory + '.' + name);
         if (this.context != null) {
             m.context = new HashMap<String, String>(this.context);
@@ -108,6 +116,9 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter m(final String message) {
+        if (message == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+        }
         this.description = message;
         return this;
     }
@@ -116,16 +127,21 @@ public class Meter extends MeterData implements Closeable {
      * Configures the meter with a human readable message that explains the task
      * purpose.
      *
-     * @param message message format ({@link String#format(java.lang.String, java.lang.Object...)
+     * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)
      * })
      * @param args message arguments
      * @return reference to the meter itself.
      */
-    public Meter m(final String message, final Object... args) {
+    public Meter m(final String format, final Object... args) {
+        if (format == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            this.description = null;
+            return this;
+        }
         try {
-            this.description = String.format(message, args);
+            this.description = String.format(format, args);
         } catch (final IllegalFormatException e) {
-            logger.error("Illegal string format in Meter.setMessage(message, args...)", e);
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(format, args)", ERROR_MSG_ILLEGAL_STRING_FORMAT, new IllegalMeterUsage(2, e));
         }
         return this;
     }
@@ -138,6 +154,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter limitMilliseconds(final long timeLimitMilliseconds) {
+        if (timeLimitMilliseconds <= 0) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "limitMilliseconds(timeLimitMilliseconds)", ERROR_MSG_NON_POSITIVE_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         this.timeLimitNanoseconds = timeLimitMilliseconds * 1000 * 1000;
         return this;
     }
@@ -148,11 +168,16 @@ public class Meter extends MeterData implements Closeable {
      * number of times between {@link #start() } and {@link #ok() }/{@link #fail(java.lang.Throwable)
      * } method calls.
      *
-     * @param i Number of expected iterations or steps that make up the task
+     * @param expectedIterations Number of expected iterations or steps that
+     * make up the task
      * @return reference to the meter itself.
      */
-    public Meter iterations(final long i) {
-        this.expectedIteration = i;
+    public Meter iterations(final long expectedIterations) {
+        if (expectedIterations <= 0) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "iterations(expectedIterations)", ERROR_MSG_NON_POSITIVE_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
+        this.expectedIteration = expectedIterations;
         return this;
     }
 
@@ -165,6 +190,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -180,6 +209,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final int value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -195,6 +228,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final long value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -210,6 +247,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final boolean value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -225,6 +266,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final float value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -240,6 +285,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final double value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -255,6 +304,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final Integer value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -270,6 +323,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final Long value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -285,6 +342,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final Boolean value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -300,6 +361,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final Float value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -315,6 +380,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final Double value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -331,6 +400,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final Object object) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -346,6 +419,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final String value) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
@@ -360,17 +437,21 @@ public class Meter extends MeterData implements Closeable {
      * @param name key of the entry to add.
      * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)
      * })
-     * @param objects message arguments
+     * @param args message arguments
      * @return reference to the meter itself.
      */
-    public Meter ctx(final String name, final String format, final Object... objects) {
+    public Meter ctx(final String name, final String format, final Object... args) {
+        if (name == null || format == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, format, args...)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             this.context = new HashMap<String, String>();
         }
         try {
-            ctx(name, String.format(format, objects));
+            ctx(name, String.format(format, args));
         } catch (final IllegalFormatException e) {
-            logger.error("Illegal string format in Meter.ctx(name, format, objects...)", e);
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, format, args...)", ERROR_MSG_ILLEGAL_STRING_FORMAT, new IllegalMeterUsage(2, e));
         }
         return this;
     }
@@ -382,6 +463,10 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter unctx(final String name) {
+        if (name == null) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "unctx(name)", ERROR_MSG_NULL_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
         if (context == null) {
             return this;
         }
@@ -402,7 +487,7 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (startTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.start(): startTime != 0", 2)
+                logger.error(Slf4JMarkers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(2)
                 //        return new Exception(message);
                 );
             }
@@ -442,11 +527,15 @@ public class Meter extends MeterData implements Closeable {
      * Notifies the meter that more of iterations or steps that make up the task
      * completed successfully.
      *
-     * @param i the number of iterations or steps
+     * @param increment the number of iterations or steps
      * @return reference to the meter itself.
      */
-    public Meter incBy(final long i) {
-        this.currentIteration += i;
+    public Meter incBy(final long increment) {
+         if (increment <= 0) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incBy(increment)", ERROR_MSG_NON_POSITIVE_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
+       this.currentIteration += increment;
         return this;
     }
 
@@ -454,11 +543,18 @@ public class Meter extends MeterData implements Closeable {
      * Notifies the meter that a number of iterations or steps that make up the
      * task already completed successfully.
      *
-     * @param i the number of iterations or steps
+     * @param currentIteration the number of iterations or steps
      * @return reference to the meter itself.
      */
-    public Meter incTo(final long i) {
-        this.currentIteration = i;
+    public Meter incTo(final long currentIteration) {
+         if (currentIteration <= 0) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_POSITIVE_ARGUMENT, new IllegalMeterUsage(2));
+            return this;
+        }
+         if (currentIteration <= this.currentIteration) {
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_FORWARD_ITERATION, new IllegalMeterUsage(2));
+        }
+        this.currentIteration = currentIteration;
         return this;
     }
 
@@ -509,12 +605,12 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.ok(...): stopTime != 0", 4));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(4));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED_, this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.ok(...): startTime == 0", 4));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED_, this.eventCategory, this.eventPosition, new IllegalMeterUsage(4));
             }
             success = true;
 
@@ -566,12 +662,12 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (stopTime != 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.fail(): stopTime != 0", 2));
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(2));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_REFUSED_BUT_NOT_STARTED, this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.fail(): startTime == 0", 2));
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_REFUSED_BUT_NOT_STARTED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(2));
             }
             if (throwable != null) {
                 exceptionClass = throwable.getClass().getName();
@@ -607,15 +703,20 @@ public class Meter extends MeterData implements Closeable {
     protected void finalize() throws Throwable {
         if (stopTime == 0) {
             /* Log exception to provide stacktrace to inconsistent meter call. */
-            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_FINALIZED_BUT_NOT_REFUSED_NOR_CONFI, this.eventCategory, this.eventPosition, new InconsistentMeterException("Meter.finalize(): stopTime == 0"));
+            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_FINALIZED_BUT_NOT_REFUSED_NOR_CONFI, this.eventCategory, this.eventPosition, new IllegalMeterUsage());
         }
         super.finalize();
     }
 
-    public static class InconsistentMeterException extends Throwable {
+    public static class IllegalMeterUsage extends Throwable {
 
-        InconsistentMeterException(final String message, int framesToDiscard) {
-            super(message);
+        IllegalMeterUsage(int framesToDiscard) {
+            this(framesToDiscard+1, null);
+        }
+
+        IllegalMeterUsage(int framesToDiscard, Throwable e) {
+            super(e);
+            framesToDiscard++;
             StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
             while (MY_CLASS_NAME.equals(stacktrace[framesToDiscard].getClassName())) {
                 framesToDiscard++;
@@ -624,8 +725,8 @@ public class Meter extends MeterData implements Closeable {
             setStackTrace(stacktrace);
         }
 
-        InconsistentMeterException(final String message) {
-            super(message);
+        IllegalMeterUsage() {
+            super("Illegal Meter usage.");
         }
 
         @Override

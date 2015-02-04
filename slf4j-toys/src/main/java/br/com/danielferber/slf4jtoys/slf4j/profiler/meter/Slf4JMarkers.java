@@ -43,5 +43,6 @@ public final class Slf4JMarkers {
     public static final Marker INCONSISTENT_OK = MarkerFactory.getMarker("METER_INCONSISTENT_OK");
     public static final Marker INCONSISTENT_FAIL = MarkerFactory.getMarker("METER_INCONSISTENT_FAIL");
     public static final Marker BUG = MarkerFactory.getMarker("METER_BUG");
+    public static final Marker ILLEGAL = MarkerFactory.getMarker("METER_ILLEGAL");
     public static final Marker INCONSISTENT_EXCEPTION = MarkerFactory.getMarker("METER_INCONSISTENT_EXCEPTION");
 }

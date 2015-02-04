@@ -88,4 +88,126 @@ public class ErrorMessageTest {
         m.ok();
     }
 
+    @Test
+    public void testIllegalCallSub() {
+        final Meter m = MeterFactory.getMeter("teste").start();
+        Meter m2 = m.sub(null).start();
+        m2.ok();
+        m.ok();
+    }
+
+    @Test
+    public void testIllegalCallM() {
+        final Meter m = MeterFactory.getMeter("teste").m(null).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallM2() {
+        final Meter m = MeterFactory.getMeter("teste").m(null, "abc").start().ok();
+    }
+
+    @Test
+    public void testIllegalCallM3() {
+        final Meter m = MeterFactory.getMeter("teste").m(null, "%d", 0.0f).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallLimitMilliseconds() {
+        final Meter m = MeterFactory.getMeter("teste").limitMilliseconds(-10).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallIterations() {
+        final Meter m = MeterFactory.getMeter("teste").iterations(-10).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx0() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx1() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, 0).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx2() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, 0L).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx3() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, "s").start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx4() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, true).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx5() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, 0.0f).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx6() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, 0.0).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx7() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, Integer.valueOf(0)).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx8() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, Long.valueOf(0)).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx9() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, Boolean.FALSE).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx10() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, Float.valueOf(0)).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx11() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, Double.valueOf(0)).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx12() {
+        final Meter m = MeterFactory.getMeter("teste").ctx(null, "a", "b").start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx13() {
+        final Meter m = MeterFactory.getMeter("teste").ctx("a", null, "b").start().ok();
+    }
+
+    @Test
+    public void testIllegalCallCtx14() {
+        final Meter m = MeterFactory.getMeter("teste").ctx("a", "%d", 0.0f).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallIncBy() {
+        final Meter m = MeterFactory.getMeter("teste").incBy(-10).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallIncTo0() {
+        final Meter m = MeterFactory.getMeter("teste").incTo(-10).start().ok();
+    }
+
+    @Test
+    public void testIllegalCallIncTo1() {
+        final Meter m = MeterFactory.getMeter("teste").incTo(10).incTo(5).start().ok();
+    }
 }
