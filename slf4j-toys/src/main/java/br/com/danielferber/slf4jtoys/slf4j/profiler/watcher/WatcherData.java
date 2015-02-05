@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 Daniel Felix Ferber.
+/* 
+ * Copyright 2015 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
  * @author Daniel Felix Ferber
  */
 public class WatcherData extends SystemData {
-	private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
 
     protected WatcherData() {
         super();

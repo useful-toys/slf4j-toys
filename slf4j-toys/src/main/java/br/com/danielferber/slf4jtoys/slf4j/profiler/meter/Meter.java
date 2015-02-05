@@ -1,11 +1,11 @@
-/*
- * Copyright 2013 Daniel Felix Ferber
+/* 
+ * Copyright 2015 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,7 +45,7 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_NULL_ARGUMENT = "null argument";
     private static final String ERROR_MSG_NON_POSITIVE_ARGUMENT = "non positive argument";
     private static final String ERROR_MSG_ILLEGAL_STRING_FORMAT = "Illegal string format";
-    private static final String ERROR_MSG_NON_FORWARD_ITERATION= "Non forward iteration";
+    private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non forward iteration";
     private static final String MY_CLASS_NAME = Meter.class.getName();
 
     /**
@@ -531,11 +531,11 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter incBy(final long increment) {
-         if (increment <= 0) {
+        if (increment <= 0) {
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incBy(increment)", ERROR_MSG_NON_POSITIVE_ARGUMENT, new IllegalMeterUsage(2));
             return this;
         }
-       this.currentIteration += increment;
+        this.currentIteration += increment;
         return this;
     }
 
@@ -547,11 +547,11 @@ public class Meter extends MeterData implements Closeable {
      * @return reference to the meter itself.
      */
     public Meter incTo(final long currentIteration) {
-         if (currentIteration <= 0) {
+        if (currentIteration <= 0) {
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_POSITIVE_ARGUMENT, new IllegalMeterUsage(2));
             return this;
         }
-         if (currentIteration <= this.currentIteration) {
+        if (currentIteration <= this.currentIteration) {
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_FORWARD_ITERATION, new IllegalMeterUsage(2));
         }
         this.currentIteration = currentIteration;
@@ -711,7 +711,7 @@ public class Meter extends MeterData implements Closeable {
     public static class IllegalMeterUsage extends Throwable {
 
         IllegalMeterUsage(int framesToDiscard) {
-            this(framesToDiscard+1, null);
+            this(framesToDiscard + 1, null);
         }
 
         IllegalMeterUsage(int framesToDiscard, Throwable e) {

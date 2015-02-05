@@ -1,11 +1,11 @@
-/*
- * Copyright 2013 Daniel Felix Ferber
+/* 
+ * Copyright 2015 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,8 @@ import java.io.Serializable;
  * @author Daniel
  */
 public abstract class EventData implements Serializable {
-	private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
     /**
      * Unique ProfilingSession UUID.
      */
@@ -60,8 +61,6 @@ public abstract class EventData implements Serializable {
     public long getTime() {
         return time;
     }
-
-
 
     /**
      * Reverts all event attributes to their constructor initial value. Useful
@@ -200,8 +199,7 @@ public abstract class EventData implements Serializable {
      * Writes an encoded string representation of the event into the supplied
      * StringBuilder.
      *
-     * @param builder The StringBuilder that receives the encoded
-     * representation.
+     * @param sb The StringBuilder that receives the encoded representation.
      * @param messagePrefix A prefix character used by an parser to recognize
      * the encoded message.
      * @return The StringBuilder passed as argument to allow chained
@@ -258,11 +256,10 @@ public abstract class EventData implements Serializable {
         final EventReader eventReader = new EventReader();
         eventReader.reset(plausibleMessage);
 
-        String key = null;
         try {
             while (eventReader.hasMore()) {
-                key = eventReader.readPropertyName();
-                if (! readKeyProperties(eventReader, key)) {
+                String key = eventReader.readPropertyName();
+                if (!readKeyProperties(eventReader, key)) {
                     if (!readPropertyImpl(eventReader, key)) {
                         return false;
                     }

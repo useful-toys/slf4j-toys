@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 Daniel Felix Ferber.
+/* 
+ * Copyright 2015 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 public class MeterFactory {
 
 //    private static final Map<String, String> context = new TreeMap<String, String>();
-
     public static Meter getMeter(final String name) {
         return new Meter(LoggerFactory.getLogger(name));
     }

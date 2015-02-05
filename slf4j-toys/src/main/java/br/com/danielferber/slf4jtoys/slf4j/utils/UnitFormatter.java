@@ -1,11 +1,11 @@
-/*
- * Copyright 2013 Daniel Felix Ferber
+/* 
+ * Copyright 2015 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,6 +51,7 @@ public final class UnitFormatter {
     }
 
     static final double Epsylon = 0.001;
+
     static String doubleUnit(double value, final String[] units, final int[] factors) {
         if (value == 0.0) {
             return "0" + units[0];
@@ -59,7 +60,7 @@ public final class UnitFormatter {
         int index = 0;
         final int length = factors.length;
 
-        while (index < length && (value+Epsylon) >= (factors[index] + factors[index] / 10)) {
+        while (index < length && (value + Epsylon) >= (factors[index] + factors[index] / 10)) {
             value /= factors[index];
             index++;
         }

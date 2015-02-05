@@ -2,15 +2,14 @@
  */
 package br.com.danielferber.toys.slf4j.toys.examples;
 
-import java.util.Random;
-
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.meter.Meter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.meter.MeterFactory;
+import java.util.Random;
 
 /**
  *
- * @author x7ws - Daniel Felix Ferber
+ * @author Daniel Felix Ferber
  */
 public class WatcherDemo {
 

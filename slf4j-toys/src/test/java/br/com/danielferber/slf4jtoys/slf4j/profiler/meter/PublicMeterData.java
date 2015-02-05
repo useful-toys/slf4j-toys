@@ -1,15 +1,27 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright 2015 Daniel Felix Ferber.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 /**
  *
- * @author X7WS
+ * @author Daniel Felix Ferber
  */
 public class PublicMeterData extends MeterData {
-	private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
 
     public PublicMeterData() {
         super();
@@ -22,14 +34,6 @@ public class PublicMeterData extends MeterData {
     public void setHeap_commited(final long heap_commited) {
         this.heap_commited = heap_commited;
     }
-
-//    public long getHeap_init() {
-//        return heap_init;
-//    }
-
-//    public void setHeap_init(long heap_init) {
-//        this.heap_init = heap_init;
-//    }
 
     public long getHeap_max() {
         return heap_max;
@@ -54,14 +58,6 @@ public class PublicMeterData extends MeterData {
     public void setNonHeap_commited(final long nonHeap_commited) {
         this.nonHeap_commited = nonHeap_commited;
     }
-
-//    public long getNonHeap_init() {
-//        return nonHeap_init;
-//    }
-
-//    public void setNonHeap_init(long nonHeap_init) {
-//        this.nonHeap_init = nonHeap_init;
-//    }
 
     public long getNonHeap_max() {
         return nonHeap_max;
@@ -168,7 +164,7 @@ public class PublicMeterData extends MeterData {
     }
 
     @Override
-	public String getSessionUuid() {
+    public String getSessionUuid() {
         return sessionUuid;
     }
 
@@ -177,7 +173,7 @@ public class PublicMeterData extends MeterData {
     }
 
     @Override
-	public String getEventCategory() {
+    public String getEventCategory() {
         return eventCategory;
     }
 
@@ -186,7 +182,7 @@ public class PublicMeterData extends MeterData {
     }
 
     @Override
-	public long getEventPosition() {
+    public long getEventPosition() {
         return eventPosition;
     }
 
@@ -195,13 +191,12 @@ public class PublicMeterData extends MeterData {
     }
 
     @Override
-	public long getTime() {
+    public long getTime() {
         return time;
     }
 
     public void setTime(final long time) {
         this.time = time;
     }
-
 
 }
