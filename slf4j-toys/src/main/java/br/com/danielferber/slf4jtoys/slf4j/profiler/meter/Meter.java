@@ -16,15 +16,18 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
+
 import java.io.Closeable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
+import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
+
 import org.slf4j.Logger;
 
 /**
@@ -37,7 +40,7 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_CANNOT_CREATE_EXCEPTION = "Meter cannot create exception of type {}.";
     private static final String ERROR_MSG_METER_ALREADY_STARTED = "Meter already started: {}/{}";
     private static final String ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED = "Meter already refused or confirmed: {}/{}";
-    private static final String ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED_ = "Meter confirmed but not started: {}/{}";
+    private static final String ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED = "Meter confirmed but not started: {}/{}";
     private static final String ERROR_MSG_METER_REFUSED_BUT_NOT_STARTED = "Meter refused, but not started: {}/{}";
     private static final String ERROR_MSG_METER_FINALIZED_BUT_NOT_REFUSED_NOR_CONFI = "Meter finalized but not refused nor confirmed: {}/{}";
     private static final String ERROR_MSG_METHOD_THREW_EXCEPTION = "Meter.{}(...) method threw exception: {}/{}";
@@ -195,7 +198,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, null);
         return this;
@@ -214,7 +217,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, Integer.toString(value));
         return this;
@@ -233,7 +236,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, Long.toString(value));
         return this;
@@ -252,7 +255,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, Boolean.toString(value));
         return this;
@@ -271,7 +274,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, Float.toString(value));
         return this;
@@ -290,7 +293,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, Double.toString(value));
         return this;
@@ -309,7 +312,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -328,7 +331,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -347,7 +350,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -366,7 +369,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -385,7 +388,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -405,7 +408,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, object == null ? NULL_VALUE : object.toString());
         return this;
@@ -424,7 +427,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         context.put(name, value);
         return this;
@@ -446,7 +449,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new HashMap<String, String>();
+            this.context = new LinkedHashMap<String, String>();
         }
         try {
             ctx(name, String.format(format, args));
@@ -610,7 +613,7 @@ public class Meter extends MeterData implements Closeable {
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED_, this.eventCategory, this.eventPosition, new IllegalMeterUsage(4));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(4));
             }
             success = true;
 

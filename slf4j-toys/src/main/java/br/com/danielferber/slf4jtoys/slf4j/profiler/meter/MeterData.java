@@ -17,7 +17,9 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventData;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
@@ -282,7 +284,16 @@ public class MeterData extends SystemData {
             buffer.append("; ");
             buffer.append(UnitFormatter.bytes(this.runtime_usedMemory));
         }
-//        return super.readableString(buffer);
+        if (context != null) {
+	        for (Entry<String, String> entry: context.entrySet()) {
+	        	buffer.append("; ");
+	        	buffer.append(entry.getKey());
+	        	if (entry.getValue() != null) {
+		        	buffer.append("=");
+		        	buffer.append(entry.getValue());
+	        	}
+			} 
+        }
         return buffer;
     }
 
