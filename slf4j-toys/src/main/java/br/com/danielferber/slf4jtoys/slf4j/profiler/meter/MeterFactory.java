@@ -21,6 +21,10 @@ import org.slf4j.Logger;
 public class MeterFactory {
 
 //    private static final Map<String, String> context = new TreeMap<String, String>();
+    public static Meter getMeter(final Logger logger) {
+        return new Meter(logger);
+    }
+    
     public static Meter getMeter(final String name) {
         return new Meter(LoggerFactory.getLogger(name));
     }
