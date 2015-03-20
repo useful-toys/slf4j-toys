@@ -16,7 +16,6 @@
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
-
 import java.io.Closeable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -27,7 +26,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.slf4j.Logger;
 
 /**
@@ -767,7 +765,7 @@ public class Meter extends MeterData implements Closeable {
         this.start();
         try {
             T result = callable.call();
-            this.ok();
+            this.ctx("result", result).ok();
             return result;
         } catch (Exception e) {
             this.fail(e);
@@ -779,7 +777,7 @@ public class Meter extends MeterData implements Closeable {
         this.start();
         try {
             T result = callable.call();
-            this.ok();
+            this.ctx("result", result).ok();
             return result;
         } catch (RuntimeException e) {
             this.fail(e);
