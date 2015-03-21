@@ -19,7 +19,7 @@ import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
+import org.slf4j.impl.TestLogger;
 
 /**
  *
@@ -27,9 +27,10 @@ import org.slf4j.Logger;
  */
 public class MeterTest {
 
-    Logger logger = LoggerFactory.getLogger("Test");
+    TestLogger logger = (TestLogger) LoggerFactory.getLogger("Test");
 
     public MeterTest() {
+        logger.setEnabled(false);
     }
 
     @Test
@@ -67,7 +68,7 @@ public class MeterTest {
         Assert.assertEquals(0, stopTime2);
         Assert.assertEquals(startTime2 - createTime2, waitingTime2);
         Assert.assertTrue(executionTime2 > 0);
-        Assert.assertTrue(executionTime2 <= now1b - now1a);
+        Assert.assertTrue(executionTime2 <= now2b - now2a);
         Assert.assertFalse(m.isSuccess());
 
         final long now3a = System.nanoTime();
@@ -123,7 +124,7 @@ public class MeterTest {
         Assert.assertEquals(0, stopTime2);
         Assert.assertEquals(startTime2 - createTime2, waitingTime2);
         Assert.assertTrue(executionTime2 > 0);
-        Assert.assertTrue(executionTime2 <= now1b - now1a);
+        Assert.assertTrue(executionTime2 <= now2b - now2a);
         Assert.assertFalse(m.isSuccess());
 
         final long now3a = System.nanoTime();
@@ -147,7 +148,8 @@ public class MeterTest {
     @Test
     public void testIdentifierAttributes() {
         final String name1 = "TestAttributes1";
-        final Logger logger1 = LoggerFactory.getLogger(name1);
+        final TestLogger logger1 = (TestLogger) LoggerFactory.getLogger(name1);
+        logger1.setEnabled(false);
 
         final Meter m = new Meter(logger1);
         Assert.assertEquals(ProfilingSession.uuid, m.getSessionUuid());
@@ -162,8 +164,9 @@ public class MeterTest {
         Assert.assertEquals(2L, m2.getEventPosition());
 
         final String name2 = "TestAttributes2";
-        final Logger logger2 = LoggerFactory.getLogger(name2);
-
+        final TestLogger logger2 = (TestLogger) LoggerFactory.getLogger(name2);
+        logger2.setEnabled(false);
+        
         final Meter m3 = new Meter(logger2);
         Assert.assertEquals(ProfilingSession.uuid, m3.getSessionUuid());
         Assert.assertEquals(m3.getLogger(), logger2);
@@ -230,5 +233,17 @@ public class MeterTest {
         m1.fail(e);
         Assert.assertEquals(e.getClass().getName(), m1.getExceptionClass());
         Assert.assertEquals(e.getMessage(), m1.getExceptionMessage());
+    }
+
+    @Test
+    public void testExceptionAttributesNull() {
+        final Meter m1 = new Meter(logger).start();
+        Assert.assertNull(m1.getExceptionClass());
+        Assert.assertNull(m1.getExceptionMessage());
+        
+        final RuntimeException e = new RuntimeException("Test error message");
+        m1.fail();
+        Assert.assertNull(m1.getExceptionClass());
+        Assert.assertNull(m1.getExceptionMessage());
     }
 }

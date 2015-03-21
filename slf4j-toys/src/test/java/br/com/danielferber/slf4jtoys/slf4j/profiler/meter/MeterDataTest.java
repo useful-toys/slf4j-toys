@@ -196,7 +196,7 @@ public class MeterDataTest {
 
     @Test
     public void writeReadTest2() {
-        final PublicMeterData a = createMeterData();
+        final MeterDataMock a = createMeterData();
 
         a.setEventCategory("aaaa");
         a.setEventPosition(1111);
@@ -250,8 +250,8 @@ public class MeterDataTest {
         assertTrue(b.isCompletelyEqualsTo(a));
     }
 
-    private PublicMeterData createMeterData() {
-        return new PublicMeterData() {
+    private MeterDataMock createMeterData() {
+        return new MeterDataMock() {
             private static final long serialVersionUID = 1L;
 
             @Override

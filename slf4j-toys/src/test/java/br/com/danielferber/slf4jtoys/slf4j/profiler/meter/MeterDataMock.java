@@ -19,11 +19,11 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
  *
  * @author Daniel Felix Ferber
  */
-public class PublicMeterData extends MeterData {
+public class MeterDataMock extends MeterData {
 
     private static final long serialVersionUID = 1L;
 
-    public PublicMeterData() {
+    public MeterDataMock() {
         super();
     }
 
