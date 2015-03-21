@@ -41,6 +41,7 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED = "Meter confirmed but not started: {}/{}";
     private static final String ERROR_MSG_METER_REFUSED_BUT_NOT_STARTED = "Meter refused, but not started: {}/{}";
     private static final String ERROR_MSG_METER_FINALIZED_BUT_NOT_REFUSED_NOR_CONFI = "Meter finalized but not refused nor confirmed: {}/{}";
+    private static final String ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED = "Meter incremented but not started: {}/{}";
     private static final String ERROR_MSG_METHOD_THREW_EXCEPTION = "Meter.{}(...) method threw exception: {}/{}";
     private static final String ERROR_MSG_ILLEGAL_ARGUMENT = "Illegal call to Meter.{}: {}.";
     private static final String ERROR_MSG_NULL_ARGUMENT = "null argument";
@@ -89,10 +90,9 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Creates a new mwter whose name is under the hierarchy of this meter.
-     * Useful if a large task may be subdivided into smaller task and reported
-     * individually. The new meter uses the name of this meter, appended my its
-     * name, similar as logger do.
+     * Creates a new mwter whose name is under the hierarchy of this meter. Useful if a large task may be subdivided
+     * into smaller task and reported individually. The new meter uses the name of this meter, appended my its name,
+     * similar as logger do.
      *
      * @param name
      * @return
@@ -110,8 +110,7 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Configures the meter with a human readable message that explains the task
-     * purpose.
+     * Configures the meter with a human readable message that explains the task purpose.
      *
      * @param message fixed message
      * @return reference to the meter itself.
@@ -125,8 +124,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Configures the meter with a human readable message that explains the task
-     * purpose.
+     * Configures the meter with a human readable message that explains the task purpose.
      *
      * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)
      * })
@@ -148,8 +146,8 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Configures the meter with an threshold for reasonable, typical execution
-     * time for the task represented by the meter.
+     * Configures the meter with an threshold for reasonable, typical execution time for the task represented by the
+     * meter.
      *
      * @param timeLimitMilliseconds time threshold
      * @return reference to the meter itself.
@@ -164,13 +162,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Configures the meter as representing a task made up of iterations or
-     * steps. Such meters are allows to call {@link #progress() } an arbitrarily
-     * number of times between {@link #start() } and {@link #ok() }/{@link #fail(java.lang.Throwable)
+     * Configures the meter as representing a task made up of iterations or steps. Such meters are allows to call {@link #progress()
+     * } an arbitrarily number of times between {@link #start() } and {@link #ok() }/{@link #fail(java.lang.Throwable)
      * } method calls.
      *
-     * @param expectedIterations Number of expected iterations or steps that
-     * make up the task
+     * @param expectedIterations Number of expected iterations or steps that make up the task
      * @return reference to the meter itself.
      */
     public Meter iterations(final long expectedIterations) {
@@ -184,8 +180,7 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Adds an entry to the context map. The entry has no value and is
-     * interpreted as a marker.
+     * Adds an entry to the context map. The entry has no value and is interpreted as a marker.
      *
      * @param name key of the entry to add.
      * @return reference to the meter itself.
@@ -396,8 +391,7 @@ public class Meter extends MeterData implements Closeable {
      * Adds an entry to the context map.
      *
      * @param name key of the entry to add.
-     * @param object object which string representation is used for the value of
-     * the entry to add
+     * @param object object which string representation is used for the value of the entry to add
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final Object object) {
@@ -432,8 +426,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Adds an entry to the context map. The entry value is made up of a
-     * formatted message with arguments.
+     * Adds an entry to the context map. The entry value is made up of a formatted message with arguments.
      *
      * @param name key of the entry to add.
      * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)
@@ -477,10 +470,9 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Notifies the meter in order to claim immediate execution start of the
-     * task represented by the meter. Sends a message to logger using debug
-     * level. Sends a message with system status and partial context to log
-     * using trace level.
+     * Notifies the meter in order to claim immediate execution start of the task represented by the meter. Sends a
+     * message to logger using debug level. Sends a message with system status and partial context to log using trace
+     * level.
      *
      * @return reference to the meter itself.
      */
@@ -501,9 +493,12 @@ public class Meter extends MeterData implements Closeable {
             if (logger.isDebugEnabled()) {
                 collectSystemStatus();
                 logger.debug(Slf4JMarkers.MSG_START, readableString(new StringBuilder()).toString());
-            }
-            if (logger.isTraceEnabled()) {
-                logger.trace(Slf4JMarkers.DATA_START, write(new StringBuilder(), 'M').toString());
+                if (logger.isTraceEnabled()) {
+                    logger.trace(Slf4JMarkers.DATA_START, write(new StringBuilder(), 'M').toString());
+                }
+                if (context != null) {
+                    context.clear();
+                }
             }
 
         } catch (final Exception t) {
@@ -514,24 +509,28 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Notifies the meter that one more iteration or step completed that make up
-     * the task successfully.
+     * Notifies the meter that one more iteration or step completed that make up the task successfully.
      *
      * @return reference to the meter itself.
      */
     public Meter inc() {
+        if (startTime == 0) {
+            logger.error(Slf4JMarkers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(4));
+        }
         this.currentIteration++;
         return this;
     }
 
     /**
-     * Notifies the meter that more of iterations or steps that make up the task
-     * completed successfully.
+     * Notifies the meter that more of iterations or steps that make up the task completed successfully.
      *
      * @param increment the number of iterations or steps
      * @return reference to the meter itself.
      */
     public Meter incBy(final long increment) {
+        if (startTime == 0) {
+            logger.error(Slf4JMarkers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(4));
+        }
         if (increment <= 0) {
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incBy(increment)", ERROR_MSG_NON_POSITIVE_ARGUMENT, new IllegalMeterUsage(2));
             return this;
@@ -541,13 +540,15 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Notifies the meter that a number of iterations or steps that make up the
-     * task already completed successfully.
+     * Notifies the meter that a number of iterations or steps that make up the task already completed successfully.
      *
      * @param currentIteration the number of iterations or steps
      * @return reference to the meter itself.
      */
     public Meter incTo(final long currentIteration) {
+        if (startTime == 0) {
+            logger.error(Slf4JMarkers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(4));
+        }
         if (currentIteration <= 0) {
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_POSITIVE_ARGUMENT, new IllegalMeterUsage(2));
             return this;
@@ -560,11 +561,10 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Allow informing about successful completion of iterations or steps making
-     * up the task represented by the meter. Only applicable for meters that
-     * called {@link #iterations(long i)} before calling {@link #start() }.
-     * Sends a message to logger using info level, only periodically and if
-     * progress was observed, to minimize performance degradation.
+     * Allow informing about successful completion of iterations or steps making up the task represented by the meter.
+     * Only applicable for meters that called {@link #iterations(long i)} before calling {@link #start() }. Sends a
+     * message to logger using info level, only periodically and if progress was observed, to minimize performance
+     * degradation.
      *
      * @return reference to the meter itself.
      */
@@ -578,11 +578,16 @@ public class Meter extends MeterData implements Closeable {
                 if (logger.isInfoEnabled()) {
                     collectSystemStatus();
                     logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
-                }
-                if (startTime != 0 && timeLimitNanoseconds != 0 && (now - startTime) > timeLimitNanoseconds) {
-                    logger.trace(Slf4JMarkers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString());
-                } else if (logger.isTraceEnabled()) {
-                    logger.trace(Slf4JMarkers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
+                    if (logger.isTraceEnabled()) {
+                        if (startTime != 0 && timeLimitNanoseconds != 0 && (now - startTime) > timeLimitNanoseconds) {
+                            logger.trace(Slf4JMarkers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString());
+                        } else if (logger.isTraceEnabled()) {
+                            logger.trace(Slf4JMarkers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
+                        }
+                    }
+                    if (context != null) {
+                        context.clear();
+                    }
                 }
             }
         } catch (final Exception t) {
@@ -594,11 +599,9 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Confirms the meter in order to claim successful completion of the task
-     * represented by the meter. Sends a message to logger using info level.
-     * Sends a message with system status and partial context to log using trace
-     * level. Sends a warn message if the task executed for more time than the
-     * optionally configured time threshold.
+     * Confirms the meter in order to claim successful completion of the task represented by the meter. Sends a message
+     * to logger using info level. Sends a message with system status and partial context to log using trace level.
+     * Sends a warn message if the task executed for more time than the optionally configured time threshold.
      *
      * @return reference to the meter itself.
      */
@@ -619,12 +622,11 @@ public class Meter extends MeterData implements Closeable {
             this.threadStopId = currentThread.getId();
             this.threadStopName = currentThread.getName();
 
-            if (startTime != 0) {
-                if (logger.isWarnEnabled()) {
-                    collectSystemStatus();
-                }
-                final boolean warnSlowness = timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
-                if (warnSlowness && logger.isWarnEnabled()) {
+            if (logger.isWarnEnabled()) {
+                collectSystemStatus();
+
+                final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
+                if (warnSlowness) {
                     logger.warn(Slf4JMarkers.MSG_SLOW_OK, readableString(new StringBuilder()).toString());
                 } else if (logger.isInfoEnabled()) {
                     logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
@@ -635,6 +637,9 @@ public class Meter extends MeterData implements Closeable {
                     } else {
                         logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());
                     }
+                }
+                if (context != null) {
+                    context.clear();
                 }
             }
         } catch (final Exception t) {
@@ -650,13 +655,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Refuses the meter in order to claim incomplete or inconsistent execution
-     * of the task represented by the meter. Sends a message with the the
-     * exception to logger using warn level. Sends a message with system status,
-     * statistics and complete context to log using trace level.
+     * Refuses the meter in order to claim incomplete or inconsistent execution of the task represented by the meter.
+     * Sends a message with the the exception to logger using warn level. Sends a message with system status, statistics
+     * and complete context to log using trace level.
      *
-     * @param throwable Exception that represents the failure. May be null if no
-     * exception applies.
+     * @param throwable Exception that represents the failure. May be null if no exception applies.
      * @return reference to the meter itself.
      */
     public Meter fail(final Throwable throwable) {
@@ -683,9 +686,12 @@ public class Meter extends MeterData implements Closeable {
             if (logger.isWarnEnabled()) {
                 collectSystemStatus();
                 logger.warn(Slf4JMarkers.MSG_FAIL, readableString(new StringBuilder()).toString());
-            }
-            if (logger.isTraceEnabled()) {
-                logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder(), 'M').toString());
+                if (logger.isTraceEnabled()) {
+                    logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder(), 'M').toString());
+                }
+                if (context != null) {
+                    context.clear();
+                }
             }
         } catch (final Exception t) {
             /* Prevent bugs from disrupting the application. Log exception to provide stacktrace to bug. */
@@ -696,9 +702,8 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Checks if meters the meter has been forgotten to be confirmed or refused.
-     * Useful to track those meters that do not follow the start(), ok()/fail()
-     * idiom for all execution flows
+     * Checks if meters the meter has been forgotten to be confirmed or refused. Useful to track those meters that do
+     * not follow the start(), ok()/fail() idiom for all execution flows
      */
     @Override
     protected void finalize() throws Throwable {
@@ -739,8 +744,8 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Compliance with {@link Closeable}. Assumes failure and refuses the meter
-     * if the meter has not yet been marked as confirmed.
+     * Compliance with {@link Closeable}. Assumes failure and refuses the meter if the meter has not yet been marked as
+     * confirmed.
      */
     @Override
     public void close() {

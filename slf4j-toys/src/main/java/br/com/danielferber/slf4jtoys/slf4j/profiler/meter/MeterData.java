@@ -17,7 +17,6 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -116,7 +115,7 @@ public class MeterData extends SystemData {
         return stopTime;
     }
 
-    public long getCurrentIterations() {
+    public long getCurrentIteration() {
         return currentIteration;
     }
 
@@ -302,7 +301,9 @@ public class MeterData extends SystemData {
     }
 
     public long getExecutionTime() {
-        if (stopTime == 0) {
+        if (startTime == 0) {
+            return 0;
+        } else if (stopTime == 0) {
             return System.nanoTime() - startTime;
         }
         return stopTime - startTime;
