@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
-import org.slf4j.helpers.MessageFormatter;
 import org.slf4j.impl.TestLoggerEvent.Level;
 
 /**
@@ -54,7 +53,7 @@ public class TestLogger implements Logger {
         loggerEvents.add(event);
     }
 
-    private void clearEvents() {
+    public void clearEvents() {
         loggerEvents.clear();
     }
 
@@ -410,6 +409,14 @@ public class TestLogger implements Logger {
     }
 
     private String formatLogStatement(TestLoggerEvent event) {
-        return event.getLevel() + " " + event.getLoggerName() + ": " + MessageFormatter.arrayFormat(event.getMessage(), event.getArguments()).getMessage();
+        return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage();
+    }
+
+    public int getEventCount() {
+        return loggerEvents.size();
+    }
+
+    public TestLoggerEvent getEvent(int i) {
+        return loggerEvents.get(i);
     }
 }

@@ -577,7 +577,7 @@ public class Meter extends MeterData implements Closeable {
 
                 if (logger.isInfoEnabled()) {
                     collectSystemStatus();
-                    logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
+                    logger.info(Slf4JMarkers.MSG_PROGRESS, readableString(new StringBuilder()).toString());
                     if (logger.isTraceEnabled()) {
                         if (startTime != 0 && timeLimitNanoseconds != 0 && (now - startTime) > timeLimitNanoseconds) {
                             logger.trace(Slf4JMarkers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString());

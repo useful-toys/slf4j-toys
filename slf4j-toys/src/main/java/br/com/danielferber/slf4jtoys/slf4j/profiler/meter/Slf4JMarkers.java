@@ -36,6 +36,7 @@ public final class Slf4JMarkers {
     public static final Marker DATA_FAIL = MarkerFactory.getMarker("METER_DATA_FAIL");
     public static final Marker MSG_START = MarkerFactory.getMarker("METER_MSG_START");
     public static final Marker MSG_OK = MarkerFactory.getMarker("METER_MSG_OK");
+    public static final Marker MSG_PROGRESS = MarkerFactory.getMarker("METER_MSG_PROGRESS");
     public static final Marker MSG_SLOW_OK = MarkerFactory.getMarker("METER_MSG_SLOW_OK");
     public static final Marker MSG_FAIL = MarkerFactory.getMarker("METER_MSG_FAIL");
     public static final Marker INCONSISTENT_FINALIZED = MarkerFactory.getMarker("METER_INCONSISTENT_FINALIZED");

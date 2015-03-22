@@ -18,6 +18,7 @@ package org.slf4j.impl;
 import java.util.Arrays;
 import java.util.Map;
 import org.slf4j.Marker;
+import org.slf4j.helpers.MessageFormatter;
 
 /**
  *
@@ -95,4 +96,14 @@ public class TestLoggerEvent {
     public Object[] getArguments() {
         return arguments;
     }
+
+    @Override
+    public String toString() {
+        return "TestLoggerEvent{" + "loggerName=" + loggerName + ", level=" + level + ", marker=" + marker + ", throwable=" + throwable + ", message=" + message + ", arguments=" + arguments + '}';
+    }
+
+    public String getFormattedMessage() {
+        return MessageFormatter.arrayFormat(getMessage(), getArguments()).getMessage();
+    }
+
 }

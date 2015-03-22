@@ -15,17 +15,16 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventData;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.SystemData;
 import static br.com.danielferber.slf4jtoys.slf4j.profiler.meter.MeterData.SUCCESS;
 import br.com.danielferber.slf4jtoys.slf4j.utils.UnitFormatter;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class MeterData extends SystemData {
 
@@ -238,7 +237,7 @@ public class MeterData extends SystemData {
         if (stopTime != 0) {
             if (success) {
                 if (isSlow()) {
-                    buffer.append("SLOW");
+                    buffer.append("Slow");
                 } else {
                     buffer.append("OK");
                 }
