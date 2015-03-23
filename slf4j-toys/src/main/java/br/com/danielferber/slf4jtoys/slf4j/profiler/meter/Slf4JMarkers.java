@@ -41,10 +41,11 @@ public final class Slf4JMarkers {
     public static final Marker MSG_FAIL = MarkerFactory.getMarker("METER_MSG_FAIL");
     public static final Marker INCONSISTENT_FINALIZED = MarkerFactory.getMarker("METER_INCONSISTENT_FINALIZED");
     public static final Marker INCONSISTENT_START = MarkerFactory.getMarker("METER_INCONSISTENT_START");
+    public static final Marker INCONSISTENT_INCREMENT = MarkerFactory.getMarker("INCONSISTENT_INCREMENT");
+    public static final Marker INCONSISTENT_PROGRESS = MarkerFactory.getMarker("INCONSISTENT_PROGRESS");
     public static final Marker INCONSISTENT_OK = MarkerFactory.getMarker("METER_INCONSISTENT_OK");
     public static final Marker INCONSISTENT_FAIL = MarkerFactory.getMarker("METER_INCONSISTENT_FAIL");
     public static final Marker BUG = MarkerFactory.getMarker("METER_BUG");
     public static final Marker ILLEGAL = MarkerFactory.getMarker("METER_ILLEGAL");
     public static final Marker INCONSISTENT_EXCEPTION = MarkerFactory.getMarker("METER_INCONSISTENT_EXCEPTION");
-    public static final Marker INCONSISTENT_INCREMENT = MarkerFactory.getMarker("INCONSISTENT_INCREMENT");
 }
