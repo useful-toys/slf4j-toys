@@ -18,6 +18,7 @@ package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 
@@ -31,6 +32,11 @@ public class MeterTest {
 
     public MeterTest() {
         logger.setEnabled(false);
+    }
+
+    @Before
+    public void clearEvents() {
+        logger.clearEvents();
     }
 
     @Test
@@ -166,7 +172,7 @@ public class MeterTest {
         final String name2 = "TestAttributes2";
         final TestLogger logger2 = (TestLogger) LoggerFactory.getLogger(name2);
         logger2.setEnabled(false);
-        
+
         final Meter m3 = new Meter(logger2);
         Assert.assertEquals(ProfilingSession.uuid, m3.getSessionUuid());
         Assert.assertEquals(m3.getLogger(), logger2);
@@ -228,7 +234,7 @@ public class MeterTest {
         final Meter m1 = new Meter(logger).start();
         Assert.assertNull(m1.getExceptionClass());
         Assert.assertNull(m1.getExceptionMessage());
-        
+
         final RuntimeException e = new RuntimeException("Test error message");
         m1.fail(e);
         Assert.assertEquals(e.getClass().getName(), m1.getExceptionClass());
@@ -240,7 +246,7 @@ public class MeterTest {
         final Meter m1 = new Meter(logger).start();
         Assert.assertNull(m1.getExceptionClass());
         Assert.assertNull(m1.getExceptionMessage());
-        
+
         final RuntimeException e = new RuntimeException("Test error message");
         m1.fail();
         Assert.assertNull(m1.getExceptionClass());

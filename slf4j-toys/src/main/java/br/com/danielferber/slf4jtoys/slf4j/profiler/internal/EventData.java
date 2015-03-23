@@ -63,8 +63,8 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Reverts all event attributes to their constructor initial value. Useful
-     * to reuse the event instance and avoid creation of new objects.
+     * Reverts all event attributes to their constructor initial value. Useful to reuse the event instance and avoid
+     * creation of new objects.
      */
     protected final void reset() {
         this.sessionUuid = null;
@@ -104,19 +104,19 @@ public abstract class EventData implements Serializable {
     @Override
     public final String toString() {
         if (sessionUuid != null) {
-            return this.sessionUuid + ":" + this.eventPosition;
+            return this.sessionUuid + ":" + this.eventCategory + ":" + Long.toString(this.eventPosition);
         } else {
-            return Long.toString(this.eventPosition);
+            return this.eventCategory + ":" + Long.toString(this.eventPosition);
         }
     }
 
     /**
-     * Indicates whether this event represents the same as the given argument,
-     * based on session uuid, category and position.
+     * Indicates whether this event represents the same as the given argument, based on session uuid, category and
+     * position.
      *
      * @param other the event with which to compare
-     * @return <code>true</code> if this event represents the same * * * * * *
-     * as <code>other</code> argument; <code>false</code> otherwise.
+     * @return <code>true</code> if this event represents the same * * * * * * as <code>other</code> argument;
+     * <code>false</code> otherwise.
      */
     public final boolean isSameAs(final EventData other) {
         if (other == null) {
@@ -143,13 +143,11 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Indicates weather all event collected attributes are equal than the
-     * attributes collected by the event given as argument. Used only in unit
-     * tests.
+     * Indicates weather all event collected attributes are equal than the attributes collected by the event given as
+     * argument. Used only in unit tests.
      *
      * @param other the event with which to compare
-     * @return <code>true</code> if all attributes are equal between the *
-     * events; <code>false</code> otherwise.
+     * @return <code>true</code> if all attributes are equal between the * events; <code>false</code> otherwise.
      */
     public final boolean isCompletelyEqualsTo(final EventData other) {
         if (other == null) {
@@ -186,24 +184,19 @@ public abstract class EventData implements Serializable {
     private static final String EVENT_TIME = "t";
 
     /**
-     * Writes a concise, human readable string representation of the event into
-     * the supplied StringBuilder.
+     * Writes a concise, human readable string representation of the event into the supplied StringBuilder.
      *
      * @param builder The StringBuilder that receives the string representation
-     * @return The StringBuilder passed as argument to allow chained
-     * StringBuilder method calls.
+     * @return The StringBuilder passed as argument to allow chained StringBuilder method calls.
      */
     public abstract StringBuilder readableString(StringBuilder builder);
 
     /**
-     * Writes an encoded string representation of the event into the supplied
-     * StringBuilder.
+     * Writes an encoded string representation of the event into the supplied StringBuilder.
      *
      * @param sb The StringBuilder that receives the encoded representation.
-     * @param messagePrefix A prefix character used by an parser to recognize
-     * the encoded message.
-     * @return The StringBuilder passed as argument to allow chained
-     * StringBuilder method calls.
+     * @param messagePrefix A prefix character used by an parser to recognize the encoded message.
+     * @return The StringBuilder passed as argument to allow chained StringBuilder method calls.
      */
     public final StringBuilder write(final StringBuilder sb, final char messagePrefix) {
         final EventWriter w = new EventWriter(sb);
@@ -239,13 +232,11 @@ public abstract class EventData implements Serializable {
     protected abstract void writePropertiesImpl(EventWriter w);
 
     /**
-     * Reads an events from the encoded string representation. If no event data
-     * is recognized, then inconsistent data might have been loaded.
+     * Reads an events from the encoded string representation. If no event data is recognized, then inconsistent data
+     * might have been loaded.
      *
-     * @param message The string that is supposed to contain an encoded string
-     * representation of the event.
-     * @return <code>true</code> if an event was successfully read;
-     * <code>false</code> otherwise.
+     * @param message The string that is supposed to contain an encoded string representation of the event.
+     * @return <code>true</code> if an event was successfully read; <code>false</code> otherwise.
      */
     public final boolean read(final String message, final char messagePrefix) {
         final String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);
@@ -290,9 +281,8 @@ public abstract class EventData implements Serializable {
 
     /**
      *
-     * Implementation shall provide an implementation that reads one or more
-     * values (via given EventReader) from the encoded string and assign them to
-     * the property represented by the given key.
+     * Implementation shall provide an implementation that reads one or more values (via given EventReader) from the
+     * encoded string and assign them to the property represented by the given key.
      *
      * @param r The EventReader that is parsing the message.
      * @param key The key that represents the property.

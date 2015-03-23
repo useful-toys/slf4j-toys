@@ -15,6 +15,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
+import br.com.danielferber.slf4jtoys.slf4j.logger.LoggerFactory;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import java.io.Closeable;
 import java.lang.reflect.InvocationTargetException;
@@ -65,6 +66,12 @@ public class Meter extends MeterData implements Closeable {
     private static long meterProgressPeriodNanoseconds = ProfilingSession.readMeterProgressPeriodProperty() * 1000 * 1000;
 
     /**
+     * Most recent meter from this thread.
+     */
+    private static final ThreadLocal<Meter> currentInstance = new ThreadLocal<Meter>();
+    private Meter previousInstance;
+
+    /**
      * Creates a new meter.
      *
      * @param logger
@@ -77,6 +84,14 @@ public class Meter extends MeterData implements Closeable {
         eventCounterByName.putIfAbsent(this.eventCategory, new AtomicLong(0));
         this.eventPosition = eventCounterByName.get(this.eventCategory).incrementAndGet();
         this.createTime = System.nanoTime();
+    }
+
+    public static Meter getCurrentInstance() {
+        final Meter current = currentInstance.get();
+        if (current == null) {
+            return new Meter(LoggerFactory.getLogger("???"));
+        }
+        return current;
     }
 
     /**
@@ -483,6 +498,9 @@ public class Meter extends MeterData implements Closeable {
                 logger.error(Slf4JMarkers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(2)
                 //        return new Exception(message);
                 );
+            } else {
+                previousInstance = currentInstance.get();
+                currentInstance.set(this);
             }
 
             final Thread currentThread = Thread.currentThread();
@@ -616,6 +634,7 @@ public class Meter extends MeterData implements Closeable {
                 /* Log exception to provide stacktrace to inconsistent meter call. */
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED, this.eventCategory, this.eventPosition, new IllegalMeterUsage(4));
             }
+            currentInstance.set(previousInstance);
             success = true;
 
             final Thread currentThread = Thread.currentThread();
@@ -678,6 +697,7 @@ public class Meter extends MeterData implements Closeable {
                 exceptionMessage = throwable.getLocalizedMessage();
             }
             success = false;
+            currentInstance.set(previousInstance);
 
             final Thread currentThread = Thread.currentThread();
             this.threadStopId = currentThread.getId();
