@@ -22,10 +22,11 @@ import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 
 /**
- * Validates use cases for meter and threadlocal.
+ * Validates incorrect use cases for meter and threadlocal, to ensure
+ * that the framework recovers gracefully.
  * @author Daniel Felix Ferber
  */
-public class MeterThreadLocalTest {
+public class MeterThreadLocalMisuseTest {
 
     final String meterName = "name";
     final TestLogger loggerName = (TestLogger) LoggerFactory.getLogger(meterName);
@@ -43,18 +44,18 @@ public class MeterThreadLocalTest {
 
         final Meter m1 = MeterFactory.getMeter(loggerName);
         Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
-        m1.start();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        // forgets to call m1.start(); and current meter is not set to m1
+        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
 
         final Meter m2 = MeterFactory.getMeter(loggerOther);
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
         m2.start();
         Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
 
-        m2.ok();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        m2.ok(); 
+        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
 
-        m1.ok();
+        m1.ok(); // reports error
         Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
     }
 
@@ -64,7 +65,7 @@ public class MeterThreadLocalTest {
 
         final Meter m1 = MeterFactory.getMeter(loggerName);
         Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
-        m1.start();
+        m1.start(); 
         Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
 
         final Meter m2 = MeterFactory.getMeter(loggerOther);
@@ -72,38 +73,10 @@ public class MeterThreadLocalTest {
         m2.start();
         Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
 
-        m2.fail();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        // forgets to call m2.ok(); 
+        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
 
-        m1.fail();
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
-    }
-
-    @Test
-    public void testCurrentMeter3() throws InterruptedException {
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
-
-        final Meter m1 = MeterFactory.getMeter(loggerName);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
-        m1.start();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
-
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                final Meter m2 = MeterFactory.getMeter(loggerOther);
-                Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
-                m2.start();
-                Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
-                m2.ok();
-                Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
-            }
-        };
-        t.start();
-        t.join();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
-
-        m1.fail();
+        m1.ok(); // reports error
         Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
     }
 }
