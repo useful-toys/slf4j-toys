@@ -1,21 +1,35 @@
 # slf4j-toys #
 
-**SLF4J-TOYS is set of useful things that work with SLF4J:**
- * Consistent and predictable logger naming convention;
- * Operation demarcation and performance measure; 
- * Application resource usage;
- * Large data logged using formatted print streams;
- * Parsable message for later analysis.
+**SLF4J-TOYS is collection of useful things for SLF4J:**
+ * Promote predictable logger naming convention;
+ * Adopt logger coding conventions with minimal effort; 
+ * Automate analysis on paseable log messages;
+ * Measure resources with minimal effort;
+ * Generate large messages and reports as printstreams;
+ * Dump binary snapshot as outputstreams.
 
-## Consistent and predictable logger naming convention
+## Promote predictable logger naming convention
 
-*Nearly every application reuses the fully qualified class name as logger name. Though simple, there are several disadvantages. It imposes one logger per class. Logger names reflect strict software structure instead of self-documenting logical organization. It implies long string constants conventions between implementation and logger configuration. Any refactor breaks existing logger configuration.*
+*Applications use the fully qualified class name as logger name. 
+I prefer to call this LOGGER NAMING HELL.
+One logger per class results in thousands of loggers names.
+Those names are long and repetitive.
+They reflect your implementation structure and do not follow a self-documenting logical organization.
+They are challenging to predict by outsiders. 
+Even worse, they impliy string constants conventions between your implementation and your logger configuration.
+Any refactor breaks existing logger configuration.*
 
-The **LoggerFactory substitute** eases the consistent and predictable logger naming convention. The original `getLogger(...)` methods were preserved for compatibility.
+The **LoggerFactory substitute** predictable logger naming convention. The original `getLogger(...)` methods were preserved for compatibility.
 
-The `getLogger(Class<?> clazz, String name)` helps to fine tune loggers for specific operations or features of interest provided by your class. For example, you could define loggers to separately track `open()` and `close()` methods.
+I suggest creating a logger hierarchy that rely  on features groups, features and operations. 
+For example, instead of *com.company.application.authentication.dao.hibernate.UserDAOImpl*, one could use *authentication.persistence.user*: 
+shorter, more intuitive and does not leak implementation details. 
+The suggested hierarchy is defined purely on . Names are short and self describing. 
+One each level, define a logger based on the parent level logger by calling `getLogger(Logger parent, String name)`. 
+This protects your logging configuration against refactoring as the logger name is preserved.
 
-For a consistent  and predictable logger convention, I suggest creating a logger hierarchy that describes features groups, features and operations. For example, instead of *com.company.application.authentication.dao.hibernate.UserDAOImpl*, one could use *authentication.persistence.hibernate.user*: shorter, more intuitive and does not leak implementation details. The suggested hierarchy is defined purely on and hierarchy of short and self describing names, instand of class hierarchy. One each level, define a logger based on the parent level logger by calling `getLogger(Logger logger, String name)`. This protects your logging configuration against refactoring as the logger name is preserved.
+The `getLogger(Class<?> clazz, String name)` helps to fine tune loggers for specific operations or features of interest provided by your class. 
+For example, you could define loggers to separately track `open()` and `close()` methods.
 
 ## Operation demarcation and performance measure ##
 
