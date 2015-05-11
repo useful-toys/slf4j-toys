@@ -34,6 +34,10 @@ public abstract class EventData implements Serializable {
      */
     protected String eventCategory = null;
     /**
+     * The event name.
+     */
+    protected String eventName = null;
+    /**
      * The event position within the category.
      */
     protected long eventPosition = 0;
@@ -58,6 +62,32 @@ public abstract class EventData implements Serializable {
         return eventPosition;
     }
 
+    public String getEventName() {
+        return eventName;
+    }
+
+    public String getFullID() {
+        if (eventName == null) {
+            return eventCategory + '/' + eventPosition;
+        }
+        return eventCategory + '/' + eventName + '/' + eventPosition;
+    }
+
+    public String getID() {
+        if (eventName == null) {
+            return eventCategory;
+        }
+        return eventCategory + '/' + eventName;
+    }
+
+    public String getAbbreviatedID() {
+        final int index = eventCategory.lastIndexOf('.')+1;
+        if (eventName == null) {
+            return eventCategory.substring(index);
+        }
+        return eventCategory.substring(index) + '/' + eventName;
+    }
+
     public long getTime() {
         return time;
     }
@@ -69,6 +99,7 @@ public abstract class EventData implements Serializable {
     protected final void reset() {
         this.sessionUuid = null;
         this.eventCategory = null;
+        this.eventName = null;
         this.eventPosition = 0;
         this.time = 0;
         this.resetImpl();
@@ -82,6 +113,7 @@ public abstract class EventData implements Serializable {
         int result = 1;
         result = prime * result + ((sessionUuid == null) ? 0 : sessionUuid.hashCode());
         result = prime * result + ((eventCategory == null) ? 0 : eventCategory.hashCode());
+        result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
         result = prime * result + (int) (eventPosition ^ (eventPosition >>> 32));
         return result;
     }
@@ -132,6 +164,13 @@ public abstract class EventData implements Serializable {
         } else if (!eventCategory.equals(other.eventCategory)) {
             return false;
         }
+        if (eventName == null) {
+            if (other.eventName != null) {
+                return false;
+            }
+        } else if (!eventName.equals(other.eventName)) {
+            return false;
+        }
         if (sessionUuid == null) {
             if (other.sessionUuid != null) {
                 return false;
@@ -163,6 +202,13 @@ public abstract class EventData implements Serializable {
         } else if (!eventCategory.equals(other.eventCategory)) {
             return false;
         }
+        if (eventName == null) {
+            if (other.eventName != null) {
+                return false;
+            }
+        } else if (!eventName.equals(other.eventName)) {
+            return false;
+        }
         if (sessionUuid == null) {
             if (other.sessionUuid != null) {
                 return false;
@@ -181,6 +227,7 @@ public abstract class EventData implements Serializable {
     protected static final String SESSION_UUID = "s";
     protected static final String EVENT_POSITION = "p";
     protected static final String EVENT_CATEGORY = "c";
+    protected static final String EVENT_NAME = "n";
     private static final String EVENT_TIME = "t";
 
     /**
@@ -216,6 +263,11 @@ public abstract class EventData implements Serializable {
         /* Event category */
         if (this.eventCategory != null) {
             w.property(EVENT_CATEGORY, this.eventCategory);
+        }
+
+        /* Event name */
+        if (this.eventName != null) {
+            w.property(EVENT_NAME, this.eventName);
         }
 
         /* Event position */
@@ -271,6 +323,9 @@ public abstract class EventData implements Serializable {
             return true;
         } else if (EVENT_CATEGORY.equals(key)) {
             this.eventCategory = eventReader.readString();
+            return true;
+        } else if (EVENT_NAME.equals(key)) {
+            this.eventName = eventReader.readString();
             return true;
         } else if (EVENT_TIME.equals(key)) {
             this.time = eventReader.readLong();

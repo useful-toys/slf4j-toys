@@ -19,9 +19,10 @@ They are challenging to predict by outsiders.
 Even worse, they impliy string constants conventions between your implementation and your logger configuration.
 Any refactor breaks existing logger configuration.*
 
-The **LoggerFactory substitute** predictable logger naming convention. The original `getLogger(...)` methods were preserved for compatibility.
+The **LoggerFactory substitute** promotes predictable logger naming convention. 
+The original `getLogger(...)` methods were preserved for compatibility.
 
-I suggest creating a logger hierarchy that rely  on features groups, features and operations. 
+I suggest creating a logger hierarchy that relies on features groups, features and operations. 
 For example, instead of *com.company.application.authentication.dao.hibernate.UserDAOImpl*, one could use *authentication.persistence.user*: 
 shorter, more intuitive and does not leak implementation details. 
 The suggested hierarchy is defined purely on . Names are short and self describing. 

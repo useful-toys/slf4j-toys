@@ -15,6 +15,7 @@
  */
 package br.com.danielferber.slf4jtoys.slf4j.profiler.meter;
 
+import br.com.danielferber.slf4jtoys.slf4j.profiler.ProfilingSession;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventData;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventReader;
 import br.com.danielferber.slf4jtoys.slf4j.profiler.internal.EventWriter;
@@ -29,13 +30,13 @@ import java.util.Map.Entry;
 public class MeterData extends SystemData {
 
     private static final long serialVersionUID = 1L;
+    private static final boolean meterPrintCategory = ProfilingSession.readMeterPrintCategoryProperty();
 
     public MeterData() {
         super();
     }
     /**
-     * An arbitrary short, human readable message to describe the task being
-     * measured.
+     * An arbitrary short, human readable message to describe the task being measured.
      */
     protected String description = null;
     /**
@@ -260,7 +261,14 @@ public class MeterData extends SystemData {
         if (this.description != null) {
             buffer.append(this.description);
         } else {
-            buffer.append(this.eventCategory);
+            if (eventName == null || meterPrintCategory) {
+                final int index = eventCategory.lastIndexOf('.') + 1;
+                buffer.append(eventCategory.substring(index));
+            }
+            if (eventName != null) {
+                buffer.append('/');
+                buffer.append(eventName);
+            }
         }
 
         if (this.startTime > 0) {
@@ -283,14 +291,14 @@ public class MeterData extends SystemData {
             buffer.append(UnitFormatter.bytes(this.runtime_usedMemory));
         }
         if (context != null) {
-	        for (Entry<String, String> entry: context.entrySet()) {
-	        	buffer.append("; ");
-	        	buffer.append(entry.getKey());
-	        	if (entry.getValue() != null) {
-		        	buffer.append("=");
-		        	buffer.append(entry.getValue());
-	        	}
-			} 
+            for (Entry<String, String> entry : context.entrySet()) {
+                buffer.append("; ");
+                buffer.append(entry.getKey());
+                if (entry.getValue() != null) {
+                    buffer.append("=");
+                    buffer.append(entry.getValue());
+                }
+            }
         }
         return buffer;
     }
@@ -373,10 +381,10 @@ public class MeterData extends SystemData {
         /* Thread info */
         if (this.threadStartId != 0 || this.threadStopId != 0 || this.threadStartName != null || this.threadStopName != null) {
             w.property(THREAD,
-                    this.threadStartId != 0 ? Long.toString(this.threadStartId) : "",
-                    this.threadStartName != null ? this.threadStartName : "",
-                    this.threadStopId != 0 ? Long.toString(this.threadStopId) : "",
-                    this.threadStopName != null ? this.threadStopName : "");
+                this.threadStartId != 0 ? Long.toString(this.threadStartId) : "",
+                this.threadStartName != null ? this.threadStartName : "",
+                this.threadStopId != 0 ? Long.toString(this.threadStopId) : "",
+                this.threadStopName != null ? this.threadStopName : "");
         }
 
         /* Context */

@@ -38,11 +38,13 @@ public class EventDataTest {
         assertTrue(b.isCompletelyEqualsTo(a));
 
         a.eventCategory = "a";
+        a.eventName = "c";
         a.eventPosition = 1;
         a.sessionUuid = "b";
         a.time = 2;
 
         b.eventCategory = "a";
+        b.eventName = "c";
         b.eventPosition = 1;
         b.sessionUuid = "b";
         b.time = 2;
@@ -72,6 +74,16 @@ public class EventDataTest {
 
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
+
+        b.time = 2;
+        b.eventName = "cc";
+
+        assertFalse(a.isCompletelyEqualsTo(b));
+        assertFalse(b.isCompletelyEqualsTo(a));
+
+        b.eventName = "c";
+        assertTrue(a.isCompletelyEqualsTo(b));
+        assertTrue(b.isCompletelyEqualsTo(a));
     }
 
     @Test
@@ -80,6 +92,7 @@ public class EventDataTest {
         final EventData b = createEventData();
 
         b.eventCategory = "a";
+        b.eventName = "c";
         b.eventPosition = 1;
         b.sessionUuid = "b";
         b.time = 2;
@@ -102,11 +115,13 @@ public class EventDataTest {
         assertTrue(b.isSameAs(a));
 
         a.eventCategory = "a";
+        a.eventName = "c";
         a.eventPosition = 1;
         a.sessionUuid = "b";
         a.time = 2;
 
         b.eventCategory = "a";
+        b.eventName = "c";
         b.eventPosition = 1;
         b.sessionUuid = "b";
         b.time = 2;
@@ -132,10 +147,22 @@ public class EventDataTest {
         assertFalse(b.isSameAs(a));
 
         b.sessionUuid = "b";
+        b.eventName = "cc";
+
+        assertFalse(a.isSameAs(b));
+        assertFalse(b.isSameAs(a));
+
+        b.eventName = "c";
+
+        assertTrue(a.isSameAs(b));
+        assertTrue(b.isSameAs(a));
+
         b.time = 22;
 
         assertTrue(a.isSameAs(b));
         assertTrue(b.isSameAs(a));
+
+        b.time = 2;
     }
 
     @Test
@@ -149,11 +176,13 @@ public class EventDataTest {
 
         a.eventCategory = "a";
         a.eventPosition = 1;
+        a.eventName = "c";
         a.sessionUuid = "b";
         a.time = 2;
 
         b.eventCategory = "a";
         b.eventPosition = 1;
+        b.eventName = "c";
         b.sessionUuid = "b";
         b.time = 2;
 
@@ -182,6 +211,13 @@ public class EventDataTest {
         assertFalse(a.hashCode() == b.hashCode());
 
         b.sessionUuid = "b";
+        b.eventName = "cc";
+
+        assertFalse(a.equals(b));
+        assertFalse(b.equals(a));
+        assertFalse(a.hashCode() == b.hashCode());
+
+        b.eventName = "c";
         b.time = 22;
 
         assertTrue(a.equals(b));
@@ -208,6 +244,7 @@ public class EventDataTest {
         final EventData a = createEventData();
         a.eventCategory = "a";
         a.eventPosition = 1;
+        a.eventName = "c";
         a.sessionUuid = "b";
         a.time = 2;
 

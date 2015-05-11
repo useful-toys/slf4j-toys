@@ -24,8 +24,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Profiling session for the current JVM. Stores the UUID logged on each message
- * on the current JVM. Keeps the timer calls the watcher periodically.
+ * Profiling session for the current JVM. Stores the UUID logged on each message on the current JVM. Keeps the timer
+ * calls the watcher periodically.
  *
  * @author Daniel Felix Ferber
  */
@@ -127,6 +127,10 @@ public final class ProfilingSession {
         } catch (final NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+    public static boolean readMeterPrintCategoryProperty() {
+        return ProfilingSession.getProperty("meter.print.category", true);
     }
 
     public static long readMeterProgressPeriodProperty() {

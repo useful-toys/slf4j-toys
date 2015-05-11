@@ -34,10 +34,10 @@ public class MeterFactory {
     }
 
     public static Meter getMeter(final Class<?> clazz, final String operationId) {
-        return new Meter(LoggerFactory.getLogger(clazz, operationId));
+        return new Meter(LoggerFactory.getLogger(clazz), operationId);
     }
 
     public static Meter getMeter(final Logger logger, final String operationId) {
-        return new Meter(LoggerFactory.getLogger(logger, operationId));
+        return new Meter(logger, operationId);
     }
 }

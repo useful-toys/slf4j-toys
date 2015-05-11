@@ -161,12 +161,14 @@ public class MeterTest {
         Assert.assertEquals(ProfilingSession.uuid, m.getSessionUuid());
         Assert.assertEquals(m.getLogger(), logger1);
         Assert.assertEquals(name1, m.getEventCategory());
+        Assert.assertNull(m.getEventName());
         Assert.assertEquals(1L, m.getEventPosition());
 
         final Meter m2 = new Meter(logger1);
         Assert.assertEquals(ProfilingSession.uuid, m2.getSessionUuid());
         Assert.assertEquals(m2.getLogger(), logger1);
         Assert.assertEquals(name1, m2.getEventCategory());
+        Assert.assertNull(m2.getEventName());
         Assert.assertEquals(2L, m2.getEventPosition());
 
         final String name2 = "TestAttributes2";
@@ -177,7 +179,36 @@ public class MeterTest {
         Assert.assertEquals(ProfilingSession.uuid, m3.getSessionUuid());
         Assert.assertEquals(m3.getLogger(), logger2);
         Assert.assertEquals(name2, m3.getEventCategory());
+        Assert.assertNull(m3.getEventName());
         Assert.assertEquals(1L, m3.getEventPosition());
+
+        final Meter m4 = new Meter(logger2, "op");
+        Assert.assertEquals(ProfilingSession.uuid, m4.getSessionUuid());
+        Assert.assertEquals(m4.getLogger(), logger2);
+        Assert.assertEquals(name2, m4.getEventCategory());
+        Assert.assertEquals("op", m4.getEventName());
+        Assert.assertEquals(1L, m4.getEventPosition());
+
+        final Meter m5 = new Meter(logger2, "op");
+        Assert.assertEquals(ProfilingSession.uuid, m5.getSessionUuid());
+        Assert.assertEquals(m5.getLogger(), logger2);
+        Assert.assertEquals(name2, m5.getEventCategory());
+        Assert.assertEquals("op", m5.getEventName());
+        Assert.assertEquals(2L, m5.getEventPosition());
+
+        final Meter m6 = m5.sub("rs");
+        Assert.assertEquals(ProfilingSession.uuid, m6.getSessionUuid());
+        Assert.assertEquals(m6.getLogger(), logger2);
+        Assert.assertEquals(name2, m6.getEventCategory());
+        Assert.assertEquals("op/rs", m6.getEventName());
+        Assert.assertEquals(1L, m6.getEventPosition());
+
+        final Meter m7 = m5.sub("rs");
+        Assert.assertEquals(ProfilingSession.uuid, m7.getSessionUuid());
+        Assert.assertEquals(m7.getLogger(), logger2);
+        Assert.assertEquals(name2, m7.getEventCategory());
+        Assert.assertEquals("op/rs", m7.getEventName());
+        Assert.assertEquals(2L, m7.getEventPosition());
     }
 
     @Test
