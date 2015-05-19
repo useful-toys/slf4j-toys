@@ -1,34 +1,39 @@
 # slf4j-toys #
 
 **SLF4J-TOYS is collection of useful things for SLF4J:**
- * Promote predictable logger naming convention;
- * Adopt logger coding conventions with minimal effort; 
- * Automate analysis on paseable log messages;
- * Measure resources with minimal effort;
- * Generate large messages and reports as printstreams;
- * Dump binary snapshot as outputstreams.
 
-## Promote predictable logger naming convention
+ * Promote more predictable logger naming convention;
+ * Adopt logging conventions with minimal effort;
+ * Measure resource usage with minimal effort;
+ * Report data readably using PrintStream;
+ * Dump binary snapshots using OutputStreams.
 
-*Applications use the fully qualified class name as logger name. 
-I prefer to call this LOGGER NAMING HELL.
-One logger per class results in thousands of loggers names.
-Those names are long and repetitive.
+
+## Promote more predictable logger naming convention
+
+*Modern Java application suffer from what I prefer to call this LOGGER NAMING HELL.
+The convention of logger per class results in an assortment of thousands long, repetitive and boring names.
 They reflect your implementation structure and do not follow a self-documenting logical organization.
 They are challenging to predict by outsiders. 
-Even worse, they impliy string constants conventions between your implementation and your logger configuration.
+Even worse, they imply string constants convention between your implementation and your outside logger configuration. 
 Any refactor breaks existing logger configuration.*
 
-The **LoggerFactory substitute** promotes predictable logger naming convention. 
-The original `getLogger(...)` methods were preserved for compatibility.
+The **LoggerFactory substitute** promotes a more predictable logger naming convention. 
 
+Instead of letting your package hierarchy should to drive your logger hierarchy, 
 I suggest creating a logger hierarchy that relies on features groups, features and operations. 
-For example, instead of *com.company.application.authentication.dao.hibernate.UserDAOImpl*, one could use *authentication.persistence.user*: 
+For example, instead of _com.company.application.dao.authentication.hibernate.UserDAOImpl_, 
+one could use _persistence.authentication.user_: 
 shorter, more intuitive and does not leak implementation details. 
-The suggested hierarchy is defined purely on . Names are short and self describing. 
-One each level, define a logger based on the parent level logger by calling `getLogger(Logger parent, String name)`. 
-This protects your logging configuration against refactoring as the logger name is preserved.
+The suggested hierarchy is defined over a more predictable structure that probably will not change much from application to application. 
+A refactoring will not harm much any existing logger configuration.
+Names are shorter and self-describing. 
 
+Define your logger as public constants. 
+Create the hierarchy with `getLogger(Logger parent, String name)`.
+This protects your logging configuration against refactoring as the logger structure is preserved.
+
+For those who still prefer the traditional convention, the original `getLogger(...)` methods were preserved for compatibility.
 The `getLogger(Class<?> clazz, String name)` helps to fine tune loggers for specific operations or features of interest provided by your class. 
 For example, you could define loggers to separately track `open()` and `close()` methods.
 
