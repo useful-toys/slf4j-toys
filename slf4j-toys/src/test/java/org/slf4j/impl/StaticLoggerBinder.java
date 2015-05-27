@@ -12,11 +12,13 @@ public final class StaticLoggerBinder implements LoggerFactoryBinder {
         return SINGLETON;
     }
 
-    public ILoggerFactory getLoggerFactory() {
+    @Override
+	public ILoggerFactory getLoggerFactory() {
         return TestLoggerFactory.getInstance();
     }
 
-    public String getLoggerFactoryClassStr() {
+    @Override
+	public String getLoggerFactoryClassStr() {
         return TestLoggerFactory.class.getName();
     }
 }

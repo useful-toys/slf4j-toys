@@ -17,6 +17,7 @@ package org.slf4j.impl;
 
 import java.util.Arrays;
 import java.util.Map;
+
 import org.slf4j.Marker;
 import org.slf4j.helpers.MessageFormatter;
 

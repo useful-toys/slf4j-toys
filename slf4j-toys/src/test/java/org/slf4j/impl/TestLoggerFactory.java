@@ -18,6 +18,7 @@ package org.slf4j.impl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
@@ -34,9 +35,11 @@ public class TestLoggerFactory implements ILoggerFactory {
         return instance;
     }
 
-    public Logger getLogger(String name) {
+    @Override
+	public Logger getLogger(final String name) {
         return nameToLogger.computeIfAbsent(name, new Function<String, Logger>() {
-            public Logger apply(String name) {
+            @Override
+			public Logger apply(final String name) {
                 return new TestLogger(name);
             }
         });

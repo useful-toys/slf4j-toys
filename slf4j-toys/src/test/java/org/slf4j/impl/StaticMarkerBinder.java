@@ -12,11 +12,13 @@ public final class StaticMarkerBinder implements MarkerFactoryBinder {
 
     private StaticMarkerBinder() { }
 
-    public IMarkerFactory getMarkerFactory() {
+    @Override
+	public IMarkerFactory getMarkerFactory() {
         return markerFactory;
     }
 
-    public String getMarkerFactoryClassStr() {
+    @Override
+	public String getMarkerFactoryClassStr() {
         return BasicMarkerFactory.class.getName();
     }
 }

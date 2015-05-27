@@ -17,6 +17,7 @@ package org.slf4j.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.slf4j.spi.MDCAdapter;
 
 /**
@@ -32,27 +33,33 @@ public class TestMDCAdapter implements MDCAdapter {
         }
     };
 
-    public void put(final String key, final String val) {
+    @Override
+	public void put(final String key, final String val) {
         value.get().put(key, val);
     }
 
-    public String get(final String key) {
+    @Override
+	public String get(final String key) {
         return value.get().get(key);
     }
 
-    public void remove(final String key) {
+    @Override
+	public void remove(final String key) {
         value.get().remove(key);
     }
 
-    public void clear() {
+    @Override
+	public void clear() {
         value.get().clear();
     }
 
-    public void setContextMap(final Map contextMap) {
+    @Override
+	public void setContextMap(final Map contextMap) {
         value.set(new HashMap<String, String>(contextMap));
     }
 
-    public Map<String, String> getCopyOfContextMap() {
+    @Override
+	public Map<String, String> getCopyOfContextMap() {
         return new HashMap<String, String>(value.get());
     }
 

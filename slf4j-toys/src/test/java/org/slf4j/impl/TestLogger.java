@@ -18,6 +18,7 @@ package org.slf4j.impl;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.impl.TestLoggerEvent.Level;
@@ -37,19 +38,21 @@ public class TestLogger implements Logger {
 
     private final List<TestLoggerEvent> loggerEvents = new ArrayList<TestLoggerEvent>();
 
-    public TestLogger(String name) {
+    public TestLogger(final String name) {
         this.name = name;
     }
 
-    public String getName() {
+    @Override
+	public String getName() {
         return name;
     }
 
-    public boolean isTraceEnabled() {
+    @Override
+	public boolean isTraceEnabled() {
         return traceEnabled;
     }
 
-    private void addEvent(TestLoggerEvent event) {
+    private void addEvent(final TestLoggerEvent event) {
         loggerEvents.add(event);
     }
 
@@ -57,27 +60,27 @@ public class TestLogger implements Logger {
         loggerEvents.clear();
     }
 
-    public void setTraceEnabled(boolean traceEnabled) {
+    public void setTraceEnabled(final boolean traceEnabled) {
         this.traceEnabled = traceEnabled;
     }
 
-    public void setDebugEnabled(boolean debugEnabled) {
+    public void setDebugEnabled(final boolean debugEnabled) {
         this.debugEnabled = debugEnabled;
     }
 
-    public void setInfoEnabled(boolean infoEnabled) {
+    public void setInfoEnabled(final boolean infoEnabled) {
         this.infoEnabled = infoEnabled;
     }
 
-    public void setWarnEnabled(boolean warnEnabled) {
+    public void setWarnEnabled(final boolean warnEnabled) {
         this.warnEnabled = warnEnabled;
     }
 
-    public void setErrorEnabled(boolean errorEnabled) {
+    public void setErrorEnabled(final boolean errorEnabled) {
         this.errorEnabled = errorEnabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(final boolean enabled) {
         this.errorEnabled = enabled;
         this.warnEnabled = enabled;
         this.infoEnabled = enabled;
@@ -110,7 +113,8 @@ public class TestLogger implements Logger {
         log(Level.TRACE, msg, throwable);
     }
 
-    public boolean isTraceEnabled(Marker marker) {
+    @Override
+	public boolean isTraceEnabled(final Marker marker) {
         return traceEnabled;
     }
 
@@ -139,7 +143,8 @@ public class TestLogger implements Logger {
         log(Level.TRACE, marker, msg, throwable);
     }
 
-    public boolean isDebugEnabled() {
+    @Override
+	public boolean isDebugEnabled() {
         return debugEnabled;
     }
 
@@ -168,7 +173,8 @@ public class TestLogger implements Logger {
         log(Level.DEBUG, msg, throwable);
     }
 
-    public boolean isDebugEnabled(Marker marker) {
+    @Override
+	public boolean isDebugEnabled(final Marker marker) {
         return debugEnabled;
     }
 
@@ -197,7 +203,8 @@ public class TestLogger implements Logger {
         log(Level.DEBUG, marker, msg, throwable);
     }
 
-    public boolean isInfoEnabled() {
+    @Override
+	public boolean isInfoEnabled() {
         return infoEnabled;
     }
 
@@ -226,7 +233,8 @@ public class TestLogger implements Logger {
         log(Level.INFO, msg, throwable);
     }
 
-    public boolean isInfoEnabled(Marker marker) {
+    @Override
+	public boolean isInfoEnabled(final Marker marker) {
         return infoEnabled;
     }
 
@@ -255,7 +263,8 @@ public class TestLogger implements Logger {
         log(Level.INFO, marker, msg, throwable);
     }
 
-    public boolean isWarnEnabled() {
+    @Override
+	public boolean isWarnEnabled() {
         return warnEnabled;
     }
 
@@ -284,7 +293,8 @@ public class TestLogger implements Logger {
         log(Level.WARN, msg, throwable);
     }
 
-    public boolean isWarnEnabled(Marker marker) {
+    @Override
+	public boolean isWarnEnabled(final Marker marker) {
         return warnEnabled;
     }
 
@@ -313,7 +323,8 @@ public class TestLogger implements Logger {
         log(Level.WARN, marker, msg, throwable);
     }
 
-    public boolean isErrorEnabled() {
+    @Override
+	public boolean isErrorEnabled() {
         return errorEnabled;
     }
 
@@ -342,7 +353,8 @@ public class TestLogger implements Logger {
         log(Level.ERROR, msg, throwable);
     }
 
-    public boolean isErrorEnabled(Marker marker) {
+    @Override
+	public boolean isErrorEnabled(final Marker marker) {
         return errorEnabled;
     }
 
@@ -402,13 +414,13 @@ public class TestLogger implements Logger {
         print(event);
     }
 
-    private void print(TestLoggerEvent event) {
-        PrintStream ps = event.getLevel() == Level.ERROR || event.getLevel() == Level.WARN ? System.err : System.out;
+    private void print(final TestLoggerEvent event) {
+        final PrintStream ps = event.getLevel() == Level.ERROR || event.getLevel() == Level.WARN ? System.err : System.out;
         ps.println(formatLogStatement(event));
         ps.flush();
     }
 
-    private String formatLogStatement(TestLoggerEvent event) {
+    private String formatLogStatement(final TestLoggerEvent event) {
         return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage();
     }
 
@@ -416,7 +428,7 @@ public class TestLogger implements Logger {
         return loggerEvents.size();
     }
 
-    public TestLoggerEvent getEvent(int i) {
+    public TestLoggerEvent getEvent(final int i) {
         return loggerEvents.get(i);
     }
 }
