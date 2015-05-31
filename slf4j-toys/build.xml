@@ -71,7 +71,7 @@
 
     -->
     <target name="download-libs">
-        <ant antfile="../lib/lib-init.xml" target="lib-init"/>
+        <ant antfile="../lib/lib-init.xml" target="slf4j-toys-libs.init"/>
     </target>
     
     <target name="-pre-compile" depends="download-libs" />
