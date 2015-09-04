@@ -50,6 +50,11 @@ public final class EventWriter {
         builder.append(MESSAGE_CLOSE);
     }
 
+    public EventWriter property(final String name, final Enum<?>  value) {
+        property(name, value.name());
+        return this;
+    }
+
     public EventWriter property(final String name, final boolean value) {
         property(name, Boolean.toString(value));
         return this;

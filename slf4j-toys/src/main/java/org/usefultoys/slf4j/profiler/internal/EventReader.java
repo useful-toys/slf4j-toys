@@ -99,6 +99,15 @@ public class EventReader {
         return Boolean.parseBoolean(readString());
     }
 
+    public<T extends Enum<T>> T readEnum(Class<T> c) throws IOException {
+            try {
+                return Enum.valueOf(c, readString().toUpperCase());
+            } catch(IllegalArgumentException e) {
+                throw new IOException("invalid enum", e);
+            }
+        }
+    
+    
     public long readLong() throws IOException {
         try {
             return Long.parseLong(readString());
