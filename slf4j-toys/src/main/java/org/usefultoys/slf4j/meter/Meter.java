@@ -748,7 +748,7 @@ public class Meter extends MeterData implements Closeable {
             if (cause instanceof String) {
             	this.cause = (String) cause;
             } else if (cause instanceof Enum) {
-            	this.cause = ((Enum) cause).name();
+            	this.cause = ((Enum<?>) cause).name();
             } else if (cause instanceof Throwable) {
             	this.cause = cause.getClass().getSimpleName();
             } else if (cause != null) {

@@ -38,8 +38,8 @@ public class WatcherDemo {
         final Meter m = MeterFactory.getMeter("iteration").m("Execute 1000 iterations").start();
         try {
             for (int i = 0; i < 1000; i++) {
-                Thread.sleep(10+random.nextInt(10));
-                m.inc().progress();
+                Thread.sleep(500+random.nextInt(500));
+//                m.inc().progress();
             }
             m.ok();
         } catch (final Exception e) {

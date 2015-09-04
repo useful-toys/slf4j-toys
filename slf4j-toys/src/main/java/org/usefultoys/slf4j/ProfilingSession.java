@@ -138,10 +138,10 @@ public final class ProfilingSession {
     }
 
     public static long readWatcherPeriodMillisecondsProperty() {
-        return getMillisecondsProperty("watcher.period", 15000L);
+        return getMillisecondsProperty("watcher.period", 120000L);
     }
 
     public static long readWatcherDelayMillisecondsProperty() {
-        return getMillisecondsProperty("watcher.delay", 15000L);
+        return getMillisecondsProperty("watcher.delay", 60000L);
     }
 }
