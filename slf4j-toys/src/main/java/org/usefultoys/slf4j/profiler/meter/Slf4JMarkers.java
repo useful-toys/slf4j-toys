@@ -30,20 +30,25 @@ public final class Slf4JMarkers {
 
     public static final Marker DATA_START = MarkerFactory.getMarker("METER_DATA_START");
     public static final Marker DATA_OK = MarkerFactory.getMarker("METER_DATA_OK");
-    public static final Marker DATA_SLOW_OK = MarkerFactory.getMarker("METER_DATA_SLOW_OK");
+    public static final Marker DATA_SLOW_OK = MarkerFactory.getMarker("METER_DATA_SLOW_BAD");
+    public static final Marker DATA_BAD = MarkerFactory.getMarker("METER_DATA_OK");
+    public static final Marker DATA_SLOW_BAD = MarkerFactory.getMarker("METER_DATA_SLOW_BAD");
     public static final Marker DATA_PROGRESS = MarkerFactory.getMarker("METER_DATA_PROGRESS");
     public static final Marker DATA_SLOW_PROGRESS = MarkerFactory.getMarker("METER_DATA_SLOW_PROGRESS");
     public static final Marker DATA_FAIL = MarkerFactory.getMarker("METER_DATA_FAIL");
     public static final Marker MSG_START = MarkerFactory.getMarker("METER_MSG_START");
-    public static final Marker MSG_OK = MarkerFactory.getMarker("METER_MSG_OK");
     public static final Marker MSG_PROGRESS = MarkerFactory.getMarker("METER_MSG_PROGRESS");
+    public static final Marker MSG_OK = MarkerFactory.getMarker("METER_MSG_OK");
     public static final Marker MSG_SLOW_OK = MarkerFactory.getMarker("METER_MSG_SLOW_OK");
+    public static final Marker MSG_BAD = MarkerFactory.getMarker("METER_MSG_BAD");
+    public static final Marker MSG_SLOW_BAD = MarkerFactory.getMarker("METER_MSG_SLOW_BAD");
     public static final Marker MSG_FAIL = MarkerFactory.getMarker("METER_MSG_FAIL");
     public static final Marker INCONSISTENT_FINALIZED = MarkerFactory.getMarker("METER_INCONSISTENT_FINALIZED");
     public static final Marker INCONSISTENT_START = MarkerFactory.getMarker("METER_INCONSISTENT_START");
     public static final Marker INCONSISTENT_INCREMENT = MarkerFactory.getMarker("INCONSISTENT_INCREMENT");
     public static final Marker INCONSISTENT_PROGRESS = MarkerFactory.getMarker("INCONSISTENT_PROGRESS");
     public static final Marker INCONSISTENT_OK = MarkerFactory.getMarker("METER_INCONSISTENT_OK");
+    public static final Marker INCONSISTENT_BAD = MarkerFactory.getMarker("METER_INCONSISTENT_BAD");
     public static final Marker INCONSISTENT_FAIL = MarkerFactory.getMarker("METER_INCONSISTENT_FAIL");
     public static final Marker BUG = MarkerFactory.getMarker("METER_BUG");
     public static final Marker ILLEGAL = MarkerFactory.getMarker("METER_ILLEGAL");

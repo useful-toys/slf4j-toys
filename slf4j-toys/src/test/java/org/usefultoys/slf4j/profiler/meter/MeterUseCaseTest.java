@@ -38,9 +38,10 @@ public class MeterUseCaseTest {
 
     static final String MESSAGE_START_PREFIX = "Started:";
     static final String MESSAGE_PROGRESS_PREFIX = "Progress ";
-    static final String MESSAGE_SLOW_PREFIX = "Slow:";
-    static final String MESSAGE_OK_PREFIX = "OK:";
-    static final String MESSAGE_FAIL_PREFIX = "Failed:";
+    static final String MESSAGE_SLOW_PREFIX = "(Slow)";
+    static final String MESSAGE_OK_PREFIX = "OK";
+    static final String MESSAGE_BAD_PREFIX = "BAD";
+    static final String MESSAGE_FAIL_PREFIX = "FAIL";
 
     public MeterUseCaseTest() {
     }
@@ -191,6 +192,7 @@ public class MeterUseCaseTest {
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
         Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_OK_PREFIX));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_SLOW_PREFIX));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));

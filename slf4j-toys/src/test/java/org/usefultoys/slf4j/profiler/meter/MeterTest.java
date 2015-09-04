@@ -135,7 +135,7 @@ public class MeterTest {
         Assert.assertFalse(m.isSuccess());
 
         final long now3a = System.nanoTime();
-        m.fail();
+        m.fail(new IllegalStateException());
         final long createTime3 = m.getCreateTime();
         final long startTime3 = m.getStartTime();
         final long stopTime3 = m.getStopTime();
@@ -271,17 +271,5 @@ public class MeterTest {
         m1.fail(e);
         Assert.assertEquals(e.getClass().getName(), m1.getExceptionClass());
         Assert.assertEquals(e.getMessage(), m1.getExceptionMessage());
-    }
-
-    @Test
-    public void testExceptionAttributesNull() {
-        final Meter m1 = new Meter(logger).start();
-        Assert.assertNull(m1.getExceptionClass());
-        Assert.assertNull(m1.getExceptionMessage());
-
-        final RuntimeException e = new RuntimeException("Test error message");
-        m1.fail();
-        Assert.assertNull(m1.getExceptionClass());
-        Assert.assertNull(m1.getExceptionMessage());
     }
 }

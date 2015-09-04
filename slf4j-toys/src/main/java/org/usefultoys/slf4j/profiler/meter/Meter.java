@@ -210,7 +210,7 @@ public class Meter extends MeterData implements Closeable {
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "iterations(expectedIterations)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             return this;
         }
-        this.expectedIteration = expectedIterations;
+        this.expectedIterations = expectedIterations;
         return this;
     }
 
@@ -573,7 +573,7 @@ public class Meter extends MeterData implements Closeable {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             logger.error(Slf4JMarkers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(4));
         }
-        this.currentIteration++;
+        this.iteration++;
         return this;
     }
 
@@ -593,7 +593,7 @@ public class Meter extends MeterData implements Closeable {
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incBy(increment)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             return this;
         }
-        this.currentIteration += increment;
+        this.iteration += increment;
         return this;
     }
 
@@ -613,11 +613,11 @@ public class Meter extends MeterData implements Closeable {
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             return this;
         }
-        if (currentIteration <= this.currentIteration) {
+        if (currentIteration <= this.iteration) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_FORWARD_ITERATION, getFullID(), new IllegalMeterUsage(2));
         }
-        this.currentIteration = currentIteration;
+        this.iteration = currentIteration;
         return this;
     }
 
@@ -637,8 +637,8 @@ public class Meter extends MeterData implements Closeable {
             }
 
             long now;
-            if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > meterProgressPeriodNanoseconds) {
-                lastProgressIteration = currentIteration;
+            if (iteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > meterProgressPeriodNanoseconds) {
+                lastProgressIteration = iteration;
                 lastProgressTime = now;
 
                 if (logger.isInfoEnabled()) {
@@ -665,9 +665,10 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Confirms the meter in order to claim successful completion of the task represented by the meter. Sends a message
-     * to logger using info level. Sends a message with system status and partial context to log using trace level.
-     * Sends a warn message if the task executed for more time than the optionally configured time threshold.
+     * Confirms the meter in order to claim successful completion of the task represented by the meter. 
+     * Sends a message to logger using info level. 
+     * If a time limit was given and execution exceeded this limit, sends a message using warn level instead. 
+     * Sends a message with system status and partial context to log using trace level.
      *
      * @return reference to the meter itself.
      */
@@ -686,7 +687,7 @@ public class Meter extends MeterData implements Closeable {
 
             }
             currentInstance.set(previousInstance);
-            success = true;
+            result = Result.OK;
 
             final Thread currentThread = Thread.currentThread();
             this.threadStopId = currentThread.getId();
@@ -718,12 +719,78 @@ public class Meter extends MeterData implements Closeable {
         }
         return this;
     }
+    
+    /**
+     * Confirms the meter in order to claim unsuccessful completion of the task represented by the meter.
+     * Sends a message to logger using info level. 
+     * If a time limit was given and execution exceeded this limit, sends a message using warn level instead. 
+     * Sends a message with system status and partial context to log using trace level.
+     *
+     * @param cause A token, enum or exception that describes the cause.
+     * @return reference to the meter itself.
+     */
+    public Meter bad(Object cause) {
+        try {
+            if (stopTime != 0) {
+                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+                logger.error(Slf4JMarkers.INCONSISTENT_BAD, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(4));
+            }
+            stopTime = System.nanoTime();
+            if (startTime == 0) {
+                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+                logger.error(Slf4JMarkers.INCONSISTENT_BAD, ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(4));
+            }
+            if (currentInstance.get() != this) {
 
-    // ========================================================================
-    public Meter fail() {
-        return fail(null);
+            }
+            currentInstance.set(previousInstance);
+            result = Result.BAD;
+            if (cause instanceof String) {
+            	this.cause = (String) cause;
+            } else if (cause instanceof Enum) {
+            	this.cause = ((Enum) cause).name();
+            } else if (cause instanceof Throwable) {
+            	this.cause = cause.getClass().getSimpleName();
+            } else if (cause != null) {
+            	this.cause = cause.toString();
+            } else {
+                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+                logger.error(Slf4JMarkers.INCONSISTENT_BAD, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
+            }
+
+            final Thread currentThread = Thread.currentThread();
+            this.threadStopId = currentThread.getId();
+            this.threadStopName = currentThread.getName();
+
+            if (logger.isWarnEnabled()) {
+                collectSystemStatus();
+
+                final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
+                if (warnSlowness) {
+                    logger.warn(Slf4JMarkers.MSG_SLOW_BAD, readableString(new StringBuilder()).toString());
+                } else if (logger.isInfoEnabled()) {
+                    logger.info(Slf4JMarkers.MSG_BAD, readableString(new StringBuilder()).toString());
+                }
+                if (logger.isTraceEnabled()) {
+                    if (warnSlowness) {
+                        logger.trace(Slf4JMarkers.DATA_SLOW_BAD, write(new StringBuilder(), 'M').toString());
+                    } else {
+                        logger.trace(Slf4JMarkers.DATA_BAD, write(new StringBuilder(), 'M').toString());
+                    }
+                }
+                if (context != null) {
+                    context.clear();
+                }
+            }
+        } catch (final Exception t) {
+            /* Prevents bugs from disrupting the application. Logs message with exception to provide stacktrace to bug. */
+            logger.error(Slf4JMarkers.BUG, ERROR_MSG_METHOD_THREW_EXCEPTION, "ok", getFullID(), t);
+        }
+        return this;
     }
 
+
+    // ========================================================================
     /**
      * Refuses the meter in order to claim incomplete or inconsistent execution of the task represented by the meter.
      * Sends a message with the the exception to logger using warn level. Sends a message with system status, statistics
@@ -746,17 +813,20 @@ public class Meter extends MeterData implements Closeable {
             if (throwable != null) {
                 exceptionClass = throwable.getClass().getName();
                 exceptionMessage = throwable.getLocalizedMessage();
+            } else {
+                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
-            success = false;
+            result = Result.FAIL;
             currentInstance.set(previousInstance);
 
             final Thread currentThread = Thread.currentThread();
             this.threadStopId = currentThread.getId();
             this.threadStopName = currentThread.getName();
 
-            if (logger.isWarnEnabled()) {
+            if (logger.isErrorEnabled()) {
                 collectSystemStatus();
-                logger.warn(Slf4JMarkers.MSG_FAIL, readableString(new StringBuilder()).toString());
+                logger.error(Slf4JMarkers.MSG_FAIL, readableString(new StringBuilder()).toString());
                 if (logger.isTraceEnabled()) {
                     logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder(), 'M').toString());
                 }

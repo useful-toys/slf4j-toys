@@ -29,12 +29,25 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
 
 public class MeterData extends SystemData {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     private static final boolean meterPrintCategory = ProfilingSession.readMeterPrintCategoryProperty();
 
     public MeterData() {
         super();
     }
+    
+    public static enum Result {
+    	OK, BAD, FAIL
+    }
+    
+    /**
+     * Execution result.
+     */
+    protected Result result;
+    /**
+     * For bad result, the string token that identifies the cause.
+     */
+    protected String cause;
     /**
      * An arbitrary short, human readable message to describe the task being measured.
      */
@@ -52,25 +65,21 @@ public class MeterData extends SystemData {
      */
     protected long stopTime = 0;
     /**
-     * How many iteration were run by the operation.
+     * How many iterations were run by the operation.
      */
-    protected long currentIteration = 0;
+    protected long iteration = 0;
     /**
      * How many iteration were expected by the operation.
      */
-    protected long expectedIteration = 0;
+    protected long expectedIterations = 0;
     /**
-     * An arbitrary exception to signal that the task failed.
+     * For failure result, the exception class that caused the failure.
      */
     protected String exceptionClass = null;
     /**
-     * Message of arbitrary exception to signal that the task failed.
+     * For failure result, the exception message that caused the failure.
      */
     protected String exceptionMessage = null;
-    /**
-     * If the job completed successfully, as expected (true) or failed (false).
-     */
-    protected boolean success = false;
     /**
      * Time considered reasonable for successful execution.
      */
@@ -91,11 +100,9 @@ public class MeterData extends SystemData {
      * Thread that notified job stop.
      */
     protected String threadStopName = null;
-//    protected int threadDepth;
-//    protected long depthCount;
-//    protected long depthContext;
+
     /**
-     * Additionala meta data describing the job.
+     * Additional meta data describing the job.
      */
     protected Map<String, String> context;
 
@@ -116,11 +123,11 @@ public class MeterData extends SystemData {
     }
 
     public long getCurrentIteration() {
-        return currentIteration;
+        return iteration;
     }
 
     public long getExpectedIteration() {
-        return expectedIteration;
+        return expectedIterations;
     }
 
     public String getExceptionClass() {
@@ -131,8 +138,20 @@ public class MeterData extends SystemData {
         return exceptionMessage;
     }
 
+    public boolean isOK() {
+        return result == Result.OK;
+    }
+
     public boolean isSuccess() {
-        return success;
+        return result == Result.OK;
+    }
+
+    public boolean isBad() {
+        return result == Result.BAD;
+    }
+
+    public boolean isFailure() {
+        return result == Result.FAIL;
     }
 
     public long getTimeLimitNanoseconds() {
@@ -165,15 +184,16 @@ public class MeterData extends SystemData {
     @Override
     protected void resetImpl() {
         super.resetImpl();
+        this.result = null;
+        this.cause = null;
         this.description = null;
         this.createTime = 0;
         this.startTime = 0;
         this.stopTime = 0;
-        this.currentIteration = 0;
-        this.expectedIteration = 0;
+        this.iteration = 0;
+        this.expectedIterations = 0;
         this.exceptionClass = null;
         this.exceptionMessage = null;
-        this.success = false;
         this.timeLimitNanoseconds = 0;
         this.threadStartId = 0;
         this.threadStopId = 0;
@@ -188,6 +208,9 @@ public class MeterData extends SystemData {
         if ((this.description == null) ? (other.description != null) : !this.description.equals(other.description)) {
             return false;
         }
+        if ((this.cause == null) ? (other.cause != null) : !this.cause.equals(other.cause)) {
+            return false;
+        }
         if (this.createTime != other.createTime) {
             return false;
         }
@@ -197,10 +220,10 @@ public class MeterData extends SystemData {
         if (this.stopTime != other.stopTime) {
             return false;
         }
-        if (this.currentIteration != other.currentIteration) {
+        if (this.iteration != other.iteration) {
             return false;
         }
-        if (this.expectedIteration != other.expectedIteration) {
+        if (this.expectedIterations != other.expectedIterations) {
             return false;
         }
         if ((this.exceptionClass == null) ? (other.exceptionClass != null) : !this.exceptionClass.equals(other.exceptionClass)) {
@@ -209,7 +232,7 @@ public class MeterData extends SystemData {
         if ((this.exceptionMessage == null) ? (other.exceptionMessage != null) : !this.exceptionMessage.equals(other.exceptionMessage)) {
             return false;
         }
-        if (this.success != other.success) {
+        if (this.result != other.result) {
             return false;
         }
         if (this.timeLimitNanoseconds != other.timeLimitNanoseconds) {
@@ -236,23 +259,47 @@ public class MeterData extends SystemData {
     @Override
     public StringBuilder readableString(final StringBuilder buffer) {
         if (stopTime != 0) {
-            if (success) {
+            if (isOK()) {
                 if (isSlow()) {
-                    buffer.append("Slow");
+                    buffer.append("OK (Slow)");
                 } else {
                     buffer.append("OK");
                 }
+            } else if (isBad()) {
+                    if (isSlow()) {
+                        buffer.append("BAD (Slow)");
+                    } else {
+                        buffer.append("BAD");
+                    }
+                    if (cause != null) {
+                        buffer.append(" [");
+                        buffer.append(cause);
+                        buffer.append(']');
+                    }
             } else {
-                buffer.append("Failed");
+                buffer.append("FAIL");
+                if (exceptionClass != null || exceptionMessage != null) {
+                    buffer.append(" [");
+                    if (exceptionClass != null) {
+                    	buffer.append(exceptionClass);
+                    }
+                    if (exceptionClass != null && exceptionMessage != null) {
+                        buffer.append("; ");                    	
+                    }
+                    if (exceptionMessage != null) {
+                    	buffer.append(exceptionMessage);
+                    }
+                    buffer.append(']');
+                }
             }
-        } else if (startTime != 0 && currentIteration == 0) {
+        } else if (startTime != 0 && iteration == 0) {
             buffer.append("Started");
         } else if (startTime != 0) {
             buffer.append("Progress ");
-            buffer.append(UnitFormatter.iterations(this.currentIteration));
-            if (this.expectedIteration > 0) {
+            buffer.append(UnitFormatter.iterations(this.iteration));
+            if (this.expectedIterations > 0) {
                 buffer.append('/');
-                buffer.append(UnitFormatter.iterations(this.expectedIteration));
+                buffer.append(UnitFormatter.iterations(this.expectedIterations));
             }
         } else {
             buffer.append("Scheduled");
@@ -274,7 +321,7 @@ public class MeterData extends SystemData {
         if (this.startTime > 0) {
             buffer.append("; ");
             buffer.append(UnitFormatter.nanoseconds(getExecutionTime()));
-            if (this.currentIteration > 0) {
+            if (this.iteration > 0) {
                 buffer.append("; ");
                 final double iterationsPerSecond = getIterationsPerSecond();
                 buffer.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
@@ -324,14 +371,14 @@ public class MeterData extends SystemData {
     }
 
     public double getIterationsPerSecond() {
-        if (currentIteration == 0 || startTime == 0) {
+        if (iteration == 0 || startTime == 0) {
             return 0;
         }
         final float executionTimeNS = getExecutionTime();
         if (executionTimeNS == 0) {
             return 0;
         }
-        return ((double) this.currentIteration) / executionTimeNS * 1000000000;
+        return ((double) this.iteration) / executionTimeNS * 1000000000;
     }
     protected static final String DESCRIPTION = "d";
     protected static final String CREATE_TIME = "t0";
@@ -339,14 +386,18 @@ public class MeterData extends SystemData {
     protected static final String STOP_TIME = "t2";
     protected static final String CURRENT_ITERATION = "i";
     protected static final String EXPECTED_ITERATION = "ei";
-    protected static final String EXCEPTION = "e";
-    protected static final String SUCCESS = "ok";
+    protected static final String RESULT = "r";
+    protected static final String EXCEPTION = "re";
+    protected static final String CAUSE= "rc";
     protected static final String LIMIT_TIME = "tl";
     protected static final String THREAD = "th";
     protected static final String CONTEXT = "ctx";
 
     @Override
     public void writePropertiesImpl(final EventWriter w) {
+        if (this.result != null) {
+        	w.property(RESULT, this.result);
+        }
         if (this.description != null) {
             w.property(DESCRIPTION, this.description);
         }
@@ -361,19 +412,21 @@ public class MeterData extends SystemData {
         if (this.stopTime != 0) {
             w.property(STOP_TIME, this.stopTime);
         }
-        if (this.currentIteration != 0) {
-            w.property(CURRENT_ITERATION, this.currentIteration);
+        if (this.iteration != 0) {
+            w.property(CURRENT_ITERATION, this.iteration);
         }
-        if (this.expectedIteration != 0) {
-            w.property(EXPECTED_ITERATION, this.expectedIteration);
+        if (this.expectedIterations != 0) {
+            w.property(EXPECTED_ITERATION, this.expectedIterations);
         }
 
-        /* Excetion */
+        /* Exception and cause */
         if (this.exceptionClass != null) {
             w.property(EXCEPTION, this.exceptionClass, this.exceptionMessage != null ? this.exceptionMessage : "");
         }
+        if (this.cause != null) {
+            w.property(CAUSE, this.cause);
+        }
 
-        w.property(SUCCESS, success);
         if (this.timeLimitNanoseconds != 0) {
             w.property(LIMIT_TIME, timeLimitNanoseconds);
         }
@@ -410,14 +463,17 @@ public class MeterData extends SystemData {
             this.stopTime = r.readLong();
             return true;
         } else if (CURRENT_ITERATION.equals(propertyName)) {
-            this.currentIteration = r.readLong();
+            this.iteration = r.readLong();
             return true;
         } else if (EXCEPTION.equals(propertyName)) {
             this.exceptionClass = r.readString();
             this.exceptionMessage = r.readString();
             return true;
-        } else if (SUCCESS.equals(propertyName)) {
-            this.success = r.readBoolean();
+        } else if (RESULT.equals(propertyName)) {
+            this.result = r.readEnum(Result.class);
+            return true;
+        } else if (CAUSE.equals(propertyName)) {
+            this.cause = r.readString();
             return true;
         } else if (LIMIT_TIME.equals(propertyName)) {
             this.timeLimitNanoseconds = r.readLong();

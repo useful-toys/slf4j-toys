@@ -40,10 +40,10 @@ public class BasicUsageTest {
         final Meter m = MeterFactory.getMeter("teste").ctx("in", a).start();
         try {
             a++;
+            m.ctx("out", a).ok();
         } catch (final RuntimeException e) {
             m.ctx("error", a).fail(e);
         }
-        m.ctx("out", a).ok();
     }
 
     @Test
@@ -51,16 +51,15 @@ public class BasicUsageTest {
         final Meter m = MeterFactory.getMeter("teste").ctx("in", a).start();
         try {
             a /= 0;
+            m.ctx("out", a).ok();
         } catch (final RuntimeException e) {
             m.ctx("error", a).fail(e);
         }
-        m.ctx("out", a).ok();
     }
 
     @Test
     public void test3() {
         final Meter m = MeterFactory.getMeter("teste").ctx("in", a).start();
-
         try {
             Meter m2 = m.sub("add").start();
             a += 5;
@@ -79,10 +78,11 @@ public class BasicUsageTest {
             m2 = m.sub("div").start();
             a /= 5;
             m2.ok();
+
+            m.ctx("out", a).ok();
         } catch (final RuntimeException e) {
             m.ctx("error", a).fail(e);
         }
-        m.ctx("out", a).ok();
     }
 
         @Test
@@ -108,10 +108,11 @@ public class BasicUsageTest {
             m2 = m.sub("div").start();
             a /= 5;
             m2.ok();
+
+            m.ctx("out", a).ok();
         } catch (final RuntimeException e) {
             m.ctx("error", a).fail(e);
         }
-        m.ctx("out", a).ok();
     }
 
 }

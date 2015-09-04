@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 import org.usefultoys.slf4j.profiler.meter.MeterData;
+import org.usefultoys.slf4j.profiler.meter.MeterData.Result;
 
 /**
  *
@@ -41,10 +42,11 @@ public class MeterDataTest {
         b.createTime = 1;
         b.startTime = 2;
         b.stopTime = 3;
-        b.currentIteration = 4;
+        b.iteration = 4;
         b.exceptionClass = "Exception";
         b.exceptionMessage = "b";
-        b.success = true;
+        b.result = Result.OK;
+        b.cause = "B";
         b.timeLimitNanoseconds = 10;
         b.threadStartId = 5;
         b.threadStopId = 6;
@@ -75,10 +77,11 @@ public class MeterDataTest {
         a.createTime = 1;
         a.startTime = 2;
         a.stopTime = 3;
-        a.currentIteration = 4;
+        a.iteration = 4;
         a.exceptionClass = "Exception";
         a.exceptionMessage = "b";
-        a.success = true;
+        a.result = Result.OK;
+        a.cause = "A";
         a.timeLimitNanoseconds = 10;
         a.threadStartId = 5;
         a.threadStopId = 6;
@@ -92,10 +95,11 @@ public class MeterDataTest {
         b.createTime = 1;
         b.startTime = 2;
         b.stopTime = 3;
-        b.currentIteration = 4;
+        b.iteration = 4;
         b.exceptionClass = "Exception";
         b.exceptionMessage = "b";
-        b.success = true;
+        b.result = Result.OK;
+        b.cause = "A";
         b.timeLimitNanoseconds = 10;
         b.threadStartId = 5;
         b.threadStopId = 6;
@@ -128,10 +132,10 @@ public class MeterDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
         b.stopTime = 3;
 
-        b.currentIteration = 44;
+        b.iteration = 44;
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.currentIteration = 4;
+        b.iteration = 4;
 
         b.exceptionClass = "ExceptionException";
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -143,10 +147,15 @@ public class MeterDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
         b.exceptionMessage = "b";
 
-        b.success = false;
+        b.result = Result.BAD;
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.success = true;
+        b.result = Result.OK;
+
+        b.cause = "B";
+        assertFalse(a.isCompletelyEqualsTo(b));
+        assertFalse(b.isCompletelyEqualsTo(a));
+        b.cause = "A";
 
         b.timeLimitNanoseconds = 100;
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -230,10 +239,11 @@ public class MeterDataTest {
         a.createTime = 1;
         a.startTime = 2;
         a.stopTime = 3;
-        a.currentIteration = 4;
+        a.iteration = 4;
         a.exceptionClass = "Exception";
         a.exceptionMessage = "b";
-        a.success = true;
+        a.result = Result.OK;
+        a.cause = "A";
         a.timeLimitNanoseconds = 10;
         a.threadStartId = 5;
         a.threadStopId = 6;

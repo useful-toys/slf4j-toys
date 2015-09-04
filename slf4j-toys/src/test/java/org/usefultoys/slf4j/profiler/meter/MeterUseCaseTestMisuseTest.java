@@ -43,26 +43,26 @@ public class MeterUseCaseTestMisuseTest {
     public void testMeterAlreadyRefusedOrConfirmed2() {
         final Meter m = MeterFactory.getMeter("teste").start();
         m.ok();
-        m.fail();
+        m.fail(new IllegalStateException());
     }
 
     @Test
     public void testMeterRefusedButNotStarted() {
         final Meter m = MeterFactory.getMeter("teste");
-        m.fail();
+        m.fail(new IllegalStateException());
     }
 
     @Test
     public void testMeterAlreadyRefusedOrConfirmed3() {
         final Meter m = MeterFactory.getMeter("teste").start();
-        m.fail();
-        m.fail();
+        m.fail(new IllegalStateException());
+        m.fail(new IllegalStateException());
     }
 
     @Test
     public void testMeterAlreadyRefusedOrConfirmed4() {
         final Meter m = MeterFactory.getMeter("teste").start();
-        m.fail();
+        m.fail(new IllegalStateException());
         m.ok();
     }
 

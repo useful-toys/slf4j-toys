@@ -74,10 +74,10 @@ public class MeterThreadLocalTest {
         m2.start();
         Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
 
-        m2.fail();
+        m2.fail(new IllegalStateException());
         Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
 
-        m1.fail();
+        m1.fail(new IllegalStateException());
         Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
     }
 
@@ -105,7 +105,7 @@ public class MeterThreadLocalTest {
         t.join();
         Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
 
-        m1.fail();
+        m1.fail(new IllegalStateException());
         Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
     }
 }
