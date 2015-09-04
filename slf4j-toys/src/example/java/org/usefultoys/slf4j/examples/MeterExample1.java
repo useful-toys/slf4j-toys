@@ -29,7 +29,10 @@ public class MeterExample1 {
 	}
 
 	private void run() {
-		example1();
+		example1A();
+		example1B();
+		example1C();
+		example1D();
 		example2(random.nextInt());
 		example3();
 		example4();
@@ -38,7 +41,7 @@ public class MeterExample1 {
 	}
 
 
-	private void example1() {
+	private void example1A() {
 		/*
 		 * Simpliest Meter workflow. Create Meter based on logger and suffix
 		 * that identifies the operation. Start it. Run stuff. Confirm success
@@ -53,6 +56,68 @@ public class MeterExample1 {
 		}
 	}
 
+	private void example1B() {
+		/*
+		 * Typical Meter workflow. Create Meter based on logger and suffix
+		 * that identifies the operation. Start it. Run stuff. Confirm optional success,
+		 * or report failure.
+		 */
+		final Meter m = MeterFactory.getMeter(logger, "example1").start();
+		try {
+			if (runStuff() < 100) {
+				m.bad("TooSmall");
+			} else {
+				m.ok();
+			}
+		} catch (final RuntimeException e) {
+			m.fail(e);
+		}
+	}
+
+	static enum Example1CFailures {
+		TooMuch, TooFew
+	}
+	
+	private void example1C() {
+		/*
+		 * Typical Meter workflow. Create Meter based on logger and suffix
+		 * that identifies the operation. Start it. Run stuff. Confirm optional success,
+		 * or report failure.
+		 */
+		final Meter m = MeterFactory.getMeter(logger, "example1").start();
+		try {
+			int stuff = runStuff();
+			if (stuff < 50) {
+				m.bad(Example1CFailures.TooFew);
+			} else if (stuff > 50) {
+					m.bad(Example1CFailures.TooMuch);
+			} else {
+				m.ok();
+			}
+		} catch (final RuntimeException e) {
+			m.fail(e);
+		}
+	}
+	
+	private void example1D() {
+		/*
+		 * Typical Meter workflow. Create Meter based on logger and suffix
+		 * that identifies the operation. Start it. Run stuff. Confirm optional success,
+		 * or report failure.
+		 */
+		final Meter m = MeterFactory.getMeter(logger, "example1").start();
+		try {
+			int stuff = runStuff();
+			if (stuff < 50) {
+				m.bad(new IllegalStateException("TooFew"));
+			} else {
+				m.ok();
+			}
+		} catch (final RuntimeException e) {
+			m.fail(e);
+		}
+	}
+
 	private void example2(final int param) {
 		/*
 		 * Meter workflow with context given by properties at startup. Create
@@ -60,7 +125,8 @@ public class MeterExample1 {
 		 * one or more properties that describe the context where stuff will
 		 * run, then start it. Run stuff. Confirm success or report failure.
 		 */
-		final Meter m = MeterFactory.getMeter(logger, "example2").ctx("param", param)
+		final Meter m = MeterFactory.getMeter(logger, "example2")
+				.ctx("param", param)
 				.ctx("state", state).start();
 		try {
 			runStuff();
@@ -79,7 +145,6 @@ public class MeterExample1 {
 		 */
 		final Meter m = MeterFactory.getMeter(logger, "example3");
 		if (random.nextBoolean()) {
-
 			m.ctx("turnRight").start();
 			try {
 				runStuff();
