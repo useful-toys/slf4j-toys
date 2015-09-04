@@ -4,9 +4,9 @@ package org.usefultoys.slf4j.examples;
 
 import java.util.Random;
 
-import org.usefultoys.slf4j.profiler.ProfilingSession;
-import org.usefultoys.slf4j.profiler.meter.Meter;
-import org.usefultoys.slf4j.profiler.meter.MeterFactory;
+import org.usefultoys.slf4j.ProfilingSession;
+import org.usefultoys.slf4j.meter.Meter;
+import org.usefultoys.slf4j.meter.MeterFactory;
 
 /**
  *

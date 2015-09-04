@@ -18,9 +18,9 @@ package org.usefultoys.slf4j.demo;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.usefultoys.slf4j.logger.LoggerFactory;
-import org.usefultoys.slf4j.profiler.meter.Meter;
-import org.usefultoys.slf4j.profiler.meter.MeterFactory;
+import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.meter.Meter;
+import org.usefultoys.slf4j.meter.MeterFactory;
 
 /**
  *

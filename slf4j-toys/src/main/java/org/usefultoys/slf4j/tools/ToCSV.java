@@ -19,7 +19,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.usefultoys.slf4j.profiler.meter.MeterData;
+import org.usefultoys.slf4j.meter.MeterData;
 
 /**
  *
