@@ -59,6 +59,12 @@ public class MeterTest {
         Assert.assertTrue(waitingTime1 <= now1b - now1a);
         Assert.assertEquals(0, executionTime1);
         Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
 
         final long now2a = System.nanoTime();
         m.start();
@@ -77,6 +83,12 @@ public class MeterTest {
         Assert.assertTrue(executionTime2 > 0);
         Assert.assertTrue(executionTime2 <= now2b - now2a);
         Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
 
         final long now3a = System.nanoTime();
         m.ok();
@@ -94,6 +106,160 @@ public class MeterTest {
         Assert.assertEquals(waitingTime3, waitingTime2);
         Assert.assertEquals(stopTime3 - startTime2, executionTime3);
         Assert.assertTrue(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
+    }
+    
+    @Test
+    public void testTimeAttributesOkFlow() {
+        final long now1a = System.nanoTime();
+        final Meter m = new Meter(logger);
+        final long createTime1 = m.getCreateTime();
+        final long startTime1 = m.getStartTime();
+        final long stopTime1 = m.getStopTime();
+        final long waitingTime1 = m.getWaitingTime();
+        final long executionTime1 = m.getExecutionTime();
+        final long now1b = System.nanoTime();
+
+        Assert.assertTrue(createTime1 >= now1a);
+        Assert.assertTrue(createTime1 <= now1b);
+        Assert.assertEquals(0, startTime1);
+        Assert.assertEquals(0, stopTime1);
+        Assert.assertTrue(waitingTime1 > 0);
+        Assert.assertTrue(waitingTime1 <= now1b - now1a);
+        Assert.assertEquals(0, executionTime1);
+        Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
+
+        final long now2a = System.nanoTime();
+        m.start();
+        final long createTime2 = m.getCreateTime();
+        final long startTime2 = m.getStartTime();
+        final long stopTime2 = m.getStopTime();
+        final long waitingTime2 = m.getWaitingTime();
+        final long executionTime2 = m.getExecutionTime();
+        final long now2b = System.nanoTime();
+
+        Assert.assertEquals(createTime1, createTime2);
+        Assert.assertTrue(startTime2 >= now2a);
+        Assert.assertTrue(startTime2 <= now2b);
+        Assert.assertEquals(0, stopTime2);
+        Assert.assertEquals(startTime2 - createTime2, waitingTime2);
+        Assert.assertTrue(executionTime2 > 0);
+        Assert.assertTrue(executionTime2 <= now2b - now2a);
+        Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
+
+        final long now3a = System.nanoTime();
+        m.ok("Flow");
+        final long createTime3 = m.getCreateTime();
+        final long startTime3 = m.getStartTime();
+        final long stopTime3 = m.getStopTime();
+        final long waitingTime3 = m.getWaitingTime();
+        final long executionTime3 = m.getExecutionTime();
+        final long now3b = System.nanoTime();
+
+        Assert.assertEquals(createTime1, createTime3);
+        Assert.assertEquals(startTime2, startTime3);
+        Assert.assertTrue(stopTime3 >= now3a);
+        Assert.assertTrue(stopTime3 <= now3b);
+        Assert.assertEquals(waitingTime3, waitingTime2);
+        Assert.assertEquals(stopTime3 - startTime2, executionTime3);
+        Assert.assertTrue(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertEquals("Flow", m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
+    }
+  
+    @Test
+    public void testTimeAttributesReject() {
+        final long now1a = System.nanoTime();
+        final Meter m = new Meter(logger);
+        final long createTime1 = m.getCreateTime();
+        final long startTime1 = m.getStartTime();
+        final long stopTime1 = m.getStopTime();
+        final long waitingTime1 = m.getWaitingTime();
+        final long executionTime1 = m.getExecutionTime();
+        final long now1b = System.nanoTime();
+
+        Assert.assertTrue(createTime1 >= now1a);
+        Assert.assertTrue(createTime1 <= now1b);
+        Assert.assertEquals(0, startTime1);
+        Assert.assertEquals(0, stopTime1);
+        Assert.assertTrue(waitingTime1 > 0);
+        Assert.assertTrue(waitingTime1 <= now1b - now1a);
+        Assert.assertEquals(0, executionTime1);
+        Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
+
+        final long now2a = System.nanoTime();
+        m.start();
+        final long createTime2 = m.getCreateTime();
+        final long startTime2 = m.getStartTime();
+        final long stopTime2 = m.getStopTime();
+        final long waitingTime2 = m.getWaitingTime();
+        final long executionTime2 = m.getExecutionTime();
+        final long now2b = System.nanoTime();
+
+        Assert.assertEquals(createTime1, createTime2);
+        Assert.assertTrue(startTime2 >= now2a);
+        Assert.assertTrue(startTime2 <= now2b);
+        Assert.assertEquals(0, stopTime2);
+        Assert.assertEquals(startTime2 - createTime2, waitingTime2);
+        Assert.assertTrue(executionTime2 > 0);
+        Assert.assertTrue(executionTime2 <= now2b - now2a);
+        Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
+
+        final long now3a = System.nanoTime();
+        m.reject("Reject");
+        final long createTime3 = m.getCreateTime();
+        final long startTime3 = m.getStartTime();
+        final long stopTime3 = m.getStopTime();
+        final long waitingTime3 = m.getWaitingTime();
+        final long executionTime3 = m.getExecutionTime();
+        final long now3b = System.nanoTime();
+
+        Assert.assertEquals(createTime1, createTime3);
+        Assert.assertEquals(startTime2, startTime3);
+        Assert.assertTrue(stopTime3 >= now3a);
+        Assert.assertTrue(stopTime3 <= now3b);
+        Assert.assertEquals(waitingTime3, waitingTime2);
+        Assert.assertEquals(stopTime3 - startTime2, executionTime3);
+        Assert.assertFalse(m.isSuccess());
+        Assert.assertTrue(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertEquals("Reject", m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
     }
 
     @Test
@@ -115,6 +281,12 @@ public class MeterTest {
         Assert.assertTrue(waitingTime1 <= now1b - now1a);
         Assert.assertEquals(0, executionTime1);
         Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
 
         final long now2a = System.nanoTime();
         m.start();
@@ -133,9 +305,15 @@ public class MeterTest {
         Assert.assertTrue(executionTime2 > 0);
         Assert.assertTrue(executionTime2 <= now2b - now2a);
         Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertNull(m.getExceptionMessage());
+        Assert.assertNull(m.getExceptionClass());
 
         final long now3a = System.nanoTime();
-        m.fail(new IllegalStateException());
+        m.fail(new IllegalStateException("ISE"));
         final long createTime3 = m.getCreateTime();
         final long startTime3 = m.getStartTime();
         final long stopTime3 = m.getStopTime();
@@ -150,6 +328,12 @@ public class MeterTest {
         Assert.assertEquals(waitingTime3, waitingTime2);
         Assert.assertEquals(stopTime3 - startTime2, executionTime3);
         Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertTrue(m.isFailure());
+        Assert.assertNull(m.getFlow());
+        Assert.assertNull(m.getRejection());
+        Assert.assertEquals("ISE", m.getExceptionMessage());
+        Assert.assertEquals("java.lang.IllegalStateException", m.getExceptionClass());
     }
 
     @Test
@@ -260,16 +444,4 @@ public class MeterTest {
         Assert.assertEquals(iterationCount, m1.getExpectedIteration());
         Assert.assertEquals(4, m1.getCurrentIteration());
     }
-
-    @Test
-    public void testExceptionAttributes() {
-        final Meter m1 = new Meter(logger).start();
-        Assert.assertNull(m1.getExceptionClass());
-        Assert.assertNull(m1.getExceptionMessage());
-
-        final RuntimeException e = new RuntimeException("Test error message");
-        m1.fail(e);
-        Assert.assertEquals(e.getClass().getName(), m1.getExceptionClass());
-        Assert.assertEquals(e.getMessage(), m1.getExceptionMessage());
-    }
-}
+ }
