@@ -27,11 +27,11 @@ import org.usefultoys.slf4j.meter.Meter;
  *
  * @author Daniel Felix Ferber
  */
-public class MeterTest {
+public class MeterAttributesTest {
 
     TestLogger logger = (TestLogger) LoggerFactory.getLogger("Test");
 
-    public MeterTest() {
+    public MeterAttributesTest() {
         logger.setEnabled(false);
     }
 

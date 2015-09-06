@@ -24,7 +24,7 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  *
  * @author Daniel Felix Ferber
  */
-public class MeterUseCaseTestMisuseTest {
+public class MeterMessageMisuseTest {
 
     @Test
     public void testMeterConfirmedButNotStarted() {

@@ -888,7 +888,7 @@ public class Meter extends MeterData implements Closeable {
 
             if (logger.isErrorEnabled()) {
                 collectSystemStatus();
-                logger.error(Slf4JMarkers.MSG_FAIL, readableString(new StringBuilder()).toString());
+                logger.error(Slf4JMarkers.MSG_FAIL, readableString(new StringBuilder()).toString(), throwable);
                 if (logger.isTraceEnabled()) {
                     logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder(), 'M').toString());
                 }

@@ -31,7 +31,7 @@ import org.usefultoys.slf4j.meter.Slf4JMarkers;
  *
  * @author Daniel Felix Ferber
  */
-public class MeterUseCaseTest {
+public class MeterMessageTest {
 
     final String meterName = "name";
     final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterName);
@@ -40,10 +40,10 @@ public class MeterUseCaseTest {
     static final String MESSAGE_PROGRESS_PREFIX = "Progress ";
     static final String MESSAGE_SLOW_PREFIX = "(Slow)";
     static final String MESSAGE_OK_PREFIX = "OK";
-    static final String MESSAGE_BAD_PREFIX = "BAD";
+    static final String MESSAGE_REJECT_PREFIX = "REJECT";
     static final String MESSAGE_FAIL_PREFIX = "FAIL";
 
-    public MeterUseCaseTest() {
+    public MeterMessageTest() {
     }
 
     @BeforeClass
@@ -58,14 +58,10 @@ public class MeterUseCaseTest {
 
     @Test
     public void testOk() {
-        System.out.println("testOk:");
         final String title = "Example of execution that succeeds.";
         final Meter m = new Meter(logger).m(title).start();
         try {
             /* Run stuff that may fail. */
-            if (1 + 2 == 4) {
-                throw new Exception("message");
-            }
             m.ok();
         } catch (final Exception e) {
             m.fail(e);
@@ -73,6 +69,8 @@ public class MeterUseCaseTest {
         }
 
         Assert.assertTrue(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -93,6 +91,82 @@ public class MeterUseCaseTest {
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
     }
 
+    @Test
+    public void testOkFlow() {
+        final String title = "Example of execution that succeeds.";
+        final String flow = "qwerty";
+        final Meter m = new Meter(logger).m(title).start();
+		try {
+            /* Run stuff that may fail. */
+            m.ok(flow);
+        } catch (final Exception e) {
+            m.fail(e);
+            // may rethrow
+        }
+
+        Assert.assertTrue(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertFalse(m.isSlow());
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.MSG_OK, stopEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_OK, stopDataEvent.getMarker());
+        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_OK_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(flow));
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(flow));
+    }
+
+    @Test
+    public void testReject() {
+        final String title = "Example of execution that succeeds.";
+        final String reject = "qwerty";
+        final Meter m = new Meter(logger).m(title).start();
+		try {
+            /* Run stuff that may fail. */
+            m.reject(reject);
+        } catch (final Exception e) {
+            m.fail(e);
+            // may rethrow
+        }
+
+        Assert.assertFalse(m.isSuccess());
+        Assert.assertTrue(m.isRejection());
+        Assert.assertFalse(m.isFailure());
+        Assert.assertFalse(m.isSlow());
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.MSG_REJECT, stopEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_REJECT, stopDataEvent.getMarker());
+        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_REJECT_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(reject));
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(reject));
+    }
+    
     @Test
     public void testFail() {
         System.out.println("testFail:");
@@ -109,6 +183,8 @@ public class MeterUseCaseTest {
             // may rethrow
         }
         Assert.assertFalse(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertTrue(m.isFailure());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -120,52 +196,19 @@ public class MeterUseCaseTest {
         Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent.getMarker());
         Assert.assertEquals(Slf4JMarkers.DATA_FAIL, stopDataEvent.getMarker());
         Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent.getLevel());
-        Assert.assertEquals(TestLoggerEvent.Level.WARN, stopEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.ERROR, stopEvent.getLevel());
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
         Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_FAIL_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(Exception.class.getName()));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(Exception.class.getName()));
     }
 
     @Test
-    public void testSlownessNo() {
-        System.out.println("testSlownessNo:");
-        final String title = "Example of execution that succeeds within time limit.";
-        final Meter m = new Meter(logger).m(title).limitMilliseconds(200).start();
-        try {
-            /* Run stuff that may delay. */
-            Thread.sleep(1);
-            m.ok();
-        } catch (final Exception e) {
-            m.fail(e);
-            // may rethrow
-        }
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Slf4JMarkers.MSG_OK, stopEvent.getMarker());
-        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Slf4JMarkers.DATA_OK, stopDataEvent.getMarker());
-        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent.getLevel());
-        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
-        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
-        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
-        Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_OK_PREFIX));
-        Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
-    }
-
-    @Test
-    public void testSlownessYes() {
-        System.out.println("testSlownessYes:");
+    public void testOkSlowness() {
         final String title = "Example of execution that succeeds but exceeds time limit.";
         final Meter m = new Meter(logger).m(title).limitMilliseconds(200).start();
         try {
@@ -177,6 +220,8 @@ public class MeterUseCaseTest {
             // may rethrow
         }
         Assert.assertTrue(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
         Assert.assertTrue(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -216,6 +261,8 @@ public class MeterUseCaseTest {
             // may rethrow
         }
         Assert.assertTrue(m.isSuccess());
+        Assert.assertFalse(m.isRejection());
+        Assert.assertFalse(m.isFailure());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(12, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);

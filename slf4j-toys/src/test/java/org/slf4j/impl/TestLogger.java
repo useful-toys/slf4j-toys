@@ -15,6 +15,7 @@
  */
 package org.slf4j.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -421,7 +422,13 @@ public class TestLogger implements Logger {
     }
 
     private String formatLogStatement(final TestLoggerEvent event) {
-        return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage();
+    	if (event.getThrowable() == null) {
+    		return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage();
+    	}
+    	ByteArrayOutputStream s = new ByteArrayOutputStream();
+		event.getThrowable().printStackTrace(new PrintStream(s));
+		String st = new String(s.toByteArray());
+    	return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage() + "\n" + st;
     }
 
     public int getEventCount() {
