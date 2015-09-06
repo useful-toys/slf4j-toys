@@ -65,7 +65,7 @@ public class MeterExample1 {
 		final Meter m = MeterFactory.getMeter(logger, "example1").start();
 		try {
 			if (runStuff() < 100) {
-				m.bad("TooSmall");
+				m.reject("TooSmall");
 			} else {
 				m.ok();
 			}
@@ -88,9 +88,9 @@ public class MeterExample1 {
 		try {
 			int stuff = runStuff();
 			if (stuff < 50) {
-				m.bad(Example1CFailures.TooFew);
+				m.reject(Example1CFailures.TooFew);
 			} else if (stuff > 50) {
-					m.bad(Example1CFailures.TooMuch);
+					m.reject(Example1CFailures.TooMuch);
 			} else {
 				m.ok();
 			}
@@ -109,7 +109,7 @@ public class MeterExample1 {
 		try {
 			int stuff = runStuff();
 			if (stuff < 50) {
-				m.bad(new IllegalStateException("TooFew"));
+				m.reject(new IllegalStateException("TooFew"));
 			} else {
 				m.ok();
 			}

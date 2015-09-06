@@ -37,7 +37,7 @@ public class MeterData extends SystemData {
     }
     
     public static enum Result {
-    	OK, BAD, FAIL
+    	OK, REJECT, FAIL
     }
     
     /**
@@ -45,13 +45,17 @@ public class MeterData extends SystemData {
      */
     protected Result result;
     /**
-     * For bad result, the string token that identifies the cause.
-     */
-    protected String cause;
-    /**
      * An arbitrary short, human readable message to describe the task being measured.
      */
     protected String description = null;
+    /**
+     * For successful execution, the string token that identifies the execution flow.
+     */
+    protected String flow;
+    /**
+     * For rejected execution, the string token that identifies the rejection cause.
+     */
+    protected String rejection;
     /**
      * When the job was created/scheduled.
      */
@@ -110,6 +114,14 @@ public class MeterData extends SystemData {
         return description;
     }
 
+    public String getFlow() {
+		return flow;
+	}
+    
+    public String getRejection() {
+		return rejection;
+	}
+    
     public long getCreateTime() {
         return createTime;
     }
@@ -146,8 +158,8 @@ public class MeterData extends SystemData {
         return result == Result.OK;
     }
 
-    public boolean isBad() {
-        return result == Result.BAD;
+    public boolean isRejection() {
+        return result == Result.REJECT;
     }
 
     public boolean isFailure() {
@@ -185,8 +197,9 @@ public class MeterData extends SystemData {
     protected void resetImpl() {
         super.resetImpl();
         this.result = null;
-        this.cause = null;
         this.description = null;
+        this.flow = null;
+        this.rejection = null;
         this.createTime = 0;
         this.startTime = 0;
         this.stopTime = 0;
@@ -205,10 +218,16 @@ public class MeterData extends SystemData {
     @Override
     protected boolean isCompletelyEqualsImpl(final EventData obj) {
         final MeterData other = (MeterData) obj;
+        if ((this.result == null) ? (other.result != null) : !this.result.equals(other.result)) {
+            return false;
+        }
         if ((this.description == null) ? (other.description != null) : !this.description.equals(other.description)) {
             return false;
         }
-        if ((this.cause == null) ? (other.cause != null) : !this.cause.equals(other.cause)) {
+        if ((this.flow == null) ? (other.flow != null) : !this.flow.equals(other.flow)) {
+            return false;
+        }
+        if ((this.rejection == null) ? (other.rejection != null) : !this.rejection.equals(other.rejection)) {
             return false;
         }
         if (this.createTime != other.createTime) {
@@ -230,9 +249,6 @@ public class MeterData extends SystemData {
             return false;
         }
         if ((this.exceptionMessage == null) ? (other.exceptionMessage != null) : !this.exceptionMessage.equals(other.exceptionMessage)) {
-            return false;
-        }
-        if (this.result != other.result) {
             return false;
         }
         if (this.timeLimitNanoseconds != other.timeLimitNanoseconds) {
@@ -265,15 +281,16 @@ public class MeterData extends SystemData {
                 } else {
                     buffer.append("OK");
                 }
-            } else if (isBad()) {
-                    if (isSlow()) {
-                        buffer.append("BAD (Slow)");
-                    } else {
-                        buffer.append("BAD");
-                    }
-                    if (cause != null) {
+                if (flow != null) {
+                    buffer.append(" [");
+                    buffer.append(flow);
+                    buffer.append(']');
+                }
+            } else if (isRejection()) {
+                    buffer.append("REJECT");
+                    if (rejection != null) {
                         buffer.append(" [");
-                        buffer.append(cause);
+                        buffer.append(rejection);
                         buffer.append(']');
                     }
             } else {
@@ -380,15 +397,16 @@ public class MeterData extends SystemData {
         }
         return ((double) this.iteration) / executionTimeNS * 1000000000;
     }
+    protected static final String RESULT = "r";
     protected static final String DESCRIPTION = "d";
+    protected static final String FLOW = "rf";
+    protected static final String REJECTION= "rr";
     protected static final String CREATE_TIME = "t0";
     protected static final String START_TIME = "t1";
     protected static final String STOP_TIME = "t2";
-    protected static final String CURRENT_ITERATION = "i";
+    protected static final String ITERATION = "i";
     protected static final String EXPECTED_ITERATION = "ei";
-    protected static final String RESULT = "r";
     protected static final String EXCEPTION = "re";
-    protected static final String CAUSE= "rc";
     protected static final String LIMIT_TIME = "tl";
     protected static final String THREAD = "th";
     protected static final String CONTEXT = "ctx";
@@ -400,6 +418,12 @@ public class MeterData extends SystemData {
         }
         if (this.description != null) {
             w.property(DESCRIPTION, this.description);
+        }
+        if (this.rejection != null) {
+            w.property(REJECTION, this.rejection);
+        }
+        if (this.flow != null) {
+            w.property(FLOW, this.flow);
         }
 
         /* Create, start, stop time. */
@@ -413,7 +437,7 @@ public class MeterData extends SystemData {
             w.property(STOP_TIME, this.stopTime);
         }
         if (this.iteration != 0) {
-            w.property(CURRENT_ITERATION, this.iteration);
+            w.property(ITERATION, this.iteration);
         }
         if (this.expectedIterations != 0) {
             w.property(EXPECTED_ITERATION, this.expectedIterations);
@@ -422,9 +446,6 @@ public class MeterData extends SystemData {
         /* Exception and cause */
         if (this.exceptionClass != null) {
             w.property(EXCEPTION, this.exceptionClass, this.exceptionMessage != null ? this.exceptionMessage : "");
-        }
-        if (this.cause != null) {
-            w.property(CAUSE, this.cause);
         }
 
         if (this.timeLimitNanoseconds != 0) {
@@ -462,7 +483,7 @@ public class MeterData extends SystemData {
         } else if (STOP_TIME.equals(propertyName)) {
             this.stopTime = r.readLong();
             return true;
-        } else if (CURRENT_ITERATION.equals(propertyName)) {
+        } else if (ITERATION.equals(propertyName)) {
             this.iteration = r.readLong();
             return true;
         } else if (EXCEPTION.equals(propertyName)) {
@@ -472,8 +493,11 @@ public class MeterData extends SystemData {
         } else if (RESULT.equals(propertyName)) {
             this.result = r.readEnum(Result.class);
             return true;
-        } else if (CAUSE.equals(propertyName)) {
-            this.cause = r.readString();
+        } else if (REJECTION.equals(propertyName)) {
+            this.rejection = r.readString();
+            return true;
+        } else if (FLOW.equals(propertyName)) {
+            this.flow = r.readString();
             return true;
         } else if (LIMIT_TIME.equals(propertyName)) {
             this.timeLimitNanoseconds = r.readLong();

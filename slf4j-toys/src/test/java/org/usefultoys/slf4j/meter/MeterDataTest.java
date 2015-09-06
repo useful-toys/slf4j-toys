@@ -46,7 +46,8 @@ public class MeterDataTest {
         b.exceptionClass = "Exception";
         b.exceptionMessage = "b";
         b.result = Result.OK;
-        b.cause = "B";
+        b.rejection = "B";
+        b.flow= "FB";
         b.timeLimitNanoseconds = 10;
         b.threadStartId = 5;
         b.threadStopId = 6;
@@ -81,7 +82,8 @@ public class MeterDataTest {
         a.exceptionClass = "Exception";
         a.exceptionMessage = "b";
         a.result = Result.OK;
-        a.cause = "A";
+        a.rejection = "A";
+        a.flow= "FA";
         a.timeLimitNanoseconds = 10;
         a.threadStartId = 5;
         a.threadStopId = 6;
@@ -99,7 +101,8 @@ public class MeterDataTest {
         b.exceptionClass = "Exception";
         b.exceptionMessage = "b";
         b.result = Result.OK;
-        b.cause = "A";
+        b.rejection = "A";
+        b.flow= "FA";
         b.timeLimitNanoseconds = 10;
         b.threadStartId = 5;
         b.threadStopId = 6;
@@ -147,15 +150,20 @@ public class MeterDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
         b.exceptionMessage = "b";
 
-        b.result = Result.BAD;
+        b.result = Result.REJECT;
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
         b.result = Result.OK;
 
-        b.cause = "B";
+        b.rejection = "B";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.cause = "A";
+        b.rejection = "A";
+
+        b.flow = "FB";
+        assertFalse(a.isCompletelyEqualsTo(b));
+        assertFalse(b.isCompletelyEqualsTo(a));
+        b.flow = "FA";
 
         b.timeLimitNanoseconds = 100;
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -243,7 +251,8 @@ public class MeterDataTest {
         a.exceptionClass = "Exception";
         a.exceptionMessage = "b";
         a.result = Result.OK;
-        a.cause = "A";
+        a.rejection = "A";
+        a.flow = "FA";
         a.timeLimitNanoseconds = 10;
         a.threadStartId = 5;
         a.threadStopId = 6;

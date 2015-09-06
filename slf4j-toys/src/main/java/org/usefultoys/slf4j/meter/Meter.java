@@ -721,15 +721,83 @@ public class Meter extends MeterData implements Closeable {
     }
     
     /**
+     * Confirms the meter in order to claim successful completion of the task represented by the meter. 
+     * Sends a message to logger using info level. 
+     * If a time limit was given and execution exceeded this limit, sends a message using warn level instead. 
+     * Sends a message with system status and partial context to log using trace level.
+     *
+     * @param flow A token, enum or exception that describes the successful flow.
+     * @return reference to the meter itself.
+     */
+    public Meter ok(Object flow) {
+        try {
+            if (stopTime != 0) {
+                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(4));
+            }
+            stopTime = System.nanoTime();
+            if (startTime == 0) {
+                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(4));
+            }
+            if (currentInstance.get() != this) {
+
+            }
+            currentInstance.set(previousInstance);
+            result = Result.OK;
+            if (flow instanceof String) {
+            	this.flow = (String) flow;
+            } else if (flow instanceof Enum) {
+            	this.flow = ((Enum<?>) flow).name();
+            } else if (flow instanceof Throwable) {
+            	this.flow = flow.getClass().getSimpleName();
+            } else if (flow != null) {
+            	this.flow = flow.toString();
+            } else {
+                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
+            }
+            final Thread currentThread = Thread.currentThread();
+            this.threadStopId = currentThread.getId();
+            this.threadStopName = currentThread.getName();
+
+            if (logger.isWarnEnabled()) {
+                collectSystemStatus();
+
+                final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
+                if (warnSlowness) {
+                    logger.warn(Slf4JMarkers.MSG_SLOW_OK, readableString(new StringBuilder()).toString());
+                } else if (logger.isInfoEnabled()) {
+                    logger.info(Slf4JMarkers.MSG_OK, readableString(new StringBuilder()).toString());
+                }
+                if (logger.isTraceEnabled()) {
+                    if (warnSlowness) {
+                        logger.trace(Slf4JMarkers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString());
+                    } else {
+                        logger.trace(Slf4JMarkers.DATA_OK, write(new StringBuilder(), 'M').toString());
+                    }
+                }
+                if (context != null) {
+                    context.clear();
+                }
+            }
+        } catch (final Exception t) {
+            /* Prevents bugs from disrupting the application. Logs message with exception to provide stacktrace to bug. */
+            logger.error(Slf4JMarkers.BUG, ERROR_MSG_METHOD_THREW_EXCEPTION, "ok", getFullID(), t);
+        }
+        return this;
+    }
+    
+    /**
      * Confirms the meter in order to claim unsuccessful completion of the task represented by the meter.
      * Sends a message to logger using info level. 
      * If a time limit was given and execution exceeded this limit, sends a message using warn level instead. 
      * Sends a message with system status and partial context to log using trace level.
      *
-     * @param cause A token, enum or exception that describes the cause.
+     * @param cause A token, enum or exception that describes the cause of rejection.
      * @return reference to the meter itself.
      */
-    public Meter bad(Object cause) {
+    public Meter reject(Object cause) {
         try {
             if (stopTime != 0) {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
@@ -744,15 +812,15 @@ public class Meter extends MeterData implements Closeable {
 
             }
             currentInstance.set(previousInstance);
-            result = Result.BAD;
+            result = Result.REJECT;
             if (cause instanceof String) {
-            	this.cause = (String) cause;
+            	this.rejection = (String) cause;
             } else if (cause instanceof Enum) {
-            	this.cause = ((Enum<?>) cause).name();
+            	this.rejection = ((Enum<?>) cause).name();
             } else if (cause instanceof Throwable) {
-            	this.cause = cause.getClass().getSimpleName();
+            	this.rejection = cause.getClass().getSimpleName();
             } else if (cause != null) {
-            	this.cause = cause.toString();
+            	this.rejection = cause.toString();
             } else {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
                 logger.error(Slf4JMarkers.INCONSISTENT_BAD, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
