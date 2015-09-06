@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.meter;
 
 import java.io.Closeable;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,8 +72,8 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Most recent meter from this thread.
      */
-    private static final ThreadLocal<Meter> localThreadInstance = new ThreadLocal<Meter>();
-    private Meter previousInstance;
+    private static final ThreadLocal<WeakReference<Meter>> localThreadInstance = new ThreadLocal<WeakReference<Meter>>();
+    private WeakReference<Meter> previousInstance;
 
     /**
      * Creates a new meter.
@@ -103,7 +104,8 @@ public class Meter extends MeterData implements Closeable {
     }
 
     public static Meter getCurrentInstance() {
-        final Meter current = localThreadInstance.get();
+        final WeakReference<Meter> ref = localThreadInstance.get();
+        final Meter current = ref == null ? null : ref.get();
         if (current == null) {
             return new Meter(LoggerFactory.getLogger("???"));
         }
@@ -546,7 +548,7 @@ public class Meter extends MeterData implements Closeable {
                 );
             } else {
                 previousInstance = localThreadInstance.get();
-                localThreadInstance.set(this);
+                localThreadInstance.set(new WeakReference<Meter>(this));
             }
 
             final Thread currentThread = Thread.currentThread();
@@ -694,7 +696,7 @@ public class Meter extends MeterData implements Closeable {
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(2));
-            } else if (localThreadInstance.get() != this) {
+            } else if (checkCurrentInstance()) {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
@@ -735,6 +737,11 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    public boolean checkCurrentInstance() {
+        final WeakReference<Meter> ref = localThreadInstance.get();
+        return ref == null ? true : ref.get() != this;
+    }
+
     /**
      * Confirms the meter in order to claim successful completion of the task
      * represented by the meter. Sends a message to logger using info level. If
@@ -753,7 +760,7 @@ public class Meter extends MeterData implements Closeable {
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(2));
-            } else if (localThreadInstance.get() != this) {
+            } else if (checkCurrentInstance()) {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
@@ -824,7 +831,7 @@ public class Meter extends MeterData implements Closeable {
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(2));
-            } else if (localThreadInstance.get() != this) {
+            } else if (checkCurrentInstance()) {
                 logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
@@ -886,12 +893,12 @@ public class Meter extends MeterData implements Closeable {
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(2));
-            } else if (localThreadInstance.get() != this) {
+            } else if (checkCurrentInstance()) {
                 logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
                 logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
             }
-            
+
             stopTime = newStopTime;
             result = Result.FAIL;
             localThreadInstance.set(previousInstance);
@@ -901,7 +908,6 @@ public class Meter extends MeterData implements Closeable {
             } else {
                 logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
-
 
             final Thread currentThread = Thread.currentThread();
             this.threadStopId = currentThread.getId();
