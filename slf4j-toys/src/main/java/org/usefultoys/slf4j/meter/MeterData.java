@@ -397,64 +397,65 @@ public class MeterData extends SystemData {
         }
         return ((double) this.iteration) / executionTimeNS * 1000000000;
     }
-    protected static final String RESULT = "r";
-    protected static final String DESCRIPTION = "d";
-    protected static final String FLOW = "rf";
-    protected static final String REJECTION= "rr";
-    protected static final String CREATE_TIME = "t0";
-    protected static final String START_TIME = "t1";
-    protected static final String STOP_TIME = "t2";
-    protected static final String ITERATION = "i";
-    protected static final String EXPECTED_ITERATION = "ei";
-    protected static final String EXCEPTION = "re";
-    protected static final String LIMIT_TIME = "tl";
-    protected static final String THREAD = "th";
-    protected static final String CONTEXT = "ctx";
+
+    protected static final String PROP_DESCRIPTION = "d";
+    protected static final String PROP_RESULT = "r";
+    protected static final String PROP_FLOW = "rf";
+    protected static final String PROP_REJECTION= "rr";
+    protected static final String PROP_CREATE_TIME = "t0";
+    protected static final String PROP_START_TIME = "t1";
+    protected static final String PROP_STOP_TIME = "t2";
+    protected static final String PROP_ITERATION = "i";
+    protected static final String PROP_EXPECTED_ITERATION = "ei";
+    protected static final String PROP_EXCEPTION = "re";
+    protected static final String PROP_LIMIT_TIME = "tl";
+    protected static final String PROP_THREAD = "th";
+    protected static final String PROP_CONTEXT = "ctx";
 
     @Override
     public void writePropertiesImpl(final EventWriter w) {
         if (this.result != null) {
-        	w.property(RESULT, this.result);
+        	w.property(PROP_RESULT, this.result);
         }
         if (this.description != null) {
-            w.property(DESCRIPTION, this.description);
+            w.property(PROP_DESCRIPTION, this.description);
         }
         if (this.rejection != null) {
-            w.property(REJECTION, this.rejection);
+            w.property(PROP_REJECTION, this.rejection);
         }
         if (this.flow != null) {
-            w.property(FLOW, this.flow);
+            w.property(PROP_FLOW, this.flow);
         }
 
         /* Create, start, stop time. */
         if (this.createTime != 0) {
-            w.property(CREATE_TIME, this.createTime);
+            w.property(PROP_CREATE_TIME, this.createTime);
         }
         if (this.startTime != 0) {
-            w.property(START_TIME, this.startTime);
+            w.property(PROP_START_TIME, this.startTime);
         }
         if (this.stopTime != 0) {
-            w.property(STOP_TIME, this.stopTime);
+            w.property(PROP_STOP_TIME, this.stopTime);
         }
         if (this.iteration != 0) {
-            w.property(ITERATION, this.iteration);
+            w.property(PROP_ITERATION, this.iteration);
         }
         if (this.expectedIterations != 0) {
-            w.property(EXPECTED_ITERATION, this.expectedIterations);
+            w.property(PROP_EXPECTED_ITERATION, this.expectedIterations);
         }
 
         /* Exception and cause */
         if (this.exceptionClass != null) {
-            w.property(EXCEPTION, this.exceptionClass, this.exceptionMessage != null ? this.exceptionMessage : "");
+            w.property(PROP_EXCEPTION, this.exceptionClass, this.exceptionMessage != null ? this.exceptionMessage : "");
         }
 
         if (this.timeLimitNanoseconds != 0) {
-            w.property(LIMIT_TIME, timeLimitNanoseconds);
+            w.property(PROP_LIMIT_TIME, timeLimitNanoseconds);
         }
 
         /* Thread info */
         if (this.threadStartId != 0 || this.threadStopId != 0 || this.threadStartName != null || this.threadStopName != null) {
-            w.property(THREAD,
+            w.property(PROP_THREAD,
                 this.threadStartId != 0 ? Long.toString(this.threadStartId) : "",
                 this.threadStartName != null ? this.threadStartName : "",
                 this.threadStopId != 0 ? Long.toString(this.threadStopId) : "",
@@ -463,7 +464,7 @@ public class MeterData extends SystemData {
 
         /* Context */
         if (this.context != null && !this.context.isEmpty()) {
-            w.property(CONTEXT, this.context);
+            w.property(PROP_CONTEXT, this.context);
         }
 
         super.writePropertiesImpl(w);
@@ -471,44 +472,44 @@ public class MeterData extends SystemData {
 
     @Override
     protected boolean readPropertyImpl(final EventReader r, final String propertyName) throws IOException {
-        if (DESCRIPTION.equals(propertyName)) {
+        if (PROP_DESCRIPTION.equals(propertyName)) {
             this.description = r.readString();
             return true;
-        } else if (CREATE_TIME.equals(propertyName)) {
+        } else if (PROP_CREATE_TIME.equals(propertyName)) {
             this.createTime = r.readLong();
             return true;
-        } else if (START_TIME.equals(propertyName)) {
+        } else if (PROP_START_TIME.equals(propertyName)) {
             this.startTime = r.readLong();
             return true;
-        } else if (STOP_TIME.equals(propertyName)) {
+        } else if (PROP_STOP_TIME.equals(propertyName)) {
             this.stopTime = r.readLong();
             return true;
-        } else if (ITERATION.equals(propertyName)) {
+        } else if (PROP_ITERATION.equals(propertyName)) {
             this.iteration = r.readLong();
             return true;
-        } else if (EXCEPTION.equals(propertyName)) {
+        } else if (PROP_EXCEPTION.equals(propertyName)) {
             this.exceptionClass = r.readString();
             this.exceptionMessage = r.readString();
             return true;
-        } else if (RESULT.equals(propertyName)) {
+        } else if (PROP_RESULT.equals(propertyName)) {
             this.result = r.readEnum(Result.class);
             return true;
-        } else if (REJECTION.equals(propertyName)) {
+        } else if (PROP_REJECTION.equals(propertyName)) {
             this.rejection = r.readString();
             return true;
-        } else if (FLOW.equals(propertyName)) {
+        } else if (PROP_FLOW.equals(propertyName)) {
             this.flow = r.readString();
             return true;
-        } else if (LIMIT_TIME.equals(propertyName)) {
+        } else if (PROP_LIMIT_TIME.equals(propertyName)) {
             this.timeLimitNanoseconds = r.readLong();
             return true;
-        } else if (THREAD.equals(propertyName)) {
+        } else if (PROP_THREAD.equals(propertyName)) {
             this.threadStartId = r.readLongOrZero();
             this.threadStartName = r.readString();
             this.threadStopId = r.readLongOrZero();
             this.threadStopName = r.readString();
             return true;
-        } else if (CONTEXT.equals(propertyName)) {
+        } else if (PROP_CONTEXT.equals(propertyName)) {
             this.context = r.readMap();
             return true;
         }
