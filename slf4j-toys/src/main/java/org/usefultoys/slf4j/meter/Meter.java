@@ -801,12 +801,12 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (stopTime != 0) {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                logger.error(Slf4JMarkers.INCONSISTENT_BAD, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(4));
+                logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(4));
             }
             stopTime = System.nanoTime();
             if (startTime == 0) {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                logger.error(Slf4JMarkers.INCONSISTENT_BAD, ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(4));
+                logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_METER_CONFIRMED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(4));
             }
             if (currentInstance.get() != this) {
 
@@ -823,7 +823,7 @@ public class Meter extends MeterData implements Closeable {
             	this.rejection = cause.toString();
             } else {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                logger.error(Slf4JMarkers.INCONSISTENT_BAD, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
+                logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
             }
 
             final Thread currentThread = Thread.currentThread();
@@ -834,17 +834,11 @@ public class Meter extends MeterData implements Closeable {
                 collectSystemStatus();
 
                 final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
-                if (warnSlowness) {
-                    logger.warn(Slf4JMarkers.MSG_SLOW_BAD, readableString(new StringBuilder()).toString());
-                } else if (logger.isInfoEnabled()) {
-                    logger.info(Slf4JMarkers.MSG_BAD, readableString(new StringBuilder()).toString());
+                if (logger.isInfoEnabled()) {
+                    logger.info(Slf4JMarkers.MSG_REJECT, readableString(new StringBuilder()).toString());
                 }
                 if (logger.isTraceEnabled()) {
-                    if (warnSlowness) {
-                        logger.trace(Slf4JMarkers.DATA_SLOW_BAD, write(new StringBuilder(), 'M').toString());
-                    } else {
-                        logger.trace(Slf4JMarkers.DATA_BAD, write(new StringBuilder(), 'M').toString());
-                    }
+                	logger.trace(Slf4JMarkers.DATA_REJECT, write(new StringBuilder(), 'M').toString());
                 }
                 if (context != null) {
                     context.clear();
@@ -852,7 +846,7 @@ public class Meter extends MeterData implements Closeable {
             }
         } catch (final Exception t) {
             /* Prevents bugs from disrupting the application. Logs message with exception to provide stacktrace to bug. */
-            logger.error(Slf4JMarkers.BUG, ERROR_MSG_METHOD_THREW_EXCEPTION, "ok", getFullID(), t);
+            logger.error(Slf4JMarkers.BUG, ERROR_MSG_METHOD_THREW_EXCEPTION, "reject", getFullID(), t);
         }
         return this;
     }
