@@ -940,23 +940,19 @@ public class Meter extends MeterData implements Closeable {
     protected void finalize() throws Throwable {
         if (stopTime == 0) {
             /* Logs only message. Stacktrace will not contain useful hints. Exception is logged only for visibility of inconsistent meter usage. */
-            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_FINALIZED_BUT_NOT_REFUSED_NOR_CONFIMED, getFullID(), new IllegalMeterUsage());
+            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_FINALIZED_BUT_NOT_REFUSED_NOR_CONFIMED, getFullID(), new IllegalMeterUsage(1));
         }
         super.finalize();
     }
 
-    public static class IllegalMeterUsage extends Throwable {
-
-        /**
-         *
-         */
+    public static class MeterThrowable extends Throwable {
         private static final long serialVersionUID = 1L;
 
-        IllegalMeterUsage(final int framesToDiscard) {
+        MeterThrowable(final int framesToDiscard) {
             this(framesToDiscard + 1, null);
         }
 
-        IllegalMeterUsage(int framesToDiscard, final Throwable e) {
+        MeterThrowable(int framesToDiscard, final Throwable e) {
             super(e);
             framesToDiscard++;
             StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
@@ -967,13 +963,33 @@ public class Meter extends MeterData implements Closeable {
             setStackTrace(stacktrace);
         }
 
-        IllegalMeterUsage() {
+        MeterThrowable() {
             super("Illegal Meter usage.");
         }
 
         @Override
         public synchronized Throwable fillInStackTrace() {
             return this;
+        }
+    }
+
+    public static class IllegalMeterUsage extends MeterThrowable {
+        private static final long serialVersionUID = 1L;
+
+        public IllegalMeterUsage(int framesToDiscard) {
+            super(framesToDiscard);
+        }
+
+        public IllegalMeterUsage(int framesToDiscard, Throwable e) {
+            super(framesToDiscard, e);
+        }
+    }
+
+    public static class MeterClosedWithFailure extends MeterThrowable {
+        private static final long serialVersionUID = 1L;
+
+        public MeterClosedWithFailure(int framesToDiscard) {
+            super(framesToDiscard);
         }
 
     }
@@ -986,7 +1002,7 @@ public class Meter extends MeterData implements Closeable {
     @Override
     public void close() {
         if (stopTime == 0) {
-            fail(null);
+            fail(new MeterClosedWithFailure((2)));
         }
     }
 
