@@ -903,7 +903,10 @@ public class Meter extends MeterData implements Closeable {
             stopTime = newStopTime;
             result = Result.FAIL;
             localThreadInstance.set(previousInstance);
-            if (cause != null) {
+            if (cause instanceof TryWithResourcesFailed) {
+                exceptionClass = null;
+                exceptionMessage = "try-with-resources";
+            } else if (cause != null) {
                 exceptionClass = cause.getClass().getName();
                 exceptionMessage = cause.getLocalizedMessage();
             } else {
@@ -977,19 +980,19 @@ public class Meter extends MeterData implements Closeable {
     public static class IllegalMeterUsage extends MeterThrowable {
         private static final long serialVersionUID = 1L;
 
-        public IllegalMeterUsage(int framesToDiscard) {
+        IllegalMeterUsage(int framesToDiscard) {
             super(framesToDiscard);
         }
 
-        public IllegalMeterUsage(int framesToDiscard, Throwable e) {
+        IllegalMeterUsage(int framesToDiscard, Throwable e) {
             super(framesToDiscard, e);
         }
     }
 
-    public static class MeterClosedWithFailure extends MeterThrowable {
+    public static class TryWithResourcesFailed extends MeterThrowable {
         private static final long serialVersionUID = 1L;
 
-        public MeterClosedWithFailure(int framesToDiscard) {
+        TryWithResourcesFailed(int framesToDiscard) {
             super(framesToDiscard);
         }
 
@@ -1003,7 +1006,7 @@ public class Meter extends MeterData implements Closeable {
     @Override
     public void close() {
         if (stopTime == 0) {
-            fail(new MeterClosedWithFailure((2)));
+            fail(new TryWithResourcesFailed((2)));
         }
     }
 
