@@ -38,13 +38,14 @@ import org.usefultoys.slf4j.ProfilingSession;
 public class Meter extends MeterData implements Closeable {
 
     private static final long serialVersionUID = 1L;
-    private static final String ERROR_MSG_CANNOT_CREATE_EXCEPTION = "Meter cannot create exception of type {}.";
+    private static final String ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION = "Meter cannot create exception of type {}.";
     private static final String ERROR_MSG_METER_ALREADY_STARTED = "Meter already started. id={}";
-    private static final String ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED = "Meter already stopped. id={}";
+    private static final String ERROR_MSG_METER_ALREADY_STOPPED = "Meter already stopped. id={}";
     private static final String ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED = "Meter stopped but not started. id={}";
-    private static final String ERROR_MSG_METER_FINALIZED_BUT_NOT_REFUSED_NOR_CONFIMED = "Meter finalized but not refused nor confirmed. id={}";
+    private static final String ERROR_MSG_METER_STATED_AND_NEVER_STOPPED = "Meter started and never stopped. id={}";
     private static final String ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED = "Meter incremented but not started. id={}";
     private static final String ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED = "Meter progress but not started. id={}";
+    
     private static final String ERROR_MSG_METHOD_THREW_EXCEPTION = "Meter.{}(...) method threw exception. id={}";
     private static final String ERROR_MSG_ILLEGAL_ARGUMENT = "Illegal call to Meter.{}: {}. id={}";
     private static final String ERROR_MSG_METER_OUT_OF_ORDER = "Meter out of order. id={}";
@@ -695,7 +696,7 @@ public class Meter extends MeterData implements Closeable {
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(2));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
             } else if (checkCurrentInstance()) {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
@@ -759,7 +760,7 @@ public class Meter extends MeterData implements Closeable {
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(2));
+                logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
             } else if (checkCurrentInstance()) {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
@@ -830,7 +831,7 @@ public class Meter extends MeterData implements Closeable {
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(2));
+                logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
             } else if (checkCurrentInstance()) {
                 logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
@@ -892,7 +893,7 @@ public class Meter extends MeterData implements Closeable {
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
-                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_ALREADY_REFUSED_OR_CONFIRMED, getFullID(), new IllegalMeterUsage(2));
+                logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
             } else if (checkCurrentInstance()) {
                 logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
@@ -940,7 +941,7 @@ public class Meter extends MeterData implements Closeable {
     protected void finalize() throws Throwable {
         if (stopTime == 0) {
             /* Logs only message. Stacktrace will not contain useful hints. Exception is logged only for visibility of inconsistent meter usage. */
-            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_FINALIZED_BUT_NOT_REFUSED_NOR_CONFIMED, getFullID(), new IllegalMeterUsage(1));
+            logger.error(Slf4JMarkers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_STATED_AND_NEVER_STOPPED, getFullID(), new IllegalMeterUsage(1));
         }
         super.finalize();
     }
@@ -1066,17 +1067,17 @@ public class Meter extends MeterData implements Closeable {
             final RuntimeException exception = exceptionClass.getConstructor(String.class, Throwable.class).newInstance(message, e);
             return exception;
         } catch (final NoSuchMethodException ex) {
-            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         } catch (final SecurityException ex) {
-            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         } catch (final InstantiationException ex) {
-            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         } catch (final IllegalAccessException ex) {
-            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         } catch (final IllegalArgumentException ex) {
-            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         } catch (final InvocationTargetException ex) {
-            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
+            logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         }
         return new RuntimeException(e);
     }
