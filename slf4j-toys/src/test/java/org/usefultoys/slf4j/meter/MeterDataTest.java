@@ -46,10 +46,10 @@ public class MeterDataTest {
         b.rejectId = "B";
         b.pathId= "FB";
         b.timeLimitNanoseconds = 10;
-        b.threadStartId = 5;
-        b.threadStopId = 6;
-        b.threadStartName = "c";
-        b.threadStopName = "d";
+//        b.threadStartId = 5;
+//        b.threadStopId = 6;
+//        b.threadStartName = "c";
+//        b.threadStopName = "d";
         b.context = new HashMap<String, String>();
         b.context.put("a", "b");
         b.context.put("c", "d");
@@ -81,10 +81,10 @@ public class MeterDataTest {
         a.rejectId = "A";
         a.pathId= "FA";
         a.timeLimitNanoseconds = 10;
-        a.threadStartId = 5;
-        a.threadStopId = 6;
-        a.threadStartName = "c";
-        a.threadStopName = "d";
+//        a.threadStartId = 5;
+//        a.threadStopId = 6;
+//        a.threadStartName = "c";
+//        a.threadStopName = "d";
         a.context = new HashMap<String, String>();
         a.context.put("a", "b");
         a.context.put("c", "d");
@@ -99,10 +99,10 @@ public class MeterDataTest {
         b.rejectId = "A";
         b.pathId= "FA";
         b.timeLimitNanoseconds = 10;
-        b.threadStartId = 5;
-        b.threadStopId = 6;
-        b.threadStartName = "c";
-        b.threadStopName = "d";
+//        b.threadStartId = 5;
+//        b.threadStopId = 6;
+//        b.threadStartName = "c";
+//        b.threadStopName = "d";
         b.context = new HashMap<String, String>();
         b.context.put("a", "b");
         b.context.put("c", "d");
@@ -160,25 +160,25 @@ public class MeterDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
         b.timeLimitNanoseconds = 10;
 
-        b.threadStartId = 55;
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.threadStartId = 5;
-
-        b.threadStopId = 66;
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.threadStopId = 6;
-
-        b.threadStartName = "cc";
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.threadStartName = "c";
-
-        b.threadStopName = "dd";
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.threadStopName = "d";
+//        b.threadStartId = 55;
+//        assertFalse(a.isCompletelyEqualsTo(b));
+//        assertFalse(b.isCompletelyEqualsTo(a));
+//        b.threadStartId = 5;
+//
+//        b.threadStopId = 66;
+//        assertFalse(a.isCompletelyEqualsTo(b));
+//        assertFalse(b.isCompletelyEqualsTo(a));
+//        b.threadStopId = 6;
+//
+//        b.threadStartName = "cc";
+//        assertFalse(a.isCompletelyEqualsTo(b));
+//        assertFalse(b.isCompletelyEqualsTo(a));
+//        b.threadStartName = "c";
+//
+//        b.threadStopName = "dd";
+//        assertFalse(a.isCompletelyEqualsTo(b));
+//        assertFalse(b.isCompletelyEqualsTo(a));
+//        b.threadStopName = "d";
 
         b.context.put("e", "f");
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -243,10 +243,7 @@ public class MeterDataTest {
         a.rejectId = "A";
         a.pathId = "FA";
         a.timeLimitNanoseconds = 10;
-        a.threadStartId = 5;
-        a.threadStopId = 6;
-        a.threadStartName = "c";
-        a.threadStopName = "d";
+//        a.threcdStopName = "d";
         a.context = new HashMap<String, String>();
         a.context.put("e", "f");
         a.context.put("g", "h");

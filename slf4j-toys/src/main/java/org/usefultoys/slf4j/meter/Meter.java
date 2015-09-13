@@ -552,9 +552,9 @@ public class Meter extends MeterData implements Closeable {
                 localThreadInstance.set(new WeakReference<Meter>(this));
             }
 
-            final Thread currentThread = Thread.currentThread();
-            this.threadStartId = currentThread.getId();
-            this.threadStartName = currentThread.getName();
+//            final Thread currentThread = Thread.currentThread();
+//            this.threadStartId = currentThread.getId();
+//            this.threadStartName = currentThread.getName();
             this.lastProgressTime = this.startTime = System.nanoTime();
 
             if (logger.isDebugEnabled()) {
@@ -710,9 +710,9 @@ public class Meter extends MeterData implements Closeable {
             pathId = null;
             localThreadInstance.set(previousInstance);
 
-            final Thread currentThread = Thread.currentThread();
-            this.threadStopId = currentThread.getId();
-            this.threadStopName = currentThread.getName();
+//            final Thread currentThread = Thread.currentThread();
+//            this.threadStopId = currentThread.getId();
+//            this.threadStopName = currentThread.getName();
 
             if (logger.isWarnEnabled()) {
                 collectSystemStatus();
@@ -788,9 +788,9 @@ public class Meter extends MeterData implements Closeable {
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
             }
 
-            final Thread currentThread = Thread.currentThread();
-            this.threadStopId = currentThread.getId();
-            this.threadStopName = currentThread.getName();
+//            final Thread currentThread = Thread.currentThread();
+//            this.threadStopId = currentThread.getId();
+//            this.threadStopName = currentThread.getName();
 
             if (logger.isWarnEnabled()) {
                 collectSystemStatus();
@@ -860,9 +860,9 @@ public class Meter extends MeterData implements Closeable {
                 logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
 
-            final Thread currentThread = Thread.currentThread();
-            this.threadStopId = currentThread.getId();
-            this.threadStopName = currentThread.getName();
+//            final Thread currentThread = Thread.currentThread();
+//            this.threadStopId = currentThread.getId();
+//            this.threadStopName = currentThread.getName();
 
             if (logger.isInfoEnabled()) {
                 collectSystemStatus();
@@ -921,9 +921,9 @@ public class Meter extends MeterData implements Closeable {
                 logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
 
-            final Thread currentThread = Thread.currentThread();
-            this.threadStopId = currentThread.getId();
-            this.threadStopName = currentThread.getName();
+//            final Thread currentThread = Thread.currentThread();
+//            this.threadStopId = currentThread.getId();
+//            this.threadStopName = currentThread.getName();
 
             if (logger.isErrorEnabled()) {
                 collectSystemStatus();

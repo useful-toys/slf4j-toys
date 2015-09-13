@@ -395,26 +395,26 @@ public class MeterAttributesTest {
         Assert.assertEquals(2L, m7.getEventPosition());
     }
 
-    @Test
-    public void testThreadAttributes() throws InterruptedException {
-        final Meter m1 = new Meter(logger);
-        Assert.assertEquals(0, m1.getThreadStartId());
-        Assert.assertEquals(null, m1.getThreadStartName());
-
-        m1.start();
-        Assert.assertEquals(Thread.currentThread().getId(), m1.getThreadStartId());
-        Assert.assertEquals(Thread.currentThread().getName(), m1.getThreadStartName());
-        final Thread t = new Thread() {
-            @Override
-            public void run() {
-                m1.ok();
-            }
-        };
-        t.start();
-        t.join();
-        Assert.assertEquals(t.getId(), m1.getThreadStopId());
-        Assert.assertEquals(t.getName(), m1.getThreadStopName());
-    }
+//    @Test
+//    public void testThreadAttributes() throws InterruptedException {
+//        final Meter m1 = new Meter(logger);
+//        Assert.assertEquals(0, m1.getThreadStartId());
+//        Assert.assertEquals(null, m1.getThreadStartName());
+//
+//        m1.start();
+//        Assert.assertEquals(Thread.currentThread().getId(), m1.getThreadStartId());
+//        Assert.assertEquals(Thread.currentThread().getName(), m1.getThreadStartName());
+//        final Thread t = new Thread() {
+//            @Override
+//            public void run() {
+//                m1.ok();
+//            }
+//        };
+//        t.start();
+//        t.join();
+//        Assert.assertEquals(t.getId(), m1.getThreadStopId());
+//        Assert.assertEquals(t.getName(), m1.getThreadStopName());
+//    }
 
     @Test
     public void testMessageAttributes() {
