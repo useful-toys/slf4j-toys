@@ -55,7 +55,7 @@ public class ToCSV {
                     sb.append(',');
                     sb.append(data.getExecutionTime()/1000000.0);
                     sb.append(',');
-                    sb.append(data.isSuccess());
+                    sb.append(data.isOK());
                     sb.append(',');
                     sb.append(data.isSlow());
                     sb.append(',');

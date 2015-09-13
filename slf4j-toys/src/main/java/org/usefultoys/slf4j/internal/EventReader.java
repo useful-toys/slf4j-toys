@@ -99,15 +99,14 @@ public class EventReader {
         return Boolean.parseBoolean(readString());
     }
 
-    public<T extends Enum<T>> T readEnum(Class<T> c) throws IOException {
-            try {
-                return Enum.valueOf(c, readString().toUpperCase());
-            } catch(IllegalArgumentException e) {
-                throw new IOException("invalid enum", e);
-            }
+    public <T extends Enum<T>> T readEnum(Class<T> c) throws IOException {
+        try {
+            return Enum.valueOf(c, readString().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IOException("invalid enum", e);
         }
-    
-    
+    }
+
     public long readLong() throws IOException {
         try {
             return Long.parseLong(readString());
@@ -230,7 +229,7 @@ public class EventReader {
         }
 
         char c = chars[start];
-        if (!Character.isJavaIdentifierStart(c)) {
+        if (!Character.isJavaIdentifierStart(c) && c != '#') {
             throw new IOException("invalid identifier");
         }
         int end = start + 1;

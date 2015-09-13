@@ -179,92 +179,92 @@ public abstract class SystemData extends EventData {
             systemLoad = os.getSystemLoadAverage();
         }
     }
-    static final String MEMORY = "m";
-    static final String HEAP = "h";
-    static final String NON_HEAP = "nh";
-    static final String FINALIZATION_COUNT = "fc";
-    static final String CLASS_LOADING = "cl";
-    static final String COMPILATION_TIME = "ct";
-    static final String GARBAGE_COLLECTOR = "gc";
-    static final String SYSTEM_LOAD = "sl";
+    static final String PROP_MEMORY = "m";
+    static final String PROP_HEAP = "h";
+    static final String PROP_NON_HEAP = "nh";
+    static final String PROP_FINALIZATION_COUNT = "fc";
+    static final String PROP_CLASS_LOADING = "cl";
+    static final String PROP_COMPILATION_TIME = "ct";
+    static final String PROP_GARBAGE_COLLECTOR = "gc";
+    static final String PROP_SYSTEM_LOAD = "sl";
 
     @Override
     protected void writePropertiesImpl(final EventWriter w) {
         /* memory usage */
         if (this.runtime_usedMemory > 0 || this.runtime_totalMemory > 0 || this.runtime_maxMemory > 0) {
-            w.property(MEMORY, this.runtime_usedMemory, this.runtime_totalMemory, this.runtime_maxMemory);
+            w.property(PROP_MEMORY, this.runtime_usedMemory, this.runtime_totalMemory, this.runtime_maxMemory);
         }
 
         /* heap usage */
         if (this.heap_commited > 0 || this.heap_max > 0 || this.heap_used > 0) {
-            w.property(HEAP, this.heap_used, this.heap_commited, this.heap_max);
+            w.property(PROP_HEAP, this.heap_used, this.heap_commited, this.heap_max);
         }
 
         /* non heap usage */
         if (this.nonHeap_commited > 0 || this.nonHeap_max > 0 || this.nonHeap_used > 0) {
-            w.property(NON_HEAP, this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
+            w.property(PROP_NON_HEAP, this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
         }
 
         /* objectPendingFinalizationCount */
         if (this.objectPendingFinalizationCount > 0) {
-            w.property(FINALIZATION_COUNT, this.objectPendingFinalizationCount);
+            w.property(PROP_FINALIZATION_COUNT, this.objectPendingFinalizationCount);
         }
 
         /* class loading */
         if (this.classLoading_loaded > 0 || this.classLoading_total > 0 || this.classLoading_unloaded > 0) {
-            w.property(CLASS_LOADING, this.classLoading_total, this.classLoading_loaded, this.classLoading_unloaded);
+            w.property(PROP_CLASS_LOADING, this.classLoading_total, this.classLoading_loaded, this.classLoading_unloaded);
         }
 
         /* compiler */
         if (this.compilationTime > 0) {
-            w.property(COMPILATION_TIME, this.compilationTime);
+            w.property(PROP_COMPILATION_TIME, this.compilationTime);
         }
 
         /* garbage collector. */
         if (this.garbageCollector_count > 0 || this.garbageCollector_time > 0) {
-            w.property(GARBAGE_COLLECTOR, this.garbageCollector_count, this.garbageCollector_time);
+            w.property(PROP_GARBAGE_COLLECTOR, this.garbageCollector_count, this.garbageCollector_time);
         }
 
         /* system load */
         if (this.systemLoad > 0) {
-            w.property(SYSTEM_LOAD, this.systemLoad);
+            w.property(PROP_SYSTEM_LOAD, this.systemLoad);
         }
 
     }
 
     @Override
     protected boolean readPropertyImpl(final EventReader r, final String propertyName) throws IOException {
-        if (MEMORY.equals(propertyName)) {
+        if (PROP_MEMORY.equals(propertyName)) {
             this.runtime_usedMemory = r.readLong();
             this.runtime_totalMemory = r.readLong();
             this.runtime_maxMemory = r.readLong();
             return true;
-        } else if (HEAP.equals(propertyName)) {
+        } else if (PROP_HEAP.equals(propertyName)) {
             this.heap_used = r.readLong();
             this.heap_commited = r.readLong();
             this.heap_max = r.readLong();
             return true;
-        } else if (NON_HEAP.equals(propertyName)) {
+        } else if (PROP_NON_HEAP.equals(propertyName)) {
             this.nonHeap_used = r.readLong();
             this.nonHeap_commited = r.readLong();
             this.nonHeap_max = r.readLong();
             return true;
-        } else if (FINALIZATION_COUNT.equals(propertyName)) {
+        } else if (PROP_FINALIZATION_COUNT.equals(propertyName)) {
             this.objectPendingFinalizationCount = r.readLong();
             return true;
-        } else if (CLASS_LOADING.equals(propertyName)) {
+        } else if (PROP_CLASS_LOADING.equals(propertyName)) {
             this.classLoading_total = r.readLong();
             this.classLoading_loaded = r.readLong();
             this.classLoading_unloaded = r.readLong();
             return true;
-        } else if (COMPILATION_TIME.equals(propertyName)) {
+        } else if (PROP_COMPILATION_TIME.equals(propertyName)) {
             this.compilationTime = r.readLong();
             return true;
-        } else if (GARBAGE_COLLECTOR.equals(propertyName)) {
+        } else if (PROP_GARBAGE_COLLECTOR.equals(propertyName)) {
             this.garbageCollector_count = r.readLong();
             this.garbageCollector_time = r.readLong();
             return true;
-        } else if (SYSTEM_LOAD.equals(propertyName)) {
+        } else if (PROP_SYSTEM_LOAD.equals(propertyName)) {
             this.systemLoad = r.readDouble();
             return true;
         }

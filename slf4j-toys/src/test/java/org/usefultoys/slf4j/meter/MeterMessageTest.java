@@ -68,9 +68,9 @@ public class MeterMessageTest {
             // may rethrow
         }
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -104,9 +104,9 @@ public class MeterMessageTest {
             // may rethrow
         }
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -142,9 +142,9 @@ public class MeterMessageTest {
             // may rethrow
         }
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertTrue(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertTrue(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -182,9 +182,9 @@ public class MeterMessageTest {
             m.fail(e);
             // may rethrow
         }
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertTrue(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertTrue(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -219,9 +219,9 @@ public class MeterMessageTest {
             m.fail(e);
             // may rethrow
         }
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertTrue(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -260,9 +260,9 @@ public class MeterMessageTest {
             m.fail(e);
             // may rethrow
         }
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(12, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -337,7 +337,7 @@ public class MeterMessageTest {
             m.fail(e);
             // may rethrow
         }
-        Assert.assertTrue(m.isSuccess());
+        Assert.assertTrue(m.isOK());
         Assert.assertFalse(m.isSlow());
         /* Messages were already tested by testIteration() */
     }
@@ -360,7 +360,7 @@ public class MeterMessageTest {
             m.fail(e);
             // may rethrow
         }
-        Assert.assertTrue(m.isSuccess());
+        Assert.assertTrue(m.isOK());
         Assert.assertFalse(m.isSlow());
         /* Messages were already tested by testIteration() */
     }
@@ -396,7 +396,7 @@ public class MeterMessageTest {
             m.ctx("cause", causeValue).fail(e);
             // may rethrow
         }
-        Assert.assertTrue(m.isSuccess());
+        Assert.assertTrue(m.isOK());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger2.getEventCount());
         final TestLoggerEvent startEvent = logger2.getEvent(0);
@@ -460,7 +460,7 @@ public class MeterMessageTest {
             m.ctx("cause", causeValue).fail(e);
             // may rethrow
         }
-        Assert.assertTrue(m.isSuccess());
+        Assert.assertTrue(m.isOK());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(1, logger2.getEventCount());
         final TestLoggerEvent stopEvent = logger2.getEvent(0);
@@ -518,7 +518,7 @@ public class MeterMessageTest {
             // may rethrow
         }
 
-        Assert.assertTrue(m.isSuccess());
+        Assert.assertTrue(m.isOK());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger2.getEventCount());
         final TestLoggerEvent startEvent = logger2.getEvent(0);

@@ -21,8 +21,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 
 import org.junit.Test;
-import org.usefultoys.slf4j.meter.MeterData;
-import org.usefultoys.slf4j.meter.MeterData.Result;
 
 /**
  *
@@ -43,11 +41,10 @@ public class MeterDataTest {
         b.startTime = 2;
         b.stopTime = 3;
         b.iteration = 4;
-        b.exceptionClass = "Exception";
-        b.exceptionMessage = "b";
-        b.result = Result.OK;
-        b.rejection = "B";
-        b.flow= "FB";
+        b.failClass = "Exception";
+        b.failMessage = "b";
+        b.rejectId = "B";
+        b.pathId= "FB";
         b.timeLimitNanoseconds = 10;
         b.threadStartId = 5;
         b.threadStopId = 6;
@@ -79,11 +76,10 @@ public class MeterDataTest {
         a.startTime = 2;
         a.stopTime = 3;
         a.iteration = 4;
-        a.exceptionClass = "Exception";
-        a.exceptionMessage = "b";
-        a.result = Result.OK;
-        a.rejection = "A";
-        a.flow= "FA";
+        a.failClass = "Exception";
+        a.failMessage = "b";
+        a.rejectId = "A";
+        a.pathId= "FA";
         a.timeLimitNanoseconds = 10;
         a.threadStartId = 5;
         a.threadStopId = 6;
@@ -98,11 +94,10 @@ public class MeterDataTest {
         b.startTime = 2;
         b.stopTime = 3;
         b.iteration = 4;
-        b.exceptionClass = "Exception";
-        b.exceptionMessage = "b";
-        b.result = Result.OK;
-        b.rejection = "A";
-        b.flow= "FA";
+        b.failClass = "Exception";
+        b.failMessage = "b";
+        b.rejectId = "A";
+        b.pathId= "FA";
         b.timeLimitNanoseconds = 10;
         b.threadStartId = 5;
         b.threadStopId = 6;
@@ -140,30 +135,25 @@ public class MeterDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
         b.iteration = 4;
 
-        b.exceptionClass = "ExceptionException";
+        b.failClass = "ExceptionException";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.exceptionClass = "Exception";
+        b.failClass = "Exception";
 
-        b.exceptionMessage = "bb";
+        b.failMessage = "bb";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.exceptionMessage = "b";
+        b.failMessage = "b";
 
-        b.result = Result.REJECT;
+        b.rejectId = "B";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.result = Result.OK;
+        b.rejectId = "A";
 
-        b.rejection = "B";
+        b.pathId = "FB";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.rejection = "A";
-
-        b.flow = "FB";
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.flow = "FA";
+        b.pathId = "FA";
 
         b.timeLimitNanoseconds = 100;
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -248,11 +238,10 @@ public class MeterDataTest {
         a.startTime = 2;
         a.stopTime = 3;
         a.iteration = 4;
-        a.exceptionClass = "Exception";
-        a.exceptionMessage = "b";
-        a.result = Result.OK;
-        a.rejection = "A";
-        a.flow = "FA";
+        a.failClass = "Exception";
+        a.failMessage = "b";
+        a.rejectId = "A";
+        a.pathId = "FA";
         a.timeLimitNanoseconds = 10;
         a.threadStartId = 5;
         a.threadStopId = 6;

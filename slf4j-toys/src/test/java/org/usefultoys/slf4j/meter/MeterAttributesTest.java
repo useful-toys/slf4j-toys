@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.ProfilingSession;
-import org.usefultoys.slf4j.meter.Meter;
 
 /**
  *
@@ -58,11 +57,11 @@ public class MeterAttributesTest {
         Assert.assertTrue(waitingTime1 > 0);
         Assert.assertTrue(waitingTime1 <= now1b - now1a);
         Assert.assertEquals(0, executionTime1);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
 
@@ -82,11 +81,11 @@ public class MeterAttributesTest {
         Assert.assertEquals(startTime2 - createTime2, waitingTime2);
         Assert.assertTrue(executionTime2 > 0);
         Assert.assertTrue(executionTime2 <= now2b - now2a);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
 
@@ -105,11 +104,11 @@ public class MeterAttributesTest {
         Assert.assertTrue(stopTime3 <= now3b);
         Assert.assertEquals(waitingTime3, waitingTime2);
         Assert.assertEquals(stopTime3 - startTime2, executionTime3);
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
     }
@@ -132,11 +131,11 @@ public class MeterAttributesTest {
         Assert.assertTrue(waitingTime1 > 0);
         Assert.assertTrue(waitingTime1 <= now1b - now1a);
         Assert.assertEquals(0, executionTime1);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
 
@@ -156,11 +155,11 @@ public class MeterAttributesTest {
         Assert.assertEquals(startTime2 - createTime2, waitingTime2);
         Assert.assertTrue(executionTime2 > 0);
         Assert.assertTrue(executionTime2 <= now2b - now2a);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
 
@@ -179,11 +178,11 @@ public class MeterAttributesTest {
         Assert.assertTrue(stopTime3 <= now3b);
         Assert.assertEquals(waitingTime3, waitingTime2);
         Assert.assertEquals(stopTime3 - startTime2, executionTime3);
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertEquals("Flow", m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertEquals("Flow", m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
     }
@@ -206,11 +205,11 @@ public class MeterAttributesTest {
         Assert.assertTrue(waitingTime1 > 0);
         Assert.assertTrue(waitingTime1 <= now1b - now1a);
         Assert.assertEquals(0, executionTime1);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
 
@@ -230,11 +229,11 @@ public class MeterAttributesTest {
         Assert.assertEquals(startTime2 - createTime2, waitingTime2);
         Assert.assertTrue(executionTime2 > 0);
         Assert.assertTrue(executionTime2 <= now2b - now2a);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
 
@@ -253,11 +252,11 @@ public class MeterAttributesTest {
         Assert.assertTrue(stopTime3 <= now3b);
         Assert.assertEquals(waitingTime3, waitingTime2);
         Assert.assertEquals(stopTime3 - startTime2, executionTime3);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertTrue(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertEquals("Reject", m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertTrue(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertEquals("Reject", m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
     }
@@ -280,11 +279,11 @@ public class MeterAttributesTest {
         Assert.assertTrue(waitingTime1 > 0);
         Assert.assertTrue(waitingTime1 <= now1b - now1a);
         Assert.assertEquals(0, executionTime1);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
 
@@ -304,11 +303,11 @@ public class MeterAttributesTest {
         Assert.assertEquals(startTime2 - createTime2, waitingTime2);
         Assert.assertTrue(executionTime2 > 0);
         Assert.assertTrue(executionTime2 <= now2b - now2a);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertNull(m.getExceptionMessage());
         Assert.assertNull(m.getExceptionClass());
 
@@ -327,11 +326,11 @@ public class MeterAttributesTest {
         Assert.assertTrue(stopTime3 <= now3b);
         Assert.assertEquals(waitingTime3, waitingTime2);
         Assert.assertEquals(stopTime3 - startTime2, executionTime3);
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertTrue(m.isFailure());
-        Assert.assertNull(m.getFlow());
-        Assert.assertNull(m.getRejection());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertTrue(m.isFail());
+        Assert.assertNull(m.getPathId());
+        Assert.assertNull(m.getRejectId());
         Assert.assertEquals("ISE", m.getExceptionMessage());
         Assert.assertEquals("java.lang.IllegalStateException", m.getExceptionClass());
     }
@@ -432,16 +431,16 @@ public class MeterAttributesTest {
     public void testIterationAttributes() {
         final int iterationCount = 10;
         final Meter m1 = new Meter(logger).iterations(iterationCount).start();
-        Assert.assertEquals(iterationCount, m1.getExpectedIteration());
+        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
         Assert.assertEquals(0, m1.getCurrentIteration());
         m1.inc();
-        Assert.assertEquals(iterationCount, m1.getExpectedIteration());
+        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
         Assert.assertEquals(1, m1.getCurrentIteration());
         m1.incBy(2);
-        Assert.assertEquals(iterationCount, m1.getExpectedIteration());
+        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
         Assert.assertEquals(3, m1.getCurrentIteration());
         m1.incTo(4);
-        Assert.assertEquals(iterationCount, m1.getExpectedIteration());
+        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
         Assert.assertEquals(4, m1.getCurrentIteration());
     }
  }

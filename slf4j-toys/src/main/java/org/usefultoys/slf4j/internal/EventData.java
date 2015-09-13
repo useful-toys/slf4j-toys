@@ -225,8 +225,8 @@ public abstract class EventData implements Serializable {
     protected abstract boolean isCompletelyEqualsImpl(EventData other);
 
     protected static final String SESSION_UUID = "s";
-    protected static final String EVENT_POSITION = "p";
     protected static final String EVENT_CATEGORY = "c";
+    protected static final String EVENT_POSITION = "#";
     protected static final String EVENT_NAME = "n";
     private static final String EVENT_TIME = "t";
 

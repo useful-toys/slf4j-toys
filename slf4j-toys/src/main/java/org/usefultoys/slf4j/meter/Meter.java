@@ -45,7 +45,7 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_METER_STATED_AND_NEVER_STOPPED = "Meter started and never stopped. id={}";
     private static final String ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED = "Meter incremented but not started. id={}";
     private static final String ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED = "Meter progress but not started. id={}";
-    
+
     private static final String ERROR_MSG_METHOD_THREW_EXCEPTION = "Meter.{}(...) method threw exception. id={}";
     private static final String ERROR_MSG_ILLEGAL_ARGUMENT = "Illegal call to Meter.{}: {}. id={}";
     private static final String ERROR_MSG_METER_OUT_OF_ORDER = "Meter out of order. id={}";
@@ -704,8 +704,11 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
+            failClass = null;
+            failMessage = null;
+            rejectId = null;
+            pathId = null;
             localThreadInstance.set(previousInstance);
-            result = Result.OK;
 
             final Thread currentThread = Thread.currentThread();
             this.threadStopId = currentThread.getId();
@@ -751,7 +754,7 @@ public class Meter extends MeterData implements Closeable {
      * context to log using trace level.
      *
      * @param flow A token, enum or exception that describes the successful
-     * flow.
+     * pathId.
      * @return reference to the meter itself.
      */
     public Meter ok(Object flow) {
@@ -768,16 +771,18 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            result = Result.OK;
+            failClass = null;
+            failMessage = null;
+            rejectId = null;
             localThreadInstance.set(previousInstance);
             if (flow instanceof String) {
-                this.flow = (String) flow;
+                this.pathId = (String) flow;
             } else if (flow instanceof Enum) {
-                this.flow = ((Enum<?>) flow).name();
+                this.pathId = ((Enum<?>) flow).name();
             } else if (flow instanceof Throwable) {
-                this.flow = flow.getClass().getSimpleName();
+                this.pathId = flow.getClass().getSimpleName();
             } else if (flow != null) {
-                this.flow = flow.toString();
+                this.pathId = flow.toString();
             } else {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
@@ -839,16 +844,18 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            result = Result.REJECT;
+            failClass = null;
+            failMessage = null;
+            pathId = null;
             localThreadInstance.set(previousInstance);
             if (cause instanceof String) {
-                this.rejection = (String) cause;
+                this.rejectId = (String) cause;
             } else if (cause instanceof Enum) {
-                this.rejection = ((Enum<?>) cause).name();
+                this.rejectId = ((Enum<?>) cause).name();
             } else if (cause instanceof Throwable) {
-                this.rejection = cause.getClass().getSimpleName();
+                this.rejectId = cause.getClass().getSimpleName();
             } else if (cause != null) {
-                this.rejection = cause.toString();
+                this.rejectId = cause.toString();
             } else {
                 logger.error(Slf4JMarkers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
@@ -901,14 +908,15 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            result = Result.FAIL;
+            rejectId = null;
+            pathId = null;
             localThreadInstance.set(previousInstance);
             if (cause instanceof TryWithResourcesFailed) {
-                exceptionClass = null;
-                exceptionMessage = "try-with-resources";
+                failClass = null;
+                failMessage = "try-with-resources";
             } else if (cause != null) {
-                exceptionClass = cause.getClass().getName();
-                exceptionMessage = cause.getLocalizedMessage();
+                failClass = cause.getClass().getName();
+                failMessage = cause.getLocalizedMessage();
             } else {
                 logger.error(Slf4JMarkers.INCONSISTENT_FAIL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
@@ -950,6 +958,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     public static class MeterThrowable extends Throwable {
+
         private static final long serialVersionUID = 1L;
 
         MeterThrowable(final int framesToDiscard) {
@@ -978,6 +987,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     public static class IllegalMeterUsage extends MeterThrowable {
+
         private static final long serialVersionUID = 1L;
 
         IllegalMeterUsage(int framesToDiscard) {
@@ -990,6 +1000,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     public static class TryWithResourcesFailed extends MeterThrowable {
+
         private static final long serialVersionUID = 1L;
 
         TryWithResourcesFailed(int framesToDiscard) {

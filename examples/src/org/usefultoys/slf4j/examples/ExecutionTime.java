@@ -26,7 +26,7 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  *
  * @author daniel
  */
-public class MeasureExecutionTime {
+public class ExecutionTime {
 
     static {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");

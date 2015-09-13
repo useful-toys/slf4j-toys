@@ -51,9 +51,9 @@ public class MeterMessageMisuseTest {
         m.ok();
         m.ok();
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -79,9 +79,9 @@ public class MeterMessageMisuseTest {
         m.ok();
         m.ok("OK");
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -107,9 +107,9 @@ public class MeterMessageMisuseTest {
         m.ok();
         m.reject("REJ");
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertTrue(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertTrue(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -135,9 +135,9 @@ public class MeterMessageMisuseTest {
         m.ok();
         m.fail(new IllegalStateException());
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertTrue(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertTrue(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -163,9 +163,9 @@ public class MeterMessageMisuseTest {
         m.ok("OK");
         m.ok();
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -191,9 +191,9 @@ public class MeterMessageMisuseTest {
         m.ok("OK");
         m.ok("OK");
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -219,9 +219,9 @@ public class MeterMessageMisuseTest {
         m.ok("OK");
         m.reject("REJ");
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertTrue(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertTrue(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -247,9 +247,9 @@ public class MeterMessageMisuseTest {
         m.ok("OK");
         m.fail(new IllegalStateException());
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertTrue(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertTrue(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -275,9 +275,9 @@ public class MeterMessageMisuseTest {
         m.reject("REJ");
         m.ok();
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -303,9 +303,9 @@ public class MeterMessageMisuseTest {
         m.reject("REJ");
         m.ok("OK");
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -331,9 +331,9 @@ public class MeterMessageMisuseTest {
         m.reject("REJ");
         m.reject("REJ");
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertTrue(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertTrue(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -359,9 +359,9 @@ public class MeterMessageMisuseTest {
         m.reject("REJ");
         m.fail(new IllegalStateException());
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertTrue(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertTrue(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -387,9 +387,9 @@ public class MeterMessageMisuseTest {
         m.fail(new IllegalStateException());
         m.ok();
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -415,9 +415,9 @@ public class MeterMessageMisuseTest {
         m.fail(new IllegalStateException());
         m.ok("OK");
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -443,9 +443,9 @@ public class MeterMessageMisuseTest {
         m.fail(new IllegalStateException());
         m.reject("REJ");
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertTrue(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertTrue(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -471,9 +471,9 @@ public class MeterMessageMisuseTest {
         m.fail(new IllegalStateException());
         m.fail(new IllegalStateException());
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertTrue(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertTrue(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
@@ -497,9 +497,9 @@ public class MeterMessageMisuseTest {
     public void testMeterStoppedButNotStarted1() {
         final Meter m = new Meter(logger).m(title).ok();
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(3, logger.getEventCount());
         final TestLoggerEvent stopEvent = logger.getEvent(1);
@@ -515,9 +515,9 @@ public class MeterMessageMisuseTest {
     public void testMeterStoppedButNotStarted2() {
         final Meter m = new Meter(logger).m(title).ok("ok");
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(3, logger.getEventCount());
         final TestLoggerEvent stopEvent = logger.getEvent(1);
@@ -533,9 +533,9 @@ public class MeterMessageMisuseTest {
     public void testMeterStoppedButNotStarted3() {
         final Meter m = new Meter(logger).m(title).reject("bad");
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertTrue(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertTrue(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(3, logger.getEventCount());
         final TestLoggerEvent stopEvent = logger.getEvent(1);
@@ -551,9 +551,9 @@ public class MeterMessageMisuseTest {
     public void testMeterStoppedButNotStarted4() {
         final Meter m = new Meter(logger).m(title).fail(new IllegalStateException());
 
-        Assert.assertFalse(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertTrue(m.isFailure());
+        Assert.assertFalse(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertTrue(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(3, logger.getEventCount());
         final TestLoggerEvent stopEvent = logger.getEvent(1);
@@ -569,9 +569,9 @@ public class MeterMessageMisuseTest {
     public void testMeterAlreadyStarted() {
         final Meter m = new Meter(logger).m(title).start().start().ok();
 
-        Assert.assertTrue(m.isSuccess());
-        Assert.assertFalse(m.isRejection());
-        Assert.assertFalse(m.isFailure());
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
         Assert.assertFalse(m.isSlow());
         Assert.assertEquals(7, logger.getEventCount());
         final TestLoggerEvent startEvent1 = logger.getEvent(0);

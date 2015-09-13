@@ -36,26 +36,18 @@ public class MeterData extends SystemData {
         super();
     }
     
-    public static enum Result {
-    	OK, REJECT, FAIL
-    }
-    
-    /**
-     * Execution result.
-     */
-    protected Result result;
     /**
      * An arbitrary short, human readable message to describe the task being measured.
      */
     protected String description = null;
     /**
-     * For successful execution, the string token that identifies the execution flow.
+     * For successful execution, the string token that identifies the execution pathId.
      */
-    protected String flow;
+    protected String pathId;
     /**
      * For rejected execution, the string token that identifies the rejection cause.
      */
-    protected String rejection;
+    protected String rejectId;
     /**
      * When the job was created/scheduled.
      */
@@ -79,11 +71,11 @@ public class MeterData extends SystemData {
     /**
      * For failure result, the exception class that caused the failure.
      */
-    protected String exceptionClass = null;
+    protected String failClass = null;
     /**
      * For failure result, the exception message that caused the failure.
      */
-    protected String exceptionMessage = null;
+    protected String failMessage = null;
     /**
      * Time considered reasonable for successful execution.
      */
@@ -114,12 +106,12 @@ public class MeterData extends SystemData {
         return description;
     }
 
-    public String getFlow() {
-		return flow;
+    public String getPathId() {
+		return pathId;
 	}
     
-    public String getRejection() {
-		return rejection;
+    public String getRejectId() {
+		return rejectId;
 	}
     
     public long getCreateTime() {
@@ -138,32 +130,36 @@ public class MeterData extends SystemData {
         return iteration;
     }
 
-    public long getExpectedIteration() {
+    public long getExpectedIterations() {
         return expectedIterations;
     }
 
     public String getExceptionClass() {
-        return exceptionClass;
+        return failClass;
     }
 
     public String getExceptionMessage() {
-        return exceptionMessage;
+        return failMessage;
+    }
+
+    public boolean isStarted() {
+        return startTime != 0;
+    }
+    
+    public boolean isStopped() {
+        return stopTime != 0;
     }
 
     public boolean isOK() {
-        return result == Result.OK;
+        return (stopTime != 0) && (failClass == null && rejectId == null);
     }
 
-    public boolean isSuccess() {
-        return result == Result.OK;
+    public boolean isReject() {
+        return (stopTime != 0) && (rejectId != null);
     }
 
-    public boolean isRejection() {
-        return result == Result.REJECT;
-    }
-
-    public boolean isFailure() {
-        return result == Result.FAIL;
+    public boolean isFail() {
+        return (stopTime != 0) && (failClass != null);
     }
 
     public long getTimeLimitNanoseconds() {
@@ -196,17 +192,16 @@ public class MeterData extends SystemData {
     @Override
     protected void resetImpl() {
         super.resetImpl();
-        this.result = null;
         this.description = null;
-        this.flow = null;
-        this.rejection = null;
+        this.pathId = null;
+        this.rejectId = null;
         this.createTime = 0;
         this.startTime = 0;
         this.stopTime = 0;
         this.iteration = 0;
         this.expectedIterations = 0;
-        this.exceptionClass = null;
-        this.exceptionMessage = null;
+        this.failClass = null;
+        this.failMessage = null;
         this.timeLimitNanoseconds = 0;
         this.threadStartId = 0;
         this.threadStopId = 0;
@@ -218,16 +213,13 @@ public class MeterData extends SystemData {
     @Override
     protected boolean isCompletelyEqualsImpl(final EventData obj) {
         final MeterData other = (MeterData) obj;
-        if ((this.result == null) ? (other.result != null) : !this.result.equals(other.result)) {
-            return false;
-        }
         if ((this.description == null) ? (other.description != null) : !this.description.equals(other.description)) {
             return false;
         }
-        if ((this.flow == null) ? (other.flow != null) : !this.flow.equals(other.flow)) {
+        if ((this.pathId == null) ? (other.pathId != null) : !this.pathId.equals(other.pathId)) {
             return false;
         }
-        if ((this.rejection == null) ? (other.rejection != null) : !this.rejection.equals(other.rejection)) {
+        if ((this.rejectId == null) ? (other.rejectId != null) : !this.rejectId.equals(other.rejectId)) {
             return false;
         }
         if (this.createTime != other.createTime) {
@@ -245,10 +237,10 @@ public class MeterData extends SystemData {
         if (this.expectedIterations != other.expectedIterations) {
             return false;
         }
-        if ((this.exceptionClass == null) ? (other.exceptionClass != null) : !this.exceptionClass.equals(other.exceptionClass)) {
+        if ((this.failClass == null) ? (other.failClass != null) : !this.failClass.equals(other.failClass)) {
             return false;
         }
-        if ((this.exceptionMessage == null) ? (other.exceptionMessage != null) : !this.exceptionMessage.equals(other.exceptionMessage)) {
+        if ((this.failMessage == null) ? (other.failMessage != null) : !this.failMessage.equals(other.failMessage)) {
             return false;
         }
         if (this.timeLimitNanoseconds != other.timeLimitNanoseconds) {
@@ -281,30 +273,30 @@ public class MeterData extends SystemData {
                 } else {
                     buffer.append("OK");
                 }
-                if (flow != null) {
+                if (pathId != null) {
                     buffer.append(" [");
-                    buffer.append(flow);
+                    buffer.append(pathId);
                     buffer.append(']');
                 }
-            } else if (isRejection()) {
+            } else if (isReject()) {
                     buffer.append("REJECT");
-                    if (rejection != null) {
+                    if (rejectId != null) {
                         buffer.append(" [");
-                        buffer.append(rejection);
+                        buffer.append(rejectId);
                         buffer.append(']');
                     }
             } else {
                 buffer.append("FAIL");
-                if (exceptionClass != null || exceptionMessage != null) {
+                if (failClass != null || failMessage != null) {
                     buffer.append(" [");
-                    if (exceptionClass != null) {
-                    	buffer.append(exceptionClass);
+                    if (failClass != null) {
+                    	buffer.append(failClass);
                     }
-                    if (exceptionClass != null && exceptionMessage != null) {
+                    if (failClass != null && failMessage != null) {
                         buffer.append("; ");                    	
                     }
-                    if (exceptionMessage != null) {
-                    	buffer.append(exceptionMessage);
+                    if (failMessage != null) {
+                    	buffer.append(failMessage);
                     }
                     buffer.append(']');
                 }
@@ -399,32 +391,31 @@ public class MeterData extends SystemData {
     }
 
     protected static final String PROP_DESCRIPTION = "d";
-    protected static final String PROP_RESULT = "r";
-    protected static final String PROP_FLOW = "rf";
-    protected static final String PROP_REJECTION= "rr";
+    protected static final String PROP_PATH_ID = "p";
+    protected static final String PROP_REJECT_ID= "r";
+    protected static final String PROP_FAIL_ID = "f";
     protected static final String PROP_CREATE_TIME = "t0";
     protected static final String PROP_START_TIME = "t1";
     protected static final String PROP_STOP_TIME = "t2";
     protected static final String PROP_ITERATION = "i";
     protected static final String PROP_EXPECTED_ITERATION = "ei";
-    protected static final String PROP_EXCEPTION = "re";
     protected static final String PROP_LIMIT_TIME = "tl";
     protected static final String PROP_THREAD = "th";
     protected static final String PROP_CONTEXT = "ctx";
 
     @Override
     public void writePropertiesImpl(final EventWriter w) {
-        if (this.result != null) {
-        	w.property(PROP_RESULT, this.result);
-        }
         if (this.description != null) {
             w.property(PROP_DESCRIPTION, this.description);
         }
-        if (this.rejection != null) {
-            w.property(PROP_REJECTION, this.rejection);
+        if (this.rejectId != null) {
+            w.property(PROP_REJECT_ID, this.rejectId);
         }
-        if (this.flow != null) {
-            w.property(PROP_FLOW, this.flow);
+        if (this.pathId != null) {
+            w.property(PROP_PATH_ID, this.pathId);
+        }
+        if (this.failClass != null) {
+            w.property(PROP_FAIL_ID, this.failClass, this.failMessage != null ? this.failMessage : "");
         }
 
         /* Create, start, stop time. */
@@ -444,10 +435,6 @@ public class MeterData extends SystemData {
             w.property(PROP_EXPECTED_ITERATION, this.expectedIterations);
         }
 
-        /* Exception and cause */
-        if (this.exceptionClass != null) {
-            w.property(PROP_EXCEPTION, this.exceptionClass, this.exceptionMessage != null ? this.exceptionMessage : "");
-        }
 
         if (this.timeLimitNanoseconds != 0) {
             w.property(PROP_LIMIT_TIME, timeLimitNanoseconds);
@@ -475,6 +462,16 @@ public class MeterData extends SystemData {
         if (PROP_DESCRIPTION.equals(propertyName)) {
             this.description = r.readString();
             return true;
+        } else if (PROP_FAIL_ID.equals(propertyName)) {
+            this.failClass = r.readString();
+            this.failMessage = r.readString();
+            return true;
+        } else if (PROP_REJECT_ID.equals(propertyName)) {
+            this.rejectId = r.readString();
+            return true;
+        } else if (PROP_PATH_ID.equals(propertyName)) {
+            this.pathId = r.readString();
+            return true;
         } else if (PROP_CREATE_TIME.equals(propertyName)) {
             this.createTime = r.readLong();
             return true;
@@ -486,19 +483,6 @@ public class MeterData extends SystemData {
             return true;
         } else if (PROP_ITERATION.equals(propertyName)) {
             this.iteration = r.readLong();
-            return true;
-        } else if (PROP_EXCEPTION.equals(propertyName)) {
-            this.exceptionClass = r.readString();
-            this.exceptionMessage = r.readString();
-            return true;
-        } else if (PROP_RESULT.equals(propertyName)) {
-            this.result = r.readEnum(Result.class);
-            return true;
-        } else if (PROP_REJECTION.equals(propertyName)) {
-            this.rejection = r.readString();
-            return true;
-        } else if (PROP_FLOW.equals(propertyName)) {
-            this.flow = r.readString();
             return true;
         } else if (PROP_LIMIT_TIME.equals(propertyName)) {
             this.timeLimitNanoseconds = r.readLong();
