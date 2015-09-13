@@ -138,6 +138,19 @@ public abstract class SystemData extends EventData {
         return true;
     }
 
+    private static final boolean hasSunOperatingSystemMXBean;
+
+    static {
+        boolean tmpHasSunOperatingSystemMXBean = false;
+        try {
+            Class.forName("com.sun.management.OperatingSystemMXBean");
+            tmpHasSunOperatingSystemMXBean = true;
+        } catch (ClassNotFoundException e) {
+            // ignora
+        }
+        hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
+    }
+
     protected void collectSystemStatus() {
         final Runtime runtime = Runtime.getRuntime();
         runtime_totalMemory = runtime.totalMemory();
@@ -175,8 +188,19 @@ public abstract class SystemData extends EventData {
                 garbageCollector_time += garbageCollector.getCollectionTime();
             }
 
-            final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-            systemLoad = os.getSystemLoadAverage();
+            if (hasSunOperatingSystemMXBean) {
+                com.sun.management.OperatingSystemMXBean os = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class);
+                final double systemLoadAverage = os.getSystemCpuLoad();
+                if (systemLoadAverage > 0) {
+                    systemLoad = systemLoadAverage;
+                }
+            } else {
+                final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
+                final double systemLoadAverage = os.getSystemLoadAverage();
+                if (systemLoadAverage > 0) {
+                    systemLoad = systemLoadAverage;
+                }
+            }
         }
     }
     static final String PROP_MEMORY = "m";

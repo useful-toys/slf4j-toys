@@ -15,7 +15,6 @@
  */
 package org.usefultoys.slf4j.examples;
 
-import java.util.Random;
 import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -30,9 +29,40 @@ public class ExecutionTime {
 
     static {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+        System.setProperty("profiler.useManagementFactory", "true");
     }
 
     public static void main(final String argv[]) {
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int i = Integer.MIN_VALUE;
+                while (! Thread.interrupted()) {
+                    i++;
+                }
+            }
+        });
+        t1.setDaemon(true);
+        t1.start();
+        
+        Thread t2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int i = Integer.MIN_VALUE;
+                while (! Thread.interrupted()) {
+                    i++;
+                }
+            }
+        });
+        t2.setDaemon(true);
+        t2.start();
+        
+        try {
+            Thread.sleep(3000L);
+        } catch (InterruptedException ex) {
+            java.util.logging.Logger.getLogger(ExecutionTime.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         example1();
         try {
             example2();

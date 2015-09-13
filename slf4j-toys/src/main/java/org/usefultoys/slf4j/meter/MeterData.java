@@ -346,6 +346,11 @@ public class MeterData extends SystemData {
             buffer.append("; ");
             buffer.append(UnitFormatter.bytes(this.runtime_usedMemory));
         }
+        if (this.systemLoad > 0) {
+            buffer.append("; ");
+            buffer.append(Math.round(this.systemLoad * 100));
+            buffer.append("%");
+        }
         if (context != null) {
             for (final Entry<String, String> entry : context.entrySet()) {
                 buffer.append("; ");
