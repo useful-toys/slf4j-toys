@@ -558,7 +558,8 @@ public class Meter extends MeterData implements Closeable {
             this.lastProgressTime = this.startTime = System.nanoTime();
 
             if (logger.isDebugEnabled()) {
-                collectSystemStatus();
+                collectRuntimeStatus();
+                collectPlatformStatus();
                 logger.debug(Slf4JMarkers.MSG_START, readableString(new StringBuilder()).toString());
                 if (logger.isTraceEnabled()) {
                     logger.trace(Slf4JMarkers.DATA_START, write(new StringBuilder(), 'M').toString());
@@ -659,7 +660,8 @@ public class Meter extends MeterData implements Closeable {
                 lastProgressTime = now;
 
                 if (logger.isInfoEnabled()) {
-                    collectSystemStatus();
+                    collectRuntimeStatus();
+                    collectPlatformStatus();
                     logger.info(Slf4JMarkers.MSG_PROGRESS, readableString(new StringBuilder()).toString());
                     if (logger.isTraceEnabled()) {
                         if (startTime != 0 && timeLimitNanoseconds != 0 && (now - startTime) > timeLimitNanoseconds) {
@@ -713,9 +715,9 @@ public class Meter extends MeterData implements Closeable {
 //            final Thread currentThread = Thread.currentThread();
 //            this.threadStopId = currentThread.getId();
 //            this.threadStopName = currentThread.getName();
-
             if (logger.isWarnEnabled()) {
-                collectSystemStatus();
+                collectRuntimeStatus();
+                collectPlatformStatus();
 
                 final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
                 if (warnSlowness) {
@@ -791,9 +793,9 @@ public class Meter extends MeterData implements Closeable {
 //            final Thread currentThread = Thread.currentThread();
 //            this.threadStopId = currentThread.getId();
 //            this.threadStopName = currentThread.getName();
-
             if (logger.isWarnEnabled()) {
-                collectSystemStatus();
+                collectRuntimeStatus();
+                collectPlatformStatus();
 
                 final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
                 if (warnSlowness) {
@@ -863,9 +865,9 @@ public class Meter extends MeterData implements Closeable {
 //            final Thread currentThread = Thread.currentThread();
 //            this.threadStopId = currentThread.getId();
 //            this.threadStopName = currentThread.getName();
-
             if (logger.isInfoEnabled()) {
-                collectSystemStatus();
+                collectRuntimeStatus();
+                collectPlatformStatus();
                 if (logger.isInfoEnabled()) {
                     logger.info(Slf4JMarkers.MSG_REJECT, readableString(new StringBuilder()).toString());
                 }
@@ -924,9 +926,9 @@ public class Meter extends MeterData implements Closeable {
 //            final Thread currentThread = Thread.currentThread();
 //            this.threadStopId = currentThread.getId();
 //            this.threadStopName = currentThread.getName();
-
             if (logger.isErrorEnabled()) {
-                collectSystemStatus();
+                collectRuntimeStatus();
+                collectPlatformStatus();
                 logger.error(Slf4JMarkers.MSG_FAIL, readableString(new StringBuilder()).toString(), cause);
                 if (logger.isTraceEnabled()) {
                     logger.trace(Slf4JMarkers.DATA_FAIL, write(new StringBuilder(), 'M').toString());

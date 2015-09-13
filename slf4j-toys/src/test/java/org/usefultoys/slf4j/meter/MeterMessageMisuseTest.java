@@ -620,7 +620,12 @@ public class MeterMessageMisuseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void collectSystemStatus() {
+            protected void collectManagedBeanStatus() {
+                throw new RuntimeException();
+            }
+
+            @Override
+            protected void collectRuntimeStatus() {
                 throw new RuntimeException();
             }
         };

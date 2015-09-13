@@ -42,7 +42,9 @@ public class Watcher extends WatcherData implements Runnable {
         eventPosition++;
 
         if (logger.isInfoEnabled()) {
-            collectSystemStatus();
+            collectRuntimeStatus();
+            collectPlatformStatus();
+            collectManagedBeanStatus();
             logger.info(readableString(new StringBuilder()).toString());
         }
         if (logger.isTraceEnabled()) {

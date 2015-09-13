@@ -40,6 +40,7 @@ public abstract class SystemData extends EventData {
     protected SystemData() {
         super();
     }
+
     protected long heap_commited = 0;
     protected long heap_max = 0;
     protected long heap_used = 0;
@@ -151,13 +152,34 @@ public abstract class SystemData extends EventData {
         hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
     }
 
-    protected void collectSystemStatus() {
+    protected void collectRuntimeStatus() {
         final Runtime runtime = Runtime.getRuntime();
         runtime_totalMemory = runtime.totalMemory();
         runtime_usedMemory = runtime_totalMemory - runtime.freeMemory();
         runtime_maxMemory = runtime.maxMemory();
+    }
 
-        if (ProfilingSession.useManagementFactory) {
+    protected void collectPlatformStatus() {
+        if (!ProfilingSession.usePlatformManagedBean) {
+            return;
+        }
+        if (hasSunOperatingSystemMXBean) {
+            com.sun.management.OperatingSystemMXBean os = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class);
+            final double systemLoadAverage = os.getSystemCpuLoad();
+            if (systemLoadAverage > 0) {
+                systemLoad = systemLoadAverage;
+            }
+        } else {
+            final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
+            final double systemLoadAverage = os.getSystemLoadAverage();
+            if (systemLoadAverage > 0) {
+                systemLoad = systemLoadAverage;
+            }
+        }
+    }
+
+    protected void collectManagedBeanStatus() {
+        if (ProfilingSession.useMemoryManagedBean) {
             final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
             final MemoryUsage heapUsage = memory.getHeapMemoryUsage();
             heap_commited = heapUsage.getCommitted();
@@ -168,41 +190,32 @@ public abstract class SystemData extends EventData {
             nonHeap_commited = nonHeapUsage.getCommitted();
             nonHeap_max = nonHeapUsage.getMax();
             nonHeap_used = nonHeapUsage.getUsed();
-
             objectPendingFinalizationCount = memory.getObjectPendingFinalizationCount();
+        }
 
+        if (ProfilingSession.useClassLoadingManagedBean) {
             final ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
             classLoading_loaded = classLoading.getLoadedClassCount();
             classLoading_total = classLoading.getTotalLoadedClassCount();
             classLoading_unloaded = classLoading.getUnloadedClassCount();
+        }
 
+        if (ProfilingSession.useCompilationManagedBean) {
             final CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
             compilationTime = compilation.getTotalCompilationTime();
+        }
 
+        if (ProfilingSession.useGarbageCollectionManagedBean) {
             final List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
-
             garbageCollector_count = 0;
             garbageCollector_time = 0;
             for (final GarbageCollectorMXBean garbageCollector : garbageCollectors) {
                 garbageCollector_count += garbageCollector.getCollectionCount();
                 garbageCollector_time += garbageCollector.getCollectionTime();
             }
-
-            if (hasSunOperatingSystemMXBean) {
-                com.sun.management.OperatingSystemMXBean os = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class);
-                final double systemLoadAverage = os.getSystemCpuLoad();
-                if (systemLoadAverage > 0) {
-                    systemLoad = systemLoadAverage;
-                }
-            } else {
-                final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-                final double systemLoadAverage = os.getSystemLoadAverage();
-                if (systemLoadAverage > 0) {
-                    systemLoad = systemLoadAverage;
-                }
-            }
         }
     }
+
     static final String PROP_MEMORY = "m";
     static final String PROP_HEAP = "h";
     static final String PROP_NON_HEAP = "nh";

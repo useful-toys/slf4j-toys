@@ -36,7 +36,11 @@ public final class ProfilingSession {
     }
 
     public static final String uuid = UUID.randomUUID().toString().replace("-", "");
-    public static boolean useManagementFactory = getProperty("profiler.useManagementFactory", false);
+    public static boolean useMemoryManagedBean = getProperty("profiler.useMemoryManagedBean", false);
+    public static boolean useClassLoadingManagedBean = getProperty("profiler.useClassLoadingManagedBean", false);
+    public static boolean useCompilationManagedBean = getProperty("profiler.useCompilationManagedBean", false);
+    public static boolean useGarbageCollectionManagedBean = getProperty("profiler.useGarbageCollectionManagedBean", false);
+    public static boolean usePlatformManagedBean = getProperty("profiler.usePlatformManagedBean", false);
     private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> scheduledWatcher;
 

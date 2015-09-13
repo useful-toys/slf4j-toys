@@ -29,7 +29,7 @@ public class ExecutionTime {
 
     static {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-        System.setProperty("profiler.useManagementFactory", "true");
+        System.setProperty("profiler.usePlatformManagedBean", "true");
     }
 
     public static void main(final String argv[]) {
