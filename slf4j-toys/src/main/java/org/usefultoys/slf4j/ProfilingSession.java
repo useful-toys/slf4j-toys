@@ -48,6 +48,7 @@ public final class ProfilingSession {
         if (scheduledWatcher == null) {
             final Watcher watcher = new Watcher(LoggerFactory.getLogger(getProperty("watcher.name", "watcher")));
             scheduledWatcher = executor.scheduleAtFixedRate(watcher, readWatcherDelayMillisecondsProperty(), readWatcherPeriodMillisecondsProperty(), TimeUnit.MILLISECONDS);
+            watcher.systemReport();
         }
     }
 

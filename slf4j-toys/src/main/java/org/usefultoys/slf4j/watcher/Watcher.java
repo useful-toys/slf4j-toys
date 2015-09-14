@@ -15,8 +15,12 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import java.io.File;
+import java.io.PrintStream;
 import org.slf4j.Logger;
+import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.ProfilingSession;
+import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
  *
@@ -50,5 +54,35 @@ public class Watcher extends WatcherData implements Runnable {
         if (logger.isTraceEnabled()) {
             logger.trace(Slf4JMarkers.WATCHER, write(new StringBuilder(), 'W').toString());
         }
+    }
+
+    public void systemReport() {
+        PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+        final Runtime runtime = Runtime.getRuntime();
+        ps.println("System report:");
+        ps.println();
+
+        ps.println("Number of processors available to the JVM (cores): " + runtime.availableProcessors());
+        ps.println();
+
+        ps.println("Memory:");
+        long maxMemory = runtime.maxMemory();
+        final long totalMemory = runtime.totalMemory();
+        final long freeMemory = runtime.freeMemory();
+        ps.println(" - Maximum allowed (bytes): " + (maxMemory == Long.MAX_VALUE ? "no limit" : UnitFormatter.bytes(maxMemory)));
+        ps.println(" - Currently allocated (bytes): " + UnitFormatter.bytes(totalMemory));
+        ps.println("    - used (bytes): " + UnitFormatter.bytes(totalMemory - freeMemory));
+        ps.println("    - free (bytes): " + UnitFormatter.bytes(freeMemory));
+        ps.println();
+
+        File[] roots = File.listRoots();
+        for (File root : roots) {
+            ps.println("File system root: " + root.getAbsolutePath());
+            ps.println(" - Total space (bytes): " + UnitFormatter.bytes(root.getTotalSpace()));
+            ps.println(" - Currently free space (bytes): " + UnitFormatter.bytes(root.getFreeSpace()));
+            ps.println("    - usable (bytes): " + UnitFormatter.bytes(root.getUsableSpace()));
+            ps.println();
+        }
+        ps.close();
     }
 }

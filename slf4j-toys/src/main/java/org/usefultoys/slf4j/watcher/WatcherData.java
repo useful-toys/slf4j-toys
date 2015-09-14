@@ -32,15 +32,26 @@ public class WatcherData extends SystemData {
 
     @Override
     public StringBuilder readableString(final StringBuilder builder) {
+        boolean hasPrevious = false;
         if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
+            if (hasPrevious) {
+                builder.append("; ");
+            }
             builder.append("Memory: ");
             builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
             builder.append(' ');
             builder.append(UnitFormatter.bytes(this.runtime_totalMemory));
             builder.append(' ');
             builder.append(UnitFormatter.bytes(this.runtime_maxMemory));
-        } else {
-            builder.append("No memory status.");
+            hasPrevious = true;
+        }
+        if (this.systemLoad > 0) {
+            if (hasPrevious) {
+                builder.append("; ");
+            }
+            builder.append("System load: ");
+            builder.append(Math.round(this.systemLoad * 100));
+            hasPrevious = true;
         }
         return builder;
     }
