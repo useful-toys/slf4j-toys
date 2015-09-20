@@ -15,17 +15,22 @@
  */
 package org.usefultoys.slf4j;
 
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
 
 import org.usefultoys.slf4j.watcher.Watcher;
 
 /**
- * Profiling session for the current JVM. Stores the UUID logged on each message on the current JVM. Keeps the timer
- * calls the watcher periodically.
+ * Profiling session for the current JVM. Stores the UUID logged on each message
+ * on the current JVM. Keeps the timer calls the watcher periodically.
  *
  * @author Daniel Felix Ferber
  */
@@ -48,7 +53,6 @@ public final class ProfilingSession {
         if (scheduledWatcher == null) {
             final Watcher watcher = new Watcher(LoggerFactory.getLogger(getProperty("watcher.name", "watcher")));
             scheduledWatcher = executor.scheduleAtFixedRate(watcher, readWatcherDelayMillisecondsProperty(), readWatcherPeriodMillisecondsProperty(), TimeUnit.MILLISECONDS);
-            watcher.systemReport();
         }
     }
 
@@ -68,6 +72,26 @@ public final class ProfilingSession {
         if (executor != null) {
             executor.shutdownNow();
             executor = null;
+        }
+    }
+
+    public static void logResourcesReport() {
+        final Logger logger = LoggerFactory.getLogger(getProperty("report.name", "report"));
+        final Report report = new Report(logger);
+        executor.execute(report.new ReportPhysicalSystem());
+        executor.execute(report.new ReportOperatingSystem());
+        executor.execute(report.new ReportVM());
+        executor.execute(report.new ReportFileSystem());
+        executor.execute(report.new ReportMemory());
+        executor.execute(report.new ReportUser());
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface nif = interfaces.nextElement();
+                executor.execute(report.new ReportNetworkInterface(nif));
+            }
+        } catch (SocketException e) {
+            logger.warn("Cannot report interfaces", e);
         }
     }
 

@@ -26,24 +26,25 @@ public class WatcherDemo {
 
         ProfilingSession.startExecutor();
         ProfilingSession.startWatcher();
+        ProfilingSession.logResourcesReport();
 
         Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {
                 int i = Integer.MIN_VALUE;
-                while (! Thread.interrupted()) {
+                while (!Thread.interrupted()) {
                     i++;
                 }
             }
         });
         t1.setDaemon(true);
         t1.start();
-        
+
         Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
                 int i = Integer.MIN_VALUE;
-                while (! Thread.interrupted()) {
+                while (!Thread.interrupted()) {
                     i++;
                 }
             }
@@ -75,7 +76,7 @@ public class WatcherDemo {
         final Meter m = MeterFactory.getMeter("iteration").m("Execute 1000 iterations").start();
         try {
             for (int i = 0; i < 1000; i++) {
-                Thread.sleep(500+random.nextInt(500));
+                Thread.sleep(500 + random.nextInt(500));
 //                m.inc().progress();
             }
             m.ok();
