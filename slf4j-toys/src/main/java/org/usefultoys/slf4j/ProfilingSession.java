@@ -19,7 +19,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.UUID;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -46,6 +45,16 @@ public final class ProfilingSession {
     public static boolean useCompilationManagedBean = getProperty("profiler.useCompilationManagedBean", false);
     public static boolean useGarbageCollectionManagedBean = getProperty("profiler.useGarbageCollectionManagedBean", false);
     public static boolean usePlatformManagedBean = getProperty("profiler.usePlatformManagedBean", false);
+    public static boolean reportVM = getProperty("report.VM", true);
+    public static boolean reportFileSystem = getProperty("report.FileSystem", false);
+    public static boolean reportMemory = getProperty("report.Memory", true);
+    public static boolean reportUser = getProperty("report.User", true);
+    public static boolean reportPhysicalSystem = getProperty("report.PhysicalSystem", true);
+    public static boolean reportOperatingSystem = getProperty("report.OperatingSystem", true);
+    public static boolean reportCalendar = getProperty("report.Calendar", true);
+    public static boolean reportLocale = getProperty("report.Locale", true);
+    public static boolean reportNetworkInterface = getProperty("report.NetworkInterface", false);
+
     private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> scheduledWatcher;
 
@@ -75,23 +84,43 @@ public final class ProfilingSession {
         }
     }
 
-    public static void logResourcesReport() {
+    public static void logReport() {
         final Logger logger = LoggerFactory.getLogger(getProperty("report.name", "report"));
         final Report report = new Report(logger);
-        executor.execute(report.new ReportPhysicalSystem());
-        executor.execute(report.new ReportOperatingSystem());
-        executor.execute(report.new ReportVM());
-        executor.execute(report.new ReportFileSystem());
-        executor.execute(report.new ReportMemory());
-        executor.execute(report.new ReportUser());
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface nif = interfaces.nextElement();
-                executor.execute(report.new ReportNetworkInterface(nif));
+        if (reportPhysicalSystem) {
+            executor.execute(report.new ReportPhysicalSystem());
+        }
+        if (reportOperatingSystem) {
+            executor.execute(report.new ReportOperatingSystem());
+        }
+        if (reportUser) {
+            executor.execute(report.new ReportUser());
+        }
+        if (reportVM) {
+            executor.execute(report.new ReportVM());
+        }
+        if (reportMemory) {
+            executor.execute(report.new ReportMemory());
+        }
+        if (reportFileSystem) {
+            executor.execute(report.new ReportFileSystem());
+        }
+        if (reportCalendar) {
+            executor.execute(report.new ReportCalendar());
+        }
+        if (reportLocale) {
+            executor.execute(report.new ReportLocale());
+        }
+        if (reportNetworkInterface) {
+            try {
+                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface nif = interfaces.nextElement();
+                    executor.execute(report.new ReportNetworkInterface(nif));
+                }
+            } catch (SocketException e) {
+                logger.warn("Cannot report interfaces", e);
             }
-        } catch (SocketException e) {
-            logger.warn("Cannot report interfaces", e);
         }
     }
 

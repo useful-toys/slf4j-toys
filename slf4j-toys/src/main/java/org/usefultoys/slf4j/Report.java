@@ -23,7 +23,12 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.Locale;
+import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
@@ -125,9 +130,58 @@ public class Report implements Serializable {
             ps.println(" - architecture: " + System.getProperty("os.arch"));
             ps.println(" - name: " + System.getProperty("os.name"));
             ps.println(" - version: " + System.getProperty("os.version"));
-            ps.println(" - file separator: " + System.getProperty("file.separator"));
-            ps.println(" - path separator: " + System.getProperty("path.separator"));
-            ps.println(" - line separator: " + System.getProperty("line.separator"));
+            ps.println(" - file separator: " + Integer.toHexString(System.getProperty("file.separator").charAt(0)));
+            ps.println(" - path separator: " + Integer.toHexString(System.getProperty("path.separator").charAt(0)));
+            ps.println(" - line separator: " + Integer.toHexString(System.getProperty("line.separator").charAt(0)));
+            ps.close();
+        }
+    }
+
+    public class ReportCalendar implements Runnable {
+
+        @Override
+        public void run() {
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            ps.println("Calendar");
+            ps.print(" - current date/time: " + SimpleDateFormat.getDateTimeInstance().format(new Date()));
+            final TimeZone tz = TimeZone.getDefault();
+            ps.print(" - default timezone: " + tz.getDisplayName());
+            ps.print(" (" + tz.getID() + ")");
+            ps.print("; DST=" + tz.getDSTSavings() / 60000 + "min");
+            ps.print("; observesDT=" + tz.observesDaylightTime());
+            ps.print("; useDT=" + tz.useDaylightTime());
+            ps.print("; inDT=" + tz.inDaylightTime(new Date()));
+            ps.print("; offset=" + tz.getRawOffset() / 60000 + "min");
+            ps.println();
+            ps.print(" - available IDs:");
+            int i = 1;
+            for (String id : TimeZone.getAvailableIDs()) {
+                if (i++ % 5 ==0) ps.print("\n      ");
+                ps.print(id + "; ");
+            }
+            ps.close();
+        }
+    }
+
+    public class ReportLocale implements Runnable {
+
+        @Override
+        public void run() {
+            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            Locale loc = Locale.getDefault();
+            ps.println("Locale");
+            ps.print(" - default locale: " + loc.getDisplayName());
+            ps.print("; language=" + loc.getDisplayLanguage() + " (" + loc.getLanguage() + ")");
+            ps.print("; country=" + loc.getDisplayCountry() + " (" + loc.getCountry() + ")");
+            ps.print("; script=" + loc.getDisplayScript() + " (" + loc.getScript() + ")");
+            ps.print("; variant=" + loc.getDisplayVariant() + " (" + loc.getVariant() + ")");
+            ps.println();
+            ps.print(" - available locales:");
+            int i = 1;
+            for (Locale l : Locale.getAvailableLocales()) {
+                if (i++ % 5 ==0) ps.print("\n      ");
+                ps.print(l.getDisplayName() + "; ");
+            }
             ps.close();
         }
     }

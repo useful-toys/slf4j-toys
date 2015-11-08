@@ -26,7 +26,7 @@ public class WatcherDemo {
 
         ProfilingSession.startExecutor();
         ProfilingSession.startWatcher();
-        ProfilingSession.logResourcesReport();
+        ProfilingSession.logReport();
 
         Thread t1 = new Thread(new Runnable() {
             @Override
