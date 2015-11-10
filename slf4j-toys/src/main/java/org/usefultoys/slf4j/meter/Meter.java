@@ -245,6 +245,64 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
+     * Adds an entry to the context map if conditions is true. The entry has no value and is
+     * interpreted as a marker.
+     *
+     * @param condition the condition
+     * @param trueName key of the entry to add if conditions is true
+     * @return reference to the meter itself.
+     */
+    public Meter ctx(final boolean condition, final String trueName) {
+        if (!condition) {
+            return this;
+        }
+        if (trueName == null) {
+            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition,name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+            return this;
+        }
+        if (context == null) {
+            this.context = new LinkedHashMap<String, String>();
+        }
+        context.put(trueName, null);
+        return this;
+    }
+
+    /**
+     * Adds an entry to the context map if conditions is true or false. The entry has no value and is
+     * interpreted as a marker.
+     *
+     * @param condition the condition
+     * @param trueName key of the entry to add if conditions is true
+     * @param falseName key of the entry to add if conditions is true
+     * @return reference to the meter itself.
+     */
+    public Meter ctx(final boolean condition, final String trueName, final String falseName) {
+        if (condition) {
+            if (trueName == null) {
+                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+                logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition,name,name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+                return this;
+            }
+            if (context == null) {
+                this.context = new LinkedHashMap<String, String>();
+            }
+            context.put(trueName, null);
+        } else {
+            if (falseName == null) {
+                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+                logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition,name,name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+                return this;
+            }
+            if (context == null) {
+                this.context = new LinkedHashMap<String, String>();
+            }
+            context.put(falseName, null);
+        }
+        return this;
+    }
+
+    /**
      * Adds an entry to the context map.
      *
      * @param name key of the entry to add.
