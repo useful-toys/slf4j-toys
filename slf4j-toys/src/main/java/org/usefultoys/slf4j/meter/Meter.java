@@ -245,8 +245,8 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Adds an entry to the context map if conditions is true. The entry has no value and is
-     * interpreted as a marker.
+     * Adds an entry to the context map if conditions is true. The entry has no
+     * value and is interpreted as a marker.
      *
      * @param condition the condition
      * @param trueName key of the entry to add if conditions is true
@@ -269,8 +269,8 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Adds an entry to the context map if conditions is true or false. The entry has no value and is
-     * interpreted as a marker.
+     * Adds an entry to the context map if conditions is true or false. The
+     * entry has no value and is interpreted as a marker.
      *
      * @param condition the condition
      * @param trueName key of the entry to add if conditions is true
@@ -741,6 +741,22 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+    public Meter flow(Object flow) {
+        if (flow instanceof String) {
+            this.pathId = (String) flow;
+        } else if (flow instanceof Enum) {
+            this.pathId = ((Enum<?>) flow).name();
+        } else if (flow instanceof Throwable) {
+            this.pathId = flow.getClass().getSimpleName();
+        } else if (flow != null) {
+            this.pathId = flow.toString();
+        } else {
+            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
+//            logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
+        }
+        return this;
+    }
+
     /**
      * Confirms the meter in order to claim successful completion of the task
      * represented by the meter. Sends a message to logger using info level. If
