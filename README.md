@@ -47,6 +47,10 @@ persistence.user
 persistence.product
 ```
 
+**Further information**
+
+Take a look at our [WIKI](https://github.com/useful-toys/slf4j-toys/wiki)
+
 **Similar projects**
 
  * [Perf4J](http://perf4j.codehaus.org/) Appearantly discotinued project.
