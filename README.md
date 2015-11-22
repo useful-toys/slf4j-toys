@@ -12,7 +12,7 @@ SLF4J-TOYS promotes clean and organized log files, like:
 [main] INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0,1s; 1,5MB
 ```
 
-And promotes clean and organized java code, like:
+And suggests clean and organized java code, like:
 ```
 final Meter m = MeterFactory.getMeter(LOGGER, "saveUser").start();
 try {
