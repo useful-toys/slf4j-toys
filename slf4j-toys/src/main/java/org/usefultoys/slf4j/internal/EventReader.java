@@ -222,7 +222,7 @@ public class EventReader {
         return readStringImp(PROPERTY_DIV, PROPERTY_SEPARATOR, Character.MIN_VALUE);
     }
 
-    protected String readPropertyKey() throws EOFException, IOException {
+    protected String readPropertyKey() throws IOException {
         if (start >= lenght) {
             throw new EOFException();
         }

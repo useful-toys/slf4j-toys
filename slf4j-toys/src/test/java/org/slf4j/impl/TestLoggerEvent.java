@@ -35,7 +35,7 @@ public class TestLoggerEvent {
     private final String message;
     private final Object[] arguments;
 
-    public static enum Level {
+    public enum Level {
 
         ERROR, WARN, INFO, DEBUG, TRACE
     }

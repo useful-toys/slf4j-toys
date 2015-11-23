@@ -132,10 +132,7 @@ public abstract class SystemData extends EventData {
         if (this.runtime_totalMemory != other.runtime_totalMemory) {
             return false;
         }
-        if (Double.doubleToLongBits(this.systemLoad) != Double.doubleToLongBits(other.systemLoad)) {
-            return false;
-        }
-        return true;
+        return Double.doubleToLongBits(this.systemLoad) == Double.doubleToLongBits(other.systemLoad);
     }
 
     private static final boolean hasSunOperatingSystemMXBean;
