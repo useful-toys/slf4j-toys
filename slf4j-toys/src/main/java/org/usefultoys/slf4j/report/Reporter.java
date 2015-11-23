@@ -61,14 +61,14 @@ public class Reporter implements Serializable {
         logger = LoggerFactory.getLogger(getProperty("slf4jtoys.report.name", "report"));
     }
 
-    public Logger getLogger() {
-        return logger;
-    }
-    
     public Reporter(Logger logger) {
         this.logger = logger;
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+    
     public void logReport(final Executor executor) {
         final Reporter report = new Reporter(logger);
         if (reportPhysicalSystem) {
