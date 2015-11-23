@@ -15,14 +15,11 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Map;
 import java.util.TreeMap;
-
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import org.usefultoys.slf4j.internal.EventWriter;
 
 /**
  *

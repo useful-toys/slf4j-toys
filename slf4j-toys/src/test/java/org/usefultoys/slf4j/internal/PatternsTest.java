@@ -16,9 +16,7 @@
 package org.usefultoys.slf4j.internal;
 
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
-import org.usefultoys.slf4j.internal.PatternDefinition;
 
 /**
  *

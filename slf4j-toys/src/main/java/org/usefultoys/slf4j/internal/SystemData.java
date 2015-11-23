@@ -24,8 +24,7 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
-
-import org.usefultoys.slf4j.ProfilingSession;
+import org.usefultoys.slf4j.Session;
 
 /**
  * Augments the EventData with status information collected from the virtual
@@ -160,7 +159,7 @@ public abstract class SystemData extends EventData {
     }
 
     protected void collectPlatformStatus() {
-        if (!ProfilingSession.usePlatformManagedBean) {
+        if (!Session.usePlatformManagedBean) {
             return;
         }
         if (hasSunOperatingSystemMXBean) {
@@ -179,7 +178,7 @@ public abstract class SystemData extends EventData {
     }
 
     protected void collectManagedBeanStatus() {
-        if (ProfilingSession.useMemoryManagedBean) {
+        if (Session.useMemoryManagedBean) {
             final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
             final MemoryUsage heapUsage = memory.getHeapMemoryUsage();
             heap_commited = heapUsage.getCommitted();
@@ -193,19 +192,19 @@ public abstract class SystemData extends EventData {
             objectPendingFinalizationCount = memory.getObjectPendingFinalizationCount();
         }
 
-        if (ProfilingSession.useClassLoadingManagedBean) {
+        if (Session.useClassLoadingManagedBean) {
             final ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
             classLoading_loaded = classLoading.getLoadedClassCount();
             classLoading_total = classLoading.getTotalLoadedClassCount();
             classLoading_unloaded = classLoading.getUnloadedClassCount();
         }
 
-        if (ProfilingSession.useCompilationManagedBean) {
+        if (Session.useCompilationManagedBean) {
             final CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
             compilationTime = compilation.getTotalCompilationTime();
         }
 
-        if (ProfilingSession.useGarbageCollectionManagedBean) {
+        if (Session.useGarbageCollectionManagedBean) {
             final List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
             garbageCollector_count = 0;
             garbageCollector_time = 0;

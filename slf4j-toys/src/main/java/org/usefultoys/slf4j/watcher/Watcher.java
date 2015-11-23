@@ -17,7 +17,7 @@ package org.usefultoys.slf4j.watcher;
 
 import java.util.concurrent.ScheduledExecutorService;
 import org.slf4j.Logger;
-import org.usefultoys.slf4j.ProfilingSession;
+import org.usefultoys.slf4j.Session;
 
 /**
  * Periodically collect system status and reports to logger. It conveniently
@@ -38,7 +38,7 @@ public class Watcher extends WatcherData implements Runnable {
     public Watcher(final Logger logger) {
         super();
         this.logger = logger;
-        this.sessionUuid = ProfilingSession.uuid;
+        this.sessionUuid = Session.uuid;
         this.eventPosition = 0;
         this.eventCategory = logger.getName();
     }

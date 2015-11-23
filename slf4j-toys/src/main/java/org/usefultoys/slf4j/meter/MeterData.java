@@ -19,8 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.usefultoys.slf4j.ProfilingSession;
+import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.internal.EventData;
 import org.usefultoys.slf4j.internal.EventReader;
 import org.usefultoys.slf4j.internal.EventWriter;
@@ -30,7 +29,7 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
 public class MeterData extends SystemData {
 
     private static final long serialVersionUID = 2L;
-    private static final boolean meterPrintCategory = ProfilingSession.readMeterPrintCategoryProperty();
+    private static final boolean meterPrintCategory = Session.readMeterPrintCategoryProperty();
 
     public MeterData() {
         super();

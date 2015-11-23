@@ -18,7 +18,6 @@ package org.slf4j.impl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 

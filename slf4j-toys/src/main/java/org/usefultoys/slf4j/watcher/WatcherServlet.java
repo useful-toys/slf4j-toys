@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j;
+package org.usefultoys.slf4j.watcher;
 
-import javax.servlet.ServletContextEvent;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.usefultoys.slf4j.Session;
 
 /**
  *
  * @author Daniel
  */
-public class ReportContextListener implements javax.servlet.ServletContextListener {
+public class WatcherServlet extends HttpServlet {
 
     @Override
-    public void contextDestroyed(ServletContextEvent arg0) {
-        // nothing
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Session.DEFAULT_WATCHER.logCurrentStatus();
     }
-
-    @Override
-    public void contextInitialized(ServletContextEvent arg0) {
-        ProfilingSession.logReport();
-    }
-
 }

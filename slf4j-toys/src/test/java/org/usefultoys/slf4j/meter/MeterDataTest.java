@@ -15,11 +15,9 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import java.util.HashMap;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-
 import org.junit.Test;
 
 /**

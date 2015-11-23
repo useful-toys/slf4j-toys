@@ -15,8 +15,6 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.usefultoys.slf4j.meter.MeterData;
-
 /**
  *
  * @author Daniel Felix Ferber

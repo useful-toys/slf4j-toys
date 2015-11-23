@@ -18,7 +18,6 @@ package org.usefultoys.slf4j.tools;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
 import org.usefultoys.slf4j.meter.MeterData;
 
 /**

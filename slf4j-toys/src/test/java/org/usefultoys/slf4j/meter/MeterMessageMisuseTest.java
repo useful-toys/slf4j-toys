@@ -22,7 +22,6 @@ import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 import org.slf4j.impl.TestLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
-import static org.usefultoys.slf4j.meter.MeterMessageTest.*;
 
 /**
  *

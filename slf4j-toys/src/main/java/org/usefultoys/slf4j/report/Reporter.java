@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j;
+package org.usefultoys.slf4j.report;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,27 +23,92 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.Executor;
 import org.slf4j.Logger;
+import org.usefultoys.slf4j.LoggerFactory;
+import static org.usefultoys.slf4j.Session.getProperty;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
  *
  * @author Daniel Felix Ferber
  */
-public class Report implements Serializable {
+public class Reporter implements Serializable {
+
+    private final boolean reportVM = getProperty("slf4jtoys.report.vm", true);
+    private final boolean reportFileSystem = getProperty("slf4jtoys.report.FileSystem", false);
+    private final boolean reportMemory = getProperty("slf4jtoys.report.memory", true);
+    private final boolean reportUser = getProperty("slf4jtoys.report.user", true);
+    private final boolean reportPhysicalSystem = getProperty("slf4jtoys.report.physicalSystem", true);
+    private final boolean reportOperatingSystem = getProperty("slf4jtoys.report.operatingSystem", true);
+    private final boolean reportCalendar = getProperty("slf4jtoys.report.calendar", true);
+    private final boolean reportLocale = getProperty("slf4jtoys.report.locale", true);
+    private final boolean reportCharset = getProperty("slf4jtoys.report.charset", true);
+    private final boolean reportNetworkInterface = getProperty("slf4jtoys.report.networkInterface", false);
+    private final Logger logger;
 
     private static final long serialVersionUID = 1L;
 
-    transient private final Logger logger;
+    public Reporter() {
+        super();
+        logger = LoggerFactory.getLogger(getProperty("slf4jtoys.report.name", "report"));
+    }
 
-    public Report(Logger logger) {
+    public Logger getLogger() {
+        return logger;
+    }
+    
+    public Reporter(Logger logger) {
         this.logger = logger;
+    }
+
+    public void logReport(final Executor executor) {
+        final Reporter report = new Reporter(logger);
+        if (reportPhysicalSystem) {
+            executor.execute(report.new ReportPhysicalSystem());
+        }
+        if (reportOperatingSystem) {
+            executor.execute(report.new ReportOperatingSystem());
+        }
+        if (reportUser) {
+            executor.execute(report.new ReportUser());
+        }
+        if (reportVM) {
+            executor.execute(report.new ReportVM());
+        }
+        if (reportMemory) {
+            executor.execute(report.new ReportMemory());
+        }
+        if (reportFileSystem) {
+            executor.execute(report.new ReportFileSystem());
+        }
+        if (reportCalendar) {
+            executor.execute(report.new ReportCalendar());
+        }
+        if (reportLocale) {
+            executor.execute(report.new ReportLocale());
+        }
+        if (reportCharset) {
+            executor.execute(report.new ReportCharset());
+        }
+        if (reportNetworkInterface) {
+            try {
+                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface nif = interfaces.nextElement();
+                    executor.execute(report.new ReportNetworkInterface(nif));
+                }
+            } catch (SocketException e) {
+                logger.warn("Cannot report interfaces", e);
+            }
+        }
     }
 
     public class ReportVM implements Runnable {
@@ -156,7 +221,9 @@ public class Report implements Serializable {
             ps.print(" - available IDs:");
             int i = 1;
             for (String id : TimeZone.getAvailableIDs()) {
-                if (i++ % 5 ==0) ps.print("\n      ");
+                if (i++ % 5 == 0) {
+                    ps.print("\n      ");
+                }
                 ps.print(id + "; ");
             }
             ps.close();
@@ -179,13 +246,38 @@ public class Report implements Serializable {
             ps.print(" - available locales:");
             int i = 1;
             for (Locale l : Locale.getAvailableLocales()) {
-                if (i++ % 5 ==0) ps.print("\n      ");
+                if (i++ % 5 == 0) {
+                    ps.print("\n      ");
+                }
                 ps.print(l.getDisplayName() + "; ");
             }
             ps.close();
         }
     }
 
+    public class ReportCharset implements Runnable {
+
+        @Override
+        public void run() {
+            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            Charset charset = Charset.defaultCharset();
+            ps.println("Charset");
+            ps.print(" - default charset: " + charset.displayName());
+            ps.print("; name=" + charset.name());
+            ps.print("; canEncode=" + charset.canEncode());
+            ps.println();
+            ps.print(" - available charsets:");
+            int i = 1;
+            for (Charset l : Charset.availableCharsets().values()) {
+                if (i++ % 5 == 0) {
+                    ps.print("\n      ");
+                }
+                ps.print(l.displayName() + "; ");
+            }
+            ps.close();
+        }
+    }
+    
     public class ReportNetworkInterface implements Runnable {
 
         private final NetworkInterface nif;

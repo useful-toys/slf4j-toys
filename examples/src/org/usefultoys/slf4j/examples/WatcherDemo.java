@@ -3,12 +3,14 @@
 package org.usefultoys.slf4j.examples;
 
 import java.util.Random;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.usefultoys.slf4j.ProfilingSession;
+import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterFactory;
+import org.usefultoys.slf4j.report.Reporter;
 
 /**
  *
@@ -19,14 +21,15 @@ public class WatcherDemo {
     static Random random = new Random(System.currentTimeMillis());
 
     public static void main(final String[] args) {
-        System.setProperty("profiler.usePlatformManagedBean", "true");
-        System.setProperty("watcher.period", "1s");
-        System.setProperty("watcher.delay", "1s");
+        System.setProperty("slf4jtoys.usePlatformManagedBean", "true");
+        System.setProperty("slf4jtoys.watcher.period", "1s");
+        System.setProperty("slf4jtoys.watcher.delay", "1s");
+        System.setProperty("slf4jtoys.report.networkInterface", "true");
+        System.setProperty("slf4jtoys.report.FileSystem", "true");
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
 
-        ProfilingSession.startExecutor();
-        ProfilingSession.startWatcher();
-        ProfilingSession.logReport();
+        Session.startDefaultWatcher();
+        new Reporter().logReport(Executors.newSingleThreadExecutor());
 
         Thread t1 = new Thread(new Runnable() {
             @Override
@@ -68,8 +71,7 @@ public class WatcherDemo {
             m.fail(ex);
         }
 
-        ProfilingSession.stopWatcher();
-        ProfilingSession.stopExecutor();
+        Session.stopDefaultWatcher();
     }
 
     private static void iterationMeter() {

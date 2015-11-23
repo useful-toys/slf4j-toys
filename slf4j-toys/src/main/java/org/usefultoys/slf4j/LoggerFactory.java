@@ -15,13 +15,11 @@
  */
 package org.usefultoys.slf4j;
 
-import static org.slf4j.LoggerFactory.getILoggerFactory;
-
 import java.io.OutputStream;
 import java.io.PrintStream;
-
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
+import static org.slf4j.LoggerFactory.getILoggerFactory;
 
 /**
  * An alternative to {@link org.slf4j.LoggerFactory}, with additional useful

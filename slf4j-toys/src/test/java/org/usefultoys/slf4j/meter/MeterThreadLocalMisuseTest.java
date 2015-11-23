@@ -20,8 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.meter.Meter;
-import org.usefultoys.slf4j.meter.MeterFactory;
 
 /**
  * Validates incorrect use cases for meter and threadlocal, to ensure

@@ -26,10 +26,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.ProfilingSession;
+import org.usefultoys.slf4j.Session;
 
 /**
  *
@@ -68,7 +67,7 @@ public class Meter extends MeterData implements Closeable {
     private static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
     private transient long lastProgressTime = 0;
     private transient long lastProgressIteration = 0;
-    private static long meterProgressPeriodNanoseconds = ProfilingSession.readMeterProgressPeriodProperty() * 1000 * 1000;
+    private static long meterProgressPeriodNanoseconds = Session.readMeterProgressPeriodProperty() * 1000 * 1000;
 
     /**
      * Most recent meter from this thread.
@@ -83,7 +82,7 @@ public class Meter extends MeterData implements Closeable {
      */
     public Meter(final Logger logger) {
         super();
-        this.sessionUuid = ProfilingSession.uuid;
+        this.sessionUuid = Session.uuid;
         this.logger = logger;
         this.eventCategory = logger.getName();
         this.eventName = null;
@@ -94,7 +93,7 @@ public class Meter extends MeterData implements Closeable {
 
     public Meter(final Logger logger, final String eventName) {
         super();
-        this.sessionUuid = ProfilingSession.uuid;
+        this.sessionUuid = Session.uuid;
         this.logger = logger;
         this.eventCategory = logger.getName();
         final String index = this.eventCategory + "/" + eventName;

@@ -15,15 +15,10 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import java.io.IOException;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
 import org.junit.Test;
-import org.usefultoys.slf4j.internal.EventData;
-import org.usefultoys.slf4j.internal.EventReader;
-import org.usefultoys.slf4j.internal.EventWriter;
 
 /**
  *

@@ -16,9 +16,7 @@
 package org.usefultoys.slf4j.utils;
 
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
-import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
  *
