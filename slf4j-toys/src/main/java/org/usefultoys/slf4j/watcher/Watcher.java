@@ -15,21 +15,9 @@
  */
 package org.usefultoys.slf4j.watcher;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import org.slf4j.Logger;
-import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.ProfilingSession;
-import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
  * Periodically collect system status and reports to logger. It conveniently
