@@ -12,7 +12,7 @@ SLF4J-TOYS promotes clean and organized log files, like:
 [main] INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0,1s; 1,5MB
 ```
 
-And suggests clean and organized java code, like:
+And suggests a coding convention for consistent logging, like:
 ```
 final Meter m = MeterFactory.getMeter(LOGGER, "saveUser").start();
 try {
@@ -33,11 +33,23 @@ try {
 }
 ```
 
+And produces reports about your host environment, like:
+```
+INFO report - Memory:
+ - maximum allowed: 1,9GB
+ - currently allocated: 129,0MB (1,8GB more available)
+ - currently used: 4,1MB (124,9MB free)
+```
+
 It further encourages simple logger names as:
 ```
 persistence.user
 persistence.product
 ```
+
+**Further information**
+
+Take a look at our [WIKI](https://github.com/useful-toys/slf4j-toys/wiki)
 
 **Similar projects**
 
