@@ -12,7 +12,7 @@ SLF4J-TOYS promotes clean and organized log files, like:
 [main] INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0,1s; 1,5MB
 ```
 
-And suggests a coding convention for consistent logging, like:
+Most of SLF4J-TOYS is a sort of log message builder, that suggests a coding convention for consistent logging, like:
 ```
 final Meter m = MeterFactory.getMeter(LOGGER, "saveUser").start();
 try {
