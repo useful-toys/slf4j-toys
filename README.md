@@ -12,7 +12,7 @@ SLF4J-TOYS promotes clean and organized log files, like:
 [main] 25/11/2015 14:38:52 INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0,1s; 1,5MB
 ```
 
-Such messages are not only easily readable, but also easily parsable for statistics and for data mining.
+Such messages are not only easily readable, but also easily parsable for later automatic investigation, like statistics and  data mining.
 
 Most of SLF4J-TOYS is a sort of log message builder, that suggests a coding convention for consistent logging, like:
 ```
