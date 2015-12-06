@@ -6,11 +6,13 @@ SLF4J-TOYS is collection of useful practices that complement SLF4J.
 
 SLF4J-TOYS promotes clean and organized log files, like:
 ```
-[main] INFO dao - OK [Insert]: dao/saveUser; 0,1s; 1,5MB; login=alice; 
-[main] INFO dao - OK [Update]: dao/saveUser; 0,1s; 1,5MB; login=bob; 
-[main] INFO dao - REJECT [Concurrent]: dao/saveUser; 0,1s; 1,5MB; login=bob; 
-[main] INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0,1s; 1,5MB
+[main] 25/11/2015 14:35:14 INFO dao - OK [Insert]: dao/saveUser; 0,1s; 1,5MB; login=alice; 
+[main] 25/11/2015 14:36:35 INFO dao - OK [Update]: dao/saveUser; 0,1s; 1,5MB; login=bob; 
+[main] 25/11/2015 14:37:27 INFO dao - REJECT [Concurrent]: dao/saveUser; 0,1s; 1,5MB; login=bob; 
+[main] 25/11/2015 14:38:52 INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0,1s; 1,5MB
 ```
+
+Such messages are not only easily readable, but also easily parsable for statistics and for data mining.
 
 Most of SLF4J-TOYS is a sort of log message builder, that suggests a coding convention for consistent logging, like:
 ```
