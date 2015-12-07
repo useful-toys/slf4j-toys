@@ -782,7 +782,6 @@ public class Meter extends MeterData implements Closeable {
             failClass = null;
             failMessage = null;
             rejectId = null;
-            pathId = null;
             localThreadInstance.set(previousInstance);
 
 //            final Thread currentThread = Thread.currentThread();
