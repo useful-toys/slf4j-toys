@@ -99,7 +99,7 @@ public class TestLoggerEvent {
 
     @Override
     public String toString() {
-        return "TestLoggerEvent{" + "loggerName=" + loggerName + ", level=" + level + ", marker=" + marker + ", throwable=" + throwable + ", message=" + message + ", arguments=" + arguments + '}';
+        return "TestLoggerEvent{" + "loggerName=" + loggerName + ", level=" + level + ", marker=" + marker + ", throwable=" + throwable + ", message=" + message + ", arguments=" + Arrays.toString(arguments) + '}';
     }
 
     public String getFormattedMessage() {

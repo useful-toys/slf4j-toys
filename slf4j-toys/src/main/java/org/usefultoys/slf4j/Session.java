@@ -85,7 +85,7 @@ public final class Session {
         }
         try {
             return Integer.parseInt(value);
-        } catch (final NumberFormatException e) {
+        } catch (final NumberFormatException ignored) {
             return defaultValue;
         }
     }
@@ -97,7 +97,7 @@ public final class Session {
         }
         try {
             return Long.parseLong(value);
-        } catch (final NumberFormatException e) {
+        } catch (final NumberFormatException ignored) {
             return defaultValue;
         }
     }
@@ -123,7 +123,7 @@ public final class Session {
             }
             return Long.parseLong(value.substring(0, value.length() - suffixLength)) * multiplicador;
 
-        } catch (final NumberFormatException e) {
+        } catch (final NumberFormatException ignored) {
             return defaultValue;
         }
     }

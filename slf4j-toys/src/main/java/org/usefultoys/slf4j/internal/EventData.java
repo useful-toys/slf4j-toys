@@ -152,7 +152,7 @@ public abstract class EventData implements Serializable {
      */
     public final boolean isSameAs(final EventData other) {
         if (other == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("other == null");
         }
         if (eventPosition != other.eventPosition) {
             return false;
@@ -190,7 +190,7 @@ public abstract class EventData implements Serializable {
      */
     public final boolean isCompletelyEqualsTo(final EventData other) {
         if (other == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("other == null");
         }
         if (eventPosition != other.eventPosition) {
             return false;
@@ -309,7 +309,7 @@ public abstract class EventData implements Serializable {
                 }
             }
             return true;
-        } catch (final IOException e) {
+        } catch (final IOException ignored) {
             return false;
         }
     }

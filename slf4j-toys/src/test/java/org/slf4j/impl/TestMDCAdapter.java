@@ -53,7 +53,7 @@ public class TestMDCAdapter implements MDCAdapter {
     }
 
     @Override
-	public void setContextMap(final Map contextMap) {
+	public void setContextMap(final Map<String, String> contextMap) {
         value.set(new HashMap<String, String>(contextMap));
     }
 
