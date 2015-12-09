@@ -16,10 +16,12 @@
 package org.usefultoys.slf4j;
 
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import org.usefultoys.slf4j.report.Reporter;
 import org.usefultoys.slf4j.watcher.Watcher;
 
 /**
@@ -42,7 +44,7 @@ public final class Session {
     public static boolean usePlatformManagedBean = getProperty("slf4jtoys.usePlatformManagedBean", false);
 
     public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(readWatcherLoggerName()));
-    
+
     private static ScheduledExecutorService defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> scheduledDefaultWatcher;
 
@@ -63,6 +65,16 @@ public final class Session {
             defaultWatcherExecutor.shutdownNow();
             defaultWatcherExecutor = null;
         }
+    }
+
+    public static void runDefaultReport() {
+        final Executor noThreadExecutor = new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        };
+        new Reporter().logReport(noThreadExecutor);
     }
 
     public static String getProperty(final String name, final String defaultValue) {
@@ -143,7 +155,7 @@ public final class Session {
     public static long readWatcherDelayMillisecondsProperty() {
         return getMillisecondsProperty("slf4jtoys.watcher.delay", 60000L);
     }
-    
+
     public static String readWatcherLoggerName() {
         return getProperty("slf4jtoys.watcher.name", "watcher");
     }

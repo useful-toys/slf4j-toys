@@ -68,7 +68,7 @@ public class Reporter implements Serializable {
     public Logger getLogger() {
         return logger;
     }
-    
+
     public void logReport(final Executor executor) {
         final Reporter report = new Reporter(logger);
         if (reportPhysicalSystem) {
@@ -213,12 +213,16 @@ public class Reporter implements Serializable {
             ps.print(" - default timezone: " + tz.getDisplayName());
             ps.print(" (" + tz.getID() + ")");
             ps.print("; DST=" + tz.getDSTSavings() / 60000 + "min");
-            ps.print("; observesDT=" + tz.observesDaylightTime());
+            try {
+                ps.print("; observesDT=" + tz.observesDaylightTime());
+            } catch (NoSuchMethodError e) {
+                // Ignore property that exists only from Java 1.7 on.
+            }
             ps.print("; useDT=" + tz.useDaylightTime());
             ps.print("; inDT=" + tz.inDaylightTime(new Date()));
             ps.print("; offset=" + tz.getRawOffset() / 60000 + "min");
             ps.println();
-            ps.print(" - available IDs:");
+            ps.print(" - available IDs: ");
             int i = 1;
             for (final String id : TimeZone.getAvailableIDs()) {
                 if (i++ % 5 == 0) {
@@ -240,10 +244,14 @@ public class Reporter implements Serializable {
             ps.print(" - default locale: " + loc.getDisplayName());
             ps.print("; language=" + loc.getDisplayLanguage() + " (" + loc.getLanguage() + ")");
             ps.print("; country=" + loc.getDisplayCountry() + " (" + loc.getCountry() + ")");
-            ps.print("; script=" + loc.getDisplayScript() + " (" + loc.getScript() + ")");
+            try {
+                ps.print("; script=" + loc.getDisplayScript() + " (" + loc.getScript() + ")");
+            } catch (NoSuchMethodError e) {
+                // Ignore property that exists only from Java 1.7 on.
+            }
             ps.print("; variant=" + loc.getDisplayVariant() + " (" + loc.getVariant() + ")");
             ps.println();
-            ps.print(" - available locales:");
+            ps.print(" - available locales: ");
             int i = 1;
             for (final Locale l : Locale.getAvailableLocales()) {
                 if (i++ % 5 == 0) {
@@ -266,7 +274,7 @@ public class Reporter implements Serializable {
             ps.print("; name=" + charset.name());
             ps.print("; canEncode=" + charset.canEncode());
             ps.println();
-            ps.print(" - available charsets:");
+            ps.print(" - available charsets: ");
             int i = 1;
             for (final Charset l : Charset.availableCharsets().values()) {
                 if (i++ % 5 == 0) {
@@ -277,7 +285,7 @@ public class Reporter implements Serializable {
             ps.close();
         }
     }
-    
+
     public class ReportNetworkInterface implements Runnable {
 
         private final NetworkInterface nif;
@@ -290,7 +298,7 @@ public class Reporter implements Serializable {
         public void run() {
             final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             try {
-                ps.println("Network Interface " + nif.getName() + " :");
+                ps.println("Network Interface " + nif.getName() + ":");
                 ps.println(" - display name: " + nif.getDisplayName());
                 ps.print(" - properties: ");
                 ps.print("mtu=" + nif.getMTU() + "; ");

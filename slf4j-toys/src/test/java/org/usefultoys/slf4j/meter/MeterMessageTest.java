@@ -45,7 +45,7 @@ public class MeterMessageTest {
 
     @BeforeClass
     public static void configureMeterSettings() {
-        System.setProperty("meter.progress.period", "0ms");
+        System.setProperty("slf4jtoys.meter.progress.period", "0ms");
     }
 
     @Before
@@ -93,7 +93,7 @@ public class MeterMessageTest {
         final String title = "Example of execution that succeeds.";
         final String flow = "qwerty";
         final Meter m = new Meter(logger).m(title).start();
-		try {
+        try {
             /* Run stuff that may fail. */
             m.ok(flow);
         } catch (final Exception e) {
@@ -120,7 +120,44 @@ public class MeterMessageTest {
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
         Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_OK_PREFIX));
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(flow));
+    }
+
+    @Test
+    public void testOkFlow2() {
+        final String title = "Example of execution that succeeds.";
+        final String flow = "qwerty";
+        final Meter m = new Meter(logger).m(title).start();
+        try {
+            m.flow(flow);
+            /* Run stuff that may fail. */
+            m.ok();
+        } catch (final Exception e) {
+            m.fail(e);
+            // may rethrow
+        }
+
+        Assert.assertTrue(m.isOK());
+        Assert.assertFalse(m.isReject());
+        Assert.assertFalse(m.isFail());
+        Assert.assertFalse(m.isSlow());
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.MSG_OK, stopEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_OK, stopDataEvent.getMarker());
+        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_OK_PREFIX));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(flow));
@@ -130,8 +167,10 @@ public class MeterMessageTest {
     public void testReject() {
         final String title = "Example of execution that succeeds.";
         final String reject = "qwerty";
+        final String flow = "ytrewq";
         final Meter m = new Meter(logger).m(title).start();
-		try {
+        try {
+            m.flow(flow);
             /* Run stuff that may fail. */
             m.reject(reject);
         } catch (final Exception e) {
@@ -158,18 +197,20 @@ public class MeterMessageTest {
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
         Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_REJECT_PREFIX));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(reject));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(reject));
+        Assert.assertFalse(stopEvent.getFormattedMessage().contains(flow));
     }
-    
+
     @Test
     public void testFail() {
         System.out.println("testFail:");
         final String title = "Example of execution that fails.";
         final Meter m = new Meter(logger).m(title).start();
+        final String flow = "ytrewq";
         try {
+            m.flow(flow);
             /* Run stuff that may fail. */
             if (1 + 2 == 3) {
                 throw new Exception("message");
@@ -198,18 +239,20 @@ public class MeterMessageTest {
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
         Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_FAIL_PREFIX));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(Exception.class.getName()));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(Exception.class.getName()));
+        Assert.assertFalse(stopEvent.getFormattedMessage().contains(flow));
     }
 
     @Test
     public void testOkSlowness() {
         final String title = "Example of execution that succeeds but exceeds time limit.";
         final Meter m = new Meter(logger).m(title).limitMilliseconds(200).start();
+        final String flow = "ytrewq";
         try {
             /* Run stuff that may delay. */
+            m.flow(flow);
             Thread.sleep(220);
             m.ok();
         } catch (final Exception e) {
@@ -238,6 +281,7 @@ public class MeterMessageTest {
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_SLOW_PREFIX));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(flow));
     }
 
     @Test
