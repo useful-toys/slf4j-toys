@@ -32,7 +32,7 @@ public class ToCSV {
             return;
         }
         final String fileName = argv[0];
-        final String prefix = argv.length >= 2 ? argv[2] : null;
+        //final String prefix = argv.length >= 2 ? argv[2] : null;
 
         BufferedReader reader = null;
         try {

@@ -142,7 +142,7 @@ public abstract class SystemData extends EventData {
         try {
             Class.forName("com.sun.management.OperatingSystemMXBean");
             tmpHasSunOperatingSystemMXBean = true;
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ignored) {
             // ignora
         }
         hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;

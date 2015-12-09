@@ -34,9 +34,9 @@ public class WatcherData extends SystemData {
     public StringBuilder readableString(final StringBuilder builder) {
         boolean hasPrevious = false;
         if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
-            if (hasPrevious) {
-                builder.append("; ");
-            }
+            //if (hasPrevious) {
+            //    builder.append("; ");
+            //}
             builder.append("Memory: ");
             builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
             builder.append(' ');
@@ -51,7 +51,7 @@ public class WatcherData extends SystemData {
             }
             builder.append("System load: ");
             builder.append(Math.round(this.systemLoad * 100));
-            hasPrevious = true;
+            //hasPrevious = true;
         }
         return builder;
     }

@@ -751,7 +751,7 @@ public class Meter extends MeterData implements Closeable {
             this.pathId = flow.toString();
         } else {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-//            logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
+            logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
         }
         return this;
     }
@@ -817,7 +817,7 @@ public class Meter extends MeterData implements Closeable {
 
     public boolean checkCurrentInstance() {
         final WeakReference<Meter> ref = localThreadInstance.get();
-        return ref == null ? true : ref.get() != this;
+        return ref == null || ref.get() != this;
     }
 
     /**
@@ -1031,6 +1031,7 @@ public class Meter extends MeterData implements Closeable {
         super.finalize();
     }
 
+    @SuppressWarnings("ExtendsThrowable")
     public static class MeterThrowable extends Throwable {
 
         private static final long serialVersionUID = 1L;
@@ -1152,19 +1153,18 @@ public class Meter extends MeterData implements Closeable {
     private <T extends RuntimeException> RuntimeException convertException(final Class<T> exceptionClass, final Exception e) {
         final String message = "Failed: " + (this.description != null ? this.description : this.eventCategory);
         try {
-            final RuntimeException exception = exceptionClass.getConstructor(String.class, Throwable.class).newInstance(message, e);
-            return exception;
-        } catch (final NoSuchMethodException ex) {
+            return exceptionClass.getConstructor(String.class, Throwable.class).newInstance(message, e);
+        } catch (final NoSuchMethodException ignored) {
             logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final SecurityException ex) {
+        } catch (final SecurityException ignored) {
             logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final InstantiationException ex) {
+        } catch (final InstantiationException ignored) {
             logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final IllegalAccessException ex) {
+        } catch (final IllegalAccessException ignored) {
             logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final IllegalArgumentException ex) {
+        } catch (final IllegalArgumentException ignored) {
             logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final InvocationTargetException ex) {
+        } catch (final InvocationTargetException ignored) {
             logger.error(Slf4JMarkers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         }
         return new RuntimeException(e);
