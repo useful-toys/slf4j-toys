@@ -61,7 +61,7 @@ public class Reporter implements Serializable {
         logger = LoggerFactory.getLogger(getProperty("slf4jtoys.report.name", "report"));
     }
 
-    public Reporter(Logger logger) {
+    public Reporter(final Logger logger) {
         this.logger = logger;
     }
 
@@ -100,9 +100,9 @@ public class Reporter implements Serializable {
         }
         if (reportNetworkInterface) {
             try {
-                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
-                    NetworkInterface nif = interfaces.nextElement();
+                    final NetworkInterface nif = interfaces.nextElement();
                     executor.execute(report.new ReportNetworkInterface(nif));
                 }
             } catch (SocketException e) {
@@ -115,7 +115,7 @@ public class Reporter implements Serializable {
 
         @Override
         public void run() {
-            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             ps.println("Java Virtual Machine");
             ps.println(" - vendor: " + System.getProperty("java.vendor"));
             ps.println(" - version: " + System.getProperty("java.version"));
@@ -128,10 +128,10 @@ public class Reporter implements Serializable {
 
         @Override
         public void run() {
-            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
-            File[] roots = File.listRoots();
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            final File[] roots = File.listRoots();
             boolean first = true;
-            for (File root : roots) {
+            for (final File root : roots) {
                 if (first) {
                     first = false;
                 } else {
@@ -149,10 +149,10 @@ public class Reporter implements Serializable {
 
         @Override
         public void run() {
-            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             final Runtime runtime = Runtime.getRuntime();
             ps.println("Memory:");
-            long maxMemory = runtime.maxMemory();
+            final long maxMemory = runtime.maxMemory();
             final long totalMemory = runtime.totalMemory();
             final long freeMemory = runtime.freeMemory();
             ps.println(" - maximum allowed: " + (maxMemory == Long.MAX_VALUE ? "no limit" : UnitFormatter.bytes(maxMemory)));
@@ -220,7 +220,7 @@ public class Reporter implements Serializable {
             ps.println();
             ps.print(" - available IDs:");
             int i = 1;
-            for (String id : TimeZone.getAvailableIDs()) {
+            for (final String id : TimeZone.getAvailableIDs()) {
                 if (i++ % 5 == 0) {
                     ps.print("\n      ");
                 }
@@ -234,8 +234,8 @@ public class Reporter implements Serializable {
 
         @Override
         public void run() {
-            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
-            Locale loc = Locale.getDefault();
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            final Locale loc = Locale.getDefault();
             ps.println("Locale");
             ps.print(" - default locale: " + loc.getDisplayName());
             ps.print("; language=" + loc.getDisplayLanguage() + " (" + loc.getLanguage() + ")");
@@ -245,7 +245,7 @@ public class Reporter implements Serializable {
             ps.println();
             ps.print(" - available locales:");
             int i = 1;
-            for (Locale l : Locale.getAvailableLocales()) {
+            for (final Locale l : Locale.getAvailableLocales()) {
                 if (i++ % 5 == 0) {
                     ps.print("\n      ");
                 }
@@ -259,8 +259,8 @@ public class Reporter implements Serializable {
 
         @Override
         public void run() {
-            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
-            Charset charset = Charset.defaultCharset();
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            final Charset charset = Charset.defaultCharset();
             ps.println("Charset");
             ps.print(" - default charset: " + charset.displayName());
             ps.print("; name=" + charset.name());
@@ -268,7 +268,7 @@ public class Reporter implements Serializable {
             ps.println();
             ps.print(" - available charsets:");
             int i = 1;
-            for (Charset l : Charset.availableCharsets().values()) {
+            for (final Charset l : Charset.availableCharsets().values()) {
                 if (i++ % 5 == 0) {
                     ps.print("\n      ");
                 }
@@ -282,13 +282,13 @@ public class Reporter implements Serializable {
 
         private final NetworkInterface nif;
 
-        public ReportNetworkInterface(NetworkInterface nif) {
+        public ReportNetworkInterface(final NetworkInterface nif) {
             this.nif = nif;
         }
 
         @Override
         public void run() {
-            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             try {
                 ps.println("Network Interface " + nif.getName() + " :");
                 ps.println(" - display name: " + nif.getDisplayName());
@@ -311,16 +311,16 @@ public class Reporter implements Serializable {
                 }
                 ps.println();
                 ps.print(" - hardware address: ");
-                byte[] macAddress = nif.getHardwareAddress();
-                if (macAddress != null) {
-                    for (byte b : macAddress) {
+                final byte[] macAddress = nif.getHardwareAddress();
+                if (macAddress == null) {
+                    ps.println("n/a");
+                } else {
+                    for (final byte b : macAddress) {
                         ps.print(String.format("%1$02X ", b));
                     }
                     ps.println();
-                } else {
-                    ps.println("n/a");
                 }
-                Enumeration<InetAddress> inetAddresses = nif.getInetAddresses();
+                final Enumeration<InetAddress> inetAddresses = nif.getInetAddresses();
                 while (inetAddresses.hasMoreElements()) {
                     reportNetworkAddress(ps, inetAddresses.nextElement());
                 }
@@ -330,7 +330,7 @@ public class Reporter implements Serializable {
             ps.close();
         }
 
-        private void reportNetworkAddress(PrintStream ps, InetAddress inetAddress) {
+        private void reportNetworkAddress(final PrintStream ps, final InetAddress inetAddress) {
             try {
                 if (inetAddress instanceof Inet4Address) {
                     ps.println(" - NET address (IPV4): " + inetAddress.getHostAddress());
