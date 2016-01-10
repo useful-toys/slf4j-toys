@@ -43,7 +43,7 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
 public class Reporter implements Serializable {
 
     private final boolean reportVM = getProperty("slf4jtoys.report.vm", true);
-    private final boolean reportFileSystem = getProperty("slf4jtoys.report.FileSystem", false);
+    private final boolean reportFileSystem = getProperty("slf4jtoys.report.fileSystem", false);
     private final boolean reportMemory = getProperty("slf4jtoys.report.memory", true);
     private final boolean reportUser = getProperty("slf4jtoys.report.user", true);
     private final boolean reportPhysicalSystem = getProperty("slf4jtoys.report.physicalSystem", true);
@@ -69,41 +69,61 @@ public class Reporter implements Serializable {
         return logger;
     }
 
-    public void logReport(final Executor executor) {
-        final Reporter report = new Reporter(logger);
+    public void logAllReports(final Executor executor) {
+        executor.execute(this.new ReportPhysicalSystem());
+        executor.execute(this.new ReportOperatingSystem());
+        executor.execute(this.new ReportUser());
+        executor.execute(this.new ReportVM());
+        executor.execute(this.new ReportMemory());
+        executor.execute(this.new ReportFileSystem());
+        executor.execute(this.new ReportCalendar());
+        executor.execute(this.new ReportLocale());
+        executor.execute(this.new ReportCharset());
+        try {
+            final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                final NetworkInterface nif = interfaces.nextElement();
+                executor.execute(this.new ReportNetworkInterface(nif));
+            }
+        } catch (SocketException e) {
+            logger.warn("Cannot report interfaces.", e);
+        }
+    }
+
+    public void logDefaultReports(final Executor executor) {
         if (reportPhysicalSystem) {
-            executor.execute(report.new ReportPhysicalSystem());
+            executor.execute(this.new ReportPhysicalSystem());
         }
         if (reportOperatingSystem) {
-            executor.execute(report.new ReportOperatingSystem());
+            executor.execute(this.new ReportOperatingSystem());
         }
         if (reportUser) {
-            executor.execute(report.new ReportUser());
+            executor.execute(this.new ReportUser());
         }
         if (reportVM) {
-            executor.execute(report.new ReportVM());
+            executor.execute(this.new ReportVM());
         }
         if (reportMemory) {
-            executor.execute(report.new ReportMemory());
+            executor.execute(this.new ReportMemory());
         }
         if (reportFileSystem) {
-            executor.execute(report.new ReportFileSystem());
+            executor.execute(this.new ReportFileSystem());
         }
         if (reportCalendar) {
-            executor.execute(report.new ReportCalendar());
+            executor.execute(this.new ReportCalendar());
         }
         if (reportLocale) {
-            executor.execute(report.new ReportLocale());
+            executor.execute(this.new ReportLocale());
         }
         if (reportCharset) {
-            executor.execute(report.new ReportCharset());
+            executor.execute(this.new ReportCharset());
         }
         if (reportNetworkInterface) {
             try {
                 final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
                     final NetworkInterface nif = interfaces.nextElement();
-                    executor.execute(report.new ReportNetworkInterface(nif));
+                    executor.execute(this.new ReportNetworkInterface(nif));
                 }
             } catch (SocketException e) {
                 logger.warn("Cannot report interfaces", e);
