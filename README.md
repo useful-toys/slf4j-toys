@@ -14,7 +14,7 @@ SLF4J-TOYS promotes clean and organized log files, like:
 
 Such messages are not only easily readable, but also easily parsable for later automatic investigation, like statistics and  data mining.
 
-Most of SLF4J-TOYS is a sort of log message builder, that suggests a coding convention for consistent logging, like:
+Most of SLF4J-TOYS is a kind of log message builder, that suggests a coding convention for consistent logging, like:
 ```
 final Meter m = MeterFactory.getMeter(LOGGER, "saveUser").start();
 try {
