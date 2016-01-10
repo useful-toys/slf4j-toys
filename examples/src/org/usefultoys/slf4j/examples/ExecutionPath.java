@@ -126,7 +126,7 @@ public class ExecutionPath {
     }
 
     private static void example3A() {
-        /* Report execution flow with Meter.ok() and Meter.reject() with string parameter. */
+        /* Report execution flow with Meter.ok() and Meter.reject(). */
         final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
         // Check if user has permissions
         boolean authorized = runOperation(false);
