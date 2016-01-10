@@ -15,11 +15,8 @@
  */
 package org.usefultoys.slf4j.examples;
 
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.usefultoys.slf4j.Session;
 
@@ -29,46 +26,35 @@ import org.usefultoys.slf4j.Session;
  */
 public class CustomWatcher1 {
 
-    static Random random = new Random(System.currentTimeMillis());
-
-    private static class HeavyCalculation extends Thread {
-
-        {
-            setDaemon(true);
-        }
-
-        @Override
-        public void run() {
-            int i = Integer.MIN_VALUE;
-            while (!Thread.interrupted()) {
-                i++;
-            }
-        }
-    };
-
-    private static final Timer timer = new Timer("timer", true);
-
-    public static void main(final String[] args) {
+    static {
+        /* Customizes the Watcher for more frequent messages for a faster execution
+         * of this example. Also enable managed bean that is able to read CPU usage.  */
         System.setProperty("slf4jtoys.usePlatformManagedBean", "true");
+        System.setProperty("slf4jtoys.watcher.period", "1s");
+        System.setProperty("slf4jtoys.watcher.delay", "1s");
+        /* Customizes the SLF4J simple logger to display trace messages that contain
+         * encoded and parsable information. Enable additional information that allow better 
+         * undestanding of the log output. */
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
         System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
         System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
         System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "yy/MM/dd HH:mm");
+    }
 
-        // Platform specific periodic scheduled job to call watcher.
-        final Timer timer = new Timer("timer", true);
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Session.DEFAULT_WATCHER.logCurrentStatus();
-                }
-            }, 1000, 1000);
+    public static void main(final String[] args) {
+        /* Create a timer that perodically calls the Watcher to report current status. */
+        final Timer timer = new Timer("watcher-timer", true);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Session.DEFAULT_WATCHER.logCurrentStatus();
+            }
+        }, 1000, 1000);
 
         try {
             DefaultWatcher.doWork();
         } finally {
             timer.cancel();
         }
-
     }
 }

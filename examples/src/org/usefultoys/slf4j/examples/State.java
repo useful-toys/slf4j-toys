@@ -27,7 +27,11 @@ import org.usefultoys.slf4j.meter.MeterFactory;
 public class State {
 
     static {
+        /* Customizes the SLF4J simple logger to display trace messages that contain
+         * encoded and parsable information. */
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+        /* Enable managed bean that is able to read CPU usage.  */
+        System.setProperty("profiler.usePlatformManagedBean", "true");
     }
 
     public static void main(final String argv[]) {

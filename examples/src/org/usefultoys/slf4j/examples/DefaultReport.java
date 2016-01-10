@@ -26,11 +26,6 @@ import org.usefultoys.slf4j.Session;
 public class DefaultReport {
 
     public static void main(String[] args) {
-//        The default report may be customized with system properties, for example:
-//        System.setProperty("slf4jtoys.report.networkInterface", "true");
-//        System.setProperty("slf4jtoys.report.fileSystem", "true");
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-
         Session.runDefaultReport();
     }
 }
