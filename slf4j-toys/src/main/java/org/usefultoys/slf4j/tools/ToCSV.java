@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 x7ws.
+ * Copyright 2015 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import org.usefultoys.slf4j.meter.MeterData;
 
-/**
- *
- * @author x7ws
- */
 public class ToCSV {
 
     public static void main(final String argv[]) {
