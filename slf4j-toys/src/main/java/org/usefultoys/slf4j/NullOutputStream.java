@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Outputstream that discards everything.
+ * OutputStream that discards everything.
  *
  * @author Daniel Felix Ferber
  *

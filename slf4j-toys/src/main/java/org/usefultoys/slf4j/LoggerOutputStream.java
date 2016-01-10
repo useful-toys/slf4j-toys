@@ -75,14 +75,4 @@ abstract class LoggerOutputStream extends OutputStream {
     public String toString() {
         return os.toString();
     }
-
-    @Override
-    public int hashCode() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        throw new UnsupportedOperationException();
-    }
 }

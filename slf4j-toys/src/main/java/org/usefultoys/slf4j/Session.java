@@ -43,7 +43,7 @@ public final class Session {
     public static boolean useGarbageCollectionManagedBean = getProperty("slf4jtoys.useGarbageCollectionManagedBean", false);
     public static boolean usePlatformManagedBean = getProperty("slf4jtoys.usePlatformManagedBean", false);
 
-    public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(readWatcherLoggerName()));
+    public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(getProperty("slf4jtoys.watcher.name", "watcher")));
 
     private static ScheduledExecutorService defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> scheduledDefaultWatcher;
@@ -53,7 +53,11 @@ public final class Session {
             defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
         }
         if (scheduledDefaultWatcher == null) {
-            scheduledDefaultWatcher = defaultWatcherExecutor.scheduleAtFixedRate(DEFAULT_WATCHER, readWatcherDelayMillisecondsProperty(), readWatcherPeriodMillisecondsProperty(), TimeUnit.MILLISECONDS);
+            scheduledDefaultWatcher = defaultWatcherExecutor.scheduleAtFixedRate(
+                    DEFAULT_WATCHER, 
+                    getMillisecondsProperty("slf4jtoys.watcher.delay", 60000L), 
+                    getMillisecondsProperty("slf4jtoys.watcher.period", 600000L), 
+                    TimeUnit.MILLISECONDS);
         }
     }
 
@@ -74,7 +78,7 @@ public final class Session {
                 command.run();
             }
         };
-        new Reporter().logReport(noThreadExecutor);
+        new Reporter().logDefaultReports(noThreadExecutor);
     }
 
     public static String getProperty(final String name, final String defaultValue) {
@@ -148,15 +152,6 @@ public final class Session {
         return Session.getMillisecondsProperty("slf4jtoys.meter.progress.period", 2000L);
     }
 
-    public static long readWatcherPeriodMillisecondsProperty() {
-        return getMillisecondsProperty("slf4jtoys.watcher.period", 600000L);
-    }
 
-    public static long readWatcherDelayMillisecondsProperty() {
-        return getMillisecondsProperty("slf4jtoys.watcher.delay", 60000L);
-    }
 
-    public static String readWatcherLoggerName() {
-        return getProperty("slf4jtoys.watcher.name", "watcher");
-    }
 }

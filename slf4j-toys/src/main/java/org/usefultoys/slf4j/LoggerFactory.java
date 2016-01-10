@@ -375,5 +375,4 @@ public class LoggerFactory {
     public static OutputStream getErrorOutputStream(final Logger logger, final String name) {
         return getErrorOutputStream(LoggerFactory.getLogger(logger, name));
     }
-
 }
