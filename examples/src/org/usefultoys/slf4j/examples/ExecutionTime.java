@@ -28,41 +28,22 @@ import org.usefultoys.slf4j.meter.MeterFactory;
 public class ExecutionTime {
 
     static {
+        /* Customizes the SLF4J simple logger to display trace messages that contain
+         * encoded and parsable information. */
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+        /* Enable managed bean that is able to read CPU usage.  */
         System.setProperty("profiler.usePlatformManagedBean", "true");
     }
 
+    public static final Logger logger = LoggerFactory.getLogger("example");
+
     public static void main(final String argv[]) {
-        Thread t1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int i = Integer.MIN_VALUE;
-                while (! Thread.interrupted()) {
-                    i++;
-                }
-            }
-        });
-        t1.setDaemon(true);
-        t1.start();
-        
-        Thread t2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int i = Integer.MIN_VALUE;
-                while (! Thread.interrupted()) {
-                    i++;
-                }
-            }
-        });
-        t2.setDaemon(true);
-        t2.start();
-        
         try {
             Thread.sleep(3000L);
         } catch (InterruptedException ex) {
             java.util.logging.Logger.getLogger(ExecutionTime.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         example1();
         try {
             example2();
@@ -79,24 +60,23 @@ public class ExecutionTime {
         }
         System.gc();
 
+        example5();
+        example6();
     }
 
     private static void example1() {
-        final Logger logger = LoggerFactory.getLogger("example");
         final Meter m = MeterFactory.getMeter(logger, "operation").start();
         runOperation();
         m.ok();
     }
 
     private static void example2() {
-        final Logger logger = LoggerFactory.getLogger("example");
         final Meter m = MeterFactory.getMeter(logger, "operation").start();
         failOperation();
         m.ok();
     }
 
     private static void example3() {
-        final Logger logger = LoggerFactory.getLogger("example");
         try (final Meter m = MeterFactory.getMeter(logger, "operation").start()) {
             runOperation();
             m.ok();
@@ -104,10 +84,29 @@ public class ExecutionTime {
     }
 
     private static void example4() {
-        final Logger logger = LoggerFactory.getLogger("example");
         try (final Meter m = MeterFactory.getMeter(logger, "operation").start()) {
             failOperation();
             m.ok();
+        }
+    }
+
+    private static void example5() {
+        final Meter m = MeterFactory.getMeter(logger, "operation").start();
+        try {
+            runOperation();
+            m.ok();
+        } catch (RuntimeException e) {
+            m.fail(e);
+        }
+    }
+
+    private static void example6() {
+        final Meter m = MeterFactory.getMeter(logger, "operation").start();
+        try {
+            failOperation();
+            m.ok();
+        } catch (RuntimeException e) {
+            m.fail(e);
         }
     }
 

@@ -15,9 +15,6 @@
  */
 package org.usefultoys.slf4j.examples;
 
-import java.sql.SQLException;
-import java.util.Random;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.meter.Meter;
@@ -27,10 +24,14 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  *
  * @author daniel
  */
-public class Failure {
+public class ExecutionFailure {
 
     static {
+        /* Customizes the SLF4J simple logger to display trace messages that contain
+         * encoded and parsable information. */
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+        /* Enable managed bean that is able to read CPU usage.  */
+        System.setProperty("profiler.usePlatformManagedBean", "true");
     }
 
     public static void main(final String argv[]) {

@@ -28,23 +28,30 @@ import org.usefultoys.slf4j.meter.MeterFactory;
 public class ExecutionPath {
 
     static {
+        /* Customizes the SLF4J simple logger to display trace messages that contain
+         * encoded and parsable information. */
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-    }
+         /* Enable managed bean that is able to read CPU usage.  */
+        System.setProperty("profiler.usePlatformManagedBean", "true");
+   }
 
     public static void main(final String argv[]) {
         example1();
-        example2();
+        example2A();
+        example2B();
         example3();
     }
 
     private static void example1() {
+        /* Simplistic usage. */
         final Logger logger = LoggerFactory.getLogger("example");
         final Meter m1 = MeterFactory.getMeter(logger, "operation1").start();
         runOperation(true);
         m1.ok();
     }
 
-    private static void example2() {
+    private static void example2A() {
+        /* Report execution flow with Meter.ok(). */
         final Logger logger = LoggerFactory.getLogger("example");
         final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
         // Check if user exists in database
@@ -60,7 +67,26 @@ public class ExecutionPath {
         }
     }
     
+    private static void example2B() {
+        /* Report execution flow with Meter.flow(). */
+        final Logger logger = LoggerFactory.getLogger("example");
+        final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
+        // Check if user exists in database
+        boolean exist = runOperation(true);
+        if (exist) {
+            // Update user in database
+            someOperation();
+            m2.flow("Update");
+        } else {
+            // Insert user into database
+            otherOperation();
+            m2.flow("Insert");
+        }
+        m2.ok();
+    }
+    
     private static void example3() {
+        /* Report execution flow with Meter.ok() and Meter.reject(). */
         final Logger logger = LoggerFactory.getLogger("example");
         final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
         // Check if user has permissions

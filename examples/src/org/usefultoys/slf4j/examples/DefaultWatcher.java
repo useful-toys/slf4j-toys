@@ -29,7 +29,7 @@ public class DefaultWatcher {
 
     static Random random = new Random(System.currentTimeMillis());
 
-    private static class HeavyCalculation extends Thread {
+    static class HeavyCalculation extends Thread {
 
         {
             setDaemon(true);
@@ -43,23 +43,30 @@ public class DefaultWatcher {
             }
         }
     };
-    
-    public static void main(final String[] args) {
+
+    static {
+        /* Customizes the Watcher for more frequent messages for a faster execution
+         * of this example. Also enable managed bean that is able to read CPU usage.  */
         System.setProperty("slf4jtoys.usePlatformManagedBean", "true");
         System.setProperty("slf4jtoys.watcher.period", "1s");
         System.setProperty("slf4jtoys.watcher.delay", "1s");
+        /* Customizes the SLF4J simple logger to display trace messages that contain
+         * encoded and parsable information. Enable additional information that allow better 
+         * undestanding of the log output. */
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
         System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
         System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
         System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "yy/MM/dd HH:mm");
+    }
 
+    public static void main(final String[] args) {
         Session.startDefaultWatcher();
         doWork();
-        
-       Session.stopDefaultWatcher();
-     }
+        Session.stopDefaultWatcher();
+    }
 
     static void doWork() {
+        /* Start some calculation on separated thread to see CPU usage on Watcher log output. */
         HeavyCalculation c1 = new HeavyCalculation();
         HeavyCalculation c2 = new HeavyCalculation();
         c1.start();
