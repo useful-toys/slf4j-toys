@@ -538,7 +538,7 @@ public class Meter extends MeterData implements Closeable {
         if (context == null) {
             this.context = new LinkedHashMap<String, String>();
         }
-        context.put(name, value);
+        context.put(name, value == null ? NULL_VALUE : value);
         return this;
     }
 
@@ -602,8 +602,7 @@ public class Meter extends MeterData implements Closeable {
         try {
             if (startTime != 0) {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                logger.error(Slf4JMarkers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, getFullID(), new IllegalMeterUsage(2)
-                );
+                logger.error(Slf4JMarkers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, getFullID(), new IllegalMeterUsage(2));
             } else {
                 previousInstance = localThreadInstance.get();
                 localThreadInstance.set(new WeakReference<Meter>(this));
