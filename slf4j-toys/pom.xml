@@ -5,12 +5,6 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
   
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>9</version>
-    </parent>  
-  
     <groupId> org.usefultoys</groupId>
     <artifactId>slf4j-toys</artifactId>
     <version>1.5.0</version>  
@@ -19,18 +13,23 @@
     <description>A collection of useful practices that complement SLF4J and promotes clean and organized log files.</description>
     <url>https://github.com/useful-toys/slf4j-toys</url>
     
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <properties>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.debug>false</maven.compiler.debug>
+        
+        <maven.test.skip>true</maven.test.skip>
+        
+        <gpg.executable>gpg2</gpg.executable>
+        <gpg.keyname>F21879F3</gpg.keyname>
+        <gpg.passphrase>*********</gpg.passphrase>
+        <gpg.defaultKeyring>false</gpg.defaultKeyring>
+        <gpg.useagent>true</gpg.useagent>
+        <gpg.lockMode>never</gpg.lockMode>
+        <gpg.homedir>/home/lkrnac/.gnupg</gpg.homedir>
+        <gpg.publicKeyring>/home/lkrnac/.gnupg/pubring.gpg</gpg.publicKeyring>
+        <gpg.secretKeyring>/home/lkrnac/.gnupg/secring.gpg</gpg.secretKeyring>
+    </properties>    
     
     <licenses>
         <license>
@@ -53,6 +52,17 @@
         <developerConnection>scm:git:git@github.com/useful-toys/slf4j-toys.git</developerConnection>
         <url>git@github.com/useful-toys/slf4j-toys.git</url>
     </scm>
+    
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>    
+    </distributionManagement>    
 
     <dependencies>
         <dependency>
@@ -73,4 +83,69 @@
             <version>4.12</version>
         </dependency>
     </dependencies>
+    
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>2.6</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                </manifest>
+                                <manifestEntries>
+                                    <Built-By>Daniel Felix Ferber</Built-By>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </plugin>                    
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.4</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.3</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
