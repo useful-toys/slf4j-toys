@@ -16,11 +16,12 @@
 package org.usefultoys.slf4j;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Locale;
 
 /**
- * OutputStream that discards everything.
+ * An {@link PrintStream} that discards everything.
  *
  * @author Daniel Felix Ferber
  *
@@ -28,6 +29,7 @@ import java.util.Locale;
 class NullPrintStream extends PrintStream {
 
     NullPrintStream() {
+        // prevent instances outside this library
         super(new NullOutputStream());
     }
 

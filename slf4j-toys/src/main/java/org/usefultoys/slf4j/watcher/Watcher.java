@@ -23,10 +23,8 @@ import org.usefultoys.slf4j.Session;
  * Periodically collect system status and reports to logger. It conveniently
  * implements {@link Runnable} for compliance with
  * {@link ScheduledExecutorService}. Call {@link #logCurrentStatus()} to log a
- * single 1-line summary of the current system status. Call
- * {@link #logResourcesReport()} for a detailed report of available system
- * resources.
- *
+ * single 1-line summary of the current system status. 
+ * 
  * @author Daniel Felix Ferber
  */
 public class Watcher extends WatcherData implements Runnable {

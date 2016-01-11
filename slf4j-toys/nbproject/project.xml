@@ -8,8 +8,7 @@
                 <root id="src.dir" name="Sources"/>
             </source-roots>
             <test-roots>
-                <root id="test.src.dir" name="Test cases"/>
-                <root id="test.java.dir" name="Examples"/>
+                <root id="test.src.dir" name="Tests"/>
             </test-roots>
         </data>
         <libraries xmlns="http://www.netbeans.org/ns/ant-project-libraries/1">

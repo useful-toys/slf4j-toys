@@ -1,10 +1,19 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2015 Daniel Felix Ferber.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.usefultoys.slf4j.examples;
-
 
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -17,25 +26,36 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  */
 public class ExecutionPath {
 
+    public static final Logger logger = LoggerFactory.getLogger("example");
+
     static {
+        /* Customizes the SLF4J simple logger to display trace messages that contain
+         * encoded and parsable information. */
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+        /* Enable managed bean that is able to read CPU usage.  */
+        System.setProperty("profiler.usePlatformManagedBean", "true");
     }
 
     public static void main(final String argv[]) {
         example1();
-        example2();
-        example3();
+        example2A();
+        example2C();
+        example2B();
+        example2D();
+        example3A();
+        example3B();
+        example3C();
     }
 
     private static void example1() {
-        final Logger logger = LoggerFactory.getLogger("example");
+        /* Simplistic usage. */
         final Meter m1 = MeterFactory.getMeter(logger, "operation1").start();
         runOperation(true);
         m1.ok();
     }
 
-    private static void example2() {
-        final Logger logger = LoggerFactory.getLogger("example");
+    private static void example2A() {
+        /* Report execution flow with Meter.ok() with string parameter. */
         final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
         // Check if user exists in database
         boolean exist = runOperation(true);
@@ -49,9 +69,64 @@ public class ExecutionPath {
             m2.ok("Insert");
         }
     }
-    
-    private static void example3() {
-        final Logger logger = LoggerFactory.getLogger("example");
+
+    static enum OperationResult {
+
+        UPDATE, INSERT
+    }
+
+    private static void example2C() {
+        /* Report execution flow with Meter.ok() with enum parameter. */
+        final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
+        // Check if user exists in database
+        boolean exist = runOperation(true);
+        if (exist) {
+            // Update user in database
+            someOperation();
+            m2.ok(OperationResult.UPDATE);
+        } else {
+            // Insert user into database
+            otherOperation();
+            m2.ok(OperationResult.INSERT);
+        }
+    }
+
+    private static void example2B() {
+        /* Report execution flow with Meter.flow() with string parameter. */
+        final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
+        // Check if user exists in database
+        boolean exist = runOperation(true);
+        if (exist) {
+            // Update user in database
+            someOperation();
+            m2.flow("Update");
+        } else {
+            // Insert user into database
+            otherOperation();
+            m2.flow("Insert");
+        }
+        m2.ok();
+    }
+
+    private static void example2D() {
+        /* Report execution flow with Meter.flow() with enum parameter. */
+        final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
+        // Check if user exists in database
+        boolean exist = runOperation(true);
+        if (exist) {
+            // Update user in database
+            someOperation();
+            m2.flow(OperationResult.UPDATE);
+        } else {
+            // Insert user into database
+            otherOperation();
+            m2.flow(OperationResult.INSERT);
+        }
+        m2.ok();
+    }
+
+    private static void example3A() {
+        /* Report execution flow with Meter.ok() and Meter.reject(). */
         final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
         // Check if user has permissions
         boolean authorized = runOperation(false);
@@ -61,6 +136,45 @@ public class ExecutionPath {
             m2.ok("Update");
         } else {
             m2.reject("Unauthorized");
+        }
+    }
+
+    static enum OperationFailure {
+
+        UNAUTHORIZED
+    }
+
+    private static void example3B() {
+        /* Report execution flow with Meter.ok() and Meter.reject() with enum parameter. */
+        final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
+        // Check if user has permissions
+        boolean authorized = runOperation(false);
+        if (authorized) {
+            // Proceed
+            someOperation();
+            m2.ok("Update");
+        } else {
+            m2.reject(OperationFailure.UNAUTHORIZED);
+        }
+    }
+
+    public static class UnauthorizedException extends Exception {
+    }
+
+    private static void example3C() {
+        /* Report execution flow with Meter.ok() and Meter.reject() with exception parameter. */
+        final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
+        try {
+            // Check if user has permissions
+            boolean authorized = runOperation(false);
+            if (!authorized) {
+                throw new UnauthorizedException();
+            }
+            // Proceed
+            someOperation();
+            m2.ok("Update");
+        } catch (UnauthorizedException e) {
+            m2.reject(e);
         }
     }
 

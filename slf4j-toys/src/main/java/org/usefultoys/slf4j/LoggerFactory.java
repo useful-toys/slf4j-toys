@@ -35,7 +35,7 @@ public class LoggerFactory {
      * {@link org.slf4j.LoggerFactory#getLogger(String)}.
      * <p>
      * Recommended to get a special purpose logger defined by the application,
-     * whose name does not follow de fully qualified name convention and that
+     * whose name does not follow the fully qualified name convention and that
      * tracks some globally available feature.
      *
      * @param name The name of the logger.
@@ -51,7 +51,7 @@ public class LoggerFactory {
      * <p>
      * Recommended to get a logger that tracks features provided by the class.
      *
-     * @param clazz the returned logger will be named after clazz
+     * @param clazz the returned logger will be named after {@literal clazz}
      * @return the logger
      */
     public static Logger getLogger(final Class<?> clazz) {
@@ -59,15 +59,13 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a logger named according to the operation or feature and provided
-     * by the class passed as parameter, using the statically bound
-     * {@link ILoggerFactory} instance.
+     * Returns a separate logger named according to a parent logger and the operation or feature, 
+     * using the statically bound {@link ILoggerFactory} instance.
      * <p>
-     * Recommended to get a logger that tracks separatedly a specific operation
-     * or feature provided by the class.
+     * Recommended to get a logger subordinated to an existing logger.
      *
      * @param clazz the returned logger will be named after clazz
-     * @param name the name of the operation or feature provided by the class.
+     * @param name the name of operation or feature appended to the parent logger name.
      * @return the logger
      */
     public static Logger getLogger(final Class<?> clazz, final String name) {
@@ -75,15 +73,13 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a logger named according to and operation or feature tracked by
-     * the the logger passed as parameter, using the statically bound
-     * {@link ILoggerFactory} instance.
+     * Returns a separate logger named according to a parent logger and the operation or feature, 
+     * using the statically bound {@link ILoggerFactory} instance.
+     * <p>
+     * Recommended to get a logger subordinated to an existing logger.
      *
-     * Recommended to get a logger that tracks separatedly a step, operation or
-     * feature being reported by an existing logger.
-     *
-     * @param logger the returned logger will be named after logger
-     * @param name the name of the operation provided by the class.
+     * @param logger the returned logger will be named after this parent logger
+     * @param name the name of operation or feature appended to the parent logger name.
      * @return the logger
      */
     public static Logger getLogger(final Logger logger, final String name) {
@@ -91,11 +87,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a trace logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as a trace message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getTracePrintStream(final Logger logger) {
         if (!logger.isTraceEnabled()) {
@@ -105,11 +100,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a debug logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as a debug message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getDebugPrintStream(final Logger logger) {
         if (!logger.isDebugEnabled()) {
@@ -119,11 +113,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a info logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as an information message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getInfoPrintStream(final Logger logger) {
         if (!logger.isInfoEnabled()) {
@@ -133,11 +126,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a warn logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as a warning message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getWarnPrintStream(final Logger logger) {
         if (!logger.isWarnEnabled()) {
@@ -147,11 +139,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a error logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as an error message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getErrorPrintStream(final Logger logger) {
         if (!logger.isErrorEnabled()) {
@@ -161,11 +152,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write
-     * unformatted data to a trace logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a trace message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger data is reported to.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getTraceOutputStream(final Logger logger) {
         if (!logger.isTraceEnabled()) {
@@ -180,11 +170,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write
-     * unformatted data to a debug logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a debug message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger data is reported to.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getDebugOutputStream(final Logger logger) {
         if (!logger.isDebugEnabled()) {
@@ -199,11 +188,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write unformatted
-     * data to a info logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as an information message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger data is reported to.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getInfoOutputStream(final Logger logger) {
         if (!logger.isInfoEnabled()) {
@@ -218,11 +206,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write
-     * unformatted data to a warn logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a warning message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger data is reported to.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getWarnOutputStream(final Logger logger) {
         if (!logger.isWarnEnabled()) {
@@ -237,11 +224,10 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write
-     * unformatted data to a error logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as an error message to logger. 
      *
-     * @param logger the logger written to.
-     * @return the PrintStream
+     * @param logger the logger data is reported to.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getErrorOutputStream(final Logger logger) {
         if (!logger.isErrorEnabled()) {
@@ -256,72 +242,72 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a trace logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its structured text as a trace message to logger. 
+     * Shortcut to {@code getTracePrintStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the PrintStream logger will be named after this logger
-     * @param name the name of the operation or feature for the PrintStream.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getTracePrintStream(final Logger logger, final String name) {
         return getTracePrintStream(LoggerFactory.getLogger(logger, name));
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a debug logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its structured text as a debug message to logger. 
+     * Shortcut to {@code getDebugPrintStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the PrintStream logger will be named after this logger
-     * @param name the name of the operation or feature for the PrintStream.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getDebugPrintStream(final Logger logger, final String name) {
         return getDebugPrintStream(LoggerFactory.getLogger(logger, name));
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a info logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its structured text as an information message to logger. 
+     * Shortcut to {@code getInfoPrintStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the PrintStream logger will be named after this logger
-     * @param name the name of the operation or feature for the PrintStream.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getInfoPrintStream(final Logger logger, final String name) {
         return getInfoPrintStream(LoggerFactory.getLogger(logger, name));
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a warn logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its structured text as a warning message to logger. 
+     * Shortcut to {@code getWarnPrintStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the PrintStream logger will be named after this logger
-     * @param name the name of the operation or feature for the PrintStream.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getWarnPrintStream(final Logger logger, final String name) {
         return getWarnPrintStream(LoggerFactory.getLogger(logger, name));
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write text to
-     * a error logger.
+     * Returns a {@link PrintStream} whose close and flush methods write its structured text as an error message to logger. 
+     * Shortcut to {@code getErrorPrintStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the PrintStream logger will be named after this logger
-     * @param name the name of the operation or feature for the PrintStream.
-     * @return the PrintStream
+     * @param logger the logger text is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getErrorPrintStream(final Logger logger, final String name) {
         return getErrorPrintStream(LoggerFactory.getLogger(logger, name));
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write
-     * unformatted data to a trace logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a trace message to logger. 
+     * Shortcut to {@code getTraceOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the OutputStream logger will be named after this logger
-     * @param name the name of the operation or feature for the OutputStream.
-     * @return the OutputStream
+     * @param logger the logger data is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getTraceOutputStream(final Logger logger, final String name) {
         return getTraceOutputStream(LoggerFactory.getLogger(logger, name));
@@ -329,51 +315,51 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write
-     * unformatted data to a debug logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a debug message to logger. 
+     * Shortcut to {@code getDebugOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the OutputStream logger will be named after this logger
-     * @param name the name of the operation or feature for the OutputStream.
-     * @return the OutputStream
+     * @param logger the logger data is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getDebugOutputStream(final Logger logger, final String name) {
         return getDebugOutputStream(LoggerFactory.getLogger(logger, name));
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush write unformatted
-     * data to a info logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as an information message to logger. 
+     * Shortcut to {@code getInfoOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the OutputStream logger will be named after this logger
-     * @param name the name of the operation or feature for the OutputStream.
-     * @return the OutputStream
+     * @param logger the logger data is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getInfoOutputStream(final Logger logger, final String name) {
         return getInfoOutputStream(LoggerFactory.getLogger(logger, name));
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write
-     * unformatted data to a warn logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a warning message to logger. 
+     * Shortcut to {@code getWarnOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the OutputStream logger will be named after this logger
-     * @param name the name of the operation or feature for the OutputStream.
-     * @return the OutputStream
+     * @param logger the logger data is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getWarnOutputStream(final Logger logger, final String name) {
         return getWarnOutputStream(LoggerFactory.getLogger(logger, name));
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write
-     * unformatted data to a error logger.
+     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as an error message to logger. 
+     * unformatted data as a error level message to to the logger.
+     * Shortcut to {@code getErrorOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
-     * @param logger the OutputStream logger will be named after this logger
-     * @param name the name of the operation or feature for the OutputStream.
-     * @return the OutputStream
+     * @param logger the logger data is reported to.
+     * @param name the name of operation or feature appended to the logger name.
+     * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getErrorOutputStream(final Logger logger, final String name) {
         return getErrorOutputStream(LoggerFactory.getLogger(logger, name));
     }
-
 }
