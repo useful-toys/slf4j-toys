@@ -25,8 +25,11 @@ import org.usefultoys.slf4j.report.Reporter;
 import org.usefultoys.slf4j.watcher.Watcher;
 
 /**
- * Profiling session for the current JVM. Stores the UUID logged on each message
- * on the current JVM. Keeps the timer calls the watcher periodically.
+ * Profiling session for the current JVM. 
+ * Stores the UUID of the current SLF4J-Toys instance.
+ * Retrieves global configuration.
+ * Keeps the default watcher instance.
+ * Keeps the default executor that periodically invokes the default watcher.
  *
  * @author Daniel Felix Ferber
  */
@@ -36,18 +39,63 @@ public final class Session {
         // prevent instances
     }
 
+    /**
+     * UUID of the current SLF4J-Toys instance. This UUID is added to all trace messages.
+     * It allows do distinguish messages from different JVM instances if logfiles are shared.  
+     * Default: {@code false}.
+     * Value is assigned at application startup and cannot be changed at runtome.
+     */
     public static final String uuid = UUID.randomUUID().toString().replace("-", "");
+    /**
+     * If additional memory usage status is retrieved from MemoryMXBean.
+     * Not all JVM may support or allow MemoryMXBean usage.
+     * Value is read from system property {@code slf4jtoys.useMemoryManagedBean} at application startup, defaults to {@code false}. 
+     * You may assign a new value at runtime.
+     */
     public static boolean useMemoryManagedBean = getProperty("slf4jtoys.useMemoryManagedBean", false);
+    /**
+     * If additional class loading status is retrieved from ClassLoadingMXBean.
+     * Not all JVM may support or allow ClassLoadingMXBean usage.
+     * Value is read from system property {@code slf4jtoys.useClassLoadingManagedBean} at application startup, defaults to {@code false}. 
+     * You may assign a new value at runtime.
+     */
     public static boolean useClassLoadingManagedBean = getProperty("slf4jtoys.useClassLoadingManagedBean", false);
+    /**
+     * If additional JIT compiler status is retrieved from CompilationMXBean.
+     * Not all JVM may support or allow CompilationMXBean usage.
+     * Value is read from system property {@code slf4jtoys.useCompilationManagedBean} at application startup, defaults to {@code false}. 
+     * You may assign a new value at runtime.
+     */
     public static boolean useCompilationManagedBean = getProperty("slf4jtoys.useCompilationManagedBean", false);
+    /**
+     * If additional garbage collector status is retrieved from GarbageCollectorMXBean.
+     * Not all JVM may support or allow GarbageCollectorMXBean usage.
+     * Value is read from system property {@code slf4jtoys.useGarbageCollectionManagedBean} at application startup, defaults to {@code false}. 
+     * You may assign a new value at runtime.
+     */
     public static boolean useGarbageCollectionManagedBean = getProperty("slf4jtoys.useGarbageCollectionManagedBean", false);
+    /**
+     * If additional operating system status is retrieved from OperatingSystemMXBean.
+     * Not all JVM may support or allow OperatingSystemMXBean usage.
+     * Value is read from system property {@code slf4jtoys.usePlatformManagedBean} at application startup, defaults to {@code false}. 
+     * You may assign a new value at runtime.
+     */
     public static boolean usePlatformManagedBean = getProperty("slf4jtoys.usePlatformManagedBean", false);
 
+    /**
+     * Default watcher.
+     * Watcher is created at application startup. Its name is read from system property {@code slf4jtoys.watcher.name}, defaults to {@code watcher}. 
+     * You cannot assign the default watcher at runtime.
+     */
     public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(getProperty("slf4jtoys.watcher.name", "watcher")));
 
     private static ScheduledExecutorService defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> scheduledDefaultWatcher;
 
+    /**
+     * Starts the executor that periodically invokes the default watcher to report system status.
+     * Intended for simple arquitectures. May not be suitable for JavaEE environments that manage threads by iteself.
+     */
     public static synchronized void startDefaultWatcher() {
         if (defaultWatcherExecutor == null) {
             defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -61,6 +109,9 @@ public final class Session {
         }
     }
 
+    /**
+     * Stops the executor that periodically invokes the default watcher to report system status.
+     */
     public static synchronized void stopDefaultWatcher() {
         if (scheduledDefaultWatcher != null) {
             scheduledDefaultWatcher.cancel(true);
@@ -71,6 +122,10 @@ public final class Session {
         }
     }
 
+    /**
+     * Runs the default report on the current thread.
+     * Intended for simple arquitectures. May not be suitable for JavaEE environments that do not allow blocking threads for extended amount of time.
+     */
     public static void runDefaultReport() {
         final Executor noThreadExecutor = new Executor() {
             @Override

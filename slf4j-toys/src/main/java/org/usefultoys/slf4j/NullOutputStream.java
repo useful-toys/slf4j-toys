@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * OutputStream that discards everything.
+ * An {@link OutputStream} that discards everything.
  *
  * @author Daniel Felix Ferber
  *
@@ -27,6 +27,7 @@ import java.io.OutputStream;
 class NullOutputStream extends OutputStream {
 
     NullOutputStream() {
+        // prevent instances outside this library
         super();
     }
 

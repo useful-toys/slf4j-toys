@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * An outputstream that redirects the written data to a logger whenever
+ * An {@link OutputStream} that redirects the written data to a logger whenever
  * {@link #close()} or {@link #flush()} is called.
  * <p>
  * Instance of this class are obtained by calling factory methods from
@@ -33,11 +33,19 @@ import java.io.OutputStream;
  */
 abstract class LoggerOutputStream extends OutputStream {
 
+	LoggerOutputStream() {
+        // prevent instances outside this library
+		super();
+	}
+	
     /**
      * Buffer that buffers data until it is redirected to the logger.
      */
     private final ByteArrayOutputStream os = new ByteArrayOutputStream(0x3FFF);
 
+    /**
+     * Closes this output stream and writes any buffered output bytes as a message to the logger. 
+     */
     @Override
     public void close() throws IOException {
         os.close();
@@ -45,6 +53,9 @@ abstract class LoggerOutputStream extends OutputStream {
         super.close();
     }
 
+    /**
+     * Flushes this output stream and forces any buffered output bytes to be written as a message to the logger.
+     */
     @Override
     public void flush() throws IOException {
         os.flush();
@@ -65,8 +76,15 @@ abstract class LoggerOutputStream extends OutputStream {
         os.write(b, off, len);
     }
 
+    /**
+     * Writes any buffered output bytes as a message to the logger.
+     */
     protected abstract void writeToLogger();
 
+    /**
+     * Converts any buffered output bytes to string.
+     * @return string representing any buffered output bytes
+     */
     protected String extractString() {
         return os.toString();
     }

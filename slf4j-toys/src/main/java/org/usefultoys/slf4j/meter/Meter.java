@@ -78,7 +78,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Creates a new meter.
      *
-     * @param logger
+     * @param logger Logger 
      */
     public Meter(final Logger logger) {
         super();
@@ -126,7 +126,7 @@ public class Meter extends MeterData implements Closeable {
      * individually. The new meter uses the name of this meter, appended my its
      * name, similar as logger do.
      *
-     * @param name
+     * @param name 
      * @return The new Meter
      */
     public Meter sub(final String name) {
