@@ -32,7 +32,7 @@ import static org.usefultoys.slf4j.internal.SyntaxDefinition.QUOTE;
 /**
  * Provides methods that implement recurrent deserialization patterns. The
  * methods consist of a simplified parser of patterns produced by
- * {@link MessageWriter}.
+ * {@link EventWriter}.
  * <p>
  * To ease deserialization of one event and to reduce the amount of parameters,
  * EventReader keeps state of the deserialization of the event. For sake of

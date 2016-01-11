@@ -113,9 +113,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Logger that receives messages from this meter.
-     *
-     * @return
+     * @return Logger that receives messages from this meter.
      */
     public Logger getLogger() {
         return logger;
@@ -123,13 +121,13 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Creates a new mwter whose name is under the hierarchy of this meter.
+     * Creates a new Meter whose name is under the hierarchy of this meter.
      * Useful if a large task may be subdivided into smaller task and reported
      * individually. The new meter uses the name of this meter, appended my its
      * name, similar as logger do.
      *
      * @param name
-     * @return
+     * @return The new Meter
      */
     public Meter sub(final String name) {
         if (name == null) {
