@@ -16,7 +16,7 @@
 package org.usefultoys.slf4j.internal;
 
 /**
- * Defines symbols used to serialize data into log messages.
+ * Symbols used to serialize/deserialize events as encoded strings.
  *
  * @author Daniel Felix Ferber
  */

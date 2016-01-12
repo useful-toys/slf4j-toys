@@ -26,6 +26,10 @@ import org.usefultoys.slf4j.internal.EventWriter;
 import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
+/**
+ * 
+ * @author x7ws
+ */
 public class MeterData extends SystemData {
 
     private static final long serialVersionUID = 2L;

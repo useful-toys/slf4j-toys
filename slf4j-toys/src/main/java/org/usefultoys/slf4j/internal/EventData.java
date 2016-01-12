@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- *
+ * 
  * @author Daniel
  */
 public abstract class EventData implements Serializable {

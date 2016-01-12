@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Regular expression patterns used to deserialize events as encoded strings.
  * @author Daniel
  */
 class PatternDefinition extends SyntaxDefinition {

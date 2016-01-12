@@ -61,11 +61,9 @@ public abstract class SystemData extends EventData {
     @Override
     protected void resetImpl() {
         this.heap_commited = 0;
-//        this.heap_init = 0;
         this.heap_max = 0;
         this.heap_used = 0;
         this.nonHeap_commited = 0;
-//        this.nonHeap_init = 0;
         this.nonHeap_max = 0;
         this.nonHeap_used = 0;
         this.objectPendingFinalizationCount = 0;
