@@ -26,19 +26,19 @@ public abstract class EventData implements Serializable {
 
     private static final long serialVersionUID = 1L;
     /**
-     * Unique ProfilingSession UUID.
+     * Session UUID of JVM where this event data was collected.
      */
     protected String sessionUuid = null;
     /**
-     * Identifier that categorizes events into groups.
+     * Identifier that categorizes events.
      */
     protected String eventCategory = null;
     /**
-     * The event name.
+     * Identifier of the event.
      */
     protected String eventName = null;
     /**
-     * The event position within the category.
+     * Time ordered position for multiple occurrences of the same event.
      */
     protected long eventPosition = 0;
     /**
@@ -50,20 +50,32 @@ public abstract class EventData implements Serializable {
         super();
     }
 
+    /**
+     * @return Session UUID of JVM where this event data was collected.
+     */
     public String getSessionUuid() {
         return sessionUuid;
     }
 
+    /**
+     * @return Identifier that categorizes events.
+     */
     public String getEventCategory() {
         return eventCategory;
     }
 
-    public long getEventPosition() {
-        return eventPosition;
-    }
-
+    /**
+     * @return Identifier of the event.
+     */
     public String getEventName() {
         return eventName;
+    }
+
+    /**
+     * @return Time ordered position for multiple occurrences of the same event.
+     */
+    public long getEventPosition() {
+        return eventPosition;
     }
 
     public String getFullID() {
@@ -81,13 +93,16 @@ public abstract class EventData implements Serializable {
     }
 
     public String getAbbreviatedID() {
-        final int index = eventCategory.lastIndexOf('.')+1;
+        final int index = eventCategory.lastIndexOf('.') + 1;
         if (eventName == null) {
             return eventCategory.substring(index);
         }
         return eventCategory.substring(index) + '/' + eventName;
     }
 
+    /**
+     * @return Timestamp when the event data was collected.
+     */
     public long getTime() {
         return time;
     }
@@ -105,6 +120,10 @@ public abstract class EventData implements Serializable {
         this.resetImpl();
     }
 
+    /**
+     * Subclasses shall provide an implementation that resets its specific properties to their constructor initial value.
+     * This method is called once and shall compare all specific properties.
+     */
     protected abstract void resetImpl();
 
     @Override
@@ -143,12 +162,11 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Indicates whether this event represents the same as the given argument, based on session uuid, category and
+     * Indicates whether this event represents the same as the given argument, based on session uuid, category, name and
      * position.
      *
      * @param other the event with which to compare
-     * @return <code>true</code> if this event represents the same * * * * * * as <code>other</code> argument;
-     * <code>false</code> otherwise.
+     * @return true if this event represents the same event as <code>other</code> argument, false otherwise.
      */
     public final boolean isSameAs(final EventData other) {
         if (other == null) {
@@ -182,11 +200,11 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Indicates weather all event collected attributes are equal than the attributes collected by the event given as
-     * argument. Used only in unit tests.
+     * Indicates weather all properties are equal to the respective properties of the other instance given as argument.
+     * Used only in unit tests.
      *
-     * @param other the event with which to compare
-     * @return <code>true</code> if all attributes are equal between the * events; <code>false</code> otherwise.
+     * @param other the other EventData instance been compared to.
+     * @return true if all properties are equal on the other instance, false otherwise.
      */
     public final boolean isCompletelyEqualsTo(final EventData other) {
         if (other == null) {
@@ -222,6 +240,14 @@ public abstract class EventData implements Serializable {
         return isCompletelyEqualsImpl(other);
     }
 
+    /**
+     * Subclasses shall provide an implementation that compares its specific properties to the respective properties of the
+     * other instance given as argument.
+     * This method is called once and shall compare all specific properties.
+     *
+     * @param other the other EventData instance been compared to.
+     * @return true if all specific properties are equal on the other instance, false otherwise.
+     */
     protected abstract boolean isCompletelyEqualsImpl(EventData other);
 
     protected static final String SESSION_UUID = "s";
@@ -281,11 +307,17 @@ public abstract class EventData implements Serializable {
         }
     }
 
+    /**
+     * Subclasses shall provide an implementation that appends its specific properties to the encoded string representation.
+     * This method is called once and shall append all specific properties using the EventWriter.
+     *
+     * @param w The EventWriter that encodes the properties.
+     */
     protected abstract void writePropertiesImpl(EventWriter w);
 
     /**
-     * Reads an events from the encoded string representation. If no event data is recognized, then inconsistent data
-     * might have been loaded.
+     * Reads an event from the encoded string representation. If string is not well formed, returns {@code false}, but some properties
+     * may already have been assigned.
      *
      * @param message The string that is supposed to contain an encoded string representation of the event.
      * @param messagePrefix message prefix
@@ -336,14 +368,13 @@ public abstract class EventData implements Serializable {
     }
 
     /**
+     * Subclasses shall provide an implementation that reads its specific properties from the
+     * encoded string representation. This method is called for each encoded property.
      *
-     * Implementation shall provide an implementation that reads one or more values (via given EventReader) from the
-     * encoded string and assign them to the property represented by the given key.
-     *
-     * @param r The EventReader that is parsing the message.
-     * @param key The key that represents the property.
-     * @return true if the key was recognized, false otherwise.
-     * @throws IOException the EventReader failed to parse the encoded string.
+     * @param r The EventReader that is parsing the message. Use this parser to retrieve the property value.
+     * @param key The property key.
+     * @return true if the property key was recognized, false otherwise.
+     * @throws IOException the EventReader failed to parse the encoded property value.
      */
     protected abstract boolean readPropertyImpl(EventReader r, String key) throws IOException;
 }
