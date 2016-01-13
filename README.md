@@ -51,7 +51,7 @@ persistence.product
 
 **Installing and using**
 
-SLF4J-TOYS is avaiable at Maven Central repository:
+SLF4J-TOYS is avaiable at [Maven Central repository](http://search.maven.org/#artifactdetails|org.usefultoys|slf4j-toys|1.5.0|jar):
 ```
 <dependency>
     <groupId>org.usefultoys</groupId>
