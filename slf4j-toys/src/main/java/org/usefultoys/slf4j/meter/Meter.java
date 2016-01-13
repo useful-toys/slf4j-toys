@@ -66,7 +66,6 @@ public class Meter extends MeterData implements Closeable {
     private static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
     private transient long lastProgressTime = 0;
     private transient long lastProgressIteration = 0;
-    private static long meterProgressPeriodNanoseconds = Session.readMeterProgressPeriodProperty() * 1000 * 1000;
 
     /**
      * Most recent meter from this thread.
@@ -708,6 +707,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
             long now;
+            long meterProgressPeriodNanoseconds = MeterConfig.progressPeriodMilliseconds * 1000 * 1000;
             if (iteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > meterProgressPeriodNanoseconds) {
                 lastProgressIteration = iteration;
                 lastProgressTime = now;

@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.internal.EventData;
 import org.usefultoys.slf4j.internal.EventReader;
 import org.usefultoys.slf4j.internal.EventWriter;
@@ -35,7 +34,6 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
 public class MeterData extends SystemData {
 
     private static final long serialVersionUID = 2L;
-    private static final boolean meterPrintCategory = Session.readMeterPrintCategoryProperty();
 
     public MeterData() {
         super();
@@ -324,7 +322,7 @@ public class MeterData extends SystemData {
         if (this.description != null) {
             buffer.append(this.description);
         } else {
-            if (eventName == null || meterPrintCategory) {
+            if (eventName == null || MeterConfig.printCategory) {
                 final int index = eventCategory.lastIndexOf('.') + 1;
                 buffer.append(eventCategory.substring(index));
             }

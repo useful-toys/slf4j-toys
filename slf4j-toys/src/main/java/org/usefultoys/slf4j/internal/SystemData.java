@@ -133,18 +133,6 @@ public abstract class SystemData extends EventData {
         return Double.doubleToLongBits(this.systemLoad) == Double.doubleToLongBits(other.systemLoad);
     }
 
-    private static final boolean hasSunOperatingSystemMXBean;
-
-    static {
-        boolean tmpHasSunOperatingSystemMXBean = false;
-        try {
-            Class.forName("com.sun.management.OperatingSystemMXBean");
-            tmpHasSunOperatingSystemMXBean = true;
-        } catch (ClassNotFoundException ignored) {
-            // ignora
-        }
-        hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
-    }
 
     protected void collectRuntimeStatus() {
         final Runtime runtime = Runtime.getRuntime();
@@ -154,10 +142,10 @@ public abstract class SystemData extends EventData {
     }
 
     protected void collectPlatformStatus() {
-        if (!Session.usePlatformManagedBean) {
+        if (!SystemConfig.usePlatformManagedBean) {
             return;
         }
-        if (hasSunOperatingSystemMXBean) {
+        if (SystemConfig.hasSunOperatingSystemMXBean) {
             com.sun.management.OperatingSystemMXBean os = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class);
             final double systemLoadAverage = os.getSystemCpuLoad();
             if (systemLoadAverage > 0) {
@@ -173,7 +161,7 @@ public abstract class SystemData extends EventData {
     }
 
     protected void collectManagedBeanStatus() {
-        if (Session.useMemoryManagedBean) {
+        if (SystemConfig.useMemoryManagedBean) {
             final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
             final MemoryUsage heapUsage = memory.getHeapMemoryUsage();
             heap_commited = heapUsage.getCommitted();
@@ -187,19 +175,19 @@ public abstract class SystemData extends EventData {
             objectPendingFinalizationCount = memory.getObjectPendingFinalizationCount();
         }
 
-        if (Session.useClassLoadingManagedBean) {
+        if (SystemConfig.useClassLoadingManagedBean) {
             final ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
             classLoading_loaded = classLoading.getLoadedClassCount();
             classLoading_total = classLoading.getTotalLoadedClassCount();
             classLoading_unloaded = classLoading.getUnloadedClassCount();
         }
 
-        if (Session.useCompilationManagedBean) {
+        if (SystemConfig.useCompilationManagedBean) {
             final CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
             compilationTime = compilation.getTotalCompilationTime();
         }
 
-        if (Session.useGarbageCollectionManagedBean) {
+        if (SystemConfig.useGarbageCollectionManagedBean) {
             final List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
             garbageCollector_count = 0;
             garbageCollector_time = 0;

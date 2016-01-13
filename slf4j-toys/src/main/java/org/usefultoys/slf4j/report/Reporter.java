@@ -33,7 +33,7 @@ import java.util.TimeZone;
 import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
-import static org.usefultoys.slf4j.Session.getProperty;
+import org.usefultoys.slf4j.internal.Config;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
@@ -42,23 +42,13 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
  */
 public class Reporter implements Serializable {
 
-    private final boolean reportVM = getProperty("slf4jtoys.report.vm", true);
-    private final boolean reportFileSystem = getProperty("slf4jtoys.report.fileSystem", false);
-    private final boolean reportMemory = getProperty("slf4jtoys.report.memory", true);
-    private final boolean reportUser = getProperty("slf4jtoys.report.user", true);
-    private final boolean reportPhysicalSystem = getProperty("slf4jtoys.report.physicalSystem", true);
-    private final boolean reportOperatingSystem = getProperty("slf4jtoys.report.operatingSystem", true);
-    private final boolean reportCalendar = getProperty("slf4jtoys.report.calendar", true);
-    private final boolean reportLocale = getProperty("slf4jtoys.report.locale", true);
-    private final boolean reportCharset = getProperty("slf4jtoys.report.charset", true);
-    private final boolean reportNetworkInterface = getProperty("slf4jtoys.report.networkInterface", false);
     private final Logger logger;
 
     private static final long serialVersionUID = 1L;
 
     public Reporter() {
         super();
-        logger = LoggerFactory.getLogger(getProperty("slf4jtoys.report.name", "report"));
+        logger = LoggerFactory.getLogger(Config.getProperty("slf4jtoys.report.name", "report"));
     }
 
     public Reporter(final Logger logger) {
@@ -91,34 +81,34 @@ public class Reporter implements Serializable {
     }
 
     public void logDefaultReports(final Executor executor) {
-        if (reportPhysicalSystem) {
+        if (ReporterConfig.reportPhysicalSystem) {
             executor.execute(this.new ReportPhysicalSystem());
         }
-        if (reportOperatingSystem) {
+        if (ReporterConfig.reportOperatingSystem) {
             executor.execute(this.new ReportOperatingSystem());
         }
-        if (reportUser) {
+        if (ReporterConfig.reportUser) {
             executor.execute(this.new ReportUser());
         }
-        if (reportVM) {
+        if (ReporterConfig.reportVM) {
             executor.execute(this.new ReportVM());
         }
-        if (reportMemory) {
+        if (ReporterConfig.reportMemory) {
             executor.execute(this.new ReportMemory());
         }
-        if (reportFileSystem) {
+        if (ReporterConfig.reportFileSystem) {
             executor.execute(this.new ReportFileSystem());
         }
-        if (reportCalendar) {
+        if (ReporterConfig.reportCalendar) {
             executor.execute(this.new ReportCalendar());
         }
-        if (reportLocale) {
+        if (ReporterConfig.reportLocale) {
             executor.execute(this.new ReportLocale());
         }
-        if (reportCharset) {
+        if (ReporterConfig.reportCharset) {
             executor.execute(this.new ReportCharset());
         }
-        if (reportNetworkInterface) {
+        if (ReporterConfig.reportNetworkInterface) {
             try {
                 final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
