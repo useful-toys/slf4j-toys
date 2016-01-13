@@ -34,6 +34,10 @@ class PatternDefinition extends SyntaxDefinition {
     // see http://ad.hominem.org/log/2005/05/quoted_strings.php
     static final Pattern messagePattern = Pattern.compile("(.)" + "\\" + MESSAGE_OPEN + "([^\\" + MESSAGE_CLOSE + "\\" + QUOTE + "]*(?:\\" + QUOTE + ".[^\"\\" + QUOTE + "]*)*)\\" + MESSAGE_CLOSE);
 
+    /**
+     * @param chars list of chars
+     * @return a pattern that matches any of the chars
+     */
     private static Pattern quotedCharsPattern(final char... chars) {
         final StringBuilder sb = new StringBuilder("([");
         for (final char c : chars) {
@@ -44,8 +48,16 @@ class PatternDefinition extends SyntaxDefinition {
         return Pattern.compile(sb.toString());
     }
 
-    static String extractPlausibleMessage(final char prefix, final String s) {
-        final Matcher m = messagePattern.matcher(s);
+    /**
+     * Tests if the candidate string contains something that looks like an encoded substring.
+     * A prefix is used to signal a potential valid encoded string.
+     *  
+     * @param prefix Prefix that identifies strings containing an encoded event
+     * @param candidateString String that may contain an encoded event  
+     * @return string that encodes event, null otherwise 
+     */
+    static String extractPlausibleMessage(final char prefix, final String candidateString) {
+        final Matcher m = messagePattern.matcher(candidateString);
         if (m.find()) {
             if (m.group(1).charAt(0) == prefix) {
                 return m.group(2);

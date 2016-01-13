@@ -27,8 +27,10 @@ import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
- * 
- * @author x7ws
+ * Augments the {@link SystemData} with start, stop, failure and flow
+ * information measured by Meter.
+ *
+ * @author Daniel Felix Ferber
  */
 public class MeterData extends SystemData {
 

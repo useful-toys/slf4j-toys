@@ -29,61 +29,148 @@ import static org.usefultoys.slf4j.internal.SyntaxDefinition.PROPERTY_DIV;
 import static org.usefultoys.slf4j.internal.SyntaxDefinition.PROPERTY_EQUALS;
 import static org.usefultoys.slf4j.internal.SyntaxDefinition.PROPERTY_SEPARATOR;
 
+/**
+ * Provides methods that implement recurrent serialization patterns.
+ * These patterns are recognized by {@link EventReader}.
+ * <p>
+ * To ease serialization of one event and to reduce the amount of parameters,
+ * EventWrite keeps state of the serialization of the event. For sake of
+ * simplicity, the EventWrite automatically produces separators.
+ * <p>
+ * Thus, the instance might be shared and reused to reduce object creation
+ * overhead, as long as events are serialized one after the other and within
+ * the same thread.
+ *
+ * @author Daniel Felix Ferber
+ */
 public final class EventWriter {
 
     private transient boolean firstProperty;
     private transient final StringBuilder builder;
 
+    /**
+     * Constructor.
+     * @param builder StringBuilder where encoded event is appended to.
+     */
     EventWriter(final StringBuilder builder) {
         super();
         firstProperty = true;
         this.builder = builder;
     }
 
-    void open(final char id) {
-        builder.append(id);
+    /**
+     * Writes the delimiter that starts the encoded string.
+     * @param prefix Prefix that identifies strings containing an encoded event
+     */
+    void open(final char prefix) {
+        builder.append(prefix);
         builder.append(MESSAGE_OPEN);
     }
 
+    /**
+     * Writes the delimiter that ends the encoded string.
+     */
     void close() {
         builder.append(MESSAGE_CLOSE);
     }
 
-    public EventWriter property(final String name, final Enum<?>  value) {
+    /**
+     * Writes a property whose value is an enumeration.
+     * 
+     * @param name property name
+     * @param value property value
+     * @return itself for chained method calls.
+     */
+    public EventWriter property(final String name, final Enum<?> value) {
         property(name, value.name());
         return this;
     }
 
+    /**
+     * Writes a property whose value is a boolean.
+     * 
+     * @param name property name
+     * @param value property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final boolean value) {
         property(name, Boolean.toString(value));
         return this;
     }
 
+    /**
+     * Writes a property whose value is a long integer.
+     * 
+     * @param name property name
+     * @param value property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final long value) {
         property(name, Long.toString(value));
         return this;
     }
 
+    /**
+     * Writes a property whose value is a tuple of two long integers.
+     * 
+     * @param name property name
+     * @param value1 property value
+     * @param value2 property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final long value1, final long value2) {
         property(name, Long.toString(value1), Long.toString(value2));
         return this;
     }
 
+    /**
+     * Writes a property whose value is a tuple of three long integers.
+     * 
+     * @param name property name
+     * @param value1 property value
+     * @param value2 property value
+     * @param value3 property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final long value1, final long value2, final long value3) {
         property(name, Long.toString(value1), Long.toString(value2), Long.toString(value3));
         return this;
     }
 
+    /**
+     * Writes a property whose value is a tuple of four long integers.
+     * 
+     * @param name property name
+     * @param value1 property value
+     * @param value2 property value
+     * @param value3 property value
+     * @param value4 property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final long value1, final long value2, final long value3, final long value4) {
         property(name, Long.toString(value1), Long.toString(value2), Long.toString(value3), Long.toString(value4));
         return this;
     }
 
+    /**
+     * Writes a property whose value is a long double.
+     * 
+     * @param name property name
+     * @param value property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final double value) {
         property(name, Double.toString(value));
         return this;
     }
 
+    /**
+     * Writes a property whose value is a string.
+     * 
+     * @param name property name
+     * @param value property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final String value) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
@@ -96,6 +183,14 @@ public final class EventWriter {
         return this;
     }
 
+    /**
+     * Writes a property whose value is a tuple of tow strings.
+     * 
+     * @param name property name
+     * @param value1 property value
+     * @param value2 property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final String value1, final String value2) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
@@ -110,6 +205,15 @@ public final class EventWriter {
         return this;
     }
 
+    /**
+     * Writes a property whose value is a tuple of three strings.
+     * 
+     * @param name property name
+     * @param value1 property value
+     * @param value2 property value
+     * @param value3 property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final String value1, final String value2, final String value3) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
@@ -126,6 +230,16 @@ public final class EventWriter {
         return this;
     }
 
+    /**
+     * Writes a property whose value is a tuple of four strings.
+     * 
+     * @param name property name
+     * @param value1 property value
+     * @param value2 property value
+     * @param value3 property value
+     * @param value4 property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final String value1, final String value2, final String value3, final String value4) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);
@@ -144,6 +258,13 @@ public final class EventWriter {
         return this;
     }
 
+    /**
+     * Writes a property whose value is a map.
+     * 
+     * @param name property name
+     * @param map property value
+     * @return itself for chained method calls.
+     */
     public EventWriter property(final String name, final Map<String, String> map) {
         if (!firstProperty) {
             builder.append(PROPERTY_SEPARATOR);

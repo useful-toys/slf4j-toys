@@ -64,15 +64,18 @@ public class EventReader {
         return this;
     }
 
+    /**
+     * @return If there are more potentially incoming property.
+     */
     public boolean hasMore() {
         return start < lenght;
     }
 
     /**
-     * Read an identifier that defines the next incomming property.
+     * Read a name of the next expected incoming property.
      *
      * @return The name of the property.
-     * @throws IOException Incomming chars are not a valid property identifier.
+     * @throws IOException Incoming chars are not a valid property name.
      */
     public String readPropertyName() throws IOException {
         if (!firstProperty) {
@@ -84,6 +87,13 @@ public class EventReader {
         return readPropertyKey();
     }
 
+    /**
+     * Read the property value as string. May be called several times if the
+     * property value is a tuple.
+     *
+     * @return the property value
+     * @throws IOException Incoming chars are not a valid property value.
+     */
     public String readString() throws IOException {
         if (firstValue) {
             readSymbol(PROPERTY_EQUALS);
@@ -94,10 +104,26 @@ public class EventReader {
         return readPropertyValue();
     }
 
+    /**
+     * Read the property value as boolean. May be called several times if the
+     * property value is a tuple.
+     *
+     * @return the property value
+     * @throws IOException Incoming chars are not a valid property value.
+     */
     public boolean readBoolean() throws IOException {
         return Boolean.parseBoolean(readString());
     }
 
+    /**
+     * Read the property value as enumeration. May be called several times if
+     * the property value is a tuple.
+     *
+     * @param <T> type of enumeration
+     * @param c class of enumeration
+     * @return the property value
+     * @throws IOException Incoming chars are not a valid property value.
+     */
     public <T extends Enum<T>> T readEnum(Class<T> c) throws IOException {
         try {
             return Enum.valueOf(c, readString().toUpperCase());
@@ -106,6 +132,13 @@ public class EventReader {
         }
     }
 
+    /**
+     * Read the property value as long integer. May be called several times if
+     * the property value is a tuple.
+     *
+     * @return the property value
+     * @throws IOException Incoming chars are not a valid property value.
+     */
     public long readLong() throws IOException {
         try {
             return Long.parseLong(readString());
@@ -114,6 +147,13 @@ public class EventReader {
         }
     }
 
+    /**
+     * Read the property value as long integer or zero if values is empty. May
+     * be called several times if the property value is a tuple.
+     *
+     * @return the property value
+     * @throws IOException Incoming chars are not a valid property value.
+     */
     public long readLongOrZero() throws IOException {
         try {
             final String str = readString();
@@ -126,6 +166,13 @@ public class EventReader {
         }
     }
 
+    /**
+     * Read the property value as double. May be called several times if the
+     * property value is a tuple.
+     *
+     * @return the property value
+     * @throws IOException Incoming chars are not a valid property value.
+     */
     public double readDouble() throws IOException {
         try {
             return Double.parseDouble(readString());
@@ -134,6 +181,13 @@ public class EventReader {
         }
     }
 
+    /**
+     * Read the property value as double or zero if values is empty. May be
+     * called several times if the property value is a tuple.
+     *
+     * @return the property value
+     * @throws IOException Incoming chars are not a valid property value.
+     */
     public double readDoubleOrZero() throws IOException {
         try {
             final String str = readString();
@@ -146,28 +200,47 @@ public class EventReader {
         }
     }
 
-    protected void readSymbol(final char operator) throws IOException {
+    /**
+     * Consumes an expected symbol.
+     *
+     * @param symbol the expected symbol.
+     * @throws IOException All chars were consumed or incoming char is not the expected symbol.
+     */
+    protected void readSymbol(final char symbol) throws IOException {
         if (start >= lenght) {
             throw new EOFException();
         }
         final char c = chars[start++];
-        if (c != operator) {
-            throw new IOException("expected: " + operator);
+        if (c != symbol) {
+            throw new IOException("expected: " + symbol);
         }
     }
 
-    protected boolean readOptionalSymbol(final char operator) throws IOException {
+    /**
+     * Consumes an optional symbol if available.
+     *
+     * @param symbol the optionally expected symbol.
+     * @return true if the consumed char was the symbol, false otherwise.
+     * @throws IOException All chars were consumed.
+     */
+    protected boolean readOptionalSymbol(final char symbol) throws IOException {
         if (start >= lenght) {
             throw new EOFException();
         }
         final char c = chars[start];
-        if (c == operator) {
+        if (c == symbol) {
             start++;
             return true;
         }
         return false;
     }
 
+    /**
+     * Read the property value as a map of string key and values.
+     *
+     * @return the map
+     * @throws IOException Incoming chars are not a valid property value.
+     */
     public Map<String, String> readMap() throws IOException {
         if (firstValue) {
             readSymbol(PROPERTY_EQUALS);

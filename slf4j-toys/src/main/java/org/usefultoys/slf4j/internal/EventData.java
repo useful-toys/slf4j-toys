@@ -19,8 +19,9 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * 
- * @author Daniel
+ * Abstract class representing events collected by slf4j-toys.
+ *
+ * @author Daniel Felix Ferber
  */
 public abstract class EventData implements Serializable {
 
@@ -85,20 +86,20 @@ public abstract class EventData implements Serializable {
         return eventCategory + '/' + eventName + '/' + eventPosition;
     }
 
-    public String getID() {
-        if (eventName == null) {
-            return eventCategory;
-        }
-        return eventCategory + '/' + eventName;
-    }
+//    public String getID() {
+//        if (eventName == null) {
+//            return eventCategory;
+//        }
+//        return eventCategory + '/' + eventName;
+//    }
 
-    public String getAbbreviatedID() {
-        final int index = eventCategory.lastIndexOf('.') + 1;
-        if (eventName == null) {
-            return eventCategory.substring(index);
-        }
-        return eventCategory.substring(index) + '/' + eventName;
-    }
+//    public String getAbbreviatedID() {
+//        final int index = eventCategory.lastIndexOf('.') + 1;
+//        if (eventName == null) {
+//            return eventCategory.substring(index);
+//        }
+//        return eventCategory.substring(index) + '/' + eventName;
+//    }
 
     /**
      * @return Timestamp when the event data was collected.
@@ -108,8 +109,8 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Reverts all event attributes to their constructor initial value. Useful to reuse the event instance and avoid
-     * creation of new objects.
+     * Reverts all event attributes to their constructor initial value. Useful
+     * to reuse the event instance and avoid creation of new objects.
      */
     protected final void reset() {
         this.sessionUuid = null;
@@ -121,8 +122,9 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Subclasses shall provide an implementation that resets its specific properties to their constructor initial value.
-     * This method is called once and shall compare all specific properties.
+     * Subclasses shall provide an implementation that resets its specific
+     * properties to their constructor initial value. This method is called once
+     * and shall compare all specific properties.
      */
     protected abstract void resetImpl();
 
@@ -162,11 +164,12 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Indicates whether this event represents the same as the given argument, based on session uuid, category, name and
-     * position.
+     * Indicates whether this event represents the same as the given argument,
+     * based on session uuid, category, name and position.
      *
-     * @param other the event with which to compare
-     * @return true if this event represents the same event as <code>other</code> argument, false otherwise.
+     * @param other the other event to compare to.
+     * @return true if this event represents the same event as
+     *  argument, false otherwise.
      */
     public final boolean isSameAs(final EventData other) {
         if (other == null) {
@@ -200,11 +203,12 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Indicates weather all properties are equal to the respective properties of the other instance given as argument.
-     * Used only in unit tests.
+     * Indicates weather all properties are equal to the respective properties
+     * of the other instance given as argument. Used only in unit tests.
      *
      * @param other the other EventData instance been compared to.
-     * @return true if all properties are equal on the other instance, false otherwise.
+     * @return true if all properties are equal on the other instance, false
+     * otherwise.
      */
     public final boolean isCompletelyEqualsTo(final EventData other) {
         if (other == null) {
@@ -241,12 +245,14 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Subclasses shall provide an implementation that compares its specific properties to the respective properties of the
-     * other instance given as argument.
-     * This method is called once and shall compare all specific properties.
+     * Subclasses shall provide an implementation that compares its specific
+     * properties to the respective properties of the other instance given as
+     * argument. This method is called once and shall compare all specific
+     * properties.
      *
      * @param other the other EventData instance been compared to.
-     * @return true if all specific properties are equal on the other instance, false otherwise.
+     * @return true if all specific properties are equal on the other instance,
+     * false otherwise.
      */
     protected abstract boolean isCompletelyEqualsImpl(EventData other);
 
@@ -257,19 +263,24 @@ public abstract class EventData implements Serializable {
     private static final String EVENT_TIME = "t";
 
     /**
-     * Writes a concise, human readable string representation of the event into the supplied StringBuilder.
+     * Writes a concise, human readable string representation of the event into
+     * the supplied StringBuilder.
      *
      * @param builder The StringBuilder that receives the string representation
-     * @return The StringBuilder passed as argument to allow chained StringBuilder method calls.
+     * @return The StringBuilder passed as argument to allow chained
+     * StringBuilder method calls.
      */
     public abstract StringBuilder readableString(StringBuilder builder);
 
     /**
-     * Writes an encoded string representation of the event into the supplied StringBuilder.
+     * Writes an encoded string representation of the event into the supplied
+     * StringBuilder.
      *
      * @param sb The StringBuilder that receives the encoded representation.
-     * @param messagePrefix A prefix character used by an parser to recognize the encoded message.
-     * @return The StringBuilder passed as argument to allow chained StringBuilder method calls.
+     * @param messagePrefix A prefix character used by an parser to recognize
+     * the encoded message.
+     * @return The StringBuilder passed as argument to allow chained
+     * StringBuilder method calls.
      */
     public final StringBuilder write(final StringBuilder sb, final char messagePrefix) {
         final EventWriter w = new EventWriter(sb);
@@ -308,20 +319,24 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Subclasses shall provide an implementation that appends its specific properties to the encoded string representation.
-     * This method is called once and shall append all specific properties using the EventWriter.
+     * Subclasses shall provide an implementation that appends its specific
+     * properties to the encoded string representation. This method is called
+     * once and shall append all specific properties using the EventWriter.
      *
      * @param w The EventWriter that encodes the properties.
      */
     protected abstract void writePropertiesImpl(EventWriter w);
 
     /**
-     * Reads an event from the encoded string representation. If string is not well formed, returns {@code false}, but some properties
-     * may already have been assigned.
+     * Reads an event from the encoded string representation. If string is not
+     * well formed, returns {@code false}, but some properties may already have
+     * been assigned.
      *
-     * @param message The string that is supposed to contain an encoded string representation of the event.
+     * @param message The string that is supposed to contain an encoded string
+     * representation of the event.
      * @param messagePrefix message prefix
-     * @return <code>true</code> if an event was successfully read; <code>false</code> otherwise.
+     * @return <code>true</code> if an event was successfully read;
+     * <code>false</code> otherwise.
      */
     public final boolean read(final String message, final char messagePrefix) {
         final String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);
@@ -368,13 +383,16 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Subclasses shall provide an implementation that reads its specific properties from the
-     * encoded string representation. This method is called for each encoded property.
+     * Subclasses shall provide an implementation that reads its specific
+     * properties from the encoded string representation. This method is called
+     * for each encoded property.
      *
-     * @param r The EventReader that is parsing the message. Use this parser to retrieve the property value.
+     * @param reader The EventReader that is parsing the message. Use this parser to
+     * retrieve the property value.
      * @param key The property key.
      * @return true if the property key was recognized, false otherwise.
-     * @throws IOException the EventReader failed to parse the encoded property value.
+     * @throws IOException the EventReader failed to parse the encoded property
+     * value.
      */
-    protected abstract boolean readPropertyImpl(EventReader r, String key) throws IOException;
+    protected abstract boolean readPropertyImpl(EventReader reader, String key) throws IOException;
 }

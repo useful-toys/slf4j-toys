@@ -27,7 +27,7 @@ import java.util.List;
 import org.usefultoys.slf4j.Session;
 
 /**
- * Augments the EventData with status information collected from the virtual
+ * Augments the {@link EventData} with status collected from the virtual
  * machine.
  *
  * @author Daniel Felix Ferber

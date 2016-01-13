@@ -31,7 +31,6 @@ import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
 
 /**
- *
  * @author Daniel Felix Ferber
  */
 public class Meter extends MeterData implements Closeable {

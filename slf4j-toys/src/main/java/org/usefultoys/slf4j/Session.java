@@ -43,8 +43,8 @@ public final class Session {
 
     /**
      * UUID of the current SLF4J-Toys instance. This UUID is added to all trace messages.
-     * It allows to distinguish messages from different JVM instances when logfiles are shared.
-     * Value is assigned at application startup and cannot be changed at runtome.
+     * It allows to distinguish messages from different JVM instances when log files are shared.
+     * Value is assigned at application startup and cannot be changed at runtime.
      */
     public static final String uuid = UUID.randomUUID().toString().replace("-", "");
     /**
@@ -96,7 +96,7 @@ public final class Session {
 
     /**
      * Starts the executor that periodically invokes the default watcher to report system status.
-     * Intended for simple arquitectures. May not be suitable for JavaEE environments that manage threads by iteself.
+     * Intended for simple architectures. May not be suitable for JavaEE environments that manage threads by itself.
      */
     public static synchronized void startDefaultWatcher() {
         if (defaultWatcherExecutor == null) {
@@ -126,7 +126,7 @@ public final class Session {
 
     /**
      * Runs the default report on the current thread.
-     * Intended for simple arquitectures. May not be suitable for JavaEE environments that do not allow blocking threads for extended amount of time.
+     * Intended for simple architectures. May not be suitable for JavaEE environments that do not allow blocking threads for extended amount of time.
      */
     public static void runDefaultReport() {
         final Executor noThreadExecutor = new Executor() {
@@ -139,7 +139,7 @@ public final class Session {
     }
 
     /**
-     * Retrieve the value of a system propert as a string value.
+     * Retrieve the value of a system property as a string value.
      * If the system property is not set, the default value is returned.
 
      * @param name the system property name
@@ -152,7 +152,7 @@ public final class Session {
     }
 
     /**
-     * Retrieve the value of a system propert as a boolean value.
+     * Retrieve the value of a system property as a boolean value.
      * If the system property is not set, or its value is a valid number, the default value is returned.
      * See {@link Boolean#parseBoolean(java.lang.String)}.
      *
@@ -169,7 +169,7 @@ public final class Session {
     }
 
     /**
-     * Retrieve the value of a system propert as an integer value.
+     * Retrieve the value of a system property as an integer value.
      * If the system property is not set, or its value is a valid number, the default value is returned.
      *
      * @param name the system property name
@@ -189,7 +189,7 @@ public final class Session {
     }
 
     /**
-     * Retrieve the value of a system propert as a long integer value.
+     * Retrieve the value of a system property as a long integer value.
      * If the system property is not set, or its value is a valid number, the default value is returned.
      *
      * @param name the system property name
@@ -211,7 +211,7 @@ public final class Session {
     /**
      * Retrieve the value of a system property as an integer representing milliseconds.
      * If the system property is not set, or its value is a valid number, the default value is returned.
-     * The value may be suffixed with 'ms', 's', 'm' or 'h', that will be intepreted as
+     * The value may be suffixed with 'ms', 's', 'm' or 'h', that will be interpreted as
      * a value in milliseconds, seconds, minutes or hours, respectively, and converted
      * to an integer in milliseconds.
      *
