@@ -49,9 +49,24 @@ persistence.user
 persistence.product
 ```
 
+**Installing and using**
+
+SLF4J-TOYS is avaiable at [Maven Central repository](http://search.maven.org/#artifactdetails|org.usefultoys|slf4j-toys|1.5.0|jar):
+```
+<dependency>
+    <groupId>org.usefultoys</groupId>
+    <artifactId>slf4j-toys</artifactId>
+    <version>1.5.0</version>
+</dependency>
+```
+
+SLF4J-TOYS is also avaiable as [single JAR](https://github.com/useful-toys/slf4j-toys/releases/download/1.5.0/slf4j-toys-1.5.0.jar).
+
+
+
 **Further information**
 
-Take a look at our [WIKI](https://github.com/useful-toys/slf4j-toys/wiki)
+Take a look at our [WIKI](https://github.com/useful-toys/slf4j-toys/wiki) or the [API Javadoc](http://useful-toys.github.io/slf4j-toys/javadoc/).
 
 **Similar projects**
 
