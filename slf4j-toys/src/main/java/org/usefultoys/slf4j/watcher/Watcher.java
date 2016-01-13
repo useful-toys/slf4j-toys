@@ -20,19 +20,29 @@ import org.slf4j.Logger;
 import org.usefultoys.slf4j.Session;
 
 /**
- * Periodically collect system status and reports to logger. It conveniently
- * implements {@link Runnable} for compliance with
- * {@link ScheduledExecutorService}. Call {@link #logCurrentStatus()} to log a
- * single 1-line summary of the current system status. 
- * 
+ * Periodically collects system status and reports to logger. It conveniently
+ * implements {@link Runnable} for compliance with {@link ScheduledExecutorService}.
+ * Call {@link #logCurrentStatus()} to produce a 1-line summary of
+ * the current system status as information message and an encoded event as trace message.
+ *
  * @author Daniel Felix Ferber
  */
 public class Watcher extends WatcherData implements Runnable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Logger that reports messages.
+     */
     transient private final Logger logger;
 
+    /**
+     * Constructor.
+     * Events produced by this watcher will use the logger name
+     * as event category.
+     *
+     * @param logger Logger that reports messages.
+     */
     public Watcher(final Logger logger) {
         super();
         this.logger = logger;
@@ -41,13 +51,28 @@ public class Watcher extends WatcherData implements Runnable {
         this.eventCategory = logger.getName();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param logger logger that reports messages.
+     * @param eventCategory event category.
+     */
+    public Watcher(final Logger logger, String eventCategory) {
+        super();
+        this.logger = logger;
+        this.sessionUuid = Session.uuid;
+        this.eventPosition = 0;
+        this.eventCategory = eventCategory;
+    }
+    
     @Override
     public void run() {
         logCurrentStatus();
     }
 
     /**
-     * A single 1-line summary of the current system status
+     * Produces a 1-line summary of the current system status as information message
+     * and an encoded event as trace message.
      */
     public void logCurrentStatus() {
         time = System.nanoTime();
@@ -63,6 +88,4 @@ public class Watcher extends WatcherData implements Runnable {
             logger.trace(Slf4JMarkers.WATCHER, write(new StringBuilder(), 'W').toString());
         }
     }
-
-   
 }

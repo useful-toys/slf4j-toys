@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.tools;
+package org.usefultoys.slf4j.meter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

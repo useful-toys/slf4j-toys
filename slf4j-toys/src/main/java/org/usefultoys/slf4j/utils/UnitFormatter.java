@@ -16,13 +16,16 @@
 package org.usefultoys.slf4j.utils;
 
 /**
+ * Collection of methods to format numbers, rounding them to an unit that reduces their string representation.
  *
  * @author Daniel Felix Ferber
  */
 public final class UnitFormatter {
 
     private UnitFormatter() {
+        // prevent instances
     }
+
     private static final int[] TIME_FACTORS = new int[]{1000, 1000, 1000, 60, 60};
     private static final String[] TIME_UNITS = new String[]{"ns", "us", "ms", "s", "m", "h"};
     private static final String[] MEMORY_UNITS = new String[]{"B", "kB", "MB", "GB"};
@@ -67,30 +70,65 @@ public final class UnitFormatter {
         return String.format("%.1f%s", value, units[index]);
     }
 
+    /**
+     * Format number of bytes as string.
+     * @param value number of bytes
+     * @return formatted string
+     */
     public static String bytes(final long value) {
         return longUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
     }
 
+    /**
+     * Format number of nanoseconds as string.
+     * @param value number of nanoseconds
+     * @return formatted string
+     */
     public static String nanoseconds(final long value) {
         return longUnit(value, TIME_UNITS, TIME_FACTORS);
     }
 
+    /**
+     * Format number of nanoseconds as string.
+     * @param value number of nanoseconds
+     * @return formatted string
+     */
     public static String nanoseconds(final double value) {
         return doubleUnit(value, TIME_UNITS, TIME_FACTORS);
     }
 
+    /**
+     * Format number of iterations as string.
+     * @param value number of iterations
+     * @return formatted string
+     */
     public static String iterations(final long value) {
         return longUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
     }
 
+    /**
+     * Format number of iterations as string.
+     * @param value number of iterations
+     * @return formatted string
+     */
     public static String iterations(final double value) {
         return doubleUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
     }
 
+    /**
+     * Format number of iterations/second as string.
+     * @param value number of iterations
+     * @return formatted string
+     */
     public static String iterationsPerSecond(final long value) {
         return longUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
     }
 
+    /**
+     * Format number of iterations/second as string.
+     * @param value number of iterations
+     * @return formatted string
+     */
     public static String iterationsPerSecond(final double value) {
         return doubleUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
     }

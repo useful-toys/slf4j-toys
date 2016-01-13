@@ -70,10 +70,9 @@ public final class Session {
             defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
         }
         if (scheduledDefaultWatcher == null) {
-            scheduledDefaultWatcher = defaultWatcherExecutor.scheduleAtFixedRate(
-                    DEFAULT_WATCHER,
-                    WatcherConfig.delay,
-                    WatcherConfig.period,
+            scheduledDefaultWatcher = defaultWatcherExecutor.scheduleAtFixedRate(DEFAULT_WATCHER,
+                    WatcherConfig.delayMilliseconds,
+                    WatcherConfig.periodMilliseconds,
                     TimeUnit.MILLISECONDS);
         }
     }

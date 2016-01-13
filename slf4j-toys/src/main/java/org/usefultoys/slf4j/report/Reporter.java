@@ -33,22 +33,26 @@ import java.util.TimeZone;
 import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.internal.Config;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
+ * Produces reports about available and used resources, and current configuration.
+ * Reports are printed as information messages to the logger.
  *
  * @author Daniel Felix Ferber
  */
 public class Reporter implements Serializable {
 
+    /**
+     * Logger that prints reports as information messages.
+     */
     private final Logger logger;
 
     private static final long serialVersionUID = 1L;
 
     public Reporter() {
         super();
-        logger = LoggerFactory.getLogger(Config.getProperty("slf4jtoys.report.name", "report"));
+        logger = LoggerFactory.getLogger(ReporterConfig.name);
     }
 
     public Reporter(final Logger logger) {

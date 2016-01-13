@@ -23,8 +23,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.usefultoys.slf4j.Session;
 
 /**
+ * Simple servlet that reports system status using the default watcher on every GET.
+ * You may bind this servlet to an URL for this special purpose.
+ * For example, this URL may be invoked periodically by a CRON job.
  *
- * @author Daniel
+ * @author Daniel Felix Ferber
  */
 public class WatcherServlet extends HttpServlet {
 

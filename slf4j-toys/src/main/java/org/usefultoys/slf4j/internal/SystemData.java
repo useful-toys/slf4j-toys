@@ -24,7 +24,6 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
-import org.usefultoys.slf4j.Session;
 
 /**
  * Augments the {@link EventData} with status collected from the virtual

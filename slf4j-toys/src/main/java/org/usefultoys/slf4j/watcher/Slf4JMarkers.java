@@ -19,6 +19,7 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 /**
+ * Collection of SLF4J {@link Marker}s used to identify {@link Watcher} log messages.
  *
  * @author Daniel Felix Ferber
  */

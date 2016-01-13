@@ -18,10 +18,22 @@ package org.usefultoys.slf4j.watcher;
 import org.usefultoys.slf4j.internal.Config;
 
 /**
- *
- * @author x7ws
+ * Collection of properties that drive {@link Watcher} and {@link WatcherData} behavior.
+ * Initial values are read from system properties, if available.
+ * Some properties allow reassigning their values at runtime.
  */
 public class WatcherConfig {
-    public static long delay = Config.getMillisecondsProperty("slf4jtoys.watcher.delay", 60000L);
-    public static long period = Config.getMillisecondsProperty("slf4jtoys.watcher.period", 600000L);
+    /**
+     * Time to wait before reporting the first watcher status, in milliseconds.
+     * Value is read from system property {@code slf4jtoys.watcher.delay} at application startup, defaults to {@code 1 minute}.
+     * You may assign a new value at runtime, but if the default watcher is already running, you need to restart it.
+     */
+    public static long delayMilliseconds = Config.getMillisecondsProperty("slf4jtoys.watcher.delay", 60000L);
+    /**
+     * Time period to wait before reporting further watcher status, in milliseconds.
+     * Time to wait before reporting the first watcher status, in milliseconds.
+     * Value is read from system property {@code slf4jtoys.watcher.period} at application startup, defaults to {@code 10 minutes}.
+     * You may assign a new value at runtime, but if the default watcher is already running, you need to restart it.
+     */
+    public static long periodMilliseconds = Config.getMillisecondsProperty("slf4jtoys.watcher.period", 600000L);
 }
