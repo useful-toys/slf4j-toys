@@ -55,14 +55,26 @@ public class Reporter implements Serializable {
         logger = LoggerFactory.getLogger(ReporterConfig.name);
     }
 
+    /**
+     * Constructor
+     * @param logger Logger that writes reports as information messages.
+     */
     public Reporter(final Logger logger) {
         this.logger = logger;
     }
 
+    /**
+     * @return Logger that writes reports as information messages.
+     */
     public Logger getLogger() {
         return logger;
     }
 
+    /**
+     * Run all reports and write them as information messages to logger.
+     *
+     * @param executor Executor that runs each report.
+     */
     public void logAllReports(final Executor executor) {
         executor.execute(this.new ReportPhysicalSystem());
         executor.execute(this.new ReportOperatingSystem());
@@ -84,6 +96,11 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Run reports accoding to {@link ReporterConfig} and write them as information messages to logger.
+     *
+     * @param executor Executor that runs each report.
+     */
     public void logDefaultReports(final Executor executor) {
         if (ReporterConfig.reportPhysicalSystem) {
             executor.execute(this.new ReportPhysicalSystem());

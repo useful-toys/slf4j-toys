@@ -17,8 +17,7 @@ package org.usefultoys.slf4j.examples;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import org.usefultoys.slf4j.Session;
+import org.usefultoys.slf4j.watcher.WatcherSingleton;
 
 /**
  *
@@ -47,7 +46,7 @@ public class CustomWatcher1 {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Session.DEFAULT_WATCHER.logCurrentStatus();
+                WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
             }
         }, 1000, 1000);
 

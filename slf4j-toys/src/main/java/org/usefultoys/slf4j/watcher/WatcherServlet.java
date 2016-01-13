@@ -20,7 +20,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.usefultoys.slf4j.Session;
 
 /**
  * Simple servlet that reports system status using the default watcher on every GET.
@@ -33,6 +32,6 @@ public class WatcherServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Session.DEFAULT_WATCHER.logCurrentStatus();
+        WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
     }
 }

@@ -18,8 +18,7 @@ package org.usefultoys.slf4j.examples;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.usefultoys.slf4j.Session;
+import org.usefultoys.slf4j.watcher.WatcherSingleton;
 
 /**
  *
@@ -60,9 +59,9 @@ public class DefaultWatcher {
     }
 
     public static void main(final String[] args) {
-        Session.startDefaultWatcher();
+        WatcherSingleton.startDefaultWatcherExecutor();
         doWork();
-        Session.stopDefaultWatcher();
+        WatcherSingleton.stopDefaultWatcherExecutor();
     }
 
     static void doWork() {

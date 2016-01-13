@@ -17,23 +17,10 @@ package org.usefultoys.slf4j;
 
 import java.util.UUID;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import org.usefultoys.slf4j.internal.Config;
 import org.usefultoys.slf4j.report.Reporter;
-import org.usefultoys.slf4j.watcher.Watcher;
-import org.usefultoys.slf4j.watcher.WatcherConfig;
 
 /**
  * Profiling session for the current JVM.
- * <ul>
- * <li>Stores the UUID of the current SLF4J-Toys instance.
- * <li>Retrieves global configuration.
- * <li>Keeps the default watcher instance.
- * <li>Keeps the default executor that periodically invokes the default watcher.
- * </ul>
  *
  * @author Daniel Felix Ferber
  */
@@ -49,46 +36,6 @@ public final class Session {
      * Value is assigned at application startup and cannot be changed at runtime.
      */
     public static final String uuid = UUID.randomUUID().toString().replace("-", "");
-
-    /**
-     * Watcher default instance.
-     * This Watcher is created at application startup. Its name is read from system property {@code slf4jtoys.watcher.name}, defaults to
-     * {@code watcher}.
-     * You cannot assign a new default watcher at runtime.
-     */
-    public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(Config.getProperty("slf4jtoys.watcher.name", "watcher")));
-
-    private static ScheduledExecutorService defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
-    private static ScheduledFuture<?> scheduledDefaultWatcher;
-
-    /**
-     * Starts the executor that periodically invokes the default watcher to report system status.
-     * Intended for simple architectures. May not be suitable for JavaEE environments that manage threads by itself.
-     */
-    public static synchronized void startDefaultWatcher() {
-        if (defaultWatcherExecutor == null) {
-            defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
-        }
-        if (scheduledDefaultWatcher == null) {
-            scheduledDefaultWatcher = defaultWatcherExecutor.scheduleAtFixedRate(DEFAULT_WATCHER,
-                    WatcherConfig.delayMilliseconds,
-                    WatcherConfig.periodMilliseconds,
-                    TimeUnit.MILLISECONDS);
-        }
-    }
-
-    /**
-     * Stops the executor that periodically invokes the default watcher to report system status.
-     */
-    public static synchronized void stopDefaultWatcher() {
-        if (scheduledDefaultWatcher != null) {
-            scheduledDefaultWatcher.cancel(true);
-        }
-        if (defaultWatcherExecutor != null) {
-            defaultWatcherExecutor.shutdownNow();
-            defaultWatcherExecutor = null;
-        }
-    }
 
     /**
      * Runs the default report on the current thread.

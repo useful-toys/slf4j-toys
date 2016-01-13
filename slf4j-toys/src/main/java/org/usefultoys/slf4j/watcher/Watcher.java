@@ -64,7 +64,14 @@ public class Watcher extends WatcherData implements Runnable {
         this.eventPosition = 0;
         this.eventCategory = eventCategory;
     }
-    
+
+    /**
+     * @return Logger that reports current system status as information messages.
+     */
+    public Logger getLogger() {
+        return logger;
+    }
+
     @Override
     public void run() {
         logCurrentStatus();

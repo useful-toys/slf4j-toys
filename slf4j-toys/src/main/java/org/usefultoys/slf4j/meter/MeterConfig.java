@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 x7ws.
+ * Copyright 2016 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.usefultoys.slf4j.internal.Config;
 
 /**
  *
- * @author x7ws
+ * @author Daniel Felix Ferber
  */
 public class MeterConfig {
 
