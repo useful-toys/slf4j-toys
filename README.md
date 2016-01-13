@@ -51,7 +51,7 @@ persistence.product
 
 **Further information**
 
-Take a look at our [WIKI](https://github.com/useful-toys/slf4j-toys/wiki)
+Take a look at our [WIKI](https://github.com/useful-toys/slf4j-toys/wiki) or the [API Javadoc](http://useful-toys.github.io/slf4j-toys/javadoc/).
 
 **Similar projects**
 
