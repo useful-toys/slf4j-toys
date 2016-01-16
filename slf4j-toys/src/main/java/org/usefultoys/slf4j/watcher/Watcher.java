@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.usefultoys.slf4j.Session;
 
 /**
- * Periodically collects system status and reports to logger. It conveniently
+ * Periodically collects system status and reports it to logger. It conveniently
  * implements {@link Runnable} for compliance with {@link ScheduledExecutorService}.
  * Call {@link #logCurrentStatus()} to produce a 1-line summary of
  * the current system status as information message and an encoded event as trace message.
@@ -38,8 +38,7 @@ public class Watcher extends WatcherData implements Runnable {
 
     /**
      * Constructor.
-     * Events produced by this watcher will use the logger name
-     * as event category.
+     * Events produced by this watcher will use the logger name as event category.
      *
      * @param logger Logger that reports messages.
      */

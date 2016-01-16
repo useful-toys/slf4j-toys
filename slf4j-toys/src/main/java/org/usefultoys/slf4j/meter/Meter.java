@@ -31,11 +31,18 @@ import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
 
 /**
+ * At beginning, termination of operations and on iterations, collects system status and reports it to logger.
+ * Call {@link #start()} to produce a 1-line summary about operation start and current system status as debug message and an encoded event as trace message.
+ * Call {@link #ok()} to produce a 1-line summary about operation successful end and current system status as information message and an encoded event as trace message.
+ * Call {@link #fail(Throwable)} to produce a 1-line summary about operation failure and current system status as error message and an encoded event as trace message.
+ * Call {@link #progress()} to produce a 1-line summary about operation progress and current system status as information message and an encoded event as trace message.
+ * 
  * @author Daniel Felix Ferber
  */
 public class Meter extends MeterData implements Closeable {
 
     private static final long serialVersionUID = 1L;
+    
     private static final String ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION = "Meter cannot create exception of type {}.";
     private static final String ERROR_MSG_METER_ALREADY_STARTED = "Meter already started. id={}";
     private static final String ERROR_MSG_METER_ALREADY_STOPPED = "Meter already stopped. id={}";
@@ -55,7 +62,7 @@ public class Meter extends MeterData implements Closeable {
     private static final String MY_CLASS_NAME = Meter.class.getName();
 
     /**
-     * Logger that reports events from this Meter.
+     * Logger that reports messages.
      */
     private transient final Logger logger;
     private static final String NULL_VALUE = "<null>";
@@ -75,8 +82,9 @@ public class Meter extends MeterData implements Closeable {
 
     /**
      * Creates a new meter.
+     * Events produced by this meter will use the logger name as event category.
      *
-     * @param logger Logger 
+     * @param logger Logger that reports messages.
      */
     public Meter(final Logger logger) {
         super();
@@ -89,18 +97,28 @@ public class Meter extends MeterData implements Closeable {
         this.createTime = System.nanoTime();
     }
 
-    public Meter(final Logger logger, final String eventName) {
+    /**
+     * Creates a new meter.
+     * Events produced by this meter will use the logger name as event category.
+     *
+     * @param logger Logger that reports messages.
+     * @param operationName Additional identification to distinguish operations reported on the same logger.
+     */
+    public Meter(final Logger logger, final String operationName) {
         super();
         this.sessionUuid = Session.uuid;
         this.logger = logger;
         this.eventCategory = logger.getName();
-        final String index = this.eventCategory + "/" + eventName;
+        final String index = this.eventCategory + "/" + operationName;
         eventCounterByName.putIfAbsent(index, new AtomicLong(0));
         this.eventPosition = eventCounterByName.get(index).incrementAndGet();
-        this.eventName = eventName;
+        this.eventName = operationName;
         this.createTime = System.nanoTime();
     }
 
+    /**
+     * @return The meter most recently started on the current thread.
+     */
     public static Meter getCurrentInstance() {
         final WeakReference<Meter> ref = localThreadInstance.get();
         final Meter current = ref == null ? null : ref.get();
@@ -111,7 +129,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * @return Logger that receives messages from this meter.
+     * @return Logger that reports current system status as information messages.
      */
     public Logger getLogger() {
         return logger;
@@ -121,18 +139,18 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Creates a new Meter whose name is under the hierarchy of this meter.
      * Useful if a large task may be subdivided into smaller task and reported
-     * individually. The new meter uses the name of this meter, appended my its
-     * name, similar as logger do.
+     * individually. The new meter uses the name of this meter appended by dot and its
+     * own name, similar as logger do.
      *
-     * @param name 
+     * @param suboperationName Additional identification appended to this logger name.
      * @return The new Meter
      */
-    public Meter sub(final String name) {
-        if (name == null) {
+    public Meter sub(final String suboperationName) {
+        if (suboperationName == null) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "sub(name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
         }
-        final Meter m = new Meter(logger, eventName == null ? name : eventName + '/' + name);
+        final Meter m = new Meter(logger, eventName == null ? suboperationName : eventName + '/' + suboperationName);
         if (this.context != null) {
             m.context = new HashMap<String, String>(this.context);
         }
@@ -141,7 +159,7 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Configures the meter with a human readable message that explains the task
+     * Configures the meter with a human readable message that explains the task's
      * purpose.
      *
      * @param message fixed message
@@ -157,11 +175,10 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Configures the meter with a human readable message that explains the task
+     * Configures the meter with a human readable message that explains the task's
      * purpose.
      *
-     * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)
-     * })
+     * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)})
      * @param args message arguments
      * @return reference to the meter itself.
      */

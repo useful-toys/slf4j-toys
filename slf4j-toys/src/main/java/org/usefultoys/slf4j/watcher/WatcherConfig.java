@@ -25,14 +25,14 @@ import org.usefultoys.slf4j.internal.Config;
 public class WatcherConfig {
     /**
      * Time to wait before reporting the first watcher status, in milliseconds.
-     * Value is read from system property {@code slf4jtoys.watcher.delay} at application startup, defaults to {@code 1 minute}.
+     * Value is read from system property {@code slf4jtoys.watcher.delay} at application startup and defaults to {@code 1 minute}.
      * You may assign a new value at runtime, but if the default watcher is already running, you need to restart it.
      */
     public static long delayMilliseconds = Config.getMillisecondsProperty("slf4jtoys.watcher.delay", 60000L);
     /**
      * Time period to wait before reporting further watcher status, in milliseconds.
      * Time to wait before reporting the first watcher status, in milliseconds.
-     * Value is read from system property {@code slf4jtoys.watcher.period} at application startup, defaults to {@code 10 minutes}.
+     * Value is read from system property {@code slf4jtoys.watcher.period} at application startup and defaults to {@code 10 minutes}.
      * You may assign a new value at runtime, but if the default watcher is already running, you need to restart it.
      */
     public static long periodMilliseconds = Config.getMillisecondsProperty("slf4jtoys.watcher.period", 600000L);

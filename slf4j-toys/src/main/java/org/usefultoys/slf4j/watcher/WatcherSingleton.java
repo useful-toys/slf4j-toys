@@ -17,6 +17,7 @@ package org.usefultoys.slf4j.watcher;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -25,17 +26,17 @@ import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.internal.Config;
 
 /**
- * Keeps the default watcher singleton. Offers some methods to execute this watcher periodically.
+ * Keeps the default watcher singleton. Offers some methods to execute this watcher periodically
+ * on simple architectures.
  *
  * @author Daniel Felix Ferber
  */
 public class WatcherSingleton {
 
     /**
-     * Watcher default instance.
-     * This Watcher is created at application startup.
-     * Its name is read from system property {@code slf4jtoys.watcher.name}, defaults to
-     * {@code watcher}.
+     * Watcher default instance. 
+     * It is created at application startup and named as system 
+     * property {@code slf4jtoys.watcher.name}, which defaults to {@code watcher}.
      * You cannot assign a new default watcher at runtime.
      */
     public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(Config.getProperty("slf4jtoys.watcher.name", "watcher")));
@@ -64,7 +65,7 @@ public class WatcherSingleton {
     }
 
     /**
-     * Stops the executor that periodically invokes the default watcher to report system status.
+     * Stops the executor that periodically invokes the default watcher periodically.
      */
     public static synchronized void stopDefaultWatcherExecutor() {
         if (scheduledDefaultWatcher != null) {
@@ -99,7 +100,7 @@ public class WatcherSingleton {
     }
 
     /**
-     * Stops the timer that periodically invokes the default watcher to report system status.
+     * Stops the timer that periodically invokes the default watcher periodically.
      */
     public static synchronized void stopDefaultWatcherTimer() {
         if (defaultWatcherTimer != null) {
