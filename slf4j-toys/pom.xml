@@ -7,7 +7,7 @@
   
     <groupId> org.usefultoys</groupId>
     <artifactId>slf4j-toys</artifactId>
-    <version>1.5.0</version>  
+    <version>1.6.0-SNAPSHOT</version>  
     <packaging>jar</packaging>
     <name>slf4j-toys</name>
     <description>A collection of useful practices that complement SLF4J and promotes clean and organized log files.</description>
