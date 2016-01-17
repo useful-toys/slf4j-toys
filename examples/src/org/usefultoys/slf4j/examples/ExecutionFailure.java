@@ -26,10 +26,15 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  */
 public class ExecutionFailure {
 
+    public static final Logger logger = LoggerFactory.getLogger("example");
+
     static {
         /* Customizes the SLF4J simple logger to display trace messages that contain
          * encoded and parsable information. */
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+        System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
+        System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
+        System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "yy/MM/dd HH:mm");
         /* Enable managed bean that is able to read CPU usage.  */
         System.setProperty("profiler.usePlatformManagedBean", "true");
     }
@@ -37,67 +42,44 @@ public class ExecutionFailure {
     public static void main(final String argv[]) {
         example1();
 
+        try {
+            example2();
+        } catch (RuntimeException e) {
+            // ignore
+        }
+
     }
 
     private static void example1() {
-        final Logger logger = LoggerFactory.getLogger("example");
-        final Meter m = MeterFactory.getMeter(logger, "operation").start();
+        final Meter m = MeterFactory.getMeter(logger, "operation1").start();
         try {
-            runOperation();
+            failOperation();
             m.ok();
         } catch (RuntimeException e) {
             m.fail(e);
-            throw e;
-        }
-    }
-
-    public static class BusinessLogicException extends Exception {
-
-        public BusinessLogicException(Throwable cause) {
-            super(cause);
         }
     }
 
     private static void example2() {
-        final Logger logger = LoggerFactory.getLogger("example");
-        final Meter m = MeterFactory.getMeter(logger, "operation").start();
-        try {
-            runOperation();
-            m.ok();
-        } catch (RuntimeException e) {
-            m.fail(e);
-            throw e;
-        }
-    }
-
-    private static void example3() {
-        final Logger logger = LoggerFactory.getLogger("example");
-        try (final Meter m = MeterFactory.getMeter(logger, "operation").start()) {
-            runOperation();
-            m.ok();
-        }
-    }
-
-    private static void example4() {
-        final Logger logger = LoggerFactory.getLogger("example");
-        try (final Meter m = MeterFactory.getMeter(logger, "operation").start()) {
+        try (final Meter m = MeterFactory.getMeter(logger, "operation2").start()) {
             failOperation();
             m.ok();
         }
     }
 
-    private static void runOperation() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            // ignore
+    private static class CustomException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public CustomException(String message) {
+            super(message);
         }
     }
 
-    private static void failOperation() {
+    private static void failOperation() throws CustomException {
         try {
             Thread.sleep(500);
-            throw new RuntimeException();
+            throw new CustomException("error message");
         } catch (InterruptedException ex) {
             // ignore
         }

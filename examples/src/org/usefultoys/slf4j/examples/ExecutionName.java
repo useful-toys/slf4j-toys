@@ -30,6 +30,9 @@ public class ExecutionName {
         /* Customizes the SLF4J simple logger to display trace messages that contain
          * encoded and parsable information. */
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+        System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
+        System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
+        System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "yy/MM/dd HH:mm");
         /* Enable managed bean that is able to read CPU usage.  */
         System.setProperty("profiler.usePlatformManagedBean", "true");
     }

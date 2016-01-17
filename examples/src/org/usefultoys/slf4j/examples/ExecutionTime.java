@@ -45,23 +45,8 @@ public class ExecutionTime {
         }
 
         example1();
-        try {
-            example2();
-        } catch (RuntimeException e) {
-
-        }
-        System.gc();
-
+        example2();
         example3();
-        try {
-            example4();
-        } catch (RuntimeException e) {
-
-        }
-        System.gc();
-
-        example5();
-        example6();
     }
 
     private static void example1() {
@@ -71,39 +56,16 @@ public class ExecutionTime {
     }
 
     private static void example2() {
-        final Meter m = MeterFactory.getMeter(logger, "operation").start();
-        failOperation();
-        m.ok();
+        try (final Meter m = MeterFactory.getMeter(logger, "operation").start()) {
+            runOperation();
+            m.ok();
+        }
     }
 
     private static void example3() {
-        try (final Meter m = MeterFactory.getMeter(logger, "operation").start()) {
-            runOperation();
-            m.ok();
-        }
-    }
-
-    private static void example4() {
-        try (final Meter m = MeterFactory.getMeter(logger, "operation").start()) {
-            failOperation();
-            m.ok();
-        }
-    }
-
-    private static void example5() {
         final Meter m = MeterFactory.getMeter(logger, "operation").start();
         try {
             runOperation();
-            m.ok();
-        } catch (RuntimeException e) {
-            m.fail(e);
-        }
-    }
-
-    private static void example6() {
-        final Meter m = MeterFactory.getMeter(logger, "operation").start();
-        try {
-            failOperation();
             m.ok();
         } catch (RuntimeException e) {
             m.fail(e);
@@ -113,15 +75,6 @@ public class ExecutionTime {
     private static void runOperation() {
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            // ignore
-        }
-    }
-
-    private static void failOperation() {
-        try {
-            Thread.sleep(500);
-            throw new RuntimeException();
         } catch (InterruptedException ex) {
             // ignore
         }
