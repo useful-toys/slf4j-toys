@@ -70,7 +70,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * How many times each event has been executed.
      */
-    private static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
+    static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
     private transient long lastProgressTime = 0;
     private transient long lastProgressIteration = 0;
 
@@ -93,7 +93,9 @@ public class Meter extends MeterData implements Closeable {
         this.eventCategory = logger.getName();
         this.eventName = null;
         eventCounterByName.putIfAbsent(this.eventCategory, new AtomicLong(0));
-        this.eventPosition = eventCounterByName.get(this.eventCategory).incrementAndGet();
+        final AtomicLong atomicLong = eventCounterByName.get(this.eventCategory);
+    	atomicLong.compareAndSet(Long.MAX_VALUE, 0);
+		this.eventPosition = atomicLong.incrementAndGet();
         this.createTime = System.nanoTime();
     }
 
@@ -111,7 +113,9 @@ public class Meter extends MeterData implements Closeable {
         this.eventCategory = logger.getName();
         final String index = this.eventCategory + "/" + operationName;
         eventCounterByName.putIfAbsent(index, new AtomicLong(0));
-        this.eventPosition = eventCounterByName.get(index).incrementAndGet();
+        final AtomicLong atomicLong = eventCounterByName.get(index);
+        atomicLong.compareAndSet(Long.MAX_VALUE, 0);
+		this.eventPosition = atomicLong.incrementAndGet();
         this.eventName = operationName;
         this.createTime = System.nanoTime();
     }
