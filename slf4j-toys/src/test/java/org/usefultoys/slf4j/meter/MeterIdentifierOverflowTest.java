@@ -29,11 +29,11 @@ import org.usefultoys.slf4j.LoggerFactory;
  *
  * @author Daniel
  */
-public class MeterOverflowTest {
+public class MeterIdentifierOverflowTest {
     final String meterName = "name";
     final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterName);
 
-    public MeterOverflowTest() {
+    public MeterIdentifierOverflowTest() {
 	}
 
 	@BeforeClass
