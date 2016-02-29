@@ -15,34 +15,62 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.TestLoggerEvent;
+import org.usefultoys.slf4j.LoggerFactory;
 
 /**
-*
-* @author Daniel
-*/
+ *
+ * @author Daniel
+ */
 public class MeterOverflowTest {
+    final String meterName = "name";
+    final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterName);
 
-   public MeterOverflowTest() {
-   }
+    public MeterOverflowTest() {
+	}
 
-   @Test
-   public void testResetImpl() {
-       Meter.eventCounterByName.put("a", new AtomicLong(Long.MAX_VALUE-2));
-       
-       MeterFactory.getMeter("a").start().ok();
-       MeterFactory.getMeter("a").start().ok();
-       MeterFactory.getMeter("a").start().ok();
-       MeterFactory.getMeter("a").start().ok();
-       MeterFactory.getMeter("a").start().ok();
-       MeterFactory.getMeter("a").start().ok();
-       MeterFactory.getMeter("a").start().ok();
-       MeterFactory.getMeter("a").start().ok();
-   }
+	@BeforeClass
+	public static void configureMeterSettings() {
+		System.setProperty("slf4jtoys.meter.progress.period", "0ms");
+	}
+
+    @Before
+    public void clearEvents() {
+        logger.clearEvents();
+    }
+
+	@Test
+	public void testResetImpl() {
+		Meter.eventCounterByName.put(meterName, new AtomicLong(Long.MAX_VALUE - 2));
+
+		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 4, Long.MAX_VALUE - 1);
+		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 8, Long.MAX_VALUE);
+		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 12, 1);
+		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 16, 2);
+		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 20, 3);
+	}
+
+	private void assertEvents(Meter m, int expectedMessageCount, long expectedEventPosition) {
+        Assert.assertEquals(expectedEventPosition, m.getEventPosition());
+        Assert.assertEquals(null, m.getEventName());
+        Assert.assertEquals(meterName, m.getEventCategory());
+        final TestLoggerEvent startEvent = logger.getEvent(expectedMessageCount-4);
+        final TestLoggerEvent startDataEvent = logger.getEvent(expectedMessageCount-3);
+        final TestLoggerEvent stopEvent = logger.getEvent(expectedMessageCount-2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(expectedMessageCount-1);
+
+        String str = "#="+Long.toString(expectedEventPosition);
+        Assert.assertEquals(expectedEventPosition, m.getEventPosition());
+        Assert.assertFalse(startEvent.getFormattedMessage().contains(str));
+        Assert.assertTrue(startDataEvent.getFormattedMessage().contains(str));
+        Assert.assertFalse(stopEvent.getFormattedMessage().contains(str));
+        Assert.assertTrue(stopDataEvent.getFormattedMessage().contains(str));
+	}
 }
