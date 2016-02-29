@@ -26,11 +26,11 @@ import org.usefultoys.slf4j.Session;
  *
  * @author Daniel Felix Ferber
  */
-public class MeterAttributesTest {
+public class MeterIterationAttributesTest {
 
     TestLogger logger = (TestLogger) LoggerFactory.getLogger("Test");
 
-    public MeterAttributesTest() {
+    public MeterIterationAttributesTest() {
         logger.setEnabled(false);
     }
 
@@ -40,30 +40,54 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testMessageAttributes() {
-        final String description1 = "Test Message";
-        final Meter m1 = new Meter(logger).m(description1);
-        Assert.assertEquals(description1, m1.getDescription());
-
-        final String description2 = "Test  %d Message";
-        final Meter m2 = new Meter(logger).m(description2, 10);
-        Assert.assertEquals(String.format(description2, 10), m2.getDescription());
-    }
-
-    @Test
     public void testIterationAttributes() {
         final int iterationCount = 10;
-        final Meter m1 = new Meter(logger).iterations(iterationCount).start();
+        
+        
+        final Meter m1 = new Meter(logger);
+        
+        Assert.assertEquals(0, m1.getExpectedIterations());
+        Assert.assertEquals(0, m1.getCurrentIteration());
+        Assert.assertEquals(0.0d, m1.getIterationsPerSecond(), Double.MIN_VALUE);        
+
+        m1.iterations(iterationCount);
+        
         Assert.assertEquals(iterationCount, m1.getExpectedIterations());
         Assert.assertEquals(0, m1.getCurrentIteration());
+        Assert.assertEquals(0.0d, m1.getIterationsPerSecond(), Double.MIN_VALUE);        
+
+        final long now1a = System.nanoTime();
+        m1.start();
+        final long now1b = System.nanoTime();
+        
+        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
+        Assert.assertEquals(0, m1.getCurrentIteration());
+        Assert.assertEquals(0.0d, m1.getIterationsPerSecond(), Double.MIN_VALUE);        
+        
         m1.inc();
+        
         Assert.assertEquals(iterationCount, m1.getExpectedIterations());
         Assert.assertEquals(1, m1.getCurrentIteration());
+        Assert.assertTrue(m1.getIterationsPerSecond() > 0.0);        
+
         m1.incBy(2);
         Assert.assertEquals(iterationCount, m1.getExpectedIterations());
+        Assert.assertTrue(m1.getIterationsPerSecond() > 0.0);        
         Assert.assertEquals(3, m1.getCurrentIteration());
+        
         m1.incTo(4);
         Assert.assertEquals(iterationCount, m1.getExpectedIterations());
         Assert.assertEquals(4, m1.getCurrentIteration());
+        Assert.assertTrue(m1.getIterationsPerSecond() > 0.0);        
+        
+        final long now2a = System.nanoTime();
+        m1.ok();
+        final long now2b = System.nanoTime();
+        
+        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
+        Assert.assertEquals(4, m1.getCurrentIteration());
+        Assert.assertTrue(m1.getIterationsPerSecond() > 0.0);        
+
+//        double minIterationsPerSecond = 1000000*(now2b-now1a)
     }
  }

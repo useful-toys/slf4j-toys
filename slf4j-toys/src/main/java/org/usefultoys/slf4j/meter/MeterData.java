@@ -391,11 +391,11 @@ public class MeterData extends SystemData {
 
     public double getIterationsPerSecond() {
         if (iteration == 0 || startTime == 0) {
-            return 0;
+            return 0.0d;
         }
         final float executionTimeNS = getExecutionTime();
         if (executionTimeNS == 0) {
-            return 0;
+            return 0.0d;
         }
         return ((double) this.iteration) / executionTimeNS * 1000000000;
     }
