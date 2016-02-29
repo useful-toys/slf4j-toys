@@ -757,15 +757,20 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+    @Deprecated
     public Meter flow(Object flow) {
-        if (flow instanceof String) {
-            this.pathId = (String) flow;
-        } else if (flow instanceof Enum) {
-            this.pathId = ((Enum<?>) flow).name();
-        } else if (flow instanceof Throwable) {
-            this.pathId = flow.getClass().getSimpleName();
-        } else if (flow != null) {
-            this.pathId = flow.toString();
+    	return path(flow);
+    }
+    
+    public Meter path(Object pathId) {
+        if (pathId instanceof String) {
+            this.pathId = (String) pathId;
+        } else if (pathId instanceof Enum) {
+            this.pathId = ((Enum<?>) pathId).name();
+        } else if (pathId instanceof Throwable) {
+            this.pathId = pathId.getClass().getSimpleName();
+        } else if (pathId != null) {
+            this.pathId = pathId.toString();
         } else {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             logger.error(Slf4JMarkers.ILLEGAL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
@@ -844,11 +849,11 @@ public class Meter extends MeterData implements Closeable {
      * using warn level instead. Sends a message with system status and partial
      * context to log using trace level.
      *
-     * @param flow A token, enum or exception that describes the successful
+     * @param pathId A token, enum or exception that describes the successful
      * pathId.
      * @return reference to the meter itself.
      */
-    public Meter ok(Object flow) {
+    public Meter ok(Object pathId) {
         try {
             final long newStopTime = System.nanoTime();
 
@@ -866,14 +871,14 @@ public class Meter extends MeterData implements Closeable {
             failMessage = null;
             rejectId = null;
             localThreadInstance.set(previousInstance);
-            if (flow instanceof String) {
-                this.pathId = (String) flow;
-            } else if (flow instanceof Enum) {
-                this.pathId = ((Enum<?>) flow).name();
-            } else if (flow instanceof Throwable) {
-                this.pathId = flow.getClass().getSimpleName();
-            } else if (flow != null) {
-                this.pathId = flow.toString();
+            if (pathId instanceof String) {
+                this.pathId = (String) pathId;
+            } else if (pathId instanceof Enum) {
+                this.pathId = ((Enum<?>) pathId).name();
+            } else if (pathId instanceof Throwable) {
+                this.pathId = pathId.getClass().getSimpleName();
+            } else if (pathId != null) {
+                this.pathId = pathId.toString();
             } else {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
                 logger.error(Slf4JMarkers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
