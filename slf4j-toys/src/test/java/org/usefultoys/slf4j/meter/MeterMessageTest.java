@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 import org.slf4j.impl.TestLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.Session;
 
 /**
  *
@@ -30,11 +31,15 @@ import org.usefultoys.slf4j.LoggerFactory;
  */
 public class MeterMessageTest {
 
-    final String meterName = "name";
-    final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterName);
+	static final String meterCategory = "category";
+	static final String meterName = "name";
+	static final String meterName2 = "eman";
+    final String title = "Example of execution.";
+    static final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterCategory);
+    static final MeterData data = new MeterData();
 
-    static final String MESSAGE_START_PREFIX = "Started:";
-    static final String MESSAGE_PROGRESS_PREFIX = "Progress ";
+    static final String MESSAGE_START_PREFIX = "Started";
+    static final String MESSAGE_PROGRESS_PREFIX = "Progress";
     static final String MESSAGE_SLOW_PREFIX = "(Slow)";
     static final String MESSAGE_OK_PREFIX = "OK";
     static final String MESSAGE_REJECT_PREFIX = "REJECT";
@@ -46,29 +51,19 @@ public class MeterMessageTest {
     @BeforeClass
     public static void configureMeterSettings() {
         System.setProperty("slf4jtoys.meter.progress.period", "0ms");
+        System.setProperty("slf4jtoys.meter.print.category", "false");
     }
 
     @Before
     public void clearEvents() {
         logger.clearEvents();
+        MeterConfig.printCategory = false;
     }
 
     @Test
     public void testOk() {
-        final String title = "Example of execution that succeeds.";
-        final Meter m = new Meter(logger).m(title).start();
-        try {
-            /* Run stuff that may fail. */
-            m.ok();
-        } catch (final Exception e) {
-            m.fail(e);
-            // may rethrow
-        }
+        final Meter m = new Meter(logger).start().ok();
 
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
@@ -82,29 +77,37 @@ public class MeterMessageTest {
         Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
-        Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_OK_PREFIX));
-        Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
+        Assert.assertTrue(startEvent.getFormattedMessage().startsWith(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains(meterCategory));
+        Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterCategory));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
     }
 
     @Test
-    public void testOkFlow() {
-        final String title = "Example of execution that succeeds.";
-        final String flow = "qwerty";
-        final Meter m = new Meter(logger).m(title).start();
-        try {
-            /* Run stuff that may fail. */
-            m.ok(flow);
-        } catch (final Exception e) {
-            m.fail(e);
-            // may rethrow
-        }
+    public void testOkPrintCategoryEnabled() {
+    	MeterConfig.printCategory = true;
+        final Meter m = new Meter(logger).start().ok();
 
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
@@ -118,31 +121,36 @@ public class MeterMessageTest {
         Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
-        Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_OK_PREFIX));
-        Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(flow));
+        Assert.assertTrue(startEvent.getFormattedMessage().startsWith(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(meterCategory));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(meterCategory));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
     }
 
     @Test
-    public void testOkFlow2() {
-        final String title = "Example of execution that succeeds.";
-        final String flow = "qwerty";
-        final Meter m = new Meter(logger).m(title).start();
-        try {
-            m.flow(flow);
-            /* Run stuff that may fail. */
-            m.ok();
-        } catch (final Exception e) {
-            m.fail(e);
-            // may rethrow
-        }
+    public void testOkWithDescription() {
+        final Meter m = new Meter(logger).m(title).start().ok();
 
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
@@ -156,32 +164,396 @@ public class MeterMessageTest {
         Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
-        Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_OK_PREFIX));
+        Assert.assertTrue(startEvent.getFormattedMessage().startsWith(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains(meterCategory));
+        Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterCategory));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(flow));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(title, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(title, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }
+    
+    @Test
+    public void testOkWithName() {
+        final Meter m = new Meter(logger, meterName).start().ok();
+
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.MSG_OK, stopEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_OK, stopDataEvent.getMarker());
+        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
+        Assert.assertTrue(startEvent.getFormattedMessage().startsWith(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains(meterCategory));
+        Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterCategory));
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(meterName));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(meterName));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }
+
+    @Test
+    public void testOkWithNamePrintCategoryEnabled() {
+    	MeterConfig.printCategory = true;
+        final Meter m = new Meter(logger, meterName).start().ok();
+
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.MSG_OK, stopEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_OK, stopDataEvent.getMarker());
+        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
+        Assert.assertTrue(startEvent.getFormattedMessage().startsWith(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(meterCategory));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(meterCategory));
+        Assert.assertTrue(startEvent.getFormattedMessage().contains("/"+meterName));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("/"+meterName));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }
+    
+    @Test
+    public void testOkWithNameAndDescription() {
+        final Meter m = new Meter(logger, meterName).m(title).start().ok();
+
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.MSG_OK, stopEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_OK, stopDataEvent.getMarker());
+        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
+        Assert.assertTrue(startEvent.getFormattedMessage().startsWith(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains(meterCategory));
+        Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterCategory));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains(meterName));
+        Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterName));
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(title, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(title, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }
+
+    @Test
+    public void testOkWithNameAndName() {
+        final Meter m = new Meter(logger, meterName).start();
+        final Meter m2 = m.sub(meterName2).start().ok();
+        m.ok();
+
+        Assert.assertEquals(8, logger.getEventCount());
+        final TestLoggerEvent startEvent1 = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent1 = logger.getEvent(1);
+        final TestLoggerEvent startEvent2 = logger.getEvent(2);
+        final TestLoggerEvent startDataEvent2 = logger.getEvent(3);
+        final TestLoggerEvent stopEvent2 = logger.getEvent(4);
+        final TestLoggerEvent stopDataEvent2 = logger.getEvent(5);
+        final TestLoggerEvent stopEvent1 = logger.getEvent(6);
+        final TestLoggerEvent stopDataEvent1 = logger.getEvent(7);
+        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent2.getMarker());
+        Assert.assertEquals(Slf4JMarkers.MSG_OK, stopEvent2.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent2.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_OK, stopDataEvent2.getMarker());
+        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent2.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent2.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent2.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent2.getLevel());
+        Assert.assertTrue(startEvent2.getFormattedMessage().startsWith(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent2.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
+        Assert.assertFalse(startEvent2.getFormattedMessage().contains(meterCategory));
+        Assert.assertFalse(stopEvent2.getFormattedMessage().contains(meterCategory));
+        Assert.assertTrue(startEvent2.getFormattedMessage().contains(meterName+"/"+meterName2));
+        Assert.assertTrue(stopEvent2.getFormattedMessage().contains(meterName+"/"+meterName2));
+        
+        Assert.assertTrue(data.read(startDataEvent2.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName+"/"+meterName2, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent2.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName+"/"+meterName2, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }    
+
+    @Test
+    public void testOkWithNameAndNamePrintCategoryEnabled() {
+    	MeterConfig.printCategory = true;
+        final Meter m = new Meter(logger, meterName).start();
+        final Meter m2 = m.sub(meterName2).start().ok();
+        m.ok();
+
+        Assert.assertEquals(8, logger.getEventCount());
+        final TestLoggerEvent startEvent1 = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent1 = logger.getEvent(1);
+        final TestLoggerEvent startEvent2 = logger.getEvent(2);
+        final TestLoggerEvent startDataEvent2 = logger.getEvent(3);
+        final TestLoggerEvent stopEvent2 = logger.getEvent(4);
+        final TestLoggerEvent stopDataEvent2 = logger.getEvent(5);
+        final TestLoggerEvent stopEvent1 = logger.getEvent(6);
+        final TestLoggerEvent stopDataEvent1 = logger.getEvent(7);
+        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent2.getMarker());
+        Assert.assertEquals(Slf4JMarkers.MSG_OK, stopEvent2.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent2.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_OK, stopDataEvent2.getMarker());
+        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent2.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent2.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent2.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent2.getLevel());
+        Assert.assertTrue(startEvent2.getFormattedMessage().startsWith(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent2.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
+        Assert.assertTrue(startEvent2.getFormattedMessage().contains(meterCategory));
+        Assert.assertTrue(stopEvent2.getFormattedMessage().contains(meterCategory));
+        Assert.assertTrue(startEvent2.getFormattedMessage().contains("/"+meterName+"/"+meterName2));
+        Assert.assertTrue(stopEvent2.getFormattedMessage().contains("/"+meterName+"/"+meterName2));
+        
+        Assert.assertTrue(data.read(startDataEvent2.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName+"/"+meterName2, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent2.getFormattedMessage(), 'M'));
+        Assert.assertEquals(meterName+"/"+meterName2, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }    
+
+    @Test
+    public void testOkPath() {
+        final String path = "qwerty";
+        final Meter m = new Meter(logger).start().ok(path);
+
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path+"]"));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("["+path+"]"));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(path, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }
+
+    @Test
+    public void testPathOk() {
+        final String path = "qwerty";
+        final Meter m = new Meter(logger).start().path(path).ok();
+
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path+"]"));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("["+path+"]"));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(path, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }
+    
+    @Test
+    public void testPathPathOk() {
+        final String path = "qwerty";
+        final String path2 = "ytrewq";
+        final Meter m = new Meter(logger).start().path(path).path(path2).ok();
+
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path+"]"));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path2+"]"));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("["+path2+"]"));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(path2, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }
+
+    @Test
+    public void testPathOkPath() {
+        final String path = "qwerty";
+        final String path2 = "ytrewq";
+        final Meter m = new Meter(logger).start().path(path).ok(path2);
+
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path+"]"));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path2+"]"));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("["+path2+"]"));
+        
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(path2, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
     }
 
     @Test
     public void testReject() {
-        final String title = "Example of execution that succeeds.";
         final String reject = "qwerty";
-        final String flow = "ytrewq";
-        final Meter m = new Meter(logger).m(title).start();
-        try {
-            m.flow(flow);
-            /* Run stuff that may fail. */
-            m.reject(reject);
-        } catch (final Exception e) {
-            m.fail(e);
-            // may rethrow
-        }
+        final Meter m = new Meter(logger).start().reject(reject);
 
-        Assert.assertFalse(m.isOK());
-        Assert.assertTrue(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
@@ -197,33 +569,76 @@ public class MeterMessageTest {
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
         Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_REJECT_PREFIX));
-        Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains(reject));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(reject));
-        Assert.assertFalse(stopEvent.getFormattedMessage().contains(flow));
+    
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(reject, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
     }
 
     @Test
+    public void testPathReject() {
+    	final String path = "ytrewq";
+        final String reject = "qwerty";
+        final Meter m = new Meter(logger).start().path(path).reject(reject);
+
+        Assert.assertEquals(4, logger.getEventCount());
+        final TestLoggerEvent startEvent = logger.getEvent(0);
+        final TestLoggerEvent startDataEvent = logger.getEvent(1);
+        final TestLoggerEvent stopEvent = logger.getEvent(2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        Assert.assertEquals(Slf4JMarkers.MSG_START, startEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.MSG_REJECT, stopEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_START, startDataEvent.getMarker());
+        Assert.assertEquals(Slf4JMarkers.DATA_REJECT, stopDataEvent.getMarker());
+        Assert.assertEquals(TestLoggerEvent.Level.DEBUG, startEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.INFO, stopEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, startDataEvent.getLevel());
+        Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_REJECT_PREFIX));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains(reject));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(reject));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains(path));
+        Assert.assertFalse(stopEvent.getFormattedMessage().contains(path));
+    
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getEventName());
+        Assert.assertEquals(meterCategory, data.getEventCategory());
+        Assert.assertEquals(null, data.getDescription());
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(reject, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+    }
+    
+    @Test
     public void testFail() {
-        System.out.println("testFail:");
-        final String title = "Example of execution that fails.";
-        final Meter m = new Meter(logger).m(title).start();
-        final String flow = "ytrewq";
-        try {
-            m.flow(flow);
-            /* Run stuff that may fail. */
-            if (1 + 2 == 3) {
-                throw new Exception("message");
-            }
-            m.ok();
-        } catch (final Exception e) {
-            m.fail(e);
-            // may rethrow
-        }
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertTrue(m.isFail());
-        Assert.assertFalse(m.isSlow());
+    	final String exceptionStr = "bad exception";
+        final Meter m = new Meter(logger).start().fail(new Exception(exceptionStr));
+
         Assert.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
@@ -239,10 +654,22 @@ public class MeterMessageTest {
         Assert.assertEquals(TestLoggerEvent.Level.TRACE, stopDataEvent.getLevel());
         Assert.assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_FAIL_PREFIX));
-        Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(Exception.class.getName()));
-        Assert.assertFalse(stopEvent.getFormattedMessage().contains(flow));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(exceptionStr));
+
+        Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(null, data.getExceptionClass());
+        Assert.assertEquals(null, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+
+        Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage(), 'M'));
+        Assert.assertEquals(null, data.getPathId());
+        Assert.assertEquals(null, data.getRejectId());
+        Assert.assertEquals(Exception.class.getName(), data.getExceptionClass());
+        Assert.assertEquals(exceptionStr, data.getExceptionMessage());
+        Assert.assertEquals(Session.uuid, data.getSessionUuid());
     }
 
     @Test
@@ -257,7 +684,6 @@ public class MeterMessageTest {
             m.ok();
         } catch (final Exception e) {
             m.fail(e);
-            // may rethrow
         }
         Assert.assertTrue(m.isOK());
         Assert.assertFalse(m.isReject());

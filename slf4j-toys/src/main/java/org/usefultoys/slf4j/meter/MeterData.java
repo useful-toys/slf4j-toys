@@ -318,16 +318,21 @@ public class MeterData extends SystemData {
         } else {
             buffer.append("Scheduled");
         }
-        buffer.append(": ");
         if (this.description != null) {
+            buffer.append(": ");
             buffer.append(this.description);
         } else {
-            if (eventName == null || MeterConfig.printCategory) {
+        	if (MeterConfig.printCategory || eventName != null) {
+        		buffer.append(": ");
+        	}
+            if (MeterConfig.printCategory) {
                 final int index = eventCategory.lastIndexOf('.') + 1;
                 buffer.append(eventCategory.substring(index));
             }
             if (eventName != null) {
-                buffer.append('/');
+                if (MeterConfig.printCategory) {
+                	buffer.append('/');
+                }
                 buffer.append(eventName);
             }
         }
