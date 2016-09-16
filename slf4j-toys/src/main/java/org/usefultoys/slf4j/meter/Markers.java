@@ -22,9 +22,9 @@ import org.slf4j.MarkerFactory;
  * Collection of SLF4J {@link Marker}s used to identify {@link Meter} log messages.
  * @author Daniel Felix Ferber
  */
-public final class Slf4JMarkers {
+public final class Markers {
 
-    private Slf4JMarkers() {
+    private Markers() {
         // nothing
     }
 

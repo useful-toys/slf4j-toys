@@ -91,7 +91,7 @@ public class Watcher extends WatcherData implements Runnable {
             logger.info(readableString(new StringBuilder()).toString());
         }
         if (logger.isTraceEnabled()) {
-            logger.trace(Slf4JMarkers.WATCHER, write(new StringBuilder(), 'W').toString());
+            logger.trace(Markers.WATCHER, write(new StringBuilder(), 'W').toString());
         }
     }
 }

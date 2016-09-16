@@ -23,9 +23,9 @@ import org.slf4j.MarkerFactory;
  *
  * @author Daniel Felix Ferber
  */
-public final class Slf4JMarkers {
+public final class Markers {
 
-    private Slf4JMarkers() {
+    private Markers() {
         //nothing
     }
 
