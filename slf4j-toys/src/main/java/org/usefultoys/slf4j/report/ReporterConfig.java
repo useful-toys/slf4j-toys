@@ -49,7 +49,7 @@ public class ReporterConfig {
      */
     public static boolean reportUser = Config.getProperty("slf4jtoys.report.user", true);
     /**
-     * If default report includes phisical machine information.
+     * If default report includes physical machine information.
      * Value is read from system property {@code slf4jtoys.report.user} at application startup, defaults to {@code true}.
      * You may assign a new value at runtime.
      */
