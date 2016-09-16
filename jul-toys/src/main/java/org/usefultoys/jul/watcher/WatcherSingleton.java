@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.watcher;
+package org.usefultoys.jul.watcher;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,8 +21,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.internal.Config;
+import java.util.logging.Logger;
+import org.usefultoys.jul.internal.Config;
 
 /**
  * Keeps the default watcher singleton. Offers some methods to execute this watcher periodically
@@ -35,10 +35,10 @@ public class WatcherSingleton {
     /**
      * Watcher default instance. 
      * It is created at application startup and named as system 
-     * property {@code slf4jtoys.watcher.name}, which defaults to {@code watcher}.
+     * property {@code jultoys.watcher.name}, which defaults to {@code watcher}.
      * You cannot assign a new default watcher at runtime.
      */
-    public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(Config.getProperty("slf4jtoys.watcher.name", "watcher")));
+    public static final Watcher DEFAULT_WATCHER = new Watcher(Logger.getLogger(Config.getProperty("jultoys.watcher.name", "watcher")));
 
     private static ScheduledExecutorService defaultWatcherExecutor;
     private static ScheduledFuture<?> scheduledDefaultWatcher;
