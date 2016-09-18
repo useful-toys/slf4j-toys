@@ -646,9 +646,9 @@ public class Meter extends MeterData implements Closeable {
             if (logger.isLoggable(Level.FINE)) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
-                logger.log(debugLogRecord(Markers.MSG_START, readableString(new StringBuilder()).toString()));
+                logger.log(startDebugStatusLogRecord(Markers.MSG_START, readableString(new StringBuilder()).toString()));
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.log(traceLogRecord(Markers.DATA_START, write(new StringBuilder(), 'M').toString()));
+                    logger.log(startTraceStatusLogRecord(Markers.DATA_START, write(new StringBuilder(), 'M').toString()));
                 }
                 if (context != null) {
                     context.clear();
@@ -749,12 +749,12 @@ public class Meter extends MeterData implements Closeable {
                 if (logger.isLoggable(Level.INFO)) {
                     collectRuntimeStatus();
                     collectPlatformStatus();
-                    logger.log(infoLogRecord(Markers.MSG_PROGRESS, readableString(new StringBuilder()).toString()));
+                    logger.log(progressInfoStausLogRecord(Markers.MSG_PROGRESS, readableString(new StringBuilder()).toString()));
                     if (logger.isLoggable(Level.FINEST)) {
                         if (startTime != 0 && timeLimitNanoseconds != 0 && (now - startTime) > timeLimitNanoseconds) {
-                            logger.log(traceLogRecord(Markers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString()));
+                            logger.log(progressTraceStatusLogRecord(Markers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString()));
                         } else if (logger.isLoggable(Level.FINEST)) {
-                            logger.log(traceLogRecord(Markers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString()));
+                            logger.log(progressTraceStatusLogRecord(Markers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString()));
                         }
                     }
                     if (context != null) {
@@ -828,15 +828,15 @@ public class Meter extends MeterData implements Closeable {
 
                 final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
                 if (warnSlowness) {
-                    logger.log(warnLogRecord(Markers.MSG_SLOW_OK, readableString(new StringBuilder()).toString()));
+                    logger.log(okWarnLogRecord(Markers.MSG_SLOW_OK, readableString(new StringBuilder()).toString()));
                 } else if (logger.isLoggable(Level.INFO)) {
-                    logger.log(infoLogRecord(Markers.MSG_OK, readableString(new StringBuilder()).toString()));
+                    logger.log(okInfoStausLogRecord(Markers.MSG_OK, readableString(new StringBuilder()).toString()));
                 }
                 if (logger.isLoggable(Level.FINEST)) {
                     if (warnSlowness) {
-                        logger.log(traceLogRecord(Markers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString()));
+                        logger.log(okTraceStatusLogRecord(Markers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString()));
                     } else {
-                        logger.log(traceLogRecord(Markers.DATA_OK, write(new StringBuilder(), 'M').toString()));
+                        logger.log(okTraceStatusLogRecord(Markers.DATA_OK, write(new StringBuilder(), 'M').toString()));
                     }
                 }
                 if (context != null) {
@@ -906,15 +906,15 @@ public class Meter extends MeterData implements Closeable {
 
                 final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
                 if (warnSlowness) {
-                    logger.log(warnLogRecord(Markers.MSG_SLOW_OK, readableString(new StringBuilder()).toString()));
+                    logger.log(okWarnLogRecord(Markers.MSG_SLOW_OK, readableString(new StringBuilder()).toString()));
                 } else if (logger.isLoggable(Level.INFO)) {
-                    logger.log(infoLogRecord(Markers.MSG_OK, readableString(new StringBuilder()).toString()));
+                    logger.log(okInfoStausLogRecord(Markers.MSG_OK, readableString(new StringBuilder()).toString()));
                 }
                 if (logger.isLoggable(Level.FINEST)) {
                     if (warnSlowness) {
-                        logger.log(traceLogRecord(Markers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString()));
+                        logger.log(okTraceStatusLogRecord(Markers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString()));
                     } else {
-                        logger.log(traceLogRecord(Markers.DATA_OK, write(new StringBuilder(), 'M').toString()));
+                        logger.log(okTraceStatusLogRecord(Markers.DATA_OK, write(new StringBuilder(), 'M').toString()));
                     }
                 }
                 if (context != null) {
@@ -976,10 +976,10 @@ public class Meter extends MeterData implements Closeable {
                 collectRuntimeStatus();
                 collectPlatformStatus();
                 if (logger.isLoggable(Level.INFO)) {
-                    logger.log(infoLogRecord(Markers.MSG_REJECT, readableString(new StringBuilder()).toString()));
+                    logger.log(rejectInfoStausLogRecord(Markers.MSG_REJECT, readableString(new StringBuilder()).toString()));
                 }
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.log(traceLogRecord(Markers.DATA_REJECT, write(new StringBuilder(), 'M').toString()));
+                    logger.log(rejectTraceStatusLogRecord(Markers.DATA_REJECT, write(new StringBuilder(), 'M').toString()));
                 }
                 if (context != null) {
                     context.clear();
@@ -1036,9 +1036,9 @@ public class Meter extends MeterData implements Closeable {
             if (logger.isLoggable(Level.SEVERE)) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
-                logger.log(errorLogRecord(Markers.MSG_FAIL, readableString(new StringBuilder()).toString(), cause));
+                logger.log(failErrorStatusLogRecord(Markers.MSG_FAIL, readableString(new StringBuilder()).toString(), cause));
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.log(traceLogRecord(Markers.DATA_FAIL, write(new StringBuilder(), 'M').toString()));
+                    logger.log(failTraceStatusLogRecord(Markers.DATA_FAIL, write(new StringBuilder(), 'M').toString()));
                 }
                 if (context != null) {
                     context.clear();
@@ -1209,6 +1209,8 @@ public class Meter extends MeterData implements Closeable {
         final LogRecord logRecord = new LogRecord(Level.SEVERE, message);
         logRecord.setParameters(new Object[]{marker, exceptionClass});
         logRecord.setThrown(e);
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("n/a");
         return logRecord;
     }
 
@@ -1216,13 +1218,17 @@ public class Meter extends MeterData implements Closeable {
         final LogRecord logRecord = new LogRecord(Level.SEVERE, message);
         logRecord.setParameters(new Object[]{marker, fullID});
         logRecord.setThrown(illegalMeterUsage);
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("n/a");
         return logRecord;
     }
 
     private LogRecord errorLogRecord(Marker marker, String message, String methodName, String errorMessage, String fullID, IllegalMeterUsage illegalMeterUsage) {
         final LogRecord logRecord = new LogRecord(Level.SEVERE, message);
-        logRecord.setParameters(new Object[]{marker, errorMessage, fullID});
+        logRecord.setParameters(new Object[]{marker, errorMessage, methodName, fullID});
         logRecord.setThrown(illegalMeterUsage);
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName(methodName);
         return logRecord;
     }
 
@@ -1230,37 +1236,93 @@ public class Meter extends MeterData implements Closeable {
         final LogRecord logRecord = new LogRecord(Level.SEVERE, message);
         logRecord.setParameters(new Object[]{marker, methodName, fullID});
         logRecord.setThrown(t);
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName(methodName);
         return logRecord;
     }
 
-    private LogRecord errorLogRecord(Marker marker, String message, Throwable cause) {
+    private LogRecord failErrorStatusLogRecord(Marker marker, String message, Throwable cause) {
         final LogRecord logRecord = new LogRecord(Level.FINE, message);
         logRecord.setParameters(new Object[]{marker});
         logRecord.setThrown(cause);
         return logRecord;
     }
 
-    private LogRecord debugLogRecord(Marker marker, String message) {
+    private LogRecord startDebugStatusLogRecord(Marker marker, String message) {
         final LogRecord logRecord = new LogRecord(Level.FINE, "[{0}] {1}");
         logRecord.setParameters(new Object[]{marker, message});
         return logRecord;
     }
 
-    private LogRecord traceLogRecord(Marker marker, String message) {
+    private LogRecord startTraceStatusLogRecord(Marker marker, String message) {
         final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
         logRecord.setParameters(new Object[]{marker, message});
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("start");
         return logRecord;
     }
 
-    private LogRecord infoLogRecord(Marker marker, String message) {
+    private LogRecord okTraceStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker, message});
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("ok");
+        return logRecord;
+    }
+
+    private LogRecord rejectTraceStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker, message});
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("reject");
+        return logRecord;
+    }
+
+    private LogRecord failTraceStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker, message});
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("fail");
+        return logRecord;
+    }
+
+    private LogRecord progressTraceStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker, message});
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("progress");
+        return logRecord;
+    }
+
+    private LogRecord progressInfoStausLogRecord(Marker marker, String message) {
         final LogRecord logRecord = new LogRecord(Level.INFO, "[{0}] {1}");
         logRecord.setParameters(new Object[]{marker, message});
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("progress");
         return logRecord;
     }
 
-    private LogRecord warnLogRecord(Marker marker, String message) {
+    private LogRecord rejectInfoStausLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.INFO, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker, message});
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("reject");
+        return logRecord;
+    }
+
+    private LogRecord okInfoStausLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.INFO, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker, message});
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("ok");
+        return logRecord;
+    }
+
+    private LogRecord okWarnLogRecord(Marker marker, String message) {
         final LogRecord logRecord = new LogRecord(Level.WARNING, "[{0}] {1}");
         logRecord.setParameters(new Object[]{marker, message});
+        logRecord.setSourceClassName(Meter.class.getName());
+        logRecord.setSourceMethodName("ok");
         return logRecord;
     }
 }
