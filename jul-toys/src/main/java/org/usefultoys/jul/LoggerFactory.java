@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An alternative to {@link org.slf4j.LoggerFactory}, with additional useful
+ * Similar to to {@link org.slf4j.LoggerFactory}, with additional useful
  * methods.
  *
  * @author Daniel Felix Ferber

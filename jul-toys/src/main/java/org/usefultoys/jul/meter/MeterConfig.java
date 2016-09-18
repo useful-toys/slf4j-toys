@@ -16,8 +16,6 @@
 package org.usefultoys.jul.meter;
 
 import org.usefultoys.jul.internal.Config;
-import org.usefultoys.jul.watcher.Watcher;
-import org.usefultoys.jul.watcher.WatcherData;
 
 /**
  * Collection of properties that drive {@link Meter} and {@link MeterData} behavior.
@@ -33,14 +31,14 @@ public class MeterConfig {
      * The category is the same as logger name. On the usual logger configuration, the logger prints its name.
      * Printing also the category name would be redundant. 
      * Setting this property to true only makes sense if logger is not configured to print its name. 
-     * Value is read from system property {@code slf4jtoys.meter.print.category} at application startup, defaults to {@code false}.
+     * Value is read from system property {@code jultoys.meter.print.category} at application startup, defaults to {@code false}.
      * You may assign a new value at runtime.
      */
-    public static boolean printCategory = Config.getProperty("slf4jtoys.meter.print.category", false);
+    public static boolean printCategory = Config.getProperty("jultoys.meter.print.category", false);
     /**
      * Time to wait before reporting next progress status, in milliseconds.
-     * Value is read from system property {@code slf4jtoys.meter.progress.period} at application startup and defaults to {@code 2 seconds}.
+     * Value is read from system property {@code jultoys.meter.progress.period} at application startup and defaults to {@code 2 seconds}.
      * You may assign a new value at runtime.
      */
-    public static long progressPeriodMilliseconds = Config.getMillisecondsProperty("slf4jtoys.meter.progress.period", 2000L);
+    public static long progressPeriodMilliseconds = Config.getMillisecondsProperty("jultoys.meter.progress.period", 2000L);
 }

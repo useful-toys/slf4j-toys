@@ -31,7 +31,7 @@ public final class Session {
     }
 
     /**
-     * UUID of the current SLF4J-Toys instance. This UUID is added to all trace messages.
+     * UUID of the current JUL-Toys instance. This UUID is added to all trace messages.
      * It allows to distinguish messages from different JVM instances when log files are shared.
      * Value is assigned at application startup and cannot be changed at runtime.
      */

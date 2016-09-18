@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * Abstract class representing events collected by slf4j-toys.
+ * Abstract class representing events collected by jul-toys.
  *
  * @author Daniel Felix Ferber
  */
