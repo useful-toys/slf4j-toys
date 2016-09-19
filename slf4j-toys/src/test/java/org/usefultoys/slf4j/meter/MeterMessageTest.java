@@ -31,9 +31,9 @@ import org.usefultoys.slf4j.Session;
  */
 public class MeterMessageTest {
 
-	static final String meterCategory = "category";
-	static final String meterName = "name";
-	static final String meterName2 = "eman";
+    static final String meterCategory = "category";
+    static final String meterName = "name";
+    static final String meterName2 = "eman";
     final String title = "Example of execution.";
     static final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterCategory);
     static final MeterData data = new MeterData();
@@ -81,7 +81,7 @@ public class MeterMessageTest {
         Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
         Assert.assertFalse(startEvent.getFormattedMessage().contains(meterCategory));
         Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterCategory));
-        
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(null, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
@@ -105,7 +105,7 @@ public class MeterMessageTest {
 
     @Test
     public void testOkPrintCategoryEnabled() {
-    	MeterConfig.printCategory = true;
+        MeterConfig.printCategory = true;
         final Meter m = new Meter(logger).start().ok();
 
         Assert.assertEquals(4, logger.getEventCount());
@@ -125,7 +125,7 @@ public class MeterMessageTest {
         Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(meterCategory));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(meterCategory));
-        
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(null, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
@@ -170,7 +170,7 @@ public class MeterMessageTest {
         Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterCategory));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
-        
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(null, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
@@ -191,7 +191,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getExceptionMessage());
         Assert.assertEquals(Session.uuid, data.getSessionUuid());
     }
-    
+
     @Test
     public void testOkWithName() {
         final Meter m = new Meter(logger, meterName).start().ok();
@@ -215,7 +215,7 @@ public class MeterMessageTest {
         Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterCategory));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(meterName));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(meterName));
-        
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(meterName, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
@@ -239,7 +239,7 @@ public class MeterMessageTest {
 
     @Test
     public void testOkWithNamePrintCategoryEnabled() {
-    	MeterConfig.printCategory = true;
+        MeterConfig.printCategory = true;
         final Meter m = new Meter(logger, meterName).start().ok();
 
         Assert.assertEquals(4, logger.getEventCount());
@@ -259,9 +259,9 @@ public class MeterMessageTest {
         Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(meterCategory));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(meterCategory));
-        Assert.assertTrue(startEvent.getFormattedMessage().contains("/"+meterName));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains("/"+meterName));
-        
+        Assert.assertTrue(startEvent.getFormattedMessage().contains("/" + meterName));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("/" + meterName));
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(meterName, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
@@ -282,7 +282,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getExceptionMessage());
         Assert.assertEquals(Session.uuid, data.getSessionUuid());
     }
-    
+
     @Test
     public void testOkWithNameAndDescription() {
         final Meter m = new Meter(logger, meterName).m(title).start().ok();
@@ -308,7 +308,7 @@ public class MeterMessageTest {
         Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterName));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
-        
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(meterName, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
@@ -357,11 +357,11 @@ public class MeterMessageTest {
         Assert.assertTrue(stopEvent2.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
         Assert.assertFalse(startEvent2.getFormattedMessage().contains(meterCategory));
         Assert.assertFalse(stopEvent2.getFormattedMessage().contains(meterCategory));
-        Assert.assertTrue(startEvent2.getFormattedMessage().contains(meterName+"/"+meterName2));
-        Assert.assertTrue(stopEvent2.getFormattedMessage().contains(meterName+"/"+meterName2));
-        
+        Assert.assertTrue(startEvent2.getFormattedMessage().contains(meterName + "/" + meterName2));
+        Assert.assertTrue(stopEvent2.getFormattedMessage().contains(meterName + "/" + meterName2));
+
         Assert.assertTrue(data.read(startDataEvent2.getFormattedMessage(), 'M'));
-        Assert.assertEquals(meterName+"/"+meterName2, data.getEventName());
+        Assert.assertEquals(meterName + "/" + meterName2, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
         Assert.assertEquals(null, data.getDescription());
         Assert.assertEquals(null, data.getPathId());
@@ -371,7 +371,7 @@ public class MeterMessageTest {
         Assert.assertEquals(Session.uuid, data.getSessionUuid());
 
         Assert.assertTrue(data.read(stopDataEvent2.getFormattedMessage(), 'M'));
-        Assert.assertEquals(meterName+"/"+meterName2, data.getEventName());
+        Assert.assertEquals(meterName + "/" + meterName2, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
         Assert.assertEquals(null, data.getDescription());
         Assert.assertEquals(null, data.getPathId());
@@ -379,11 +379,11 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
         Assert.assertEquals(Session.uuid, data.getSessionUuid());
-    }    
+    }
 
     @Test
     public void testOkWithNameAndNamePrintCategoryEnabled() {
-    	MeterConfig.printCategory = true;
+        MeterConfig.printCategory = true;
         final Meter m = new Meter(logger, meterName).start();
         final Meter m2 = m.sub(meterName2).start().ok();
         m.ok();
@@ -409,11 +409,11 @@ public class MeterMessageTest {
         Assert.assertTrue(stopEvent2.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
         Assert.assertTrue(startEvent2.getFormattedMessage().contains(meterCategory));
         Assert.assertTrue(stopEvent2.getFormattedMessage().contains(meterCategory));
-        Assert.assertTrue(startEvent2.getFormattedMessage().contains("/"+meterName+"/"+meterName2));
-        Assert.assertTrue(stopEvent2.getFormattedMessage().contains("/"+meterName+"/"+meterName2));
-        
+        Assert.assertTrue(startEvent2.getFormattedMessage().contains("/" + meterName + "/" + meterName2));
+        Assert.assertTrue(stopEvent2.getFormattedMessage().contains("/" + meterName + "/" + meterName2));
+
         Assert.assertTrue(data.read(startDataEvent2.getFormattedMessage(), 'M'));
-        Assert.assertEquals(meterName+"/"+meterName2, data.getEventName());
+        Assert.assertEquals(meterName + "/" + meterName2, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
         Assert.assertEquals(null, data.getDescription());
         Assert.assertEquals(null, data.getPathId());
@@ -423,7 +423,7 @@ public class MeterMessageTest {
         Assert.assertEquals(Session.uuid, data.getSessionUuid());
 
         Assert.assertTrue(data.read(stopDataEvent2.getFormattedMessage(), 'M'));
-        Assert.assertEquals(meterName+"/"+meterName2, data.getEventName());
+        Assert.assertEquals(meterName + "/" + meterName2, data.getEventName());
         Assert.assertEquals(meterCategory, data.getEventCategory());
         Assert.assertEquals(null, data.getDescription());
         Assert.assertEquals(null, data.getPathId());
@@ -431,7 +431,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
         Assert.assertEquals(Session.uuid, data.getSessionUuid());
-    }    
+    }
 
     @Test
     public void testOkPath() {
@@ -443,9 +443,9 @@ public class MeterMessageTest {
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path+"]"));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains("["+path+"]"));
-        
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("[" + path + "]"));
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(null, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
@@ -471,9 +471,9 @@ public class MeterMessageTest {
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path+"]"));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains("["+path+"]"));
-        
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("[" + path + "]"));
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(null, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
@@ -488,7 +488,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getExceptionMessage());
         Assert.assertEquals(Session.uuid, data.getSessionUuid());
     }
-    
+
     @Test
     public void testPathPathOk() {
         final String path = "qwerty";
@@ -500,10 +500,10 @@ public class MeterMessageTest {
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path+"]"));
-        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path2+"]"));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains("["+path2+"]"));
-        
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("[" + path2 + "]"));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("[" + path2 + "]"));
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(null, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
@@ -530,10 +530,10 @@ public class MeterMessageTest {
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path+"]"));
-        Assert.assertFalse(startEvent.getFormattedMessage().contains("["+path2+"]"));
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains("["+path2+"]"));
-        
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
+        Assert.assertFalse(startEvent.getFormattedMessage().contains("[" + path2 + "]"));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains("[" + path2 + "]"));
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(null, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
@@ -571,7 +571,7 @@ public class MeterMessageTest {
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_REJECT_PREFIX));
         Assert.assertFalse(startEvent.getFormattedMessage().contains(reject));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(reject));
-    
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(null, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
@@ -592,7 +592,7 @@ public class MeterMessageTest {
 
     @Test
     public void testPathReject() {
-    	final String path = "ytrewq";
+        final String path = "ytrewq";
         final String reject = "qwerty";
         final Meter m = new Meter(logger).start().path(path).reject(reject);
 
@@ -615,7 +615,7 @@ public class MeterMessageTest {
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(reject));
         Assert.assertFalse(startEvent.getFormattedMessage().contains(path));
         Assert.assertFalse(stopEvent.getFormattedMessage().contains(path));
-    
+
         Assert.assertTrue(data.read(startDataEvent.getFormattedMessage(), 'M'));
         Assert.assertEquals(null, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
@@ -633,10 +633,10 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getExceptionMessage());
         Assert.assertEquals(Session.uuid, data.getSessionUuid());
     }
-    
+
     @Test
     public void testFail() {
-    	final String exceptionStr = "bad exception";
+        final String exceptionStr = "bad exception";
         final Meter m = new Meter(logger).start().fail(new Exception(exceptionStr));
 
         Assert.assertEquals(4, logger.getEventCount());
@@ -712,6 +712,7 @@ public class MeterMessageTest {
 
     @Test
     public void testIteration() {
+        MeterConfig.progressPeriodMilliseconds = 0;
         System.out.println("testIteration:");
         final String title = "Example of execution that succeeds and reports progress of completed iterations.";
         final Meter m = new Meter(logger).m(title).iterations(4).start();
@@ -833,8 +834,8 @@ public class MeterMessageTest {
     }
 
     /**
-     * As logger is enable for debug, it will print the start message. Hence, the stop message will not include context
-     * from the input message anymore.
+     * As logger is enable for debug, it will print the start message. Hence,
+     * the stop message will not include context from the input message anymore.
      */
     @Test
     public void testContext0() {
@@ -897,8 +898,9 @@ public class MeterMessageTest {
     }
 
     /**
-     * As logger is not enable for debug, it will print the start message. Hence, the stop message will not include
-     * context from the input message anymore.
+     * As logger is not enable for debug, it will print the start message.
+     * Hence, the stop message will not include context from the input message
+     * anymore.
      */
     @Test
     public void testContext1() {

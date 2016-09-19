@@ -15,9 +15,8 @@
  */
 package org.slf4j.impl;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
@@ -27,7 +26,7 @@ import org.slf4j.Logger;
  */
 public class TestLoggerFactory implements ILoggerFactory {
 
-    private final Map<String, Logger> nameToLogger = new ConcurrentHashMap<String, Logger>();
+    private final Map<String, Logger> nameToLogger = new HashMap<String, Logger>();
     private static final TestLoggerFactory instance = new TestLoggerFactory();
 
     public static ILoggerFactory getInstance() {
@@ -35,12 +34,12 @@ public class TestLoggerFactory implements ILoggerFactory {
     }
 
     @Override
-	public Logger getLogger(final String name) {
-        return nameToLogger.computeIfAbsent(name, new Function<String, Logger>() {
-            @Override
-			public Logger apply(final String name) {
-                return new TestLogger(name);
-            }
-        });
+    public Logger getLogger(final String name) {
+        Logger logger = nameToLogger.get(name);
+        if (logger != null) {
+            return logger;
+        }
+        nameToLogger.put(name, logger = new TestLogger(name));
+        return logger;
     }
 }
