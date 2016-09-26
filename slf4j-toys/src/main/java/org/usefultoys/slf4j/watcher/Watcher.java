@@ -16,14 +16,18 @@
 package org.usefultoys.slf4j.watcher;
 
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import org.slf4j.Logger;
+import org.usefultoys.slf4j.LoggerConfig;
 import org.usefultoys.slf4j.Session;
+import org.usefultoys.slf4j.meter.Meter;
+import org.usefultoys.slf4j.meter.MeterConfig;
 
 /**
- * Periodically collects system status and reports it to logger. It conveniently
- * implements {@link Runnable} for compliance with {@link ScheduledExecutorService}.
- * Call {@link #logCurrentStatus()} to produce a 1-line summary of
- * the current system status as information message and an encoded event as trace message.
+ * Periodically collects system status and reports it to logger. It conveniently implements {@link Runnable} for compliance with
+ * {@link ScheduledExecutorService}. Call {@link #logCurrentStatus()} to produce a 1-line summary of the current system status as information message
+ * and an encoded event as trace message.
  *
  * @author Daniel Felix Ferber
  */
@@ -35,16 +39,17 @@ public class Watcher extends WatcherData implements Runnable {
      * Logger that reports messages.
      */
     transient private final Logger logger;
+    transient private final java.util.logging.Logger julLogger;
 
     /**
-     * Constructor.
-     * Events produced by this watcher will use the logger name as event category.
+     * Constructor. Events produced by this watcher will use the logger name as event category.
      *
      * @param logger Logger that reports messages.
      */
     public Watcher(final Logger logger) {
         super();
         this.logger = logger;
+        this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
         this.sessionUuid = Session.uuid;
         this.eventPosition = 0;
         this.eventCategory = logger.getName();
@@ -59,6 +64,7 @@ public class Watcher extends WatcherData implements Runnable {
     public Watcher(final Logger logger, String eventCategory) {
         super();
         this.logger = logger;
+        this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
         this.sessionUuid = Session.uuid;
         this.eventPosition = 0;
         this.eventCategory = eventCategory;
@@ -77,8 +83,7 @@ public class Watcher extends WatcherData implements Runnable {
     }
 
     /**
-     * Produces a 1-line summary of the current system status as information message
-     * and an encoded event as trace message.
+     * Produces a 1-line summary of the current system status as information message and an encoded event as trace message.
      */
     public void logCurrentStatus() {
         time = System.nanoTime();
@@ -88,10 +93,40 @@ public class Watcher extends WatcherData implements Runnable {
             collectRuntimeStatus();
             collectPlatformStatus();
             collectManagedBeanStatus();
-            logger.info(readableString(new StringBuilder()).toString());
+            final String message = readableString(new StringBuilder()).toString();
+            if (LoggerConfig.hackJulEnable) {
+                watcherMessageLogRecord(message);
+                julLogger.info(message);
+            } else {
+                logger.info(Markers.MSG_WATCHER, message);
+            }
         }
         if (logger.isTraceEnabled()) {
-            logger.trace(Markers.WATCHER, write(new StringBuilder(), 'W').toString());
+            final String message = write(new StringBuilder(), 'W').toString();
+            if (LoggerConfig.hackJulEnable) {
+                julLogger.log(watcherDataLogRecord(message));
+            } else {
+                logger.trace(Markers.DATA_WATCHER, message);
+            }
         }
+    }
+
+    private void watcherMessageLogRecord(final String message) {
+        final LogRecord logRecord = new LogRecord(Level.INFO, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{Markers.MSG_WATCHER.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("watcher");
+        }
+    }
+
+    private LogRecord watcherDataLogRecord(final String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{Markers.DATA_WATCHER.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("watcher");
+        }
+        return logRecord;
     }
 }

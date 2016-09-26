@@ -29,5 +29,6 @@ public final class Markers {
         //nothing
     }
 
-    public static final Marker WATCHER = MarkerFactory.getMarker("WATCHER");
+    public static final Marker MSG_WATCHER = MarkerFactory.getMarker("WATCHER_MSG");
+    public static final Marker DATA_WATCHER = MarkerFactory.getMarker("WATCHER_DATA");
 }

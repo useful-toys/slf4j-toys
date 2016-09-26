@@ -26,23 +26,28 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import org.slf4j.Logger;
+import org.slf4j.Marker;
+import org.usefultoys.slf4j.LoggerConfig;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
 
 /**
- * At beginning, termination of operations and on iterations, collects system status and reports it to logger.
- * Call {@link #start()} to produce a 1-line summary about operation start and current system status as debug message and an encoded event as trace message.
- * Call {@link #ok()} to produce a 1-line summary about operation successful end and current system status as information message and an encoded event as trace message.
- * Call {@link #fail(Throwable)} to produce a 1-line summary about operation failure and current system status as error message and an encoded event as trace message.
- * Call {@link #progress()} to produce a 1-line summary about operation progress and current system status as information message and an encoded event as trace message.
- * 
+ * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call {@link #start()} to produce a
+ * 1-line summary about operation start and current system status as debug message and an encoded event as trace message. Call {@link #ok()} to
+ * produce a 1-line summary about operation successful end and current system status as information message and an encoded event as trace message.
+ * Call {@link #fail(Throwable)} to produce a 1-line summary about operation failure and current system status as error message and an encoded event
+ * as trace message. Call {@link #progress()} to produce a 1-line summary about operation progress and current system status as information message
+ * and an encoded event as trace message.
+ *
  * @author Daniel Felix Ferber
  */
 public class Meter extends MeterData implements Closeable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private static final String ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION = "Meter cannot create exception of type {}.";
     private static final String ERROR_MSG_METER_ALREADY_STARTED = "Meter already started. id={}";
     private static final String ERROR_MSG_METER_ALREADY_STOPPED = "Meter already stopped. id={}";
@@ -65,6 +70,7 @@ public class Meter extends MeterData implements Closeable {
      * Logger that reports messages.
      */
     private transient final Logger logger;
+    private transient final java.util.logging.Logger julLogger;
     private static final String NULL_VALUE = "<null>";
 
     /**
@@ -81,8 +87,7 @@ public class Meter extends MeterData implements Closeable {
     private WeakReference<Meter> previousInstance;
 
     /**
-     * Creates a new meter.
-     * Events produced by this meter will use the logger name as event category.
+     * Creates a new meter. Events produced by this meter will use the logger name as event category.
      *
      * @param logger Logger that reports messages.
      */
@@ -90,18 +95,18 @@ public class Meter extends MeterData implements Closeable {
         super();
         this.sessionUuid = Session.uuid;
         this.logger = logger;
+        this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
         this.eventCategory = logger.getName();
         this.eventName = null;
         eventCounterByName.putIfAbsent(this.eventCategory, new AtomicLong(0));
         final AtomicLong atomicLong = eventCounterByName.get(this.eventCategory);
-    	atomicLong.compareAndSet(Long.MAX_VALUE, 0);
-		this.eventPosition = atomicLong.incrementAndGet();
+        atomicLong.compareAndSet(Long.MAX_VALUE, 0);
+        this.eventPosition = atomicLong.incrementAndGet();
         this.createTime = System.nanoTime();
     }
 
     /**
-     * Creates a new meter.
-     * Events produced by this meter will use the logger name as event category.
+     * Creates a new meter. Events produced by this meter will use the logger name as event category.
      *
      * @param logger Logger that reports messages.
      * @param operationName Additional identification to distinguish operations reported on the same logger.
@@ -110,12 +115,13 @@ public class Meter extends MeterData implements Closeable {
         super();
         this.sessionUuid = Session.uuid;
         this.logger = logger;
+        this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
         this.eventCategory = logger.getName();
         final String index = this.eventCategory + "/" + operationName;
         eventCounterByName.putIfAbsent(index, new AtomicLong(0));
         final AtomicLong atomicLong = eventCounterByName.get(index);
         atomicLong.compareAndSet(Long.MAX_VALUE, 0);
-		this.eventPosition = atomicLong.incrementAndGet();
+        this.eventPosition = atomicLong.incrementAndGet();
         this.eventName = operationName;
         this.createTime = System.nanoTime();
     }
@@ -141,10 +147,8 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Creates a new Meter whose name is under the hierarchy of this meter.
-     * Useful if a large task may be subdivided into smaller task and reported
-     * individually. The new meter uses the name of this meter appended by dot and its
-     * own name, similar as logger do.
+     * Creates a new Meter whose name is under the hierarchy of this meter. Useful if a large task may be subdivided into smaller task and reported
+     * individually. The new meter uses the name of this meter appended by dot and its own name, similar as logger do.
      *
      * @param suboperationName Additional identification appended to this logger name.
      * @return The new Meter
@@ -163,8 +167,7 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Configures the meter with a human readable message that explains the task's
-     * purpose.
+     * Configures the meter with a human readable message that explains the task's purpose.
      *
      * @param message fixed message
      * @return reference to the meter itself.
@@ -179,8 +182,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Configures the meter with a human readable message that explains the task's
-     * purpose.
+     * Configures the meter with a human readable message that explains the task's purpose.
      *
      * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)})
      * @param args message arguments
@@ -203,8 +205,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Configures the meter with an threshold for reasonable, typical execution
-     * time for the task represented by the meter.
+     * Configures the meter with an threshold for reasonable, typical execution time for the task represented by the meter.
      *
      * @param timeLimitMilliseconds time threshold
      * @return reference to the meter itself.
@@ -220,13 +221,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Configures the meter as representing a task made up of iterations or
-     * steps. Such meters are allows to call {@link #progress()
+     * Configures the meter as representing a task made up of iterations or steps. Such meters are allows to call {@link #progress()
      * } an arbitrarily number of times between {@link #start() } and {@link #ok() }/{@link #fail(java.lang.Throwable)
      * } method calls.
      *
-     * @param expectedIterations Number of expected iterations or steps that
-     * make up the task
+     * @param expectedIterations Number of expected iterations or steps that make up the task
      * @return reference to the meter itself.
      */
     public Meter iterations(final long expectedIterations) {
@@ -241,8 +240,7 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Adds an entry to the context map. The entry has no value and is
-     * interpreted as a marker.
+     * Adds an entry to the context map. The entry has no value and is interpreted as a marker.
      *
      * @param name key of the entry to add.
      * @return reference to the meter itself.
@@ -261,8 +259,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Adds an entry to the context map if conditions is true. The entry has no
-     * value and is interpreted as a marker.
+     * Adds an entry to the context map if conditions is true. The entry has no value and is interpreted as a marker.
      *
      * @param condition the condition
      * @param trueName key of the entry to add if conditions is true
@@ -285,8 +282,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Adds an entry to the context map if conditions is true or false. The
-     * entry has no value and is interpreted as a marker.
+     * Adds an entry to the context map if conditions is true or false. The entry has no value and is interpreted as a marker.
      *
      * @param condition the condition
      * @param trueName key of the entry to add if conditions is true
@@ -522,8 +518,7 @@ public class Meter extends MeterData implements Closeable {
      * Adds an entry to the context map.
      *
      * @param name key of the entry to add.
-     * @param object object which string representation is used for the value of
-     * the entry to add
+     * @param object object which string representation is used for the value of the entry to add
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final Object object) {
@@ -560,8 +555,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Adds an entry to the context map. The entry value is made up of a
-     * formatted message with arguments.
+     * Adds an entry to the context map. The entry value is made up of a formatted message with arguments.
      *
      * @param name key of the entry to add.
      * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)
@@ -608,10 +602,8 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Notifies the meter in order to claim immediate execution start of the
-     * task represented by the meter. Sends a message to logger using debug
-     * level. Sends a message with system status and partial context to log
-     * using trace level.
+     * Notifies the meter in order to claim immediate execution start of the task represented by the meter. Sends a message to logger using debug
+     * level. Sends a message with system status and partial context to log using trace level.
      *
      * @return reference to the meter itself.
      */
@@ -625,17 +617,22 @@ public class Meter extends MeterData implements Closeable {
                 localThreadInstance.set(new WeakReference<Meter>(this));
             }
 
-//            final Thread currentThread = Thread.currentThread();
-//            this.threadStartId = currentThread.getId();
-//            this.threadStartName = currentThread.getName();
             this.lastProgressTime = this.startTime = System.nanoTime();
 
             if (logger.isDebugEnabled()) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
-                logger.debug(Markers.MSG_START, readableString(new StringBuilder()).toString());
+                if (LoggerConfig.hackJulEnable) {
+                    julLogger.log(startDebugStatusLogRecord(Markers.MSG_START, readableString(new StringBuilder()).toString()));
+                } else {
+                    logger.debug(Markers.MSG_START, readableString(new StringBuilder()).toString());
+                }
                 if (logger.isTraceEnabled()) {
-                    logger.trace(Markers.DATA_START, write(new StringBuilder(), 'M').toString());
+                    if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(startTraceStatusLogRecord(Markers.DATA_START, write(new StringBuilder(), 'M').toString()));
+                    } else {
+                        logger.trace(Markers.DATA_START, write(new StringBuilder(), 'M').toString());
+                    }
                 }
                 if (context != null) {
                     context.clear();
@@ -651,8 +648,7 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Notifies the meter that one more iteration or step completed that make up
-     * the task successfully.
+     * Notifies the meter that one more iteration or step completed that make up the task successfully.
      *
      * @return reference to the meter itself.
      */
@@ -666,8 +662,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Notifies the meter that more of iterations or steps that make up the task
-     * completed successfully.
+     * Notifies the meter that more of iterations or steps that make up the task completed successfully.
      *
      * @param increment the number of iterations or steps
      * @return reference to the meter itself.
@@ -687,8 +682,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Notifies the meter that a number of iterations or steps that make up the
-     * task already completed successfully.
+     * Notifies the meter that a number of iterations or steps that make up the task already completed successfully.
      *
      * @param currentIteration the number of iterations or steps
      * @return reference to the meter itself.
@@ -712,10 +706,8 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Allow informing about successful completion of iterations or steps making
-     * up the task represented by the meter. Only applicable for meters that
-     * called {@link #iterations(long i)} before calling {@link #start() }.
-     * Sends a message to logger using info level, only periodically and if
+     * Allow informing about successful completion of iterations or steps making up the task represented by the meter. Only applicable for meters that
+     * called {@link #iterations(long i)} before calling {@link #start() }. Sends a message to logger using info level, only periodically and if
      * progress was observed, to minimize performance degradation.
      *
      * @return reference to the meter itself.
@@ -739,9 +731,17 @@ public class Meter extends MeterData implements Closeable {
                     logger.info(Markers.MSG_PROGRESS, readableString(new StringBuilder()).toString());
                     if (logger.isTraceEnabled()) {
                         if (startTime != 0 && timeLimitNanoseconds != 0 && (now - startTime) > timeLimitNanoseconds) {
-                            logger.trace(Markers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString());
+                            if (LoggerConfig.hackJulEnable) {
+                                julLogger.log(progressTraceStatusLogRecord(Markers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString()));
+                            } else {
+                                logger.trace(Markers.DATA_SLOW_PROGRESS, write(new StringBuilder(), 'M').toString());
+                            }
                         } else if (logger.isTraceEnabled()) {
-                            logger.trace(Markers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
+                            if (LoggerConfig.hackJulEnable) {
+                                julLogger.log(progressTraceStatusLogRecord(Markers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString()));
+                            } else {
+                                logger.trace(Markers.DATA_PROGRESS, write(new StringBuilder(), 'M').toString());
+                            }
                         }
                     }
                     if (context != null) {
@@ -759,9 +759,9 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
     @Deprecated
     public Meter flow(Object flow) {
-    	return path(flow);
+        return path(flow);
     }
-    
+
     public Meter path(Object pathId) {
         if (pathId instanceof String) {
             this.pathId = (String) pathId;
@@ -779,11 +779,9 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Confirms the meter in order to claim successful completion of the task
-     * represented by the meter. Sends a message to logger using info level. If
-     * a time limit was given and execution exceeded this limit, sends a message
-     * using warn level instead. Sends a message with system status and partial
-     * context to log using trace level.
+     * Confirms the meter in order to claim successful completion of the task represented by the meter. Sends a message to logger using info level. If
+     * a time limit was given and execution exceeded this limit, sends a message using warn level instead. Sends a message with system status and
+     * partial context to log using trace level.
      *
      * @return reference to the meter itself.
      */
@@ -806,24 +804,37 @@ public class Meter extends MeterData implements Closeable {
             rejectId = null;
             localThreadInstance.set(previousInstance);
 
-//            final Thread currentThread = Thread.currentThread();
-//            this.threadStopId = currentThread.getId();
-//            this.threadStopName = currentThread.getName();
             if (logger.isWarnEnabled()) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
 
                 final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
+                final String message1 = readableString(new StringBuilder()).toString();
                 if (warnSlowness) {
-                    logger.warn(Markers.MSG_SLOW_OK, readableString(new StringBuilder()).toString());
+                    if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(okWarnLogRecord(Markers.MSG_SLOW_OK, message1));
+                    } else {
+                        logger.warn(Markers.MSG_SLOW_OK, message1);
+                    }
                 } else if (logger.isInfoEnabled()) {
-                    logger.info(Markers.MSG_OK, readableString(new StringBuilder()).toString());
+                    if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(okInfoStausLogRecord(Markers.MSG_OK, message1));
+                    } else {
+                        logger.info(Markers.MSG_OK, message1);
+                    }
                 }
                 if (logger.isTraceEnabled()) {
+                    final String message2 = write(new StringBuilder(), 'M').toString();
                     if (warnSlowness) {
-                        logger.trace(Markers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString());
+                        if (LoggerConfig.hackJulEnable) {
+                            julLogger.log(okTraceStatusLogRecord(Markers.DATA_SLOW_OK, message2));
+                        } else {
+                            logger.trace(Markers.DATA_SLOW_OK, message2);
+                        }
+                    } else if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(okTraceStatusLogRecord(Markers.DATA_OK, message2));
                     } else {
-                        logger.trace(Markers.DATA_OK, write(new StringBuilder(), 'M').toString());
+                        logger.trace(Markers.DATA_OK, message2);
                     }
                 }
                 if (context != null) {
@@ -843,14 +854,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Confirms the meter in order to claim successful completion of the task
-     * represented by the meter. Sends a message to logger using info level. If
-     * a time limit was given and execution exceeded this limit, sends a message
-     * using warn level instead. Sends a message with system status and partial
-     * context to log using trace level.
+     * Confirms the meter in order to claim successful completion of the task represented by the meter. Sends a message to logger using info level. If
+     * a time limit was given and execution exceeded this limit, sends a message using warn level instead. Sends a message with system status and
+     * partial context to log using trace level.
      *
-     * @param pathId A token, enum or exception that describes the successful
-     * pathId.
+     * @param pathId A token, enum or exception that describes the successful pathId.
      * @return reference to the meter itself.
      */
     public Meter ok(Object pathId) {
@@ -884,24 +892,37 @@ public class Meter extends MeterData implements Closeable {
                 logger.error(Markers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
             }
 
-//            final Thread currentThread = Thread.currentThread();
-//            this.threadStopId = currentThread.getId();
-//            this.threadStopName = currentThread.getName();
             if (logger.isWarnEnabled()) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
 
                 final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
+                final String message1 = readableString(new StringBuilder()).toString();
                 if (warnSlowness) {
-                    logger.warn(Markers.MSG_SLOW_OK, readableString(new StringBuilder()).toString());
+                    if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(okWarnLogRecord(Markers.MSG_SLOW_OK, message1));
+                    } else {
+                        logger.warn(Markers.MSG_SLOW_OK, message1);
+                    }
                 } else if (logger.isInfoEnabled()) {
-                    logger.info(Markers.MSG_OK, readableString(new StringBuilder()).toString());
+                    if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(okInfoStausLogRecord(Markers.MSG_OK, message1));
+                    } else {
+                        logger.info(Markers.MSG_OK, message1);
+                    }
                 }
                 if (logger.isTraceEnabled()) {
+                    final String message2 = write(new StringBuilder(), 'M').toString();
                     if (warnSlowness) {
-                        logger.trace(Markers.DATA_SLOW_OK, write(new StringBuilder(), 'M').toString());
+                        if (LoggerConfig.hackJulEnable) {
+                            julLogger.log(okTraceStatusLogRecord(Markers.DATA_SLOW_OK, message2));
+                        } else {
+                            logger.trace(Markers.DATA_SLOW_OK, message2);
+                        }
+                    } else if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(okTraceStatusLogRecord(Markers.DATA_OK, message2));
                     } else {
-                        logger.trace(Markers.DATA_OK, write(new StringBuilder(), 'M').toString());
+                        logger.trace(Markers.DATA_OK, message2);
                     }
                 }
                 if (context != null) {
@@ -916,14 +937,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Confirms the meter in order to claim unsuccessful completion of the task
-     * represented by the meter. Sends a message to logger using info level. If
-     * a time limit was given and execution exceeded this limit, sends a message
-     * using warn level instead. Sends a message with system status and partial
-     * context to log using trace level.
+     * Confirms the meter in order to claim unsuccessful completion of the task represented by the meter. Sends a message to logger using info level.
+     * If a time limit was given and execution exceeded this limit, sends a message using warn level instead. Sends a message with system status and
+     * partial context to log using trace level.
      *
-     * @param cause A token, enum or exception that describes the cause of
-     * rejection.
+     * @param cause A token, enum or exception that describes the cause of rejection.
      * @return reference to the meter itself.
      */
     public Meter reject(Object cause) {
@@ -956,17 +974,24 @@ public class Meter extends MeterData implements Closeable {
                 logger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
 
-//            final Thread currentThread = Thread.currentThread();
-//            this.threadStopId = currentThread.getId();
-//            this.threadStopName = currentThread.getName();
             if (logger.isInfoEnabled()) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
                 if (logger.isInfoEnabled()) {
-                    logger.info(Markers.MSG_REJECT, readableString(new StringBuilder()).toString());
+                    final String message1 = readableString(new StringBuilder()).toString();
+                    if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(rejectInfoStausLogRecord(Markers.MSG_REJECT, message1));
+                    } else {
+                        logger.info(Markers.MSG_REJECT, message1);
+                    }
                 }
                 if (logger.isTraceEnabled()) {
-                    logger.trace(Markers.DATA_REJECT, write(new StringBuilder(), 'M').toString());
+                    final String message2 = write(new StringBuilder(), 'M').toString();
+                    if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(rejectTraceStatusLogRecord(Markers.DATA_REJECT, message2));
+                    } else {
+                        logger.trace(Markers.DATA_REJECT, message2);
+                    }
                 }
                 if (context != null) {
                     context.clear();
@@ -981,13 +1006,10 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Refuses the meter in order to claim incomplete or inconsistent execution
-     * of the task represented by the meter. Sends a message with the the
-     * exception to logger using warn level. Sends a message with system status,
-     * statistics and complete context to log using trace level.
+     * Refuses the meter in order to claim incomplete or inconsistent execution of the task represented by the meter. Sends a message with the the
+     * exception to logger using warn level. Sends a message with system status, statistics and complete context to log using trace level.
      *
-     * @param cause Exception that represents the failure. May be null if no
-     * exception applies.
+     * @param cause Exception that represents the failure. May be null if no exception applies.
      * @return reference to the meter itself.
      */
     public Meter fail(final Throwable cause) {
@@ -1017,15 +1039,22 @@ public class Meter extends MeterData implements Closeable {
                 logger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
 
-//            final Thread currentThread = Thread.currentThread();
-//            this.threadStopId = currentThread.getId();
-//            this.threadStopName = currentThread.getName();
             if (logger.isErrorEnabled()) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
-                logger.error(Markers.MSG_FAIL, readableString(new StringBuilder()).toString(), cause);
+                final String message1 = readableString(new StringBuilder()).toString();
+                if (LoggerConfig.hackJulEnable) {
+                    julLogger.log(failErrorStatusLogRecord(Markers.MSG_FAIL, message1, cause));
+                } else {
+                    logger.error(Markers.MSG_FAIL, message1, cause);
+                }
                 if (logger.isTraceEnabled()) {
-                    logger.trace(Markers.DATA_FAIL, write(new StringBuilder(), 'M').toString());
+                    final String message2 = write(new StringBuilder(), 'M').toString();
+                    if (LoggerConfig.hackJulEnable) {
+                        julLogger.log(failTraceStatusLogRecord(Markers.DATA_FAIL, message2));
+                    } else {
+                        logger.trace(Markers.DATA_FAIL, message2);
+                    }
                 }
                 if (context != null) {
                     context.clear();
@@ -1040,9 +1069,8 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Checks if meters the meter has been forgotten to be confirmed or refused.
-     * Useful to track those meters that do not follow the start(), ok()/fail()
-     * idiom for all execution flows
+     * Checks if meters the meter has been forgotten to be confirmed or refused. Useful to track those meters that do not follow the start(),
+     * ok()/fail() idiom for all execution flows
      */
     @Override
     protected void finalize() throws Throwable {
@@ -1108,8 +1136,7 @@ public class Meter extends MeterData implements Closeable {
 
     // ========================================================================
     /**
-     * Compliance with {@link Closeable}. Assumes failure and refuses the meter
-     * if the meter has not yet been marked as confirmed.
+     * Compliance with {@link Closeable}. Assumes failure and refuses the meter if the meter has not yet been marked as confirmed.
      */
     @Override
     public void close() {
@@ -1190,5 +1217,116 @@ public class Meter extends MeterData implements Closeable {
             logger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         }
         return new RuntimeException(e);
+    }
+
+    private static LogRecord startDebugStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINE, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("start");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord startTraceStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("start");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord okTraceStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("ok");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord rejectTraceStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("reject");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord failTraceStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("fail");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord failErrorStatusLogRecord(Marker marker, String message, Throwable cause) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        logRecord.setThrown(cause);
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("fail");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord progressTraceStatusLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.FINEST, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("progress");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord progressInfoStausLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.INFO, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("progress");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord rejectInfoStausLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.INFO, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("reject");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord okInfoStausLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.INFO, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("ok");
+        }
+        return logRecord;
+    }
+
+    private static LogRecord okWarnLogRecord(Marker marker, String message) {
+        final LogRecord logRecord = new LogRecord(Level.WARNING, "[{0}] {1}");
+        logRecord.setParameters(new Object[]{marker.getName(), message});
+        if (LoggerConfig.hackJulReplaceSource) {
+            logRecord.setSourceClassName(Meter.class.getName());
+            logRecord.setSourceMethodName("ok");
+        }
+        return logRecord;
     }
 }
