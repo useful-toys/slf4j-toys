@@ -22,15 +22,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Simple servlet that reacts to GET methods by invoking the default watcher to report system status.
- * You may bind this servlet to an URL for this special purpose and calls this URK by a CRON job.
+ * Simple servlet that reacts to GET methods by invoking the default watcher to report system status. You may bind this servlet to an URL for this
+ * special purpose and calls this URK by a CRON job.
  *
  * @author Daniel Felix Ferber
  */
 public class WatcherServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 
-	@Override
+    private static final long serialVersionUID = 1L;
+
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
     }

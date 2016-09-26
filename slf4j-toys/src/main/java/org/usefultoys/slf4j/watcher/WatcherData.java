@@ -19,8 +19,7 @@ import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
- * Adapts the {@link SystemData} to semantics required by Watcher.
- * Further, {@link Watcher} events are deserialized back to {@link WatcherData}.
+ * Adapts the {@link SystemData} to semantics required by Watcher. Further, {@link Watcher} events are deserialized back to {@link WatcherData}.
  *
  * @author Daniel Felix Ferber
  */

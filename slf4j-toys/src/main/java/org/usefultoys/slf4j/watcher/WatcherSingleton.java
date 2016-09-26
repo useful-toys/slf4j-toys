@@ -25,18 +25,15 @@ import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.internal.Config;
 
 /**
- * Keeps the default watcher singleton. Offers some methods to execute this watcher periodically
- * on simple architectures.
+ * Keeps the default watcher singleton. Offers some methods to execute this watcher periodically on simple architectures.
  *
  * @author Daniel Felix Ferber
  */
 public class WatcherSingleton {
 
     /**
-     * Watcher default instance. 
-     * It is created at application startup and named as system 
-     * property {@code slf4jtoys.watcher.name}, which defaults to {@code watcher}.
-     * You cannot assign a new default watcher at runtime.
+     * Watcher default instance. It is created at application startup and named as system property {@code slf4jtoys.watcher.name}, which defaults to
+     * {@code watcher}. You cannot assign a new default watcher at runtime.
      */
     public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(Config.getProperty("slf4jtoys.watcher.name", "watcher")));
 
@@ -47,9 +44,8 @@ public class WatcherSingleton {
     private static TimerTask defaultWatcherTask;
 
     /**
-     * Starts the executor that periodically invokes the default watcher to report system status.
-     * Intended for simple architectures.
-     * May not be suitable for JavaEE environments that manage threads by itself.
+     * Starts the executor that periodically invokes the default watcher to report system status. Intended for simple architectures. May not be
+     * suitable for JavaEE environments that manage threads by itself.
      */
     public static synchronized void startDefaultWatcherExecutor() {
         if (defaultWatcherExecutor == null) {
@@ -77,9 +73,8 @@ public class WatcherSingleton {
     }
 
     /**
-     * Starts the timer that periodically invokes the default watcher to report system status.
-     * Intended for simple architectures.
-     * May not be suitable for JavaEE environments that manage threads by itself.
+     * Starts the timer that periodically invokes the default watcher to report system status. Intended for simple architectures. May not be suitable
+     * for JavaEE environments that manage threads by itself.
      */
     public static synchronized void startDefaultWatcherTimer() {
         if (defaultWatcherTimer == null) {
