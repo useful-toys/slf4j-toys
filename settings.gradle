@@ -1,4 +1,4 @@
 rootProject.name = 'slf4j-toys-root'
 
 include 'slf4j-toys'
-include 'jul-toys'
+include 'slf4j-jul-toys'

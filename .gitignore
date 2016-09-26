@@ -7,3 +7,4 @@ private/
 /slf4j-toys/.nb-gradle/
 /jul-toys/.nb-gradle/
 /.gradle
+/slf4j-jul-toys/.nb-gradle/
