@@ -16,8 +16,6 @@
 package org.usefultoys.slf4j.meter;
 
 import org.usefultoys.slf4j.internal.Config;
-import org.usefultoys.slf4j.watcher.Watcher;
-import org.usefultoys.slf4j.watcher.WatcherData;
 
 /**
  * Collection of properties that drive {@link Meter} and {@link MeterData} behavior.
