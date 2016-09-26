@@ -102,6 +102,8 @@ public class Config {
                 multiplicador = 1000;
             } else if (value.endsWith("m")) {
                 multiplicador = 60 * 1000;
+            } else if (value.endsWith("min")) {
+                multiplicador = 60 * 1000;
             } else if (value.endsWith("h")) {
                 multiplicador = 60 * 60 * 1000;
             } else {
