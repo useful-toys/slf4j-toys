@@ -28,14 +28,13 @@ import org.usefultoys.slf4j.watcher.Watcher;
 public class LoggerConfig {
 
     /**
-     * Enable JUL hack. Uses JUL instead of SLF4J for start, progress, ok, reject and fail messages. This hack might be
-     * reasonable when the underlying logger framework injects class and method name. Or when the underlying logger
-     * framework ignores the logger name (eg. Google App Engine).
+     * Use JUL instead of SLF4J. Uses JUL instead of SLF4J for start, progress, ok, reject and fail messages. This hack might be
+     * reasonable when the SLF4J integration does not work well over the underlying logger framework.
      */
-    public static boolean hackJulEnable = Config.getProperty("slf4jtoys.meter.hack.jul.enable", false);
+    public static boolean hackJulEnable = Config.getProperty("slf4jtoys.hack.jul.enable", false);
     /**
-     * configure JUL hack: Repalaces class and method name with logger name. This hack might be reasonable does not
+     * Replace class and method name with logger name. This hack might be reasonable does not
      * support logger name (eg. Google App Engine).
      */
-    public static boolean hackJulReplaceSource = Config.getProperty("slf4jtoys.meter.hack.jul.replaceSource", false);
+    public static boolean hackJulReplaceSource = Config.getProperty("slf4jtoys.hack.jul.replaceSource", false);
 }
