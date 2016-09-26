@@ -24,12 +24,18 @@ import org.usefultoys.slf4j.internal.Config;
 public class WatcherConfig {
 
     /**
+     * Logger name where watcher log messages are written to. 
+     */
+    public static String name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
+
+    /**
      * Time to wait before reporting the first watcher status, in milliseconds. Value is read from system property {@code slf4jtoys.watcher.delay} at
      * application startup and defaults to {@code 1 minute}. The number represents a long integer that represents milliseconds. The system property
      * allows the number suffixed with 'ms', 's', 'm' and 'h' to represent milliseconds, seconds, minutes and hours.You may assign a new value at
      * runtime, but if the default watcher is already running, you need to restart it.
      */
     public static long delayMilliseconds = Config.getMillisecondsProperty("slf4jtoys.watcher.delay", 60000L);
+
     /**
      * Time period to wait before reporting further watcher status, in milliseconds. Time to wait before reporting the first watcher status, in
      * milliseconds. Value is read from system property {@code slf4jtoys.watcher.period} at application startup and defaults to {@code 10 minutes}.

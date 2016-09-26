@@ -35,7 +35,7 @@ public class WatcherSingleton {
      * Watcher default instance. It is created at application startup and named as system property {@code slf4jtoys.watcher.name}, which defaults to
      * {@code watcher}. You cannot assign a new default watcher at runtime.
      */
-    public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(Config.getProperty("slf4jtoys.watcher.name", "watcher")));
+    public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(WatcherConfig.name));
 
     private static ScheduledExecutorService defaultWatcherExecutor;
     private static ScheduledFuture<?> scheduledDefaultWatcher;
