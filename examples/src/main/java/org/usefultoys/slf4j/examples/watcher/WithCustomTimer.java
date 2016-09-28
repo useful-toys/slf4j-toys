@@ -13,31 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.examples;
+package org.usefultoys.slf4j.examples.watcher;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import org.usefultoys.slf4j.examples.ExampleCommons;
+import static org.usefultoys.slf4j.examples.ExampleCommons.doWork;
+import org.usefultoys.slf4j.internal.SystemConfig;
+import org.usefultoys.slf4j.watcher.WatcherConfig;
 import org.usefultoys.slf4j.watcher.WatcherSingleton;
 
 /**
  *
  * @author Daniel Felix Ferber
  */
-public class CustomWatcher1 {
+public class WithCustomTimer {
 
     static {
-        /* Customizes the Watcher for more frequent messages for a faster execution
-         * of this example. Also enable managed bean that is able to read CPU usage.  */
-        System.setProperty("slf4jtoys.usePlatformManagedBean", "true");
-        System.setProperty("slf4jtoys.watcher.period", "1s");
-        System.setProperty("slf4jtoys.watcher.delay", "1s");
-        /* Customizes the SLF4J simple logger to display trace messages that contain
-         * encoded and parsable information. Enable additional information that allow better 
-         * undestanding of the log output. */
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-        System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
-        System.setProperty("org.slf4j.simpleLogger.showThreadName", "false");
-        System.setProperty("org.slf4j.simpleLogger.dateTimeFormat", "yy/MM/dd HH:mm");
+        ExampleCommons.configureSLF4J();
+
+        WatcherConfig.delayMilliseconds = 2000;
+        WatcherConfig.periodMilliseconds = 1000;
+        SystemConfig.useClassLoadingManagedBean = true;
+        SystemConfig.useCompilationManagedBean = true;
+        SystemConfig.useGarbageCollectionManagedBean = true;
+        SystemConfig.useMemoryManagedBean = true;
+        SystemConfig.usePlatformManagedBean = true;
     }
 
     public static void main(final String[] args) {
@@ -51,7 +52,7 @@ public class CustomWatcher1 {
         }, 1000, 1000);
 
         try {
-            DefaultWatcher.doWork();
+            doWork();
         } finally {
             timer.cancel();
         }
