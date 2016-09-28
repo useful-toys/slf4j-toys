@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="dist/examples.jar"/>
-	<classpathentry kind="lib" path="dist/lib/slf4j-api-1.7.12.jar"/>
-	<classpathentry kind="lib" path="dist/lib/slf4j-simple-1.7.12.jar"/>
-	<classpathentry kind="lib" path="dist/lib/slf4j-toys-1.4.0.jar"/>
+	<classpathentry kind="src" path="src/main/java">
+		<attributes>
+			<attribute name="FROM_GRADLE_MODEL" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="src/test/java">
+		<attributes>
+			<attribute name="FROM_GRADLE_MODEL" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/slf4j-toys"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/slf4j-toys-libs"/>
-	<classpathentry kind="output" path="build/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>
