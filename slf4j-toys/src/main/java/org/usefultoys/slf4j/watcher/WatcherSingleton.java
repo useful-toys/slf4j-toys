@@ -22,7 +22,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.internal.Config;
 
 /**
  * Keeps the default watcher singleton. Offers some methods to execute this watcher periodically on simple architectures.

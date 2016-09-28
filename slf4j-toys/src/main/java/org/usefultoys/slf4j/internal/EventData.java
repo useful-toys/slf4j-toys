@@ -338,7 +338,7 @@ public abstract class EventData implements Serializable {
      * @return <code>true</code> if an event was successfully read;
      * <code>false</code> otherwise.
      */
-    public final boolean read(final String message, final char messagePrefix) {
+    protected final boolean read(final String message, final char messagePrefix) {
         final String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);
         if (plausibleMessage == null) {
             return false;

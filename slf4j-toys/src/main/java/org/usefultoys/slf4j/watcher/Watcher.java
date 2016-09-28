@@ -51,22 +51,7 @@ public class Watcher extends WatcherData implements Runnable {
         this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
         this.sessionUuid = Session.uuid;
         this.eventPosition = 0;
-        this.eventCategory = logger.getName();
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param logger logger that reports messages.
-     * @param eventCategory event category.
-     */
-    public Watcher(final Logger logger, String eventCategory) {
-        super();
-        this.logger = logger;
-        this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
-        this.sessionUuid = Session.uuid;
-        this.eventPosition = 0;
-        this.eventCategory = eventCategory;
+        this.eventCategory = null;
     }
 
     /**
@@ -92,7 +77,7 @@ public class Watcher extends WatcherData implements Runnable {
             collectRuntimeStatus();
             collectPlatformStatus();
             collectManagedBeanStatus();
-            final String message = readableString(new StringBuilder()).toString();
+            final String message = readableWrite();
             if (LoggerConfig.hackJulEnable) {
                 watcherMessageLogRecord(message);
                 julLogger.info(message);
@@ -101,7 +86,7 @@ public class Watcher extends WatcherData implements Runnable {
             }
         }
         if (logger.isTraceEnabled()) {
-            final String message = write(new StringBuilder(), 'W').toString();
+            final String message = write();
             if (LoggerConfig.hackJulEnable) {
                 julLogger.log(watcherDataLogRecord(message));
             } else {

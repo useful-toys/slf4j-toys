@@ -26,32 +26,29 @@ import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
- * Augments the {@link SystemData} with start, stop, failure and flow
- * information measured by Meter.
+ * Augments the {@link SystemData} with start, stop, failure and flow information measured by Meter.
  *
  * @author Daniel Felix Ferber
  */
 public class MeterData extends SystemData {
 
     private static final long serialVersionUID = 2L;
+    public static final char DETAILED_MESSAGE_PREFIX = 'M';
 
     public MeterData() {
         super();
     }
 
     /**
-     * An arbitrary short, human readable message to describe the task being
-     * measured.
+     * An arbitrary short, human readable message to describe the task being measured.
      */
     protected String description = null;
     /**
-     * For successful execution, the string token that identifies the execution
-     * pathId.
+     * For successful execution, the string token that identifies the execution pathId.
      */
     protected String pathId;
     /**
-     * For rejected execution, the string token that identifies the rejection
-     * cause.
+     * For rejected execution, the string token that identifies the rejection cause.
      */
     protected String rejectId;
     /**
@@ -322,16 +319,16 @@ public class MeterData extends SystemData {
             buffer.append(": ");
             buffer.append(this.description);
         } else {
-        	if (MeterConfig.printCategory || eventName != null) {
-        		buffer.append(": ");
-        	}
+            if (MeterConfig.printCategory || eventName != null) {
+                buffer.append(": ");
+            }
             if (MeterConfig.printCategory) {
                 final int index = eventCategory.lastIndexOf('.') + 1;
                 buffer.append(eventCategory.substring(index));
             }
             if (eventName != null) {
                 if (MeterConfig.printCategory) {
-                	buffer.append('/');
+                    buffer.append('/');
                 }
                 buffer.append(eventName);
             }
@@ -514,7 +511,20 @@ public class MeterData extends SystemData {
         return super.readPropertyImpl(r, propertyName);
     }
 
+    public final boolean read(final String message) {
+        return this.read(message, DETAILED_MESSAGE_PREFIX);
+    }
+
+    public final String write() {
+        return write(new StringBuilder(), DETAILED_MESSAGE_PREFIX).toString();
+    }
+
+    public final String readableWrite() {
+        return readableString(new StringBuilder()).toString();
+    }
+
     void resetBridge() {
         this.reset();
     }
+
 }

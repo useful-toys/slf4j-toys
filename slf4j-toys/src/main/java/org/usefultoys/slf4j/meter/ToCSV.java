@@ -37,7 +37,7 @@ public class ToCSV {
             final MeterData data = new MeterData();
             System.out.println("uuid,category,position,waiting,execution,success,slow");
             while ((line = reader.readLine()) != null) {
-                final boolean plausible = data.read(line, 'M');
+                final boolean plausible = data.read(line);
                 if (plausible) {
                     final StringBuilder sb = new StringBuilder();
                     sb.append(data.getSessionUuid());

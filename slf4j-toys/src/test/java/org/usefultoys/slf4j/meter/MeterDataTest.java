@@ -196,7 +196,7 @@ public class MeterDataTest {
         System.out.println(s);
 
         final MeterData b = createMeterData();
-        assertTrue(b.read(s, 'M'));
+        assertTrue(b.read(s));
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
@@ -246,11 +246,11 @@ public class MeterDataTest {
         a.context.put("e", "f");
         a.context.put("g", "h");
 
-        final String s = a.write(new StringBuilder(), 'S').toString();
+        final String s = a.write(new StringBuilder(), 'M').toString();
         System.out.println(s);
 
         final MeterData b = createMeterData();
-        assertTrue(b.read(s, 'S'));
+        assertTrue(b.read(s));
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));

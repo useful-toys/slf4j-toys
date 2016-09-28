@@ -26,8 +26,9 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
 public class WatcherData extends SystemData {
 
     private static final long serialVersionUID = 1L;
+    public static final char DETAILED_MESSAGE_PREFIX = 'W';
 
-    protected WatcherData() {
+    public WatcherData() {
         super();
     }
 
@@ -56,4 +57,17 @@ public class WatcherData extends SystemData {
         }
         return builder;
     }
+
+    public final boolean read(final String message) {
+        return this.read(message, DETAILED_MESSAGE_PREFIX);
+    }
+
+    public final String write() {
+        return write(new StringBuilder(), 'W').toString();
+    }
+
+    public final String readableWrite() {
+        return readableString(new StringBuilder()).toString();
+    }
+
 }
