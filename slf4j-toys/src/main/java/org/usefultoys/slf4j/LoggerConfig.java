@@ -15,8 +15,8 @@
  */
 package org.usefultoys.slf4j;
 
-import org.usefultoys.slf4j.meter.*;
 import org.usefultoys.slf4j.internal.Config;
+import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.watcher.Watcher;
 
 /**

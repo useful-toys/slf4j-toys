@@ -15,8 +15,8 @@
  */
 package org.usefultoys.slf4j.report;
 
-import java.util.concurrent.Executor;
 import javax.servlet.ServletContextEvent;
+import java.util.concurrent.Executor;
 
 /**
  * A servlet context listener that logs reports when server is started. The

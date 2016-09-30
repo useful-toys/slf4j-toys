@@ -15,9 +15,10 @@
  */
 package org.usefultoys.slf4j;
 
+import org.usefultoys.slf4j.report.Reporter;
+
 import java.util.UUID;
 import java.util.concurrent.Executor;
-import org.usefultoys.slf4j.report.Reporter;
 
 /**
  * Profiling session for the current JVM.
@@ -31,15 +32,14 @@ public final class Session {
     }
 
     /**
-     * UUID of the current SLF4J-Toys instance. This UUID is added to all trace messages.
-     * It allows to distinguish messages from different JVM instances when log files are shared.
-     * Value is assigned at application startup and cannot be changed at runtime.
+     * UUID of the current SLF4J-Toys instance. This UUID is added to all trace messages. It allows to distinguish messages from different JVM
+     * instances when log files are shared. Value is assigned at application startup and cannot be changed at runtime.
      */
     public static final String uuid = UUID.randomUUID().toString().replace("-", "");
 
     /**
-     * Runs the default report on the current thread.
-     * Intended for simple architectures. May not be suitable for JavaEE environments that do not allow blocking threads for extended amount of time.
+     * Runs the default report on the current thread. Intended for simple architectures. May not be suitable for JavaEE environments that do not allow
+     * blocking threads for extended amount of time.
      */
     public static void runDefaultReport() {
         final Executor noThreadExecutor = new Executor() {

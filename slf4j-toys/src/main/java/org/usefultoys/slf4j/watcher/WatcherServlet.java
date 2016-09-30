@@ -15,11 +15,11 @@
  */
 package org.usefultoys.slf4j.watcher;
 
-import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Simple servlet that reacts to GET methods by invoking the default watcher to report system status. You may bind this servlet to an URL for this

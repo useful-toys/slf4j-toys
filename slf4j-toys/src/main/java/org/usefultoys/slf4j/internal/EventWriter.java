@@ -16,9 +16,8 @@
 package org.usefultoys.slf4j.internal;
 
 import java.util.Map;
-import static org.usefultoys.slf4j.internal.PatternDefinition.encodeMapValuePattern;
-import static org.usefultoys.slf4j.internal.PatternDefinition.encodePropertyValuePattern;
-import static org.usefultoys.slf4j.internal.PatternDefinition.encodeReplacement;
+
+import static org.usefultoys.slf4j.internal.PatternDefinition.*;
 import static org.usefultoys.slf4j.internal.SyntaxDefinition.MAP_CLOSE;
 import static org.usefultoys.slf4j.internal.SyntaxDefinition.MAP_EQUAL;
 import static org.usefultoys.slf4j.internal.SyntaxDefinition.MAP_OPEN;

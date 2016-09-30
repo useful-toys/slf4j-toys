@@ -16,13 +16,7 @@
 package org.usefultoys.slf4j.internal;
 
 import java.io.IOException;
-import java.lang.management.ClassLoadingMXBean;
-import java.lang.management.CompilationMXBean;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryUsage;
-import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.*;
 import java.util.List;
 
 /**

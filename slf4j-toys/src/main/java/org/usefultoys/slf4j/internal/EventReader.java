@@ -20,14 +20,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
-import static org.usefultoys.slf4j.internal.SyntaxDefinition.MAP_CLOSE;
-import static org.usefultoys.slf4j.internal.SyntaxDefinition.MAP_EQUAL;
-import static org.usefultoys.slf4j.internal.SyntaxDefinition.MAP_OPEN;
-import static org.usefultoys.slf4j.internal.SyntaxDefinition.MAP_SEPARATOR;
-import static org.usefultoys.slf4j.internal.SyntaxDefinition.PROPERTY_DIV;
-import static org.usefultoys.slf4j.internal.SyntaxDefinition.PROPERTY_EQUALS;
-import static org.usefultoys.slf4j.internal.SyntaxDefinition.PROPERTY_SEPARATOR;
-import static org.usefultoys.slf4j.internal.SyntaxDefinition.QUOTE;
+
+import static org.usefultoys.slf4j.internal.SyntaxDefinition.*;
 
 /**
  * Provides methods that implement recurrent deserialization patterns. The

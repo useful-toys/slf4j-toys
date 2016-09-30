@@ -15,15 +15,15 @@
  */
 package org.usefultoys.slf4j.report;
 
+import org.slf4j.Logger;
+import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.utils.UnitFormatter;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,9 +31,6 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.Executor;
-import org.slf4j.Logger;
-import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
  * Produces reports about available and used resources, and current configuration.

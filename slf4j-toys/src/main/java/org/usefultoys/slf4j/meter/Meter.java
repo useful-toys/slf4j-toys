@@ -15,6 +15,12 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.slf4j.Logger;
+import org.slf4j.Marker;
+import org.usefultoys.slf4j.LoggerConfig;
+import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.Session;
+
 import java.io.Closeable;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
@@ -28,11 +34,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import org.slf4j.Logger;
-import org.slf4j.Marker;
-import org.usefultoys.slf4j.LoggerConfig;
-import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.Session;
 
 /**
  * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call {@link #start()} to produce a

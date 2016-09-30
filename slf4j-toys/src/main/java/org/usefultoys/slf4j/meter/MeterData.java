@@ -15,15 +15,16 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.usefultoys.slf4j.internal.EventData;
 import org.usefultoys.slf4j.internal.EventReader;
 import org.usefultoys.slf4j.internal.EventWriter;
 import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Augments the {@link SystemData} with start, stop, failure and flow information measured by Meter.

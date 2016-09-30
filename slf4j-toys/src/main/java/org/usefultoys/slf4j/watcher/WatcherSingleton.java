@@ -15,13 +15,14 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import org.usefultoys.slf4j.LoggerFactory;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import org.usefultoys.slf4j.LoggerFactory;
 
 /**
  * Keeps the default watcher singleton. Offers some methods to execute this watcher periodically on simple architectures.

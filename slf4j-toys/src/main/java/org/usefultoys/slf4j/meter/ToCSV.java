@@ -18,7 +18,6 @@ package org.usefultoys.slf4j.meter;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import org.usefultoys.slf4j.meter.MeterData;
 
 public class ToCSV {
 

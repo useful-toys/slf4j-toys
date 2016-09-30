@@ -15,13 +15,14 @@
  */
 package org.usefultoys.slf4j.watcher;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerConfig;
 import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.meter.Meter;
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /**
  * Periodically collects system status and reports it to logger. It conveniently implements {@link Runnable} for compliance with
