@@ -98,7 +98,7 @@ public class LoggerFactory {
         if (!logger.isTraceEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(LoggerFactory.getTraceOutputStream(logger));
+        return new PrintStream(getTraceOutputStream(logger));
     }
 
     /**
@@ -111,7 +111,7 @@ public class LoggerFactory {
         if (!logger.isDebugEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(LoggerFactory.getDebugOutputStream(logger));
+        return new PrintStream(getDebugOutputStream(logger));
     }
 
     /**
@@ -124,7 +124,7 @@ public class LoggerFactory {
         if (!logger.isInfoEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(LoggerFactory.getInfoOutputStream(logger));
+        return new PrintStream(getInfoOutputStream(logger));
     }
 
     /**
@@ -137,7 +137,7 @@ public class LoggerFactory {
         if (!logger.isWarnEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(LoggerFactory.getWarnOutputStream(logger));
+        return new PrintStream(getWarnOutputStream(logger));
     }
 
     /**
@@ -150,7 +150,7 @@ public class LoggerFactory {
         if (!logger.isErrorEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(LoggerFactory.getErrorOutputStream(logger));
+        return new PrintStream(getErrorOutputStream(logger));
     }
 
     /**
@@ -252,7 +252,7 @@ public class LoggerFactory {
      * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getTracePrintStream(final Logger logger, final String name) {
-        return getTracePrintStream(LoggerFactory.getLogger(logger, name));
+        return getTracePrintStream(getLogger(logger, name));
     }
 
     /**
@@ -264,7 +264,7 @@ public class LoggerFactory {
      * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getDebugPrintStream(final Logger logger, final String name) {
-        return getDebugPrintStream(LoggerFactory.getLogger(logger, name));
+        return getDebugPrintStream(getLogger(logger, name));
     }
 
     /**
@@ -276,7 +276,7 @@ public class LoggerFactory {
      * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getInfoPrintStream(final Logger logger, final String name) {
-        return getInfoPrintStream(LoggerFactory.getLogger(logger, name));
+        return getInfoPrintStream(getLogger(logger, name));
     }
 
     /**
@@ -288,7 +288,7 @@ public class LoggerFactory {
      * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getWarnPrintStream(final Logger logger, final String name) {
-        return getWarnPrintStream(LoggerFactory.getLogger(logger, name));
+        return getWarnPrintStream(getLogger(logger, name));
     }
 
     /**
@@ -300,7 +300,7 @@ public class LoggerFactory {
      * @return the PrintStream that writes its text to the logger.
      */
     public static PrintStream getErrorPrintStream(final Logger logger, final String name) {
-        return getErrorPrintStream(LoggerFactory.getLogger(logger, name));
+        return getErrorPrintStream(getLogger(logger, name));
     }
 
     /**
@@ -312,7 +312,7 @@ public class LoggerFactory {
      * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getTraceOutputStream(final Logger logger, final String name) {
-        return getTraceOutputStream(LoggerFactory.getLogger(logger, name));
+        return getTraceOutputStream(getLogger(logger, name));
 
     }
 
@@ -325,7 +325,7 @@ public class LoggerFactory {
      * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getDebugOutputStream(final Logger logger, final String name) {
-        return getDebugOutputStream(LoggerFactory.getLogger(logger, name));
+        return getDebugOutputStream(getLogger(logger, name));
     }
 
     /**
@@ -337,7 +337,7 @@ public class LoggerFactory {
      * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getInfoOutputStream(final Logger logger, final String name) {
-        return getInfoOutputStream(LoggerFactory.getLogger(logger, name));
+        return getInfoOutputStream(getLogger(logger, name));
     }
 
     /**
@@ -349,7 +349,7 @@ public class LoggerFactory {
      * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getWarnOutputStream(final Logger logger, final String name) {
-        return getWarnOutputStream(LoggerFactory.getLogger(logger, name));
+        return getWarnOutputStream(getLogger(logger, name));
     }
 
     /**
@@ -362,6 +362,6 @@ public class LoggerFactory {
      * @return the OutputStream that writes its data to the logger.
      */
     public static OutputStream getErrorOutputStream(final Logger logger, final String name) {
-        return getErrorOutputStream(LoggerFactory.getLogger(logger, name));
+        return getErrorOutputStream(getLogger(logger, name));
     }
 }

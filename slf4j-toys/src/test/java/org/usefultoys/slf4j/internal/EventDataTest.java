@@ -273,7 +273,7 @@ public class EventDataTest {
             }
 
             @Override
-            protected boolean readPropertyImpl(final EventReader r, final String key) throws IOException {
+            protected boolean readPropertyImpl(final EventReader r, final String key) {
                 return false;
             }
 

@@ -37,7 +37,6 @@ public class MeterData extends SystemData {
     public static final char DETAILED_MESSAGE_PREFIX = 'M';
 
     public MeterData() {
-        super();
     }
 
     /**

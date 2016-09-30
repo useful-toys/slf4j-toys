@@ -22,11 +22,13 @@ import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 import org.slf4j.impl.TestLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.meter.Meter.IllegalMeterUsage;
 
 /**
  *
  * @author Daniel Felix Ferber
  */
+@SuppressWarnings("UnusedAssignment")
 public class MeterMessageMisuseTest {
 
     final String title = "Example of meter misuse.";
@@ -69,7 +71,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -97,7 +99,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -125,7 +127,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_REJECT, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_REJECT, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_REJECT, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -153,7 +155,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_FAIL, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_FAIL, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -181,7 +183,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -209,7 +211,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -237,7 +239,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_REJECT, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_REJECT, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_REJECT, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -265,7 +267,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_FAIL, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_FAIL, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -293,7 +295,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -321,7 +323,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -349,7 +351,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_REJECT, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_REJECT, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_REJECT, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -377,7 +379,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_FAIL, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_FAIL, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -405,7 +407,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -433,7 +435,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -461,7 +463,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_REJECT, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_REJECT, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_REJECT, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -489,7 +491,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_FAIL, stopEvent2.getMarker());
         Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent2.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_FAIL, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -507,7 +509,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -525,7 +527,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_OK, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -543,7 +545,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_REJECT, stopEvent.getMarker());
         Assert.assertEquals(Markers.DATA_REJECT, stopDataEvent.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_REJECT, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -561,7 +563,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
         Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_FAIL, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
@@ -587,14 +589,12 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         Assert.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_START, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test
     public void testMeterNotStopped() throws InterruptedException {
-        {
-            new Meter(logger).m(title).start();
-        }
+        new Meter(logger).m(title).start();
         // Wait and force garbage colletor to finalize meter
         System.gc();
         Thread.sleep(1000);
@@ -609,7 +609,7 @@ public class MeterMessageMisuseTest {
         Assert.assertEquals(Markers.MSG_START, startEvent1.getMarker());
         Assert.assertEquals(Markers.DATA_START, startDataEvent1.getMarker());
         Assert.assertEquals(Markers.INCONSISTENT_FINALIZED, messageEvent.getMarker());
-        Assert.assertTrue(messageEvent.getThrowable() instanceof Meter.IllegalMeterUsage);
+        Assert.assertTrue(messageEvent.getThrowable() instanceof IllegalMeterUsage);
     }
 
     @Test

@@ -53,7 +53,7 @@ public class ToCSV {
                     sb.append(',');
                     sb.append(data.isSlow());
                     sb.append(',');
-                    System.out.println(sb.toString());
+                    System.out.println(sb);
                 }
             }
         } catch (final Exception e) {

@@ -24,7 +24,6 @@ public class MeterDataMock extends MeterData {
     private static final long serialVersionUID = 1L;
 
     public MeterDataMock() {
-        super();
     }
 
     public long getHeap_commited() {

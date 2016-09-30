@@ -28,7 +28,6 @@ class NullOutputStream extends OutputStream {
 
     NullOutputStream() {
         // prevent instances outside this library
-        super();
     }
 
     @Override

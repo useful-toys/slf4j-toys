@@ -26,14 +26,14 @@ public final class UnitFormatter {
         // prevent instances
     }
 
-    private static final int[] TIME_FACTORS = new int[]{1000, 1000, 1000, 60, 60};
-    private static final String[] TIME_UNITS = new String[]{"ns", "us", "ms", "s", "m", "h"};
-    private static final String[] MEMORY_UNITS = new String[]{"B", "kB", "MB", "GB"};
-    private static final int[] MEMORY_FACTORS = new int[]{1000, 1000, 1000};
-    private static final String[] ITERATIONS_PER_TIME_UNITS = new String[]{"/s", "k/s", "M/s"};
-    private static final int[] ITERATIONS_PER_TIME_FACTORS = new int[]{1000, 1000, 1000};
-    private static final String[] ITERATIONS_UNITS = new String[]{"", "k", "M"};
-    private static final int[] ITERATIONS_FACTORS = new int[]{1000, 1000, 1000};
+    private static final int[] TIME_FACTORS = {1000, 1000, 1000, 60, 60};
+    private static final String[] TIME_UNITS = {"ns", "us", "ms", "s", "m", "h"};
+    private static final String[] MEMORY_UNITS = {"B", "kB", "MB", "GB"};
+    private static final int[] MEMORY_FACTORS = {1000, 1000, 1000};
+    private static final String[] ITERATIONS_PER_TIME_UNITS = {"/s", "k/s", "M/s"};
+    private static final int[] ITERATIONS_PER_TIME_FACTORS = {1000, 1000, 1000};
+    private static final String[] ITERATIONS_UNITS = {"", "k", "M"};
+    private static final int[] ITERATIONS_FACTORS = {1000, 1000, 1000};
 
     static String longUnit(long value, final String[] units, final int[] factors) {
         int index = 0;

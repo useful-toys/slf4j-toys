@@ -26,6 +26,7 @@ import org.usefultoys.slf4j.Session;
  *
  * @author Daniel Felix Ferber
  */
+@SuppressWarnings("UnusedAssignment")
 public class MeterIterationAttributesTest {
 
     TestLogger logger = (TestLogger) LoggerFactory.getLogger("Test");

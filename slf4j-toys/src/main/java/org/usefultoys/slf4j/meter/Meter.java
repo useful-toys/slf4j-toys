@@ -93,7 +93,6 @@ public class Meter extends MeterData implements Closeable {
      * @param logger Logger that reports messages.
      */
     public Meter(final Logger logger) {
-        super();
         this.sessionUuid = Session.uuid;
         this.logger = logger;
         this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
@@ -113,7 +112,6 @@ public class Meter extends MeterData implements Closeable {
      * @param operationName Additional identification to distinguish operations reported on the same logger.
      */
     public Meter(final Logger logger, final String operationName) {
-        super();
         this.sessionUuid = Session.uuid;
         this.logger = logger;
         this.julLogger = java.util.logging.Logger.getLogger(logger.getName());

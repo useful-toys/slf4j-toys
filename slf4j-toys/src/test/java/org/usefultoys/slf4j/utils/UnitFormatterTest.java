@@ -26,8 +26,8 @@ public class UnitFormatterTest {
 
     public UnitFormatterTest() {
     }
-    private static final int[] FACTORS = new int[]{1000, 1000, 1000};
-    private static final String[] UNITS = new String[]{"A", "B", "C"};
+    private static final int[] FACTORS = {1000, 1000, 1000};
+    private static final String[] UNITS = {"A", "B", "C"};
 
     @Test
     public void testLongUnit() {

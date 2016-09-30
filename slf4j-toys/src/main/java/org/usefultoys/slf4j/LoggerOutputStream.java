@@ -35,8 +35,7 @@ abstract class LoggerOutputStream extends OutputStream {
 
 	LoggerOutputStream() {
         // prevent instances outside this library
-		super();
-	}
+    }
 	
     /**
      * Buffer that buffers data until it is redirected to the logger.

@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.net.*;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -48,7 +49,6 @@ public class Reporter implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public Reporter() {
-        super();
         logger = LoggerFactory.getLogger(ReporterConfig.name);
     }
 
@@ -236,7 +236,7 @@ public class Reporter implements Serializable {
         public void run() {
             final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             ps.println("Calendar");
-            ps.print(" - current date/time: " + SimpleDateFormat.getDateTimeInstance().format(new Date()));
+            ps.print(" - current date/time: " + DateFormat.getDateTimeInstance().format(new Date()));
             final TimeZone tz = TimeZone.getDefault();
             ps.print(" - default timezone: " + tz.getDisplayName());
             ps.print(" (" + tz.getID() + ")");

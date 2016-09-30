@@ -47,7 +47,6 @@ public class Watcher extends WatcherData implements Runnable {
      * @param logger Logger that reports messages.
      */
     public Watcher(final Logger logger) {
-        super();
         this.logger = logger;
         this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
         this.sessionUuid = Session.uuid;

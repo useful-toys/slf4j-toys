@@ -84,7 +84,7 @@ public class WatcherSingleton {
             defaultWatcherTask = new TimerTask() {
                 @Override
                 public void run() {
-                    WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
+                    DEFAULT_WATCHER.logCurrentStatus();
                 }
             };
             defaultWatcherTimer.schedule(defaultWatcherTask,

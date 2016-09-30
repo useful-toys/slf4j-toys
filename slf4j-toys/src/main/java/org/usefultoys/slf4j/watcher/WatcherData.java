@@ -29,7 +29,6 @@ public class WatcherData extends SystemData {
     public static final char DETAILED_MESSAGE_PREFIX = 'W';
 
     public WatcherData() {
-        super();
     }
 
     @Override

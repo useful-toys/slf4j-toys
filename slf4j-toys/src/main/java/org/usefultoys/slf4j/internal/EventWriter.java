@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.internal;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import static org.usefultoys.slf4j.internal.PatternDefinition.*;
 import static org.usefultoys.slf4j.internal.SyntaxDefinition.MAP_CLOSE;
@@ -49,16 +50,17 @@ public final class EventWriter {
 
     /**
      * Constructor.
+     *
      * @param builder StringBuilder where encoded event is appended to.
      */
     EventWriter(final StringBuilder builder) {
-        super();
         firstProperty = true;
         this.builder = builder;
     }
 
     /**
      * Writes the delimiter that starts the encoded string.
+     *
      * @param prefix Prefix that identifies strings containing an encoded event
      */
     void open(final char prefix) {
@@ -75,8 +77,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is an enumeration.
-     * 
-     * @param name property name
+     *
+     * @param name  property name
      * @param value property value
      * @return itself for chained method calls.
      */
@@ -87,8 +89,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a boolean.
-     * 
-     * @param name property name
+     *
+     * @param name  property name
      * @param value property value
      * @return itself for chained method calls.
      */
@@ -99,8 +101,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a long integer.
-     * 
-     * @param name property name
+     *
+     * @param name  property name
      * @param value property value
      * @return itself for chained method calls.
      */
@@ -111,8 +113,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a tuple of two long integers.
-     * 
-     * @param name property name
+     *
+     * @param name   property name
      * @param value1 property value
      * @param value2 property value
      * @return itself for chained method calls.
@@ -124,8 +126,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a tuple of three long integers.
-     * 
-     * @param name property name
+     *
+     * @param name   property name
      * @param value1 property value
      * @param value2 property value
      * @param value3 property value
@@ -138,8 +140,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a tuple of four long integers.
-     * 
-     * @param name property name
+     *
+     * @param name   property name
      * @param value1 property value
      * @param value2 property value
      * @param value3 property value
@@ -153,8 +155,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a long double.
-     * 
-     * @param name property name
+     *
+     * @param name  property name
      * @param value property value
      * @return itself for chained method calls.
      */
@@ -165,8 +167,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a string.
-     * 
-     * @param name property name
+     *
+     * @param name  property name
      * @param value property value
      * @return itself for chained method calls.
      */
@@ -184,8 +186,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a tuple of tow strings.
-     * 
-     * @param name property name
+     *
+     * @param name   property name
      * @param value1 property value
      * @param value2 property value
      * @return itself for chained method calls.
@@ -206,8 +208,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a tuple of three strings.
-     * 
-     * @param name property name
+     *
+     * @param name   property name
      * @param value1 property value
      * @param value2 property value
      * @param value3 property value
@@ -231,8 +233,8 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a tuple of four strings.
-     * 
-     * @param name property name
+     *
+     * @param name   property name
      * @param value1 property value
      * @param value2 property value
      * @param value3 property value
@@ -259,9 +261,9 @@ public final class EventWriter {
 
     /**
      * Writes a property whose value is a map.
-     * 
+     *
      * @param name property name
-     * @param map property value
+     * @param map  property value
      * @return itself for chained method calls.
      */
     public EventWriter property(final String name, final Map<String, String> map) {
@@ -274,7 +276,7 @@ public final class EventWriter {
         builder.append(PROPERTY_EQUALS);
         builder.append(MAP_OPEN);
         boolean firstEntry = true;
-        for (final Map.Entry<String, String> entry : map.entrySet()) {
+        for (final Entry<String, String> entry : map.entrySet()) {
             if (!firstEntry) {
                 builder.append(MAP_SEPARATOR);
             } else {

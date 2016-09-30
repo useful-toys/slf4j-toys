@@ -48,7 +48,6 @@ public abstract class EventData implements Serializable {
     protected long time = 0;
 
     protected EventData() {
-        super();
     }
 
     /**

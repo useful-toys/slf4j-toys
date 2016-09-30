@@ -30,7 +30,6 @@ public abstract class SystemData extends EventData {
     private static final long serialVersionUID = 1L;
 
     protected SystemData() {
-        super();
     }
 
     protected long heap_commited = 0;
