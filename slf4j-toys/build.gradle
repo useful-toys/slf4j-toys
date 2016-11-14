@@ -1,10 +1,14 @@
 apply plugin: 'java'
 
+group = 'org.usefultoys'
+version = '1.6.0'
+
 repositories {
     jcenter()
 }
 
 compileJava.options.encoding = 'UTF-8'
+compileJava.options.debug = false
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
     
