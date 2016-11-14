@@ -27,7 +27,7 @@ public class MeterConfig {
 
     /**
      * Time to wait before reporting next progress status, in milliseconds. Meter allows reporting progress status of incremental operations by
-     * calling the {@link Meter#inc()}, {@link Meter#incBy(long)} and {@link Meter#incTo()} method on each step. To prevent crowding the log file and
+     * calling the {@link Meter#inc()}, {@link Meter#incBy(long)} and {@link Meter#incTo(long)} method on each step. To prevent crowding the log file and
      * to prevent performance degradation, Meter waits a minimal amount of time before printing the next status message. Value is read from system
      * property {@code slf4jtoys.meter.progress.period} at application startup and defaults to {@code 2 seconds}. The number represents a long integer
      * that represents milliseconds. The system property allows the number suffixed with 'ms', 's', 'm' and 'h' to represent milliseconds, seconds,
