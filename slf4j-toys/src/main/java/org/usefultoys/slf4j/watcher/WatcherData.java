@@ -62,7 +62,7 @@ public class WatcherData extends SystemData {
     }
 
     public final String write() {
-        return write(new StringBuilder(), 'W').toString();
+        return write(new StringBuilder(), DETAILED_MESSAGE_PREFIX).toString();
     }
 
     public final String readableWrite() {

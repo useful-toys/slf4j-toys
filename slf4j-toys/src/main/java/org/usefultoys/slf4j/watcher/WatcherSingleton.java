@@ -43,6 +43,10 @@ public class WatcherSingleton {
     private static Timer defaultWatcherTimer;
     private static TimerTask defaultWatcherTask;
 
+    private WatcherSingleton() {
+        // prevent instances
+    }
+
     /**
      * Starts the executor that periodically invokes the default watcher to report system status. Intended for simple architectures. May not be
      * suitable for JavaEE environments that manage threads by itself.

@@ -25,9 +25,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /**
- * Periodically collects system status and reports it to logger. It conveniently implements {@link Runnable} for compliance with
- * {@link ScheduledExecutorService}. Call {@link #logCurrentStatus()} to produce a 1-line summary of the current system status as information message
- * and an encoded event as trace message.
+ * Collects system status and reports it to logger. It conveniently implements {@link Runnable} for compliance with {@link ScheduledExecutorService}.
+ * Call {@link #logCurrentStatus()} to produce a 1-line summary of the current system status as information message and an encoded event as trace
+ * message.
  *
  * @author Daniel Felix Ferber
  */
@@ -39,6 +39,9 @@ public class Watcher extends WatcherData implements Runnable {
      * Logger that reports messages.
      */
     transient private final Logger logger;
+    /**
+     * Logger that reports messages using the JUL hack.
+     */
     transient private final java.util.logging.Logger julLogger;
 
     /**
@@ -48,7 +51,11 @@ public class Watcher extends WatcherData implements Runnable {
      */
     public Watcher(final Logger logger) {
         this.logger = logger;
-        this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
+        if (LoggerConfig.hackJulEnable) {
+            this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
+        } else {
+            this.julLogger = null;
+        }
         this.sessionUuid = Session.uuid;
         this.eventPosition = 0;
         this.eventCategory = null;
@@ -78,7 +85,7 @@ public class Watcher extends WatcherData implements Runnable {
             collectPlatformStatus();
             collectManagedBeanStatus();
             final String message = readableWrite();
-            if (LoggerConfig.hackJulEnable) {
+            if (julLogger != null) {
                 watcherMessageLogRecord(message);
                 julLogger.info(message);
             } else {
@@ -87,7 +94,7 @@ public class Watcher extends WatcherData implements Runnable {
         }
         if (logger.isTraceEnabled()) {
             final String message = write();
-            if (LoggerConfig.hackJulEnable) {
+            if (julLogger != null) {
                 julLogger.log(watcherDataLogRecord(message));
             } else {
                 logger.trace(Markers.DATA_WATCHER, message);

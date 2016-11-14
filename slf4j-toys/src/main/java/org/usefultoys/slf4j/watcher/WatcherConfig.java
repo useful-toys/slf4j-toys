@@ -19,12 +19,12 @@ import org.usefultoys.slf4j.internal.Config;
 
 /**
  * Collection of properties that drive {@link Watcher} and {@link WatcherData} behavior. Initial values are read from system properties, if available.
- * Some properties allow reassigning their values at runtime.
+ * Some properties allow reassigning their value at runtime.
  */
 public class WatcherConfig {
 
     /**
-     * Logger name where watcher log messages are written to. 
+     * Logger name where watcher log messages are written to.
      */
     public static String name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
 

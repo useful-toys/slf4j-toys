@@ -85,21 +85,6 @@ public abstract class EventData implements Serializable {
         return eventCategory + '/' + eventName + '/' + eventPosition;
     }
 
-//    public String getID() {
-//        if (eventName == null) {
-//            return eventCategory;
-//        }
-//        return eventCategory + '/' + eventName;
-//    }
-
-//    public String getAbbreviatedID() {
-//        final int index = eventCategory.lastIndexOf('.') + 1;
-//        if (eventName == null) {
-//            return eventCategory.substring(index);
-//        }
-//        return eventCategory.substring(index) + '/' + eventName;
-//    }
-
     /**
      * @return Timestamp when the event data was collected.
      */
@@ -155,11 +140,7 @@ public abstract class EventData implements Serializable {
 
     @Override
     public final String toString() {
-        if (sessionUuid != null) {
-            return this.sessionUuid + ":" + this.eventCategory + ":" + Long.toString(this.eventPosition);
-        } else {
-            return this.eventCategory + ":" + Long.toString(this.eventPosition);
-        }
+        return getFullID();
     }
 
     /**
