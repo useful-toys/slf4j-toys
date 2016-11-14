@@ -25,6 +25,7 @@ import org.usefultoys.slf4j.watcher.Watcher;
  *
  * @author Daniel Felix Ferber
  */
+@SuppressWarnings("CanBeFinal")
 public class LoggerConfig {
 
     /**

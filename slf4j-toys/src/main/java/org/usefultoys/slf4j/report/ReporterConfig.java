@@ -22,6 +22,7 @@ import org.usefultoys.slf4j.internal.Config;
  *
  * @author Daniel Felix Ferber
  */
+@SuppressWarnings("CanBeFinal")
 public class ReporterConfig {
 
     /**

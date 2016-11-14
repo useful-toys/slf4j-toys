@@ -6,6 +6,7 @@ package org.usefultoys.slf4j.internal;
  * @author Daniel Felix Ferber
  *
  */
+@SuppressWarnings("CanBeFinal")
 public class SystemConfig {
 	/**
 	 * If Sun native OperatingSystemMXBean is available.

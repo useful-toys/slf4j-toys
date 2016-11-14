@@ -21,6 +21,7 @@ import org.usefultoys.slf4j.internal.Config;
  * Collection of properties that drive {@link Watcher} and {@link WatcherData} behavior. Initial values are read from system properties, if available.
  * Some properties allow reassigning their value at runtime.
  */
+@SuppressWarnings("CanBeFinal")
 public class WatcherConfig {
 
     /**
