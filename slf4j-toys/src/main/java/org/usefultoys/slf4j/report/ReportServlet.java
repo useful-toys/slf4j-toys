@@ -25,8 +25,9 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 /**
- *
- * @author Daniel
+ * A servlet that logs a report according to the URL suffix.
+ * 
+ * @author Daniel Felix Ferber
  */
 public class ReportServlet extends HttpServlet {
 

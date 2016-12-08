@@ -26,7 +26,6 @@ import java.io.Serializable;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -34,8 +33,8 @@ import java.util.TimeZone;
 import java.util.concurrent.Executor;
 
 /**
- * Produces reports about available and used resources, and current configuration.
- * Reports are printed as information messages to the logger.
+ * Produces reports about available and used resources, and current
+ * configuration. Reports are printed as information messages to the logger.
  *
  * @author Daniel Felix Ferber
  */
@@ -54,6 +53,7 @@ public class Reporter implements Serializable {
 
     /**
      * Constructor
+     *
      * @param logger Logger that writes reports as information messages.
      */
     public Reporter(final Logger logger) {
@@ -94,7 +94,8 @@ public class Reporter implements Serializable {
     }
 
     /**
-     * Run reports accoding to {@link ReporterConfig} and write them as information messages to logger.
+     * Run reports accoding to {@link ReporterConfig} and write them as
+     * information messages to logger.
      *
      * @param executor Executor that runs each report.
      */
@@ -400,4 +401,5 @@ public class Reporter implements Serializable {
             }
         }
     }
+
 }
