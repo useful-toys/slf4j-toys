@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Daniel Felix Ferber.
+ * Copyright 2016 Daniel Felix Ferber.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public class LoggerFactory {
      * Returns a separate logger named according to a parent logger and the operation or feature, 
      * using the statically bound {@link ILoggerFactory} instance.
      * <p>
-     * Recommended to get a logger subordinated to an existing logger.
+     * Recommended to get a logger subordinated to an existing logger named after a class.
      *
      * @param clazz the returned logger will be named after clazz
      * @param name the name of operation or feature appended to the parent logger name.
@@ -89,7 +89,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as a trace message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the formatted text as a trace message to logger. 
      *
      * @param logger the logger text is reported to.
      * @return the PrintStream that writes its text to the logger.
@@ -102,7 +102,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as a debug message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the formatted text as a debug message to logger. 
      *
      * @param logger the logger text is reported to.
      * @return the PrintStream that writes its text to the logger.
@@ -115,7 +115,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as an information message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the formatted text as an information message to logger. 
      *
      * @param logger the logger text is reported to.
      * @return the PrintStream that writes its text to the logger.
@@ -128,7 +128,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as a warning message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the formatted text as a warning message to logger. 
      *
      * @param logger the logger text is reported to.
      * @return the PrintStream that writes its text to the logger.
@@ -141,7 +141,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its formatted text as an error message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the formatted text as an error message to logger. 
      *
      * @param logger the logger text is reported to.
      * @return the PrintStream that writes its text to the logger.
@@ -154,7 +154,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a trace message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as a trace message to logger. 
      *
      * @param logger the logger data is reported to.
      * @return the OutputStream that writes its data to the logger.
@@ -172,7 +172,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a debug message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as a debug message to logger. 
      *
      * @param logger the logger data is reported to.
      * @return the OutputStream that writes its data to the logger.
@@ -190,7 +190,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as an information message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as an information message to logger. 
      *
      * @param logger the logger data is reported to.
      * @return the OutputStream that writes its data to the logger.
@@ -208,7 +208,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a warning message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as a warning message to logger. 
      *
      * @param logger the logger data is reported to.
      * @return the OutputStream that writes its data to the logger.
@@ -226,7 +226,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as an error message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as an error message to logger. 
      *
      * @param logger the logger data is reported to.
      * @return the OutputStream that writes its data to the logger.
@@ -244,7 +244,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its structured text as a trace message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the structured text as a trace message to logger. 
      * Shortcut to {@code getTracePrintStream(LoggerFactory.getLogger(logger, name))}.
      *
      * @param logger the logger text is reported to.
@@ -256,7 +256,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its structured text as a debug message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the structured text as a debug message to logger. 
      * Shortcut to {@code getDebugPrintStream(LoggerFactory.getLogger(logger, name))}.
      *
      * @param logger the logger text is reported to.
@@ -268,7 +268,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its structured text as an information message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the structured text as an information message to logger. 
      * Shortcut to {@code getInfoPrintStream(LoggerFactory.getLogger(logger, name))}.
      *
      * @param logger the logger text is reported to.
@@ -280,7 +280,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its structured text as a warning message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the structured text as a warning message to logger. 
      * Shortcut to {@code getWarnPrintStream(LoggerFactory.getLogger(logger, name))}.
      *
      * @param logger the logger text is reported to.
@@ -292,7 +292,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link PrintStream} whose close and flush methods write its structured text as an error message to logger. 
+     * Returns a {@link PrintStream} whose close and flush methods write the structured text as an error message to logger. 
      * Shortcut to {@code getErrorPrintStream(LoggerFactory.getLogger(logger, name))}.
      *
      * @param logger the logger text is reported to.
@@ -304,7 +304,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a trace message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as a trace message to logger. 
      * Shortcut to {@code getTraceOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
      * @param logger the logger data is reported to.
@@ -317,7 +317,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a debug message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as a debug message to logger. 
      * Shortcut to {@code getDebugOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
      * @param logger the logger data is reported to.
@@ -329,7 +329,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as an information message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as an information message to logger. 
      * Shortcut to {@code getInfoOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
      * @param logger the logger data is reported to.
@@ -341,7 +341,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as a warning message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as a warning message to logger. 
      * Shortcut to {@code getWarnOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
      * @param logger the logger data is reported to.
@@ -353,7 +353,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a {@link OutputStream} whose close and flush methods write its unformatted data as an error message to logger. 
+     * Returns a {@link OutputStream} whose close and flush methods write the unformatted data as an error message to logger. 
      * unformatted data as a error level message to to the logger.
      * Shortcut to {@code getErrorOutputStream(LoggerFactory.getLogger(logger, name))}.
      *
