@@ -1,5 +1,5 @@
 connection.arguments=
-connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
+connection.gradle.distribution=GRADLE_DISTRIBUTION(LOCAL_INSTALLATION(K\:\\build\\gradle-3.3))
 connection.java.home=null
 connection.jvm.arguments=
 connection.project.dir=

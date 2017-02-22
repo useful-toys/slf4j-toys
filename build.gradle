@@ -1,0 +1,6 @@
+/* Repositório comum. */
+allprojects {
+	repositories {
+	    jcenter()
+	}
+}
