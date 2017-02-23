@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/examples/Examples.iml" filepath="$PROJECT_DIR$/examples/Examples.iml" />
-      <module fileurl="file://$PROJECT_DIR$/slf4j-toys/Library.iml" filepath="$PROJECT_DIR$/slf4j-toys/Library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/slf4j-toys.iml" filepath="$PROJECT_DIR$/.idea/modules/slf4j-toys.iml" />
     </modules>
   </component>
 </project>
