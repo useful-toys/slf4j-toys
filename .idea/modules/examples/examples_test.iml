@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":examples:test" external.linked.project.path="$MODULE_DIR$/../../../examples" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="slf4j-toys-root" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
+    <output-test url="file://$MODULE_DIR$/../../../examples/build/classes/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../examples/src/test">
+      <sourceFolder url="file://$MODULE_DIR$/../../../examples/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../examples/src/test/resources" type="java-test-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="examples_main" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.21" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-simple:1.7.21" level="project" />
+    <orderEntry type="module" module-name="slf4j-toys_main" />
+    <orderEntry type="library" name="Gradle: javax.servlet:javax.servlet-api:3.1.0" level="project" />
+  </component>
+  <component name="TestModuleProperties" production-module="examples_main" />
+</module>

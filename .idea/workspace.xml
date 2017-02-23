@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2a5640ea-9cd0-4144-8ae9-3021cc63ef5f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules/slf4j-toys.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/readme.txt" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.name" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/license-header.txt" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="" />
@@ -14,11 +10,22 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/JUnit_4.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/JavaEE_5.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Slf4j_1.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules/slf4j-toys.iml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.name" afterPath="$PROJECT_DIR$/.idea/.name" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
     </list>
+    <ignored path="$PROJECT_DIR$/examples/.gradle/" />
+    <ignored path="$PROJECT_DIR$/examples/build/" />
+    <ignored path="$PROJECT_DIR$/slf4j-toys/.gradle/" />
+    <ignored path="$PROJECT_DIR$/slf4j-toys/build/" />
+    <ignored path="$PROJECT_DIR$/.gradle/" />
+    <ignored path="$PROJECT_DIR$/build/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -39,48 +46,29 @@
     <system id="GRADLE">
       <state>
         <projects_view>
-          <tree_state />
+          <tree_state>
+            <PATH>
+              <PATH_ELEMENT>
+                <option name="myItemId" value="" />
+                <option name="myItemType" value="com.intellij.openapi.externalSystem.view.ExternalProjectsStructure$RootNode" />
+              </PATH_ELEMENT>
+              <PATH_ELEMENT>
+                <option name="myItemId" value="slf4j-toys-root" />
+                <option name="myItemType" value="com.intellij.openapi.externalSystem.view.ProjectNode" />
+              </PATH_ELEMENT>
+            </PATH>
+          </tree_state>
         </projects_view>
       </state>
     </system>
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="build.gradle" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/build.gradle">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="readme.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/readme.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="settings.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/settings.gradle">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+            <state relative-caret-position="156">
+              <caret line="13" column="5" lean-forward="false" selection-start-line="13" selection-start-column="5" selection-end-line="13" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -92,21 +80,580 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GradleLocalSettings">
+    <option name="myGradleHomes">
+      <map>
+        <entry key="$PROJECT_DIR$" value="D:\home\.gradle\wrapper\dists\gradle-3.1-all\7v522598rw1b93jkcneehqz1n\gradle-3.1" />
+      </map>
+    </option>
+    <option name="myGradleVersions">
+      <map>
+        <entry key="$PROJECT_DIR$" value="3.1" />
+      </map>
+    </option>
     <option name="availableProjects">
       <map>
         <entry>
           <key>
             <ExternalProjectPojo>
-              <option name="name" value="slf4j-toys" />
+              <option name="name" value="slf4j-toys-root" />
               <option name="path" value="$PROJECT_DIR$" />
             </ExternalProjectPojo>
           </key>
           <value>
             <list>
               <ExternalProjectPojo>
-                <option name="name" value="slf4j-toys" />
+                <option name="name" value=":examples" />
+                <option name="path" value="$PROJECT_DIR$/examples" />
+              </ExternalProjectPojo>
+              <ExternalProjectPojo>
+                <option name="name" value=":slf4j-toys" />
+                <option name="path" value="$PROJECT_DIR$/slf4j-toys" />
+              </ExternalProjectPojo>
+              <ExternalProjectPojo>
+                <option name="name" value="slf4j-toys-root" />
                 <option name="path" value="$PROJECT_DIR$" />
               </ExternalProjectPojo>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="availableTasks">
+      <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <list>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on test files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="licenseFormatTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the components produced by root project 'slf4j-toys-root'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="components" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the sub-projects of root project 'slf4j-toys-root'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="projects" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects that depend on it." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="buildDependents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles main classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="classes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all buildscript dependencies declared in root project 'slf4j-toys-root'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="buildEnvironment" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates Gradle wrapper files. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="wrapper" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="sourcesJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles test classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="testClasses" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates Javadoc API documentation for the main source code." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="javadoc" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates reports on your runtime dependencies." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="downloadLicenses" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="signArchives" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the configuration model of root project 'slf4j-toys-root'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="model" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles a jar archive containing the main classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="jar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on main files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="licenseMain" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Processes main resources." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="processResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the tasks runnable from root project 'slf4j-toys-root' (some of the displayed tasks may belong to subprojects)." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="tasks" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Initializes a new Gradle build. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="init" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs the unit tests." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="test" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles main Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="compileJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="javadocJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the insight into a specific dependency in root project 'slf4j-toys-root'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="dependencyInsight" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all checks." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="check" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles the outputs of this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="assemble" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Deletes the build directory." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="clean" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles test Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="compileTestJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all dependencies declared in root project 'slf4j-toys-root'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="dependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Applies the license found in the header file in files missing the header." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="licenseFormat" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Processes test resources." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="processTestResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays a help message." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="help" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Checks for header consistency." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="license" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="build" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Installs the 'archives' artifacts into the local Maven repository." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="install" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects it depends on." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="buildNeeded" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on main files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="licenseFormatMain" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on test files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="licenseTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Uploads all artifacts belonging to configuration ':slf4j-toys:archives'" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="uploadArchives" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the properties of root project 'slf4j-toys-root'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="properties" />
+              </ExternalTaskPojo>
+            </list>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/examples">
+          <value>
+            <list>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on test files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="licenseFormatTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the components produced by project ':examples'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="components" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects that depend on it." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="buildDependents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the sub-projects of project ':examples'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="projects" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles main classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="classes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all buildscript dependencies declared in project ':examples'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="buildEnvironment" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles test classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="testClasses" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates Javadoc API documentation for the main source code." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="javadoc" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates reports on your runtime dependencies." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="downloadLicenses" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles a jar archive containing the main classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="jar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the configuration model of project ':examples'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="model" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on main files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="licenseMain" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Processes main resources." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="processResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the tasks runnable from project ':examples'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="tasks" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs the unit tests." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="test" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles main Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="compileJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the insight into a specific dependency in project ':examples'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="dependencyInsight" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all checks." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="check" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles the outputs of this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="assemble" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Deletes the build directory." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="clean" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles test Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="compileTestJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all dependencies declared in project ':examples'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="dependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Applies the license found in the header file in files missing the header." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="licenseFormat" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Processes test resources." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="processTestResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays a help message." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="help" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Checks for header consistency." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="license" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="build" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects it depends on." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="buildNeeded" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on main files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="licenseFormatMain" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on test files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="licenseTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the properties of project ':examples'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="properties" />
+              </ExternalTaskPojo>
+            </list>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/slf4j-toys">
+          <value>
+            <list>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on test files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="licenseFormatTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the components produced by project ':slf4j-toys'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="components" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects that depend on it." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="buildDependents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the sub-projects of project ':slf4j-toys'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="projects" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles main classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="classes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all buildscript dependencies declared in project ':slf4j-toys'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="buildEnvironment" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="sourcesJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles test classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="testClasses" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates Javadoc API documentation for the main source code." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="javadoc" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates reports on your runtime dependencies." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="downloadLicenses" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="signArchives" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles a jar archive containing the main classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="jar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the configuration model of project ':slf4j-toys'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="model" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on main files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="licenseMain" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Processes main resources." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="processResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the tasks runnable from project ':slf4j-toys'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="tasks" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs the unit tests." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="test" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles main Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="compileJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="javadocJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the insight into a specific dependency in project ':slf4j-toys'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="dependencyInsight" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all checks." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="check" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles the outputs of this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="assemble" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Deletes the build directory." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="clean" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles test Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="compileTestJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all dependencies declared in project ':slf4j-toys'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="dependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Applies the license found in the header file in files missing the header." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="licenseFormat" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Processes test resources." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="processTestResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays a help message." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="help" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Checks for header consistency." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="license" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="build" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Installs the 'archives' artifacts into the local Maven repository." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="install" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects it depends on." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="buildNeeded" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on main files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="licenseFormatMain" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on test files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="licenseTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Uploads all artifacts belonging to configuration ':slf4j-toys:archives'" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="uploadArchives" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the properties of project ':slf4j-toys'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="properties" />
+              </ExternalTaskPojo>
             </list>
           </value>
         </entry>
@@ -115,7 +662,205 @@
     <option name="modificationStamps">
       <map>
         <entry key="G:/cosmetopeia-gradle" value="2975285322670" />
-        <entry key="$PROJECT_DIR$" value="2957914158401" />
+        <entry key="$PROJECT_DIR$" value="5942528761058" />
+      </map>
+    </option>
+    <option name="projectBuildClasspath">
+      <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <ExternalProjectBuildClasspathPojo>
+              <option name="modulesBuildClasspath">
+                <map>
+                  <entry key="$PROJECT_DIR$">
+                    <value>
+                      <ExternalModuleBuildClasspathPojo>
+                        <option name="entries">
+                          <list>
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/gradle.plugin.nl.javadude.gradle.plugins/license-gradle-plugin/0.13.1/c270280ba46f95804a3aee4698725718ade3035c/license-gradle-plugin-0.13.1.jar" />
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/7841ba10ea46c9611ce702c3833ff9fccc8ae6eb/plexus-utils-2.0.5.jar" />
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/b45958476a332904c1152eb590bd4764dea5dc6d/xmltool-3.3.jar" />
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/f2c4f13c8d30e7305f3407bd4e3980f2eed8d1cf/maven-license-plugin-1.10.b1.jar" />
+                          </list>
+                        </option>
+                        <option name="path" value="$PROJECT_DIR$" />
+                      </ExternalModuleBuildClasspathPojo>
+                    </value>
+                  </entry>
+                  <entry key="$PROJECT_DIR$/examples">
+                    <value>
+                      <ExternalModuleBuildClasspathPojo>
+                        <option name="entries">
+                          <list>
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/gradle.plugin.nl.javadude.gradle.plugins/license-gradle-plugin/0.13.1/c270280ba46f95804a3aee4698725718ade3035c/license-gradle-plugin-0.13.1.jar" />
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/7841ba10ea46c9611ce702c3833ff9fccc8ae6eb/plexus-utils-2.0.5.jar" />
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/b45958476a332904c1152eb590bd4764dea5dc6d/xmltool-3.3.jar" />
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/f2c4f13c8d30e7305f3407bd4e3980f2eed8d1cf/maven-license-plugin-1.10.b1.jar" />
+                          </list>
+                        </option>
+                        <option name="path" value="$PROJECT_DIR$/examples" />
+                      </ExternalModuleBuildClasspathPojo>
+                    </value>
+                  </entry>
+                  <entry key="$PROJECT_DIR$/slf4j-toys">
+                    <value>
+                      <ExternalModuleBuildClasspathPojo>
+                        <option name="entries">
+                          <list>
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/gradle.plugin.nl.javadude.gradle.plugins/license-gradle-plugin/0.13.1/c270280ba46f95804a3aee4698725718ade3035c/license-gradle-plugin-0.13.1.jar" />
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/7841ba10ea46c9611ce702c3833ff9fccc8ae6eb/plexus-utils-2.0.5.jar" />
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/b45958476a332904c1152eb590bd4764dea5dc6d/xmltool-3.3.jar" />
+                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/f2c4f13c8d30e7305f3407bd4e3980f2eed8d1cf/maven-license-plugin-1.10.b1.jar" />
+                          </list>
+                        </option>
+                        <option name="path" value="$PROJECT_DIR$/slf4j-toys" />
+                      </ExternalModuleBuildClasspathPojo>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="name" value="examples" />
+              <option name="projectBuildClasspath">
+                <list>
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/announce" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/antlr" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/base-services" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/base-services-groovy" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/build-comparison" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/build-init" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/cli" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/code-quality" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/composite-builds" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/core" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/dependency-management" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/diagnostics" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ear" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ide" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ide-native" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ide-play" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/installation-beacon" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/internal-android-performance-testing" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/internal-integ-testing" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/internal-performance-testing" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/internal-testing" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ivy" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/jacoco" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/javascript" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/jetty" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/jvm-services" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-groovy" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-java" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-jvm" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-native" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-scala" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/launcher" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/logging" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/maven" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/messaging" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/model-core" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/model-groovy" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/native" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/open-api" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/osgi" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/platform-base" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/platform-jvm" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/platform-native" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/platform-play" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/plugin-development" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/plugin-use" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/plugins" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/process-services" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/publish" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/reporting" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/resources" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/resources-http" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/resources-s3" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/resources-sftp" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/scala" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/signing" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/task-cache-http" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/test-kit" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/testing-base" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/testing-jvm" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/testing-native" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/tooling-api" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/tooling-api-builders" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ui" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/wrapper" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/ant-1.9.6.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/ant-launcher-1.9.6.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-base-services-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-base-services-groovy-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-cli-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-core-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-docs-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-installation-beacon-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-jvm-services-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-launcher-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-logging-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-messaging-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-model-core-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-model-groovy-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-native-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-open-api-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-process-services-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-resources-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-script-kotlin-0.3.2.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-tooling-api-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-ui-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-wrapper-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/groovy-all-2.4.7.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-announce-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-antlr-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-build-comparison-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-build-init-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-code-quality-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-composite-builds-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-dependency-management-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-diagnostics-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ear-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ide-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ide-native-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ide-play-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ivy-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-jacoco-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-javascript-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-jetty-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-groovy-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-java-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-jvm-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-native-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-scala-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-maven-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-osgi-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-platform-base-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-platform-jvm-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-platform-native-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-platform-play-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-plugin-development-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-plugin-use-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-plugins-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-publish-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-reporting-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-resources-http-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-resources-s3-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-resources-sftp-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-scala-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-signing-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-task-cache-http-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-test-kit-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-testing-base-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-testing-jvm-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-testing-native-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-tooling-api-builders-3.1.jar" />
+                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/ivy-2.2.0.jar" />
+                  <option value="$PROJECT_DIR$/buildSrc/src/main/java" />
+                  <option value="$PROJECT_DIR$/buildSrc/src/main/groovy" />
+                </list>
+              </option>
+            </ExternalProjectBuildClasspathPojo>
+          </value>
+        </entry>
       </map>
     </option>
     <option name="externalProjectsViewState">
@@ -127,6 +872,8 @@
       <list>
         <option value="$PROJECT_DIR$/slf4j-toys/build.gradle" />
         <option value="$PROJECT_DIR$/readme.txt" />
+        <option value="$PROJECT_DIR$/license-header.txt" />
+        <option value="$PROJECT_DIR$/build.gradle" />
       </list>
     </option>
   </component>
@@ -159,11 +906,12 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemId" value="slf4j-toys-root" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -171,9 +919,92 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys-root" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys-root" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys-root" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="org.jetbrains.plugins.gradle.projectView.GradleTreeStructureProvider$GradleSourceSetDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys-root" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="org.jetbrains.plugins.gradle.projectView.GradleTreeStructureProvider$GradleSourceSetDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -183,6 +1014,7 @@
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.37009543" />
     <property name="js.eslint.eslintPackage" value="" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/build.gradle" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -309,6 +1141,12 @@
       <method />
     </configuration>
     <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <envs />
       <method />
     </configuration>
     <configuration default="true" type="js.build_tools.npm" factoryName="npm">
@@ -338,37 +1176,38 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1487812608562</updated>
-      <workItem from="1487812609959" duration="954000" />
+      <workItem from="1487812609959" duration="1136000" />
+      <workItem from="1487814508397" duration="625000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="954000" />
+    <option name="totallyTimeSpent" value="1761000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1296" height="1000" extended-state="6" />
     <editor active="true" />
     <layout>
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2540453" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32936978" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936978" sideWeight="0.50323623" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936978" sideWeight="0.49676377" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928804" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32936978" sideWeight="0.50323623" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32928804" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936978" sideWeight="0.49676377" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32936978" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -387,10 +1226,10 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/settings.gradle">
+    <entry file="file://$PROJECT_DIR$/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        <state relative-caret-position="306">
+          <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -411,10 +1250,66 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/settings.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/readme.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/settings.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="18" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="14" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/license-header.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="25" lean-forward="false" selection-start-line="0" selection-start-column="25" selection-end-line="0" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LICENSE">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="169" column="0" lean-forward="true" selection-start-line="169" selection-start-column="0" selection-end-line="169" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+        <state relative-caret-position="156">
+          <caret line="13" column="5" lean-forward="false" selection-start-line="13" selection-start-column="5" selection-end-line="13" selection-end-column="5" />
           <folding />
         </state>
       </provider>

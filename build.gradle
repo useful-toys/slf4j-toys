@@ -4,3 +4,26 @@ allprojects {
 	    jcenter()
 	}
 }
+
+/* Licença uniforme. */
+buildscript {
+	repositories {
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
+	}
+}
+
+allprojects {
+    apply plugin: "com.github.hierynomus.license"
+    license {
+        ext.year = Calendar.getInstance().get(Calendar.YEAR)
+        ext.name = 'Daniel Felix Ferber'
+
+        header rootProject.file('license-header.txt')
+        strictCheck true
+    }
+}
