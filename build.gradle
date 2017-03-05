@@ -5,18 +5,26 @@ allprojects {
 	}
 }
 
-/* Licença uniforme. */
 buildscript {
 	repositories {
 		maven {
 			url "https://plugins.gradle.org/m2/"
 		}
-	}
+        jcenter()
+    }
 	dependencies {
 		classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
+        classpath 'net.nemerosa:versioning:2.0.0'
 	}
 }
 
+
+/* Versioning. Not used yet. */
+project(':slf4j-toys') {
+    apply plugin: 'net.nemerosa.versioning'
+}
+
+/* Consistent license headers on all files. */
 allprojects {
     apply plugin: "com.github.hierynomus.license"
     license {
