@@ -21,7 +21,8 @@ import java.util.Locale;
 
 /**
  * An {@link PrintStream} that discards everything.
- *
+ * Used instead of {@link LoggerOutputStream} as an optimization when logging level would prevent output anyway.
+
  * @author Daniel Felix Ferber
  *
  */

@@ -1,12 +1,12 @@
 /**
  * Copyright 2017 Daniel Felix Ferber
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,8 +18,10 @@ package org.usefultoys.slf4j.watcher;
 import org.usefultoys.slf4j.internal.Config;
 
 /**
- * Collection of properties that drive {@link Watcher} and {@link WatcherData} behavior. Initial values are read from system properties, if available.
- * Some properties allow reassigning their value at runtime.
+ * Collection of properties that drive {@link Watcher} and {@link WatcherData} behavior.
+ * Initial values are read from system properties at application startup, if available.
+ * They may be assigned at application startup, before calling any {@link Watcher} methods.
+ * Some properties allow reassigning their values later at runtime.
  */
 @SuppressWarnings("CanBeFinal")
 public class WatcherConfig {

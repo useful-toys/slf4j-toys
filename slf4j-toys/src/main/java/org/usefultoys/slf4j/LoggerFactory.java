@@ -29,7 +29,11 @@ import static org.slf4j.LoggerFactory.getILoggerFactory;
  *
  * @author Daniel Felix Ferber
  */
-public class LoggerFactory {
+public final class LoggerFactory {
+
+    private LoggerFactory() {
+        // prevent instances
+    }
 
     /**
      * Returns a logger named according to the name parameter using the
@@ -61,7 +65,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a separate logger named according to a parent logger and the operation or feature, 
+     * Returns a logger named according to a parent logger and the operation or feature,
      * using the statically bound {@link ILoggerFactory} instance.
      * <p>
      * Recommended to get a logger subordinated to an existing logger named after a class.
@@ -75,7 +79,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns a separate logger named according to a parent logger and the operation or feature, 
+     * Returns a logger named according to a parent logger and the operation or feature,
      * using the statically bound {@link ILoggerFactory} instance.
      * <p>
      * Recommended to get a logger subordinated to an existing logger.
