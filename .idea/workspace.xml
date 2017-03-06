@@ -5,76 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b189690-b15e-45cf-8c2a-08f4a25d4a66" name="Default" comment="[bld] Enable Jacoco code coverage">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExampleCommons.java" afterPath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExampleCommons.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionContext.java" afterPath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionContext.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionName.java" afterPath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionName.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionPath.java" afterPath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionPath.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionTime.java" afterPath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionTime.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/Parser.java" afterPath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/Parser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/State.java" afterPath="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/State.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerFactory.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullOutputStream.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullOutputStream.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullPrintStream.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullPrintStream.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/Session.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/Session.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SyntaxDefinition.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SyntaxDefinition.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Markers.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Markers.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/JdbcConnectionReporter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/JdbcConnectionReporter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportContextListener.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportContextListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportServlet.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/utils/UnitFormatter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/utils/UnitFormatter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Markers.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Markers.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Watcher.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Watcher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/StaticLoggerBinder.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/StaticLoggerBinder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/StaticMDCBinder.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/StaticMDCBinder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/StaticMarkerBinder.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/StaticMarkerBinder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/TestLogger.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/TestLogger.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/TestLoggerEvent.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/TestLoggerEvent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/TestLoggerFactory.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/TestLoggerFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/TestMDCAdapter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/TestMDCAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/demo/BasicUsageTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/demo/BasicUsageTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/demo/ProgressTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/demo/ProgressTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/demo/TimeLimitTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/demo/TimeLimitTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/EventDataTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/EventDataTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/EventReaderTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/EventReaderTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/EventWriterTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/EventWriterTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/PatternsTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/PatternsTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/SystemDataTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/internal/SystemDataTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterAttributesTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterAttributesTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterDataMock.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterDataMock.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterDataTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterDataTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterIdentifierAttributesTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterIdentifierAttributesTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterIdentifierOverflowTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterIdentifierOverflowTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterIterationAttributesTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterIterationAttributesTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterMessageMisuseTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterMessageMisuseTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterMessageTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterMessageTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterStateAttributesTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterStateAttributesTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterThreadLocalMisuseTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterThreadLocalMisuseTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterThreadLocalTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterThreadLocalTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterTimeAttributesTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterTimeAttributesTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/utils/TimeFormatterTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/utils/TimeFormatterTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/utils/UnitFormatterTest.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/utils/UnitFormatterTest.java" />
     </list>
     <ignored path="$PROJECT_DIR$/examples/.gradle/" />
     <ignored path="$PROJECT_DIR$/examples/build/" />
@@ -124,7 +58,7 @@
         <entry file="file://$PROJECT_DIR$/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="422">
-              <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+              <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -140,7 +74,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ExampleCommons.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ExampleCommons.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExampleCommons.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="225">
@@ -152,11 +86,43 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="EventWriter.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="34" column="24" lean-forward="false" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ReporterConfig.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SyntaxDefinition.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SyntaxDefinition.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="326">
+              <caret line="39" column="22" lean-forward="false" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="ExecutionContext.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionContext.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="330">
-              <caret line="26" column="3" lean-forward="true" selection-start-line="26" selection-start-column="3" selection-end-line="26" selection-end-column="3" />
+              <caret line="26" column="3" lean-forward="false" selection-start-line="26" selection-start-column="3" selection-end-line="26" selection-end-column="3" />
               <folding>
                 <marker date="1488759684383" expanded="true" signature="0:603" ph="/**...*/" />
                 <marker date="1488759684383" expanded="false" signature="651:832" ph="..." />
@@ -175,7 +141,7 @@
         <entry file="file://$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionFailure.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="120">
-              <caret line="25" column="3" lean-forward="true" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
+              <caret line="25" column="3" lean-forward="false" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
               <folding>
                 <marker date="1488759684377" expanded="false" signature="0:603" ph="/**...*/" />
                 <marker date="1488759684377" expanded="false" signature="651:800" ph="..." />
@@ -210,69 +176,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NullOutputStream.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullOutputStream.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <marker date="1488759178083" expanded="true" signature="0:603" ph="/**...*/" />
-                <marker date="1488759178083" expanded="false" signature="642:691" ph="..." />
-                <marker date="1488759178083" expanded="true" signature="693:903" ph="/**...*/" />
-                <marker date="1488759178083" expanded="true" signature="974:1031" ph="{...}" />
-                <marker date="1488759178083" expanded="true" signature="1101:1126" ph="{...}" />
-                <marker date="1488759178083" expanded="true" signature="1199:1224" ph="{...}" />
-                <marker date="1488759178083" expanded="true" signature="1327:1352" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Session.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/Session.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <marker date="1488759178144" expanded="true" signature="0:603" ph="/**...*/" />
-                <marker date="1488759178144" expanded="false" signature="642:827" ph="..." />
-                <marker date="1488759178144" expanded="true" signature="829:969" ph="/**...*/" />
-                <marker date="1488759178144" expanded="true" signature="1022:1058" ph="{...}" />
-                <marker date="1488759178144" expanded="true" signature="1064:1337" ph="/**...*/" />
-                <marker date="1488759178144" expanded="true" signature="1428:1643" ph="/**...*/" />
-                <marker date="1488759178144" expanded="true" signature="1686:1942" ph="{...}" />
-                <marker date="1488759178144" expanded="false" signature="1730:1837" ph="(command) → { " />
-                <marker date="1488759178144" expanded="false" signature="1851:1875" ph=" }" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="workspace.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding>
-                <marker date="1488759680681" expanded="true" signature="143739:143756" ph="..." />
-                <marker date="1488759680681" expanded="true" signature="143739:143787" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WatcherConfig.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherConfig.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <marker date="1488759178167" expanded="true" signature="0:603" ph="/**...*/" />
-                <marker date="1488759178167" expanded="true" signature="689:1033" ph="/**...*/" />
-                <marker date="1488759178167" expanded="false" signature="1034:1065" ph="/CanBeFinal/" />
-                <marker date="1488759178167" expanded="true" signature="1100:1173" ph="/**...*/" />
-                <marker date="1488759178167" expanded="true" signature="1268:1810" ph="/**...*/" />
-                <marker date="1488759178167" expanded="true" signature="1926:2557" ph="/**...*/" />
+                <marker date="1488759923181" expanded="true" signature="137022:137039" ph="..." />
+                <marker date="1488759923181" expanded="true" signature="137022:137070" ph="..." />
               </folding>
             </state>
           </provider>
@@ -1161,6 +1072,8 @@
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java" />
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExampleCommons.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java" />
       </list>
     </option>
   </component>
@@ -1186,10 +1099,13 @@
           <State>
             <id>General</id>
           </State>
+          <State>
+            <id>Java</id>
+          </State>
         </expanded-state>
         <selected-state>
           <State>
-            <id>XSLT</id>
+            <id>J2ME SupportJava</id>
           </State>
         </selected-state>
       </profile-state>
@@ -1276,6 +1192,96 @@
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
             <PATH_ELEMENT USER_OBJECT="slf4j-toys">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys-root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys-root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="build">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="tmp">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys-root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="build">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="slf4j-toys_main">
               <option name="myItemId" value="" />
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
@@ -1488,7 +1494,7 @@
       <option name="presentableId" value="Default" />
       <updated>1488740783947</updated>
       <workItem from="1488740785281" duration="3455000" />
-      <workItem from="1488748728475" duration="2035000" />
+      <workItem from="1488748728475" duration="2298000" />
     </task>
     <task id="LOCAL-00001" summary="[bld] Enable Jacoco code coverage">
       <created>1488743200471</created>
@@ -1508,7 +1514,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5490000" />
+    <option name="totallyTimeSpent" value="5753000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1296" height="1000" extended-state="6" />
@@ -1806,8 +1812,8 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1488759680681" expanded="true" signature="143739:143756" ph="..." />
-            <marker date="1488759680681" expanded="true" signature="143739:143787" ph="..." />
+            <marker date="1488759923181" expanded="true" signature="137022:137039" ph="..." />
+            <marker date="1488759923181" expanded="true" signature="137022:137070" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1838,7 +1844,7 @@
     <entry file="file://$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionContext.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
-          <caret line="26" column="3" lean-forward="true" selection-start-line="26" selection-start-column="3" selection-end-line="26" selection-end-column="3" />
+          <caret line="26" column="3" lean-forward="false" selection-start-line="26" selection-start-column="3" selection-end-line="26" selection-end-column="3" />
           <folding>
             <marker date="1488759684383" expanded="true" signature="0:603" ph="/**...*/" />
             <marker date="1488759684383" expanded="false" signature="651:832" ph="..." />
@@ -1855,7 +1861,7 @@
     <entry file="file://$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionFailure.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
-          <caret line="25" column="3" lean-forward="true" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
+          <caret line="25" column="3" lean-forward="false" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
           <folding>
             <marker date="1488759684377" expanded="false" signature="0:603" ph="/**...*/" />
             <marker date="1488759684377" expanded="false" signature="651:800" ph="..." />
@@ -1875,7 +1881,7 @@
     <entry file="file://$PROJECT_DIR$/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="422">
-          <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+          <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1887,6 +1893,32 @@
           <folding>
             <element signature="e#0#2298#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SyntaxDefinition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="326">
+          <caret line="39" column="22" lean-forward="false" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="34" column="24" lean-forward="false" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

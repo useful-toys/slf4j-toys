@@ -16,8 +16,6 @@
 package org.usefultoys.slf4j.report;
 
 import org.usefultoys.slf4j.internal.Config;
-import org.usefultoys.slf4j.meter.Meter;
-import org.usefultoys.slf4j.watcher.Watcher;
 
 /**
  * Collection of properties that drive {@link Reporter} behavior.
