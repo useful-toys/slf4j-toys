@@ -34,6 +34,7 @@ import org.usefultoys.slf4j.LoggerFactory;
  *
  * @author Daniel
  */
+@SuppressWarnings("Since15")
 public class JdbcConnectionReporter {
 
     /**

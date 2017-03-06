@@ -231,6 +231,7 @@ public class Reporter implements Serializable {
         }
     }
 
+    @SuppressWarnings("Since15")
     public class ReportCalendar implements Runnable {
 
         @Override
@@ -263,6 +264,7 @@ public class Reporter implements Serializable {
         }
     }
 
+    @SuppressWarnings("Since15")
     public class ReportLocale implements Runnable {
 
         @Override

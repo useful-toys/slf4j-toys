@@ -25,6 +25,7 @@ import java.util.List;
  *
  * @author Daniel Felix Ferber
  */
+@SuppressWarnings("Since15")
 public abstract class SystemData extends EventData {
 
     private static final long serialVersionUID = 1L;

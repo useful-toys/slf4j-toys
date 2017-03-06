@@ -17,28 +17,27 @@ package org.usefultoys.slf4j.internal;
 
 /**
  * Collection of properties that drive {@link SystemData} behavior.
- * 
- * @author Daniel Felix Ferber
  *
+ * @author Daniel Felix Ferber
  */
 @SuppressWarnings("CanBeFinal")
 public class SystemConfig {
-	/**
-	 * If Sun native OperatingSystemMXBean is available.
-	 */
-	static final boolean hasSunOperatingSystemMXBean;
+    /**
+     * If Sun native OperatingSystemMXBean is available.
+     */
+    static final boolean hasSunOperatingSystemMXBean;
 
-	static {
-		boolean tmpHasSunOperatingSystemMXBean = false;
-		try {
-			Class.forName("com.sun.management.OperatingSystemMXBean");
-			tmpHasSunOperatingSystemMXBean = true;
-		} catch (ClassNotFoundException ignored) {
-			// ignora
-		}
-		hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
-	}
-	
+    static {
+        boolean tmpHasSunOperatingSystemMXBean = false;
+        try {
+            Class.forName("com.sun.management.OperatingSystemMXBean");
+            tmpHasSunOperatingSystemMXBean = true;
+        } catch (ClassNotFoundException ignored) {
+            // ignora
+        }
+        hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
+    }
+
     /**
      * If memory usage status is retrieved from MemoryMXBean.
      * Not all JVM may support or allow MemoryMXBean usage.

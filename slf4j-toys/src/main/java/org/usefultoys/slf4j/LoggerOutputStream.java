@@ -33,17 +33,17 @@ import java.io.OutputStream;
  */
 abstract class LoggerOutputStream extends OutputStream {
 
-	LoggerOutputStream() {
+    LoggerOutputStream() {
         // prevent instances outside this library
     }
-	
+
     /**
      * Buffer that buffers data until it is redirected to the logger.
      */
     private final ByteArrayOutputStream os = new ByteArrayOutputStream(0x3FFF);
 
     /**
-     * Closes this output stream and writes any buffered output bytes as a message to the logger. 
+     * Closes this output stream and writes any buffered output bytes as a message to the logger.
      */
     @Override
     public void close() throws IOException {
@@ -82,6 +82,7 @@ abstract class LoggerOutputStream extends OutputStream {
 
     /**
      * Converts any buffered output bytes to string.
+     *
      * @return string representing any buffered output bytes
      */
     protected String extractString() {

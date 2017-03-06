@@ -6,9 +6,39 @@
   <component name="ChangeListManager">
     <list default="true" id="1b189690-b15e-45cf-8c2a-08f4a25d4a66" name="Default" comment="[bld] Enable Jacoco code coverage">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerFactory.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullOutputStream.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullOutputStream.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullPrintStream.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullPrintStream.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/Session.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/Session.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SyntaxDefinition.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SyntaxDefinition.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemData.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Markers.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Markers.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterData.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/JdbcConnectionReporter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/JdbcConnectionReporter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportContextListener.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportContextListener.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportServlet.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportServlet.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/utils/UnitFormatter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/utils/UnitFormatter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Markers.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Markers.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Watcher.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Watcher.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherConfig.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/maven/pom.xml" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/maven/pom.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/examples/.gradle/" />
     <ignored path="$PROJECT_DIR$/examples/build/" />
@@ -54,136 +84,117 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/build.gradle">
+      <file leaf-file-name="PatternDefinition.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="422">
-              <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+            <state relative-caret-position="170">
+              <caret line="34" column="175" lean-forward="false" selection-start-line="34" selection-start-column="175" selection-end-line="34" selection-end-column="175" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="settings.gradle" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/settings.gradle">
+      <file leaf-file-name="LoggerOutputStream.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ExampleCommons.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExampleCommons.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+            <state relative-caret-position="242">
+              <caret line="35" column="4" lean-forward="false" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="4" />
               <folding>
-                <element signature="e#0#2298#0" expanded="true" />
+                <element signature="e#0#2654#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EventWriter.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="34" column="24" lean-forward="false" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReporterConfig.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SyntaxDefinition.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SyntaxDefinition.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="326">
-              <caret line="39" column="22" lean-forward="false" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ExecutionContext.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionContext.java">
+      <file leaf-file-name="SystemConfig.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="330">
-              <caret line="26" column="3" lean-forward="false" selection-start-line="26" selection-start-column="3" selection-end-line="26" selection-end-column="3" />
+              <caret line="40" column="7" lean-forward="false" selection-start-line="40" selection-start-column="7" selection-end-line="40" selection-end-column="7" />
               <folding>
-                <marker date="1488759684383" expanded="true" signature="0:603" ph="/**...*/" />
-                <marker date="1488759684383" expanded="false" signature="651:832" ph="..." />
-                <marker date="1488759684383" expanded="true" signature="834:862" ph="/**...*/" />
-                <marker date="1488759684383" expanded="true" signature="907:1115" ph="{...}" />
-                <marker date="1488759684383" expanded="false" signature="1242:1253" ph=" { " />
-                <marker date="1488759684383" expanded="false" signature="1264:1270" ph=" }" />
-                <marker date="1488759684383" expanded="true" signature="1307:1515" ph="{...}" />
-                <marker date="1488759684383" expanded="true" signature="1556:1685" ph="{...}" />
+                <element signature="e#0#3582#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ExecutionFailure.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExecutionFailure.java">
+      <file leaf-file-name="WatcherSingleton.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="25" column="3" lean-forward="false" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
+            <state relative-caret-position="255">
+              <caret line="24" column="37" lean-forward="false" selection-start-line="24" selection-start-column="37" selection-end-line="24" selection-end-column="37" />
               <folding>
-                <marker date="1488759684377" expanded="false" signature="0:603" ph="/**...*/" />
-                <marker date="1488759684377" expanded="false" signature="651:800" ph="..." />
-                <marker date="1488759684377" expanded="true" signature="802:830" ph="/**...*/" />
-                <marker date="1488759684377" expanded="true" signature="952:1549" ph="{...}" />
-                <marker date="1488759684377" expanded="true" signature="1600:1738" ph="{...}" />
-                <marker date="1488759684377" expanded="true" signature="1775:1994" ph="{...}" />
-                <marker date="1488759684377" expanded="true" signature="2031:2181" ph="{...}" />
-                <marker date="1488759684377" expanded="true" signature="2249:2402" ph="{...}" />
-                <marker date="1488759684377" expanded="false" signature="2356:2371" ph=" { " />
-                <marker date="1488759684377" expanded="false" signature="2386:2396" ph=" }" />
-                <marker date="1488759684377" expanded="true" signature="2467:2651" ph="{...}" />
+                <element signature="e#0#4133#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LoggerConfig.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java">
+      <file leaf-file-name="WatcherServlet.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="435">
+              <caret line="33" column="13" lean-forward="false" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
+              <folding>
+                <element signature="e#0#1395#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="WatcherData.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="390">
-              <caret line="29" column="3" lean-forward="false" selection-start-line="29" selection-start-column="3" selection-end-line="29" selection-end-column="3" />
+              <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
               <folding>
-                <marker date="1488759178014" expanded="true" signature="0:603" ph="/**...*/" />
-                <marker date="1488759178014" expanded="false" signature="642:810" ph="..." />
-                <marker date="1488759178014" expanded="true" signature="812:1234" ph="/**...*/" />
-                <marker date="1488759178014" expanded="true" signature="1297:1333" ph="{...}" />
-                <marker date="1488759178014" expanded="true" signature="1339:1797" ph="/**...*/" />
-                <marker date="1488759178014" expanded="true" signature="1900:2490" ph="/**...*/" />
+                <element signature="e#0#2466#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="workspace.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <file leaf-file-name="ToCSV.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="135">
+              <caret line="26" column="12" lean-forward="false" selection-start-line="26" selection-start-column="12" selection-end-line="26" selection-end-column="12" />
               <folding>
-                <marker date="1488759923181" expanded="true" signature="137022:137039" ph="..." />
-                <marker date="1488759923181" expanded="true" signature="137022:137070" ph="..." />
+                <element signature="e#728#774#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Reporter.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="178">
+              <caret line="241" column="18" lean-forward="false" selection-start-line="241" selection-start-column="18" selection-end-line="241" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Meter.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="178">
+              <caret line="1084" column="4" lean-forward="false" selection-start-line="1084" selection-start-column="4" selection-end-line="1084" selection-end-column="4" />
+              <folding>
+                <element signature="e#49645#49682#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MeterFactory.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-283">
+              <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#2824#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -1074,6 +1085,13 @@
         <option value="$PROJECT_DIR$/examples/src/main/java/org/usefultoys/slf4j/examples/ExampleCommons.java" />
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java" />
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemData.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java" />
       </list>
     </option>
   </component>
@@ -1097,6 +1115,12 @@
             <id />
           </State>
           <State>
+            <id>Cloning issuesJava</id>
+          </State>
+          <State>
+            <id>Code maturity issuesJava</id>
+          </State>
+          <State>
             <id>General</id>
           </State>
           <State>
@@ -1105,7 +1129,7 @@
         </expanded-state>
         <selected-state>
           <State>
-            <id>J2ME SupportJava</id>
+            <id>SuppressionAnnotation</id>
           </State>
         </selected-state>
       </profile-state>
@@ -1282,32 +1306,6 @@
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
             <PATH_ELEMENT USER_OBJECT="slf4j-toys_main">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="examples">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="examples_main">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="examples/src/main">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="java">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="org/usefultoys/slf4j/examples">
               <option name="myItemId" value="" />
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
@@ -1494,7 +1492,7 @@
       <option name="presentableId" value="Default" />
       <updated>1488740783947</updated>
       <workItem from="1488740785281" duration="3455000" />
-      <workItem from="1488748728475" duration="2298000" />
+      <workItem from="1488748728475" duration="2843000" />
     </task>
     <task id="LOCAL-00001" summary="[bld] Enable Jacoco code coverage">
       <created>1488743200471</created>
@@ -1514,11 +1512,11 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5753000" />
+    <option name="totallyTimeSpent" value="6298000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1296" height="1000" extended-state="6" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1296" height="1000" extended-state="7" />
+    <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1528,7 +1526,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27022654" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32936978" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection Results" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32936978" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928804" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1658,14 +1656,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="23" column="50" lean-forward="false" selection-start-line="23" selection-start-column="50" selection-end-line="23" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="405">
@@ -1682,49 +1672,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="1" column="2" lean-forward="false" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="2" />
-          <folding>
-            <marker date="1488759178007" expanded="true" signature="644:748" ph="/**...*/" />
-            <marker date="1488759178007" expanded="true" signature="775:1090" ph="/**...*/" />
-            <marker date="1488759178007" expanded="true" signature="1174:1289" ph="{...}" />
-            <marker date="1488759178007" expanded="true" signature="1295:1709" ph="/**...*/" />
-            <marker date="1488759178007" expanded="true" signature="1795:1973" ph="{...}" />
-            <marker date="1488759178007" expanded="true" signature="1979:2335" ph="/**...*/" />
-            <marker date="1488759178007" expanded="true" signature="2413:2704" ph="{...}" />
-            <marker date="1488759178007" expanded="true" signature="2710:3075" ph="/**...*/" />
-            <marker date="1488759178007" expanded="true" signature="3155:3444" ph="{...}" />
-            <marker date="1488759178007" expanded="true" signature="3450:4062" ph="/**...*/" />
-            <marker date="1488759178007" expanded="true" signature="4154:5077" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-15">
           <caret line="0" column="2" lean-forward="false" selection-start-line="0" selection-start-column="2" selection-end-line="0" selection-end-column="2" />
           <folding>
-            <marker date="1488759178047" expanded="false" signature="651:700" ph="..." />
-            <marker date="1488759178047" expanded="true" signature="1480:1487" ph="{...}" />
-            <marker date="1488759178047" expanded="false" signature="1611:1622" ph=" { " />
-            <marker date="1488759178047" expanded="false" signature="1641:1647" ph=" }" />
-            <marker date="1488759178047" expanded="false" signature="1752:1763" ph=" { " />
-            <marker date="1488759178047" expanded="false" signature="1784:1790" ph=" }" />
-            <marker date="1488759178047" expanded="false" signature="1880:1891" ph=" { " />
-            <marker date="1488759178047" expanded="false" signature="1908:1914" ph=" }" />
-            <marker date="1488759178047" expanded="false" signature="2047:2058" ph=" { " />
-            <marker date="1488759178047" expanded="false" signature="2079:2085" ph=" }" />
-            <marker date="1488759178047" expanded="false" signature="2396:2407" ph=" { " />
-            <marker date="1488759178047" expanded="false" signature="2419:2425" ph=" }" />
-            <marker date="1488759178047" expanded="true" signature="3620:3918" ph="{...}" />
-            <marker date="1488759178047" expanded="false" signature="3968:3979" ph=" { " />
-            <marker date="1488759178047" expanded="false" signature="3998:4004" ph=" }" />
-            <marker date="1488759178047" expanded="true" signature="4373:5256" ph="{...}" />
-            <marker date="1488759178047" expanded="true" signature="5664:6642" ph="{...}" />
-            <marker date="1488759178047" expanded="true" signature="8571:9229" ph="{...}" />
+            <marker date="1488760368016" expanded="false" signature="651:700" ph="..." />
+            <marker date="1488760368016" expanded="true" signature="1480:1487" ph="{...}" />
+            <marker date="1488760368016" expanded="false" signature="1611:1622" ph=" { " />
+            <marker date="1488760368016" expanded="false" signature="1641:1647" ph=" }" />
+            <marker date="1488760368016" expanded="false" signature="1752:1763" ph=" { " />
+            <marker date="1488760368016" expanded="false" signature="1784:1790" ph=" }" />
+            <marker date="1488760368016" expanded="false" signature="1880:1891" ph=" { " />
+            <marker date="1488760368016" expanded="false" signature="1908:1914" ph=" }" />
+            <marker date="1488760368016" expanded="false" signature="2047:2058" ph=" { " />
+            <marker date="1488760368016" expanded="false" signature="2079:2085" ph=" }" />
+            <marker date="1488760368016" expanded="false" signature="2396:2407" ph=" { " />
+            <marker date="1488760368016" expanded="false" signature="2419:2425" ph=" }" />
+            <marker date="1488760368016" expanded="true" signature="3620:3918" ph="{...}" />
+            <marker date="1488760368016" expanded="false" signature="3968:3979" ph=" { " />
+            <marker date="1488760368016" expanded="false" signature="3998:4004" ph=" }" />
+            <marker date="1488760368016" expanded="true" signature="4373:5256" ph="{...}" />
+            <marker date="1488760368016" expanded="true" signature="5664:6642" ph="{...}" />
+            <marker date="1488760368016" expanded="true" signature="8571:9229" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1750,10 +1720,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1488759178056" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488759178056" expanded="true" signature="687:1053" ph="/**...*/" />
-            <marker date="1488759178056" expanded="true" signature="1086:1906" ph="/**...*/" />
-            <marker date="1488759178056" expanded="true" signature="2038:2656" ph="/**...*/" />
+            <marker date="1488760368152" expanded="true" signature="0:603" ph="/**...*/" />
+            <marker date="1488760368152" expanded="true" signature="687:1053" ph="/**...*/" />
+            <marker date="1488760368152" expanded="true" signature="1086:1906" ph="/**...*/" />
+            <marker date="1488760368152" expanded="true" signature="2038:2656" ph="/**...*/" />
           </folding>
         </state>
       </provider>
@@ -1763,13 +1733,13 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1488759178083" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488759178083" expanded="false" signature="642:691" ph="..." />
-            <marker date="1488759178083" expanded="true" signature="693:903" ph="/**...*/" />
-            <marker date="1488759178083" expanded="true" signature="974:1031" ph="{...}" />
-            <marker date="1488759178083" expanded="true" signature="1101:1126" ph="{...}" />
-            <marker date="1488759178083" expanded="true" signature="1199:1224" ph="{...}" />
-            <marker date="1488759178083" expanded="true" signature="1327:1352" ph="{...}" />
+            <marker date="1488760368193" expanded="true" signature="0:603" ph="/**...*/" />
+            <marker date="1488760368193" expanded="false" signature="642:691" ph="..." />
+            <marker date="1488760368193" expanded="true" signature="693:903" ph="/**...*/" />
+            <marker date="1488760368193" expanded="true" signature="974:1031" ph="{...}" />
+            <marker date="1488760368193" expanded="true" signature="1101:1126" ph="{...}" />
+            <marker date="1488760368193" expanded="true" signature="1199:1224" ph="{...}" />
+            <marker date="1488760368193" expanded="true" signature="1327:1352" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1779,15 +1749,15 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1488759178144" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488759178144" expanded="false" signature="642:827" ph="..." />
-            <marker date="1488759178144" expanded="true" signature="829:969" ph="/**...*/" />
-            <marker date="1488759178144" expanded="true" signature="1022:1058" ph="{...}" />
-            <marker date="1488759178144" expanded="true" signature="1064:1337" ph="/**...*/" />
-            <marker date="1488759178144" expanded="true" signature="1428:1643" ph="/**...*/" />
-            <marker date="1488759178144" expanded="true" signature="1686:1942" ph="{...}" />
-            <marker date="1488759178144" expanded="false" signature="1730:1837" ph="(command) → { " />
-            <marker date="1488759178144" expanded="false" signature="1851:1875" ph=" }" />
+            <marker date="1488760368300" expanded="true" signature="0:603" ph="/**...*/" />
+            <marker date="1488760368300" expanded="false" signature="642:827" ph="..." />
+            <marker date="1488760368300" expanded="true" signature="829:969" ph="/**...*/" />
+            <marker date="1488760368300" expanded="true" signature="1022:1058" ph="{...}" />
+            <marker date="1488760368300" expanded="true" signature="1064:1337" ph="/**...*/" />
+            <marker date="1488760368300" expanded="true" signature="1428:1643" ph="/**...*/" />
+            <marker date="1488760368300" expanded="true" signature="1686:1942" ph="{...}" />
+            <marker date="1488760368300" expanded="false" signature="1730:1837" ph="(command) → { " />
+            <marker date="1488760368300" expanded="false" signature="1851:1875" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -1797,12 +1767,12 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1488759178167" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488759178167" expanded="true" signature="689:1033" ph="/**...*/" />
-            <marker date="1488759178167" expanded="false" signature="1034:1065" ph="/CanBeFinal/" />
-            <marker date="1488759178167" expanded="true" signature="1100:1173" ph="/**...*/" />
-            <marker date="1488759178167" expanded="true" signature="1268:1810" ph="/**...*/" />
-            <marker date="1488759178167" expanded="true" signature="1926:2557" ph="/**...*/" />
+            <marker date="1488760368383" expanded="true" signature="0:603" ph="/**...*/" />
+            <marker date="1488760368383" expanded="true" signature="689:1033" ph="/**...*/" />
+            <marker date="1488760368383" expanded="false" signature="1034:1065" ph="/CanBeFinal/" />
+            <marker date="1488760368383" expanded="true" signature="1100:1173" ph="/**...*/" />
+            <marker date="1488760368383" expanded="true" signature="1268:1810" ph="/**...*/" />
+            <marker date="1488760368383" expanded="true" signature="1926:2557" ph="/**...*/" />
           </folding>
         </state>
       </provider>
@@ -1812,8 +1782,8 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1488759923181" expanded="true" signature="137022:137039" ph="..." />
-            <marker date="1488759923181" expanded="true" signature="137022:137070" ph="..." />
+            <marker date="1488760490530" expanded="true" signature="146559:146576" ph="..." />
+            <marker date="1488760490530" expanded="true" signature="146559:146607" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1823,12 +1793,12 @@
         <state relative-caret-position="390">
           <caret line="29" column="3" lean-forward="false" selection-start-line="29" selection-start-column="3" selection-end-line="29" selection-end-column="3" />
           <folding>
-            <marker date="1488759178014" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488759178014" expanded="false" signature="642:810" ph="..." />
-            <marker date="1488759178014" expanded="true" signature="812:1234" ph="/**...*/" />
-            <marker date="1488759178014" expanded="true" signature="1297:1333" ph="{...}" />
-            <marker date="1488759178014" expanded="true" signature="1339:1797" ph="/**...*/" />
-            <marker date="1488759178014" expanded="true" signature="1900:2490" ph="/**...*/" />
+            <marker date="1488760368071" expanded="true" signature="0:603" ph="/**...*/" />
+            <marker date="1488760368071" expanded="false" signature="642:810" ph="..." />
+            <marker date="1488760368071" expanded="true" signature="812:1234" ph="/**...*/" />
+            <marker date="1488760368071" expanded="true" signature="1297:1333" ph="{...}" />
+            <marker date="1488760368071" expanded="true" signature="1339:1797" ph="/**...*/" />
+            <marker date="1488760368071" expanded="true" signature="1900:2490" ph="/**...*/" />
           </folding>
         </state>
       </provider>
@@ -1904,21 +1874,145 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="62" column="22" lean-forward="false" selection-start-line="62" selection-start-column="22" selection-end-line="62" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#5080#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="34" column="24" lean-forward="false" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+        <state relative-caret-position="170">
+          <caret line="75" column="23" lean-forward="false" selection-start-line="75" selection-start-column="23" selection-end-line="75" selection-end-column="23" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java">
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+        <state relative-caret-position="170">
+          <caret line="150" column="16" lean-forward="false" selection-start-line="150" selection-start-column="16" selection-end-line="150" selection-end-column="16" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="141" column="58" lean-forward="false" selection-start-line="141" selection-start-column="58" selection-end-line="141" selection-end-column="58" />
+          <folding>
+            <element signature="e#854#882#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="34" column="175" lean-forward="false" selection-start-line="34" selection-start-column="175" selection-end-line="34" selection-end-column="175" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-283">
+          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#2824#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="35" column="4" lean-forward="false" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#2654#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="40" column="7" lean-forward="false" selection-start-line="40" selection-start-column="7" selection-end-line="40" selection-end-column="7" />
+          <folding>
+            <element signature="e#0#3582#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="24" column="37" lean-forward="false" selection-start-line="24" selection-start-column="37" selection-end-line="24" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#4133#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="33" column="13" lean-forward="false" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#1395#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
+          <folding>
+            <element signature="e#0#2466#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="26" column="12" lean-forward="false" selection-start-line="26" selection-start-column="12" selection-end-line="26" selection-end-column="12" />
+          <folding>
+            <element signature="e#728#774#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="241" column="18" lean-forward="false" selection-start-line="241" selection-start-column="18" selection-end-line="241" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="1084" column="4" lean-forward="false" selection-start-line="1084" selection-start-column="4" selection-end-line="1084" selection-end-column="4" />
+          <folding>
+            <element signature="e#49645#49682#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

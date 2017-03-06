@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class ToCSV {
 
     public static void main(final String argv[]) {
