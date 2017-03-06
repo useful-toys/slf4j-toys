@@ -18,11 +18,13 @@ package org.usefultoys.slf4j.internal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.usefultoys.slf4j.internal.SyntaxDefinition.*;
+
 /**
  * Regular expression patterns used to deserialize events as encoded strings.
  * @author Daniel
  */
-class PatternDefinition extends SyntaxDefinition {
+class PatternDefinition {
 
     static final Pattern encodePropertyValuePattern = quotedCharsPattern(PROPERTY_DIV, PROPERTY_SEPARATOR, MESSAGE_CLOSE, QUOTE, MAP_CLOSE, MAP_SEPARATOR);
     static final Pattern encodeMapValuePattern = quotedCharsPattern(MAP_CLOSE, MAP_SEPARATOR, MESSAGE_CLOSE, QUOTE);

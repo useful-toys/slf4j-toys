@@ -245,7 +245,7 @@ public class Reporter implements Serializable {
             ps.print("; DST=" + tz.getDSTSavings() / 60000 + "min");
             try {
                 ps.print("; observesDT=" + tz.observesDaylightTime());
-            } catch (NoSuchMethodError e) {
+            } catch (NoSuchMethodError ignored) {
                 // Ignore property that exists only from Java 1.7 on.
             }
             ps.print("; useDT=" + tz.useDaylightTime());
@@ -277,7 +277,7 @@ public class Reporter implements Serializable {
             ps.print("; country=" + loc.getDisplayCountry() + " (" + loc.getCountry() + ")");
             try {
                 ps.print("; script=" + loc.getDisplayScript() + " (" + loc.getScript() + ")");
-            } catch (NoSuchMethodError e) {
+            } catch (NoSuchMethodError ignored) {
                 // Ignore property that exists only from Java 1.7 on.
             }
             ps.print("; variant=" + loc.getDisplayVariant() + " (" + loc.getVariant() + ")");

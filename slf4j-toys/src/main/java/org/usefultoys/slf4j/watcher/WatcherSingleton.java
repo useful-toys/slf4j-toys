@@ -37,11 +37,11 @@ public class WatcherSingleton {
      */
     public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(WatcherConfig.name));
 
-    private static ScheduledExecutorService defaultWatcherExecutor;
-    private static ScheduledFuture<?> scheduledDefaultWatcher;
+    private static ScheduledExecutorService defaultWatcherExecutor = null;
+    private static ScheduledFuture<?> scheduledDefaultWatcher = null;
 
-    private static Timer defaultWatcherTimer;
-    private static TimerTask defaultWatcherTask;
+    private static Timer defaultWatcherTimer = null;
+    private static TimerTask defaultWatcherTask = null;
 
     private WatcherSingleton() {
         // prevent instances

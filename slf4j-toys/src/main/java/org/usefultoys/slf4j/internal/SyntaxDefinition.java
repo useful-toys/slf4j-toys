@@ -20,7 +20,7 @@ package org.usefultoys.slf4j.internal;
  *
  * @author Daniel Felix Ferber
  */
-abstract class SyntaxDefinition {
+final class SyntaxDefinition {
 
     protected SyntaxDefinition() {
         // prevent instances
