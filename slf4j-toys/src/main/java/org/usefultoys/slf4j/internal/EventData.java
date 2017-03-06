@@ -315,8 +315,8 @@ public abstract class EventData implements Serializable {
      * @param message The string that is supposed to contain an encoded string
      * representation of the event.
      * @param messagePrefix message prefix
-     * @return <code>true</code> if an event was successfully read;
-     * <code>false</code> otherwise.
+     * @return {@code true} if an event was successfully read;
+     * {@code false} otherwise.
      */
     protected final boolean read(final String message, final char messagePrefix) {
         final String plausibleMessage = PatternDefinition.extractPlausibleMessage(messagePrefix, message);

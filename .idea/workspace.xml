@@ -5,40 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b189690-b15e-45cf-8c2a-08f4a25d4a66" name="Default" comment="[bld] Enable Jacoco code coverage">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerFactory.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullOutputStream.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullOutputStream.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullPrintStream.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/NullPrintStream.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/Session.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/Session.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__javax_servlet_javax_servlet_api_3_1_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__javax_servlet_javax_servlet_api_3_1_0.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__junit_junit_4_12.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__junit_junit_4_12.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_core_1_3.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_core_1_3.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_slf4j_slf4j_api_1_7_21.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_slf4j_slf4j_api_1_7_21.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_slf4j_slf4j_simple_1_7_21.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_slf4j_slf4j_simple_1_7_21.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/examples/examples_main.iml" afterPath="$PROJECT_DIR$/.idea/modules/examples/examples_main.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" afterPath="$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_main.iml" afterPath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_main.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_test.iml" afterPath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_test.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SyntaxDefinition.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SyntaxDefinition.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Markers.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Markers.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/JdbcConnectionReporter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/JdbcConnectionReporter.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportContextListener.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportContextListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportServlet.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/utils/UnitFormatter.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/utils/UnitFormatter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Markers.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Markers.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Watcher.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/Watcher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherConfig.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/slf4j-toys/src/main/maven/pom.xml" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/maven/pom.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/examples/.gradle/" />
     <ignored path="$PROJECT_DIR$/examples/build/" />
@@ -84,117 +67,110 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="PatternDefinition.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java">
+      <file leaf-file-name="Markers.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Markers.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="34" column="175" lean-forward="false" selection-start-line="34" selection-start-column="175" selection-end-line="34" selection-end-column="175" />
+            <state relative-caret-position="51">
+              <caret line="17" column="16" lean-forward="false" selection-start-line="17" selection-start-column="16" selection-end-line="17" selection-end-column="16" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LoggerOutputStream.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java">
+      <file leaf-file-name="gradle-wrapper.properties" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="35" column="4" lean-forward="false" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="4" />
-              <folding>
-                <element signature="e#0#2654#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SystemConfig.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="40" column="7" lean-forward="false" selection-start-line="40" selection-start-column="7" selection-end-line="40" selection-end-column="7" />
-              <folding>
-                <element signature="e#0#3582#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WatcherSingleton.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="24" column="37" lean-forward="false" selection-start-line="24" selection-start-column="37" selection-end-line="24" selection-end-column="37" />
-              <folding>
-                <element signature="e#0#4133#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WatcherServlet.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
-              <caret line="33" column="13" lean-forward="false" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-              <folding>
-                <element signature="e#0#1395#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WatcherData.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
-              <folding>
-                <element signature="e#0#2466#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ToCSV.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="26" column="12" lean-forward="false" selection-start-line="26" selection-start-column="12" selection-end-line="26" selection-end-column="12" />
-              <folding>
-                <element signature="e#728#774#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Reporter.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="241" column="18" lean-forward="false" selection-start-line="241" selection-start-column="18" selection-end-line="241" selection-end-column="18" />
+            <state relative-caret-position="102">
+              <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Meter.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="EventWriter.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="202">
+              <caret line="39" column="42" lean-forward="false" selection-start-line="39" selection-start-column="42" selection-end-line="39" selection-end-column="42" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ReportContextListener.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportContextListener.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="391">
+              <caret line="38" column="37" lean-forward="false" selection-start-line="38" selection-start-column="37" selection-end-line="38" selection-end-column="37" />
+              <folding>
+                <element signature="e#1154#1155#0" expanded="true" />
+                <element signature="e#1222#1223#0" expanded="true" />
+                <element signature="e#1349#1350#0" expanded="true" />
+                <element signature="e#1386#1387#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EventData.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="211">
+              <caret line="317" column="15" lean-forward="false" selection-start-line="317" selection-start-column="15" selection-end-line="317" selection-end-column="15" />
+              <folding>
+                <element signature="e#0#12322#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EventReader.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="202">
+              <caret line="45" column="16" lean-forward="false" selection-start-line="45" selection-start-column="16" selection-end-line="45" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="JdbcConnectionReporter.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/JdbcConnectionReporter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="211">
+              <caret line="44" column="20" lean-forward="false" selection-start-line="44" selection-start-column="20" selection-end-line="44" selection-end-column="20" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Meter.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="1084" column="4" lean-forward="false" selection-start-line="1084" selection-start-column="4" selection-end-line="1084" selection-end-column="4" />
-              <folding>
-                <element signature="e#49645#49682#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="211">
+              <caret line="87" column="33" lean-forward="false" selection-start-line="87" selection-start-column="33" selection-end-line="87" selection-end-column="33" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MeterFactory.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java">
+      <file leaf-file-name="MeterData.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterData.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-283">
-              <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+            <state relative-caret-position="211">
+              <caret line="105" column="34" lean-forward="false" selection-start-line="105" selection-start-column="34" selection-end-line="105" selection-end-column="34" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="WatcherSingleton.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="43" column="54" lean-forward="false" selection-start-line="43" selection-start-column="54" selection-end-line="43" selection-end-column="54" />
               <folding>
-                <element signature="e#0#2824#0" expanded="true" />
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -208,12 +184,12 @@
   <component name="GradleLocalSettings">
     <option name="myGradleHomes">
       <map>
-        <entry key="$PROJECT_DIR$" value="D:\home\.gradle\wrapper\dists\gradle-3.1-all\7v522598rw1b93jkcneehqz1n\gradle-3.1" />
+        <entry key="$PROJECT_DIR$" value="C:\Users\x7ws\.gradle\wrapper\dists\gradle-3.4-all\8n0mmxprpkjm7s06z5gxlyk31\gradle-3.4" />
       </map>
     </option>
     <option name="myGradleVersions">
       <map>
-        <entry key="$PROJECT_DIR$" value="3.1" />
+        <entry key="$PROJECT_DIR$" value="3.4" />
       </map>
     </option>
     <option name="availableProjects">
@@ -228,16 +204,16 @@
           <value>
             <list>
               <ExternalProjectPojo>
+                <option name="name" value="slf4j-toys-root" />
+                <option name="path" value="$PROJECT_DIR$" />
+              </ExternalProjectPojo>
+              <ExternalProjectPojo>
                 <option name="name" value=":examples" />
                 <option name="path" value="$PROJECT_DIR$/examples" />
               </ExternalProjectPojo>
               <ExternalProjectPojo>
                 <option name="name" value=":slf4j-toys" />
                 <option name="path" value="$PROJECT_DIR$/slf4j-toys" />
-              </ExternalProjectPojo>
-              <ExternalProjectPojo>
-                <option name="name" value="slf4j-toys-root" />
-                <option name="path" value="$PROJECT_DIR$" />
               </ExternalProjectPojo>
             </list>
           </value>
@@ -255,29 +231,9 @@
                 <option name="name" value="licenseFormatTest" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Displays the components produced by root project 'slf4j-toys-root'. [incubating]" />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="components" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
                 <option name="description" value="Displays the sub-projects of root project 'slf4j-toys-root'." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="projects" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles and tests this project and all projects that depend on it." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="buildDependents" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles main classes." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="classes" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Displays all buildscript dependencies declared in root project 'slf4j-toys-root'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="buildEnvironment" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Generates Gradle wrapper files. [incubating]" />
@@ -285,27 +241,13 @@
                 <option name="name" value="wrapper" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="description" value="Verifies code coverage metrics based on specified rules for the test task." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="jacocoTestCoverageVerification" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="sourcesJar" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles test classes." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="testClasses" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Generates Javadoc API documentation for the main source code." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="javadoc" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Generates reports on your runtime dependencies." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="downloadLicenses" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="signArchives" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Displays the configuration model of root project 'slf4j-toys-root'. [incubating]" />
@@ -316,11 +258,6 @@
                 <option name="description" value="Assembles a jar archive containing the main classes." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="jar" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Scanning license on main files" />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="licenseMain" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Processes main resources." />
@@ -352,29 +289,9 @@
                 <option name="name" value="javadocJar" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Displays the insight into a specific dependency in root project 'slf4j-toys-root'." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="dependencyInsight" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
                 <option name="description" value="Runs all checks." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="check" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles the outputs of this project." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="assemble" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Deletes the build directory." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="clean" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Compiles test Java source." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="compileTestJava" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Displays all dependencies declared in root project 'slf4j-toys-root'." />
@@ -392,19 +309,9 @@
                 <option name="name" value="processTestResources" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
-                <option name="description" value="Displays a help message." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="help" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
                 <option name="description" value="Checks for header consistency." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="license" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="description" value="Assembles and tests this project." />
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="build" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Installs the 'archives' artifacts into the local Maven repository." />
@@ -425,6 +332,98 @@
                 <option name="description" value="Scanning license on test files" />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="licenseTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the components produced by root project 'slf4j-toys-root'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="components" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects that depend on it." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="buildDependents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the dependent components of components in root project 'slf4j-toys-root'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="dependentComponents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles main classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="classes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays all buildscript dependencies declared in root project 'slf4j-toys-root'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="buildEnvironment" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles test classes." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="testClasses" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates Javadoc API documentation for the main source code." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="javadoc" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates reports on your runtime dependencies." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="downloadLicenses" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="signArchives" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Scanning license on main files" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="licenseMain" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="versionDisplay" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the insight into a specific dependency in root project 'slf4j-toys-root'." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="dependencyInsight" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates code coverage report for the test task." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="jacocoTestReport" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles the outputs of this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="assemble" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Deletes the build directory." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="clean" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Compiles test Java source." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="compileTestJava" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays a help message." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="help" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="build" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="versionFile" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Uploads all artifacts belonging to configuration ':slf4j-toys:archives'" />
@@ -466,6 +465,11 @@
                 <option name="description" value="Assembles main classes." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
                 <option name="name" value="classes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the dependent components of components in project ':examples'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/examples" />
+                <option name="name" value="dependentComponents" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Displays all buildscript dependencies declared in project ':examples'." />
@@ -629,9 +633,19 @@
                 <option name="name" value="classes" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="description" value="Displays the dependent components of components in project ':slf4j-toys'. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="dependentComponents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Displays all buildscript dependencies declared in project ':slf4j-toys'." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
                 <option name="name" value="buildEnvironment" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Verifies code coverage metrics based on specified rules for the test task." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="jacocoTestCoverageVerification" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
@@ -687,6 +701,10 @@
                 <option name="name" value="test" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="versionDisplay" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Compiles main Java source." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
                 <option name="name" value="compileJava" />
@@ -704,6 +722,11 @@
                 <option name="description" value="Runs all checks." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
                 <option name="name" value="check" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Generates code coverage report for the test task." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="jacocoTestReport" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Assembles the outputs of this project." />
@@ -761,6 +784,10 @@
                 <option name="name" value="buildNeeded" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+                <option name="name" value="versionFile" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Scanning license on main files" />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
                 <option name="name" value="licenseFormatMain" />
@@ -788,6 +815,7 @@
     <option name="modificationStamps">
       <map>
         <entry key="G:/cosmetopeia-gradle" value="2975285322670" />
+        <entry key="$PROJECT_DIR$" value="5953215322013" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -802,37 +830,67 @@
                       <ExternalModuleBuildClasspathPojo>
                         <option name="entries">
                           <list>
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/gradle.plugin.nl.javadude.gradle.plugins/license-gradle-plugin/0.13.1/c270280ba46f95804a3aee4698725718ade3035c/license-gradle-plugin-0.13.1.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/net.nemerosa/versioning/2.0.0/86c950fcecb62f641188220fddbe44d18279d4d4/versioning-2.0.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/7841ba10ea46c9611ce702c3833ff9fccc8ae6eb/plexus-utils-2.0.5.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/b45958476a332904c1152eb590bd4764dea5dc6d/xmltool-3.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/f2c4f13c8d30e7305f3407bd4e3980f2eed8d1cf/maven-license-plugin-1.10.b1.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.ajoberstar/grgit/1.6.0/4fb4645aa835d6f62ebab2c61f803efc699cd8f/grgit-1.6.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.tmatesoft.svnkit/svnkit/1.8.12/a14959875cc8d719de98a18b95d250bb0a9ecd4b/svnkit-1.8.12.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit/4.1.1.201511131810-r/17cf7d0cb7da8bbcc16e43f0ab5dbfc43b5cb539/org.eclipse.jgit-4.1.1.201511131810-r.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit.ui/4.1.1.201511131810-r/f9900cfedc10614f55f8a020d68a40fa4557a5ab/org.eclipse.jgit.ui-4.1.1.201511131810-r.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.jsch/0.0.9/26f5c718216f1668f674816e580aa7c92f2660ad/jsch.agentproxy.jsch-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.pageant/0.0.9/7651361429af009ff18a6ea5c4e5d38ecff7f959/jsch.agentproxy.pageant-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.sshagent/0.0.9/2ecca436463287682d16c3fa628bd7cca426cf6f/jsch.agentproxy.sshagent-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-jna/0.0.9/100522438a57b4c0d15db112fc8a08d17f48080a/jsch.agentproxy.usocket-jna-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-nc/0.0.9/926fd2eb5586c779b8d7827036ea8e06fe7744ba/jsch.agentproxy.usocket-nc-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.12/8e20852d05222dc286bf1c71d78d0531e177c317/slf4j-api-1.7.12.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.svnkit-trilead-ssh2/0.0.7/95015f649026507428aa2f37baba69ba8a86dc67/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.trilead/trilead-ssh2/1.0.0-build220/74d96b4d15dc841140487e01734201e604dfce71/trilead-ssh2-1.0.0-build220.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.1.0/23457ad1cf75c2c16763330de5565a0e67b4bc0a/jna-platform-4.1.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/1c12d070e602efd8021891cdd7fd18bc129372d4/jna-4.1.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.connector-factory/0.0.7/780e0312287dd4e4f3601d401a073a081e403f2d/jsch.agentproxy.connector-factory-0.0.7.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/de.regnis.q.sequence/sequence-library/1.0.3/3bcf12fa805a735bb26369cd66c5933767c026de/sequence-library-1.0.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.tmatesoft.sqljet/sqljet/1.1.10/ede7fbabd4c96d34e48fda0e8feced24c98cedca/sqljet-1.1.10.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.53/658b682d5c817b27ae795637dfec047c63d29935/jsch-0.1.53.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.googlecode.javaewah/JavaEWAH/0.7.9/eceaf316a8faf0e794296ebe158ae110c7d72a5a/JavaEWAH-0.7.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.3.6/4c47155e3e6c9a41a28db36680b828ced53b8af4/httpclient-4.3.6.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.eclipse.jdt/org.eclipse.jdt.annotation/1.1.0/c154cecefedc3a8f2a2752db856d8a251ecb49c9/org.eclipse.jdt.annotation-1.1.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.core/0.0.9/1af3741c3a83a71e29b8aa7637979791e50e538b/jsch.agentproxy.core-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.4/8f011408269a8e42b8548687e137d8eeb56df4b4/antlr-runtime-3.4.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.3.3/f91b7a4aadc5cf486df6e4634748d7dd7a73f06d/httpcore-4.3.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.3/f6f66e966c70a83ffbdb6f17a0919eaf7c8aca7f/commons-logging-1.1.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.6/b7f0fc8f61ecadeb3695f0b9464755eee44374d4/commons-codec-1.6.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/gradle.plugin.nl.javadude.gradle.plugins/license-gradle-plugin/0.13.1/c270280ba46f95804a3aee4698725718ade3035c/license-gradle-plugin-0.13.1.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.nemerosa/versioning/2.0.0/9d9a26a09f2137ff0eeb4f85968bb69962f29c8a/versioning-2.0.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.nemerosa/versioning/2.0.0/86c950fcecb62f641188220fddbe44d18279d4d4/versioning-2.0.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/9fa5995004da6efeb01122240ea3c935f0a4a33b/plexus-utils-2.0.5-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/7841ba10ea46c9611ce702c3833ff9fccc8ae6eb/plexus-utils-2.0.5.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/562a89efa33653e5c59f5215ea83013dc4359729/xmltool-3.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/b45958476a332904c1152eb590bd4764dea5dc6d/xmltool-3.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/432c7d5469c2a3143691334be560f59db0d410ff/maven-license-plugin-1.10.b1-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/f2c4f13c8d30e7305f3407bd4e3980f2eed8d1cf/maven-license-plugin-1.10.b1.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ajoberstar/grgit/1.6.0/1a653c602d6af373c43049e7041214b22b46128f/grgit-1.6.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ajoberstar/grgit/1.6.0/4fb4645aa835d6f62ebab2c61f803efc699cd8f/grgit-1.6.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.svnkit/svnkit/1.8.12/97515e36051a52356a1c9b2d8b9c09fe7c51df0c/svnkit-1.8.12-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.svnkit/svnkit/1.8.12/a14959875cc8d719de98a18b95d250bb0a9ecd4b/svnkit-1.8.12.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit/4.1.1.201511131810-r/e65acfcdca36ae3cbdcbd5496648612eebe54be7/org.eclipse.jgit-4.1.1.201511131810-r-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit/4.1.1.201511131810-r/17cf7d0cb7da8bbcc16e43f0ab5dbfc43b5cb539/org.eclipse.jgit-4.1.1.201511131810-r.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit.ui/4.1.1.201511131810-r/2cc910d05bfcb90af854117ca892bbe8b875014e/org.eclipse.jgit.ui-4.1.1.201511131810-r-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit.ui/4.1.1.201511131810-r/f9900cfedc10614f55f8a020d68a40fa4557a5ab/org.eclipse.jgit.ui-4.1.1.201511131810-r.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.jsch/0.0.9/580aea5836a0b077c285f85c4d5f80cb7070619c/jsch.agentproxy.jsch-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.jsch/0.0.9/26f5c718216f1668f674816e580aa7c92f2660ad/jsch.agentproxy.jsch-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.pageant/0.0.9/a3865d329183d51cbd6e21023d19d3eebd5df70e/jsch.agentproxy.pageant-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.pageant/0.0.9/7651361429af009ff18a6ea5c4e5d38ecff7f959/jsch.agentproxy.pageant-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.sshagent/0.0.9/19cb8705d905d218655aff43305cc8361f232fd7/jsch.agentproxy.sshagent-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.sshagent/0.0.9/2ecca436463287682d16c3fa628bd7cca426cf6f/jsch.agentproxy.sshagent-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-jna/0.0.9/2135bde834fb5fba3125c2f3aa14bcf472739c74/jsch.agentproxy.usocket-jna-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-jna/0.0.9/100522438a57b4c0d15db112fc8a08d17f48080a/jsch.agentproxy.usocket-jna-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-nc/0.0.9/bbfa3094c024cc1cffff1cef50be630d20ded605/jsch.agentproxy.usocket-nc-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-nc/0.0.9/926fd2eb5586c779b8d7827036ea8e06fe7744ba/jsch.agentproxy.usocket-nc-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.12/58697792617f38bf86d8e26bc004aac505e516a9/slf4j-api-1.7.12-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.12/8e20852d05222dc286bf1c71d78d0531e177c317/slf4j-api-1.7.12.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.svnkit-trilead-ssh2/0.0.7/6bf880e10d7678e5ac4897dab39860a87f8e0725/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.svnkit-trilead-ssh2/0.0.7/95015f649026507428aa2f37baba69ba8a86dc67/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.trilead/trilead-ssh2/1.0.0-build220/5ea5b9826536720cf3a12666ecacfb7746fde56a/trilead-ssh2-1.0.0-build220-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.trilead/trilead-ssh2/1.0.0-build220/74d96b4d15dc841140487e01734201e604dfce71/trilead-ssh2-1.0.0-build220.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.1.0/67d178949fe41ff82de6dbda7ef62d48f70e031c/jna-platform-4.1.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.1.0/23457ad1cf75c2c16763330de5565a0e67b4bc0a/jna-platform-4.1.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/28a5d592b494fe54c120c64689087e779a7bf55b/jna-4.1.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/1c12d070e602efd8021891cdd7fd18bc129372d4/jna-4.1.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.connector-factory/0.0.7/88ad6b451496a46a277f56efff1858e1ef8c7eb5/jsch.agentproxy.connector-factory-0.0.7-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.connector-factory/0.0.7/780e0312287dd4e4f3601d401a073a081e403f2d/jsch.agentproxy.connector-factory-0.0.7.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/de.regnis.q.sequence/sequence-library/1.0.3/976912257e8fb22e666a9435be20fe56438f9fd0/sequence-library-1.0.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/de.regnis.q.sequence/sequence-library/1.0.3/3bcf12fa805a735bb26369cd66c5933767c026de/sequence-library-1.0.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.sqljet/sqljet/1.1.10/5d9b195660fa3beb4bb54a102af747f4aad25b7/sqljet-1.1.10-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.sqljet/sqljet/1.1.10/ede7fbabd4c96d34e48fda0e8feced24c98cedca/sqljet-1.1.10.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.53/791359d94d6edcace686a56d0727ee093a2f7c33/jsch-0.1.53-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.53/658b682d5c817b27ae795637dfec047c63d29935/jsch-0.1.53.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.googlecode.javaewah/JavaEWAH/0.7.9/a50d78eb630e05439461f3130b94b3bcd1ea6f03/JavaEWAH-0.7.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.googlecode.javaewah/JavaEWAH/0.7.9/eceaf316a8faf0e794296ebe158ae110c7d72a5a/JavaEWAH-0.7.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.3.6/af4d76be0c46ee26b0d9d1d4a34d244a633cac84/httpclient-4.3.6-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.3.6/4c47155e3e6c9a41a28db36680b828ced53b8af4/httpclient-4.3.6.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jdt/org.eclipse.jdt.annotation/1.1.0/aaab664d7d6c398ba78864495fbaefd32c68e401/org.eclipse.jdt.annotation-1.1.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jdt/org.eclipse.jdt.annotation/1.1.0/c154cecefedc3a8f2a2752db856d8a251ecb49c9/org.eclipse.jdt.annotation-1.1.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.core/0.0.9/dc8402ed7f647c7d44057189a49b5743b02a7262/jsch.agentproxy.core-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.core/0.0.9/1af3741c3a83a71e29b8aa7637979791e50e538b/jsch.agentproxy.core-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.4/57a73190ad97f56c0cb83a6a5b6c08d5d428319b/antlr-runtime-3.4-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.4/8f011408269a8e42b8548687e137d8eeb56df4b4/antlr-runtime-3.4.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.3.3/1b0aa62a6a91e9fa00c16f0a4a2c874804ed3b1e/httpcore-4.3.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.3.3/f91b7a4aadc5cf486df6e4634748d7dd7a73f06d/httpcore-4.3.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.3/28bb0405fddaf04f15058fbfbe01fe2780d7d3b6/commons-logging-1.1.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.3/f6f66e966c70a83ffbdb6f17a0919eaf7c8aca7f/commons-logging-1.1.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.6/61e9f9d11fe3e12ec62f633006e99d75fd7f19c8/commons-codec-1.6-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.6/b7f0fc8f61ecadeb3695f0b9464755eee44374d4/commons-codec-1.6.jar" />
                           </list>
                         </option>
                         <option name="path" value="$PROJECT_DIR$" />
@@ -844,37 +902,67 @@
                       <ExternalModuleBuildClasspathPojo>
                         <option name="entries">
                           <list>
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/gradle.plugin.nl.javadude.gradle.plugins/license-gradle-plugin/0.13.1/c270280ba46f95804a3aee4698725718ade3035c/license-gradle-plugin-0.13.1.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/net.nemerosa/versioning/2.0.0/86c950fcecb62f641188220fddbe44d18279d4d4/versioning-2.0.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/7841ba10ea46c9611ce702c3833ff9fccc8ae6eb/plexus-utils-2.0.5.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/b45958476a332904c1152eb590bd4764dea5dc6d/xmltool-3.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/f2c4f13c8d30e7305f3407bd4e3980f2eed8d1cf/maven-license-plugin-1.10.b1.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.ajoberstar/grgit/1.6.0/4fb4645aa835d6f62ebab2c61f803efc699cd8f/grgit-1.6.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.tmatesoft.svnkit/svnkit/1.8.12/a14959875cc8d719de98a18b95d250bb0a9ecd4b/svnkit-1.8.12.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit/4.1.1.201511131810-r/17cf7d0cb7da8bbcc16e43f0ab5dbfc43b5cb539/org.eclipse.jgit-4.1.1.201511131810-r.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit.ui/4.1.1.201511131810-r/f9900cfedc10614f55f8a020d68a40fa4557a5ab/org.eclipse.jgit.ui-4.1.1.201511131810-r.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.jsch/0.0.9/26f5c718216f1668f674816e580aa7c92f2660ad/jsch.agentproxy.jsch-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.pageant/0.0.9/7651361429af009ff18a6ea5c4e5d38ecff7f959/jsch.agentproxy.pageant-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.sshagent/0.0.9/2ecca436463287682d16c3fa628bd7cca426cf6f/jsch.agentproxy.sshagent-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-jna/0.0.9/100522438a57b4c0d15db112fc8a08d17f48080a/jsch.agentproxy.usocket-jna-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-nc/0.0.9/926fd2eb5586c779b8d7827036ea8e06fe7744ba/jsch.agentproxy.usocket-nc-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.12/8e20852d05222dc286bf1c71d78d0531e177c317/slf4j-api-1.7.12.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.svnkit-trilead-ssh2/0.0.7/95015f649026507428aa2f37baba69ba8a86dc67/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.trilead/trilead-ssh2/1.0.0-build220/74d96b4d15dc841140487e01734201e604dfce71/trilead-ssh2-1.0.0-build220.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.1.0/23457ad1cf75c2c16763330de5565a0e67b4bc0a/jna-platform-4.1.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/1c12d070e602efd8021891cdd7fd18bc129372d4/jna-4.1.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.connector-factory/0.0.7/780e0312287dd4e4f3601d401a073a081e403f2d/jsch.agentproxy.connector-factory-0.0.7.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/de.regnis.q.sequence/sequence-library/1.0.3/3bcf12fa805a735bb26369cd66c5933767c026de/sequence-library-1.0.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.tmatesoft.sqljet/sqljet/1.1.10/ede7fbabd4c96d34e48fda0e8feced24c98cedca/sqljet-1.1.10.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.53/658b682d5c817b27ae795637dfec047c63d29935/jsch-0.1.53.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.googlecode.javaewah/JavaEWAH/0.7.9/eceaf316a8faf0e794296ebe158ae110c7d72a5a/JavaEWAH-0.7.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.3.6/4c47155e3e6c9a41a28db36680b828ced53b8af4/httpclient-4.3.6.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.eclipse.jdt/org.eclipse.jdt.annotation/1.1.0/c154cecefedc3a8f2a2752db856d8a251ecb49c9/org.eclipse.jdt.annotation-1.1.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.core/0.0.9/1af3741c3a83a71e29b8aa7637979791e50e538b/jsch.agentproxy.core-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.4/8f011408269a8e42b8548687e137d8eeb56df4b4/antlr-runtime-3.4.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.3.3/f91b7a4aadc5cf486df6e4634748d7dd7a73f06d/httpcore-4.3.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.3/f6f66e966c70a83ffbdb6f17a0919eaf7c8aca7f/commons-logging-1.1.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.6/b7f0fc8f61ecadeb3695f0b9464755eee44374d4/commons-codec-1.6.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/gradle.plugin.nl.javadude.gradle.plugins/license-gradle-plugin/0.13.1/c270280ba46f95804a3aee4698725718ade3035c/license-gradle-plugin-0.13.1.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.nemerosa/versioning/2.0.0/9d9a26a09f2137ff0eeb4f85968bb69962f29c8a/versioning-2.0.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.nemerosa/versioning/2.0.0/86c950fcecb62f641188220fddbe44d18279d4d4/versioning-2.0.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/9fa5995004da6efeb01122240ea3c935f0a4a33b/plexus-utils-2.0.5-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/7841ba10ea46c9611ce702c3833ff9fccc8ae6eb/plexus-utils-2.0.5.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/562a89efa33653e5c59f5215ea83013dc4359729/xmltool-3.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/b45958476a332904c1152eb590bd4764dea5dc6d/xmltool-3.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/432c7d5469c2a3143691334be560f59db0d410ff/maven-license-plugin-1.10.b1-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/f2c4f13c8d30e7305f3407bd4e3980f2eed8d1cf/maven-license-plugin-1.10.b1.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ajoberstar/grgit/1.6.0/1a653c602d6af373c43049e7041214b22b46128f/grgit-1.6.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ajoberstar/grgit/1.6.0/4fb4645aa835d6f62ebab2c61f803efc699cd8f/grgit-1.6.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.svnkit/svnkit/1.8.12/97515e36051a52356a1c9b2d8b9c09fe7c51df0c/svnkit-1.8.12-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.svnkit/svnkit/1.8.12/a14959875cc8d719de98a18b95d250bb0a9ecd4b/svnkit-1.8.12.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit/4.1.1.201511131810-r/e65acfcdca36ae3cbdcbd5496648612eebe54be7/org.eclipse.jgit-4.1.1.201511131810-r-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit/4.1.1.201511131810-r/17cf7d0cb7da8bbcc16e43f0ab5dbfc43b5cb539/org.eclipse.jgit-4.1.1.201511131810-r.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit.ui/4.1.1.201511131810-r/2cc910d05bfcb90af854117ca892bbe8b875014e/org.eclipse.jgit.ui-4.1.1.201511131810-r-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit.ui/4.1.1.201511131810-r/f9900cfedc10614f55f8a020d68a40fa4557a5ab/org.eclipse.jgit.ui-4.1.1.201511131810-r.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.jsch/0.0.9/580aea5836a0b077c285f85c4d5f80cb7070619c/jsch.agentproxy.jsch-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.jsch/0.0.9/26f5c718216f1668f674816e580aa7c92f2660ad/jsch.agentproxy.jsch-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.pageant/0.0.9/a3865d329183d51cbd6e21023d19d3eebd5df70e/jsch.agentproxy.pageant-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.pageant/0.0.9/7651361429af009ff18a6ea5c4e5d38ecff7f959/jsch.agentproxy.pageant-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.sshagent/0.0.9/19cb8705d905d218655aff43305cc8361f232fd7/jsch.agentproxy.sshagent-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.sshagent/0.0.9/2ecca436463287682d16c3fa628bd7cca426cf6f/jsch.agentproxy.sshagent-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-jna/0.0.9/2135bde834fb5fba3125c2f3aa14bcf472739c74/jsch.agentproxy.usocket-jna-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-jna/0.0.9/100522438a57b4c0d15db112fc8a08d17f48080a/jsch.agentproxy.usocket-jna-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-nc/0.0.9/bbfa3094c024cc1cffff1cef50be630d20ded605/jsch.agentproxy.usocket-nc-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-nc/0.0.9/926fd2eb5586c779b8d7827036ea8e06fe7744ba/jsch.agentproxy.usocket-nc-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.12/58697792617f38bf86d8e26bc004aac505e516a9/slf4j-api-1.7.12-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.12/8e20852d05222dc286bf1c71d78d0531e177c317/slf4j-api-1.7.12.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.svnkit-trilead-ssh2/0.0.7/6bf880e10d7678e5ac4897dab39860a87f8e0725/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.svnkit-trilead-ssh2/0.0.7/95015f649026507428aa2f37baba69ba8a86dc67/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.trilead/trilead-ssh2/1.0.0-build220/5ea5b9826536720cf3a12666ecacfb7746fde56a/trilead-ssh2-1.0.0-build220-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.trilead/trilead-ssh2/1.0.0-build220/74d96b4d15dc841140487e01734201e604dfce71/trilead-ssh2-1.0.0-build220.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.1.0/67d178949fe41ff82de6dbda7ef62d48f70e031c/jna-platform-4.1.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.1.0/23457ad1cf75c2c16763330de5565a0e67b4bc0a/jna-platform-4.1.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/28a5d592b494fe54c120c64689087e779a7bf55b/jna-4.1.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/1c12d070e602efd8021891cdd7fd18bc129372d4/jna-4.1.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.connector-factory/0.0.7/88ad6b451496a46a277f56efff1858e1ef8c7eb5/jsch.agentproxy.connector-factory-0.0.7-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.connector-factory/0.0.7/780e0312287dd4e4f3601d401a073a081e403f2d/jsch.agentproxy.connector-factory-0.0.7.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/de.regnis.q.sequence/sequence-library/1.0.3/976912257e8fb22e666a9435be20fe56438f9fd0/sequence-library-1.0.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/de.regnis.q.sequence/sequence-library/1.0.3/3bcf12fa805a735bb26369cd66c5933767c026de/sequence-library-1.0.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.sqljet/sqljet/1.1.10/5d9b195660fa3beb4bb54a102af747f4aad25b7/sqljet-1.1.10-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.sqljet/sqljet/1.1.10/ede7fbabd4c96d34e48fda0e8feced24c98cedca/sqljet-1.1.10.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.53/791359d94d6edcace686a56d0727ee093a2f7c33/jsch-0.1.53-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.53/658b682d5c817b27ae795637dfec047c63d29935/jsch-0.1.53.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.googlecode.javaewah/JavaEWAH/0.7.9/a50d78eb630e05439461f3130b94b3bcd1ea6f03/JavaEWAH-0.7.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.googlecode.javaewah/JavaEWAH/0.7.9/eceaf316a8faf0e794296ebe158ae110c7d72a5a/JavaEWAH-0.7.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.3.6/af4d76be0c46ee26b0d9d1d4a34d244a633cac84/httpclient-4.3.6-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.3.6/4c47155e3e6c9a41a28db36680b828ced53b8af4/httpclient-4.3.6.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jdt/org.eclipse.jdt.annotation/1.1.0/aaab664d7d6c398ba78864495fbaefd32c68e401/org.eclipse.jdt.annotation-1.1.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jdt/org.eclipse.jdt.annotation/1.1.0/c154cecefedc3a8f2a2752db856d8a251ecb49c9/org.eclipse.jdt.annotation-1.1.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.core/0.0.9/dc8402ed7f647c7d44057189a49b5743b02a7262/jsch.agentproxy.core-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.core/0.0.9/1af3741c3a83a71e29b8aa7637979791e50e538b/jsch.agentproxy.core-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.4/57a73190ad97f56c0cb83a6a5b6c08d5d428319b/antlr-runtime-3.4-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.4/8f011408269a8e42b8548687e137d8eeb56df4b4/antlr-runtime-3.4.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.3.3/1b0aa62a6a91e9fa00c16f0a4a2c874804ed3b1e/httpcore-4.3.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.3.3/f91b7a4aadc5cf486df6e4634748d7dd7a73f06d/httpcore-4.3.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.3/28bb0405fddaf04f15058fbfbe01fe2780d7d3b6/commons-logging-1.1.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.3/f6f66e966c70a83ffbdb6f17a0919eaf7c8aca7f/commons-logging-1.1.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.6/61e9f9d11fe3e12ec62f633006e99d75fd7f19c8/commons-codec-1.6-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.6/b7f0fc8f61ecadeb3695f0b9464755eee44374d4/commons-codec-1.6.jar" />
                           </list>
                         </option>
                         <option name="path" value="$PROJECT_DIR$/examples" />
@@ -886,37 +974,67 @@
                       <ExternalModuleBuildClasspathPojo>
                         <option name="entries">
                           <list>
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/gradle.plugin.nl.javadude.gradle.plugins/license-gradle-plugin/0.13.1/c270280ba46f95804a3aee4698725718ade3035c/license-gradle-plugin-0.13.1.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/net.nemerosa/versioning/2.0.0/86c950fcecb62f641188220fddbe44d18279d4d4/versioning-2.0.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/7841ba10ea46c9611ce702c3833ff9fccc8ae6eb/plexus-utils-2.0.5.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/b45958476a332904c1152eb590bd4764dea5dc6d/xmltool-3.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/f2c4f13c8d30e7305f3407bd4e3980f2eed8d1cf/maven-license-plugin-1.10.b1.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.ajoberstar/grgit/1.6.0/4fb4645aa835d6f62ebab2c61f803efc699cd8f/grgit-1.6.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.tmatesoft.svnkit/svnkit/1.8.12/a14959875cc8d719de98a18b95d250bb0a9ecd4b/svnkit-1.8.12.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit/4.1.1.201511131810-r/17cf7d0cb7da8bbcc16e43f0ab5dbfc43b5cb539/org.eclipse.jgit-4.1.1.201511131810-r.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit.ui/4.1.1.201511131810-r/f9900cfedc10614f55f8a020d68a40fa4557a5ab/org.eclipse.jgit.ui-4.1.1.201511131810-r.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.jsch/0.0.9/26f5c718216f1668f674816e580aa7c92f2660ad/jsch.agentproxy.jsch-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.pageant/0.0.9/7651361429af009ff18a6ea5c4e5d38ecff7f959/jsch.agentproxy.pageant-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.sshagent/0.0.9/2ecca436463287682d16c3fa628bd7cca426cf6f/jsch.agentproxy.sshagent-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-jna/0.0.9/100522438a57b4c0d15db112fc8a08d17f48080a/jsch.agentproxy.usocket-jna-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-nc/0.0.9/926fd2eb5586c779b8d7827036ea8e06fe7744ba/jsch.agentproxy.usocket-nc-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.12/8e20852d05222dc286bf1c71d78d0531e177c317/slf4j-api-1.7.12.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.svnkit-trilead-ssh2/0.0.7/95015f649026507428aa2f37baba69ba8a86dc67/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.trilead/trilead-ssh2/1.0.0-build220/74d96b4d15dc841140487e01734201e604dfce71/trilead-ssh2-1.0.0-build220.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.1.0/23457ad1cf75c2c16763330de5565a0e67b4bc0a/jna-platform-4.1.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/1c12d070e602efd8021891cdd7fd18bc129372d4/jna-4.1.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.connector-factory/0.0.7/780e0312287dd4e4f3601d401a073a081e403f2d/jsch.agentproxy.connector-factory-0.0.7.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/de.regnis.q.sequence/sequence-library/1.0.3/3bcf12fa805a735bb26369cd66c5933767c026de/sequence-library-1.0.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.tmatesoft.sqljet/sqljet/1.1.10/ede7fbabd4c96d34e48fda0e8feced24c98cedca/sqljet-1.1.10.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.53/658b682d5c817b27ae795637dfec047c63d29935/jsch-0.1.53.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.googlecode.javaewah/JavaEWAH/0.7.9/eceaf316a8faf0e794296ebe158ae110c7d72a5a/JavaEWAH-0.7.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.3.6/4c47155e3e6c9a41a28db36680b828ced53b8af4/httpclient-4.3.6.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.eclipse.jdt/org.eclipse.jdt.annotation/1.1.0/c154cecefedc3a8f2a2752db856d8a251ecb49c9/org.eclipse.jdt.annotation-1.1.0.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.core/0.0.9/1af3741c3a83a71e29b8aa7637979791e50e538b/jsch.agentproxy.core-0.0.9.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.4/8f011408269a8e42b8548687e137d8eeb56df4b4/antlr-runtime-3.4.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.3.3/f91b7a4aadc5cf486df6e4634748d7dd7a73f06d/httpcore-4.3.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.3/f6f66e966c70a83ffbdb6f17a0919eaf7c8aca7f/commons-logging-1.1.3.jar" />
-                            <option value="D:/home/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.6/b7f0fc8f61ecadeb3695f0b9464755eee44374d4/commons-codec-1.6.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/gradle.plugin.nl.javadude.gradle.plugins/license-gradle-plugin/0.13.1/c270280ba46f95804a3aee4698725718ade3035c/license-gradle-plugin-0.13.1.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.nemerosa/versioning/2.0.0/9d9a26a09f2137ff0eeb4f85968bb69962f29c8a/versioning-2.0.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.nemerosa/versioning/2.0.0/86c950fcecb62f641188220fddbe44d18279d4d4/versioning-2.0.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/9fa5995004da6efeb01122240ea3c935f0a4a33b/plexus-utils-2.0.5-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.plexus/plexus-utils/2.0.5/7841ba10ea46c9611ce702c3833ff9fccc8ae6eb/plexus-utils-2.0.5.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/562a89efa33653e5c59f5215ea83013dc4359729/xmltool-3.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.xmltool/xmltool/3.3/b45958476a332904c1152eb590bd4764dea5dc6d/xmltool-3.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/432c7d5469c2a3143691334be560f59db0d410ff/maven-license-plugin-1.10.b1-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mycila.maven-license-plugin/maven-license-plugin/1.10.b1/f2c4f13c8d30e7305f3407bd4e3980f2eed8d1cf/maven-license-plugin-1.10.b1.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ajoberstar/grgit/1.6.0/1a653c602d6af373c43049e7041214b22b46128f/grgit-1.6.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ajoberstar/grgit/1.6.0/4fb4645aa835d6f62ebab2c61f803efc699cd8f/grgit-1.6.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.svnkit/svnkit/1.8.12/97515e36051a52356a1c9b2d8b9c09fe7c51df0c/svnkit-1.8.12-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.svnkit/svnkit/1.8.12/a14959875cc8d719de98a18b95d250bb0a9ecd4b/svnkit-1.8.12.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit/4.1.1.201511131810-r/e65acfcdca36ae3cbdcbd5496648612eebe54be7/org.eclipse.jgit-4.1.1.201511131810-r-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit/4.1.1.201511131810-r/17cf7d0cb7da8bbcc16e43f0ab5dbfc43b5cb539/org.eclipse.jgit-4.1.1.201511131810-r.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit.ui/4.1.1.201511131810-r/2cc910d05bfcb90af854117ca892bbe8b875014e/org.eclipse.jgit.ui-4.1.1.201511131810-r-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jgit/org.eclipse.jgit.ui/4.1.1.201511131810-r/f9900cfedc10614f55f8a020d68a40fa4557a5ab/org.eclipse.jgit.ui-4.1.1.201511131810-r.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.jsch/0.0.9/580aea5836a0b077c285f85c4d5f80cb7070619c/jsch.agentproxy.jsch-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.jsch/0.0.9/26f5c718216f1668f674816e580aa7c92f2660ad/jsch.agentproxy.jsch-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.pageant/0.0.9/a3865d329183d51cbd6e21023d19d3eebd5df70e/jsch.agentproxy.pageant-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.pageant/0.0.9/7651361429af009ff18a6ea5c4e5d38ecff7f959/jsch.agentproxy.pageant-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.sshagent/0.0.9/19cb8705d905d218655aff43305cc8361f232fd7/jsch.agentproxy.sshagent-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.sshagent/0.0.9/2ecca436463287682d16c3fa628bd7cca426cf6f/jsch.agentproxy.sshagent-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-jna/0.0.9/2135bde834fb5fba3125c2f3aa14bcf472739c74/jsch.agentproxy.usocket-jna-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-jna/0.0.9/100522438a57b4c0d15db112fc8a08d17f48080a/jsch.agentproxy.usocket-jna-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-nc/0.0.9/bbfa3094c024cc1cffff1cef50be630d20ded605/jsch.agentproxy.usocket-nc-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.usocket-nc/0.0.9/926fd2eb5586c779b8d7827036ea8e06fe7744ba/jsch.agentproxy.usocket-nc-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.12/58697792617f38bf86d8e26bc004aac505e516a9/slf4j-api-1.7.12-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.12/8e20852d05222dc286bf1c71d78d0531e177c317/slf4j-api-1.7.12.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.svnkit-trilead-ssh2/0.0.7/6bf880e10d7678e5ac4897dab39860a87f8e0725/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.svnkit-trilead-ssh2/0.0.7/95015f649026507428aa2f37baba69ba8a86dc67/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.trilead/trilead-ssh2/1.0.0-build220/5ea5b9826536720cf3a12666ecacfb7746fde56a/trilead-ssh2-1.0.0-build220-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.trilead/trilead-ssh2/1.0.0-build220/74d96b4d15dc841140487e01734201e604dfce71/trilead-ssh2-1.0.0-build220.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.1.0/67d178949fe41ff82de6dbda7ef62d48f70e031c/jna-platform-4.1.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/4.1.0/23457ad1cf75c2c16763330de5565a0e67b4bc0a/jna-platform-4.1.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/28a5d592b494fe54c120c64689087e779a7bf55b/jna-4.1.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/4.1.0/1c12d070e602efd8021891cdd7fd18bc129372d4/jna-4.1.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.connector-factory/0.0.7/88ad6b451496a46a277f56efff1858e1ef8c7eb5/jsch.agentproxy.connector-factory-0.0.7-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.connector-factory/0.0.7/780e0312287dd4e4f3601d401a073a081e403f2d/jsch.agentproxy.connector-factory-0.0.7.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/de.regnis.q.sequence/sequence-library/1.0.3/976912257e8fb22e666a9435be20fe56438f9fd0/sequence-library-1.0.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/de.regnis.q.sequence/sequence-library/1.0.3/3bcf12fa805a735bb26369cd66c5933767c026de/sequence-library-1.0.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.sqljet/sqljet/1.1.10/5d9b195660fa3beb4bb54a102af747f4aad25b7/sqljet-1.1.10-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.tmatesoft.sqljet/sqljet/1.1.10/ede7fbabd4c96d34e48fda0e8feced24c98cedca/sqljet-1.1.10.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.53/791359d94d6edcace686a56d0727ee093a2f7c33/jsch-0.1.53-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.53/658b682d5c817b27ae795637dfec047c63d29935/jsch-0.1.53.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.googlecode.javaewah/JavaEWAH/0.7.9/a50d78eb630e05439461f3130b94b3bcd1ea6f03/JavaEWAH-0.7.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.googlecode.javaewah/JavaEWAH/0.7.9/eceaf316a8faf0e794296ebe158ae110c7d72a5a/JavaEWAH-0.7.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.3.6/af4d76be0c46ee26b0d9d1d4a34d244a633cac84/httpclient-4.3.6-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.3.6/4c47155e3e6c9a41a28db36680b828ced53b8af4/httpclient-4.3.6.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jdt/org.eclipse.jdt.annotation/1.1.0/aaab664d7d6c398ba78864495fbaefd32c68e401/org.eclipse.jdt.annotation-1.1.0-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.jdt/org.eclipse.jdt.annotation/1.1.0/c154cecefedc3a8f2a2752db856d8a251ecb49c9/org.eclipse.jdt.annotation-1.1.0.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.core/0.0.9/dc8402ed7f647c7d44057189a49b5743b02a7262/jsch.agentproxy.core-0.0.9-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch.agentproxy.core/0.0.9/1af3741c3a83a71e29b8aa7637979791e50e538b/jsch.agentproxy.core-0.0.9.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.4/57a73190ad97f56c0cb83a6a5b6c08d5d428319b/antlr-runtime-3.4-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.antlr/antlr-runtime/3.4/8f011408269a8e42b8548687e137d8eeb56df4b4/antlr-runtime-3.4.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.3.3/1b0aa62a6a91e9fa00c16f0a4a2c874804ed3b1e/httpcore-4.3.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.3.3/f91b7a4aadc5cf486df6e4634748d7dd7a73f06d/httpcore-4.3.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.3/28bb0405fddaf04f15058fbfbe01fe2780d7d3b6/commons-logging-1.1.3-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.1.3/f6f66e966c70a83ffbdb6f17a0919eaf7c8aca7f/commons-logging-1.1.3.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.6/61e9f9d11fe3e12ec62f633006e99d75fd7f19c8/commons-codec-1.6-sources.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.6/b7f0fc8f61ecadeb3695f0b9464755eee44374d4/commons-codec-1.6.jar" />
                           </list>
                         </option>
                         <option name="path" value="$PROJECT_DIR$/slf4j-toys" />
@@ -928,138 +1046,141 @@
               <option name="name" value="examples" />
               <option name="projectBuildClasspath">
                 <list>
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/announce" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/antlr" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/base-services" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/base-services-groovy" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/build-comparison" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/build-init" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/cli" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/code-quality" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/composite-builds" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/core" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/dependency-management" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/diagnostics" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ear" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ide" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ide-native" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ide-play" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/installation-beacon" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/internal-android-performance-testing" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/internal-integ-testing" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/internal-performance-testing" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/internal-testing" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ivy" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/jacoco" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/javascript" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/jetty" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/jvm-services" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-groovy" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-java" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-jvm" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-native" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/language-scala" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/launcher" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/logging" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/maven" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/messaging" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/model-core" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/model-groovy" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/native" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/open-api" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/osgi" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/platform-base" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/platform-jvm" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/platform-native" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/platform-play" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/plugin-development" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/plugin-use" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/plugins" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/process-services" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/publish" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/reporting" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/resources" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/resources-http" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/resources-s3" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/resources-sftp" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/scala" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/signing" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/task-cache-http" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/test-kit" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/testing-base" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/testing-jvm" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/testing-native" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/tooling-api" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/tooling-api-builders" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/ui" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/src/wrapper" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/ant-1.9.6.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/ant-launcher-1.9.6.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-base-services-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-base-services-groovy-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-cli-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-core-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-docs-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-installation-beacon-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-jvm-services-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-launcher-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-logging-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-messaging-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-model-core-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-model-groovy-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-native-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-open-api-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-process-services-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-resources-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-script-kotlin-0.3.2.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-tooling-api-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-ui-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/gradle-wrapper-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/groovy-all-2.4.7.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-announce-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-antlr-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-build-comparison-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-build-init-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-code-quality-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-composite-builds-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-dependency-management-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-diagnostics-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ear-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ide-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ide-native-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ide-play-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-ivy-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-jacoco-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-javascript-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-jetty-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-groovy-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-java-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-jvm-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-native-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-language-scala-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-maven-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-osgi-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-platform-base-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-platform-jvm-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-platform-native-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-platform-play-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-plugin-development-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-plugin-use-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-plugins-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-publish-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-reporting-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-resources-http-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-resources-s3-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-resources-sftp-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-scala-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-signing-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-task-cache-http-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-test-kit-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-testing-base-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-testing-jvm-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-testing-native-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/gradle-tooling-api-builders-3.1.jar" />
-                  <option value="D:/home/.gradle/wrapper/dists/gradle-3.1-all/7v522598rw1b93jkcneehqz1n/gradle-3.1/lib/plugins/ivy-2.2.0.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/announce" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/antlr" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/base-services" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/base-services-groovy" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/build-cache-http" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/build-comparison" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/build-init" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/cli" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/code-quality" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/composite-builds" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/core" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/dependency-management" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/diagnostics" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/ear" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/ide" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/ide-native" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/ide-play" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/installation-beacon" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/internal-android-performance-testing" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/internal-integ-testing" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/internal-performance-testing" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/internal-testing" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/ivy" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/jacoco" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/javascript" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/jetty" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/jvm-services" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/language-groovy" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/language-java" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/language-jvm" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/language-native" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/language-scala" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/launcher" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/logging" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/maven" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/messaging" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/model-core" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/model-groovy" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/native" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/open-api" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/osgi" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/platform-base" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/platform-jvm" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/platform-native" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/platform-play" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/plugin-development" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/plugin-use" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/plugins" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/process-services" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/publish" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/reporting" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/resources" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/resources-http" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/resources-s3" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/resources-sftp" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/scala" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/signing" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/test-kit" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/testing-base" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/testing-jvm" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/testing-native" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/tooling-api" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/tooling-api-builders" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/ui" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/workers" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/src/wrapper" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/ant-1.9.6.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/ant-launcher-1.9.6.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-base-services-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-base-services-groovy-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-cli-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-core-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-docs-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-installation-beacon-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-jvm-services-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-launcher-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-logging-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-messaging-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-model-core-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-model-groovy-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-native-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-open-api-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-process-services-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-resources-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-script-kotlin-0.5.1.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-tooling-api-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-ui-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-version-info-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/gradle-wrapper-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/groovy-all-2.4.7.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-announce-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-antlr-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-build-cache-http-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-build-comparison-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-build-init-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-code-quality-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-composite-builds-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-dependency-management-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-diagnostics-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-ear-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-ide-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-ide-native-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-ide-play-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-ivy-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-jacoco-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-javascript-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-jetty-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-language-groovy-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-language-java-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-language-jvm-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-language-native-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-language-scala-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-maven-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-osgi-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-platform-base-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-platform-jvm-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-platform-native-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-platform-play-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-plugin-development-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-plugin-use-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-plugins-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-publish-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-reporting-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-resources-http-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-resources-s3-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-resources-sftp-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-scala-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-signing-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-test-kit-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-testing-base-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-testing-jvm-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-testing-native-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-tooling-api-builders-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/gradle-workers-3.4.jar" />
+                  <option value="$USER_HOME$/.gradle/wrapper/dists/gradle-3.4-all/8n0mmxprpkjm7s06z5gxlyk31/gradle-3.4/lib/plugins/ivy-2.2.0.jar" />
                   <option value="$PROJECT_DIR$/buildSrc/src/main/java" />
                   <option value="$PROJECT_DIR$/buildSrc/src/main/groovy" />
                 </list>
@@ -1078,7 +1199,6 @@
       <list>
         <option value="$PROJECT_DIR$/slf4j-toys/build.gradle" />
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java" />
-        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerConfig.java" />
         <option value="$PROJECT_DIR$/build.gradle" />
@@ -1089,9 +1209,13 @@
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java" />
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java" />
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java" />
-        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java" />
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java" />
         <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java" />
+        <option value="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportContextListener.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java" />
+        <option value="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java" />
       </list>
     </option>
   </component>
@@ -1102,10 +1226,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
+    <option name="x" value="55" />
     <option name="y" value="-8" />
-    <option name="width" value="1296" />
-    <option name="height" value="1000" />
+    <option name="width" value="1873" />
+    <option name="height" value="1096" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -1124,12 +1248,15 @@
             <id>General</id>
           </State>
           <State>
+            <id>Initialization issuesJava</id>
+          </State>
+          <State>
             <id>Java</id>
           </State>
         </expanded-state>
         <selected-state>
           <State>
-            <id>SuppressionAnnotation</id>
+            <id>Initialization issuesJava</id>
           </State>
         </selected-state>
       </profile-state>
@@ -1137,7 +1264,7 @@
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
-    <navigator currentView="Scope" currentSubView="Project Files" proportions="" version="1">
+    <navigator currentView="PackagesPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -1151,7 +1278,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="PackagesPane">
         <subPane>
           <PATH>
@@ -1170,32 +1296,51 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleGroupNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys_main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys-root" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleGroupNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys_main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-toys-root" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="examples" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleGroupNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
             <PATH_ELEMENT>
               <option name="myItemId" value="slf4j-toys-root" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="slf4j-toys" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="slf4j-toys-root" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="slf4j-toys" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="slf4j-toys" />
@@ -1215,76 +1360,6 @@
               <option name="myItemId" value="" />
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys-root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys-root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="build">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="tmp">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys-root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="build">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT USER_OBJECT="Root">
@@ -1292,20 +1367,6 @@
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
             <PATH_ELEMENT USER_OBJECT="slf4j-toys">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="slf4j-toys_main">
               <option name="myItemId" value="" />
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
@@ -1319,8 +1380,9 @@
     <property name="js.eslint.eslintPackage" value="" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.37009543" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -1493,6 +1555,11 @@
       <updated>1488740783947</updated>
       <workItem from="1488740785281" duration="3455000" />
       <workItem from="1488748728475" duration="2843000" />
+      <workItem from="1488807159442" duration="578000" />
+      <workItem from="1488807771817" duration="82000" />
+      <workItem from="1488807876931" duration="76000" />
+      <workItem from="1488807985979" duration="335000" />
+      <workItem from="1488808667648" duration="489000" />
     </task>
     <task id="LOCAL-00001" summary="[bld] Enable Jacoco code coverage">
       <created>1488743200471</created>
@@ -1512,21 +1579,21 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6298000" />
+    <option name="totallyTimeSpent" value="7858000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1296" height="1000" extended-state="7" />
+    <frame x="55" y="-8" width="1873" height="1096" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="FindBugs-IDEA" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29726517" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="CheckStyle" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27022654" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Inspection Results" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32936978" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26979" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection Results" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32928064" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32928804" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1534,11 +1601,12 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936978" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32928064" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="CheckStyle" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
@@ -1616,11 +1684,91 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="595">
+          <caret line="35" column="4" lean-forward="false" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="4" />
+          <folding>
+            <marker date="1488807065115" expanded="false" signature="0:2" ph="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="40" column="4" lean-forward="true" selection-start-line="40" selection-start-column="4" selection-end-line="40" selection-end-column="4" />
+          <folding>
+            <marker date="1488807065146" expanded="false" signature="0:2" ph="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="24" column="37" lean-forward="false" selection-start-line="24" selection-start-column="37" selection-end-line="24" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="33" column="13" lean-forward="false" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="26" column="12" lean-forward="false" selection-start-line="26" selection-start-column="12" selection-end-line="26" selection-end-column="12" />
+          <folding>
+            <marker date="1488807065068" expanded="false" signature="0:2" ph="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3502">
+          <caret line="241" column="18" lean-forward="false" selection-start-line="241" selection-start-column="18" selection-end-line="241" selection-end-column="18" />
+          <folding>
+            <marker date="1488807065146" expanded="false" signature="0:2" ph="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding>
+            <marker date="1488807065115" expanded="false" signature="0:2" ph="/**...*/" />
+            <marker date="1488807065115" expanded="true" signature="2679:2682" ph="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="405">
           <caret line="27" column="4" lean-forward="false" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1628,7 +1776,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
           <caret line="26" column="42" lean-forward="false" selection-start-line="26" selection-start-column="42" selection-end-line="26" selection-end-column="42" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1636,7 +1783,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1644,58 +1790,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-4315">
           <caret line="31" column="13" lean-forward="false" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/build/reports/jacoco/test/html/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="55" lean-forward="true" selection-start-line="0" selection-start-column="55" selection-end-line="0" selection-end-column="55" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="4" lean-forward="false" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/build/reports/jacoco/test/html/index.html" />
     <entry file="file://$PROJECT_DIR$/.idea/gradle.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-15">
-          <caret line="0" column="2" lean-forward="false" selection-start-line="0" selection-start-column="2" selection-end-line="0" selection-end-column="2" />
-          <folding>
-            <marker date="1488760368016" expanded="false" signature="651:700" ph="..." />
-            <marker date="1488760368016" expanded="true" signature="1480:1487" ph="{...}" />
-            <marker date="1488760368016" expanded="false" signature="1611:1622" ph=" { " />
-            <marker date="1488760368016" expanded="false" signature="1641:1647" ph=" }" />
-            <marker date="1488760368016" expanded="false" signature="1752:1763" ph=" { " />
-            <marker date="1488760368016" expanded="false" signature="1784:1790" ph=" }" />
-            <marker date="1488760368016" expanded="false" signature="1880:1891" ph=" { " />
-            <marker date="1488760368016" expanded="false" signature="1908:1914" ph=" }" />
-            <marker date="1488760368016" expanded="false" signature="2047:2058" ph=" { " />
-            <marker date="1488760368016" expanded="false" signature="2079:2085" ph=" }" />
-            <marker date="1488760368016" expanded="false" signature="2396:2407" ph=" { " />
-            <marker date="1488760368016" expanded="false" signature="2419:2425" ph=" }" />
-            <marker date="1488760368016" expanded="true" signature="3620:3918" ph="{...}" />
-            <marker date="1488760368016" expanded="false" signature="3968:3979" ph=" { " />
-            <marker date="1488760368016" expanded="false" signature="3998:4004" ph=" }" />
-            <marker date="1488760368016" expanded="true" signature="4373:5256" ph="{...}" />
-            <marker date="1488760368016" expanded="true" signature="5664:6642" ph="{...}" />
-            <marker date="1488760368016" expanded="true" signature="8571:9229" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1703,7 +1805,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1711,7 +1812,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1719,12 +1819,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1488760368152" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488760368152" expanded="true" signature="687:1053" ph="/**...*/" />
-            <marker date="1488760368152" expanded="true" signature="1086:1906" ph="/**...*/" />
-            <marker date="1488760368152" expanded="true" signature="2038:2656" ph="/**...*/" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1732,15 +1826,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1488760368193" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488760368193" expanded="false" signature="642:691" ph="..." />
-            <marker date="1488760368193" expanded="true" signature="693:903" ph="/**...*/" />
-            <marker date="1488760368193" expanded="true" signature="974:1031" ph="{...}" />
-            <marker date="1488760368193" expanded="true" signature="1101:1126" ph="{...}" />
-            <marker date="1488760368193" expanded="true" signature="1199:1224" ph="{...}" />
-            <marker date="1488760368193" expanded="true" signature="1327:1352" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1748,17 +1833,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1488760368300" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488760368300" expanded="false" signature="642:827" ph="..." />
-            <marker date="1488760368300" expanded="true" signature="829:969" ph="/**...*/" />
-            <marker date="1488760368300" expanded="true" signature="1022:1058" ph="{...}" />
-            <marker date="1488760368300" expanded="true" signature="1064:1337" ph="/**...*/" />
-            <marker date="1488760368300" expanded="true" signature="1428:1643" ph="/**...*/" />
-            <marker date="1488760368300" expanded="true" signature="1686:1942" ph="{...}" />
-            <marker date="1488760368300" expanded="false" signature="1730:1837" ph="(command) → { " />
-            <marker date="1488760368300" expanded="false" signature="1851:1875" ph=" }" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1766,14 +1840,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1488760368383" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488760368383" expanded="true" signature="689:1033" ph="/**...*/" />
-            <marker date="1488760368383" expanded="false" signature="1034:1065" ph="/CanBeFinal/" />
-            <marker date="1488760368383" expanded="true" signature="1100:1173" ph="/**...*/" />
-            <marker date="1488760368383" expanded="true" signature="1268:1810" ph="/**...*/" />
-            <marker date="1488760368383" expanded="true" signature="1926:2557" ph="/**...*/" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1781,10 +1847,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1488760490530" expanded="true" signature="146559:146576" ph="..." />
-            <marker date="1488760490530" expanded="true" signature="146559:146607" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1792,14 +1854,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
           <caret line="29" column="3" lean-forward="false" selection-start-line="29" selection-start-column="3" selection-end-line="29" selection-end-column="3" />
-          <folding>
-            <marker date="1488760368071" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488760368071" expanded="false" signature="642:810" ph="..." />
-            <marker date="1488760368071" expanded="true" signature="812:1234" ph="/**...*/" />
-            <marker date="1488760368071" expanded="true" signature="1297:1333" ph="{...}" />
-            <marker date="1488760368071" expanded="true" signature="1339:1797" ph="/**...*/" />
-            <marker date="1488760368071" expanded="true" signature="1900:2490" ph="/**...*/" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1807,7 +1861,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1815,16 +1868,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
           <caret line="26" column="3" lean-forward="false" selection-start-line="26" selection-start-column="3" selection-end-line="26" selection-end-column="3" />
-          <folding>
-            <marker date="1488759684383" expanded="true" signature="0:603" ph="/**...*/" />
-            <marker date="1488759684383" expanded="false" signature="651:832" ph="..." />
-            <marker date="1488759684383" expanded="true" signature="834:862" ph="/**...*/" />
-            <marker date="1488759684383" expanded="true" signature="907:1115" ph="{...}" />
-            <marker date="1488759684383" expanded="false" signature="1242:1253" ph=" { " />
-            <marker date="1488759684383" expanded="false" signature="1264:1270" ph=" }" />
-            <marker date="1488759684383" expanded="true" signature="1307:1515" ph="{...}" />
-            <marker date="1488759684383" expanded="true" signature="1556:1685" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1832,19 +1875,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="25" column="3" lean-forward="false" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
-          <folding>
-            <marker date="1488759684377" expanded="false" signature="0:603" ph="/**...*/" />
-            <marker date="1488759684377" expanded="false" signature="651:800" ph="..." />
-            <marker date="1488759684377" expanded="true" signature="802:830" ph="/**...*/" />
-            <marker date="1488759684377" expanded="true" signature="952:1549" ph="{...}" />
-            <marker date="1488759684377" expanded="true" signature="1600:1738" ph="{...}" />
-            <marker date="1488759684377" expanded="true" signature="1775:1994" ph="{...}" />
-            <marker date="1488759684377" expanded="true" signature="2031:2181" ph="{...}" />
-            <marker date="1488759684377" expanded="true" signature="2249:2402" ph="{...}" />
-            <marker date="1488759684377" expanded="false" signature="2356:2371" ph=" { " />
-            <marker date="1488759684377" expanded="false" signature="2386:2396" ph=" }" />
-            <marker date="1488759684377" expanded="true" signature="2467:2651" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1852,7 +1882,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="422">
           <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1860,9 +1889,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
           <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#2298#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1870,7 +1896,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="326">
           <caret line="39" column="22" lean-forward="false" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1878,7 +1903,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1886,27 +1910,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="62" column="22" lean-forward="false" selection-start-line="62" selection-start-column="22" selection-end-line="62" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#5080#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="75" column="23" lean-forward="false" selection-start-line="75" selection-start-column="23" selection-end-line="75" selection-end-column="23" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="150" column="16" lean-forward="false" selection-start-line="150" selection-start-column="16" selection-end-line="150" selection-end-column="16" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1914,104 +1917,175 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="141" column="58" lean-forward="false" selection-start-line="141" selection-start-column="58" selection-end-line="141" selection-end-column="58" />
-          <folding>
-            <element signature="e#854#882#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/PatternDefinition.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="34" column="175" lean-forward="false" selection-start-line="34" selection-start-column="175" selection-end-line="34" selection-end-column="175" />
-          <folding />
+        <state relative-caret-position="306">
+          <caret line="33" column="63" lean-forward="false" selection-start-line="33" selection-start-column="63" selection-end-line="33" selection-end-column="63" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-283">
+        <state relative-caret-position="204">
           <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
           <folding>
-            <element signature="e#0#2824#0" expanded="true" />
+            <marker date="1488807065115" expanded="false" signature="0:2" ph="/**...*/" />
+            <marker date="1488807065115" expanded="true" signature="2679:2682" ph="/**...*/" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
+        <state relative-caret-position="17">
           <caret line="35" column="4" lean-forward="false" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="4" />
           <folding>
-            <element signature="e#0#2654#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="40" column="7" lean-forward="false" selection-start-line="40" selection-start-column="7" selection-end-line="40" selection-end-column="7" />
-          <folding>
-            <element signature="e#0#3582#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="24" column="37" lean-forward="false" selection-start-line="24" selection-start-column="37" selection-end-line="24" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#4133#0" expanded="true" />
+            <marker date="1488807065115" expanded="false" signature="0:2" ph="/**...*/" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="33" column="13" lean-forward="false" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#1395#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="238">
+          <caret line="32" column="0" lean-forward="false" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherData.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
+        <state relative-caret-position="187">
+          <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="899">
+          <caret line="242" column="18" lean-forward="false" selection-start-line="242" selection-start-column="18" selection-end-line="242" selection-end-column="18" />
           <folding>
-            <element signature="e#0#2466#0" expanded="true" />
+            <marker date="1488807065146" expanded="false" signature="0:2" ph="/**...*/" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/ToCSV.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="26" column="12" lean-forward="false" selection-start-line="26" selection-start-column="12" selection-end-line="26" selection-end-column="12" />
+        <state relative-caret-position="170">
+          <caret line="28" column="9" lean-forward="false" selection-start-line="28" selection-start-column="9" selection-end-line="28" selection-end-column="9" />
           <folding>
-            <element signature="e#728#774#0" expanded="true" />
+            <marker date="1488807065068" expanded="false" signature="0:2" ph="/**...*/" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/Reporter.java">
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/SystemConfig.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="241" column="18" lean-forward="false" selection-start-line="241" selection-start-column="18" selection-end-line="241" selection-end-column="18" />
+        <state relative-caret-position="425">
+          <caret line="39" column="0" lean-forward="false" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+          <folding>
+            <marker date="1488807065146" expanded="false" signature="0:2" ph="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="27" column="4" lean-forward="false" selection-start-line="27" selection-start-column="4" selection-end-line="27" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Markers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="17" column="16" lean-forward="false" selection-start-line="17" selection-start-column="16" selection-end-line="17" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventWriter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="202">
+          <caret line="39" column="42" lean-forward="false" selection-start-line="39" selection-start-column="42" selection-end-line="39" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/ReportContextListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="38" column="37" lean-forward="false" selection-start-line="38" selection-start-column="37" selection-end-line="38" selection-end-column="37" />
+          <folding>
+            <element signature="e#1154#1155#0" expanded="true" />
+            <element signature="e#1222#1223#0" expanded="true" />
+            <element signature="e#1349#1350#0" expanded="true" />
+            <element signature="e#1386#1387#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="317" column="15" lean-forward="false" selection-start-line="317" selection-start-column="15" selection-end-line="317" selection-end-column="15" />
+          <folding>
+            <element signature="e#0#12322#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="202">
+          <caret line="45" column="16" lean-forward="false" selection-start-line="45" selection-start-column="16" selection-end-line="45" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/report/JdbcConnectionReporter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="44" column="20" lean-forward="false" selection-start-line="44" selection-start-column="20" selection-end-line="44" selection-end-column="20" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="1084" column="4" lean-forward="false" selection-start-line="1084" selection-start-column="4" selection-end-line="1084" selection-end-column="4" />
+        <state relative-caret-position="211">
+          <caret line="87" column="33" lean-forward="false" selection-start-line="87" selection-start-column="33" selection-end-line="87" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/MeterData.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="105" column="34" lean-forward="false" selection-start-line="105" selection-start-column="34" selection-end-line="105" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="43" column="54" lean-forward="false" selection-start-line="43" selection-start-column="54" selection-end-line="43" selection-end-column="54" />
           <folding>
-            <element signature="e#49645#49682#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2068,11 +2142,12 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>slf4j-toys|slf4j-toys</last-edited>
+          <last-edited>slf4j-toys-root</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
                 <option value="0.37009543" />
+                <option value="0.5" />
               </list>
             </option>
           </splitter-proportions>
