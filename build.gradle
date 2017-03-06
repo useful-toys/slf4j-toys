@@ -33,5 +33,9 @@ allprojects {
 
         header rootProject.file('license-header.txt')
         strictCheck true
+        include '**/*.java'
+        mapping {
+            java = 'SLASHSTAR_STYLE'
+        }
     }
 }
