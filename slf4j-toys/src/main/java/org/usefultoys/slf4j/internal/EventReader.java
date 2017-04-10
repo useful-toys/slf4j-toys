@@ -186,7 +186,7 @@ public class EventReader {
         try {
             final String str = readString();
             if (str.isEmpty()) {
-                return 0F;
+                return 0.0;
             }
             return Double.parseDouble(str);
         } catch (final NumberFormatException e) {
