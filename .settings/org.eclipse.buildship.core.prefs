@@ -1,8 +1,8 @@
 connection.arguments=
-connection.gradle.distribution=GRADLE_DISTRIBUTION(LOCAL_INSTALLATION(K\:\\build\\gradle-3.3))
+connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
 connection.java.home=null
 connection.jvm.arguments=
-connection.project.dir=
+connection.project.dir=examples
 derived.resources=.gradle,build
 eclipse.preferences.version=1
 project.path=\:
