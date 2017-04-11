@@ -47,4 +47,5 @@ public class MeterConfig {
     public static boolean printCategory = Config.getProperty("slf4jtoys.meter.print.category", false);
 
     public static String dataPrefix = Config.getProperty("slf4jtoys.meter.data.prefix", "");
+    public static String dataSuffix = Config.getProperty("slf4jtoys.meter.data.suffix", "");
 }

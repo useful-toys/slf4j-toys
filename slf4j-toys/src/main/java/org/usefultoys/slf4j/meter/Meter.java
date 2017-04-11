@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import static org.usefultoys.slf4j.meter.MeterConfig.dataPrefix;
+import static org.usefultoys.slf4j.meter.MeterConfig.dataSuffix;
 
 /**
  * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call {@link #start()} to produce a
@@ -99,9 +100,10 @@ public class Meter extends MeterData implements Closeable {
     public Meter(final Logger logger) {
         this.sessionUuid = Session.uuid;
         this.logger = logger;
-        this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName());
+        this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
         this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
-        this.julDataLogger = java.util.logging.Logger.getLogger(dataPrefix + logger.getName());
+        this.julDataLogger = java.util.logging.Logger.getLogger(dataPrefix + logger.getName() + dataSuffix);
+        this.eventParent = null;
         this.eventCategory = logger.getName();
         this.eventName = null;
         eventCounterByName.putIfAbsent(this.eventCategory, new AtomicLong(0));
@@ -114,22 +116,23 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Creates a new meter. Events produced by this meter will use the logger name as event category.
      *
-     * @param logger Logger that reports messages.
+     * @param logger        Logger that reports messages.
      * @param operationName Additional identification to distinguish operations reported on the same logger.
      */
     public Meter(final Logger logger, final String operationName) {
         this.sessionUuid = Session.uuid;
         this.logger = logger;
-        this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName());
+        this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
         this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
-        this.julDataLogger = java.util.logging.Logger.getLogger(dataPrefix + logger.getName());
+        this.julDataLogger = java.util.logging.Logger.getLogger(dataPrefix + logger.getName() + dataSuffix);
+        this.eventParent = null;
         this.eventCategory = logger.getName();
+        this.eventName = operationName;
         final String index = this.eventCategory + "/" + operationName;
         eventCounterByName.putIfAbsent(index, new AtomicLong(0));
         final AtomicLong atomicLong = eventCounterByName.get(index);
         atomicLong.compareAndSet(Long.MAX_VALUE, 0);
         this.eventPosition = atomicLong.incrementAndGet();
-        this.eventName = operationName;
         this.createTime = System.nanoTime();
     }
 
@@ -153,6 +156,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+
     /**
      * Creates a new Meter whose name is under the hierarchy of this meter. Useful if a large task may be subdivided into smaller task and reported
      * individually. The new meter uses the name of this meter appended by dot and its own name, similar as logger do.
@@ -166,6 +170,7 @@ public class Meter extends MeterData implements Closeable {
             logger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "sub(name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
         }
         final Meter m = new Meter(logger, eventName == null ? suboperationName : eventName + '/' + suboperationName);
+        m.eventParent = this.getFullID();
         if (this.context != null) {
             m.context = new HashMap<String, String>(this.context);
         }
@@ -173,6 +178,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+
     /**
      * Configures the meter with a human readable message that explains the task's purpose.
      *
@@ -192,7 +198,7 @@ public class Meter extends MeterData implements Closeable {
      * Configures the meter with a human readable message that explains the task's purpose.
      *
      * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)})
-     * @param args message arguments
+     * @param args   message arguments
      * @return reference to the meter itself.
      */
     public Meter m(final String format, final Object... args) {
@@ -246,6 +252,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+
     /**
      * Adds an entry to the context map. The entry has no value and is interpreted as a marker.
      *
@@ -269,7 +276,7 @@ public class Meter extends MeterData implements Closeable {
      * Adds an entry to the context map if conditions is true. The entry has no value and is interpreted as a marker.
      *
      * @param condition the condition
-     * @param trueName key of the entry to add if conditions is true
+     * @param trueName  key of the entry to add if conditions is true
      * @return reference to the meter itself.
      */
     public Meter ctx(final boolean condition, final String trueName) {
@@ -292,7 +299,7 @@ public class Meter extends MeterData implements Closeable {
      * Adds an entry to the context map if conditions is true or false. The entry has no value and is interpreted as a marker.
      *
      * @param condition the condition
-     * @param trueName key of the entry to add if conditions is true
+     * @param trueName  key of the entry to add if conditions is true
      * @param falseName key of the entry to add if conditions is true
      * @return reference to the meter itself.
      */
@@ -324,7 +331,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -344,7 +351,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -364,7 +371,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -384,7 +391,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -404,7 +411,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -424,7 +431,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -444,7 +451,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -464,7 +471,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -484,7 +491,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -504,7 +511,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -524,7 +531,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name   key of the entry to add.
      * @param object object which string representation is used for the value of the entry to add
      * @return reference to the meter itself.
      */
@@ -544,7 +551,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map.
      *
-     * @param name key of the entry to add.
+     * @param name  key of the entry to add.
      * @param value value of the entry to add.
      * @return reference to the meter itself.
      */
@@ -564,10 +571,10 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Adds an entry to the context map. The entry value is made up of a formatted message with arguments.
      *
-     * @param name key of the entry to add.
+     * @param name   key of the entry to add.
      * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)
-     * })
-     * @param args message arguments
+     *               })
+     * @param args   message arguments
      * @return reference to the meter itself.
      */
     public Meter ctx(final String name, final String format, final Object... args) {
@@ -608,6 +615,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+
     /**
      * Notifies the meter in order to claim immediate execution start of the task represented by the meter. Sends a message to logger using debug
      * level. Sends a message with system status and partial context to log using trace level.
@@ -655,6 +663,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+
     /**
      * Notifies the meter that one more iteration or step completed that make up the task successfully.
      *
@@ -1014,6 +1023,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+
     /**
      * Refuses the meter in order to claim incomplete or inconsistent execution of the task represented by the meter. Sends a message with the the
      * exception to logger using warn level. Sends a message with system status, statistics and complete context to log using trace level.
@@ -1077,6 +1087,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+
     /**
      * Checks if meters the meter has been forgotten to be confirmed or refused. Useful to track those meters that do not follow the start(),
      * ok()/fail() idiom for all execution flows
@@ -1144,6 +1155,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+
     /**
      * Compliance with {@link Closeable}. Assumes failure and refuses the meter if the meter has not yet been marked as confirmed.
      */
