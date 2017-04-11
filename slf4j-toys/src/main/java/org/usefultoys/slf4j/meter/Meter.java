@@ -160,8 +160,8 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Creates a new Meter whose name is under the hierarchy of this meter. Useful if a large task may be subdivided into smaller task and reported
-     * individually. The new meter uses the name of this meter appended by dot and its own name, similar as logger do.
+     * Creates a new Meter whose name is subordinated under the hierarchy of this meter. Useful if a large task may be subdivided into smaller task and reported
+     * individually. The new meter uses the category of this meter. The new meter uses a name of the this meter, appended by slash and its own name.
      *
      * @param suboperationName Additional identification appended to this logger name.
      * @return The new Meter
