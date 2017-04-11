@@ -15,12 +15,12 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.junit.Test;
+
 import java.util.HashMap;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
 
 /**
  * @author Daniel
@@ -183,8 +183,8 @@ public class MeterDataTest {
 
     @Test
     public void equalsHashTest() {
-        final MeterData a = createMeterData();
-        final MeterData b = createMeterData();
+        final MeterDataMock a = createMeterData();
+        final MeterDataMock b = createMeterData();
 
         assertTrue(a.equals(b));
         assertTrue(b.equals(a));

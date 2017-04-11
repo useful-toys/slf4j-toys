@@ -56,18 +56,6 @@ public abstract class EventData implements Serializable {
         return eventPosition;
     }
 
-    public void setEventPosition(long eventPosition) {
-        this.eventPosition = eventPosition;
-    }
-
-    public void setSessionUuid(String sessionUuid) {
-        this.sessionUuid = sessionUuid;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
-
     /**
      * @return Timestamp when the event data was collected.
      */
