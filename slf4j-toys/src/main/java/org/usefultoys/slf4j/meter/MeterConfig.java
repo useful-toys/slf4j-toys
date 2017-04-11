@@ -45,4 +45,6 @@ public class MeterConfig {
      * runtime.
      */
     public static boolean printCategory = Config.getProperty("slf4jtoys.meter.print.category", false);
+
+    public static String dataPrefix = Config.getProperty("slf4jtoys.meter.data.prefix", "data.");
 }

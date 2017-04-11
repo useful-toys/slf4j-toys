@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/examples/examples.iml" filepath="$PROJECT_DIR$/.idea/modules/examples/examples.iml" group="examples" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/examples/examples_main.iml" filepath="$PROJECT_DIR$/.idea/modules/examples/examples_main.iml" group="examples" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" filepath="$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" group="examples" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys.iml" filepath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys.iml" group="slf4j-toys" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/slf4j-toys-root.iml" filepath="$PROJECT_DIR$/.idea/modules/slf4j-toys-root.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_main.iml" filepath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_main.iml" group="slf4j-toys" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_test.iml" filepath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_test.iml" group="slf4j-toys" />

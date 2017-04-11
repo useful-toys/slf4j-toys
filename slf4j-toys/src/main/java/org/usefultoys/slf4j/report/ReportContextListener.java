@@ -33,12 +33,13 @@ public class ReportContextListener implements javax.servlet.ServletContextListen
 
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
-        new Reporter().logDefaultReports(new Executor() {
-            @Override
-            public void execute(Runnable command) {
-                command.run();
-            }
-        });
+        new Reporter().logDefaultReports(new ExecutorImpl());
     }
 
+    private static class ExecutorImpl implements Executor {
+        @Override
+        public void execute(Runnable command) {
+            command.run();
+        }
+    }
 }
