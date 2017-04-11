@@ -756,7 +756,7 @@ public class Meter extends MeterData implements Closeable {
                             } else {
                                 dataLogger.trace(Markers.DATA_SLOW_PROGRESS, message2);
                             }
-                        } else if (logger.isTraceEnabled()) {
+                        } else if (dataLogger.isTraceEnabled()) {
                             if (hackJulEnable) {
                                 julDataLogger.log(progressTraceStatusLogRecord(Markers.DATA_PROGRESS, message2));
                             } else {
