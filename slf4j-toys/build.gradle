@@ -7,7 +7,7 @@ group = 'org.usefultoys'
 version = '1.6.1'
 
 compileJava.options.encoding = 'UTF-8'
-compileJava.options.debug = false
+//compileJava.options.debug = false
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
     
