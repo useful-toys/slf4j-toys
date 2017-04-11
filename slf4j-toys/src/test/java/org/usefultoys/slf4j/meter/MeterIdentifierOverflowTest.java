@@ -26,7 +26,6 @@ import org.slf4j.impl.TestLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
 
 /**
- *
  * @author Daniel
  */
 public class MeterIdentifierOverflowTest {
@@ -34,43 +33,43 @@ public class MeterIdentifierOverflowTest {
     final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterName);
 
     public MeterIdentifierOverflowTest() {
-	}
+    }
 
-	@BeforeClass
-	public static void configureMeterSettings() {
-		System.setProperty("slf4jtoys.meter.progress.period", "0ms");
-	}
+    @BeforeClass
+    public static void configureMeterSettings() {
+        System.setProperty("slf4jtoys.meter.progress.period", "0ms");
+    }
 
     @Before
     public void clearEvents() {
         logger.clearEvents();
     }
 
-	@Test
-	public void testResetImpl() {
-		Meter.eventCounterByName.put(meterName, new AtomicLong(Long.MAX_VALUE - 2));
+    @Test
+    public void testResetImpl() {
+        Meter.eventCounterByName.put(meterName, new AtomicLong(Long.MAX_VALUE - 2));
 
-		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 4, Long.MAX_VALUE - 1);
-		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 8, Long.MAX_VALUE);
-		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 12, 1);
-		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 16, 2);
-		assertEvents(MeterFactory.getMeter(meterName).start().ok(), 20, 3);
-	}
+        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 4, Long.MAX_VALUE - 1);
+        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 8, Long.MAX_VALUE);
+        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 12, 1);
+        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 16, 2);
+        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 20, 3);
+    }
 
-	private void assertEvents(Meter m, int expectedMessageCount, long expectedEventPosition) {
+    private void assertEvents(Meter m, int expectedMessageCount, long expectedEventPosition) {
         Assert.assertEquals(expectedEventPosition, m.getEventPosition());
         Assert.assertEquals(null, m.getEventName());
         Assert.assertEquals(meterName, m.getEventCategory());
-        final TestLoggerEvent startEvent = logger.getEvent(expectedMessageCount-4);
-        final TestLoggerEvent startDataEvent = logger.getEvent(expectedMessageCount-3);
-        final TestLoggerEvent stopEvent = logger.getEvent(expectedMessageCount-2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(expectedMessageCount-1);
+        final TestLoggerEvent startEvent = logger.getEvent(expectedMessageCount - 4);
+        final TestLoggerEvent startDataEvent = logger.getEvent(expectedMessageCount - 3);
+        final TestLoggerEvent stopEvent = logger.getEvent(expectedMessageCount - 2);
+        final TestLoggerEvent stopDataEvent = logger.getEvent(expectedMessageCount - 1);
 
-        String str = "#="+Long.toString(expectedEventPosition);
+        String str = "#=" + Long.toString(expectedEventPosition);
         Assert.assertEquals(expectedEventPosition, m.getEventPosition());
         Assert.assertFalse(startEvent.getFormattedMessage().contains(str));
         Assert.assertTrue(startDataEvent.getFormattedMessage().contains(str));
         Assert.assertFalse(stopEvent.getFormattedMessage().contains(str));
         Assert.assertTrue(stopDataEvent.getFormattedMessage().contains(str));
-	}
+    }
 }

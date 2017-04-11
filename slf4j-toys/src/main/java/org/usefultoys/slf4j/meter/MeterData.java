@@ -40,6 +40,18 @@ public class MeterData extends SystemData {
     }
 
     /**
+     * Identifier that categorizes events.
+     */
+    protected String eventCategory = null;
+    /**
+     * Identifier of the event.
+     */
+    protected String eventName = null;
+    /**
+     * Full ID of the parent event.
+     */
+    protected String eventParent = null;
+    /**
      * An arbitrary short, human readable message to describe the task being measured.
      */
     protected String description = null;
@@ -83,27 +95,30 @@ public class MeterData extends SystemData {
      * Time considered reasonable for successful execution.
      */
     protected long timeLimitNanoseconds = 0;
-//    /**
-//     * Thread that notified job start.
-//     */
-//    protected long threadStartId = 0;
-//    /**
-//     * Thread that notified job stop.
-//     */
-//    protected long threadStopId = 0;
-//    /**
-//     * Thread that notified job start.
-//     */
-//    protected String threadStartName = null;
-//    /**
-//     * Thread that notified job stop.
-//     */
-//    protected String threadStopName = null;
 
     /**
      * Additional meta data describing the job.
      */
     protected Map<String, String> context;
+
+    public String getFullID() {
+        if (eventName == null) {
+            return eventCategory + '/' + eventPosition;
+        }
+        return eventCategory + '/' + eventName + '/' + eventPosition;
+    }
+
+    public String getEventCategory() {
+        return eventCategory;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public String getEventParent() {
+        return eventParent;
+    }
 
     public String getDescription() {
         return description;
@@ -169,21 +184,6 @@ public class MeterData extends SystemData {
         return timeLimitNanoseconds;
     }
 
-//    public long getThreadStartId() {
-//        return threadStartId;
-//    }
-//
-//    public long getThreadStopId() {
-//        return threadStopId;
-//    }
-//
-//    public String getThreadStartName() {
-//        return threadStartName;
-//    }
-//
-//    public String getThreadStopName() {
-//        return threadStopName;
-//    }
     public Map<String, String> getContext() {
         if (context == null) {
             return null;
@@ -194,6 +194,9 @@ public class MeterData extends SystemData {
     @Override
     protected void resetImpl() {
         super.resetImpl();
+        this.eventCategory = null;
+        this.eventName = null;
+        this.eventParent = null;
         this.description = null;
         this.pathId = null;
         this.rejectId = null;
@@ -205,10 +208,6 @@ public class MeterData extends SystemData {
         this.failClass = null;
         this.failMessage = null;
         this.timeLimitNanoseconds = 0;
-//        this.threadStartId = 0;
-//        this.threadStopId = 0;
-//        this.threadStartName = null;
-//        this.threadStopName = null;
         this.context = null;
     }
 
@@ -216,6 +215,15 @@ public class MeterData extends SystemData {
     protected boolean isCompletelyEqualsImpl(final EventData obj) {
         final MeterData other = (MeterData) obj;
         if ((this.description == null) ? (other.description != null) : !this.description.equals(other.description)) {
+            return false;
+        }
+        if ((this.eventCategory == null) ? (other.eventCategory != null) : !this.eventCategory.equals(other.eventCategory)) {
+            return false;
+        }
+        if ((this.eventName == null) ? (other.eventName != null) : !this.eventName.equals(other.eventName)) {
+            return false;
+        }
+        if ((this.eventParent == null) ? (other.eventParent != null) : !this.eventParent.equals(other.eventParent)) {
             return false;
         }
         if ((this.pathId == null) ? (other.pathId != null) : !this.pathId.equals(other.pathId)) {
@@ -248,18 +256,6 @@ public class MeterData extends SystemData {
         if (this.timeLimitNanoseconds != other.timeLimitNanoseconds) {
             return false;
         }
-//        if (this.threadStartId != other.threadStartId) {
-//            return false;
-//        }
-//        if (this.threadStopId != other.threadStopId) {
-//            return false;
-//        }
-//        if ((this.threadStartName == null) ? (other.threadStartName != null) : !this.threadStartName.equals(other.threadStartName)) {
-//            return false;
-//        }
-//        if ((this.threadStopName == null) ? (other.threadStopName != null) : !this.threadStopName.equals(other.threadStopName)) {
-//            return false;
-//        }
         if (this.context != other.context && (this.context == null || !this.context.equals(other.context))) {
             return false;
         }
@@ -402,18 +398,21 @@ public class MeterData extends SystemData {
         return ((double) this.iteration) / executionTimeNS * 1000000000;
     }
 
-    protected static final String PROP_DESCRIPTION = "d";
-    protected static final String PROP_PATH_ID = "p";
-    protected static final String PROP_REJECT_ID = "r";
-    protected static final String PROP_FAIL_ID = "f";
-    protected static final String PROP_CREATE_TIME = "t0";
-    protected static final String PROP_START_TIME = "t1";
-    protected static final String PROP_STOP_TIME = "t2";
-    protected static final String PROP_ITERATION = "i";
-    protected static final String PROP_EXPECTED_ITERATION = "ei";
-    protected static final String PROP_LIMIT_TIME = "tl";
-    protected static final String PROP_THREAD = "th";
-    protected static final String PROP_CONTEXT = "ctx";
+    public static final String PROP_DESCRIPTION = "d";
+    public static final String PROP_PATH_ID = "p";
+    public static final String PROP_REJECT_ID = "r";
+    public static final String PROP_FAIL_ID = "f";
+    public static final String PROP_CREATE_TIME = "t0";
+    public static final String PROP_START_TIME = "t1";
+    public static final String PROP_STOP_TIME = "t2";
+    public static final String PROP_ITERATION = "i";
+    public static final String PROP_EXPECTED_ITERATION = "ei";
+    public static final String PROP_LIMIT_TIME = "tl";
+    public static final String PROP_THREAD = "th";
+    public static final String PROP_CONTEXT = "ctx";
+    public static final String EVENT_CATEGORY = "c";
+    public static final String EVENT_NAME = "n";
+    public static final String EVENT_PARENT = "ep";
 
     @Override
     public void writePropertiesImpl(final EventWriter w) {
@@ -428,6 +427,15 @@ public class MeterData extends SystemData {
         }
         if (this.failClass != null) {
             w.property(PROP_FAIL_ID, this.failClass, this.failMessage != null ? this.failMessage : "");
+        }
+        if (this.eventCategory != null) {
+            w.property(EVENT_CATEGORY, this.eventCategory);
+        }
+        if (this.eventName != null) {
+            w.property(EVENT_NAME, this.eventName);
+        }
+        if (this.eventParent != null) {
+            w.property(EVENT_PARENT, this.eventParent);
         }
 
         /* Create, start, stop time. */
@@ -446,19 +454,9 @@ public class MeterData extends SystemData {
         if (this.expectedIterations != 0) {
             w.property(PROP_EXPECTED_ITERATION, this.expectedIterations);
         }
-
         if (this.timeLimitNanoseconds != 0) {
             w.property(PROP_LIMIT_TIME, timeLimitNanoseconds);
         }
-
-//        /* Thread info */
-//        if (this.threadStartId != 0 || this.threadStopId != 0 || this.threadStartName != null || this.threadStopName != null) {
-//            w.property(PROP_THREAD,
-//                this.threadStartId != 0 ? Long.toString(this.threadStartId) : "",
-//                this.threadStartName != null ? this.threadStartName : "",
-//                this.threadStopId != 0 ? Long.toString(this.threadStopId) : "",
-//                this.threadStopName != null ? this.threadStopName : "");
-//        }
 
         /* Context */
         if (this.context != null && !this.context.isEmpty()) {
@@ -472,6 +470,15 @@ public class MeterData extends SystemData {
     protected boolean readPropertyImpl(final EventReader r, final String propertyName) throws IOException {
         if (PROP_DESCRIPTION.equals(propertyName)) {
             this.description = r.readString();
+            return true;
+        } else if (EVENT_CATEGORY.equals(propertyName)) {
+            this.eventCategory = r.readString();
+            return true;
+        } else if (EVENT_NAME.equals(propertyName)) {
+            this.eventName = r.readString();
+            return true;
+        } else if (EVENT_PARENT.equals(propertyName)) {
+            this.eventParent = r.readString();
             return true;
         } else if (PROP_FAIL_ID.equals(propertyName)) {
             this.failClass = r.readString();
@@ -498,12 +505,6 @@ public class MeterData extends SystemData {
         } else if (PROP_LIMIT_TIME.equals(propertyName)) {
             this.timeLimitNanoseconds = r.readLong();
             return true;
-//        } else if (PROP_THREAD.equals(propertyName)) {
-//            this.threadStartId = r.readLongOrZero();
-//            this.threadStartName = r.readString();
-//            this.threadStopId = r.readLongOrZero();
-//            this.threadStopName = r.readString();
-//            return true;
         } else if (PROP_CONTEXT.equals(propertyName)) {
             this.context = r.readMap();
             return true;
@@ -527,4 +528,27 @@ public class MeterData extends SystemData {
         this.reset();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MeterData meterData = (MeterData) o;
+
+        if (eventCategory != null ? !eventCategory.equals(meterData.eventCategory) : meterData.eventCategory != null)
+            return false;
+        if (sessionUuid != null ? !sessionUuid.equals(meterData.sessionUuid) : meterData.sessionUuid != null)
+            return false;
+        if (eventPosition != meterData.eventPosition) return false;
+        return eventName != null ? eventName.equals(meterData.eventName) : meterData.eventName == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = eventCategory != null ? eventCategory.hashCode() : 0;
+        result = 31 * result + (eventName != null ? eventName.hashCode() : 0);
+        result = 31 * result + (int) (eventPosition ^ (eventPosition >>> 32));
+        result = 31 * result + (sessionUuid != null ? sessionUuid.hashCode() : 0);
+        return result;
+    }
 }

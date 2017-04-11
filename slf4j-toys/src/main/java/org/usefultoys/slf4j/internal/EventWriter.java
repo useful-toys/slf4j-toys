@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static org.usefultoys.slf4j.internal.PatternDefinition.*;
+import static org.usefultoys.slf4j.internal.SyntaxDefinition.*;
 
 /**
  * Provides methods that implement recurrent serialization patterns.

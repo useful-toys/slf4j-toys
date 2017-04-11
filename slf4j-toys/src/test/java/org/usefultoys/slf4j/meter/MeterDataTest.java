@@ -16,12 +16,13 @@
 package org.usefultoys.slf4j.meter;
 
 import java.util.HashMap;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 /**
- *
  * @author Daniel
  */
 public class MeterDataTest {
@@ -34,6 +35,9 @@ public class MeterDataTest {
         final MeterData a = createMeterData();
         final MeterData b = createMeterData();
 
+        b.eventName = "n";
+        b.eventParent = "p";
+        b.eventCategory = "c";
         b.description = "a";
         b.createTime = 1;
         b.startTime = 2;
@@ -42,12 +46,8 @@ public class MeterDataTest {
         b.failClass = "Exception";
         b.failMessage = "b";
         b.rejectId = "B";
-        b.pathId= "FB";
+        b.pathId = "FB";
         b.timeLimitNanoseconds = 10;
-//        b.threadStartId = 5;
-//        b.threadStopId = 6;
-//        b.threadStartName = "c";
-//        b.threadStopName = "d";
         b.context = new HashMap<String, String>();
         b.context.put("a", "b");
         b.context.put("c", "d");
@@ -69,6 +69,9 @@ public class MeterDataTest {
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
 
+        a.eventName = "n";
+        a.eventParent = "p";
+        a.eventCategory = "c";
         a.description = "a";
         a.createTime = 1;
         a.startTime = 2;
@@ -77,16 +80,15 @@ public class MeterDataTest {
         a.failClass = "Exception";
         a.failMessage = "b";
         a.rejectId = "A";
-        a.pathId= "FA";
+        a.pathId = "FA";
         a.timeLimitNanoseconds = 10;
-//        a.threadStartId = 5;
-//        a.threadStopId = 6;
-//        a.threadStartName = "c";
-//        a.threadStopName = "d";
         a.context = new HashMap<String, String>();
         a.context.put("a", "b");
         a.context.put("c", "d");
 
+        b.eventName = "n";
+        b.eventParent = "p";
+        b.eventCategory = "c";
         b.description = "a";
         b.createTime = 1;
         b.startTime = 2;
@@ -95,18 +97,29 @@ public class MeterDataTest {
         b.failClass = "Exception";
         b.failMessage = "b";
         b.rejectId = "A";
-        b.pathId= "FA";
+        b.pathId = "FA";
         b.timeLimitNanoseconds = 10;
-//        b.threadStartId = 5;
-//        b.threadStopId = 6;
-//        b.threadStartName = "c";
-//        b.threadStopName = "d";
         b.context = new HashMap<String, String>();
         b.context.put("a", "b");
         b.context.put("c", "d");
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
+
+        b.eventCategory = "cc";
+        assertFalse(a.isCompletelyEqualsTo(b));
+        assertFalse(b.isCompletelyEqualsTo(a));
+        b.eventCategory = "c";
+
+        b.eventName = "nn";
+        assertFalse(a.isCompletelyEqualsTo(b));
+        assertFalse(b.isCompletelyEqualsTo(a));
+        b.eventName = "n";
+
+        b.eventParent = "pp";
+        assertFalse(a.isCompletelyEqualsTo(b));
+        assertFalse(b.isCompletelyEqualsTo(a));
+        b.eventParent = "p";
 
         b.description = "aa";
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -158,26 +171,6 @@ public class MeterDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
         b.timeLimitNanoseconds = 10;
 
-//        b.threadStartId = 55;
-//        assertFalse(a.isCompletelyEqualsTo(b));
-//        assertFalse(b.isCompletelyEqualsTo(a));
-//        b.threadStartId = 5;
-//
-//        b.threadStopId = 66;
-//        assertFalse(a.isCompletelyEqualsTo(b));
-//        assertFalse(b.isCompletelyEqualsTo(a));
-//        b.threadStopId = 6;
-//
-//        b.threadStartName = "cc";
-//        assertFalse(a.isCompletelyEqualsTo(b));
-//        assertFalse(b.isCompletelyEqualsTo(a));
-//        b.threadStartName = "c";
-//
-//        b.threadStopName = "dd";
-//        assertFalse(a.isCompletelyEqualsTo(b));
-//        assertFalse(b.isCompletelyEqualsTo(a));
-//        b.threadStopName = "d";
-
         b.context.put("e", "f");
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
@@ -186,6 +179,60 @@ public class MeterDataTest {
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
 
+    }
+
+    @Test
+    public void equalsHashTest() {
+        final MeterData a = createMeterData();
+        final MeterData b = createMeterData();
+
+        assertTrue(a.equals(b));
+        assertTrue(b.equals(a));
+        assertTrue(a.hashCode() == b.hashCode());
+
+        a.eventName = "n";
+        a.eventParent = "p";
+        a.eventCategory = "c";
+        a.setEventPosition(1);
+        a.setSessionUuid("uuid");
+
+        b.eventName = "n";
+        b.eventParent = "p";
+        b.eventCategory = "c";
+        b.setEventPosition(1);
+        b.setSessionUuid("uuid");
+
+        assertTrue(a.equals(b));
+        assertTrue(b.equals(a));
+        assertTrue(a.hashCode() == b.hashCode());
+
+        b.eventCategory = "cc";
+        assertFalse(a.equals(b));
+        assertFalse(b.equals(a));
+        assertFalse(a.hashCode() == b.hashCode());
+        b.eventCategory = "c";
+
+        b.setEventPosition(11);
+        assertFalse(a.equals(b));
+        assertFalse(b.equals(a));
+        assertFalse(a.hashCode() == b.hashCode());
+        b.setEventPosition(1);
+
+        b.setSessionUuid("uuiduuid");
+        assertFalse(a.equals(b));
+        assertFalse(b.equals(a));
+        assertFalse(a.hashCode() == b.hashCode());
+        b.setSessionUuid("uuid");
+
+        b.eventName = "nn";
+        assertFalse(a.equals(b));
+        assertFalse(b.equals(a));
+        assertFalse(a.hashCode() == b.hashCode());
+        b.eventName = "n";
+
+        assertTrue(a.equals(b));
+        assertTrue(b.equals(a));
+        assertTrue(a.hashCode() == b.hashCode());
     }
 
     @Test
@@ -206,7 +253,9 @@ public class MeterDataTest {
     public void writeReadTest2() {
         final MeterDataMock a = createMeterData();
 
-        a.setEventCategory("aaaa");
+        a.eventName = "n";
+        a.eventParent = "p";
+        a.eventCategory = "c";
         a.setEventPosition(1111);
         a.setSessionUuid("bbbb");
         a.setTime(2222);
@@ -241,7 +290,6 @@ public class MeterDataTest {
         a.rejectId = "A";
         a.pathId = "FA";
         a.timeLimitNanoseconds = 10;
-//        a.threcdStopName = "d";
         a.context = new HashMap<String, String>();
         a.context.put("e", "f");
         a.context.put("g", "h");

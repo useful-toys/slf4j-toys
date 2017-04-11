@@ -31,14 +31,6 @@ public abstract class EventData implements Serializable {
      */
     protected String sessionUuid = null;
     /**
-     * Identifier that categorizes events.
-     */
-    protected String eventCategory = null;
-    /**
-     * Identifier of the event.
-     */
-    protected String eventName = null;
-    /**
      * Time ordered position for multiple occurrences of the same event.
      */
     protected long eventPosition = 0;
@@ -58,31 +50,22 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * @return Identifier that categorizes events.
-     */
-    public String getEventCategory() {
-        return eventCategory;
-    }
-
-    /**
-     * @return Identifier of the event.
-     */
-    public String getEventName() {
-        return eventName;
-    }
-
-    /**
      * @return Time ordered position for multiple occurrences of the same event.
      */
     public long getEventPosition() {
         return eventPosition;
     }
 
-    public String getFullID() {
-        if (eventName == null) {
-            return eventCategory + '/' + eventPosition;
-        }
-        return eventCategory + '/' + eventName + '/' + eventPosition;
+    public void setEventPosition(long eventPosition) {
+        this.eventPosition = eventPosition;
+    }
+
+    public void setSessionUuid(String sessionUuid) {
+        this.sessionUuid = sessionUuid;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 
     /**
@@ -98,8 +81,6 @@ public abstract class EventData implements Serializable {
      */
     protected final void reset() {
         this.sessionUuid = null;
-        this.eventCategory = null;
-        this.eventName = null;
         this.eventPosition = 0;
         this.time = 0;
         this.resetImpl();
@@ -111,76 +92,6 @@ public abstract class EventData implements Serializable {
      * and shall compare all specific properties.
      */
     protected abstract void resetImpl();
-
-    @Override
-    public final int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((sessionUuid == null) ? 0 : sessionUuid.hashCode());
-        result = prime * result + ((eventCategory == null) ? 0 : eventCategory.hashCode());
-        result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
-        result = prime * result + (int) (eventPosition ^ (eventPosition >>> 32));
-        return result;
-    }
-
-    @Override
-    public final boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final EventData other = (EventData) obj;
-        return this.isSameAs(other);
-    }
-
-    @Override
-    public final String toString() {
-        return getFullID();
-    }
-
-    /**
-     * Indicates whether this event represents the same as the given argument,
-     * based on session uuid, category, name and position.
-     *
-     * @param other the other event to compare to.
-     * @return true if this event represents the same event as
-     *  argument, false otherwise.
-     */
-    public final boolean isSameAs(final EventData other) {
-        if (other == null) {
-            throw new IllegalArgumentException("other == null");
-        }
-        if (eventPosition != other.eventPosition) {
-            return false;
-        }
-        if (eventCategory == null) {
-            if (other.eventCategory != null) {
-                return false;
-            }
-        } else if (!eventCategory.equals(other.eventCategory)) {
-            return false;
-        }
-        if (eventName == null) {
-            if (other.eventName != null) {
-                return false;
-            }
-        } else if (!eventName.equals(other.eventName)) {
-            return false;
-        }
-        if (sessionUuid == null) {
-            if (other.sessionUuid != null) {
-                return false;
-            }
-        } else if (!sessionUuid.equals(other.sessionUuid)) {
-            return false;
-        }
-        return true;
-    }
 
     /**
      * Indicates weather all properties are equal to the respective properties
@@ -195,20 +106,6 @@ public abstract class EventData implements Serializable {
             throw new IllegalArgumentException("other == null");
         }
         if (eventPosition != other.eventPosition) {
-            return false;
-        }
-        if (eventCategory == null) {
-            if (other.eventCategory != null) {
-                return false;
-            }
-        } else if (!eventCategory.equals(other.eventCategory)) {
-            return false;
-        }
-        if (eventName == null) {
-            if (other.eventName != null) {
-                return false;
-            }
-        } else if (!eventName.equals(other.eventName)) {
             return false;
         }
         if (sessionUuid == null) {
@@ -236,11 +133,9 @@ public abstract class EventData implements Serializable {
      */
     protected abstract boolean isCompletelyEqualsImpl(EventData other);
 
-    protected static final String SESSION_UUID = "s";
-    protected static final String EVENT_CATEGORY = "c";
-    protected static final String EVENT_POSITION = "#";
-    protected static final String EVENT_NAME = "n";
-    private static final String EVENT_TIME = "t";
+    public static final String SESSION_UUID = "s";
+    public static final String EVENT_POSITION = "#";
+    public static final String EVENT_TIME = "t";
 
     /**
      * Writes a concise, human readable string representation of the event into
@@ -256,9 +151,9 @@ public abstract class EventData implements Serializable {
      * Writes an encoded string representation of the event into the supplied
      * StringBuilder.
      *
-     * @param sb The StringBuilder that receives the encoded representation.
+     * @param sb            The StringBuilder that receives the encoded representation.
      * @param messagePrefix A prefix character used by an parser to recognize
-     * the encoded message.
+     *                      the encoded message.
      * @return The StringBuilder passed as argument to allow chained
      * StringBuilder method calls.
      */
@@ -276,17 +171,6 @@ public abstract class EventData implements Serializable {
         if (this.sessionUuid != null) {
             w.property(SESSION_UUID, this.sessionUuid);
         }
-
-        /* Event category */
-        if (this.eventCategory != null) {
-            w.property(EVENT_CATEGORY, this.eventCategory);
-        }
-
-        /* Event name */
-        if (this.eventName != null) {
-            w.property(EVENT_NAME, this.eventName);
-        }
-
         /* Event position */
         if (this.eventPosition > 0) {
             w.property(EVENT_POSITION, this.eventPosition);
@@ -312,8 +196,8 @@ public abstract class EventData implements Serializable {
      * well formed, returns {@code false}, but some properties may already have
      * been assigned.
      *
-     * @param message The string that is supposed to contain an encoded string
-     * representation of the event.
+     * @param message       The string that is supposed to contain an encoded string
+     *                      representation of the event.
      * @param messagePrefix message prefix
      * @return {@code true} if an event was successfully read;
      * {@code false} otherwise.
@@ -349,12 +233,6 @@ public abstract class EventData implements Serializable {
         } else if (EVENT_POSITION.equals(key)) {
             this.eventPosition = eventReader.readLong();
             return true;
-        } else if (EVENT_CATEGORY.equals(key)) {
-            this.eventCategory = eventReader.readString();
-            return true;
-        } else if (EVENT_NAME.equals(key)) {
-            this.eventName = eventReader.readString();
-            return true;
         } else if (EVENT_TIME.equals(key)) {
             this.time = eventReader.readLong();
             return true;
@@ -368,11 +246,11 @@ public abstract class EventData implements Serializable {
      * for each encoded property.
      *
      * @param reader The EventReader that is parsing the message. Use this parser to
-     * retrieve the property value.
-     * @param key The property key.
+     *               retrieve the property value.
+     * @param key    The property key.
      * @return true if the property key was recognized, false otherwise.
      * @throws IOException the EventReader failed to parse the encoded property
-     * value.
+     *                     value.
      */
     protected abstract boolean readPropertyImpl(EventReader reader, String key) throws IOException;
 }

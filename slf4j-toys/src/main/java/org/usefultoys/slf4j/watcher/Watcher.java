@@ -58,7 +58,6 @@ public class Watcher extends WatcherData implements Runnable {
         }
         this.sessionUuid = Session.uuid;
         this.eventPosition = 0;
-        this.eventCategory = null;
     }
 
     /**

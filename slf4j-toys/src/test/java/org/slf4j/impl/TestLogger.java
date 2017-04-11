@@ -19,12 +19,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.impl.TestLoggerEvent.Level;
 
 /**
- *
  * @author Daniel Felix Ferber
  */
 public class TestLogger implements Logger {
@@ -43,12 +43,12 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public String getName() {
+    public String getName() {
         return name;
     }
 
     @Override
-	public boolean isTraceEnabled() {
+    public boolean isTraceEnabled() {
         return traceEnabled;
     }
 
@@ -114,7 +114,7 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public boolean isTraceEnabled(final Marker marker) {
+    public boolean isTraceEnabled(final Marker marker) {
         return traceEnabled;
     }
 
@@ -144,7 +144,7 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public boolean isDebugEnabled() {
+    public boolean isDebugEnabled() {
         return debugEnabled;
     }
 
@@ -174,7 +174,7 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public boolean isDebugEnabled(final Marker marker) {
+    public boolean isDebugEnabled(final Marker marker) {
         return debugEnabled;
     }
 
@@ -204,7 +204,7 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public boolean isInfoEnabled() {
+    public boolean isInfoEnabled() {
         return infoEnabled;
     }
 
@@ -234,7 +234,7 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public boolean isInfoEnabled(final Marker marker) {
+    public boolean isInfoEnabled(final Marker marker) {
         return infoEnabled;
     }
 
@@ -264,7 +264,7 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public boolean isWarnEnabled() {
+    public boolean isWarnEnabled() {
         return warnEnabled;
     }
 
@@ -294,7 +294,7 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public boolean isWarnEnabled(final Marker marker) {
+    public boolean isWarnEnabled(final Marker marker) {
         return warnEnabled;
     }
 
@@ -324,7 +324,7 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public boolean isErrorEnabled() {
+    public boolean isErrorEnabled() {
         return errorEnabled;
     }
 
@@ -354,7 +354,7 @@ public class TestLogger implements Logger {
     }
 
     @Override
-	public boolean isErrorEnabled(final Marker marker) {
+    public boolean isErrorEnabled(final Marker marker) {
         return errorEnabled;
     }
 
@@ -404,11 +404,11 @@ public class TestLogger implements Logger {
     }
 
     private void addLoggingEvent(
-        final Level level,
-        final Marker marker,
-        final Throwable throwable,
-        final String format,
-        final Object... args) {
+            final Level level,
+            final Marker marker,
+            final Throwable throwable,
+            final String format,
+            final Object... args) {
         final TestLoggerEvent event = new TestLoggerEvent(name, level, null, marker, throwable, format, args);
         loggerEvents.add(event);
         print(event);
@@ -421,13 +421,13 @@ public class TestLogger implements Logger {
     }
 
     private String formatLogStatement(final TestLoggerEvent event) {
-    	if (event.getThrowable() == null) {
-    		return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage();
-    	}
-    	ByteArrayOutputStream s = new ByteArrayOutputStream();
-		event.getThrowable().printStackTrace(new PrintStream(s));
-		String st = new String(s.toByteArray());
-    	return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage() + "\n" + st;
+        if (event.getThrowable() == null) {
+            return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage();
+        }
+        ByteArrayOutputStream s = new ByteArrayOutputStream();
+        event.getThrowable().printStackTrace(new PrintStream(s));
+        String st = new String(s.toByteArray());
+        return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage() + "\n" + st;
     }
 
     public int getEventCount() {

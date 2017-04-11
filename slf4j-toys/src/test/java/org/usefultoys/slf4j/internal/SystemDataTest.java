@@ -252,7 +252,6 @@ public class SystemDataTest {
     public void writeReadTest2() {
         final SystemData a = createSystemData();
 
-        a.eventCategory = "aaaa";
         a.eventPosition = 1111;
         a.sessionUuid = "bbbb";
         a.time = 2222;

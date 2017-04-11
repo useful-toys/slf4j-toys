@@ -191,14 +191,14 @@ public abstract class SystemData extends EventData {
         }
     }
 
-    static final String PROP_MEMORY = "m";
-    static final String PROP_HEAP = "h";
-    static final String PROP_NON_HEAP = "nh";
-    static final String PROP_FINALIZATION_COUNT = "fc";
-    static final String PROP_CLASS_LOADING = "cl";
-    static final String PROP_COMPILATION_TIME = "ct";
-    static final String PROP_GARBAGE_COLLECTOR = "gc";
-    static final String PROP_SYSTEM_LOAD = "sl";
+    public static final String PROP_MEMORY = "m";
+    public static final String PROP_HEAP = "h";
+    public static final String PROP_NON_HEAP = "nh";
+    public static final String PROP_FINALIZATION_COUNT = "fc";
+    public static final String PROP_CLASS_LOADING = "cl";
+    public static final String PROP_COMPILATION_TIME = "ct";
+    public static final String PROP_GARBAGE_COLLECTOR = "gc";
+    public static final String PROP_SYSTEM_LOAD = "sl";
 
     @Override
     protected void writePropertiesImpl(final EventWriter w) {
