@@ -502,6 +502,9 @@ public class MeterData extends SystemData {
         } else if (PROP_ITERATION.equals(propertyName)) {
             this.iteration = r.readLong();
             return true;
+        } else if (PROP_EXPECTED_ITERATION.equals(propertyName)) {
+            this.expectedIterations = r.readLong();
+            return true;
         } else if (PROP_LIMIT_TIME.equals(propertyName)) {
             this.timeLimitNanoseconds = r.readLong();
             return true;

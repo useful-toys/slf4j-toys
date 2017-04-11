@@ -77,6 +77,7 @@ public class MeterDataTest {
         a.startTime = 2;
         a.stopTime = 3;
         a.iteration = 4;
+        a.expectedIterations = 5;
         a.failClass = "Exception";
         a.failMessage = "b";
         a.rejectId = "A";
@@ -94,6 +95,7 @@ public class MeterDataTest {
         b.startTime = 2;
         b.stopTime = 3;
         b.iteration = 4;
+        b.expectedIterations = 5;
         b.failClass = "Exception";
         b.failMessage = "b";
         b.rejectId = "A";
@@ -145,6 +147,11 @@ public class MeterDataTest {
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
         b.iteration = 4;
+
+        b.expectedIterations = 55;
+        assertFalse(a.isCompletelyEqualsTo(b));
+        assertFalse(b.isCompletelyEqualsTo(a));
+        b.expectedIterations = 5;
 
         b.failClass = "ExceptionException";
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -261,11 +268,9 @@ public class MeterDataTest {
         a.setTime(2222);
 
         a.setHeap_commited(11);
-//        a.setHeap_init(22);
         a.setHeap_max(33);
         a.setHeap_used(44);
         a.setNonHeap_commited(55);
-//        a.setNonHeap_init(66);
         a.setNonHeap_max(77);
         a.setNonHeap_used(88);
         a.setObjectPendingFinalizationCount(99);
@@ -285,6 +290,7 @@ public class MeterDataTest {
         a.startTime = 2;
         a.stopTime = 3;
         a.iteration = 4;
+        a.expectedIterations = 5;
         a.failClass = "Exception";
         a.failMessage = "b";
         a.rejectId = "A";
