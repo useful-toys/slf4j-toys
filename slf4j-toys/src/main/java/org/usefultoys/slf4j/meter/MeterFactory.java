@@ -77,4 +77,26 @@ public class MeterFactory {
     public static Meter getMeter(final Logger logger, final String operationName) {
         return new Meter(logger, operationName);
     }
+
+    /**
+     * Returns the most recently started Meter on the current thread.
+     *
+     * @return the Meter
+     */
+    public static Meter getCurrentMeter() {
+        return Meter.getCurrentInstance();
+    }
+
+    /**
+     * Creates a new Meter whose name is subordinated under the hierarchy last started meter onthe current thread.
+     * Useful if a large task may be subdivided into smaller task and reported individually.
+     * The new meter uses the category of this meter. The new meter uses a name of the this meter, appended by slash and its own name.
+     *
+     * @param suboperationName Additional identification appended to the subordinated meter name.
+     * @return the  Meter
+     */
+    public static Meter getCurrentSubMeter(String suboperationName) {
+        return Meter.getCurrentInstance().sub(suboperationName);
+    }
+
 }

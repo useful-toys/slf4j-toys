@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import static org.usefultoys.slf4j.LoggerConfig.hackJulEnable;
 import static org.usefultoys.slf4j.meter.MeterConfig.dataPrefix;
 import static org.usefultoys.slf4j.meter.MeterConfig.dataSuffix;
 
@@ -82,7 +83,7 @@ public class Meter extends MeterData implements Closeable {
     /**
      * How many times each event has been executed.
      */
-    static final ConcurrentMap<String, AtomicLong> eventCounterByName = new ConcurrentHashMap<String, AtomicLong>();
+    static final ConcurrentMap<String, AtomicLong> EVENT_COUNTER = new ConcurrentHashMap<String, AtomicLong>();
     private transient long lastProgressTime = 0;
     private transient long lastProgressIteration = 0;
 
@@ -101,15 +102,12 @@ public class Meter extends MeterData implements Closeable {
         this.sessionUuid = Session.uuid;
         this.logger = logger;
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
-        this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
-        this.julDataLogger = java.util.logging.Logger.getLogger(dataPrefix + logger.getName() + dataSuffix);
+        this.julLogger = hackJulEnable ? java.util.logging.Logger.getLogger(logger.getName()) : null;
+        this.julDataLogger = hackJulEnable ? java.util.logging.Logger.getLogger(dataLogger.getName()) : null;
         this.eventParent = null;
         this.eventCategory = logger.getName();
         this.eventName = null;
-        eventCounterByName.putIfAbsent(this.eventCategory, new AtomicLong(0));
-        final AtomicLong atomicLong = eventCounterByName.get(this.eventCategory);
-        atomicLong.compareAndSet(Long.MAX_VALUE, 0);
-        this.eventPosition = atomicLong.incrementAndGet();
+        this.eventPosition = extractNextPosition(eventCategory, this.eventName);
         this.createTime = System.nanoTime();
     }
 
@@ -123,17 +121,21 @@ public class Meter extends MeterData implements Closeable {
         this.sessionUuid = Session.uuid;
         this.logger = logger;
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
-        this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
-        this.julDataLogger = java.util.logging.Logger.getLogger(dataPrefix + logger.getName() + dataSuffix);
+        this.julLogger = hackJulEnable ? java.util.logging.Logger.getLogger(logger.getName()) : null;
+        this.julDataLogger = hackJulEnable ? java.util.logging.Logger.getLogger(dataLogger.getName()) : null;
         this.eventParent = null;
         this.eventCategory = logger.getName();
         this.eventName = operationName;
-        final String index = this.eventCategory + "/" + operationName;
-        eventCounterByName.putIfAbsent(index, new AtomicLong(0));
-        final AtomicLong atomicLong = eventCounterByName.get(index);
-        atomicLong.compareAndSet(Long.MAX_VALUE, 0);
-        this.eventPosition = atomicLong.incrementAndGet();
+        this.eventPosition = extractNextPosition(eventCategory, this.eventName);
         this.createTime = System.nanoTime();
+    }
+
+    private static long extractNextPosition(String eventCategory, String operationName) {
+        final String key = operationName == null ? eventCategory : eventCategory + "/" + operationName;
+        EVENT_COUNTER.putIfAbsent(key, new AtomicLong(0));
+        final AtomicLong atomicLong = EVENT_COUNTER.get(key);
+        atomicLong.compareAndSet(Long.MAX_VALUE, 0);
+        return atomicLong.incrementAndGet();
     }
 
     /**
@@ -158,8 +160,8 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Creates a new Meter whose name is under the hierarchy of this meter. Useful if a large task may be subdivided into smaller task and reported
-     * individually. The new meter uses the name of this meter appended by dot and its own name, similar as logger do.
+     * Creates a new Meter whose name is subordinated under the hierarchy of this meter. Useful if a large task may be subdivided into smaller task and reported
+     * individually. The new meter uses the category of this meter. The new meter uses a name of the this meter, appended by slash and its own name.
      *
      * @param suboperationName Additional identification appended to this logger name.
      * @return The new Meter
@@ -637,14 +639,14 @@ public class Meter extends MeterData implements Closeable {
             if (logger.isDebugEnabled()) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
-                if (LoggerConfig.hackJulEnable) {
+                if (hackJulEnable) {
                     julLogger.log(startDebugStatusLogRecord(Markers.MSG_START, readableWrite()));
                 } else {
                     logger.debug(Markers.MSG_START, readableWrite());
                 }
                 if (dataLogger.isTraceEnabled()) {
                     final String message2 = write();
-                    if (LoggerConfig.hackJulEnable) {
+                    if (hackJulEnable) {
                         julDataLogger.log(startTraceStatusLogRecord(Markers.DATA_START, message2));
                     } else {
                         dataLogger.trace(Markers.DATA_START, message2);
@@ -749,13 +751,13 @@ public class Meter extends MeterData implements Closeable {
                     if (dataLogger.isTraceEnabled()) {
                         final String message2 = write();
                         if (startTime != 0 && timeLimitNanoseconds != 0 && (now - startTime) > timeLimitNanoseconds) {
-                            if (LoggerConfig.hackJulEnable) {
+                            if (hackJulEnable) {
                                 julDataLogger.log(progressTraceStatusLogRecord(Markers.DATA_SLOW_PROGRESS, message2));
                             } else {
                                 dataLogger.trace(Markers.DATA_SLOW_PROGRESS, message2);
                             }
-                        } else if (logger.isTraceEnabled()) {
-                            if (LoggerConfig.hackJulEnable) {
+                        } else if (dataLogger.isTraceEnabled()) {
+                            if (hackJulEnable) {
                                 julDataLogger.log(progressTraceStatusLogRecord(Markers.DATA_PROGRESS, message2));
                             } else {
                                 dataLogger.trace(Markers.DATA_PROGRESS, message2);
@@ -829,13 +831,13 @@ public class Meter extends MeterData implements Closeable {
                 final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
                 final String message1 = readableWrite();
                 if (warnSlowness) {
-                    if (LoggerConfig.hackJulEnable) {
+                    if (hackJulEnable) {
                         julLogger.log(okWarnLogRecord(Markers.MSG_SLOW_OK, message1));
                     } else {
                         logger.warn(Markers.MSG_SLOW_OK, message1);
                     }
                 } else if (logger.isInfoEnabled()) {
-                    if (LoggerConfig.hackJulEnable) {
+                    if (hackJulEnable) {
                         julLogger.log(okInfoStausLogRecord(Markers.MSG_OK, message1));
                     } else {
                         logger.info(Markers.MSG_OK, message1);
@@ -844,12 +846,12 @@ public class Meter extends MeterData implements Closeable {
                 if (dataLogger.isTraceEnabled()) {
                     final String message2 = write();
                     if (warnSlowness) {
-                        if (LoggerConfig.hackJulEnable) {
+                        if (hackJulEnable) {
                             julDataLogger.log(okTraceStatusLogRecord(Markers.DATA_SLOW_OK, message2));
                         } else {
                             dataLogger.trace(Markers.DATA_SLOW_OK, message2);
                         }
-                    } else if (LoggerConfig.hackJulEnable) {
+                    } else if (hackJulEnable) {
                         julDataLogger.log(okTraceStatusLogRecord(Markers.DATA_OK, message2));
                     } else {
                         dataLogger.trace(Markers.DATA_OK, message2);
@@ -917,13 +919,13 @@ public class Meter extends MeterData implements Closeable {
                 final boolean warnSlowness = startTime != 0 && timeLimitNanoseconds != 0 && stopTime - startTime > timeLimitNanoseconds;
                 final String message1 = readableWrite();
                 if (warnSlowness) {
-                    if (LoggerConfig.hackJulEnable) {
+                    if (hackJulEnable) {
                         julLogger.log(okWarnLogRecord(Markers.MSG_SLOW_OK, message1));
                     } else {
                         logger.warn(Markers.MSG_SLOW_OK, message1);
                     }
                 } else if (logger.isInfoEnabled()) {
-                    if (LoggerConfig.hackJulEnable) {
+                    if (hackJulEnable) {
                         julLogger.log(okInfoStausLogRecord(Markers.MSG_OK, message1));
                     } else {
                         logger.info(Markers.MSG_OK, message1);
@@ -932,12 +934,12 @@ public class Meter extends MeterData implements Closeable {
                 if (dataLogger.isTraceEnabled()) {
                     final String message2 = write();
                     if (warnSlowness) {
-                        if (LoggerConfig.hackJulEnable) {
+                        if (hackJulEnable) {
                             julDataLogger.log(okTraceStatusLogRecord(Markers.DATA_SLOW_OK, message2));
                         } else {
                             dataLogger.trace(Markers.DATA_SLOW_OK, message2);
                         }
-                    } else if (LoggerConfig.hackJulEnable) {
+                    } else if (hackJulEnable) {
                         julDataLogger.log(okTraceStatusLogRecord(Markers.DATA_OK, message2));
                     } else {
                         dataLogger.trace(Markers.DATA_OK, message2);
@@ -997,7 +999,7 @@ public class Meter extends MeterData implements Closeable {
                 collectPlatformStatus();
                 if (logger.isInfoEnabled()) {
                     final String message1 = readableWrite();
-                    if (LoggerConfig.hackJulEnable) {
+                    if (hackJulEnable) {
                         julLogger.log(rejectInfoStausLogRecord(Markers.MSG_REJECT, message1));
                     } else {
                         logger.info(Markers.MSG_REJECT, message1);
@@ -1005,7 +1007,7 @@ public class Meter extends MeterData implements Closeable {
                 }
                 if (dataLogger.isTraceEnabled()) {
                     final String message2 = write();
-                    if (LoggerConfig.hackJulEnable) {
+                    if (hackJulEnable) {
                         julDataLogger.log(rejectTraceStatusLogRecord(Markers.DATA_REJECT, message2));
                     } else {
                         dataLogger.trace(Markers.DATA_REJECT, message2);
@@ -1062,14 +1064,14 @@ public class Meter extends MeterData implements Closeable {
                 collectRuntimeStatus();
                 collectPlatformStatus();
                 final String message1 = readableWrite();
-                if (LoggerConfig.hackJulEnable) {
+                if (hackJulEnable) {
                     julLogger.log(failErrorStatusLogRecord(Markers.MSG_FAIL, message1, cause));
                 } else {
                     logger.error(Markers.MSG_FAIL, message1, cause);
                 }
                 if (dataLogger.isTraceEnabled()) {
                     final String message2 = write();
-                    if (LoggerConfig.hackJulEnable) {
+                    if (hackJulEnable) {
                         julDataLogger.log(failTraceStatusLogRecord(Markers.DATA_FAIL, message2));
                     } else {
                         dataLogger.trace(Markers.DATA_FAIL, message2);

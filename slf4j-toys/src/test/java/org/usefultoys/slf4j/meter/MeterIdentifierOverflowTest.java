@@ -15,8 +15,6 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -24,6 +22,8 @@ import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 import org.slf4j.impl.TestLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Daniel
@@ -47,7 +47,7 @@ public class MeterIdentifierOverflowTest {
 
     @Test
     public void testResetImpl() {
-        Meter.eventCounterByName.put(meterName, new AtomicLong(Long.MAX_VALUE - 2));
+        Meter.EVENT_COUNTER.put(meterName, new AtomicLong(Long.MAX_VALUE - 2));
 
         assertEvents(MeterFactory.getMeter(meterName).start().ok(), 4, Long.MAX_VALUE - 1);
         assertEvents(MeterFactory.getMeter(meterName).start().ok(), 8, Long.MAX_VALUE);
