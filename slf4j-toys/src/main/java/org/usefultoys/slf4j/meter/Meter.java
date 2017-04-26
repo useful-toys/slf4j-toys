@@ -38,6 +38,7 @@ import java.util.logging.LogRecord;
 import static org.usefultoys.slf4j.LoggerConfig.hackJulEnable;
 import static org.usefultoys.slf4j.meter.MeterConfig.dataPrefix;
 import static org.usefultoys.slf4j.meter.MeterConfig.dataSuffix;
+import static org.usefultoys.slf4j.meter.MeterConfig.dataIncludeUuid;
 
 /**
  * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call {@link #start()} to produce a
@@ -109,6 +110,10 @@ public class Meter extends MeterData implements Closeable {
         this.eventName = null;
         this.eventPosition = extractNextPosition(eventCategory, this.eventName);
         this.createTime = System.nanoTime();
+        if (!dataIncludeUuid) {
+            /* Watcher está configurado para não informar o UUID. */
+            this.sessionUuid = null;
+        }
     }
 
     /**
@@ -128,6 +133,10 @@ public class Meter extends MeterData implements Closeable {
         this.eventName = operationName;
         this.eventPosition = extractNextPosition(eventCategory, this.eventName);
         this.createTime = System.nanoTime();
+        if (!dataIncludeUuid) {
+            /* Watcher está configurado para não informar o UUID. */
+            this.sessionUuid = null;
+        }
     }
 
     private static long extractNextPosition(String eventCategory, String operationName) {

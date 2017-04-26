@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import static org.usefultoys.slf4j.LoggerConfig.hackJulEnable;
+import static org.usefultoys.slf4j.watcher.WatcherConfig.dataIncludeUuid;
 import static org.usefultoys.slf4j.watcher.WatcherConfig.dataPrefix;
 import static org.usefultoys.slf4j.watcher.WatcherConfig.dataSuffix;
 
@@ -64,6 +65,10 @@ public class Watcher extends WatcherData implements Runnable {
         }
         this.sessionUuid = Session.uuid;
         this.eventPosition = 0;
+        if (!dataIncludeUuid) {
+            /* Watcher está configurado para não informar o UUID. */
+            this.sessionUuid = null;
+        }
     }
 
     /**

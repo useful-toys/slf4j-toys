@@ -33,6 +33,7 @@ public class WatcherTest {
         WatcherConfig.dataPrefix = "a.";
         WatcherConfig.dataSuffix = ".b";
         WatcherConfig.name = "mywatcher";
+        WatcherConfig.dataIncludeUuid = false;
     }
 
     @Test
