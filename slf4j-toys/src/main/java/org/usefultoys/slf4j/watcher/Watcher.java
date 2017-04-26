@@ -24,6 +24,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import static org.usefultoys.slf4j.LoggerConfig.hackJulEnable;
+import static org.usefultoys.slf4j.watcher.WatcherConfig.dataPrefix;
+import static org.usefultoys.slf4j.watcher.WatcherConfig.dataSuffix;
+
 /**
  * Collects system status and reports it to logger. It conveniently implements {@link Runnable} for compliance with {@link ScheduledExecutorService}.
  * Call {@link #logCurrentStatus()} to produce a 1-line summary of the current system status as information message and an encoded event as trace
@@ -38,11 +42,10 @@ public class Watcher extends WatcherData implements Runnable {
     /**
      * Logger that reports messages.
      */
-    transient private final Logger logger;
-    /**
-     * Logger that reports messages using the JUL hack.
-     */
-    transient private final java.util.logging.Logger julLogger;
+    private transient final Logger logger;
+    private transient final Logger dataLogger;
+    private transient final java.util.logging.Logger julLogger;
+    private transient final java.util.logging.Logger julDataLogger;
 
     /**
      * Constructor. Events produced by this watcher will use the logger name as event category.
@@ -51,10 +54,13 @@ public class Watcher extends WatcherData implements Runnable {
      */
     public Watcher(final Logger logger) {
         this.logger = logger;
+        this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
         if (LoggerConfig.hackJulEnable) {
             this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
+            this.julDataLogger = hackJulEnable ? java.util.logging.Logger.getLogger(dataLogger.getName()) : null;
         } else {
             this.julLogger = null;
+            this.julDataLogger = null;
         }
         this.sessionUuid = Session.uuid;
         this.eventPosition = 0;
@@ -93,10 +99,10 @@ public class Watcher extends WatcherData implements Runnable {
         }
         if (logger.isTraceEnabled()) {
             final String message = write();
-            if (julLogger != null) {
-                julLogger.log(watcherDataLogRecord(message));
+            if (julDataLogger != null) {
+                julDataLogger.log(watcherDataLogRecord(message));
             } else {
-                logger.trace(Markers.DATA_WATCHER, message);
+                dataLogger.trace(Markers.DATA_WATCHER, message);
             }
         }
     }

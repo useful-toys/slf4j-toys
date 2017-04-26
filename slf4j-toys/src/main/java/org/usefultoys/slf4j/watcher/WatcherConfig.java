@@ -30,6 +30,8 @@ public class WatcherConfig {
      * Logger name where watcher log messages are written to.
      */
     public static String name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
+    public static String dataPrefix = Config.getProperty("slf4jtoys.watcher.data.prefix", "");
+    public static String dataSuffix = Config.getProperty("slf4jtoys.watcher.data.suffix", "");
 
     /**
      * Time to wait before reporting the first watcher status, in milliseconds. Value is read from system property {@code slf4jtoys.watcher.delay} at
