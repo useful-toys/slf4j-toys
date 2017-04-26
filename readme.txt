@@ -9,6 +9,10 @@ signing.keyId=3E892DA7
 signing.password=?
 signing.secretKeyRingFile=C:\\Users\\Daniel\\AppData\\Roaming\\gnupg\\secring.gpg
 
+Update version in slf4j-toys/build.gradle and commit with version message.
+Create tag.
+Upload to git repository.
+
 Run:
 gradle clean build uploadArchives
 
