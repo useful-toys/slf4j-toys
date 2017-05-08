@@ -48,5 +48,7 @@ public class MeterConfig {
 
     public static String dataPrefix = Config.getProperty("slf4jtoys.meter.data.prefix", "");
     public static String dataSuffix = Config.getProperty("slf4jtoys.meter.data.suffix", "");
+    public static String messagePrefix = Config.getProperty("slf4jtoys.meter.message.prefix", "");
+    public static String messageSuffix = Config.getProperty("slf4jtoys.meter.message.suffix", "");
     public static boolean dataIncludeUuid = Config.getProperty("slf4jtoys.meter.data.uuid", true);
 }

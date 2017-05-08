@@ -24,10 +24,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import static org.usefultoys.slf4j.LoggerConfig.hackJulEnable;
-import static org.usefultoys.slf4j.watcher.WatcherConfig.dataIncludeUuid;
-import static org.usefultoys.slf4j.watcher.WatcherConfig.dataPrefix;
-import static org.usefultoys.slf4j.watcher.WatcherConfig.dataSuffix;
+import static org.usefultoys.slf4j.watcher.WatcherConfig.*;
 
 /**
  * Collects system status and reports it to logger. It conveniently implements {@link Runnable} for compliance with {@link ScheduledExecutorService}.
@@ -54,11 +51,11 @@ public class Watcher extends WatcherData implements Runnable {
      * @param logger Logger that reports messages.
      */
     public Watcher(final Logger logger) {
-        this.logger = logger;
+        this.logger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
         if (LoggerConfig.hackJulEnable) {
             this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
-            this.julDataLogger = hackJulEnable ? java.util.logging.Logger.getLogger(dataLogger.getName()) : null;
+            this.julDataLogger = java.util.logging.Logger.getLogger(dataLogger.getName());
         } else {
             this.julLogger = null;
             this.julDataLogger = null;

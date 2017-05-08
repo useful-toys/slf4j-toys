@@ -32,6 +32,8 @@ public class WatcherConfig {
     public static String name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
     public static String dataPrefix = Config.getProperty("slf4jtoys.watcher.data.prefix", "");
     public static String dataSuffix = Config.getProperty("slf4jtoys.watcher.data.suffix", "");
+    public static String messagePrefix = Config.getProperty("slf4jtoys.watcher.message.prefix", "");
+    public static String messageSuffix = Config.getProperty("slf4jtoys.watcher.message.suffix", "");
     public static boolean dataIncludeUuid = Config.getProperty("slf4jtoys.watcher.data.uuid", true);
 
     /**

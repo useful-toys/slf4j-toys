@@ -36,9 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import static org.usefultoys.slf4j.LoggerConfig.hackJulEnable;
-import static org.usefultoys.slf4j.meter.MeterConfig.dataPrefix;
-import static org.usefultoys.slf4j.meter.MeterConfig.dataSuffix;
-import static org.usefultoys.slf4j.meter.MeterConfig.dataIncludeUuid;
+import static org.usefultoys.slf4j.meter.MeterConfig.*;
 
 /**
  * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call {@link #start()} to produce a
@@ -101,10 +99,15 @@ public class Meter extends MeterData implements Closeable {
      */
     public Meter(final Logger logger) {
         this.sessionUuid = Session.uuid;
-        this.logger = logger;
+        this.logger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
-        this.julLogger = hackJulEnable ? java.util.logging.Logger.getLogger(logger.getName()) : null;
-        this.julDataLogger = hackJulEnable ? java.util.logging.Logger.getLogger(dataLogger.getName()) : null;
+        if (hackJulEnable) {
+            this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
+            this.julDataLogger = java.util.logging.Logger.getLogger(dataLogger.getName());
+        } else {
+            this.julLogger = null;
+            this.julDataLogger = null;
+        }
         this.eventParent = null;
         this.eventCategory = logger.getName();
         this.eventName = null;
@@ -124,10 +127,15 @@ public class Meter extends MeterData implements Closeable {
      */
     public Meter(final Logger logger, final String operationName) {
         this.sessionUuid = Session.uuid;
-        this.logger = logger;
+        this.logger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
-        this.julLogger = hackJulEnable ? java.util.logging.Logger.getLogger(logger.getName()) : null;
-        this.julDataLogger = hackJulEnable ? java.util.logging.Logger.getLogger(dataLogger.getName()) : null;
+        if (hackJulEnable) {
+            this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
+            this.julDataLogger = java.util.logging.Logger.getLogger(dataLogger.getName());
+        } else {
+            this.julLogger = null;
+            this.julDataLogger = null;
+        }
         this.eventParent = null;
         this.eventCategory = logger.getName();
         this.eventName = operationName;
