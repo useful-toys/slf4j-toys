@@ -113,9 +113,11 @@ public class Meter extends MeterData implements Closeable {
         this.eventName = null;
         this.eventPosition = extractNextPosition(eventCategory, this.eventName);
         this.createTime = System.nanoTime();
-        if (!dataIncludeUuid) {
+        if (dataUuidSize == 0) {
             /* Watcher está configurado para não informar o UUID. */
             this.sessionUuid = null;
+        } else {
+            this.sessionUuid = Session.uuid.substring(Session.uuid.length() - dataUuidSize, Session.uuid.length());
         }
     }
 
@@ -141,7 +143,7 @@ public class Meter extends MeterData implements Closeable {
         this.eventName = operationName;
         this.eventPosition = extractNextPosition(eventCategory, this.eventName);
         this.createTime = System.nanoTime();
-        if (!dataIncludeUuid) {
+        if (dataUuidSize == 0) {
             /* Watcher está configurado para não informar o UUID. */
             this.sessionUuid = null;
         }

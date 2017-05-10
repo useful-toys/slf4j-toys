@@ -34,7 +34,7 @@ public class WatcherConfig {
     public static String dataSuffix = Config.getProperty("slf4jtoys.watcher.data.suffix", "");
     public static String messagePrefix = Config.getProperty("slf4jtoys.watcher.message.prefix", "");
     public static String messageSuffix = Config.getProperty("slf4jtoys.watcher.message.suffix", "");
-    public static boolean dataIncludeUuid = Config.getProperty("slf4jtoys.watcher.data.uuid", true);
+    public static int dataUuidSize = Config.getProperty("slf4jtoys.watcher.data.uuid.size", 10);
 
     /**
      * Time to wait before reporting the first watcher status, in milliseconds. Value is read from system property {@code slf4jtoys.watcher.delay} at
