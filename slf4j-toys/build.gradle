@@ -1,10 +1,12 @@
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'signing'
-apply plugin: 'jacoco'
+plugins {
+    id 'java'
+    id 'maven'
+    id 'signing'
+    id 'jacoco'
+}
 
 group = 'org.usefultoys'
-version = '1.6.2'
+version = '1.6.3'
 
 compileJava.options.encoding = 'UTF-8'
 compileJava.options.debug = false
@@ -12,21 +14,21 @@ sourceCompatibility = 1.6
 targetCompatibility = 1.6
     
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.21'
-    compile 'javax.servlet:javax.servlet-api:3.1.0'
+    compile 'org.slf4j:slf4j-api:1.7.28'
+    compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
     testCompile 'junit:junit:4.12'
+    compileOnly 'ch.qos.logback:logback-core:1.2.3'
 }
-
-
-/**** Upload para Maven Central ****/
-/* http://central.sonatype.org/pages/gradle.html */
 
 javadoc {
     options.charSet = 'UTF-8'
     options.author = false
     options.noDeprecatedList = true
-    options.noHelp = true    
+    options.noHelp = true
 }
+
+/**** Upload para Maven Central ****/
+/* http://central.sonatype.org/pages/gradle.html */
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
@@ -42,9 +44,9 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
-signing {
-    sign configurations.archives
-}
+//signing {
+//    sign configurations.archives
+//}
 
 uploadArchives {
   repositories {

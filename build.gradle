@@ -1,31 +1,22 @@
-/* Repositório comum. */
-allprojects {
-	repositories {
-	    jcenter()
-	}
-}
-
 buildscript {
-	repositories {
-		maven {
-			url "https://plugins.gradle.org/m2/"
-		}
+    repositories {
         jcenter()
+        mavenCentral()
     }
-	dependencies {
-		classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
-        classpath 'net.nemerosa:versioning:2.0.0'
-	}
 }
 
-
-/* Versioning. Not used yet. */
-project(':slf4j-toys') {
-    apply plugin: 'net.nemerosa.versioning'
+plugins {
+    id 'com.github.hierynomus.license' version '0.15.0' apply false
 }
 
-/* Consistent license headers on all files. */
-allprojects {
+subprojects {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+}
+
+subprojects {
     apply plugin: "com.github.hierynomus.license"
     license {
         ext.year = Calendar.getInstance().get(Calendar.YEAR)

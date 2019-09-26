@@ -1,3 +1,9 @@
+Upgrade gradle wrapper:
+.\gradlew.bat wrapper --gradle-version <Version>
+
+Update license:
+.\gradlew.bat licenseFormat
+
 How to build:
 
 Set following properties at $GRADLE_USER_HOME/gradle.properties
