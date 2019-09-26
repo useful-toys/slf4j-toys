@@ -15,7 +15,6 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import java.util.Random;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -25,6 +24,8 @@ import org.slf4j.impl.TestLoggerEvent;
 import org.slf4j.impl.TestLoggerEvent.Level;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
+
+import java.util.Random;
 
 /**
  *
@@ -92,7 +93,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(null, data.getEventName());
@@ -102,7 +103,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -136,7 +137,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(null, data.getEventName());
@@ -146,7 +147,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -181,7 +182,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(null, data.getEventName());
@@ -191,7 +192,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -226,7 +227,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(meterName, data.getEventName());
@@ -236,7 +237,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -272,7 +273,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(meterName, data.getEventName());
@@ -282,7 +283,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -319,7 +320,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(meterName, data.getEventName());
@@ -329,7 +330,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -370,7 +371,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent2.getFormattedMessage()));
         Assert.assertEquals(meterName + "/" + meterName2, data.getEventName());
@@ -380,7 +381,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -422,7 +423,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent2.getFormattedMessage()));
         Assert.assertEquals(meterName + "/" + meterName2, data.getEventName());
@@ -432,7 +433,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -453,14 +454,14 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(path, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -481,14 +482,14 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(path, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -511,14 +512,14 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(path2, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -541,14 +542,14 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(path2, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -579,7 +580,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(null, data.getEventName());
@@ -589,7 +590,7 @@ public class MeterMessageTest {
         Assert.assertEquals(reject, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -623,7 +624,7 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(null, data.getEventName());
@@ -633,7 +634,7 @@ public class MeterMessageTest {
         Assert.assertEquals(reject, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test
@@ -664,14 +665,14 @@ public class MeterMessageTest {
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(null, data.getExceptionClass());
         Assert.assertEquals(null, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
 
         Assert.assertTrue(data.read(stopDataEvent.getFormattedMessage()));
         Assert.assertEquals(null, data.getPathId());
         Assert.assertEquals(null, data.getRejectId());
         Assert.assertEquals(Exception.class.getName(), data.getExceptionClass());
         Assert.assertEquals(exceptionStr, data.getExceptionMessage());
-        Assert.assertEquals(Session.uuid, data.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(data.getSessionUuid()));
     }
 
     @Test

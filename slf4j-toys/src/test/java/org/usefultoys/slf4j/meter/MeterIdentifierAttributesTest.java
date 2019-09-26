@@ -16,7 +16,6 @@
 package org.usefultoys.slf4j.meter;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -36,14 +35,14 @@ public class MeterIdentifierAttributesTest {
         logger1.clearEvents();
 
         final Meter m1 = new Meter(logger1);
-        Assert.assertEquals(Session.uuid, m1.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m1.getSessionUuid()));
         Assert.assertEquals(logger1, m1.getLogger());
         Assert.assertEquals(category1, m1.getEventCategory());
         Assert.assertNull(m1.getEventName());
         Assert.assertEquals(1L, m1.getEventPosition());
 
         final Meter m2 = new Meter(logger1);
-        Assert.assertEquals(Session.uuid, m2.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m2.getSessionUuid()));
         Assert.assertEquals(logger1, m2.getLogger());
         Assert.assertEquals(category1, m2.getEventCategory());
         Assert.assertNull(m2.getEventName());
@@ -55,14 +54,14 @@ public class MeterIdentifierAttributesTest {
         logger2.clearEvents();
 
         final Meter m3 = new Meter(logger2);
-        Assert.assertEquals(Session.uuid, m3.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m3.getSessionUuid()));
         Assert.assertEquals(logger2, m3.getLogger());
         Assert.assertEquals(category2, m3.getEventCategory());
         Assert.assertNull(m3.getEventName());
         Assert.assertEquals(1L, m3.getEventPosition());
 
         final Meter m4 = new Meter(logger2);
-        Assert.assertEquals(Session.uuid, m4.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m4.getSessionUuid()));
         Assert.assertEquals(logger2, m4.getLogger());
         Assert.assertEquals(category2, m4.getEventCategory());
         Assert.assertNull(m3.getEventName());
@@ -77,35 +76,35 @@ public class MeterIdentifierAttributesTest {
         logger.clearEvents();
 
         final Meter m1 = new Meter(logger);
-        Assert.assertEquals(Session.uuid, m1.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m1.getSessionUuid()));
         Assert.assertEquals(logger, m1.getLogger());
         Assert.assertEquals(category, m1.getEventCategory());
         Assert.assertNull(m1.getEventName());
         Assert.assertEquals(1L, m1.getEventPosition());
 
         final Meter m2 = new Meter(logger, "op");
-        Assert.assertEquals(Session.uuid, m2.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m2.getSessionUuid()));
         Assert.assertEquals(logger, m2.getLogger());
         Assert.assertEquals(category, m2.getEventCategory());
         Assert.assertEquals("op", m2.getEventName());
         Assert.assertEquals(1L, m2.getEventPosition());
 
         final Meter m3 = new Meter(logger, "op");
-        Assert.assertEquals(Session.uuid, m3.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m3.getSessionUuid()));
         Assert.assertEquals(logger, m3.getLogger());
         Assert.assertEquals(category, m3.getEventCategory());
         Assert.assertEquals("op", m3.getEventName());
         Assert.assertEquals(2L, m3.getEventPosition());
 
         final Meter m4 = new Meter(logger, "po");
-        Assert.assertEquals(Session.uuid, m4.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m4.getSessionUuid()));
         Assert.assertEquals(logger, m4.getLogger());
         Assert.assertEquals(category, m4.getEventCategory());
         Assert.assertEquals("po", m4.getEventName());
         Assert.assertEquals(1L, m4.getEventPosition());
 
         final Meter m5 = new Meter(logger, "po");
-        Assert.assertEquals(Session.uuid, m5.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m5.getSessionUuid()));
         Assert.assertEquals(logger, m5.getLogger());
         Assert.assertEquals(category, m5.getEventCategory());
         Assert.assertEquals("po", m5.getEventName());
@@ -120,35 +119,35 @@ public class MeterIdentifierAttributesTest {
         logger.clearEvents();
 
         final Meter m1 = new Meter(logger);
-        Assert.assertEquals(Session.uuid, m1.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m1.getSessionUuid()));
         Assert.assertEquals(logger, m1.getLogger());
         Assert.assertEquals(category, m1.getEventCategory());
         Assert.assertNull(m1.getEventName());
         Assert.assertEquals(1L, m1.getEventPosition());
 
         final Meter m2 = m1.sub("rs");
-        Assert.assertEquals(Session.uuid, m2.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m2.getSessionUuid()));
         Assert.assertEquals(logger, m2.getLogger());
         Assert.assertEquals(category, m2.getEventCategory());
         Assert.assertEquals("rs", m2.getEventName());
         Assert.assertEquals(1L, m2.getEventPosition());
 
         final Meter m3 = m1.sub("rs");
-        Assert.assertEquals(Session.uuid, m3.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m3.getSessionUuid()));
         Assert.assertEquals(logger, m3.getLogger());
         Assert.assertEquals(category, m3.getEventCategory());
         Assert.assertEquals("rs", m3.getEventName());
         Assert.assertEquals(2L, m3.getEventPosition());
         
         final Meter m4 = m1.sub("sr");
-        Assert.assertEquals(Session.uuid, m4.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m4.getSessionUuid()));
         Assert.assertEquals(logger, m4.getLogger());
         Assert.assertEquals(category, m4.getEventCategory());
         Assert.assertEquals("sr", m4.getEventName());
         Assert.assertEquals(1L, m4.getEventPosition());
 
         final Meter m5 = m1.sub("sr");
-        Assert.assertEquals(Session.uuid, m5.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m5.getSessionUuid()));
         Assert.assertEquals(logger, m5.getLogger());
         Assert.assertEquals(category, m5.getEventCategory());
         Assert.assertEquals("sr", m5.getEventName());
@@ -163,35 +162,35 @@ public class MeterIdentifierAttributesTest {
         logger.clearEvents();
 
         final Meter m1 = new Meter(logger);
-        Assert.assertEquals(Session.uuid, m1.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m1.getSessionUuid()));
         Assert.assertEquals(logger, m1.getLogger());
         Assert.assertEquals(category, m1.getEventCategory());
         Assert.assertNull(m1.getEventName());
         Assert.assertEquals(1L, m1.getEventPosition());
 
         final Meter m2 = m1.sub("rs");
-        Assert.assertEquals(Session.uuid, m2.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m2.getSessionUuid()));
         Assert.assertEquals(logger, m2.getLogger());
         Assert.assertEquals(category, m2.getEventCategory());
         Assert.assertEquals("rs", m2.getEventName());
         Assert.assertEquals(1L, m2.getEventPosition());
 
         final Meter m3 = m2.sub("sr");
-        Assert.assertEquals(Session.uuid, m3.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m3.getSessionUuid()));
         Assert.assertEquals(logger, m3.getLogger());
         Assert.assertEquals(category, m3.getEventCategory());
         Assert.assertEquals("rs/sr", m3.getEventName());
         Assert.assertEquals(1L, m3.getEventPosition());
 
         final Meter m4 = m2.sub("sr");
-        Assert.assertEquals(Session.uuid, m4.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m4.getSessionUuid()));
         Assert.assertEquals(logger, m4.getLogger());
         Assert.assertEquals(category, m4.getEventCategory());
         Assert.assertEquals("rs/sr", m4.getEventName());
         Assert.assertEquals(2L, m4.getEventPosition());
 
         final Meter m5 = m4.sub("sr");
-        Assert.assertEquals(Session.uuid, m5.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m5.getSessionUuid()));
         Assert.assertEquals(logger, m5.getLogger());
         Assert.assertEquals(category, m5.getEventCategory());
         Assert.assertEquals("rs/sr/sr", m5.getEventName());
@@ -206,35 +205,35 @@ public class MeterIdentifierAttributesTest {
         logger.clearEvents();
 
         final Meter m1 = new Meter(logger, "n");
-        Assert.assertEquals(Session.uuid, m1.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m1.getSessionUuid()));
         Assert.assertEquals(logger, m1.getLogger());
         Assert.assertEquals(category, m1.getEventCategory());
         Assert.assertEquals("n", m1.getEventName());
         Assert.assertEquals(1L, m1.getEventPosition());
 
         final Meter m2 = m1.sub("rs");
-        Assert.assertEquals(Session.uuid, m2.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m2.getSessionUuid()));
         Assert.assertEquals(logger, m2.getLogger());
         Assert.assertEquals(category, m2.getEventCategory());
         Assert.assertEquals("n/rs", m2.getEventName());
         Assert.assertEquals(1L, m2.getEventPosition());
 
         final Meter m3 = m1.sub("rs");
-        Assert.assertEquals(Session.uuid, m3.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m3.getSessionUuid()));
         Assert.assertEquals(logger, m3.getLogger());
         Assert.assertEquals(category, m3.getEventCategory());
         Assert.assertEquals("n/rs", m3.getEventName());
         Assert.assertEquals(2L, m3.getEventPosition());
         
         final Meter m4 = m1.sub("sr");
-        Assert.assertEquals(Session.uuid, m4.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m4.getSessionUuid()));
         Assert.assertEquals(logger, m4.getLogger());
         Assert.assertEquals(category, m4.getEventCategory());
         Assert.assertEquals("n/sr", m4.getEventName());
         Assert.assertEquals(1L, m4.getEventPosition());
 
         final Meter m5 = m1.sub("sr");
-        Assert.assertEquals(Session.uuid, m5.getSessionUuid());
+        Assert.assertTrue(Session.uuid.endsWith(m5.getSessionUuid()));
         Assert.assertEquals(logger, m5.getLogger());
         Assert.assertEquals(category, m5.getEventCategory());
         Assert.assertEquals("n/sr", m5.getEventName());
