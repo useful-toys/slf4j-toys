@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":slf4j-toys:test" external.linked.project.path="$MODULE_DIR$/../../../slf4j-toys" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="org.usefultoys" external.system.module.type="sourceSet" external.system.module.version="1.6.1" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":slf4j-toys:test" external.linked.project.path="$MODULE_DIR$/../../../slf4j-toys" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="org.usefultoys" external.system.module.type="sourceSet" external.system.module.version="1.6.3" type="JAVA_MODULE" version="4">
+  <component name="ExternalSystem" linkedProjectPath="$MODULE_DIR$/../../.." rootProjectPath="$MODULE_DIR$/../../.." />
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6">
-    <output-test url="file://$MODULE_DIR$/../../../slf4j-toys/build/classes/test" />
+    <output-test url="file://$MODULE_DIR$/../../../slf4j-toys/build/classes/java/test" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../slf4j-toys/src/test">
       <sourceFolder url="file://$MODULE_DIR$/../../../slf4j-toys/src/test/java" isTestSource="true" />
@@ -10,8 +11,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="slf4j-toys_main" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.21" level="project" />
-    <orderEntry type="library" name="Gradle: javax.servlet:javax.servlet-api:3.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.28" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>
