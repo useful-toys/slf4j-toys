@@ -33,30 +33,12 @@ public class SystemDataTest {
         final SystemData a = createSystemData();
         final SystemData b = createSystemData();
 
-        b.heap_commited = 1;
-//        b.heap_init = 2;
-        b.heap_max = 3;
-        b.heap_used = 4;
-        b.nonHeap_commited = 5;
-//        b.nonHeap_init = 6;
-        b.nonHeap_max = 7;
-        b.nonHeap_used = 8;
-        b.objectPendingFinalizationCount = 9;
-        b.classLoading_loaded = 10;
-        b.classLoading_total = 11;
-        b.classLoading_unloaded = 12;
-        b.compilationTime = 13;
-        b.garbageCollector_count = 14;
-        b.garbageCollector_time = 15;
-        b.runtime_usedMemory = 16;
-        b.runtime_maxMemory = 17;
-        b.runtime_totalMemory = 18;
-        b.systemLoad = 1.0;
+        populateTestSystemData(b);
 
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
 
-        b.reset();
+        resetAll(b);
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
@@ -70,45 +52,10 @@ public class SystemDataTest {
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
 
-        a.heap_commited = 1;
-//        a.heap_init = 2;
-        a.heap_max = 3;
-        a.heap_used = 4;
-        a.nonHeap_commited = 5;
-//        a.nonHeap_init = 6;
-        a.nonHeap_max = 7;
-        a.nonHeap_used = 8;
-        a.objectPendingFinalizationCount = 9;
-        a.classLoading_loaded = 10;
-        a.classLoading_total = 11;
-        a.classLoading_unloaded = 12;
-        a.compilationTime = 13;
-        a.garbageCollector_count = 14;
-        a.garbageCollector_time = 15;
-        a.runtime_usedMemory = 16;
-        a.runtime_maxMemory = 17;
-        a.runtime_totalMemory = 18;
-        a.systemLoad = 1.0;
-
-        b.heap_commited = 1;
-//        b.heap_init = 2;
-        b.heap_max = 3;
-        b.heap_used = 4;
-        b.nonHeap_commited = 5;
-//        b.nonHeap_init = 6;
-        b.nonHeap_max = 7;
-        b.nonHeap_used = 8;
-        b.objectPendingFinalizationCount = 9;
-        b.classLoading_loaded = 10;
-        b.classLoading_total = 11;
-        b.classLoading_unloaded = 12;
-        b.compilationTime = 13;
-        b.garbageCollector_count = 14;
-        b.garbageCollector_time = 15;
-        b.runtime_usedMemory = 16;
-        b.runtime_maxMemory = 17;
-        b.runtime_totalMemory = 18;
-        b.systemLoad = 1.0;
+        populateEventData(a);
+        populateEventData(b);
+        populateTestSystemData(a);
+        populateTestSystemData(b);
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
@@ -122,11 +69,6 @@ public class SystemDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
 
         b.heap_commited = 1;
-//        b.heap_init = 22;
-
-//        assertFalse(a.isCompletelyEqualsTo(b));
-//        assertFalse(b.isCompletelyEqualsTo(a));
-//        b.heap_init = 2;
         b.heap_max = 33;
 
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -145,11 +87,6 @@ public class SystemDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
 
         b.nonHeap_commited = 5;
-//        b.nonHeap_init = 66;
-
-//        assertFalse(a.isCompletelyEqualsTo(b));
-//        assertFalse(b.isCompletelyEqualsTo(a));
-//        b.nonHeap_init = 6;
         b.nonHeap_max = 77;
 
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -252,16 +189,30 @@ public class SystemDataTest {
     public void writeReadTest2() {
         final SystemData a = createSystemData();
 
+        populateEventData(a);
+        populateTestSystemData(a);
+
+        final String s = a.write(new StringBuilder(), 'S').toString();
+        System.out.println(s);
+
+        final SystemData b = createSystemData();
+        assertTrue(b.read(s, 'S'));
+
+        assertTrue(a.isCompletelyEqualsTo(b));
+        assertTrue(b.isCompletelyEqualsTo(a));
+    }
+
+    public static void populateEventData(EventData a) {
         a.eventPosition = 1111;
         a.sessionUuid = "bbbb";
         a.time = 2222;
+    }
 
+    public static void populateTestSystemData(SystemData a) {
         a.heap_commited = 1;
-//        a.heap_init = 2;
         a.heap_max = 3;
         a.heap_used = 4;
         a.nonHeap_commited = 5;
-//        a.nonHeap_init = 6;
         a.nonHeap_max = 7;
         a.nonHeap_used = 8;
         a.objectPendingFinalizationCount = 9;
@@ -275,15 +226,10 @@ public class SystemDataTest {
         a.runtime_maxMemory = 17;
         a.runtime_totalMemory = 18;
         a.systemLoad = 1.0;
+    }
 
-        final String s = a.write(new StringBuilder(), 'S').toString();
-        System.out.println(s);
-
-        final SystemData b = createSystemData();
-        assertTrue(b.read(s, 'S'));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
+    public static void resetAll(SystemData b) {
+        b.reset();
     }
 
     private SystemData createSystemData() {

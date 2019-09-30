@@ -37,13 +37,9 @@ public class EventDataTest {
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
 
-        a.eventPosition = 1;
-        a.sessionUuid = "uuid";
-        a.time = 2;
+        populateEventData(a);
 
-        b.eventPosition = 1;
-        b.sessionUuid = "uuid";
-        b.time = 2;
+        populateEventData(b);
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
@@ -72,9 +68,7 @@ public class EventDataTest {
         final EventData a = createEventData();
         final EventData b = createEventData();
 
-        b.eventPosition = 1;
-        b.sessionUuid = "uuid";
-        b.time = 2;
+        populateEventData(b);
 
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
@@ -102,9 +96,7 @@ public class EventDataTest {
     @Test
     public void writeReadTest2() {
         final EventData a = createEventData();
-        a.eventPosition = 1;
-        a.sessionUuid = "uuid";
-        a.time = 2;
+        populateEventData(a);
 
         final String s = a.write(new StringBuilder(), 'E').toString();
         System.out.println(s);
@@ -114,6 +106,12 @@ public class EventDataTest {
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
+    }
+
+    public static void populateEventData(EventData a) {
+        a.eventPosition = 1;
+        a.sessionUuid = "uuid";
+        a.time = 2;
     }
 
     private EventData createEventData() {

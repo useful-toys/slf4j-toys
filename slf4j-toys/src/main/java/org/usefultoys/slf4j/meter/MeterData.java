@@ -527,10 +527,6 @@ public class MeterData extends SystemData {
         return readableString(new StringBuilder()).toString();
     }
 
-    void resetBridge() {
-        this.reset();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
