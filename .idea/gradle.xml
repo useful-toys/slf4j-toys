@@ -11,6 +11,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/example_jul" />
             <option value="$PROJECT_DIR$/example_logback" />
             <option value="$PROJECT_DIR$/examples" />
             <option value="$PROJECT_DIR$/slf4j-toys" />

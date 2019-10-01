@@ -2,12 +2,15 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="example_jul_main" target="1.8" />
+      <module name="example_jul_test" target="1.8" />
       <module name="example_logback_main" target="1.8" />
       <module name="example_logback_test" target="1.8" />
       <module name="examples_main" target="1.8" />
       <module name="examples_test" target="1.8" />
       <module name="org.usefultoys-slf4j-toys_main" target="1.6" />
       <module name="org.usefultoys-slf4j-toys_test" target="1.6" />
+      <module name="slf4j-toys" target="1.6" />
       <module name="slf4j-toys-root-example_logback_main" target="1.8" />
       <module name="slf4j-toys-root-example_logback_test" target="1.8" />
       <module name="slf4j-toys-root-examples_main" target="1.8" />

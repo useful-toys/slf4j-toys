@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":example_jul:test" external.linked.project.path="$MODULE_DIR$/../../../example_jul" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="slf4j-toys-root" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output-test url="file://$MODULE_DIR$/../../../example_jul/build/classes/java/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../example_jul/src/test" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="example_jul_main" />
+    <orderEntry type="module" module-name="slf4j-toys_main" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.28" level="project" />
+  </component>
+  <component name="TestModuleProperties" production-module="example_jul_main" />
+</module>
