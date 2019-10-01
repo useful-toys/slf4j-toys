@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+compileJava.options.encoding = 'UTF-8'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+application {
+    mainClassName = 'examples.JulExample'
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-jdk14:1.7.28'
+    compile project(':slf4j-toys')
+}
