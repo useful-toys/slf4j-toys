@@ -307,8 +307,8 @@ public class MeterMessageTest {
         Assert.assertTrue(stopEvent.getFormattedMessage().startsWith(MESSAGE_OK_PREFIX));
         Assert.assertFalse(startEvent.getFormattedMessage().contains(meterCategory));
         Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterCategory));
-        Assert.assertFalse(startEvent.getFormattedMessage().contains(meterName));
-        Assert.assertFalse(stopEvent.getFormattedMessage().contains(meterName));
+        Assert.assertTrue(startEvent.getFormattedMessage().contains(meterName));
+        Assert.assertTrue(stopEvent.getFormattedMessage().contains(meterName));
         Assert.assertTrue(startEvent.getFormattedMessage().contains(title));
         Assert.assertTrue(stopEvent.getFormattedMessage().contains(title));
 

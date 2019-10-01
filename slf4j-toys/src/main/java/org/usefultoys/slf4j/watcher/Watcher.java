@@ -65,7 +65,7 @@ public class Watcher extends WatcherData implements Runnable {
             /* Watcher está configurado para não informar o UUID. */
             this.sessionUuid = null;
         } else {
-            this.sessionUuid = Session.uuid.substring(Session.uuid.length()- dataUuidSize, Session.uuid.length());
+            this.sessionUuid = Session.uuid.substring(Session.uuid.length() - dataUuidSize);
         }
     }
 

@@ -105,7 +105,7 @@ public class MeterData extends SystemData {
         if (eventName == null) {
             return eventCategory + '/' + eventPosition;
         }
-        return eventCategory + '/' + eventName + '/' + eventPosition;
+        return eventCategory + '/' + eventName + '#' + eventPosition;
     }
 
     public String getEventCategory() {
@@ -264,73 +264,84 @@ public class MeterData extends SystemData {
 
     @Override
     public StringBuilder readableString(final StringBuilder buffer) {
-        if (stopTime != 0) {
-            if (isOK()) {
-                if (isSlow()) {
-                    buffer.append("OK (Slow)");
-                } else {
-                    buffer.append("OK");
+        if (MeterConfig.printStatus) {
+            if (stopTime != 0) {
+                if (failClass == null && rejectId == null) {
+                    if (timeLimitNanoseconds != 0 && startTime != 0 && stopTime - startTime > timeLimitNanoseconds) {
+                        buffer.append("OK (Slow)");
+                    } else {
+                        buffer.append("OK");
+                    }
+                } else if (rejectId != null) {
+                    buffer.append("REJECT");
+                } else if (failClass != null) {
+                    buffer.append("FAIL");
                 }
-                if (pathId != null) {
-                    buffer.append(" [");
-                    buffer.append(pathId);
-                    buffer.append(']');
-                }
-            } else if (isReject()) {
-                buffer.append("REJECT");
-                if (rejectId != null) {
-                    buffer.append(" [");
-                    buffer.append(rejectId);
-                    buffer.append(']');
-                }
+            } else if (startTime != 0 && iteration == 0) {
+                buffer.append("Started");
+            } else if (startTime != 0) {
+                buffer.append("Progress ");
             } else {
-                buffer.append("FAIL");
-                if (failClass != null || failMessage != null) {
-                    buffer.append(" [");
-                    if (failClass != null) {
-                        buffer.append(failClass);
-                    }
-                    if (failClass != null && failMessage != null) {
-                        buffer.append("; ");
-                    }
-                    if (failMessage != null) {
-                        buffer.append(failMessage);
-                    }
-                    buffer.append(']');
-                }
+                buffer.append("Scheduled");
             }
-        } else if (startTime != 0 && iteration == 0) {
-            buffer.append("Started");
-        } else if (startTime != 0) {
-            buffer.append("Progress ");
+            buffer.append(": ");
+        }
+
+        if (MeterConfig.printCategory) {
+            final int index = eventCategory.lastIndexOf('.') + 1;
+            buffer.append(eventCategory.substring(index));
+        }
+        if (eventName != null) {
+            if (MeterConfig.printCategory) {
+                buffer.append('/');
+            }
+            buffer.append(eventName);
+        }
+        if (MeterConfig.printPosition) {
+            buffer.append('#');
+            buffer.append(eventPosition);
+        }
+
+        if (pathId != null) {
+            buffer.append(" [");
+            buffer.append(pathId);
+            buffer.append(']');
+        }
+        if (rejectId != null) {
+            buffer.append(" [");
+            buffer.append(rejectId);
+            buffer.append(']');
+        }
+        if (failClass != null || failMessage != null) {
+            buffer.append(" [");
+            if (failClass != null) {
+                buffer.append(failClass);
+            }
+            if (failClass != null && failMessage != null) {
+                buffer.append("; ");
+            }
+            if (failMessage != null) {
+                buffer.append(failMessage);
+            }
+            buffer.append(']');
+        }
+
+        if (startTime != 0 && iteration > 0) {
+            buffer.append(' ');
             buffer.append(UnitFormatter.iterations(this.iteration));
             if (this.expectedIterations > 0) {
                 buffer.append('/');
                 buffer.append(UnitFormatter.iterations(this.expectedIterations));
             }
-        } else {
-            buffer.append("Scheduled");
-        }
-        if (this.description != null) {
-            buffer.append(": ");
-            buffer.append(this.description);
-        } else {
-            if (MeterConfig.printCategory || eventName != null) {
-                buffer.append(": ");
-            }
-            if (MeterConfig.printCategory) {
-                final int index = eventCategory.lastIndexOf('.') + 1;
-                buffer.append(eventCategory.substring(index));
-            }
-            if (eventName != null) {
-                if (MeterConfig.printCategory) {
-                    buffer.append('/');
-                }
-                buffer.append(eventName);
-            }
         }
 
-        if (this.startTime > 0) {
+        if (this.description != null) {
+            buffer.append(" '");
+            buffer.append(this.description);
+            buffer.append('\'');
+        }
+
+        if (this.startTime != 0) {
             buffer.append("; ");
             buffer.append(UnitFormatter.nanoseconds(getExecutionTime()));
             if (this.iteration > 0) {
@@ -345,6 +356,7 @@ public class MeterData extends SystemData {
             buffer.append("; ");
             buffer.append(UnitFormatter.nanoseconds(getWaitingTime()));
         }
+
         if (this.runtime_usedMemory > 0) {
             buffer.append("; ");
             buffer.append(UnitFormatter.bytes(this.runtime_usedMemory));
@@ -354,6 +366,7 @@ public class MeterData extends SystemData {
             buffer.append(Math.round(this.systemLoad * 100));
             buffer.append("%");
         }
+
         if (context != null) {
             for (final Entry<String, String> entry : context.entrySet()) {
                 buffer.append("; ");
@@ -408,7 +421,6 @@ public class MeterData extends SystemData {
     public static final String PROP_ITERATION = "i";
     public static final String PROP_EXPECTED_ITERATION = "ei";
     public static final String PROP_LIMIT_TIME = "tl";
-    public static final String PROP_THREAD = "th";
     public static final String PROP_CONTEXT = "ctx";
     public static final String EVENT_CATEGORY = "c";
     public static final String EVENT_NAME = "n";
