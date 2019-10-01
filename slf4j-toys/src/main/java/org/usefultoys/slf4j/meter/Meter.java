@@ -37,6 +37,7 @@ import java.util.logging.LogRecord;
 
 import static org.usefultoys.slf4j.LoggerConfig.hackJulEnable;
 import static org.usefultoys.slf4j.meter.MeterConfig.*;
+import static org.usefultoys.slf4j.watcher.WatcherConfig.dataUuidSize;
 
 /**
  * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call {@link #start()} to produce a
@@ -98,27 +99,7 @@ public class Meter extends MeterData implements Closeable {
      * @param logger Logger that reports messages.
      */
     public Meter(final Logger logger) {
-        this.sessionUuid = Session.uuid;
-        this.logger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
-        this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
-        if (hackJulEnable) {
-            this.julLogger = java.util.logging.Logger.getLogger(logger.getName());
-            this.julDataLogger = java.util.logging.Logger.getLogger(dataLogger.getName());
-        } else {
-            this.julLogger = null;
-            this.julDataLogger = null;
-        }
-        this.eventParent = null;
-        this.eventCategory = logger.getName();
-        this.eventName = null;
-        this.eventPosition = extractNextPosition(eventCategory, this.eventName);
-        this.createTime = System.nanoTime();
-        if (dataUuidSize == 0) {
-            /* Watcher está configurado para não informar o UUID. */
-            this.sessionUuid = null;
-        } else {
-            this.sessionUuid = Session.uuid.substring(Session.uuid.length() - dataUuidSize, Session.uuid.length());
-        }
+        this(logger, null);
     }
 
     /**
@@ -128,7 +109,6 @@ public class Meter extends MeterData implements Closeable {
      * @param operationName Additional identification to distinguish operations reported on the same logger.
      */
     public Meter(final Logger logger, final String operationName) {
-        this.sessionUuid = Session.uuid;
         this.logger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
         if (hackJulEnable) {
@@ -146,6 +126,8 @@ public class Meter extends MeterData implements Closeable {
         if (dataUuidSize == 0) {
             /* Watcher está configurado para não informar o UUID. */
             this.sessionUuid = null;
+        } else {
+            this.sessionUuid = Session.uuid.substring(Session.uuid.length() - dataUuidSize);
         }
     }
 

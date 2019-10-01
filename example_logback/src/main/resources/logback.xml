@@ -1,0 +1,14 @@
+<configuration debug="true">
+    <conversionRule conversionWord="status"
+                    converterClass="org.usefultoys.slf4j.logback.MeterConverter" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm} %logger{36} %-5.-5status %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="trace">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
