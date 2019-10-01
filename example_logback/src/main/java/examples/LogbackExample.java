@@ -17,7 +17,9 @@ package examples;
 
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.internal.SystemConfig;
 import org.usefultoys.slf4j.meter.Meter;
+import org.usefultoys.slf4j.meter.MeterConfig;
 import org.usefultoys.slf4j.meter.MeterFactory;
 
 /**
@@ -30,7 +32,10 @@ public class LogbackExample {
 
     static {
         /* Enable managed bean that is able to read CPU usage.  */
-        System.setProperty("profiler.usePlatformManagedBean", "true");
+        SystemConfig.usePlatformManagedBean = true;
+        MeterConfig.printStatus = false;
+        MeterConfig.printPosition = true;
+        MeterConfig.printCategory = false;
     }
 
     public static void main(final String argv[]) {
