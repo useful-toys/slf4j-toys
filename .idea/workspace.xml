@@ -5,36 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b189690-b15e-45cf-8c2a-08f4a25d4a66" name="Default" comment="[bld] Enable Jacoco code coverage">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__ch_qos_logback_logback_classic_1_2_3.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__ch_qos_logback_logback_core_1_2_3.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_slf4j_slf4j_api_1_7_28.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/example_logback.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/example_logback/example_logback_main.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/example_logback/example_logback_test.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/example_logback/slf4j-toys-root-example_logback_main.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/example_logback/slf4j-toys-root-example_logback_test.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/examples/slf4j-toys-root-examples_main.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/examples/slf4j-toys-root-examples_test.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/slf4j-toys/org.usefultoys-slf4j-toys_main.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/slf4j-toys/org.usefultoys-slf4j-toys_test.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_slf4j_slf4j_api_1_7_21.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/examples/examples.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/examples/examples.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/examples/examples_main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/examples/examples_main.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/slf4j-toys-root.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/slf4j-toys-root.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/readme.txt" afterDir="false" />
+    </list>
+    <list id="c86de029-24b2-40e7-ba2f-e89ad6de3c36" name="[ide] IntelliJ." comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/R_User_Library.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__javax_servlet_javax_servlet_api_3_1_0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__javax_servlet_javax_servlet_api_3_1_0.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__junit_junit_4_12.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__junit_junit_4_12.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_core_1_3.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_hamcrest_hamcrest_core_1_3.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__org_slf4j_slf4j_simple_1_7_21.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__org_slf4j_slf4j_simple_1_7_21.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_main.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_test.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/slf4j-toys/slf4j-toys_test.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/slf4j-toys/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/slf4j-toys/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java" beforeDir="false" afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java" afterDir="false" />
-    </list>
-    <list id="ec0cd797-066d-492e-b93c-a2d7eafa0a6b" name="[dvl] Logback converter for Meter status." comment="">
-      <change afterPath="$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/logback/MeterConverter.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -61,12 +48,7 @@
         </task>
         <projects_view>
           <tree_state>
-            <expand>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="slf4j-toys-root" type="f1a62948:ProjectNode" />
-              </path>
-            </expand>
+            <expand />
             <select />
           </tree_state>
         </projects_view>
@@ -301,7 +283,7 @@
       </sub-project>
     </project>
   </component>
-  <component name="ProjectId" id="1RYalt5Brm112ScmBnWyV3REDhr" />
+  <component name="ProjectId" id="1RM1mrN7cixEcDHP8H2WLaQdThA" />
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
       <profile-state>
@@ -340,19 +322,12 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="aspect.path.notification.shown" value="true" />
-    <property name="extract.method.default.visibility" value="public" />
     <property name="js.eslint.eslintPackage" value="" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/example_logback/src/main/java" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.37009543" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\x7ws\git\slf4j-toys\example_logback\src\main\java" />
-    </key>
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -366,23 +341,73 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.ExecutionName">
+  <component name="RunManager" selected="Gradle.MeterIdentifierAttributesTest">
+    <configuration default="true" type="FlashRunConfigurationType" factoryName="Flash App">
+      <option name="BCName" value="" />
+      <option name="IOSSimulatorSdkPath" value="" />
+      <option name="adlOptions" value="" />
+      <option name="airProgramParameters" value="" />
+      <option name="appDescriptorForEmulator" value="Android" />
+      <option name="debugTransport" value="USB" />
+      <option name="debuggerSdkRaw" value="BC SDK" />
+      <option name="emulator" value="NexusOne" />
+      <option name="emulatorAdlOptions" value="" />
+      <option name="fastPackaging" value="true" />
+      <option name="fullScreenHeight" value="0" />
+      <option name="fullScreenWidth" value="0" />
+      <option name="launchUrl" value="false" />
+      <option name="launcherParameters">
+        <LauncherParameters>
+          <option name="browser" value="a7bb68e0-33c0-4d6f-a81a-aac1fdb870c8" />
+          <option name="launcherType" value="OSDefault" />
+          <option name="newPlayerInstance" value="false" />
+          <option name="playerPath" value="FlashPlayerDebugger.exe" />
+        </LauncherParameters>
+      </option>
+      <option name="mobileRunTarget" value="Emulator" />
+      <option name="moduleName" value="" />
+      <option name="overriddenMainClass" value="" />
+      <option name="overriddenOutputFileName" value="" />
+      <option name="overrideMainClass" value="false" />
+      <option name="runTrusted" value="true" />
+      <option name="screenDpi" value="0" />
+      <option name="screenHeight" value="0" />
+      <option name="screenWidth" value="0" />
+      <option name="url" value="http://" />
+      <option name="usbDebugPort" value="7936" />
+      <method />
+    </configuration>
+    <configuration default="true" type="FlexUnitRunConfigurationType" factoryName="FlexUnit" appDescriptorForEmulator="Android" class_name="" emulatorAdlOptions="" method_name="" package_name="" scope="Class">
+      <option name="BCName" value="" />
+      <option name="launcherParameters">
+        <LauncherParameters>
+          <option name="browser" value="a7bb68e0-33c0-4d6f-a81a-aac1fdb870c8" />
+          <option name="launcherType" value="OSDefault" />
+          <option name="newPlayerInstance" value="false" />
+          <option name="playerPath" value="FlashPlayerDebugger.exe" />
+        </LauncherParameters>
+      </option>
+      <option name="moduleName" value="" />
+      <option name="trusted" value="true" />
+      <method />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="TestNG" default="true" selected="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+    </configuration>
+    <configuration default="true" type="osgi.bnd.run" factoryName="Run Launcher">
+      <method />
+    </configuration>
+    <configuration default="true" type="osgi.bnd.run" factoryName="Test Launcher (JUnit)">
+      <method />
+    </configuration>
     <configuration default="true" type="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ExecutionName" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.usefultoys.slf4j.examples.ExecutionName" />
-      <module name="examples_main" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.usefultoys.slf4j.examples.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -393,23 +418,64 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="slf4j-toys:slf4j-toys [compileJava]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="MeterIdentifierAttributesTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/slf4j-toys" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
+        <option name="scriptParameters" value="--tests &quot;org.usefultoys.slf4j.meter.MeterIdentifierAttributesTest&quot;" />
         <option name="taskDescriptions">
           <list />
         </option>
         <option name="taskNames">
           <list>
-            <option value="compileJava" />
+            <option value=":slf4j-toys:cleanTest" />
+            <option value=":slf4j-toys:test" />
           </list>
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+      <GradleScriptDebugEnabled>false</GradleScriptDebugEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="MeterMessageTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--tests &quot;org.usefultoys.slf4j.meter.MeterMessageTest&quot;" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":slf4j-toys:cleanTest" />
+            <option value=":slf4j-toys:test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>false</GradleScriptDebugEnabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="MeterMessageTest.testFail" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--tests &quot;org.usefultoys.slf4j.meter.MeterMessageTest.testFail&quot;" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":slf4j-toys:cleanTest" />
+            <option value=":slf4j-toys:test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>false</GradleScriptDebugEnabled>
       <method v="2" />
     </configuration>
     <configuration name="MeterIdentifierOverflowTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
@@ -423,23 +489,6 @@
       <option name="PACKAGE_NAME" value="org.usefultoys.slf4j.meter" />
       <option name="MAIN_CLASS_NAME" value="org.usefultoys.slf4j.meter.MeterIdentifierOverflowTest" />
       <option name="TEST_OBJECT" value="class" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/slf4j-toys" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MeterIdentifierOverflowTest.testResetImpl" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="slf4j-toys_test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.usefultoys.slf4j.meter.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.usefultoys.slf4j.meter" />
-      <option name="MAIN_CLASS_NAME" value="org.usefultoys.slf4j.meter.MeterIdentifierOverflowTest" />
-      <option name="METHOD_NAME" value="testResetImpl" />
-      <option name="TEST_OBJECT" value="method" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/slf4j-toys" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -501,24 +550,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="TestNG">
-      <option name="TEST_OBJECT" value="CLASS" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType">
-      <module name="" />
-      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
-      <option name="PROGRAM_PARAMETERS" />
-      <predefined_log_file enabled="true" id="idea.log" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="js.build_tools.gulp">
       <node-interpreter>project</node-interpreter>
       <node-options />
@@ -529,29 +560,26 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Application.ExecutionName" />
-      <item itemvalue="Gradle.slf4j-toys:slf4j-toys [compileJava]" />
+      <item itemvalue="Gradle.MeterMessageTest.testFail" />
+      <item itemvalue="Gradle.MeterMessageTest" />
+      <item itemvalue="Gradle.MeterIdentifierAttributesTest" />
       <item itemvalue="JUnit.MeterIdentifierOverflowTest" />
-      <item itemvalue="JUnit.MeterIdentifierOverflowTest.testResetImpl" />
       <item itemvalue="JUnit.org.usefultoys.slf4j.meter in slf4j-toys_test" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.ExecutionName" />
+        <item itemvalue="Gradle.MeterIdentifierAttributesTest" />
+        <item itemvalue="Gradle.MeterMessageTest" />
+        <item itemvalue="Gradle.MeterMessageTest.testFail" />
         <item itemvalue="JUnit.org.usefultoys.slf4j.meter in slf4j-toys_test" />
         <item itemvalue="JUnit.MeterIdentifierOverflowTest" />
-        <item itemvalue="JUnit.MeterIdentifierOverflowTest.testResetImpl" />
-        <item itemvalue="Gradle.slf4j-toys:slf4j-toys [compileJava]" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="SvnConfiguration">
-    <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="1b189690-b15e-45cf-8c2a-08f4a25d4a66" name="Default" comment="" />
-      <changelist id="ec0cd797-066d-492e-b93c-a2d7eafa0a6b" name="[dvl] Logback converter for Meter status." comment="" />
+      <changelist id="c86de029-24b2-40e7-ba2f-e89ad6de3c36" name="[ide] IntelliJ." comment="" />
       <created>1488740783947</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -567,10 +595,13 @@
       <workItem from="1488975481512" duration="51000" />
       <workItem from="1491835102797" duration="2783000" />
       <workItem from="1491878569397" duration="1332000" />
-      <workItem from="1569846714779" duration="1979000" />
-      <workItem from="1569858161816" duration="5611000" />
-      <workItem from="1569870437113" duration="6180000" />
-      <workItem from="1569877156416" duration="1357000" />
+      <workItem from="1569462334995" duration="241000" />
+      <workItem from="1569463169527" duration="700000" />
+      <workItem from="1569464094447" duration="7704000" />
+      <workItem from="1569472541823" duration="224000" />
+      <workItem from="1569473003327" duration="67000" />
+      <workItem from="1569717175791" duration="7083000" />
+      <workItem from="1569896424352" duration="529000" />
     </task>
     <task id="LOCAL-00001" summary="[bld] Enable Jacoco code coverage">
       <created>1488743200471</created>
@@ -586,47 +617,22 @@
       <option name="project" value="LOCAL" />
       <updated>1488744380571</updated>
     </task>
-    <task id="LOCAL-00003" summary="[tst] Simpler unit tests.">
-      <created>1569876450638</created>
+    <task id="LOCAL-00003" summary="[tst] Fix broken junit tests.">
+      <created>1569472112643</created>
       <option name="number" value="00003" />
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
-      <updated>1569876450638</updated>
+      <updated>1569472112643</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="[bld] New key pair.">
+      <created>1569812817747</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1569812817747</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
-  </component>
-  <component name="TestHistory">
-    <history-entry file="MeterIdentifierAttributesTest - 2017.04.10 at 23h 36m 26s.xml">
-      <configuration name="MeterIdentifierAttributesTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MeterIdentifierOverflowTest - 2017.04.10 at 23h 36m 39s.xml">
-      <configuration name="MeterIdentifierOverflowTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MeterIdentifierOverflowTest - 2017.04.10 at 23h 44m 16s.xml">
-      <configuration name="MeterIdentifierOverflowTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MeterIdentifierOverflowTest - 2017.04.10 at 23h 44m 35s.xml">
-      <configuration name="MeterIdentifierOverflowTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MeterIdentifierOverflowTest - 2017.04.10 at 23h 51m 31s.xml">
-      <configuration name="MeterIdentifierOverflowTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MeterIdentifierOverflowTest - 2017.04.10 at 23h 54m 17s.xml">
-      <configuration name="MeterIdentifierOverflowTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MeterIdentifierOverflowTest_testResetImpl - 2017.04.10 at 23h 40m 01s.xml">
-      <configuration name="MeterIdentifierOverflowTest.testResetImpl" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MeterIdentifierOverflowTest_testResetImpl - 2017.04.10 at 23h 47m 14s.xml">
-      <configuration name="MeterIdentifierOverflowTest.testResetImpl" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="MeterIdentifierOverflowTest_testResetImpl - 2017.04.10 at 23h 48m 43s.xml">
-      <configuration name="MeterIdentifierOverflowTest.testResetImpl" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="org_usefultoys_slf4j_meter_in_slf4j-toys_test - 2017.04.10 at 23h 54m 58s.xml">
-      <configuration name="org.usefultoys.slf4j.meter in slf4j-toys_test" configurationId="JUnit" />
-    </history-entry>
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -639,6 +645,16 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -661,12 +677,18 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="[bld] Enable Jacoco code coverage" />
     <MESSAGE value="[bld] Enable versioning." />
-    <MESSAGE value="[tst] Simpler unit tests." />
-    <option name="LAST_COMMIT_MESSAGE" value="[tst] Simpler unit tests." />
+    <MESSAGE value="[tst] Fix broken junit tests." />
+    <MESSAGE value="[bld] New key pair." />
+    <option name="LAST_COMMIT_MESSAGE" value="[bld] New key pair." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterDataTest.java</url>
+          <line>240</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/EventData.java</url>
           <line>205</line>
@@ -699,27 +721,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java</url>
-          <line>605</line>
+          <line>620</line>
           <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java</url>
-          <line>587</line>
+          <line>602</line>
           <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/slf4j-toys/src/test/java/org/slf4j/impl/TestLogger.java</url>
-          <line>411</line>
-          <option name="timeStamp" value="20" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/meter/Meter.java</url>
-          <line>816</line>
+          <line>818</line>
           <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/slf4j-toys/src/main/java/org/usefultoys/slf4j/internal/Config.java</url>
-          <option name="timeStamp" value="22" />
+          <url>file://$PROJECT_DIR$/slf4j-toys/src/test/java/org/usefultoys/slf4j/meter/MeterMessageTest.java</url>
+          <line>667</line>
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -727,5 +745,81 @@
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
     <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>No facets are configured</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>slf4j-toys-root</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.37009543" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>Gradle: javax.servlet:javax.servlet-api:3.1.0</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
   </component>
 </project>
