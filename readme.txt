@@ -4,9 +4,9 @@
 Set following properties at $GRADLE_USER_HOME/gradle.properties
    ossrhUsername = danielferber
    ossrhPassword = ?
-   signing.keyId=7AFA66E152AD868D0DB288DE9B1946E0C106B759
+   signing.keyId=C106B759
    signing.password=?
-   signing.secretKeyRingFile=C:\\Users\\Daniel\\AppData\\Roaming\\gnupg\\secring.gpg
+   signing.secretKeyRingFile=C:\\Users\\dffwe\\AppData\\Roaming\\gnupg\\secring.gpg
 
 Export public and secret key and ownertrust (backup):
    gpg -a --export danielferber@gmail.com > gpg/danielferber-public-gpg.key
@@ -21,6 +21,12 @@ Remember: The keys were generated running:
    gpg --full-generate-key (all default options)
    gpg --list-keys
    gpg --keyserver hkp://pgp.mit.edu --send-keys <Key-Hash>
+
+Create the secring.gpg file, as it is not maintained anymore by gpg 2.1:
+   gpg --export-secret-keys -o C:\Users\dffwe\AppData\Roaming\gnupg\secring.gpg
+
+To list avaiable keys, using keyId compatible with Gradle:
+   gpg --list-keys --keyid-format SHORT
 
 *******************************************************************************
 *** DEPLOY ********************************************************************
