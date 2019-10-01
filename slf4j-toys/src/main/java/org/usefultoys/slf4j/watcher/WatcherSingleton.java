@@ -29,37 +29,42 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Daniel Felix Ferber
  */
-public class WatcherSingleton {
+public final class WatcherSingleton {
 
     /**
-     * Watcher default instance. It is created at application startup and named as system property {@code slf4jtoys.watcher.name}, which defaults to
-     * {@code watcher}. You cannot assign a new default watcher at runtime.
+     * Watcher default instance. It is created at application startup and named as system property {@code slf4jtoys.watcher.name}, which defaults to {@code
+     * watcher}. You cannot assign a new default watcher at runtime.
      */
+    @SuppressWarnings("NonFinalStaticVariableUsedInClassInitialization")
     public static final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(WatcherConfig.name));
 
+    /** Executor that may run the default watcher. */
     private static ScheduledExecutorService defaultWatcherExecutor = null;
     private static ScheduledFuture<?> scheduledDefaultWatcher = null;
 
+    /** Timer that may run the default watcher. */
     private static Timer defaultWatcherTimer = null;
     private static TimerTask defaultWatcherTask = null;
 
     private WatcherSingleton() {
-        // prevent instances
+        // Utility class
     }
 
     /**
-     * Starts the executor that periodically invokes the default watcher to report system status. Intended for simple architectures. May not be
-     * suitable for JavaEE environments that manage threads by itself.
+     * Starts the executor that periodically invokes the default watcher to report system status. Intended for simple architectures. May not be suitable for
+     * JavaEE environments that manage threads by itself.
      */
     public static synchronized void startDefaultWatcherExecutor() {
         if (defaultWatcherExecutor == null) {
             defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
         }
         if (scheduledDefaultWatcher == null) {
-            scheduledDefaultWatcher = defaultWatcherExecutor.scheduleAtFixedRate(DEFAULT_WATCHER,
+            scheduledDefaultWatcher = defaultWatcherExecutor.scheduleAtFixedRate(
+                    DEFAULT_WATCHER,
                     WatcherConfig.delayMilliseconds,
                     WatcherConfig.periodMilliseconds,
-                    TimeUnit.MILLISECONDS);
+                    TimeUnit.MILLISECONDS
+            );
         }
     }
 
@@ -77,8 +82,8 @@ public class WatcherSingleton {
     }
 
     /**
-     * Starts the timer that periodically invokes the default watcher to report system status. Intended for simple architectures. May not be suitable
-     * for JavaEE environments that manage threads by itself.
+     * Starts the timer that periodically invokes the default watcher to report system status. Intended for simple architectures. May not be suitable for JavaEE
+     * environments that manage threads by itself.
      */
     public static synchronized void startDefaultWatcherTimer() {
         if (defaultWatcherTimer == null) {
@@ -91,9 +96,11 @@ public class WatcherSingleton {
                     DEFAULT_WATCHER.logCurrentStatus();
                 }
             };
-            defaultWatcherTimer.schedule(defaultWatcherTask,
+            defaultWatcherTimer.schedule(
+                    defaultWatcherTask,
                     WatcherConfig.delayMilliseconds,
-                    WatcherConfig.periodMilliseconds);
+                    WatcherConfig.periodMilliseconds
+            );
         }
     }
 
@@ -108,5 +115,4 @@ public class WatcherSingleton {
             defaultWatcherTask = null;
         }
     }
-
 }

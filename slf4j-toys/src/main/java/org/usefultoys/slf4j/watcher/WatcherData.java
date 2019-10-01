@@ -19,7 +19,7 @@ import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
- * Adapts the {@link SystemData} to semantics required by Watcher. Further, {@link Watcher} events are deserialized back to {@link WatcherData}.
+ * Augments the {@link SystemData} to semantics required by Watcher. Further, {@link Watcher} events are deserialized back to {@link WatcherData}.
  *
  * @author Daniel Felix Ferber
  */
@@ -35,9 +35,6 @@ public class WatcherData extends SystemData {
     public StringBuilder readableString(final StringBuilder builder) {
         boolean hasPrevious = false;
         if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
-            //if (hasPrevious) {
-            //    builder.append("; ");
-            //}
             builder.append("Memory: ");
             builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
             builder.append(' ');
@@ -52,7 +49,14 @@ public class WatcherData extends SystemData {
             }
             builder.append("System load: ");
             builder.append(Math.round(this.systemLoad * 100));
-            //hasPrevious = true;
+            hasPrevious = true;
+        }
+        if (this.sessionUuid != null) {
+            if (hasPrevious) {
+                builder.append("; ");
+            }
+            builder.append("UUID: ");
+            builder.append(this.sessionUuid);
         }
         return builder;
     }
@@ -62,11 +66,11 @@ public class WatcherData extends SystemData {
     }
 
     public final String write() {
-        return write(new StringBuilder(), DETAILED_MESSAGE_PREFIX).toString();
+        return write(new StringBuilder(200), DETAILED_MESSAGE_PREFIX).toString();
     }
 
     public final String readableWrite() {
-        return readableString(new StringBuilder()).toString();
+        return readableString(new StringBuilder(200)).toString();
     }
 
 }

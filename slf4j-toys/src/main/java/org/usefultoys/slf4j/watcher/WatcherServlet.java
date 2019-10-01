@@ -15,24 +15,23 @@
  */
 package org.usefultoys.slf4j.watcher;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
- * Simple servlet that reacts to GET methods by invoking the default watcher to report system status. You may bind this servlet to an URL for this
- * special purpose and calls this URK by a CRON job.
+ * Simple servlet that reacts to GET methods by invoking the default watcher to report system status. You may bind this servlet to an URL for this special
+ * purpose and calls this URK by a CRON job.
  *
  * @author Daniel Felix Ferber
  */
 public class WatcherServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 675380685122096016L;
 
+    @SuppressWarnings("MethodMayBeStatic")
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
     }
 }

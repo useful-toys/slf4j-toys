@@ -26,7 +26,7 @@ import org.slf4j.MarkerFactory;
 public final class Markers {
 
     private Markers() {
-        //nothing
+        // utility class
     }
 
     public static final Marker MSG_WATCHER = MarkerFactory.getMarker("WATCHER_MSG");
