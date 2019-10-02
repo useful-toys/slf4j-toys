@@ -1,4 +1,4 @@
-<configuration debug="false">
+<configuration debug="true">
     <conversionRule conversionWord="status"
                     converterClass="org.usefultoys.slf4j.logback.StatusConverter" />
     <conversionRule conversionWord="statushl"
@@ -9,11 +9,11 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <withJansi>false</withJansi>
         <encoder>
-            <pattern>%msghl(%d{HH:mm}) %statushl(%7.7status) %msghl(%logger{36}) %msghl(%msg) %n</pattern>
+            <pattern>%d{HH:mm} %logger{36} %statushl(%7status) %msghl(%msg) %n</pattern>
         </encoder>
     </appender>
 
-    <root level="debug">
+    <root level="trace">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
