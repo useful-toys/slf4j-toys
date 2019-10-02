@@ -17,12 +17,21 @@ package examples;
 
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.internal.SystemConfig;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterConfig;
 import org.usefultoys.slf4j.meter.MeterFactory;
+import org.usefultoys.slf4j.watcher.WatcherConfig;
+import org.usefultoys.slf4j.watcher.WatcherSingleton;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Locale;
 
 /**
+ * Test SLF4J Meter using JUL as underlying framework.
+ * This examample demonstrates recommended logging setting for JUL.
  *
  * @author Daniel Felix Ferber
  */
@@ -31,177 +40,72 @@ public class LogbackExample {
     public static final Logger logger = LoggerFactory.getLogger("example");
 
     static {
-        /* Enable managed bean that is able to read CPU usage.  */
+        Locale.setDefault(Locale.ENGLISH);
+        SessionConfig.uuidSize = 6;
+        WatcherConfig.delayMilliseconds = 1000;
+        WatcherConfig.periodMilliseconds = 500;
+        SystemConfig.useClassLoadingManagedBean = true;
+        SystemConfig.useCompilationManagedBean = true;
+        SystemConfig.useGarbageCollectionManagedBean = true;
+        SystemConfig.useMemoryManagedBean = true;
         SystemConfig.usePlatformManagedBean = true;
-        MeterConfig.printStatus = false;
-        MeterConfig.printPosition = true;
-        MeterConfig.printCategory = false;
+        MeterConfig.progressPeriodMilliseconds=300;
+        MeterConfig.printCategory=false;
+        MeterConfig.printStatus=false;
+        MeterConfig.printPosition=false;
     }
 
-    public static void main(final String argv[]) {
-        example1();
-        example2A();
-        example2C();
-        example2B();
-        example2D();
-        example3A();
-        example3B();
-        example3C();
+    public static void main(final String argv[]) throws IOException {
+        WatcherSingleton.startDefaultWatcherExecutor();
+        logger.error("error message");
+        logger.warn("warn message");
+        logger.info("info message");
+        logger.debug("debug message");
+        logger.trace("trace message");
+        runOperation1();
+        runOperation2();
+        runOperation3();
+        WatcherSingleton.stopDefaultWatcherExecutor();
     }
 
-    private static void example1() {
-        /* Simplistic usage. */
-        final Meter m1 = MeterFactory.getMeter(logger, "operation1").start();
-        runOperation(true);
-        m1.ok();
-    }
-
-    private static void example2A() {
-        /* Report execution flow with Meter.ok() with string parameter. */
-        final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
-        // Check if user exists in database
-        boolean exist = runOperation(true);
-        if (exist) {
-            // Update user in database
-            someOperation();
-            m2.ok("Update");
-        } else {
-            // Insert user into database
-            otherOperation();
-            m2.ok("Insert");
-        }
-    }
-
-    static enum OperationResult {
-
-        UPDATE, INSERT
-    }
-
-    private static void example2C() {
-        /* Report execution flow with Meter.ok() with enum parameter. */
-        final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
-        // Check if user exists in database
-        boolean exist = runOperation(true);
-        if (exist) {
-            // Update user in database
-            someOperation();
-            m2.ok(OperationResult.UPDATE);
-        } else {
-            // Insert user into database
-            otherOperation();
-            m2.ok(OperationResult.INSERT);
-        }
-    }
-
-    private static void example2B() {
-        /* Report execution flow with Meter.flow() with string parameter. */
-        final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
-        // Check if user exists in database
-        boolean exist = runOperation(true);
-        if (exist) {
-            // Update user in database
-            someOperation();
-            m2.flow("Update");
-        } else {
-            // Insert user into database
-            otherOperation();
-            m2.flow("Insert");
-        }
-        m2.ok();
-    }
-
-    private static void example2D() {
-        /* Report execution flow with Meter.flow() with enum parameter. */
-        final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
-        // Check if user exists in database
-        boolean exist = runOperation(true);
-        if (exist) {
-            // Update user in database
-            someOperation();
-            m2.flow(OperationResult.UPDATE);
-        } else {
-            // Insert user into database
-            otherOperation();
-            m2.flow(OperationResult.INSERT);
-        }
-        m2.ok();
-    }
-
-    private static void example3A() {
-        /* Report execution flow with Meter.ok() and Meter.reject(). */
-        final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
-        // Check if user has permissions
-        boolean authorized = runOperation(false);
-        if (authorized) {
-            // Proceed
-            someOperation();
-            m2.ok("Update");
-        } else {
-            m2.reject("Unauthorized");
-        }
-    }
-
-    static enum OperationFailure {
-
-        UNAUTHORIZED
-    }
-
-    private static void example3B() {
-        /* Report execution flow with Meter.ok() and Meter.reject() with enum parameter. */
-        final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
-        // Check if user has permissions
-        boolean authorized = runOperation(false);
-        if (authorized) {
-            // Proceed
-            someOperation();
-            m2.ok("Update");
-        } else {
-            m2.reject(OperationFailure.UNAUTHORIZED);
-        }
-    }
-
-    public static class UnauthorizedException extends Exception {
-    }
-
-    private static void example3C() {
-        /* Report execution flow with Meter.ok() and Meter.reject() with exception parameter. */
-        final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
-        try {
-            // Check if user has permissions
-            boolean authorized = runOperation(false);
-            if (!authorized) {
-                throw new UnauthorizedException();
-            }
-            // Proceed
-            someOperation();
-            m2.ok("Update");
-        } catch (UnauthorizedException e) {
-            m2.reject(e);
-        }
-    }
-
-    private static boolean runOperation(boolean expectedResult) {
-        try {
+    private static void runOperation1() {
+        try (Meter m = MeterFactory.getMeter(logger, "runOperation").iterations(3).start()) {
             Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            // ignore
-        }
-        return expectedResult;
-    }
-
-    private static void someOperation() {
-        try {
+            m.inc().progress();
             Thread.sleep(1000);
+            m.inc().progress();
+            Thread.sleep(1000);
+            m.inc().ok();
         } catch (InterruptedException ex) {
-            // ignore
+            ex.printStackTrace();
         }
     }
 
-    private static void otherOperation() {
+    private static void runOperation2() {
         try {
+            Meter m = MeterFactory.getMeter(logger, "runOperation").iterations(3).start();
             Thread.sleep(1000);
+            m.inc().progress();
+            Thread.sleep(1000);
+            m.inc().progress();
+            Thread.sleep(1000);
+            m.inc().reject("NO-WAY");
         } catch (InterruptedException ex) {
-            // ignore
+            ex.printStackTrace();
+        }
+    }
+
+    private static void runOperation3() {
+        try {
+            Meter m = MeterFactory.getMeter(logger, "runOperation").iterations(3).start();
+            Thread.sleep(1000);
+            m.inc().progress();
+            Thread.sleep(1000);
+            m.inc().progress();
+            Thread.sleep(1000);
+            m.inc().fail(new FileNotFoundException());
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
         }
     }
 }

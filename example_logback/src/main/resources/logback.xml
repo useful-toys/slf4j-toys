@@ -1,10 +1,15 @@
 <configuration debug="true">
     <conversionRule conversionWord="status"
-                    converterClass="org.usefultoys.slf4j.logback.MeterConverter" />
+                    converterClass="org.usefultoys.slf4j.logback.StatusConverter" />
+    <conversionRule conversionWord="statushl"
+                    converterClass="org.usefultoys.slf4j.logback.StatusHighlightConverter" />
+    <conversionRule conversionWord="msghl"
+                    converterClass="org.usefultoys.slf4j.logback.MessageHighlightConverter" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>false</withJansi>
         <encoder>
-            <pattern>%d{HH:mm} %logger{36} %-5.-5status %msg%n</pattern>
+            <pattern>%d{HH:mm} %logger{36} %statushl(%7status) %msghl(%msg) %n</pattern>
         </encoder>
     </appender>
 
