@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+compileJava.options.encoding = 'UTF-8'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+application {
+    mainClassName = 'examples.Slf4JoverLog4JExample'
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.28'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.12.1'
+    compile project(':slf4j-toys')
+}

@@ -3,5 +3,6 @@ rootProject.name = 'slf4j-toys-root'
 include 'slf4j-toys'
 include 'examples'
 include 'example_jul'
+include 'example_log4j'
 include 'example_logback'
 
