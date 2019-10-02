@@ -3,12 +3,16 @@
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output-test url="file://$MODULE_DIR$/../../../examples/build/classes/java/test" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../../examples/src/test" />
+    <content url="file://$MODULE_DIR$/../../../examples/src/test">
+      <sourceFolder url="file://$MODULE_DIR$/../../../examples/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../examples/src/test/resources" type="java-test-resource" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="slf4j-toys-root-examples_main" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-simple:1.7.21" level="project" />
     <orderEntry type="module" module-name="slf4j-toys_main" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.28" level="project" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-simple:1.7.21" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="examples_main" />
 </module>

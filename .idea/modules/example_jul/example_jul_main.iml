@@ -9,6 +9,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-jdk14:1.7.28" level="project" />
     <orderEntry type="module" module-name="slf4j-toys_main" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.28" level="project" />
   </component>

@@ -4,6 +4,8 @@
     <bytecodeTargetLevel>
       <module name="example_jul_main" target="1.8" />
       <module name="example_jul_test" target="1.8" />
+      <module name="example_log4j_main" target="1.8" />
+      <module name="example_log4j_test" target="1.8" />
       <module name="example_logback_main" target="1.8" />
       <module name="example_logback_test" target="1.8" />
       <module name="examples_main" target="1.8" />

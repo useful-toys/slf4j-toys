@@ -5,6 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_jul/example_jul.iml" filepath="$PROJECT_DIR$/.idea/modules/example_jul/example_jul.iml" group="slf4j-toys-root/example_jul" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_jul/example_jul_main.iml" filepath="$PROJECT_DIR$/.idea/modules/example_jul/example_jul_main.iml" group="slf4j-toys-root/example_jul" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_jul/example_jul_test.iml" filepath="$PROJECT_DIR$/.idea/modules/example_jul/example_jul_test.iml" group="slf4j-toys-root/example_jul" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_log4j/example_log4j.iml" filepath="$PROJECT_DIR$/.idea/modules/example_log4j/example_log4j.iml" group="slf4j-toys-root/example_log4j" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_log4j/example_log4j_main.iml" filepath="$PROJECT_DIR$/.idea/modules/example_log4j/example_log4j_main.iml" group="slf4j-toys-root/example_log4j" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_log4j/example_log4j_test.iml" filepath="$PROJECT_DIR$/.idea/modules/example_log4j/example_log4j_test.iml" group="slf4j-toys-root/example_log4j" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_logback/example_logback.iml" filepath="$PROJECT_DIR$/.idea/modules/example_logback/example_logback.iml" group="slf4j-toys-root/example_logback" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_logback/example_logback_main.iml" filepath="$PROJECT_DIR$/.idea/modules/example_logback/example_logback_main.iml" group="slf4j-toys-root/example_logback" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_logback/example_logback_test.iml" filepath="$PROJECT_DIR$/.idea/modules/example_logback/example_logback_test.iml" group="slf4j-toys-root/example_logback" />
