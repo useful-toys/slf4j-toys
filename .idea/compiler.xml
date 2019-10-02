@@ -8,6 +8,8 @@
       <module name="example_log4j_test" target="1.8" />
       <module name="example_logback_main" target="1.8" />
       <module name="example_logback_test" target="1.8" />
+      <module name="example_no_slf4jtoys_main" target="1.8" />
+      <module name="example_no_slf4jtoys_test" target="1.8" />
       <module name="examples_main" target="1.8" />
       <module name="examples_test" target="1.8" />
       <module name="org.usefultoys-slf4j-toys_main" target="1.6" />

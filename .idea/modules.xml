@@ -11,6 +11,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_logback/example_logback.iml" filepath="$PROJECT_DIR$/.idea/modules/example_logback/example_logback.iml" group="slf4j-toys-root/example_logback" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_logback/example_logback_main.iml" filepath="$PROJECT_DIR$/.idea/modules/example_logback/example_logback_main.iml" group="slf4j-toys-root/example_logback" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_logback/example_logback_test.iml" filepath="$PROJECT_DIR$/.idea/modules/example_logback/example_logback_test.iml" group="slf4j-toys-root/example_logback" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_no_slf4jtoys/example_no_slf4jtoys.iml" filepath="$PROJECT_DIR$/.idea/modules/example_no_slf4jtoys/example_no_slf4jtoys.iml" group="slf4j-toys-root/example_no_slf4jtoys" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_no_slf4jtoys/example_no_slf4jtoys_main.iml" filepath="$PROJECT_DIR$/.idea/modules/example_no_slf4jtoys/example_no_slf4jtoys_main.iml" group="slf4j-toys-root/example_no_slf4jtoys" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/example_no_slf4jtoys/example_no_slf4jtoys_test.iml" filepath="$PROJECT_DIR$/.idea/modules/example_no_slf4jtoys/example_no_slf4jtoys_test.iml" group="slf4j-toys-root/example_no_slf4jtoys" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/examples/examples.iml" filepath="$PROJECT_DIR$/.idea/modules/examples/examples.iml" group="slf4j-toys-root/examples" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/examples/examples_main.iml" filepath="$PROJECT_DIR$/.idea/modules/examples/examples_main.iml" group="slf4j-toys-root/examples" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" filepath="$PROJECT_DIR$/.idea/modules/examples/examples_test.iml" group="slf4j-toys-root/examples" />
