@@ -278,11 +278,11 @@ public class MeterData extends SystemData {
                     buffer.append("FAIL");
                 }
             } else if (startTime != 0 && iteration == 0) {
-                buffer.append("Started");
+                buffer.append("STARTED");
             } else if (startTime != 0) {
-                buffer.append("Progress ");
+                buffer.append("PROGRESS");
             } else {
-                buffer.append("Scheduled");
+                buffer.append("SCHEDULED");
             }
             buffer.append(": ");
         }

@@ -20,7 +20,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.slf4j.Marker;
 import org.usefultoys.slf4j.meter.Markers;
 
-public class MeterConverter extends ClassicConverter  {
+public class StatusConverter extends ClassicConverter  {
     public String convert(final ILoggingEvent event) {
         final Marker marker = event.getMarker();
         if (marker == Markers.MSG_START) return "START";
@@ -29,12 +29,12 @@ public class MeterConverter extends ClassicConverter  {
         if (marker == Markers.MSG_SLOW_OK) return "SLOW";
         if (marker == Markers.MSG_REJECT) return "REJECT";
         if (marker == Markers.MSG_FAIL) return "FAIL";
-        if (marker == Markers.DATA_START) return "START";
-        if (marker == Markers.DATA_PROGRESS) return "PROGRESS";
-        if (marker == Markers.DATA_OK) return "OK";
-        if (marker == Markers.DATA_SLOW_OK) return "SLOW";
-        if (marker == Markers.DATA_REJECT) return "REJECT";
-        if (marker == Markers.DATA_FAIL) return "FAIL";
+        if (marker == Markers.DATA_START) return "";
+        if (marker == Markers.DATA_PROGRESS) return "";
+        if (marker == Markers.DATA_OK) return "";
+        if (marker == Markers.DATA_SLOW_OK) return "";
+        if (marker == Markers.DATA_REJECT) return "";
+        if (marker == Markers.DATA_FAIL) return "";
         if (marker == Markers.BUG) return "BUG";
         if (marker == Markers.ILLEGAL) return "ILLEGAL";
         if (marker == Markers.INCONSISTENT_START) return "INCONSISTENT";
@@ -46,7 +46,7 @@ public class MeterConverter extends ClassicConverter  {
         if (marker == Markers.INCONSISTENT_FAIL) return "INCONSISTENT";
         if (marker == Markers.INCONSISTENT_FINALIZED) return "INCONSISTENT";
         if (marker == org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER) return "WATCHER";
-        if (marker == org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER) return "WATCHER";
+        if (marker == org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER) return "";
         return event.getLevel().toString();
     }
 }
