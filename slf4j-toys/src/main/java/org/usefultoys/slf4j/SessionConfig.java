@@ -30,6 +30,7 @@ import org.usefultoys.slf4j.watcher.WatcherData;
 @SuppressWarnings("CanBeFinal")
 public class SessionConfig {
 
+    public static final int UUID_LENGHT = 32;
     /**
      * Size of the UUID to print on {@link Watcher} and {@link Meter} messages.
      * The UUID has 32 digits. If you want just to distinguish one application instace from another (server running more than one node,

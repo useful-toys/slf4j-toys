@@ -24,7 +24,7 @@ public class StatusConverter extends ClassicConverter  {
     public String convert(final ILoggingEvent event) {
         final Marker marker = event.getMarker();
         if (marker == Markers.MSG_START) return "START";
-        if (marker == Markers.MSG_PROGRESS) return "PROGRESS";
+        if (marker == Markers.MSG_PROGRESS) return "PROGR";
         if (marker == Markers.MSG_OK) return "OK";
         if (marker == Markers.MSG_SLOW_OK) return "SLOW";
         if (marker == Markers.MSG_REJECT) return "REJECT";

@@ -17,7 +17,6 @@ package org.usefultoys.slf4j.watcher;
 
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.Session;
-import org.usefultoys.slf4j.SessionConfig;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -47,7 +46,7 @@ public class Watcher extends WatcherData implements Runnable {
         this.messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
         this.eventPosition = 0;
-        this.sessionUuid = Session.uuid.substring(Session.uuid.length() - SessionConfig.uuidSize);
+        this.sessionUuid = Session.uuid;
     }
 
     @Override

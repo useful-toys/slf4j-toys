@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.internal.EventData;
 import org.usefultoys.slf4j.internal.EventReader;
 import org.usefultoys.slf4j.internal.EventWriter;
@@ -263,121 +264,134 @@ public class MeterData extends SystemData {
     }
 
     @Override
-    public StringBuilder readableString(final StringBuilder buffer) {
+    protected void collectRuntimeStatus() {
+        super.collectRuntimeStatus();
+    }
+
+    @Override
+    public StringBuilder readableString(final StringBuilder builder) {
         if (MeterConfig.printStatus) {
             if (stopTime != 0) {
                 if (failClass == null && rejectId == null) {
                     if (timeLimitNanoseconds != 0 && startTime != 0 && stopTime - startTime > timeLimitNanoseconds) {
-                        buffer.append("OK (Slow)");
+                        builder.append("OK (Slow)");
                     } else {
-                        buffer.append("OK");
+                        builder.append("OK");
                     }
                 } else if (rejectId != null) {
-                    buffer.append("REJECT");
+                    builder.append("REJECT");
                 } else if (failClass != null) {
-                    buffer.append("FAIL");
+                    builder.append("FAIL");
                 }
             } else if (startTime != 0 && iteration == 0) {
-                buffer.append("STARTED");
+                builder.append("STARTED");
             } else if (startTime != 0) {
-                buffer.append("PROGRESS");
+                builder.append("PROGRESS");
             } else {
-                buffer.append("SCHEDULED");
+                builder.append("SCHEDULED");
             }
-            buffer.append(": ");
+            builder.append(": ");
         }
 
         if (MeterConfig.printCategory) {
             final int index = eventCategory.lastIndexOf('.') + 1;
-            buffer.append(eventCategory.substring(index));
+            builder.append(eventCategory.substring(index));
         }
         if (eventName != null) {
             if (MeterConfig.printCategory) {
-                buffer.append('/');
+                builder.append('/');
             }
-            buffer.append(eventName);
+            builder.append(eventName);
         }
         if (MeterConfig.printPosition) {
-            buffer.append('#');
-            buffer.append(eventPosition);
+            builder.append('#');
+            builder.append(eventPosition);
         }
 
         if (pathId != null) {
-            buffer.append(" [");
-            buffer.append(pathId);
-            buffer.append(']');
+            builder.append(" [");
+            builder.append(pathId);
+            builder.append(']');
         }
         if (rejectId != null) {
-            buffer.append(" [");
-            buffer.append(rejectId);
-            buffer.append(']');
+            builder.append(" [");
+            builder.append(rejectId);
+            builder.append(']');
         }
         if (failClass != null || failMessage != null) {
-            buffer.append(" [");
+            builder.append(" [");
             if (failClass != null) {
-                buffer.append(failClass);
+                builder.append(failClass);
             }
             if (failClass != null && failMessage != null) {
-                buffer.append("; ");
+                builder.append("; ");
             }
             if (failMessage != null) {
-                buffer.append(failMessage);
+                builder.append(failMessage);
             }
-            buffer.append(']');
+            builder.append(']');
         }
 
         if (startTime != 0 && iteration > 0) {
-            buffer.append(' ');
-            buffer.append(UnitFormatter.iterations(this.iteration));
+            builder.append(' ');
+            builder.append(UnitFormatter.iterations(this.iteration));
             if (this.expectedIterations > 0) {
-                buffer.append('/');
-                buffer.append(UnitFormatter.iterations(this.expectedIterations));
+                builder.append('/');
+                builder.append(UnitFormatter.iterations(this.expectedIterations));
             }
         }
 
         if (this.description != null) {
-            buffer.append(" '");
-            buffer.append(this.description);
-            buffer.append('\'');
-        }
-
-        if (this.startTime != 0) {
-            buffer.append("; ");
-            buffer.append(UnitFormatter.nanoseconds(getExecutionTime()));
-            if (this.iteration > 0) {
-                buffer.append("; ");
-                final double iterationsPerSecond = getIterationsPerSecond();
-                buffer.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
-                buffer.append(' ');
-                final double nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
-                buffer.append(UnitFormatter.nanoseconds(nanoSecondsPerIteration));
-            }
-        } else {
-            buffer.append("; ");
-            buffer.append(UnitFormatter.nanoseconds(getWaitingTime()));
-        }
-
-        if (this.runtime_usedMemory > 0) {
-            buffer.append("; ");
-            buffer.append(UnitFormatter.bytes(this.runtime_usedMemory));
-        }
-        if (this.systemLoad > 0) {
-            buffer.append("; ");
-            buffer.append(Math.round(this.systemLoad * 100));
-            buffer.append("%");
+            builder.append(" '");
+            builder.append(this.description);
+            builder.append('\'');
         }
 
         if (context != null) {
             for (final Entry<String, String> entry : context.entrySet()) {
-                buffer.append("; ");
-                buffer.append(entry.getKey());
+                builder.append("; ");
+                builder.append(entry.getKey());
                 if (entry.getValue() != null) {
-                    buffer.append("=");
-                    buffer.append(entry.getValue());
+                    builder.append("=");
+                    builder.append(entry.getValue());
                 }
             }
         }
-        return buffer;
+
+        if (this.startTime != 0) {
+            long executionTime = getExecutionTime();
+            if (executionTime > MeterConfig.progressPeriodMilliseconds) {
+                builder.append("; ");
+                builder.append(UnitFormatter.nanoseconds(executionTime));
+            }
+            if (this.iteration > 0) {
+                builder.append("; ");
+                final double iterationsPerSecond = getIterationsPerSecond();
+                builder.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
+                builder.append(' ');
+                final double nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
+                builder.append(UnitFormatter.nanoseconds(nanoSecondsPerIteration));
+            }
+        } else {
+            builder.append("; ");
+            builder.append(UnitFormatter.nanoseconds(getWaitingTime()));
+        }
+
+        if (MeterConfig.printMemory && this.runtime_usedMemory > 0) {
+            builder.append("; ");
+            builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
+        }
+        if (MeterConfig.printLoad && this.systemLoad > 0) {
+            builder.append("; ");
+            builder.append(Math.round(this.systemLoad * 100));
+            builder.append("%");
+        }
+        if (SessionConfig.uuidSize != 0 && this.sessionUuid != null) {
+            builder.append("; ");
+            builder.append(this.sessionUuid.substring(SessionConfig.UUID_LENGHT - SessionConfig.uuidSize));
+        }
+
+        return builder;
     }
 
     public boolean isSlow() {

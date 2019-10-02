@@ -122,12 +122,7 @@ public class Meter extends MeterData implements Closeable {
         this.eventName = operationName;
         this.eventPosition = extractNextPosition(eventCategory, this.eventName);
         this.createTime = System.nanoTime();
-        if (dataUuidSize == 0) {
-            /* Watcher está configurado para não informar o UUID. */
-            this.sessionUuid = null;
-        } else {
-            this.sessionUuid = Session.uuid.substring(Session.uuid.length() - dataUuidSize);
-        }
+        this.sessionUuid = Session.uuid;
     }
 
     private static long extractNextPosition(String eventCategory, String operationName) {

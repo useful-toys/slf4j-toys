@@ -61,6 +61,8 @@ public class MeterConfig {
      * You may assign a new value at runtime.
      */
     public static boolean printPosition = Config.getProperty("slf4jtoys.meter.print.position", false);
+    public static boolean printLoad = Config.getProperty("slf4jtoys.meter.print.load", false);
+    public static boolean printMemory = Config.getProperty("slf4jtoys.meter.print.memory", false);
 
     /**
      * A prefix added to all loggers that write encoded event data with trace level.

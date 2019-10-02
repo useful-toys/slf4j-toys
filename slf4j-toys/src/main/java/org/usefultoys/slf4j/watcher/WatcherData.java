@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
@@ -49,14 +50,15 @@ public class WatcherData extends SystemData {
             }
             builder.append("System load: ");
             builder.append(Math.round(this.systemLoad * 100));
+            builder.append("%");
             hasPrevious = true;
         }
-        if (this.sessionUuid != null) {
+        if (SessionConfig.uuidSize != 0 && this.sessionUuid != null) {
             if (hasPrevious) {
                 builder.append("; ");
             }
             builder.append("UUID: ");
-            builder.append(this.sessionUuid);
+            builder.append(this.sessionUuid.substring(SessionConfig.UUID_LENGHT - SessionConfig.uuidSize));
         }
         return builder;
     }
