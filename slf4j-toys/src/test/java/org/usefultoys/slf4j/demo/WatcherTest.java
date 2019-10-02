@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.demo;
 
 import org.junit.Test;
+import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.watcher.WatcherConfig;
 import org.usefultoys.slf4j.watcher.WatcherSingleton;
 
@@ -30,7 +31,7 @@ public class WatcherTest {
         WatcherConfig.dataPrefix = "a.";
         WatcherConfig.dataSuffix = ".b";
         WatcherConfig.name = "mywatcher";
-        WatcherConfig.dataUuidSize = 5;
+        SessionConfig.uuidSize = 5;
     }
 
     @Test

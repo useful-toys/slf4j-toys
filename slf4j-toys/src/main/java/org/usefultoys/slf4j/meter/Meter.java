@@ -37,7 +37,6 @@ import java.util.logging.LogRecord;
 
 import static org.usefultoys.slf4j.LoggerConfig.hackJulEnable;
 import static org.usefultoys.slf4j.meter.MeterConfig.*;
-import static org.usefultoys.slf4j.watcher.WatcherConfig.dataUuidSize;
 
 /**
  * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call {@link #start()} to produce a

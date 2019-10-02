@@ -73,5 +73,4 @@ public class SystemConfig {
      * You may assign a new value at runtime.
      */
     public static boolean usePlatformManagedBean = Config.getProperty("slf4jtoys.usePlatformManagedBean", false);
-
 }
