@@ -11,10 +11,10 @@ application {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'ch.qos.logback:logback-core:1.2.3'
     compile 'ch.qos.logback:logback-classic:1.2.3'
-    compile 'org.slf4j:slf4j-api:1.7.21'
-    compile 'org.fusesource.jansi:jansi:1.8'
+    compile 'org.slf4j:slf4j-api:1.7.28'
+    compile 'org.fusesource.jansi:jansi:1.18'
     compile project(':slf4j-toys')
+    annotationProcessor project(':slf4j-toys')
 }
