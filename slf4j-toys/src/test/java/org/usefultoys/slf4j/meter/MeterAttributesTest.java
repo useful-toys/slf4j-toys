@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.Session;
 
 /**
  *
@@ -65,5 +64,6 @@ public class MeterAttributesTest {
         m1.incTo(4);
         Assert.assertEquals(iterationCount, m1.getExpectedIterations());
         Assert.assertEquals(4, m1.getCurrentIteration());
+        m1.ok();
     }
  }
