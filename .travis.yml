@@ -2,3 +2,5 @@ language: java
 jdk: oraclejdk8
 dist: trusty
 script: ./gradlew check --info
+notifications:
+  webhooks: https://fathomless-fjord-24024.herokuapp.com/notify?secret=ras0conf
