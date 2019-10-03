@@ -6,10 +6,10 @@ plugins {
 }
 
 group = 'org.usefultoys'
-version = '1.6.3'
+version = '1.6.4-snapshot'
 
 compileJava.options.encoding = 'UTF-8'
-compileJava.options.debug = true
+compileJava.options.debug = false
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
@@ -22,6 +22,7 @@ dependencies {
     compile files(org.gradle.internal.jvm.Jvm.current().toolsJar)
     compileOnly 'com.google.auto.service:auto-service:1.0-rc6'
     annotationProcessor 'com.google.auto.service:auto-service:1.0-rc6'
+    compileOnly 'org.jetbrains:annotations:17.0.0'
 }
 
 javadoc {
