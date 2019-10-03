@@ -15,8 +15,11 @@
  */
 package org.usefultoys.slf4j.utils;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+
+import java.util.Locale;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -31,6 +34,7 @@ public class UnitFormatterTest {
 
     @Test
     public void testLongUnit() {
+        Locale.setDefault(Locale.ENGLISH);
         assertEquals("0A", UnitFormatter.longUnit(0, UNITS, FACTORS));
         assertEquals("1A", UnitFormatter.longUnit(1, UNITS, FACTORS));
         assertEquals("9A", UnitFormatter.longUnit(9, UNITS, FACTORS));
@@ -43,30 +47,30 @@ public class UnitFormatterTest {
         assertEquals("1000A", UnitFormatter.longUnit(1000, UNITS, FACTORS));
         assertEquals("1001A", UnitFormatter.longUnit(1001, UNITS, FACTORS));
         assertEquals("1099A", UnitFormatter.longUnit(1099, UNITS, FACTORS));
-        assertEquals("1,1B", UnitFormatter.longUnit(1100, UNITS, FACTORS));
-        assertEquals("1,1B", UnitFormatter.longUnit(1101, UNITS, FACTORS));
-        assertEquals("1,1B", UnitFormatter.longUnit(1149, UNITS, FACTORS));
-        assertEquals("1,2B", UnitFormatter.longUnit(1150, UNITS, FACTORS));
-        assertEquals("1,2B", UnitFormatter.longUnit(1151, UNITS, FACTORS));
-        assertEquals("1,2B", UnitFormatter.longUnit(1199, UNITS, FACTORS));
-        assertEquals("1,2B", UnitFormatter.longUnit(1200, UNITS, FACTORS));
-        assertEquals("1,2B", UnitFormatter.longUnit(1201, UNITS, FACTORS));
-        assertEquals("1,2B", UnitFormatter.longUnit(1249, UNITS, FACTORS));
-        assertEquals("1,3B", UnitFormatter.longUnit(1250, UNITS, FACTORS));
-        assertEquals("1,3B", UnitFormatter.longUnit(1251, UNITS, FACTORS));
-        assertEquals("1,3B", UnitFormatter.longUnit(1299, UNITS, FACTORS));
-        assertEquals("1,3B", UnitFormatter.longUnit(1300, UNITS, FACTORS));
-        assertEquals("1,3B", UnitFormatter.longUnit(1301, UNITS, FACTORS));
-        assertEquals("1,3B", UnitFormatter.longUnit(1349, UNITS, FACTORS));
-        assertEquals("4,9B", UnitFormatter.longUnit(4900, UNITS, FACTORS));
-        assertEquals("4,9B", UnitFormatter.longUnit(4949, UNITS, FACTORS));
-        assertEquals("5,0B", UnitFormatter.longUnit(4990, UNITS, FACTORS));
-        assertEquals("5,0B", UnitFormatter.longUnit(5000, UNITS, FACTORS));
-        assertEquals("5,0B", UnitFormatter.longUnit(5010, UNITS, FACTORS));
-        assertEquals("5,1B", UnitFormatter.longUnit(5050, UNITS, FACTORS));
-        assertEquals("999,9B", UnitFormatter.longUnit(999900, UNITS, FACTORS));
-        assertEquals("1000,0B", UnitFormatter.longUnit(1000000, UNITS, FACTORS));
-        assertEquals("1,1C", UnitFormatter.longUnit(1100000, UNITS, FACTORS));
+        assertEquals("1.1B", UnitFormatter.longUnit(1100, UNITS, FACTORS));
+        assertEquals("1.1B", UnitFormatter.longUnit(1101, UNITS, FACTORS));
+        assertEquals("1.1B", UnitFormatter.longUnit(1149, UNITS, FACTORS));
+        assertEquals("1.2B", UnitFormatter.longUnit(1150, UNITS, FACTORS));
+        assertEquals("1.2B", UnitFormatter.longUnit(1151, UNITS, FACTORS));
+        assertEquals("1.2B", UnitFormatter.longUnit(1199, UNITS, FACTORS));
+        assertEquals("1.2B", UnitFormatter.longUnit(1200, UNITS, FACTORS));
+        assertEquals("1.2B", UnitFormatter.longUnit(1201, UNITS, FACTORS));
+        assertEquals("1.2B", UnitFormatter.longUnit(1249, UNITS, FACTORS));
+        assertEquals("1.3B", UnitFormatter.longUnit(1250, UNITS, FACTORS));
+        assertEquals("1.3B", UnitFormatter.longUnit(1251, UNITS, FACTORS));
+        assertEquals("1.3B", UnitFormatter.longUnit(1299, UNITS, FACTORS));
+        assertEquals("1.3B", UnitFormatter.longUnit(1300, UNITS, FACTORS));
+        assertEquals("1.3B", UnitFormatter.longUnit(1301, UNITS, FACTORS));
+        assertEquals("1.3B", UnitFormatter.longUnit(1349, UNITS, FACTORS));
+        assertEquals("4.9B", UnitFormatter.longUnit(4900, UNITS, FACTORS));
+        assertEquals("4.9B", UnitFormatter.longUnit(4949, UNITS, FACTORS));
+        assertEquals("5.0B", UnitFormatter.longUnit(4990, UNITS, FACTORS));
+        assertEquals("5.0B", UnitFormatter.longUnit(5000, UNITS, FACTORS));
+        assertEquals("5.0B", UnitFormatter.longUnit(5010, UNITS, FACTORS));
+        assertEquals("5.1B", UnitFormatter.longUnit(5050, UNITS, FACTORS));
+        assertEquals("999.9B", UnitFormatter.longUnit(999900, UNITS, FACTORS));
+        assertEquals("1000.0B", UnitFormatter.longUnit(1000000, UNITS, FACTORS));
+        assertEquals("1.1C", UnitFormatter.longUnit(1100000, UNITS, FACTORS));
     }
 
 }
