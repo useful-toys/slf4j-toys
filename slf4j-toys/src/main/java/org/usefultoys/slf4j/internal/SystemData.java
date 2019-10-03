@@ -33,6 +33,10 @@ public abstract class SystemData extends EventData {
     protected SystemData() {
     }
 
+    public SystemData(String uuid) {
+        super(uuid);
+    }
+
     protected long heap_commited = 0;
     protected long heap_max = 0;
     protected long heap_used = 0;

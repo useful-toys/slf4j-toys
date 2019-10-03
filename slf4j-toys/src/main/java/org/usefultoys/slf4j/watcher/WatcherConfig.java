@@ -63,6 +63,7 @@ public final class WatcherConfig {
      * Value is read from system property {@code slf4jtoys.watcher.data.prefix} at application startup, defaults to empty. You may assign a new value at
      * runtime.
      */
+    @org.jetbrains.annotations.NonNls
     public static String dataPrefix = Config.getProperty("slf4jtoys.watcher.data.prefix", "");
 
     /**
@@ -107,5 +108,6 @@ public final class WatcherConfig {
      * Value is read from system property {@code slf4jtoys.watcher.data.prefix} at application startup, defaults to empty. You may assign a new value at
      * runtime.
      */
+    @org.jetbrains.annotations.NonNls
     public static String messageSuffix = Config.getProperty("slf4jtoys.watcher.message.suffix", "");
 }

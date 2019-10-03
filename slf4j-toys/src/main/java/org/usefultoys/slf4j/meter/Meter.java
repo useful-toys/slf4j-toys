@@ -120,7 +120,7 @@ public class Meter extends MeterData implements Closeable {
         this.eventParent = null;
         this.eventCategory = logger.getName();
         this.eventName = operationName;
-        this.eventPosition = extractNextPosition(eventCategory, this.eventName);
+        this.position = extractNextPosition(eventCategory, this.eventName);
         this.createTime = System.nanoTime();
         this.sessionUuid = Session.uuid;
     }

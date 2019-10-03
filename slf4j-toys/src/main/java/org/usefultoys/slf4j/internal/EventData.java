@@ -33,13 +33,24 @@ public abstract class EventData implements Serializable {
     /**
      * Time ordered position for multiple occurrences of the same event.
      */
-    protected long eventPosition = 0;
+    protected long position = 0;
     /**
      * Timestamp when the event data was collected.
      */
     protected long time = 0;
 
     protected EventData() {
+    }
+
+    public EventData(String uuid) {
+        this.sessionUuid = uuid;
+        this.position = 0;
+    }
+
+    /** Increments {@link #position} and stores system time to {@link #time}. */
+    protected final void nextPosition() {
+        time = System.nanoTime();
+        position++;
     }
 
     /**
@@ -52,8 +63,8 @@ public abstract class EventData implements Serializable {
     /**
      * @return Time ordered position for multiple occurrences of the same event.
      */
-    public long getEventPosition() {
-        return eventPosition;
+    public long getPosition() {
+        return position;
     }
 
     /**
@@ -69,7 +80,7 @@ public abstract class EventData implements Serializable {
      */
     protected final void reset() {
         this.sessionUuid = null;
-        this.eventPosition = 0;
+        this.position = 0;
         this.time = 0;
         this.resetImpl();
     }
@@ -93,7 +104,7 @@ public abstract class EventData implements Serializable {
         if (other == null) {
             throw new IllegalArgumentException("other == null");
         }
-        if (eventPosition != other.eventPosition) {
+        if (position != other.position) {
             return false;
         }
         if (sessionUuid == null) {
@@ -160,8 +171,8 @@ public abstract class EventData implements Serializable {
             w.property(SESSION_UUID, this.sessionUuid);
         }
         /* Event position */
-        if (this.eventPosition > 0) {
-            w.property(EVENT_POSITION, this.eventPosition);
+        if (this.position > 0) {
+            w.property(EVENT_POSITION, this.position);
         }
 
         /* Event time */
@@ -219,7 +230,7 @@ public abstract class EventData implements Serializable {
             this.sessionUuid = eventReader.readString();
             return true;
         } else if (EVENT_POSITION.equals(key)) {
-            this.eventPosition = eventReader.readLong();
+            this.position = eventReader.readLong();
             return true;
         } else if (EVENT_TIME.equals(key)) {
             this.time = eventReader.readLong();

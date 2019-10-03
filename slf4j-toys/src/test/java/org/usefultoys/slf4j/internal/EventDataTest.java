@@ -15,7 +15,6 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import java.io.IOException;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -44,10 +43,10 @@ public class EventDataTest {
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
 
-        b.eventPosition = 11;
+        b.position = 11;
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.eventPosition = 1;
+        b.position = 1;
 
         b.sessionUuid = "uuiduuid";
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -109,7 +108,7 @@ public class EventDataTest {
     }
 
     public static void populateEventData(EventData a) {
-        a.eventPosition = 1;
+        a.position = 1;
         a.sessionUuid = "uuid";
         a.time = 2;
     }

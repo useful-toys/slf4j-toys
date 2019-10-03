@@ -46,7 +46,7 @@ public final class UnitFormatter {
         double doubleValue = value;
 
         while (index < length && value >= (factors[index] + factors[index] / 10)) {
-            doubleValue = (double) value / (double) factors[index];
+            doubleValue = value / (double) factors[index];
             value /= factors[index];
             index++;
         }
@@ -63,7 +63,7 @@ public final class UnitFormatter {
         int index = 0;
         final int length = factors.length;
 
-        while (index < length && (value + Epsylon) >= (factors[index] + factors[index] / 10)) {
+        while (index < length && (value + Epsylon) >= (factors[index] + factors[index] / 10.0)) {
             value /= factors[index];
             index++;
         }

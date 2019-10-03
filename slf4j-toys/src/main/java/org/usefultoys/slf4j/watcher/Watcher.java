@@ -43,10 +43,9 @@ public class Watcher extends WatcherData implements Runnable {
      * @param logger Logger that reports messages.
      */
     public Watcher(final Logger logger) {
+        super(Session.uuid);
         this.messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
-        this.eventPosition = 0;
-        this.sessionUuid = Session.uuid;
     }
 
     @Override
@@ -58,17 +57,15 @@ public class Watcher extends WatcherData implements Runnable {
      * Logs about the current system status.
      */
     public void logCurrentStatus() {
-        time = System.nanoTime();
-        eventPosition++;
-
+        nextPosition();
         if (messageLogger.isInfoEnabled()) {
             collectRuntimeStatus();
             collectPlatformStatus();
             collectManagedBeanStatus();
-            messageLogger.info(Markers.MSG_WATCHER, readableWrite());
+            messageLogger.info(Markers.MSG_WATCHER, readableMessage());
         }
         if (messageLogger.isTraceEnabled()) {
-            dataLogger.trace(Markers.DATA_WATCHER, write());
+            dataLogger.trace(Markers.DATA_WATCHER, encodeAttributosAsString());
         }
     }
 }

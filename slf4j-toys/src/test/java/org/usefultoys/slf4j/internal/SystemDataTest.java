@@ -203,7 +203,7 @@ public class SystemDataTest {
     }
 
     public static void populateEventData(EventData a) {
-        a.eventPosition = 1111;
+        a.position = 1111;
         a.sessionUuid = "bbbb";
         a.time = 2222;
     }

@@ -57,7 +57,7 @@ public class MeterIdentifierOverflowTest {
     }
 
     private void assertEvents(Meter m, int expectedMessageCount, long expectedEventPosition) {
-        Assert.assertEquals(expectedEventPosition, m.getEventPosition());
+        Assert.assertEquals(expectedEventPosition, m.getPosition());
         Assert.assertEquals(null, m.getEventName());
         Assert.assertEquals(meterName, m.getEventCategory());
         final TestLoggerEvent startEvent = logger.getEvent(expectedMessageCount - 4);
@@ -66,7 +66,7 @@ public class MeterIdentifierOverflowTest {
         final TestLoggerEvent stopDataEvent = logger.getEvent(expectedMessageCount - 1);
 
         String str = "#=" + Long.toString(expectedEventPosition);
-        Assert.assertEquals(expectedEventPosition, m.getEventPosition());
+        Assert.assertEquals(expectedEventPosition, m.getPosition());
         Assert.assertFalse(startEvent.getFormattedMessage().contains(str));
         Assert.assertTrue(startDataEvent.getFormattedMessage().contains(str));
         Assert.assertFalse(stopEvent.getFormattedMessage().contains(str));

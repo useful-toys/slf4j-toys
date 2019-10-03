@@ -44,7 +44,7 @@ public class ToCSV {
                     sb.append(',');
                     sb.append(data.getEventCategory());
                     sb.append(',');
-                    sb.append(data.getEventPosition());
+                    sb.append(data.getPosition());
                     sb.append(',');
                     sb.append(data.getWaitingTime()/1000000.0);
                     sb.append(',');

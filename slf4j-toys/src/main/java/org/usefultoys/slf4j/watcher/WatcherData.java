@@ -32,6 +32,10 @@ public class WatcherData extends SystemData {
     public WatcherData() {
     }
 
+    public WatcherData(final String uuid) {
+        super(uuid);
+    }
+
     @Override
     public StringBuilder readableString(final StringBuilder builder) {
         boolean hasPrevious = false;
@@ -63,15 +67,15 @@ public class WatcherData extends SystemData {
         return builder;
     }
 
-    public final boolean read(final String message) {
+    public final boolean decodeAttributesFromString(final String message) {
         return this.read(message, DETAILED_MESSAGE_PREFIX);
     }
 
-    public final String write() {
+    public final String encodeAttributosAsString() {
         return write(new StringBuilder(200), DETAILED_MESSAGE_PREFIX).toString();
     }
 
-    public final String readableWrite() {
+    public final String readableMessage() {
         return readableString(new StringBuilder(200)).toString();
     }
 

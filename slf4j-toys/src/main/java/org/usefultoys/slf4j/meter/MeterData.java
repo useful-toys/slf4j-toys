@@ -104,9 +104,9 @@ public class MeterData extends SystemData {
 
     public String getFullID() {
         if (eventName == null) {
-            return eventCategory + '/' + eventPosition;
+            return eventCategory + '/' + position;
         }
-        return eventCategory + '/' + eventName + '#' + eventPosition;
+        return eventCategory + '/' + eventName + '#' + position;
     }
 
     public String getEventCategory() {
@@ -305,7 +305,7 @@ public class MeterData extends SystemData {
         }
         if (MeterConfig.printPosition) {
             builder.append('#');
-            builder.append(eventPosition);
+            builder.append(position);
         }
 
         if (pathId != null) {
@@ -564,7 +564,7 @@ public class MeterData extends SystemData {
             return false;
         if (sessionUuid != null ? !sessionUuid.equals(meterData.sessionUuid) : meterData.sessionUuid != null)
             return false;
-        if (eventPosition != meterData.eventPosition) return false;
+        if (position != meterData.position) return false;
         return eventName != null ? eventName.equals(meterData.eventName) : meterData.eventName == null;
     }
 
@@ -572,7 +572,7 @@ public class MeterData extends SystemData {
     public int hashCode() {
         int result = eventCategory != null ? eventCategory.hashCode() : 0;
         result = 31 * result + (eventName != null ? eventName.hashCode() : 0);
-        result = 31 * result + (int) (eventPosition ^ (eventPosition >>> 32));
+        result = 31 * result + (int) (position ^ (position >>> 32));
         result = 31 * result + (sessionUuid != null ? sessionUuid.hashCode() : 0);
         return result;
     }

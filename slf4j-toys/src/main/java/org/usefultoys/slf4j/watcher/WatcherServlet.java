@@ -31,7 +31,7 @@ public class WatcherServlet extends HttpServlet {
 
     @SuppressWarnings("MethodMayBeStatic")
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
         WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
     }
 }
