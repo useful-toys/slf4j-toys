@@ -41,9 +41,9 @@ public class MeterMessageTest {
     static final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterCategory);
     static final MeterData data = new MeterData();
 
-    static final String MESSAGE_START_PREFIX = "Started";
-    static final String MESSAGE_PROGRESS_PREFIX = "Progress";
-    static final String MESSAGE_SLOW_PREFIX = "(Slow)";
+    static final String MESSAGE_START_PREFIX = "STARTED";
+    static final String MESSAGE_PROGRESS_PREFIX = "PROGRESS";
+    static final String MESSAGE_SLOW_PREFIX = "OK (Slow)";
     static final String MESSAGE_OK_PREFIX = "OK";
     static final String MESSAGE_REJECT_PREFIX = "REJECT";
     static final String MESSAGE_FAIL_PREFIX = "FAIL";
@@ -53,8 +53,9 @@ public class MeterMessageTest {
 
     @BeforeClass
     public static void configureMeterSettings() {
-        System.setProperty("slf4jtoys.meter.progress.period", "0ms");
-        System.setProperty("slf4jtoys.meter.print.category", "false");
+        MeterConfig.progressPeriodMilliseconds = 0;
+        MeterConfig.printCategory = false;
+        MeterConfig.printStatus = true;
     }
 
     @Before
