@@ -18,7 +18,7 @@ package examples;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.internal.SystemConfig;
+import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterConfig;
 import org.usefultoys.slf4j.meter.MeterFactory;

@@ -18,7 +18,7 @@ package examples;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.internal.SystemConfig;
+import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterConfig;
 import org.usefultoys.slf4j.meter.MeterFactory;
@@ -26,9 +26,7 @@ import org.usefultoys.slf4j.watcher.WatcherConfig;
 import org.usefultoys.slf4j.watcher.WatcherSingleton;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Locale;
-import java.util.logging.LogManager;
 
 /**
  * Test SLF4J Meter using JUL as underlying framework.

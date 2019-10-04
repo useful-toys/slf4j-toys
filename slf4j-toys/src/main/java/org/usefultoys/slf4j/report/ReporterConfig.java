@@ -27,7 +27,7 @@ import org.usefultoys.slf4j.internal.Config;
  */
 @SuppressWarnings("CanBeFinal")
 public final class ReporterConfig {
-    public ReporterConfig() {
+    private ReporterConfig() {
         // prevent instances
     }
 

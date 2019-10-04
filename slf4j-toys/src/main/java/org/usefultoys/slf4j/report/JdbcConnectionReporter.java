@@ -20,6 +20,9 @@
  */
 package org.usefultoys.slf4j.report;
 
+import org.slf4j.Logger;
+import org.usefultoys.slf4j.LoggerFactory;
+
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -27,8 +30,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
-import org.slf4j.Logger;
-import org.usefultoys.slf4j.LoggerFactory;
 
 /**
  *
@@ -44,17 +45,17 @@ public class JdbcConnectionReporter {
 
     private boolean printTypeMap;
 
-    public JdbcConnectionReporter(Logger logger) {
+    public JdbcConnectionReporter(final Logger logger) {
         this.logger = logger;
     }
 
-    public JdbcConnectionReporter printTypeMap(boolean printTypeMap) {
+    public JdbcConnectionReporter printTypeMap(final boolean printTypeMap) {
         this.printTypeMap = printTypeMap;
         return this;
     }
 
-    public void run(Connection connection) {
-        PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+    public void run(final Connection connection) {
+        final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("JDBC connection");
         try {
             if (connection.isClosed()) {
@@ -68,7 +69,7 @@ public class JdbcConnectionReporter {
                 if (connection.getSchema() != null) {
                     ps.println(" - schema: " + connection.getSchema());
                 }
-            } catch (NoSuchMethodError ignore) {
+            } catch (final NoSuchMethodError ignore) {
                 // only since 1.7
             }
             final DatabaseMetaData metadata = connection.getMetaData();
@@ -96,7 +97,7 @@ public class JdbcConnectionReporter {
             }
             try {
                 ps.print("timeout=" + connection.getNetworkTimeout() + "ms; ");
-            } catch (NoSuchMethodError ignore) {
+            } catch (final NoSuchMethodError ignore) {
                 // only since 1.7
             }
             ps.print("transaction=");
@@ -126,7 +127,7 @@ public class JdbcConnectionReporter {
                 ps.println("n/a");
             } else {
                 int i = 1;
-                for (Map.Entry<Object, Object> entry : info.entrySet()) {
+                for (final Map.Entry<Object, Object> entry : info.entrySet()) {
                     if (i++ % 5 == 0) {
                         ps.print("\n      ");
                     }
@@ -158,13 +159,13 @@ public class JdbcConnectionReporter {
                 ps.println();
             }
             if (printTypeMap) {
-                Map<String, Class<?>> map = connection.getTypeMap();
+                final Map<String, Class<?>> map = connection.getTypeMap();
                 ps.println(" - type map: ");
                 if (map == null || map.isEmpty()) {
                     ps.println("n/a");
                 } else {
                     int i = 1;
-                    for (Map.Entry<String, Class<?>> entry : map.entrySet()) {
+                    for (final Map.Entry<String, Class<?>> entry : map.entrySet()) {
                         if (i++ % 5 == 0) {
                             ps.print("\n      ");
                         }
@@ -173,7 +174,7 @@ public class JdbcConnectionReporter {
                     ps.println();
                 }
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             ps.println("   Cannot read property: " + e.getLocalizedMessage());
         } finally {
             ps.close();

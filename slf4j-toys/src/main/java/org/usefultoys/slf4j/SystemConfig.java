@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.internal;
+package org.usefultoys.slf4j;
+
+import org.usefultoys.slf4j.internal.Config;
+import org.usefultoys.slf4j.internal.SystemData;
 
 /**
  * Collection of properties that drive {@link SystemData} behavior.

@@ -15,11 +15,9 @@
  */
 package org.usefultoys.slf4j.report;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -32,7 +30,7 @@ import java.util.Enumeration;
 public class ReportServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
         final String pathinfo = request.getPathInfo();
         if ("/VM".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportVM().run();
@@ -63,12 +61,12 @@ public class ReportServlet extends HttpServlet {
         }
         if ("/NetworkInterface".equalsIgnoreCase(pathinfo)) {
             try {
-                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
-                    NetworkInterface nif = interfaces.nextElement();
+                    final NetworkInterface nif = interfaces.nextElement();
                     new Reporter().new ReportNetworkInterface(nif).run();
                 }
-            } catch (SocketException e) {
+            } catch (final SocketException e) {
                 new Reporter().getLogger().warn("Cannot report interfaces", e);
             }
         }

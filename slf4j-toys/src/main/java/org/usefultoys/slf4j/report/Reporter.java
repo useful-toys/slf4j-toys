@@ -88,7 +88,7 @@ public class Reporter implements Serializable {
                 final NetworkInterface nif = interfaces.nextElement();
                 executor.execute(this.new ReportNetworkInterface(nif));
             }
-        } catch (SocketException e) {
+        } catch (final SocketException e) {
             logger.warn("Cannot report interfaces.", e);
         }
     }
@@ -134,7 +134,7 @@ public class Reporter implements Serializable {
                     final NetworkInterface nif = interfaces.nextElement();
                     executor.execute(this.new ReportNetworkInterface(nif));
                 }
-            } catch (SocketException e) {
+            } catch (final SocketException e) {
                 logger.warn("Cannot report interfaces", e);
             }
         }
@@ -195,7 +195,7 @@ public class Reporter implements Serializable {
 
         @Override
         public void run() {
-            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             ps.println("User:");
             ps.println(" - name: " + System.getProperty("user.name"));
             ps.println(" - home: " + System.getProperty("user.home"));
@@ -208,7 +208,7 @@ public class Reporter implements Serializable {
         @Override
         public void run() {
             final Runtime runtime = Runtime.getRuntime();
-            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             ps.println("Physical system");
             ps.println(" - processors: " + runtime.availableProcessors());
             ps.close();
@@ -219,7 +219,7 @@ public class Reporter implements Serializable {
 
         @Override
         public void run() {
-            PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             ps.println("Operating System");
             ps.println(" - architecture: " + System.getProperty("os.arch"));
             ps.println(" - name: " + System.getProperty("os.name"));
@@ -245,7 +245,7 @@ public class Reporter implements Serializable {
             ps.print("; DST=" + tz.getDSTSavings() / 60000 + "min");
             try {
                 ps.print("; observesDT=" + tz.observesDaylightTime());
-            } catch (NoSuchMethodError ignored) {
+            } catch (final NoSuchMethodError ignored) {
                 // Ignore property that exists only from Java 1.7 on.
             }
             ps.print("; useDT=" + tz.useDaylightTime());
@@ -277,7 +277,7 @@ public class Reporter implements Serializable {
             ps.print("; country=" + loc.getDisplayCountry() + " (" + loc.getCountry() + ")");
             try {
                 ps.print("; script=" + loc.getDisplayScript() + " (" + loc.getScript() + ")");
-            } catch (NoSuchMethodError ignored) {
+            } catch (final NoSuchMethodError ignored) {
                 // Ignore property that exists only from Java 1.7 on.
             }
             ps.print("; variant=" + loc.getDisplayVariant() + " (" + loc.getVariant() + ")");
@@ -363,7 +363,7 @@ public class Reporter implements Serializable {
                 while (inetAddresses.hasMoreElements()) {
                     reportNetworkAddress(ps, inetAddresses.nextElement());
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 ps.println("   Cannot read property: " + e.getLocalizedMessage());
             }
             ps.close();
@@ -398,7 +398,7 @@ public class Reporter implements Serializable {
                     ps.print("reachable; ");
                 }
                 ps.println();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 ps.println("   Cannot read property: " + e.getLocalizedMessage());
             }
         }

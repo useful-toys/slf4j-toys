@@ -27,18 +27,18 @@ import java.util.concurrent.Executor;
 public class ReportContextListener implements javax.servlet.ServletContextListener {
 
     @Override
-    public void contextDestroyed(ServletContextEvent arg0) {
+    public void contextDestroyed(final ServletContextEvent arg0) {
         // nothing
     }
 
     @Override
-    public void contextInitialized(ServletContextEvent arg0) {
+    public void contextInitialized(final ServletContextEvent arg0) {
         new Reporter().logDefaultReports(new ExecutorImpl());
     }
 
     private static class ExecutorImpl implements Executor {
         @Override
-        public void execute(Runnable command) {
+        public void execute(final Runnable command) {
             command.run();
         }
     }

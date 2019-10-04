@@ -15,6 +15,8 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import org.usefultoys.slf4j.SystemConfig;
+
 import java.io.IOException;
 import java.lang.management.*;
 import java.util.List;
