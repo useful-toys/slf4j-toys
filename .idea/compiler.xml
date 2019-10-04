@@ -2,23 +2,23 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="example_jul_main" target="1.8" />
-      <module name="example_jul_test" target="1.8" />
-      <module name="example_log4j_main" target="1.8" />
-      <module name="example_log4j_test" target="1.8" />
-      <module name="example_logback_main" target="1.8" />
-      <module name="example_logback_test" target="1.8" />
-      <module name="example_no_slf4jtoys_main" target="1.8" />
-      <module name="example_no_slf4jtoys_test" target="1.8" />
-      <module name="examples_main" target="1.8" />
-      <module name="examples_test" target="1.8" />
-      <module name="org.usefultoys-slf4j-toys_main" target="1.6" />
-      <module name="org.usefultoys-slf4j-toys_test" target="1.6" />
       <module name="slf4j-toys" target="1.6" />
       <module name="slf4j-toys-root-example_logback_main" target="1.8" />
       <module name="slf4j-toys-root-example_logback_test" target="1.8" />
       <module name="slf4j-toys-root-examples_main" target="1.8" />
       <module name="slf4j-toys-root-examples_test" target="1.8" />
+      <module name="slf4j-toys-root.example_jul.main" target="1.8" />
+      <module name="slf4j-toys-root.example_jul.test" target="1.8" />
+      <module name="slf4j-toys-root.example_log4j.main" target="1.8" />
+      <module name="slf4j-toys-root.example_log4j.test" target="1.8" />
+      <module name="slf4j-toys-root.example_logback.main" target="1.8" />
+      <module name="slf4j-toys-root.example_logback.test" target="1.8" />
+      <module name="slf4j-toys-root.example_no_slf4jtoys.main" target="1.8" />
+      <module name="slf4j-toys-root.example_no_slf4jtoys.test" target="1.8" />
+      <module name="slf4j-toys-root.examples.main" target="1.8" />
+      <module name="slf4j-toys-root.examples.test" target="1.8" />
+      <module name="slf4j-toys-root.slf4j-toys.main" target="1.6" />
+      <module name="slf4j-toys-root.slf4j-toys.test" target="1.6" />
       <module name="slf4j-toys_main" target="1.6" />
       <module name="slf4j-toys_test" target="1.6" />
     </bytecodeTargetLevel>
