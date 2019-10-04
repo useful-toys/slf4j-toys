@@ -30,8 +30,8 @@ public final class WatcherConfig {
     /**
      * For {@link WatcherSingleton#DEFAULT_WATCHER}, name where the watcher writes messages to.
      */
+    @org.jetbrains.annotations.NonNls
     public static String name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
-
     /**
      * For {@link WatcherSingleton#DEFAULT_WATCHER}, time to wait before reporting the first watcher status, in milliseconds.
      * <p>
@@ -39,8 +39,8 @@ public final class WatcherConfig {
      * integer that represents milliseconds. The system property allows the number suffixed with 'ms', 's', 'm' and 'h' to represent milliseconds, seconds,
      * minutes and hours.You may assign a new value at runtime, but if the default watcher is already running, you need to restart it.
      */
+    @org.jetbrains.annotations.NonNls
     public static long delayMilliseconds = Config.getMillisecondsProperty("slf4jtoys.watcher.delay", 60000L);
-
     /**
      * For {@link WatcherSingleton#DEFAULT_WATCHER}, time period to wait before reporting further watcher status, in milliseconds. Time to wait before reporting
      * the first watcher status, in milliseconds.
@@ -49,8 +49,8 @@ public final class WatcherConfig {
      * long integer that represents milliseconds. The system property allows the number suffixed with 'ms', 's', 'm' and 'h' to represent milliseconds, seconds,
      * minutes and hours. You may assign a new value at runtime, but if the default watcher is already running, you need to restart it.
      */
+    @org.jetbrains.annotations.NonNls
     public static long periodMilliseconds = Config.getMillisecondsProperty("slf4jtoys.watcher.period", 600000L);
-
     /**
      * A prefix added to the logger that writes encoded data for {@link Watcher}.
      * <p>
@@ -65,7 +65,6 @@ public final class WatcherConfig {
      */
     @org.jetbrains.annotations.NonNls
     public static String dataPrefix = Config.getProperty("slf4jtoys.watcher.data.prefix", "");
-
     /**
      * A suffix added to the logger that writes encoded data for {@link Watcher}.
      * <p>
@@ -78,8 +77,8 @@ public final class WatcherConfig {
      * Value is read from system property {@code slf4jtoys.watcher.data.prefix} at application startup, defaults to empty. You may assign a new value at
      * runtime.
      */
+    @org.jetbrains.annotations.NonNls
     public static String dataSuffix = Config.getProperty("slf4jtoys.watcher.data.suffix", "");
-
     /**
      * A prefix added to the logger that writes readable message for {@link Watcher}.
      * <p>
@@ -93,8 +92,8 @@ public final class WatcherConfig {
      * Value is read from system property {@code slf4jtoys.watcher.message.prefix} at application startup, defaults to empty. You may assign a new value at
      * runtime.
      */
+    @org.jetbrains.annotations.NonNls
     public static String messagePrefix = Config.getProperty("slf4jtoys.watcher.message.prefix", "");
-
     /**
      * A suffix added to the logger that writes readable message for {@link Watcher}.
      * <p>

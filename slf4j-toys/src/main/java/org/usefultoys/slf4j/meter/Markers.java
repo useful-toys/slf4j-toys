@@ -25,7 +25,7 @@ import org.slf4j.MarkerFactory;
 public final class Markers {
 
     private Markers() {
-        // nothing
+        // utility class
     }
 
     public static final Marker DATA_START = MarkerFactory.getMarker("METER_DATA_START");
