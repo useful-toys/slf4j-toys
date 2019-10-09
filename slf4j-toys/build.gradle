@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.usefultoys'
-version = '1.6.4-snapshot'
+version = '1.7.0-snapshot'
 
 compileJava.options.encoding = 'UTF-8'
 compileJava.options.debug = false
