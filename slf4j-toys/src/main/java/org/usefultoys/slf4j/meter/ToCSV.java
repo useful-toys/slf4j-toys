@@ -20,7 +20,10 @@ import java.io.FileReader;
 import java.io.IOException;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
-public class ToCSV {
+public final class ToCSV {
+
+    private ToCSV() {
+    }
 
     public static void main(final String argv[]) {
         if (argv.length < 1) {

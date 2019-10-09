@@ -24,7 +24,7 @@ import static org.usefultoys.slf4j.internal.SyntaxDefinition.*;
  * Regular expression patterns used to deserialize events as encoded strings.
  * @author Daniel
  */
-class PatternDefinition {
+final class PatternDefinition {
 
     static final Pattern encodePropertyValuePattern = quotedCharsPattern(PROPERTY_DIV, PROPERTY_SEPARATOR, MESSAGE_CLOSE, QUOTE, MAP_CLOSE, MAP_SEPARATOR);
     static final Pattern encodeMapValuePattern = quotedCharsPattern(MAP_CLOSE, MAP_SEPARATOR, MESSAGE_CLOSE, QUOTE);
@@ -35,6 +35,9 @@ class PatternDefinition {
 
     // see http://ad.hominem.org/log/2005/05/quoted_strings.php
     static final Pattern messagePattern = Pattern.compile("(.)" + "\\" + MESSAGE_OPEN + "([^\\" + MESSAGE_CLOSE + "\\" + QUOTE + "]*(?:\\" + QUOTE + ".[^\"\\" + QUOTE + "]*)*)\\" + MESSAGE_CLOSE);
+
+    private PatternDefinition() {
+    }
 
     /**
      * @param chars list of chars

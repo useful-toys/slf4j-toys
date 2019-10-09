@@ -32,6 +32,7 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
 
+@SuppressWarnings("FieldCanBeLocal")
 @SupportedAnnotationTypes("org.usefultoys.slf4j.meter.Metered")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 @AutoService(Processor.class)
@@ -43,30 +44,30 @@ public class MeteredProcessor extends AbstractProcessor {
     private Names names;
 
     @Override
-    public synchronized void init(ProcessingEnvironment env) {
+    public synchronized void init(final ProcessingEnvironment env) {
         super.init(env);
         trees = Trees.instance(env);
-        Context context = ((JavacProcessingEnvironment) env).getContext();
+        final Context context = ((JavacProcessingEnvironment) env).getContext();
         make = TreeMaker.instance(context);
         names = Names.instance(context);
         tally = 0;
     }
 
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
         if(roundEnv.processingOver()) {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Finished looking for @"+Metered.class.getSimpleName()+" annotations");
             return false;
         }
-        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Metered.class);
-        for (Element each : elements) {
+        final Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Metered.class);
+        for (final Element each : elements) {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found: "+ each.getKind().toString()+" "+each.getSimpleName());
             if (each.getKind() != ElementKind.METHOD) {
                 processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Only methods are supported.");
                 continue;
             }
-            JCTree.JCMethodDecl methodTree = (JCTree.JCMethodDecl) trees.getTree(each);
-            JCTree.JCTry tryStatement = make.Try(methodTree.body, List.<JCTree.JCCatch>nil(), make.Block(0, methodTree.body.stats));
+            final JCTree.JCMethodDecl methodTree = (JCTree.JCMethodDecl) trees.getTree(each);
+            final JCTree.JCTry tryStatement = make.Try(methodTree.body, List.<JCTree.JCCatch>nil(), make.Block(0, methodTree.body.stats));
             methodTree.body = make.Block(0, List.<JCTree.JCStatement>of(tryStatement));
         }
         return false;

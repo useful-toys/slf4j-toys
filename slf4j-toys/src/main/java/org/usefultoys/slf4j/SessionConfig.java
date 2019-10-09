@@ -28,7 +28,7 @@ import org.usefultoys.slf4j.watcher.WatcherData;
  * Some properties allow reassigning their values later at runtime.
  */
 @SuppressWarnings("CanBeFinal")
-public class SessionConfig {
+public final class SessionConfig {
 
     public static final int UUID_LENGHT = 32;
     /**
@@ -40,4 +40,7 @@ public class SessionConfig {
      * You may assign a new value at runtime.
      */
     public static int uuidSize = Config.getProperty("slf4jtoys.session.print.uuid.size", 5);
+
+    private SessionConfig() {
+    }
 }

@@ -15,7 +15,8 @@
  */
 package org.usefultoys.slf4j;
 
-import java.io.IOException;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.PrintStream;
 import java.util.Locale;
 
@@ -34,7 +35,7 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public void write(final byte[] b) throws IOException {
+    public void write(@NotNull final byte[] b) {
         // ignore
     }
 
@@ -44,7 +45,7 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public void write(final byte[] buf, final int off, final int len) {
+    public void write(@NotNull final byte[] buf, final int off, final int len) {
         // ignore
     }
 
@@ -69,7 +70,7 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public void print(final char[] s) {
+    public void print(@NotNull final char[] s) {
         // ignore
     }
 
@@ -94,13 +95,13 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public PrintStream printf(final String format, final Object... args) {
+    public PrintStream printf(@NotNull final String format, final Object... args) {
         // ignore
         return this;
     }
 
     @Override
-    public PrintStream printf(final Locale l, final String format, final Object... args) {
+    public PrintStream printf(final Locale l, @NotNull final String format, final Object... args) {
         // ignore
         return this;
     }
@@ -131,7 +132,7 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public void println(final char[] x) {
+    public void println(@NotNull final char[] x) {
         // ignore
     }
 
@@ -174,13 +175,13 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public PrintStream format(final String format, final Object... args) {
+    public PrintStream format(@NotNull final String format, final Object... args) {
         // ignore
         return this;
     }
 
     @Override
-    public PrintStream format(final Locale l, final String format, final Object... args) {
+    public PrintStream format(final Locale l, @NotNull final String format, final Object... args) {
         // ignore
         return this;
     }

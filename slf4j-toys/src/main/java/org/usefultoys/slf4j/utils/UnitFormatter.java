@@ -35,6 +35,7 @@ public final class UnitFormatter {
     private static final String[] ITERATIONS_UNITS = {"", "k", "M"};
     private static final int[] ITERATIONS_FACTORS = {1000, 1000, 1000};
 
+    @SuppressWarnings("AssignmentToMethodParameter")
     static String longUnit(long value, final String[] units, final int[] factors) {
         int index = 0;
         final int limit = factors[index] + factors[index] / 10;
@@ -55,6 +56,7 @@ public final class UnitFormatter {
 
     static final double Epsylon = 0.001;
 
+    @SuppressWarnings("AssignmentToMethodParameter")
     static String doubleUnit(double value, final String[] units, final int[] factors) {
         if (value == 0.0) {
             return "0" + units[0];

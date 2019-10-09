@@ -35,7 +35,7 @@ public abstract class SystemData extends EventData {
     protected SystemData() {
     }
 
-    protected SystemData(String uuid) {
+    protected SystemData(final String uuid) {
         super(uuid);
     }
 
@@ -149,7 +149,7 @@ public abstract class SystemData extends EventData {
             return;
         }
         if (SystemConfig.hasSunOperatingSystemMXBean) {
-            com.sun.management.OperatingSystemMXBean os = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class);
+            final com.sun.management.OperatingSystemMXBean os = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class);
             final double systemLoadAverage = os.getSystemCpuLoad();
             if (systemLoadAverage > 0) {
                 systemLoad = systemLoadAverage;

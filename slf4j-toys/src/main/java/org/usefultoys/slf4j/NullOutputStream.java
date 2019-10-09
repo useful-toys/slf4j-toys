@@ -15,7 +15,8 @@
  */
 package org.usefultoys.slf4j;
 
-import java.io.IOException;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.OutputStream;
 
 /**
@@ -32,17 +33,17 @@ class NullOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(final int b) throws IOException {
+    public void write(final int b) {
         // ignore
     }
 
     @Override
-    public void write(final byte[] b) throws IOException {
+    public void write(@NotNull final byte[] b) {
         // ignore
     }
 
     @Override
-    public void write(final byte[] b, final int off, final int len) throws IOException {
+    public void write(@NotNull final byte[] b, final int off, final int len) {
         // ignore
     }
 }

@@ -122,6 +122,7 @@ public class JdbcConnectionReporter {
             }
             ps.println();
             ps.print(" - client info: ");
+            //noinspection CollectionDeclaredAsConcreteClass
             final Properties info = connection.getClientInfo();
             if (info == null || info.isEmpty()) {
                 ps.println("n/a");

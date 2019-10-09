@@ -46,7 +46,7 @@ public final class Session {
     public static void runDefaultReport() {
         final Executor noThreadExecutor = new Executor() {
             @Override
-            public void execute(Runnable command) {
+            public void execute(final Runnable command) {
                 command.run();
             }
         };

@@ -15,7 +15,7 @@
  */
 package org.usefultoys.slf4j.logback;
 
-public final class AnsiColors {
+final class AnsiColors {
     private AnsiColors() {
         // utility class
     }

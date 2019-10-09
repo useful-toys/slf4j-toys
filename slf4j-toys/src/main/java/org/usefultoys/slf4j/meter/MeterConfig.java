@@ -23,7 +23,8 @@ import org.usefultoys.slf4j.internal.Config;
  *
  * @author Daniel Felix Ferber
  */
-public class MeterConfig {
+@SuppressWarnings("CanBeFinal")
+public final class MeterConfig {
 
     /**
      * Time to wait before reporting next progress status, in milliseconds.
@@ -141,4 +142,7 @@ public class MeterConfig {
      */
     @org.jetbrains.annotations.NonNls
     public static String messageSuffix = Config.getProperty("slf4jtoys.meter.message.suffix", "");
+
+    private MeterConfig() {
+    }
 }

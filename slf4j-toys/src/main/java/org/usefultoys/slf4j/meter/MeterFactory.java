@@ -24,7 +24,10 @@ import org.usefultoys.slf4j.LoggerFactory;
  *
  * @author Daniel Felix Ferber
  */
-public class MeterFactory {
+public final class MeterFactory {
+
+    private MeterFactory() {
+    }
 
     /**
      * Returns a Meter with category equal to the logger name and as meter category.
@@ -95,7 +98,7 @@ public class MeterFactory {
      * @param suboperationName Additional identification appended to the subordinated meter name.
      * @return the  Meter
      */
-    public static Meter getCurrentSubMeter(String suboperationName) {
+    public static Meter getCurrentSubMeter(final String suboperationName) {
         return Meter.getCurrentInstance().sub(suboperationName);
     }
 

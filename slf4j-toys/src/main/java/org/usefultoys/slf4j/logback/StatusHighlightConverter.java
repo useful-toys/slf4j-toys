@@ -36,7 +36,7 @@ public class StatusHighlightConverter extends ForegroundCompositeConverterBase<I
     public static final String START_VISIBILITY = AnsiColors.CYAN;
 
     @Override
-    protected String getForegroundColorCode(ILoggingEvent event) {
+    protected String getForegroundColorCode(final ILoggingEvent event) {
         final Marker marker = event.getMarker();
         if (marker == Markers.MSG_START) return START_VISIBILITY;
         if (marker == Markers.MSG_PROGRESS) return START_VISIBILITY;
@@ -62,9 +62,8 @@ public class StatusHighlightConverter extends ForegroundCompositeConverterBase<I
                 || marker == Markers.INCONSISTENT_FAIL
                 || marker == Markers.INCONSISTENT_FINALIZED) return INCONSISTENCY_VISIBILITY;
         if (marker == org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER) return WATCHER_VISIBILITY;
-        if (marker == org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER) return LESS_VISIBILITY;
 
-        Level level = event.getLevel();
+        final Level level = event.getLevel();
         switch (level.toInt()) {
             case Level.ERROR_INT:
                 return ERROR_VISIBILITY;

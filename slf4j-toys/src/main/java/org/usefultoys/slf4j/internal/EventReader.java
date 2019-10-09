@@ -118,10 +118,10 @@ public class EventReader {
      * @return the property value
      * @throws IOException Incoming chars are not a valid property value.
      */
-    public <T extends Enum<T>> T readEnum(Class<T> c) throws IOException {
+    public <T extends Enum<T>> T readEnum(final Class<T> c) throws IOException {
         try {
             return Enum.valueOf(c, readString().toUpperCase());
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             throw new IOException("invalid enum", e);
         }
     }

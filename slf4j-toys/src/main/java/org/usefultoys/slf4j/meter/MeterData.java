@@ -40,7 +40,7 @@ public class MeterData extends SystemData {
     public MeterData() {
     }
 
-    protected MeterData(final String uuid, long position, final String category, final String operation, final String parent) {
+    protected MeterData(final String uuid, final long position, final String category, final String operation, final String parent) {
         super(uuid, position);
         this.category = category;
         this.operation = operation;
@@ -92,12 +92,12 @@ public class MeterData extends SystemData {
      * For successful execution, the string that identifies the execution path. Mutually exclusive with {@link #rejectPath} and {@link #failPath}. Set only when
      * operation finishes with success and a path was given.
      */
-    protected String okPath;
+    protected String okPath = null;
     /**
      * For rejected execution, the string that identifies the rejection cause. Mutually exclusive with {@link #okPath} and {@link #failPath}. Set only when
      * operation finishes with rejection.
      */
-    protected String rejectPath;
+    protected String rejectPath = null;
     /**
      * For failed execution, the string that identifies the failure caused. Usually, the class name of the exception that describes the failure. Mutually
      * exclusive with {@link #okPath} and {@link #rejectPath}. Set only when operation finishes with failure.
@@ -111,7 +111,7 @@ public class MeterData extends SystemData {
     /**
      * Additional meta data describing the job.
      */
-    protected Map<String, String> context;
+    protected Map<String, String> context = null;
 
     public String getFullID() {
         if (operation == null) {
@@ -416,7 +416,7 @@ public class MeterData extends SystemData {
         }
 
         if (this.startTime != 0) {
-            long executionTime = getExecutionTime();
+            final long executionTime = getExecutionTime();
             if (executionTime > MeterConfig.progressPeriodMilliseconds) {
                 builder.append("; ");
                 builder.append(UnitFormatter.nanoseconds(executionTime));
@@ -580,11 +580,11 @@ public class MeterData extends SystemData {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MeterData meterData = (MeterData) o;
+        final MeterData meterData = (MeterData) o;
 
         if (category != null ? !category.equals(meterData.category) : meterData.category != null)
             return false;

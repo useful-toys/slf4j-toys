@@ -21,7 +21,10 @@ package org.usefultoys.slf4j.internal;
  * @author Daniel Felix Ferber
  *
  */
-public class Config {
+public final class Config {
+    private Config() {
+    }
+
     /**
      * Retrieve the value of a system property as a string value.
      * If the system property is not set, the default value is returned.

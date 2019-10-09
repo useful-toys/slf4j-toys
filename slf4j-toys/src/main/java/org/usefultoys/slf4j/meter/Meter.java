@@ -127,7 +127,7 @@ public class Meter extends MeterData implements Closeable {
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
     }
 
-    private static long extractNextPosition(String eventCategory, String operationName) {
+    private static long extractNextPosition(final String eventCategory, final String operationName) {
         final String key = operationName == null ? eventCategory : eventCategory + "/" + operationName;
         EVENT_COUNTER.putIfAbsent(key, new AtomicLong(0));
         final AtomicLong atomicLong = EVENT_COUNTER.get(key);
@@ -717,8 +717,8 @@ public class Meter extends MeterData implements Closeable {
                 messageLogger.error(Markers.INCONSISTENT_PROGRESS, ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
             }
 
-            long now;
-            long meterProgressPeriodNanoseconds = MeterConfig.progressPeriodMilliseconds * 1000 * 1000;
+            final long now;
+            final long meterProgressPeriodNanoseconds = MeterConfig.progressPeriodMilliseconds * 1000 * 1000;
             if (currentIteration > lastProgressIteration && ((now = System.nanoTime()) - lastProgressTime) > meterProgressPeriodNanoseconds) {
                 lastProgressIteration = currentIteration;
                 lastProgressTime = now;
@@ -747,7 +747,7 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
-    public Meter path(Object pathId) {
+    public Meter path(final Object pathId) {
         if (pathId instanceof String) {
             this.okPath = (String) pathId;
         } else if (pathId instanceof Enum) {
@@ -832,7 +832,7 @@ public class Meter extends MeterData implements Closeable {
      * @param pathId A token, enum or exception that describes the successful pathId.
      * @return reference to the meter itself.
      */
-    public Meter ok(Object pathId) {
+    public Meter ok(final Object pathId) {
         try {
             final long newStopTime = System.nanoTime();
 
@@ -901,7 +901,7 @@ public class Meter extends MeterData implements Closeable {
      * @param cause A token, enum or exception that describes the cause of rejection.
      * @return reference to the meter itself.
      */
-    public Meter reject(Object cause) {
+    public Meter reject(final Object cause) {
         try {
             final long newStopTime = System.nanoTime();
 
@@ -1036,6 +1036,7 @@ public class Meter extends MeterData implements Closeable {
             this(framesToDiscard + 1, null);
         }
 
+        @SuppressWarnings("AssignmentToMethodParameter")
         MeterThrowable(int framesToDiscard, final Throwable e) {
             super(e);
             framesToDiscard++;
@@ -1061,11 +1062,11 @@ public class Meter extends MeterData implements Closeable {
 
         private static final long serialVersionUID = 1L;
 
-        IllegalMeterUsage(int framesToDiscard) {
+        IllegalMeterUsage(final int framesToDiscard) {
             super(framesToDiscard);
         }
 
-        IllegalMeterUsage(int framesToDiscard, Throwable e) {
+        IllegalMeterUsage(final int framesToDiscard, final Throwable e) {
             super(framesToDiscard, e);
         }
     }
@@ -1074,7 +1075,7 @@ public class Meter extends MeterData implements Closeable {
 
         private static final long serialVersionUID = 1L;
 
-        TryWithResourcesFailed(int framesToDiscard) {
+        TryWithResourcesFailed(final int framesToDiscard) {
             super(framesToDiscard);
         }
 

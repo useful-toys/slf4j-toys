@@ -24,7 +24,7 @@ import org.usefultoys.slf4j.internal.SystemData;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("CanBeFinal")
-public class SystemConfig {
+public final class SystemConfig {
     /**
      * If Sun native OperatingSystemMXBean is available.
      */
@@ -35,7 +35,7 @@ public class SystemConfig {
         try {
             Class.forName("com.sun.management.OperatingSystemMXBean");
             tmpHasSunOperatingSystemMXBean = true;
-        } catch (ClassNotFoundException ignored) {
+        } catch (final ClassNotFoundException ignored) {
             // ignora
         }
         hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
@@ -76,4 +76,7 @@ public class SystemConfig {
      * You may assign a new value at runtime.
      */
     public static boolean usePlatformManagedBean = Config.getProperty("slf4jtoys.usePlatformManagedBean", false);
+
+    private SystemConfig() {
+    }
 }

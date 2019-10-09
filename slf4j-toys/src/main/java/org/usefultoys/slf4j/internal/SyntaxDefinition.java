@@ -22,7 +22,7 @@ package org.usefultoys.slf4j.internal;
  */
 final class SyntaxDefinition {
 
-    protected SyntaxDefinition() {
+    private SyntaxDefinition() {
         // prevent instances
     }
 

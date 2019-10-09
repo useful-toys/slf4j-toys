@@ -31,7 +31,7 @@ public class MessageHighlightConverter extends ForegroundCompositeConverterBase<
     public static final String ERROR_VISIBILITY = AnsiColors.RED;
 
     @Override
-    protected String getForegroundColorCode(ILoggingEvent event) {
+    protected String getForegroundColorCode(final ILoggingEvent event) {
         final Marker marker = event.getMarker();
         if (marker == Markers.MSG_START
                 || marker == Markers.MSG_PROGRESS

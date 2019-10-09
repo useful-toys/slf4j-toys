@@ -22,6 +22,7 @@ import org.usefultoys.slf4j.internal.Config;
  * if available. They may be assigned at application startup, before calling any {@link Watcher} methods. Some properties allow reassigning their values later
  * at runtime.
  */
+@SuppressWarnings("CanBeFinal")
 public final class WatcherConfig {
     private WatcherConfig() {
         // Utility class
