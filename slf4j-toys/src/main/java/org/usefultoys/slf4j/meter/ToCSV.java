@@ -42,7 +42,7 @@ public class ToCSV {
                     final StringBuilder sb = new StringBuilder();
                     sb.append(data.getSessionUuid());
                     sb.append(',');
-                    sb.append(data.getEventCategory());
+                    sb.append(data.getCategory());
                     sb.append(',');
                     sb.append(data.getPosition());
                     sb.append(',');

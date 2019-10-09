@@ -39,71 +39,71 @@ public class MeterThreadLocalTest {
 
     @Test
     public void testCurrentMeter1() {
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         final Meter m1 = MeterFactory.getMeter(loggerName);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
         m1.start();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
 
         final Meter m2 = MeterFactory.getMeter(loggerOther);
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
         m2.start();
-        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
 
         m2.ok();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
 
         m1.ok();
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
     }
 
     @Test
     public void testCurrentMeter2() {
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         final Meter m1 = MeterFactory.getMeter(loggerName);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
         m1.start();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
 
         final Meter m2 = MeterFactory.getMeter(loggerOther);
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
         m2.start();
-        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
 
         m2.fail(new IllegalStateException());
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
 
         m1.fail(new IllegalStateException());
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
     }
 
     @Test
     public void testCurrentMeter3() throws InterruptedException {
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         final Meter m1 = MeterFactory.getMeter(loggerName);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
         m1.start();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
 
         final Thread t = new Thread() {
             @Override
             public void run() {
                 final Meter m2 = MeterFactory.getMeter(loggerOther);
-                Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+                Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
                 m2.start();
-                Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
+                Assert.assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
                 m2.ok();
-                Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+                Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
             }
         };
         t.start();
         t.join();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
 
         m1.fail(new IllegalStateException());
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
     }
 }

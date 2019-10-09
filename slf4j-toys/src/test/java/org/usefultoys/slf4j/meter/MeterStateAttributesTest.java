@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.Session;
 
 /**
  *
@@ -48,10 +47,10 @@ public class MeterStateAttributesTest {
         Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.start();
 
@@ -60,10 +59,10 @@ public class MeterStateAttributesTest {
        Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.ok();
 
@@ -73,10 +72,10 @@ public class MeterStateAttributesTest {
         Assert.assertTrue(m.isStarted());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
     }
     
     @Test
@@ -88,10 +87,10 @@ public class MeterStateAttributesTest {
        Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.start();
 
@@ -100,10 +99,10 @@ public class MeterStateAttributesTest {
        Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.ok("Flow");
 
@@ -112,10 +111,10 @@ public class MeterStateAttributesTest {
         Assert.assertTrue(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Flow", m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertEquals("Flow", m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
     }
   
     @Test
@@ -127,10 +126,10 @@ public class MeterStateAttributesTest {
        Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.start();
 
@@ -139,10 +138,10 @@ public class MeterStateAttributesTest {
         Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.path("Flow");
 
@@ -151,10 +150,10 @@ public class MeterStateAttributesTest {
         Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Flow", m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertEquals("Flow", m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.ok();
 
@@ -163,10 +162,10 @@ public class MeterStateAttributesTest {
         Assert.assertTrue(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Flow", m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertEquals("Flow", m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
     }
       
     @Test
@@ -178,10 +177,10 @@ public class MeterStateAttributesTest {
         Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.start();
 
@@ -190,10 +189,10 @@ public class MeterStateAttributesTest {
        Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.path("Flow");
 
@@ -202,10 +201,10 @@ public class MeterStateAttributesTest {
         Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Flow", m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertEquals("Flow", m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.path("Path");
 
@@ -214,10 +213,10 @@ public class MeterStateAttributesTest {
         Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Path", m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertEquals("Path", m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
     	m.ok();
 
@@ -226,10 +225,10 @@ public class MeterStateAttributesTest {
         Assert.assertTrue(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Path", m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertEquals("Path", m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
     }
       
     @Test
@@ -241,10 +240,10 @@ public class MeterStateAttributesTest {
        Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.start();
 
@@ -253,10 +252,10 @@ public class MeterStateAttributesTest {
       Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.reject("Reject");
 
@@ -265,10 +264,10 @@ public class MeterStateAttributesTest {
         Assert.assertFalse(m.isOK());
         Assert.assertTrue(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertEquals("Reject", m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertEquals("Reject", m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
     }
 
     @Test
@@ -280,10 +279,10 @@ public class MeterStateAttributesTest {
         Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.start();
 
@@ -292,10 +291,10 @@ public class MeterStateAttributesTest {
        Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertNull(m.getExceptionMessage());
-        Assert.assertNull(m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertNull(m.getFailMessage());
+        Assert.assertNull(m.getFailPath());
 
         m.fail(new IllegalStateException("ISE"));
 
@@ -304,9 +303,9 @@ public class MeterStateAttributesTest {
         Assert.assertFalse(m.isOK());
         Assert.assertFalse(m.isReject());
         Assert.assertTrue(m.isFail());
-        Assert.assertNull(m.getPathId());
-        Assert.assertNull(m.getRejectId());
-        Assert.assertEquals("ISE", m.getExceptionMessage());
-        Assert.assertEquals("java.lang.IllegalStateException", m.getExceptionClass());
+        Assert.assertNull(m.getOkPath());
+        Assert.assertNull(m.getRejectPath());
+        Assert.assertEquals("ISE", m.getFailMessage());
+        Assert.assertEquals("java.lang.IllegalStateException", m.getFailPath());
     }
  }

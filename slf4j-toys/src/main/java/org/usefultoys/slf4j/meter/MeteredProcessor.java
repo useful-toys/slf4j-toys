@@ -17,18 +17,17 @@ package org.usefultoys.slf4j.meter;
 
 import com.google.auto.service.AutoService;
 import com.sun.source.util.Trees;
-import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Names;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.util.Set;
@@ -66,9 +65,9 @@ public class MeteredProcessor extends AbstractProcessor {
                 processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Only methods are supported.");
                 continue;
             }
-            ExecutableElement ee = ((ExecutableElement) each);
-            JCTree.JCMethodDecl tree = (JCTree.JCMethodDecl) trees.getTree(each);
-            tree.restype = make.TypeIdent(TypeTag.BOOLEAN);
+            JCTree.JCMethodDecl methodTree = (JCTree.JCMethodDecl) trees.getTree(each);
+            JCTree.JCTry tryStatement = make.Try(methodTree.body, List.<JCTree.JCCatch>nil(), make.Block(0, methodTree.body.stats));
+            methodTree.body = make.Block(0, List.<JCTree.JCStatement>of(tryStatement));
         }
         return false;
     }

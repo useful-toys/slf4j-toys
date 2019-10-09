@@ -32,7 +32,7 @@ public class WatcherData extends SystemData {
     public WatcherData() {
     }
 
-    public WatcherData(final String uuid) {
+    protected WatcherData(final String uuid) {
         super(uuid);
     }
 

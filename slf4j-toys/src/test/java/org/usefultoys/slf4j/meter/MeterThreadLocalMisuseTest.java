@@ -40,43 +40,43 @@ public class MeterThreadLocalMisuseTest {
 
     @Test
     public void testCurrentMeter1() {
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         final Meter m1 = MeterFactory.getMeter(loggerName);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
         // forgets to call m1.start(); and current meter is not set to m1
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         final Meter m2 = MeterFactory.getMeter(loggerOther);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
         m2.start();
-        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
 
         m2.ok();
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         m1.ok(); // reports error
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
     }
 
     @Test
     public void testCurrentMeter2() {
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         final Meter m1 = MeterFactory.getMeter(loggerName);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
         m1.start();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
 
         final Meter m2 = MeterFactory.getMeter(loggerOther);
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
         m2.start();
-        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
 
         // forgets to call m2.ok();
-        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
 
         m1.ok(); // reports error
-        Assert.assertEquals("???", Meter.getCurrentInstance().getEventCategory());
+        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
     }
 }

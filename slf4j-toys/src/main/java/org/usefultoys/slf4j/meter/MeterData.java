@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Augments the {@link SystemData} with start, stop, failure and flow information measured by Meter.
+ * Augments the {@link SystemData} with start, stop, failure and path information for an operation measured by Meter.
  *
  * @author Daniel Felix Ferber
  */
@@ -40,62 +40,73 @@ public class MeterData extends SystemData {
     public MeterData() {
     }
 
+    protected MeterData(final String uuid, long position, final String category, final String operation, final String parent) {
+        super(uuid, position);
+        this.category = category;
+        this.operation = operation;
+        this.parent = parent;
+        this.createTime = System.nanoTime();
+    }
+
     /**
-     * Identifier that categorizes events.
+     * Name of the category that the operation being measured belongs to. By default, it is the last name of the logger.
      */
-    protected String eventCategory = null;
+    protected String category = null;
     /**
-     * Identifier of the event.
+     * Name of the operation. May be null if the category already describes the operation itself.
      */
-    protected String eventName = null;
+    protected String operation = null;
     /**
-     * Full ID of the parent event.
+     * If the Meter was created as a child for another Meter, references category name, operation name and position of these other Meter. Null otherwise.
      */
-    protected String eventParent = null;
+    protected String parent = null;
     /**
-     * An arbitrary short, human readable message to describe the task being measured.
+     * An arbitrary short, human readable message to describe the operation being measured.
      */
     protected String description = null;
     /**
-     * For successful execution, the string token that identifies the execution pathId.
-     */
-    protected String pathId;
-    /**
-     * For rejected execution, the string token that identifies the rejection cause.
-     */
-    protected String rejectId;
-    /**
-     * When the job was created/scheduled.
+     * Timestamp when the operation was created/scheduled (nanoseconds).
      */
     protected long createTime = 0;
     /**
-     * When the job started execution.
+     * Timestamp when the operation started execution (nanoseconds). Zero if the operation has not yet started.
      */
     protected long startTime = 0;
     /**
-     * When the job finished execution.
+     * Timestamp when the operation finished execution (either success, rejection or failure) (nanoseconds). Zero if the operation has not yet finished.
      */
     protected long stopTime = 0;
     /**
-     * How many iterations were run by the operation.
+     * Time limit considered reasonable for successful execution of the operation (nanoseconds). Zero if there is no time limit for the operation.
      */
-    protected long iteration = 0;
+    protected long timeLimit = 0;
     /**
-     * How many iteration were expected by the operation.
+     * How many iterations were run by the operation. Zero if no iteration has yet run.
+     */
+    protected long currentIteration = 0;
+    /**
+     * How many iterations were expected by the operation. Zero if no iterations were expected.
      */
     protected long expectedIterations = 0;
     /**
-     * For failure result, the exception class that caused the failure.
+     * For successful execution, the string that identifies the execution path. Mutually exclusive with {@link #rejectPath} and {@link #failPath}. Set only when
+     * operation finishes with success and a path was given.
      */
-    protected String failClass = null;
+    protected String okPath;
     /**
-     * For failure result, the exception message that caused the failure.
+     * For rejected execution, the string that identifies the rejection cause. Mutually exclusive with {@link #okPath} and {@link #failPath}. Set only when
+     * operation finishes with rejection.
+     */
+    protected String rejectPath;
+    /**
+     * For failed execution, the string that identifies the failure caused. Usually, the class name of the exception that describes the failure. Mutually
+     * exclusive with {@link #okPath} and {@link #rejectPath}. Set only when operation finishes with failure.
+     */
+    protected String failPath = null;
+    /**
+     * For failed execution, an optional message that caused the failure. Usually, the message of the exception. Only set in conjuction with {@link #failPath}.
      */
     protected String failMessage = null;
-    /**
-     * Time considered reasonable for successful execution.
-     */
-    protected long timeLimitNanoseconds = 0;
 
     /**
      * Additional meta data describing the job.
@@ -103,34 +114,34 @@ public class MeterData extends SystemData {
     protected Map<String, String> context;
 
     public String getFullID() {
-        if (eventName == null) {
-            return eventCategory + '/' + position;
+        if (operation == null) {
+            return category + '/' + position;
         }
-        return eventCategory + '/' + eventName + '#' + position;
+        return category + '/' + operation + '#' + position;
     }
 
-    public String getEventCategory() {
-        return eventCategory;
+    public String getCategory() {
+        return category;
     }
 
-    public String getEventName() {
-        return eventName;
+    public String getOperation() {
+        return operation;
     }
 
-    public String getEventParent() {
-        return eventParent;
+    public String getParent() {
+        return parent;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public String getPathId() {
-        return pathId;
+    public String getOkPath() {
+        return okPath;
     }
 
-    public String getRejectId() {
-        return rejectId;
+    public String getRejectPath() {
+        return rejectPath;
     }
 
     public long getCreateTime() {
@@ -146,18 +157,18 @@ public class MeterData extends SystemData {
     }
 
     public long getCurrentIteration() {
-        return iteration;
+        return currentIteration;
     }
 
     public long getExpectedIterations() {
         return expectedIterations;
     }
 
-    public String getExceptionClass() {
-        return failClass;
+    public String getFailPath() {
+        return failPath;
     }
 
-    public String getExceptionMessage() {
+    public String getFailMessage() {
         return failMessage;
     }
 
@@ -170,19 +181,19 @@ public class MeterData extends SystemData {
     }
 
     public boolean isOK() {
-        return (stopTime != 0) && (failClass == null && rejectId == null);
+        return (stopTime != 0) && (failPath == null && rejectPath == null);
     }
 
     public boolean isReject() {
-        return (stopTime != 0) && (rejectId != null);
+        return (stopTime != 0) && (rejectPath != null);
     }
 
     public boolean isFail() {
-        return (stopTime != 0) && (failClass != null);
+        return (stopTime != 0) && (failPath != null);
     }
 
-    public long getTimeLimitNanoseconds() {
-        return timeLimitNanoseconds;
+    public long getTimeLimit() {
+        return timeLimit;
     }
 
     public Map<String, String> getContext() {
@@ -192,23 +203,69 @@ public class MeterData extends SystemData {
         return Collections.unmodifiableMap(context);
     }
 
+    /**
+     * @return If the operation execution time has exceeded (finished execution) or is exceeding (ongoing execution) the time limit.
+     */
+    public boolean isSlow() {
+        return timeLimit != 0 && stopTime != 0 && startTime != 0 && stopTime - startTime > timeLimit;
+    }
+
+    public String getPath() {
+        if (failPath != null) return failPath;
+        if (rejectPath != null) return rejectPath;
+        return okPath;
+    }
+
+    /**
+     * @return The execution time after start (until stop for finished or until now for ongoing execution).
+     */
+    public long getExecutionTime() {
+        if (startTime == 0) {
+            return 0;
+        } else if (stopTime == 0) {
+            return System.nanoTime() - startTime;
+        }
+        return stopTime - startTime;
+    }
+
+    /**
+     * @return The waiting time since Meter was created and before it was started.
+     */
+    public long getWaitingTime() {
+        if (startTime == 0) {
+            return System.nanoTime() - createTime;
+        }
+        return startTime - createTime;
+    }
+
+    public double getIterationsPerSecond() {
+        if (currentIteration == 0 || startTime == 0) {
+            return 0.0d;
+        }
+        final float executionTimeNS = getExecutionTime();
+        if (executionTimeNS == 0) {
+            return 0.0d;
+        }
+        return ((double) this.currentIteration) / executionTimeNS * 1000000000;
+    }
+
     @Override
     protected void resetImpl() {
         super.resetImpl();
-        this.eventCategory = null;
-        this.eventName = null;
-        this.eventParent = null;
+        this.category = null;
+        this.operation = null;
+        this.parent = null;
         this.description = null;
-        this.pathId = null;
-        this.rejectId = null;
+        this.okPath = null;
+        this.rejectPath = null;
         this.createTime = 0;
         this.startTime = 0;
         this.stopTime = 0;
-        this.iteration = 0;
+        this.currentIteration = 0;
         this.expectedIterations = 0;
-        this.failClass = null;
+        this.failPath = null;
         this.failMessage = null;
-        this.timeLimitNanoseconds = 0;
+        this.timeLimit = 0;
         this.context = null;
     }
 
@@ -218,19 +275,19 @@ public class MeterData extends SystemData {
         if ((this.description == null) ? (other.description != null) : !this.description.equals(other.description)) {
             return false;
         }
-        if ((this.eventCategory == null) ? (other.eventCategory != null) : !this.eventCategory.equals(other.eventCategory)) {
+        if ((this.category == null) ? (other.category != null) : !this.category.equals(other.category)) {
             return false;
         }
-        if ((this.eventName == null) ? (other.eventName != null) : !this.eventName.equals(other.eventName)) {
+        if ((this.operation == null) ? (other.operation != null) : !this.operation.equals(other.operation)) {
             return false;
         }
-        if ((this.eventParent == null) ? (other.eventParent != null) : !this.eventParent.equals(other.eventParent)) {
+        if ((this.parent == null) ? (other.parent != null) : !this.parent.equals(other.parent)) {
             return false;
         }
-        if ((this.pathId == null) ? (other.pathId != null) : !this.pathId.equals(other.pathId)) {
+        if ((this.okPath == null) ? (other.okPath != null) : !this.okPath.equals(other.okPath)) {
             return false;
         }
-        if ((this.rejectId == null) ? (other.rejectId != null) : !this.rejectId.equals(other.rejectId)) {
+        if ((this.rejectPath == null) ? (other.rejectPath != null) : !this.rejectPath.equals(other.rejectPath)) {
             return false;
         }
         if (this.createTime != other.createTime) {
@@ -242,19 +299,19 @@ public class MeterData extends SystemData {
         if (this.stopTime != other.stopTime) {
             return false;
         }
-        if (this.iteration != other.iteration) {
+        if (this.currentIteration != other.currentIteration) {
             return false;
         }
         if (this.expectedIterations != other.expectedIterations) {
             return false;
         }
-        if ((this.failClass == null) ? (other.failClass != null) : !this.failClass.equals(other.failClass)) {
+        if ((this.failPath == null) ? (other.failPath != null) : !this.failPath.equals(other.failPath)) {
             return false;
         }
         if ((this.failMessage == null) ? (other.failMessage != null) : !this.failMessage.equals(other.failMessage)) {
             return false;
         }
-        if (this.timeLimitNanoseconds != other.timeLimitNanoseconds) {
+        if (this.timeLimit != other.timeLimit) {
             return false;
         }
         if (this.context != other.context && (this.context == null || !this.context.equals(other.context))) {
@@ -272,18 +329,18 @@ public class MeterData extends SystemData {
     public StringBuilder readableString(final StringBuilder builder) {
         if (MeterConfig.printStatus) {
             if (stopTime != 0) {
-                if (failClass == null && rejectId == null) {
-                    if (timeLimitNanoseconds != 0 && startTime != 0 && stopTime - startTime > timeLimitNanoseconds) {
+                if (failPath == null && rejectPath == null) {
+                    if (timeLimit != 0 && startTime != 0 && stopTime - startTime > timeLimit) {
                         builder.append("OK (Slow)");
                     } else {
                         builder.append("OK");
                     }
-                } else if (rejectId != null) {
+                } else if (rejectPath != null) {
                     builder.append("REJECT");
-                } else if (failClass != null) {
+                } else if (failPath != null) {
                     builder.append("FAIL");
                 }
-            } else if (startTime != 0 && iteration == 0) {
+            } else if (startTime != 0 && currentIteration == 0) {
                 builder.append("STARTED");
             } else if (startTime != 0) {
                 builder.append("PROGRESS");
@@ -294,36 +351,36 @@ public class MeterData extends SystemData {
         }
 
         if (MeterConfig.printCategory) {
-            final int index = eventCategory.lastIndexOf('.') + 1;
-            builder.append(eventCategory.substring(index));
+            final int index = category.lastIndexOf('.') + 1;
+            builder.append(category.substring(index));
         }
-        if (eventName != null) {
+        if (operation != null) {
             if (MeterConfig.printCategory) {
                 builder.append('/');
             }
-            builder.append(eventName);
+            builder.append(operation);
         }
         if (MeterConfig.printPosition) {
             builder.append('#');
             builder.append(position);
         }
 
-        if (pathId != null) {
+        if (okPath != null) {
             builder.append(" [");
-            builder.append(pathId);
+            builder.append(okPath);
             builder.append(']');
         }
-        if (rejectId != null) {
+        if (rejectPath != null) {
             builder.append(" [");
-            builder.append(rejectId);
+            builder.append(rejectPath);
             builder.append(']');
         }
-        if (failClass != null || failMessage != null) {
+        if (failPath != null || failMessage != null) {
             builder.append(" [");
-            if (failClass != null) {
-                builder.append(failClass);
+            if (failPath != null) {
+                builder.append(failPath);
             }
-            if (failClass != null && failMessage != null) {
+            if (failPath != null && failMessage != null) {
                 builder.append("; ");
             }
             if (failMessage != null) {
@@ -332,9 +389,9 @@ public class MeterData extends SystemData {
             builder.append(']');
         }
 
-        if (startTime != 0 && iteration > 0) {
+        if (startTime != 0 && currentIteration > 0) {
             builder.append(' ');
-            builder.append(UnitFormatter.iterations(this.iteration));
+            builder.append(UnitFormatter.iterations(this.currentIteration));
             if (this.expectedIterations > 0) {
                 builder.append('/');
                 builder.append(UnitFormatter.iterations(this.expectedIterations));
@@ -364,7 +421,7 @@ public class MeterData extends SystemData {
                 builder.append("; ");
                 builder.append(UnitFormatter.nanoseconds(executionTime));
             }
-            if (this.iteration > 0) {
+            if (this.currentIteration > 0) {
                 builder.append("; ");
                 final double iterationsPerSecond = getIterationsPerSecond();
                 builder.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
@@ -394,37 +451,6 @@ public class MeterData extends SystemData {
         return builder;
     }
 
-    public boolean isSlow() {
-        return timeLimitNanoseconds != 0 && stopTime != 0 && startTime != 0 && stopTime - startTime > timeLimitNanoseconds;
-    }
-
-    public long getExecutionTime() {
-        if (startTime == 0) {
-            return 0;
-        } else if (stopTime == 0) {
-            return System.nanoTime() - startTime;
-        }
-        return stopTime - startTime;
-    }
-
-    public long getWaitingTime() {
-        if (startTime == 0) {
-            return System.nanoTime() - createTime;
-        }
-        return startTime - createTime;
-    }
-
-    public double getIterationsPerSecond() {
-        if (iteration == 0 || startTime == 0) {
-            return 0.0d;
-        }
-        final float executionTimeNS = getExecutionTime();
-        if (executionTimeNS == 0) {
-            return 0.0d;
-        }
-        return ((double) this.iteration) / executionTimeNS * 1000000000;
-    }
-
     public static final String PROP_DESCRIPTION = "d";
     public static final String PROP_PATH_ID = "p";
     public static final String PROP_REJECT_ID = "r";
@@ -445,23 +471,23 @@ public class MeterData extends SystemData {
         if (this.description != null) {
             w.property(PROP_DESCRIPTION, this.description);
         }
-        if (this.rejectId != null) {
-            w.property(PROP_REJECT_ID, this.rejectId);
+        if (this.rejectPath != null) {
+            w.property(PROP_REJECT_ID, this.rejectPath);
         }
-        if (this.pathId != null) {
-            w.property(PROP_PATH_ID, this.pathId);
+        if (this.okPath != null) {
+            w.property(PROP_PATH_ID, this.okPath);
         }
-        if (this.failClass != null) {
-            w.property(PROP_FAIL_ID, this.failClass, this.failMessage != null ? this.failMessage : "");
+        if (this.failPath != null) {
+            w.property(PROP_FAIL_ID, this.failPath, this.failMessage != null ? this.failMessage : "");
         }
-        if (this.eventCategory != null) {
-            w.property(EVENT_CATEGORY, this.eventCategory);
+        if (this.category != null) {
+            w.property(EVENT_CATEGORY, this.category);
         }
-        if (this.eventName != null) {
-            w.property(EVENT_NAME, this.eventName);
+        if (this.operation != null) {
+            w.property(EVENT_NAME, this.operation);
         }
-        if (this.eventParent != null) {
-            w.property(EVENT_PARENT, this.eventParent);
+        if (this.parent != null) {
+            w.property(EVENT_PARENT, this.parent);
         }
 
         /* Create, start, stop time. */
@@ -474,14 +500,14 @@ public class MeterData extends SystemData {
         if (this.stopTime != 0) {
             w.property(PROP_STOP_TIME, this.stopTime);
         }
-        if (this.iteration != 0) {
-            w.property(PROP_ITERATION, this.iteration);
+        if (this.currentIteration != 0) {
+            w.property(PROP_ITERATION, this.currentIteration);
         }
         if (this.expectedIterations != 0) {
             w.property(PROP_EXPECTED_ITERATION, this.expectedIterations);
         }
-        if (this.timeLimitNanoseconds != 0) {
-            w.property(PROP_LIMIT_TIME, timeLimitNanoseconds);
+        if (this.timeLimit != 0) {
+            w.property(PROP_LIMIT_TIME, timeLimit);
         }
 
         /* Context */
@@ -498,23 +524,23 @@ public class MeterData extends SystemData {
             this.description = r.readString();
             return true;
         } else if (EVENT_CATEGORY.equals(propertyName)) {
-            this.eventCategory = r.readString();
+            this.category = r.readString();
             return true;
         } else if (EVENT_NAME.equals(propertyName)) {
-            this.eventName = r.readString();
+            this.operation = r.readString();
             return true;
         } else if (EVENT_PARENT.equals(propertyName)) {
-            this.eventParent = r.readString();
+            this.parent = r.readString();
             return true;
         } else if (PROP_FAIL_ID.equals(propertyName)) {
-            this.failClass = r.readString();
+            this.failPath = r.readString();
             this.failMessage = r.readString();
             return true;
         } else if (PROP_REJECT_ID.equals(propertyName)) {
-            this.rejectId = r.readString();
+            this.rejectPath = r.readString();
             return true;
         } else if (PROP_PATH_ID.equals(propertyName)) {
-            this.pathId = r.readString();
+            this.okPath = r.readString();
             return true;
         } else if (PROP_CREATE_TIME.equals(propertyName)) {
             this.createTime = r.readLong();
@@ -526,13 +552,13 @@ public class MeterData extends SystemData {
             this.stopTime = r.readLong();
             return true;
         } else if (PROP_ITERATION.equals(propertyName)) {
-            this.iteration = r.readLong();
+            this.currentIteration = r.readLong();
             return true;
         } else if (PROP_EXPECTED_ITERATION.equals(propertyName)) {
             this.expectedIterations = r.readLong();
             return true;
         } else if (PROP_LIMIT_TIME.equals(propertyName)) {
-            this.timeLimitNanoseconds = r.readLong();
+            this.timeLimit = r.readLong();
             return true;
         } else if (PROP_CONTEXT.equals(propertyName)) {
             this.context = r.readMap();
@@ -560,18 +586,18 @@ public class MeterData extends SystemData {
 
         MeterData meterData = (MeterData) o;
 
-        if (eventCategory != null ? !eventCategory.equals(meterData.eventCategory) : meterData.eventCategory != null)
+        if (category != null ? !category.equals(meterData.category) : meterData.category != null)
             return false;
         if (sessionUuid != null ? !sessionUuid.equals(meterData.sessionUuid) : meterData.sessionUuid != null)
             return false;
         if (position != meterData.position) return false;
-        return eventName != null ? eventName.equals(meterData.eventName) : meterData.eventName == null;
+        return operation != null ? operation.equals(meterData.operation) : meterData.operation == null;
     }
 
     @Override
     public int hashCode() {
-        int result = eventCategory != null ? eventCategory.hashCode() : 0;
-        result = 31 * result + (eventName != null ? eventName.hashCode() : 0);
+        int result = category != null ? category.hashCode() : 0;
+        result = 31 * result + (operation != null ? operation.hashCode() : 0);
         result = 31 * result + (int) (position ^ (position >>> 32));
         result = 31 * result + (sessionUuid != null ? sessionUuid.hashCode() : 0);
         return result;

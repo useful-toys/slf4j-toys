@@ -42,9 +42,14 @@ public abstract class EventData implements Serializable {
     protected EventData() {
     }
 
-    public EventData(String uuid) {
+    protected EventData(String uuid) {
         this.sessionUuid = uuid;
         this.position = 0;
+    }
+
+    protected EventData(final String sessionUuid, final long position) {
+        this.sessionUuid = sessionUuid;
+        this.position = position;
     }
 
     /** Increments {@link #position} and stores system time to {@link #time}. */

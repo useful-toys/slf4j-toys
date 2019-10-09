@@ -35,8 +35,12 @@ public abstract class SystemData extends EventData {
     protected SystemData() {
     }
 
-    public SystemData(String uuid) {
+    protected SystemData(String uuid) {
         super(uuid);
+    }
+
+    protected SystemData(final String sessionUuid, final long position) {
+        super(sessionUuid, position);
     }
 
     protected long heap_commited = 0;

@@ -34,7 +34,7 @@ public class Watcher extends WatcherData implements Runnable {
 
     /** Logger that prints readable messages. */
     private final Logger messageLogger;
-    /** Logger that prints econded data. */
+    /** Logger that prints enconded data. */
     private final Logger dataLogger;
 
     /**

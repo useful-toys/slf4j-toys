@@ -16,9 +16,7 @@
 package org.usefultoys.slf4j.meter;
 
 import org.junit.Test;
-import org.usefultoys.slf4j.internal.EventData;
 import org.usefultoys.slf4j.internal.EventDataTest;
-import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.internal.SystemDataTest;
 
 import java.util.HashMap;
@@ -58,33 +56,33 @@ public class MeterDataTest {
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
 
-        a.eventName = "n";
-        a.eventParent = "p";
-        a.eventCategory = "c";
+        a.operation = "n";
+        a.parent = "p";
+        a.category = "c";
         populateMeterData((MeterData) a, "a", "b", "c", "d");
 
-        b.eventName = "n";
-        b.eventParent = "p";
-        b.eventCategory = "c";
+        b.operation = "n";
+        b.parent = "p";
+        b.category = "c";
         populateMeterData((MeterData) b, "a", "b", "c", "d");
 
         assertTrue(a.isCompletelyEqualsTo(b));
         assertTrue(b.isCompletelyEqualsTo(a));
 
-        b.eventCategory = "cc";
+        b.category = "cc";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.eventCategory = "c";
+        b.category = "c";
 
-        b.eventName = "nn";
+        b.operation = "nn";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.eventName = "n";
+        b.operation = "n";
 
-        b.eventParent = "pp";
+        b.parent = "pp";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.eventParent = "p";
+        b.parent = "p";
 
         b.description = "aa";
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -106,40 +104,40 @@ public class MeterDataTest {
         assertFalse(b.isCompletelyEqualsTo(a));
         b.stopTime = 3;
 
-        b.iteration = 44;
+        b.currentIteration = 44;
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.iteration = 4;
+        b.currentIteration = 4;
 
         b.expectedIterations = 55;
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
         b.expectedIterations = 5;
 
-        b.failClass = "ExceptionException";
+        b.failPath = "ExceptionException";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.failClass = "Exception";
+        b.failPath = "Exception";
 
         b.failMessage = "bb";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
         b.failMessage = "b";
 
-        b.rejectId = "B";
+        b.rejectPath = "B";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.rejectId = "A";
+        b.rejectPath = "A";
 
-        b.pathId = "FB";
+        b.okPath = "FB";
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.pathId = "FA";
+        b.okPath = "FA";
 
-        b.timeLimitNanoseconds = 100;
+        b.timeLimit = 100;
         assertFalse(a.isCompletelyEqualsTo(b));
         assertFalse(b.isCompletelyEqualsTo(a));
-        b.timeLimitNanoseconds = 10;
+        b.timeLimit = 10;
 
         b.context.put("e", "f");
         assertFalse(a.isCompletelyEqualsTo(b));
@@ -161,30 +159,30 @@ public class MeterDataTest {
         assertTrue(a.hashCode() == b.hashCode());
 
         EventDataTest.populateEventData(a);
-        a.eventName = "n";
-        a.eventParent = "p";
-        a.eventCategory = "c";
+        a.operation = "n";
+        a.parent = "p";
+        a.category = "c";
 
         EventDataTest.populateEventData(b);
-        b.eventName = "n";
-        b.eventParent = "p";
-        b.eventCategory = "c";
+        b.operation = "n";
+        b.parent = "p";
+        b.category = "c";
 
         assertTrue(a.equals(b));
         assertTrue(b.equals(a));
         assertTrue(a.hashCode() == b.hashCode());
 
-        b.eventCategory = "cc";
+        b.category = "cc";
         assertFalse(a.equals(b));
         assertFalse(b.equals(a));
         assertFalse(a.hashCode() == b.hashCode());
-        b.eventCategory = "c";
+        b.category = "c";
 
-        b.eventName = "nn";
+        b.operation = "nn";
         assertFalse(a.equals(b));
         assertFalse(b.equals(a));
         assertFalse(a.hashCode() == b.hashCode());
-        b.eventName = "n";
+        b.operation = "n";
 
         assertTrue(a.equals(b));
         assertTrue(b.equals(a));
@@ -229,13 +227,13 @@ public class MeterDataTest {
         a.createTime = 1;
         a.startTime = 2;
         a.stopTime = 3;
-        a.iteration = 4;
+        a.currentIteration = 4;
         a.expectedIterations = 5;
-        a.failClass = "Exception";
+        a.failPath = "Exception";
         a.failMessage = "b";
-        a.rejectId = "A";
-        a.pathId = "FA";
-        a.timeLimitNanoseconds = 10;
+        a.rejectPath = "A";
+        a.okPath = "FA";
+        a.timeLimit = 10;
         a.context = new HashMap<String, String>();
         a.context.put(e, f);
         a.context.put(g, h);

@@ -99,11 +99,11 @@ public class ExecutionPath {
         if (exist) {
             // Update user in database
             someOperation();
-            m2.flow("Update");
+            m2.path((Object) "Update");
         } else {
             // Insert user into database
             otherOperation();
-            m2.flow("Insert");
+            m2.path((Object) "Insert");
         }
         m2.ok();
     }
@@ -116,11 +116,11 @@ public class ExecutionPath {
         if (exist) {
             // Update user in database
             someOperation();
-            m2.flow(OperationResult.UPDATE);
+            m2.path((Object) OperationResult.UPDATE);
         } else {
             // Insert user into database
             otherOperation();
-            m2.flow(OperationResult.INSERT);
+            m2.path((Object) OperationResult.INSERT);
         }
         m2.ok();
     }

@@ -22,6 +22,7 @@ import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterConfig;
 import org.usefultoys.slf4j.meter.MeterFactory;
+import org.usefultoys.slf4j.meter.Metered;
 import org.usefultoys.slf4j.watcher.WatcherConfig;
 import org.usefultoys.slf4j.watcher.WatcherSingleton;
 
@@ -56,7 +57,7 @@ public class LogbackExample {
         MeterConfig.printLoad = false;
     }
 
-    public static void main(final String argv[]) throws IOException {
+    public static void main(final String argv[]) throws IOException, InterruptedException {
         WatcherSingleton.startDefaultWatcherExecutor();
         logger.error("error message");
         logger.warn("warn message");
@@ -70,43 +71,33 @@ public class LogbackExample {
         WatcherSingleton.stopDefaultWatcherExecutor();
     }
 
-    private static void registrarOpcaoDoUsuario(String usuario, int opcao, boolean slow) {
-        try (Meter m = MeterFactory.getMeter(logger, "registrarOpcaoDoUsuario").iterations(3).limitMilliseconds(4000)
-                .ctx("usuario", usuario).ctx("opcao", opcao).start()) {
-            Thread.sleep(800);
-            Thread.sleep(800);
-            Thread.sleep(800);
-            if (slow) Thread.sleep(3000);
-            m.ctx("id", "ABC123").ok("alterar-opcao");
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
+    @Metered
+    private static void registrarOpcaoDoUsuario(String usuario, int opcao, boolean slow) throws InterruptedException {
+        Meter m = MeterFactory.getMeter(logger, "registrarOpcaoDoUsuario").iterations(3).limitMilliseconds(4000)
+                .ctx("usuario", usuario).ctx("opcao", opcao).start();
+        Thread.sleep(800);
+        Thread.sleep(800);
+        Thread.sleep(800);
+        if (slow) Thread.sleep(3000);
+        m.ctx("id", "ABC123").ok("alterar-opcao");
     }
 
-    private static void enviarEmail(String usuario, String nome, String email) {
+    @Metered
+    private static void enviarEmail(String usuario, String nome, String email) throws InterruptedException {
         Meter m = MeterFactory.getMeter(logger, "enviarEmail")
                 .ctx("usuario", usuario)
                 .ctx("nome", nome)
                 .ctx("email", email)
                 .start();
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        Thread.sleep(3000);
         m.reject("usuario-inexistente");
     }
 
-    private static void gravarArquivo(String usuario, String arquivo) {
-        try {
-            Meter m = MeterFactory.getMeter(logger, "gravarArquivo")
-                    .ctx("usuario", usuario).ctx("arquivo", arquivo).start();
-            Thread.sleep(3000);
-            m.fail(new FileNotFoundException());
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
+    @Metered
+    private static void gravarArquivo(String usuario, String arquivo) throws InterruptedException {
+        Meter m = MeterFactory.getMeter(logger, "gravarArquivo")
+                .ctx("usuario", usuario).ctx("arquivo", arquivo).start();
+        Thread.sleep(3000);
+        m.fail(new FileNotFoundException());
     }
 }
