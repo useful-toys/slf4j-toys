@@ -28,7 +28,7 @@ public class SystemConfig {
     /**
      * If Sun native OperatingSystemMXBean is available.
      */
-    static final boolean hasSunOperatingSystemMXBean;
+    public static final boolean hasSunOperatingSystemMXBean;
 
     static {
         boolean tmpHasSunOperatingSystemMXBean = false;
