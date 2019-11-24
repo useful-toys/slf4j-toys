@@ -64,12 +64,14 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non forward iteration";
     private static final String MY_CLASS_NAME = Meter.class.getName();
     private static final String NULL_VALUE = "<null>";
-    public static final String UNKNOWN_LOGGER_NAME = "???";
+    private static final String UNKNOWN_LOGGER_NAME = "???";
+    private static final String FAIL_PATH_TRY_WITH_RESOURCES = "try-with-resources";
+    public static final String CONTEXT_RESULT = "result";
 
     /** Logger that prints readable messages. */
-    private transient final Logger messageLogger;
+    private final transient Logger messageLogger;
     /** Logger that prints enconded data. */
-    private transient final Logger dataLogger;
+    private final transient Logger dataLogger;
 
     /**
      * Tracks many times each operation has been executed.
@@ -124,8 +126,8 @@ public class Meter extends MeterData implements Closeable {
      */
     public Meter(final Logger logger, final String operation, final String parent) {
         super(Session.uuid, extractNextPosition(logger.getName(), operation), logger.getName(), operation, parent);
-        this.messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
-        this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
+        messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
+        dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
     }
 
     private static long extractNextPosition(final String eventCategory, final String operationName) {
@@ -162,9 +164,9 @@ public class Meter extends MeterData implements Closeable {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "sub(name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
         }
-        final Meter m = new Meter(messageLogger, operation == null ? suboperationName : operation + '/' + suboperationName, this.getFullID());
-        if (this.context != null) {
-            m.context = new HashMap<String, String>(this.context);
+        final Meter m = new Meter(messageLogger, operation == null ? suboperationName : operation + '/' + suboperationName, getFullID());
+        if (context != null) {
+            m.context = new HashMap<String, String>(context);
         }
         return m;
     }
@@ -182,7 +184,7 @@ public class Meter extends MeterData implements Closeable {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
         }
-        this.description = message;
+        description = message;
         return this;
     }
 
@@ -197,11 +199,11 @@ public class Meter extends MeterData implements Closeable {
         if (format == null) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args...)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            this.description = null;
+            description = null;
             return this;
         }
         try {
-            this.description = String.format(format, args);
+            description = String.format(format, args);
         } catch (final IllegalFormatException e) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(format, args...)", ERROR_MSG_ILLEGAL_STRING_FORMAT, getFullID(), new IllegalMeterUsage(2, e));
@@ -258,7 +260,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, null);
         return this;
@@ -281,7 +283,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(trueName, null);
         return this;
@@ -303,7 +305,7 @@ public class Meter extends MeterData implements Closeable {
                 return this;
             }
             if (context == null) {
-                this.context = new LinkedHashMap<String, String>();
+                context = new LinkedHashMap<String, String>();
             }
             context.put(trueName, null);
         } else {
@@ -313,7 +315,7 @@ public class Meter extends MeterData implements Closeable {
                 return this;
             }
             if (context == null) {
-                this.context = new LinkedHashMap<String, String>();
+                context = new LinkedHashMap<String, String>();
             }
             context.put(falseName, null);
         }
@@ -334,7 +336,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, Integer.toString(value));
         return this;
@@ -354,7 +356,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, Long.toString(value));
         return this;
@@ -374,7 +376,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, Boolean.toString(value));
         return this;
@@ -394,7 +396,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, Float.toString(value));
         return this;
@@ -414,7 +416,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, Double.toString(value));
         return this;
@@ -434,7 +436,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -454,7 +456,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -474,7 +476,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -494,7 +496,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -514,7 +516,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
@@ -534,7 +536,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, object == null ? NULL_VALUE : object.toString());
         return this;
@@ -554,7 +556,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         context.put(name, value == null ? NULL_VALUE : value);
         return this;
@@ -575,7 +577,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            this.context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<String, String>();
         }
         try {
             ctx(name, String.format(format, args));
@@ -623,7 +625,7 @@ public class Meter extends MeterData implements Closeable {
                 localThreadInstance.set(new WeakReference<Meter>(this));
             }
 
-            this.lastProgressTime = this.startTime = System.nanoTime();
+            lastProgressTime = startTime = System.nanoTime();
 
             if (messageLogger.isDebugEnabled()) {
                 collectRuntimeStatus();
@@ -656,7 +658,7 @@ public class Meter extends MeterData implements Closeable {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             messageLogger.error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(4));
         }
-        this.currentIteration++;
+        currentIteration++;
         return this;
     }
 
@@ -676,7 +678,7 @@ public class Meter extends MeterData implements Closeable {
             messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incBy(increment)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             return this;
         }
-        this.currentIteration += increment;
+        currentIteration += increment;
         return this;
     }
 
@@ -750,13 +752,13 @@ public class Meter extends MeterData implements Closeable {
 
     public Meter path(final Object pathId) {
         if (pathId instanceof String) {
-            this.okPath = (String) pathId;
+            okPath = (String) pathId;
         } else if (pathId instanceof Enum) {
-            this.okPath = ((Enum<?>) pathId).name();
+            okPath = ((Enum<?>) pathId).name();
         } else if (pathId instanceof Throwable) {
-            this.okPath = pathId.getClass().getSimpleName();
+            okPath = pathId.getClass().getSimpleName();
         } else if (pathId != null) {
-            this.okPath = pathId.toString();
+            okPath = pathId.toString();
         } else {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             messageLogger.error(Markers.ILLEGAL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
@@ -820,7 +822,7 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
-    public boolean checkCurrentInstance() {
+    private boolean checkCurrentInstance() {
         final WeakReference<Meter> ref = localThreadInstance.get();
         return ref == null || ref.get() != this;
     }
@@ -852,13 +854,13 @@ public class Meter extends MeterData implements Closeable {
             rejectPath = null;
             localThreadInstance.set(previousInstance);
             if (pathId instanceof String) {
-                this.okPath = (String) pathId;
+                okPath = (String) pathId;
             } else if (pathId instanceof Enum) {
-                this.okPath = ((Enum<?>) pathId).name();
+                okPath = ((Enum<?>) pathId).name();
             } else if (pathId instanceof Throwable) {
-                this.okPath = pathId.getClass().getSimpleName();
+                okPath = pathId.getClass().getSimpleName();
             } else if (pathId != null) {
-                this.okPath = pathId.toString();
+                okPath = pathId.toString();
             } else {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
                 messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
@@ -921,13 +923,13 @@ public class Meter extends MeterData implements Closeable {
             okPath = null;
             localThreadInstance.set(previousInstance);
             if (cause instanceof String) {
-                this.rejectPath = (String) cause;
+                rejectPath = (String) cause;
             } else if (cause instanceof Enum) {
-                this.rejectPath = ((Enum<?>) cause).name();
+                rejectPath = ((Enum<?>) cause).name();
             } else if (cause instanceof Throwable) {
-                this.rejectPath = cause.getClass().getSimpleName();
+                rejectPath = cause.getClass().getSimpleName();
             } else if (cause != null) {
-                this.rejectPath = cause.toString();
+                rejectPath = cause.toString();
             } else {
                 messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
@@ -981,14 +983,14 @@ public class Meter extends MeterData implements Closeable {
             okPath = null;
             localThreadInstance.set(previousInstance);
             if (cause instanceof String) {
-                this.failPath = (String) cause;
+                failPath = (String) cause;
             } else if (cause instanceof Enum) {
-                this.failPath = ((Enum<?>) cause).name();
+                failPath = ((Enum<?>) cause).name();
             } else if (cause instanceof Throwable) {
                 failPath = cause.getClass().getName();
                 failMessage = ((Throwable)cause).getLocalizedMessage();
             } else if (cause != null) {
-                this.failPath = cause.toString();
+                failPath = cause.toString();
             } else {
                 messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             }
@@ -1097,7 +1099,7 @@ public class Meter extends MeterData implements Closeable {
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
-            failPath = "try-with-resources";
+            failPath = FAIL_PATH_TRY_WITH_RESOURCES;
 
             if (messageLogger.isErrorEnabled()) {
                 collectRuntimeStatus();
@@ -1132,7 +1134,7 @@ public class Meter extends MeterData implements Closeable {
         if (startTime == 0) start();
         try {
             final T result = callable.call();
-            ctx("result", result);
+            ctx(CONTEXT_RESULT, result);
             if (stopTime == 0) ok();
             return result;
         } catch (final Exception e) {
@@ -1145,7 +1147,7 @@ public class Meter extends MeterData implements Closeable {
         if (startTime == 0) start();
         try {
             final T result = callable.call();
-            ctx("result", result);
+            ctx(CONTEXT_RESULT, result);
             if (stopTime == 0) ok();
             return result;
         } catch (final RuntimeException e) {
@@ -1161,7 +1163,7 @@ public class Meter extends MeterData implements Closeable {
         if (stopTime == 0) start();
         try {
             final T result = callable.call();
-            ctx("result", result);
+            ctx(CONTEXT_RESULT, result);
             if (stopTime == 0) ok();
             return result;
         } catch (final RuntimeException e) {
@@ -1174,7 +1176,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     private <T extends RuntimeException> RuntimeException convertException(final Class<T> exceptionClass, final Exception e) {
-        final String message = "Failed: " + (this.description != null ? this.description : this.category);
+        final String message = "Failed: " + (description != null ? description : category);
         try {
             return exceptionClass.getConstructor(String.class, Throwable.class).newInstance(message, e);
         } catch (final NoSuchMethodException ignored) {
