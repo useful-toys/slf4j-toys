@@ -50,7 +50,7 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_METER_ALREADY_STARTED = "Meter already started. id={}";
     private static final String ERROR_MSG_METER_ALREADY_STOPPED = "Meter already stopped. id={}";
     private static final String ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED = "Meter stopped but not started. id={}";
-    private static final String ERROR_MSG_METER_STATED_AND_NEVER_STOPPED = "Meter started and never stopped. id={}";
+    private static final String ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED = "Meter started and never stopped. id={}";
     private static final String ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED = "Meter incremented but not started. id={}";
     private static final String ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED = "Meter progress but not started. id={}";
 
@@ -64,6 +64,7 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non forward iteration";
     private static final String MY_CLASS_NAME = Meter.class.getName();
     private static final String NULL_VALUE = "<null>";
+    public static final String UNKNOWN_LOGGER_NAME = "???";
 
     /** Logger that prints readable messages. */
     private transient final Logger messageLogger;
@@ -142,7 +143,7 @@ public class Meter extends MeterData implements Closeable {
         final WeakReference<Meter> ref = localThreadInstance.get();
         final Meter current = ref == null ? null : ref.get();
         if (current == null) {
-            return new Meter(LoggerFactory.getLogger("???"));
+            return new Meter(LoggerFactory.getLogger(UNKNOWN_LOGGER_NAME));
         }
         return current;
     }
@@ -777,10 +778,10 @@ public class Meter extends MeterData implements Closeable {
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
                 messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
-            } else if (checkCurrentInstance()) {
-                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
                 messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+            } else if (checkCurrentInstance()) {
+                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             }
 
             stopTime = newStopTime;
@@ -839,10 +840,10 @@ public class Meter extends MeterData implements Closeable {
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
                 messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
-            } else if (checkCurrentInstance()) {
-                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
                 messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+            } else if (checkCurrentInstance()) {
+                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             }
 
             stopTime = newStopTime;
@@ -908,10 +909,10 @@ public class Meter extends MeterData implements Closeable {
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
                 messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
-            } else if (checkCurrentInstance()) {
-                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
                 messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+            } else if (checkCurrentInstance()) {
+                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             }
 
             stopTime = newStopTime;
@@ -969,19 +970,17 @@ public class Meter extends MeterData implements Closeable {
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
                 messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
-            } else if (checkCurrentInstance()) {
-                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             } else if (startTime == 0) {
                 messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+            } else if (checkCurrentInstance()) {
+                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
             }
 
             stopTime = newStopTime;
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
-            if (cause instanceof TryWithResourcesFailed) {
-                failPath = "try-with-resources";
-            } else if (cause instanceof String) {
+            if (cause instanceof String) {
                 this.failPath = (String) cause;
             } else if (cause instanceof Enum) {
                 this.failPath = ((Enum<?>) cause).name();
@@ -1016,13 +1015,13 @@ public class Meter extends MeterData implements Closeable {
 
     /**
      * Checks if meters the meter has been forgotten to be confirmed or refused. Useful to track those meters that do not follow the start(), ok()/fail() idiom
-     * for all execution flows
+     * for all execution flows. Meters created to represent unknown instance in {@link #checkCurrentInstance()} are not considered for check.
      */
     @Override
     protected void finalize() throws Throwable {
-        if (stopTime == 0) {
+        if (stopTime == 0 && ! category.equals(UNKNOWN_LOGGER_NAME)) {
             /* Logs only message. Stacktrace will not contain useful hints. Exception is logged only for visibility of inconsistent meter usage. */
-            messageLogger.error(Markers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_STATED_AND_NEVER_STOPPED, getFullID(), new IllegalMeterUsage(1));
+            messageLogger.error(Markers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED, getFullID(), new IllegalMeterUsage(1));
         }
         super.finalize();
     }
@@ -1071,16 +1070,6 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
-    public static class TryWithResourcesFailed extends MeterThrowable {
-
-        private static final long serialVersionUID = 1L;
-
-        TryWithResourcesFailed(final int framesToDiscard) {
-            super(framesToDiscard);
-        }
-
-    }
-
     // ========================================================================
 
     /**
@@ -1088,61 +1077,98 @@ public class Meter extends MeterData implements Closeable {
      */
     @Override
     public void close() {
-        if (stopTime == 0) {
-            fail(new TryWithResourcesFailed((2)));
+        try {
+            if (stopTime != 0) {
+                return;
+            }
+
+            final long newStopTime = System.nanoTime();
+
+            /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
+            if (stopTime != 0) {
+                messageLogger.error(Markers.INCONSISTENT_CLOSE, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
+            } else if (startTime == 0) {
+                messageLogger.error(Markers.INCONSISTENT_CLOSE, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+            } else if (checkCurrentInstance()) {
+                messageLogger.error(Markers.INCONSISTENT_CLOSE, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
+            }
+
+            stopTime = newStopTime;
+            rejectPath = null;
+            okPath = null;
+            localThreadInstance.set(previousInstance);
+            failPath = "try-with-resources";
+
+            if (messageLogger.isErrorEnabled()) {
+                collectRuntimeStatus();
+                collectPlatformStatus();
+                messageLogger.error(Markers.MSG_FAIL, readableWrite(), failPath);
+                if (dataLogger.isTraceEnabled()) {
+                    dataLogger.trace(Markers.DATA_FAIL, write());
+                }
+                if (context != null) {
+                    context.clear();
+                }
+            }
+        } catch (final Exception t) {
+            /* Prevents bugs from disrupting the application. Logs message with exception to provide stacktrace to bug. */
+            messageLogger.error(Markers.BUG, ERROR_MSG_METHOD_THREW_EXCEPTION, "close", getFullID(), t);
         }
     }
 
     // ========================================================================
     public void run(final Runnable runnable) {
-        this.start();
+        if (startTime == 0) start();
         try {
             runnable.run();
-            this.ok();
+            if (stopTime == 0) ok();
         } catch (final RuntimeException e) {
-            this.fail(e);
+            fail(e);
             throw e;
         }
     }
 
     public <T> T call(final Callable<T> callable) throws Exception {
-        this.start();
+        if (startTime == 0) start();
         try {
             final T result = callable.call();
-            this.ctx("result", result).ok();
+            ctx("result", result);
+            if (stopTime == 0) ok();
             return result;
         } catch (final Exception e) {
-            this.fail(e);
+            fail(e);
             throw e;
         }
     }
 
     public <T> T safeCall(final Callable<T> callable) {
-        this.start();
+        if (startTime == 0) start();
         try {
             final T result = callable.call();
-            this.ctx("result", result).ok();
+            ctx("result", result);
+            if (stopTime == 0) ok();
             return result;
         } catch (final RuntimeException e) {
-            this.fail(e);
+            fail(e);
             throw e;
         } catch (final Exception e) {
-            this.fail(e);
-            throw new RuntimeException(e);
+            fail(e);
+            throw new RuntimeException("Meter.safeCall wrapped exception.", e);
         }
     }
 
     public <E extends RuntimeException, T> T safeCall(final Class<E> exceptionClass, final Callable<T> callable) {
-        this.start();
+        if (stopTime == 0) start();
         try {
             final T result = callable.call();
-            this.ok();
+            ctx("result", result);
+            if (stopTime == 0) ok();
             return result;
         } catch (final RuntimeException e) {
-            this.fail(e);
+            fail(e);
             throw e;
         } catch (final Exception e) {
-            this.fail(e);
+            fail(e);
             throw convertException(exceptionClass, e);
         }
     }

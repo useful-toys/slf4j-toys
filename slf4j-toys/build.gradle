@@ -10,8 +10,16 @@ version = '1.7.0-snapshot'
 
 compileJava.options.encoding = 'UTF-8'
 compileJava.options.debug = false
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+
+compileJava {
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+}
+
+compileTestJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.28'

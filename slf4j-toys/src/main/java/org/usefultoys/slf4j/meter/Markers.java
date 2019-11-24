@@ -49,6 +49,7 @@ public final class Markers {
     public static final Marker INCONSISTENT_REJECT = MarkerFactory.getMarker("METER_INCONSISTENT_REJECT");
     public static final Marker INCONSISTENT_FAIL = MarkerFactory.getMarker("METER_INCONSISTENT_FAIL");
     public static final Marker INCONSISTENT_EXCEPTION = MarkerFactory.getMarker("METER_INCONSISTENT_EXCEPTION");
+    public static final Marker INCONSISTENT_CLOSE = MarkerFactory.getMarker("METER_INCONSISTENT_CLOSE");
     public static final Marker BUG = MarkerFactory.getMarker("METER_BUG");
     public static final Marker ILLEGAL = MarkerFactory.getMarker("METER_ILLEGAL");
 }
