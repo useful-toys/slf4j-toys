@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Daniel Felix Ferber
+ * Copyright 2022 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@ package org.usefultoys.slf4j.meter;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
+import sun.misc.Unsafe;
 
 import java.io.Closeable;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -97,6 +99,7 @@ public class Meter extends MeterData implements Closeable {
      * stack of Meters.
      */
     private WeakReference<Meter> previousInstance;
+    private static Unsafe unsafe;
 
     /**
      * Creates a new meter for the category given by the logger's name.
@@ -998,7 +1001,7 @@ public class Meter extends MeterData implements Closeable {
             if (messageLogger.isErrorEnabled()) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
-                messageLogger.error(Markers.MSG_FAIL, readableWrite(), cause);
+                messageLogger.error(Markers.MSG_FAIL, readableWrite());
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_FAIL, write());
                 }
@@ -1130,6 +1133,30 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    public void runOrReject(Runnable runnable, Class<? extends Exception>... exceptionsToReject) {
+        if (this.startTime == 0L) {
+            this.start();
+        }
+
+        try {
+            runnable.run();
+            if (this.stopTime == 0L) {
+                this.ok();
+            }
+        } catch (Exception e) {
+            int length = exceptionsToReject.length;
+            for(int i = 0; i < length; ++i) {
+                Class<? extends Exception> ee = exceptionsToReject[i];
+                if (ee.isAssignableFrom(e.getClass())) {
+                    this.reject(e);
+                    unsafe.throwException(e);
+                }
+            }
+            this.fail(e);
+            unsafe.throwException(e);
+        }
+    }
+
     public <T> T call(final Callable<T> callable) throws Exception {
         if (startTime == 0) start();
         try {
@@ -1140,6 +1167,58 @@ public class Meter extends MeterData implements Closeable {
         } catch (final Exception e) {
             fail(e);
             throw e;
+        }
+    }
+
+    public <T> T callOrRejectChecked(Callable<T> callable) {
+        if (this.startTime == 0L) {
+            this.start();
+        }
+
+        try {
+            T result = callable.call();
+            this.ctx("result", result);
+            if (this.stopTime == 0L) {
+                this.ok();
+            }
+
+            return result;
+        } catch (RuntimeException e) {
+            this.fail(e);
+            throw e;
+        } catch (Exception e) {
+            this.reject(e);
+            unsafe.throwException(e);
+            return null;
+        }
+    }
+
+    public <T> T callOrReject(Callable<T> callable, Class<? extends Exception>... exceptionsToReject) {
+        if (this.startTime == 0L) {
+            this.start();
+        }
+
+        try {
+            T result = callable.call();
+            this.ctx("result", result);
+            if (this.stopTime == 0L) {
+                this.ok();
+            }
+
+            return result;
+        } catch (Exception e) {
+            int length = exceptionsToReject.length;
+            for(int i = 0; i < length; ++i) {
+                Class<? extends Exception> ee = exceptionsToReject[i];
+                if (ee.isAssignableFrom(e.getClass())) {
+                    this.reject(e);
+                    unsafe.throwException(e);
+                }
+            }
+
+            this.fail(e);
+            unsafe.throwException(e);
+            return null;
         }
     }
 
@@ -1193,5 +1272,23 @@ public class Meter extends MeterData implements Closeable {
             messageLogger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         }
         return new RuntimeException(e);
+    }
+
+    static {
+        Field f = null;
+
+        try {
+            f = Unsafe.class.getDeclaredField("theUnsafe");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        f.setAccessible(true);
+
+        try {
+            unsafe = (Unsafe)f.get((Object)null);
+        } catch (IllegalAccessException var2) {
+            var2.printStackTrace();
+        }
     }
 }
