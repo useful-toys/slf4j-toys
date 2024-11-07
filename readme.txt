@@ -43,8 +43,8 @@ To list avaiable keys, using keyId compatible with Gradle:
 
 3) Update version in slf4j-toys/build.gradle.
    Ensure that compileJava.options.debug is set to false.
-   Commit with version message with message: [ver] 1.6.2
-   Create tag with name: 1.6.2
+   Commit with version message with message: [ver] X.X.X
+   Create tag with name: X.X.X
    Push to Github.
    Github will create a release for the new tag. Edit the new tag with the
    changelog message.
