@@ -56,6 +56,18 @@ public final class ReporterConfig {
      */
     public static boolean reportUser = Config.getProperty("slf4jtoys.report.user", true);
     /**
+     * If default report includes system properties.
+     * Value is read from system property {@code slf4jtoys.report.properties} at application startup, defaults to {@code true}.
+     * You may assign a new value at runtime.
+     */
+    public static boolean reportProperties = Config.getProperty("slf4jtoys.report.properties", true);
+    /**
+     * If default report includes system environment variables.
+     * Value is read from system property {@code slf4jtoys.report.environment} at application startup, defaults to {@code true}.
+     * You may assign a new value at runtime.
+     */
+    public static boolean reportEnvironment = Config.getProperty("slf4jtoys.report.environment", true);
+    /**
      * If default report includes physical machine information.
      * Value is read from system property {@code slf4jtoys.report.physicalSystem} at application startup, defaults to {@code true}.
      * You may assign a new value at runtime.

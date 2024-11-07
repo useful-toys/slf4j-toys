@@ -29,6 +29,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.Executor;
 
@@ -78,6 +79,8 @@ public class Reporter implements Serializable {
         executor.execute(this.new ReportUser());
         executor.execute(this.new ReportVM());
         executor.execute(this.new ReportMemory());
+        executor.execute(this.new ReportSystemEnvironment());
+        executor.execute(this.new ReportSystemProperties());
         executor.execute(this.new ReportFileSystem());
         executor.execute(this.new ReportCalendar());
         executor.execute(this.new ReportLocale());
@@ -114,6 +117,12 @@ public class Reporter implements Serializable {
         }
         if (ReporterConfig.reportMemory) {
             executor.execute(this.new ReportMemory());
+        }
+        if (ReporterConfig.reportEnvironment) {
+            executor.execute(this.new ReportSystemEnvironment());
+        }
+        if (ReporterConfig.reportProperties) {
+            executor.execute(this.new ReportSystemProperties());
         }
         if (ReporterConfig.reportFileSystem) {
             executor.execute(this.new ReportFileSystem());
@@ -199,6 +208,34 @@ public class Reporter implements Serializable {
             ps.println("User:");
             ps.println(" - name: " + System.getProperty("user.name"));
             ps.println(" - home: " + System.getProperty("user.home"));
+            ps.close();
+        }
+    }
+
+    public class ReportSystemEnvironment implements Runnable {
+
+        @Override
+        public void run() {
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            ps.println("System Environment:");
+            final Map<String, String> env = System.getenv();
+            for (final Map.Entry<String, String> entry : env.entrySet()) {
+                ps.println(" - " + entry.getKey() + ": "+entry.getValue());
+            }
+            ps.close();
+        }
+    }
+
+    public class ReportSystemProperties implements Runnable {
+
+        @Override
+        public void run() {
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            ps.println("System Properties:");
+            final Map<Object, Object> env = System.getProperties();
+            for (final Map.Entry<Object, Object> entry : env.entrySet()) {
+                ps.println(" - " + entry.getKey() + ": "+entry.getValue());
+            }
             ps.close();
         }
     }
