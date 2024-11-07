@@ -22,7 +22,6 @@ import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterConfig;
 import org.usefultoys.slf4j.meter.MeterFactory;
-import org.usefultoys.slf4j.meter.Metered;
 import org.usefultoys.slf4j.watcher.WatcherConfig;
 import org.usefultoys.slf4j.watcher.WatcherSingleton;
 
@@ -71,7 +70,6 @@ public class LogbackExample {
         WatcherSingleton.stopDefaultWatcherExecutor();
     }
 
-    @Metered
     private static void registrarOpcaoDoUsuario(String usuario, int opcao, boolean slow) throws InterruptedException {
         Meter m = MeterFactory.getMeter(logger, "registrarOpcaoDoUsuario").iterations(3).limitMilliseconds(4000)
                 .ctx("usuario", usuario).ctx("opcao", opcao).start();
@@ -82,7 +80,6 @@ public class LogbackExample {
         m.ctx("id", "ABC123").ok("alterar-opcao");
     }
 
-    @Metered
     private static void enviarEmail(String usuario, String nome, String email) throws InterruptedException {
         Meter m = MeterFactory.getMeter(logger, "enviarEmail")
                 .ctx("usuario", usuario)
@@ -93,7 +90,6 @@ public class LogbackExample {
         m.reject("usuario-inexistente");
     }
 
-    @Metered
     private static void gravarArquivo(String usuario, String arquivo) throws InterruptedException {
         Meter m = MeterFactory.getMeter(logger, "gravarArquivo")
                 .ctx("usuario", usuario).ctx("arquivo", arquivo).start();
