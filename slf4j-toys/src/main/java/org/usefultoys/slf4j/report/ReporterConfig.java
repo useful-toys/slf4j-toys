@@ -27,6 +27,7 @@ import org.usefultoys.slf4j.internal.Config;
  */
 @SuppressWarnings("CanBeFinal")
 public final class ReporterConfig {
+
     private ReporterConfig() {
         // prevent instances
     }
@@ -104,6 +105,19 @@ public final class ReporterConfig {
      * You may assign a new value at runtime.
      */
     public static boolean reportNetworkInterface = Config.getProperty("slf4jtoys.report.networkInterface", false);
+    /**
+     * If default report includes ssl context information.
+     * Value is read from system property {@code slf4jtoys.report.reportSSLContext} at application startup, defaults to {@code false}.
+     * You may assign a new value at runtime.
+     */
+    public static boolean reportSSLContext = Config.getProperty("slf4jtoys.report.reportSSLContext", false);
+    /**
+     * If default report includes the default trusted keystore information.
+     * Value is read from system property {@code slf4jtoys.report.defaultTrustKeyStore} at application startup, defaults to {@code false}.
+     * You may assign a new value at runtime.
+     */
+    public static boolean reportDefaultTrustKeyStore = Config.getProperty("slf4jtoys.report.defaultTrustKeyStore", false);
+
     /**
      * Default report name.
      * Value is read from system property {@code slf4jtoys.report.name} at application startup, defaults to {@code report}.

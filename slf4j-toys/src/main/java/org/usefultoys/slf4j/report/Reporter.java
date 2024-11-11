@@ -19,12 +19,16 @@ import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
+import javax.net.ssl.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.net.*;
 import java.nio.charset.Charset;
+import java.security.KeyStore;
+import java.security.Provider;
+import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -81,6 +85,8 @@ public class Reporter implements Serializable {
         executor.execute(this.new ReportCalendar());
         executor.execute(this.new ReportLocale());
         executor.execute(this.new ReportCharset());
+        executor.execute(this.new ReportSSLContex());
+        executor.execute(this.new ReportDefaultTrustKeyStore());
         try {
             final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
@@ -142,6 +148,12 @@ public class Reporter implements Serializable {
             } catch (final SocketException e) {
                 logger.warn("Cannot report interfaces", e);
             }
+        }
+        if (ReporterConfig.reportSSLContext) {
+            executor.execute(this.new ReportSSLContex());
+        }
+        if (ReporterConfig.reportDefaultTrustKeyStore) {
+            executor.execute(this.new ReportDefaultTrustKeyStore());
         }
     }
 
@@ -434,6 +446,111 @@ public class Reporter implements Serializable {
             } catch (final IOException e) {
                 ps.println("   Cannot read property: " + e.getLocalizedMessage());
             }
+        }
+    }
+
+    public class ReportSSLContex implements Runnable {
+        final String contextNames[] = {
+                "Default", "SSL", "SSLv2", "SSLv3", "TLS", "TLSv1", "TLSv1.1", "TLSv1.2"
+        };
+
+        private void printList(final PrintStream ps, final String[] list, final String newLineSpace) {
+            int i = 1;
+            for (final String s : list) {
+                if (i++ % 10 == 0) {
+                    ps.println();
+                    ps.print(newLineSpace);
+                }
+                ps.print(s);
+                ps.print("; ");
+            }
+            ps.println();
+        }
+
+        @Override
+        public void run() {
+            for (final String contextName : contextNames) {
+                final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+                ps.println("SSL Context " + contextName);
+
+                try {
+                    SSLContext sslContext = SSLContext.getInstance(contextName);
+                    ps.println("   Protocol: " + sslContext.getProtocol());
+                    ps.println("   Class: " + sslContext.getClass());
+                    ps.println("   Provider:");
+                    final Provider provider = sslContext.getProvider();
+                    final TreeMap<Object, Object> sortedProperties = new TreeMap<>(provider);
+                    for (Map.Entry<Object, Object> entry : sortedProperties.entrySet()) {
+                        ps.println("    - "+entry.getKey() + ": " + entry.getValue());
+                    }
+                    ps.println("   SocketFactory: ");
+                    ps.print("      Default Cipher Suites:");
+                    printList(ps, sslContext.getSocketFactory().getDefaultCipherSuites(), "          ");
+                    ps.print("      Supported Cipher Suites: ");
+                    printList(ps, sslContext.getSocketFactory().getSupportedCipherSuites(), "          ");
+                    ps.println("   ServerSocketFactory: ");
+                    ps.print("      Default Cipher Suites:");
+                    printList(ps, sslContext.getServerSocketFactory().getDefaultCipherSuites(), "          ");
+                    ps.print("      Supported Cipher Suites:");
+                    printList(ps, sslContext.getServerSocketFactory().getSupportedCipherSuites(), "          ");
+                    SSLParameters p =  sslContext.getDefaultSSLParameters();
+                    ps.println("   Default SSL Parameters:");
+                    ps.println("      EndpointIdentificationAlgorithm: "+p.getEndpointIdentificationAlgorithm());
+                    ps.println("      Need Client Auth: "+p.getNeedClientAuth());
+                    ps.println("      Want Client Auth: "+p.getWantClientAuth());
+                    ps.print("      Protocols: ");
+                    printList(ps, p.getProtocols(), "          ");
+                    ps.print("      Cipher Suites: ");
+                    printList(ps, p.getCipherSuites(), "          ");
+                    p =  sslContext.getSupportedSSLParameters();
+                    ps.println("   Supported SSL Parameters:");
+                    ps.println("      EndpointIdentificationAlgorithm: "+p.getEndpointIdentificationAlgorithm());
+                    ps.println("      Need Client Auth: "+p.getNeedClientAuth());
+                    ps.println("      Want Client Auth: "+p.getWantClientAuth());
+                    ps.print("      Protocols: ");
+                    printList(ps, p.getProtocols(), "          ");
+                    ps.print("      Cipher Suites: ");
+                    printList(ps, p.getCipherSuites(), "          ");
+                } catch (Exception e) {
+                    ps.println("Falha ao detalhar SSLContext: " + e.getMessage());
+                }
+                ps.close();
+            }
+        }
+    }
+
+
+    public class ReportDefaultTrustKeyStore implements Runnable {
+
+        @Override
+        public void run() {
+            final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+            ps.println("Trust Keystore");
+
+            try {
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init((KeyStore)null);
+                TrustManager[] trustManagers = tmf.getTrustManagers();
+
+                for(int i = 0; i < trustManagers.length; ++i) {
+                    TrustManager tm = trustManagers[i];
+                    ps.println(" - TrustManager: " + i + " ("+tm.getClass()+")");
+                    if (tm instanceof X509TrustManager) {
+                        X509TrustManager x509tm = (X509TrustManager)tm;
+                        X509Certificate[] certificates = x509tm.getAcceptedIssuers();
+                        for (int j = 0; j < certificates.length; j++) {
+                            final X509Certificate cert = certificates[j];
+                            ps.println("   - Certificate #"+j);
+                            ps.println("       Subject: " + cert.getSubjectX500Principal());
+                            ps.println("       Issuer: " + cert.getIssuerX500Principal());
+                            ps.println("       #: " + cert.getSerialNumber() + " From: " + cert.getNotBefore() + " Until: " + cert.getNotAfter());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                ps.println("Cannot read TrustManager: " + e.getMessage());
+            }
+            ps.close();
         }
     }
 
