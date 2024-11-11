@@ -300,7 +300,7 @@ public class Reporter implements Serializable {
             ps.print(" - available IDs: ");
             int i = 1;
             for (final String id : TimeZone.getAvailableIDs()) {
-                if (i++ % 5 == 0) {
+                if (i++ % 8 == 0) {
                     ps.print("\n      ");
                 }
                 ps.print(id + "; ");
@@ -330,7 +330,7 @@ public class Reporter implements Serializable {
             ps.print(" - available locales: ");
             int i = 1;
             for (final Locale l : Locale.getAvailableLocales()) {
-                if (i++ % 5 == 0) {
+                if (i++ % 8 == 0) {
                     ps.print("\n      ");
                 }
                 ps.print(l.getDisplayName() + "; ");
@@ -353,7 +353,7 @@ public class Reporter implements Serializable {
             ps.print(" - available charsets: ");
             int i = 1;
             for (final Charset l : Charset.availableCharsets().values()) {
-                if (i++ % 5 == 0) {
+                if (i++ % 15 == 0) {
                     ps.print("\n      ");
                 }
                 ps.print(l.displayName() + "; ");
