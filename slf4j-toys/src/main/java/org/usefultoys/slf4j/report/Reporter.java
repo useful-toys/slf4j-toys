@@ -26,11 +26,7 @@ import java.io.Serializable;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 /**
@@ -218,8 +214,8 @@ public class Reporter implements Serializable {
         public void run() {
             final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             ps.println("System Environment:");
-            final Map<String, String> env = System.getenv();
-            for (final Map.Entry<String, String> entry : env.entrySet()) {
+            final TreeMap<String, String> sortedProperties = new TreeMap<>(System.getenv());
+            for (final Map.Entry<String, String> entry : sortedProperties.entrySet()) {
                 ps.println(" - " + entry.getKey() + ": "+entry.getValue());
             }
             ps.close();
@@ -232,9 +228,9 @@ public class Reporter implements Serializable {
         public void run() {
             final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             ps.println("System Properties:");
-            final Map<Object, Object> env = System.getProperties();
-            for (final Map.Entry<Object, Object> entry : env.entrySet()) {
-                ps.println(" - " + entry.getKey() + ": "+entry.getValue());
+            final TreeMap<Object, Object> sortedProperties = new TreeMap<>(System.getProperties());
+            for (final Map.Entry<Object, Object> entry : sortedProperties.entrySet()) {
+                ps.println(" - " + entry.getKey() + ": " + entry.getValue());
             }
             ps.close();
         }
