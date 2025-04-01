@@ -31,8 +31,7 @@ import java.util.Locale;
 import java.util.logging.LogManager;
 
 /**
- * Test SLF4J Meter using JUL as underlying framework.
- * This examample demonstrates recommended logging setting for JUL.
+ * Tests SLF4J Meter using JUL as the underlying framework.
  *
  * @author Daniel Felix Ferber
  */
@@ -41,29 +40,22 @@ public class Slf4JoverJulExample {
     public static final Logger logger = LoggerFactory.getLogger("example");
 
     static {
+        /* Force JUL to read configuration file. Use English local to prevent printing logger level in foreign language. */
         java.util.Locale.setDefault(Locale.ENGLISH);
-        System.setProperty("java.util.logging.config.file",
-                Slf4JoverJulExample.class.getClassLoader().getResource("log.properties").getFile());
-        SessionConfig.uuidSize = 6;
-        WatcherConfig.delayMilliseconds = 1000;
-        WatcherConfig.periodMilliseconds = 500;
-        SystemConfig.useClassLoadingManagedBean = true;
-        SystemConfig.useCompilationManagedBean = true;
-        SystemConfig.useGarbageCollectionManagedBean = true;
-        SystemConfig.useMemoryManagedBean = true;
-        SystemConfig.usePlatformManagedBean = true;
-        MeterConfig.progressPeriodMilliseconds=300;
-    }
-
-    public static void main(final String argv[]) throws IOException {
         InputStream inputStream = Slf4JoverJulExample.class.getResourceAsStream("/log.properties");
         try {
             LogManager.getLogManager().readConfiguration(inputStream);
         } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
 
+        SessionConfig.uuidSize = 6;
+        WatcherConfig.delayMilliseconds = 1000;
+        WatcherConfig.periodMilliseconds = 500;
+        MeterConfig.progressPeriodMilliseconds = 300;
+    }
+
+    public static void main(final String argv[]) throws IOException {
         WatcherSingleton.startDefaultWatcherExecutor();
         runOperation(true);
         WatcherSingleton.stopDefaultWatcherExecutor();

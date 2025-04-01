@@ -9,7 +9,7 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <withJansi>false</withJansi>
         <encoder>
-            <pattern>%msghl(%d{HH:mm}) %statushl(%7.7status) %msghl(%logger{36}) %msghl(%msg) %n</pattern>
+            <pattern>%msghl(%d{HH:mm.ss}) %statushl(%7.7status) %msghl(%logger{36}) %msghl(%msg) %n</pattern>
         </encoder>
     </appender>
 

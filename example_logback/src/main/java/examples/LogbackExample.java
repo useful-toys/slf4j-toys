@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 /**
- * Test SLF4J Meter using JUL as underlying framework. This examample demonstrates recommended logging setting for JUL.
+ * Test SLF4J Meter using Logback as underlying framework.
  *
  * @author Daniel Felix Ferber
  */
@@ -39,61 +39,30 @@ public class LogbackExample {
     public static final Logger logger = LoggerFactory.getLogger("example");
 
     static {
-        Locale.setDefault(Locale.ENGLISH);
-        SessionConfig.uuidSize = 0;
+        java.util.Locale.setDefault(Locale.ENGLISH);
+        SessionConfig.uuidSize = 6;
         WatcherConfig.delayMilliseconds = 1000;
-        WatcherConfig.periodMilliseconds = 2000;
-        SystemConfig.useClassLoadingManagedBean = true;
-        SystemConfig.useCompilationManagedBean = true;
-        SystemConfig.useGarbageCollectionManagedBean = true;
-        SystemConfig.useMemoryManagedBean = true;
-        SystemConfig.usePlatformManagedBean = true;
-        MeterConfig.progressPeriodMilliseconds = 2000;
-        MeterConfig.printCategory = false;
-        MeterConfig.printStatus = false;
-        MeterConfig.printPosition = false;
-        MeterConfig.printMemory = false;
-        MeterConfig.printLoad = false;
+        WatcherConfig.periodMilliseconds = 500;
+        MeterConfig.progressPeriodMilliseconds = 300;
     }
 
-    public static void main(final String argv[]) throws IOException, InterruptedException {
+    public static void main(final String argv[]) throws IOException {
         WatcherSingleton.startDefaultWatcherExecutor();
-        logger.error("error message");
-        logger.warn("warn message");
-        logger.info("info message");
-        logger.debug("debug message");
-        logger.trace("trace message");
-        registrarOpcaoDoUsuario("ferber", 2, false);
-        registrarOpcaoDoUsuario("ferber", 2, true);
-        enviarEmail("ferber", "Daniel", "dff4321@gmail.com");
-        gravarArquivo("ferber", "documentos/receita.doc");
+        runOperation(true);
         WatcherSingleton.stopDefaultWatcherExecutor();
     }
 
-    private static void registrarOpcaoDoUsuario(String usuario, int opcao, boolean slow) throws InterruptedException {
-        Meter m = MeterFactory.getMeter(logger, "registrarOpcaoDoUsuario").iterations(3).limitMilliseconds(4000)
-                .ctx("usuario", usuario).ctx("opcao", opcao).start();
-        Thread.sleep(800);
-        Thread.sleep(800);
-        Thread.sleep(800);
-        if (slow) Thread.sleep(3000);
-        m.ctx("id", "ABC123").ok("alterar-opcao");
-    }
-
-    private static void enviarEmail(String usuario, String nome, String email) throws InterruptedException {
-        Meter m = MeterFactory.getMeter(logger, "enviarEmail")
-                .ctx("usuario", usuario)
-                .ctx("nome", nome)
-                .ctx("email", email)
-                .start();
-        Thread.sleep(3000);
-        m.reject("usuario-inexistente");
-    }
-
-    private static void gravarArquivo(String usuario, String arquivo) throws InterruptedException {
-        Meter m = MeterFactory.getMeter(logger, "gravarArquivo")
-                .ctx("usuario", usuario).ctx("arquivo", arquivo).start();
-        Thread.sleep(3000);
-        m.fail(new FileNotFoundException());
+    private static boolean runOperation(boolean expectedResult) {
+        try (Meter m = MeterFactory.getMeter(logger, "runOperation").iterations(3).start()) {
+            Thread.sleep(1000);
+            m.inc().progress();
+            Thread.sleep(1000);
+            m.inc().progress();
+            Thread.sleep(1000);
+            m.inc().ok();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+        return expectedResult;
     }
 }

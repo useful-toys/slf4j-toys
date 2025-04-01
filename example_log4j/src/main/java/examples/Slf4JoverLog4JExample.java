@@ -30,7 +30,6 @@ import java.util.Locale;
 
 /**
  * Test SLF4J Meter using JUL as underlying framework.
- * This examample demonstrates recommended logging setting for JUL.
  *
  * @author Daniel Felix Ferber
  */
@@ -43,12 +42,7 @@ public class Slf4JoverLog4JExample {
         SessionConfig.uuidSize = 6;
         WatcherConfig.delayMilliseconds = 1000;
         WatcherConfig.periodMilliseconds = 500;
-        SystemConfig.useClassLoadingManagedBean = true;
-        SystemConfig.useCompilationManagedBean = true;
-        SystemConfig.useGarbageCollectionManagedBean = true;
-        SystemConfig.useMemoryManagedBean = true;
-        SystemConfig.usePlatformManagedBean = true;
-        MeterConfig.progressPeriodMilliseconds=300;
+        MeterConfig.progressPeriodMilliseconds = 300;
     }
 
     public static void main(final String argv[]) throws IOException {
