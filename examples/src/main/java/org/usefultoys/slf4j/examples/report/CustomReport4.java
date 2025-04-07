@@ -28,6 +28,6 @@ public class ConfiguredDefaultReport3 {
     public static void main(String[] args) {
         System.setProperty("slf4jtoys.report.reportSSLContext", "true");
         System.setProperty("slf4jtoys.report.defaultTrustKeyStore", "true");
-        Session.runDefaultReport();
+        Reporter.runDefaultReport();
     }
 }

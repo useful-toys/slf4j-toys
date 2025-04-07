@@ -29,10 +29,7 @@ import org.usefultoys.slf4j.report.Reporter;
 public class CustomReport2 {
 
     public static void main(String[] args) {
-
-        Executor executor = Executors.newFixedThreadPool(3);
-        Reporter reporter = new Reporter();
-        executor.execute(reporter.new ReportPhysicalSystem());
-        executor.execute(reporter.new ReportMemory());
+        final Reporter reporter = new Reporter(LoggerFactory.getLogger("customLogger"));
+        reporter.logDefaultReports(Reporter.sameThreadExecutor);
     }
 }

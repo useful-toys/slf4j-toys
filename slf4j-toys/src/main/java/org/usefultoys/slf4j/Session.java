@@ -38,18 +38,4 @@ public final class Session {
      * instances when log files are shared. Value is assigned at application startup and cannot be changed at runtime.
      */
     public static final String uuid = UUID.randomUUID().toString().replace("-", "");
-
-    /**
-     * Runs the default report on the current thread. Intended for simple architectures. May not be suitable for JavaEE environments that do not allow
-     * blocking threads for extended amount of time.
-     */
-    public static void runDefaultReport() {
-        final Executor noThreadExecutor = new Executor() {
-            @Override
-            public void execute(final Runnable command) {
-                command.run();
-            }
-        };
-        new Reporter().logDefaultReports(noThreadExecutor);
-    }
 }

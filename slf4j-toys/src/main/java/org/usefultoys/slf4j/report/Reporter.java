@@ -48,6 +48,29 @@ public class Reporter implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Executor that runs tasks synchronously on the current thread. Useful for environments where multithreading is restricted or undesired.
+     */
+    public static final Executor sameThreadExecutor = new Executor() {
+        @Override
+        public void execute(final Runnable command) {
+            command.run();
+        }
+    };
+
+    /**
+     * Runs the default report on the current thread using {@link #sameThreadExecutor}.
+     * <p>
+     * Intended for simple applications or environments where blocking the current thread is acceptable. May not be suitable for JavaEE or reactive environments
+     * that restrict long-running tasks on request threads.
+     */
+    public static void runDefaultReport() {
+        new Reporter().logDefaultReports(sameThreadExecutor);
+    }
+
+    /**
+     * Creates a new {@code Reporter} using the logger defined by {@link ReporterConfig#name}.
+     */
     public Reporter() {
         logger = LoggerFactory.getLogger(ReporterConfig.name);
     }

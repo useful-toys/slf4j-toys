@@ -26,6 +26,6 @@ import org.usefultoys.slf4j.Session;
 public class DefaultReport {
 
     public static void main(String[] args) {
-        Session.runDefaultReport();
+        Reporter.runDefaultReport();
     }
 }
