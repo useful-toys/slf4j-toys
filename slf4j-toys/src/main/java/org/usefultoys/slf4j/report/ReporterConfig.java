@@ -70,7 +70,7 @@ public final class ReporterConfig {
      * <p>
      * Controlled by the system property {@code slf4jtoys.report.environment}. Defaults to {@code true}. Can be changed at runtime.
      */
-    public static boolean reportEnvironment = Config.getProperty("slf4jtoys.report.environment", true);
+    public static boolean reportEnvironment = Config.getProperty("slf4jtoys.report.environment", false);
 
     /**
      * Whether the default report includes physical machine information.
