@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Locale;
 
 /**
  * A servlet that logs system reports based on the URL path provided in the HTTP request.
@@ -46,6 +47,18 @@ import java.util.Enumeration;
  * </ul>
  * <p>
  * If the path does not match any known suffix, no action is taken and the request is silently ignored.
+ * <p>
+ * <strong>Security considerations</strong>
+ *  <p>This servlet accesses and logs potentially sensitive system information. Therefore, the following security measures are strongly recommended:</p>
+ *  <ul>
+ *    <li><strong>Restrict access</strong> to the servlet endpoint using authentication or IP whitelisting.</li>
+ *    <li><strong>Avoid exposing this servlet</strong> in production environments or public networks without proper protection.</li>
+ *    <li>Ensure that <strong>reporting environment variables or system properties</strong> is disabled unless explicitly needed, to avoid leaking secrets like passwords, API keys, or tokens.</li>
+ *    <li>Use a <strong>read-only, non-sensitive logger configuration</strong> to avoid side effects.</li>
+ *    <li><strong>Use a secure logging strategy</strong> — logged reports may contain sensitive data and should not be publicly accessible or retained longer than necessary.</li>
+ *    <li><strong>Be aware of log injection and log disclosure risks</strong>: an attacker could trigger this servlet and indirectly cause logs to capture sensitive or excessive system information. Limit logging verbosity and protect log files appropriately.</li>
+ *   <li><strong>Protect against denial-of-service (DoS) attacks</strong>: repeated requests to expensive endpoints such as <code>/NetworkInterface</code> can overload the system or exhaust resources. Consider adding rate limiting or caching to mitigate abuse.</li>
+ *  </ul>
  *
  * @author Daniel Felix Ferber
  */
@@ -55,31 +68,51 @@ public class ReportServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
-        final String pathinfo = request.getPathInfo();
+        String pathinfo = request.getPathInfo();
 
-        boolean recognized = true;
         if (pathinfo == null) {
-            recognized = false;
             LOGGER.warn("No report path provided.");
-        } else if ("/VM".equalsIgnoreCase(pathinfo)) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setContentType("text/plain");
+            try {
+                response.getWriter().write("No report path provided.");
+            } catch (Exception ignored) {
+                // no-op
+            }
+            return;
+        }
+
+        // Sanitize and normalize
+        pathinfo = pathinfo.trim()
+                .replaceAll("/+$", "")
+                .replaceAll("/{2,}", "/")
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9/_-]", "");
+
+        if (pathinfo.contains("..")) {
+            LOGGER.warn("No report path provided.");
+            return;
+        }
+
+        if ("/VM".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportVM().run();
-        } else if ("/FileSystem".equalsIgnoreCase(pathinfo)) {
+        } else if ("/filesystem".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportFileSystem().run();
-        } else if ("/Memory".equalsIgnoreCase(pathinfo)) {
+        } else if ("/memory".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportMemory().run();
-        } else if ("/User".equalsIgnoreCase(pathinfo)) {
+        } else if ("/user".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportUser().run();
-        } else if ("/PhysicalSystem".equalsIgnoreCase(pathinfo)) {
+        } else if ("/physicalsystem".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportPhysicalSystem().run();
-        } else if ("/OperatingSystem".equalsIgnoreCase(pathinfo)) {
+        } else if ("/operatingsystem".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportOperatingSystem().run();
-        } else if ("/Calendar".equalsIgnoreCase(pathinfo)) {
+        } else if ("/calendar".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportCalendar().run();
-        } else if ("/Locale".equalsIgnoreCase(pathinfo)) {
+        } else if ("/locale".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportLocale().run();
-        } else if ("/Charset".equalsIgnoreCase(pathinfo)) {
+        } else if ("/charset".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportCharset().run();
-        } else if ("/NetworkInterface".equalsIgnoreCase(pathinfo)) {
+        } else if ("/networkinterface".equalsIgnoreCase(pathinfo)) {
             try {
                 final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
@@ -90,19 +123,7 @@ public class ReportServlet extends HttpServlet {
                 new Reporter().getLogger().warn("Cannot report interfaces", e);
             }
         } else {
-            recognized = false;
             LOGGER.warn("Unrecognized report path: {}", pathinfo);
-        }
-
-        if (recognized) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("text/plain");
-            try {
-                response.getWriter().write("Report logged for: " + pathinfo);
-            } catch (Exception ignored) {
-                // no-op
-            }
-        } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.setContentType("text/plain");
             try {
@@ -110,6 +131,15 @@ public class ReportServlet extends HttpServlet {
             } catch (Exception ignored) {
                 // no-op
             }
+            return;
+        }
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("text/plain");
+        try {
+            response.getWriter().write("Report logged for: " + pathinfo);
+        } catch (Exception ignored) {
+            // no-op
         }
     }
 }
