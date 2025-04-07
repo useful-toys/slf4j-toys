@@ -51,6 +51,8 @@ public class ReportServlet extends HttpServlet {
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
         final String pathinfo = request.getPathInfo();
+
+        boolean recognized = true;
         if ("/VM".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportVM().run();
         }
@@ -87,6 +89,24 @@ public class ReportServlet extends HttpServlet {
                 }
             } catch (final SocketException e) {
                 new Reporter().getLogger().warn("Cannot report interfaces", e);
+            }
+        }
+
+        if (recognized) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("text/plain");
+            try {
+                response.getWriter().write("Report logged for: " + pathinfo);
+            } catch (Exception ignored) {
+                // no-op
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setContentType("text/plain");
+            try {
+                response.getWriter().write("Unknown report path: " + pathinfo);
+            } catch (Exception ignored) {
+                // no-op
             }
         }
     }
