@@ -31,7 +31,7 @@ import java.util.concurrent.Executor;
 public class CustomReport4 {
 
     public static void main(String[] args) {
-        System.setProperty("slf4jtoys.report.reportSSLContext", "true");
+        System.setProperty("slf4jtoys.report.SSLContext", "true");
         System.setProperty("slf4jtoys.report.defaultTrustKeyStore", "true");
         Reporter.runDefaultReport();
     }

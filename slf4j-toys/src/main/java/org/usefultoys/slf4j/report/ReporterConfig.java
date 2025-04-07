@@ -110,7 +110,7 @@ public final class ReporterConfig {
      * Value is read from system property {@code slf4jtoys.report.reportSSLContext} at application startup, defaults to {@code false}.
      * You may assign a new value at runtime.
      */
-    public static boolean reportSSLContext = Config.getProperty("slf4jtoys.report.reportSSLContext", false);
+    public static boolean reportSSLContext = Config.getProperty("slf4jtoys.report.SSLContext", false);
     /**
      * If default report includes the default trusted keystore information.
      * Value is read from system property {@code slf4jtoys.report.defaultTrustKeyStore} at application startup, defaults to {@code false}.
