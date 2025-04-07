@@ -122,6 +122,10 @@ public class ReportServlet extends HttpServlet {
             } catch (final SocketException e) {
                 new Reporter().getLogger().warn("Cannot report interfaces", e);
             }
+        } else if ("/sslcontext".equalsIgnoreCase(pathinfo)) {
+            new Reporter().new ReportSSLContex().run();
+        } else if ("/defaulttrustkeystore".equalsIgnoreCase(pathinfo)) {
+            new Reporter().new ReportDefaultTrustKeyStore().run();
         } else {
             LOGGER.warn("Unrecognized report path: {}", pathinfo);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
