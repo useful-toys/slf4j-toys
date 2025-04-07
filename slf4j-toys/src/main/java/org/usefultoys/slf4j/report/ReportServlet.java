@@ -15,6 +15,9 @@
  */
 package org.usefultoys.slf4j.report;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,8 +28,8 @@ import java.util.Enumeration;
 /**
  * A servlet that logs system reports based on the URL path provided in the HTTP request.
  * <p>
- * This servlet handles HTTP GET requests and triggers the appropriate {@link Reporter} module
- * based on the path suffix. The corresponding system report is logged using the SLF4J logger.
+ * This servlet handles HTTP GET requests and triggers the appropriate {@link Reporter} module based on the path suffix. The corresponding system report is
+ * logged using the SLF4J logger.
  * <p>
  * The following path suffixes are supported:
  * <ul>
@@ -48,39 +51,35 @@ import java.util.Enumeration;
  */
 public class ReportServlet extends HttpServlet {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(ReportServlet.class);
+
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
         final String pathinfo = request.getPathInfo();
 
         boolean recognized = true;
-        if ("/VM".equalsIgnoreCase(pathinfo)) {
+        if (pathinfo == null) {
+            recognized = false;
+            LOGGER.warn("No report path provided.");
+        } else if ("/VM".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportVM().run();
-        }
-        if ("/FileSystem".equalsIgnoreCase(pathinfo)) {
+        } else if ("/FileSystem".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportFileSystem().run();
-        }
-        if ("/Memory".equalsIgnoreCase(pathinfo)) {
+        } else if ("/Memory".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportMemory().run();
-        }
-        if ("/User".equalsIgnoreCase(pathinfo)) {
+        } else if ("/User".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportUser().run();
-        }
-        if ("/PhysicalSystem".equalsIgnoreCase(pathinfo)) {
+        } else if ("/PhysicalSystem".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportPhysicalSystem().run();
-        }
-        if ("/OperatingSystem".equalsIgnoreCase(pathinfo)) {
+        } else if ("/OperatingSystem".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportOperatingSystem().run();
-        }
-        if ("/Calendar".equalsIgnoreCase(pathinfo)) {
+        } else if ("/Calendar".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportCalendar().run();
-        }
-        if ("/Locale".equalsIgnoreCase(pathinfo)) {
+        } else if ("/Locale".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportLocale().run();
-        }
-        if ("/Charset".equalsIgnoreCase(pathinfo)) {
+        } else if ("/Charset".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportCharset().run();
-        }
-        if ("/NetworkInterface".equalsIgnoreCase(pathinfo)) {
+        } else if ("/NetworkInterface".equalsIgnoreCase(pathinfo)) {
             try {
                 final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
@@ -90,6 +89,9 @@ public class ReportServlet extends HttpServlet {
             } catch (final SocketException e) {
                 new Reporter().getLogger().warn("Cannot report interfaces", e);
             }
+        } else {
+            recognized = false;
+            LOGGER.warn("Unrecognized report path: {}", pathinfo);
         }
 
         if (recognized) {
