@@ -31,8 +31,8 @@ import java.util.concurrent.Executor;
 public class CustomReport4 {
 
     public static void main(String[] args) {
-        System.setProperty("slf4jtoys.report.SSLContext", "true");
-        System.setProperty("slf4jtoys.report.defaultTrustKeyStore", "true");
+        System.setProperty(ReporterConfig.PROP_SSL_CONTEXT, "true");
+        System.setProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE, "true");
         Reporter.runDefaultReport();
     }
 }
