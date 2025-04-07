@@ -36,8 +36,10 @@ public final class SessionConfig {
         // prevent instances
     }
 
+    // System property keys
     public static final int UUID_LENGHT = 32;
 
+    public static final String PROP_SESSION_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
     /**
      * Number of digits of the UUID printed in {@link Watcher} and {@link Meter} messages. The full UUID has 32 digits. If the goal is simply to distinguish
      * application instances (e.g., in multi-node servers, after a deployment, or in standalone executions), a shorter prefix may be sufficient.
@@ -47,5 +49,5 @@ public final class SessionConfig {
      * This value is initialized from the system property {@code slf4jtoys.session.print.uuid.size} at application startup, and defaults to 5. It may be
      * reassigned at runtime.
      */
-    public static int uuidSize = Config.getProperty("slf4jtoys.session.print.uuid.size", 5);
+    public static int uuidSize = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, 5);
 }
