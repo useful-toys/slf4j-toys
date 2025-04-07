@@ -34,8 +34,11 @@ import java.util.*;
 import java.util.concurrent.Executor;
 
 /**
- * Produces reports about available and used resources, and current
- * configuration. Reports are printed as information messages to the logger.
+ * Produces reports about available and used system resources, and the current runtime configuration. Reports are logged as information-level messages using
+ * SLF4J.
+ * <p>
+ * The specific reports to be generated are controlled by {@link ReporterConfig}, including which aspects are enabled and the logger name to use, as long as not
+ * configured otherwiese.
  *
  * @author Daniel Felix Ferber
  */
@@ -76,25 +79,34 @@ public class Reporter implements Serializable {
     }
 
     /**
-     * Constructor
+     * Creates a new {@code Reporter} that logs to the specified {@link Logger}.
      *
-     * @param logger Logger that writes reports as information messages.
+     * @param logger Logger used to write report messages.
      */
     public Reporter(final Logger logger) {
         this.logger = logger;
     }
 
     /**
-     * @return Logger that writes reports as information messages.
+     * Returns the logger used by this reporter instance.
+     *
+     * @return the logger that writes report messages.
      */
     public Logger getLogger() {
         return logger;
     }
 
     /**
-     * Run all reports and write them as information messages to logger.
+     * Runs all available reports and logs them as information-level messages.
+     * <p>
+     * Each report is executed using the provided {@link Executor}, allowing for synchronous or asynchronous execution depending on the context.
+     * <p>
+     * <strong>Note:</strong> Some reports may involve system calls or resource access operations
+     * that can block the thread for a noticeable amount of time. It is recommended to avoid using shared or latency-sensitive executors. *
+     * <p>
+     * If network interfaces cannot be retrieved, a warning is logged.
      *
-     * @param executor Executor that runs each report.
+     * @param executor the executor responsible for running each report task
      */
     public void logAllReports(final Executor executor) {
         executor.execute(this.new ReportPhysicalSystem());
@@ -122,8 +134,7 @@ public class Reporter implements Serializable {
     }
 
     /**
-     * Run reports accoding to {@link ReporterConfig} and write them as
-     * information messages to logger.
+     * Run the reports enabled in {@link ReporterConfig} and writes them as information messages to logger.
      *
      * @param executor Executor that runs each report.
      */
@@ -251,7 +262,7 @@ public class Reporter implements Serializable {
             ps.println("System Environment:");
             final TreeMap<String, String> sortedProperties = new TreeMap<>(System.getenv());
             for (final Map.Entry<String, String> entry : sortedProperties.entrySet()) {
-                ps.println(" - " + entry.getKey() + ": "+entry.getValue());
+                ps.println(" - " + entry.getKey() + ": " + entry.getValue());
             }
             ps.close();
         }
@@ -504,7 +515,7 @@ public class Reporter implements Serializable {
                     final Provider provider = sslContext.getProvider();
                     final TreeMap<Object, Object> sortedProperties = new TreeMap<>(provider);
                     for (Map.Entry<Object, Object> entry : sortedProperties.entrySet()) {
-                        ps.println("    - "+entry.getKey() + ": " + entry.getValue());
+                        ps.println("    - " + entry.getKey() + ": " + entry.getValue());
                     }
                     ps.println("   SocketFactory: ");
                     ps.print("      Default Cipher Suites:");
@@ -516,20 +527,20 @@ public class Reporter implements Serializable {
                     printList(ps, sslContext.getServerSocketFactory().getDefaultCipherSuites(), "          ");
                     ps.print("      Supported Cipher Suites:");
                     printList(ps, sslContext.getServerSocketFactory().getSupportedCipherSuites(), "          ");
-                    SSLParameters p =  sslContext.getDefaultSSLParameters();
+                    SSLParameters p = sslContext.getDefaultSSLParameters();
                     ps.println("   Default SSL Parameters:");
-                    ps.println("      EndpointIdentificationAlgorithm: "+p.getEndpointIdentificationAlgorithm());
-                    ps.println("      Need Client Auth: "+p.getNeedClientAuth());
-                    ps.println("      Want Client Auth: "+p.getWantClientAuth());
+                    ps.println("      EndpointIdentificationAlgorithm: " + p.getEndpointIdentificationAlgorithm());
+                    ps.println("      Need Client Auth: " + p.getNeedClientAuth());
+                    ps.println("      Want Client Auth: " + p.getWantClientAuth());
                     ps.print("      Protocols: ");
                     printList(ps, p.getProtocols(), "          ");
                     ps.print("      Cipher Suites: ");
                     printList(ps, p.getCipherSuites(), "          ");
-                    p =  sslContext.getSupportedSSLParameters();
+                    p = sslContext.getSupportedSSLParameters();
                     ps.println("   Supported SSL Parameters:");
-                    ps.println("      EndpointIdentificationAlgorithm: "+p.getEndpointIdentificationAlgorithm());
-                    ps.println("      Need Client Auth: "+p.getNeedClientAuth());
-                    ps.println("      Want Client Auth: "+p.getWantClientAuth());
+                    ps.println("      EndpointIdentificationAlgorithm: " + p.getEndpointIdentificationAlgorithm());
+                    ps.println("      Need Client Auth: " + p.getNeedClientAuth());
+                    ps.println("      Want Client Auth: " + p.getWantClientAuth());
                     ps.print("      Protocols: ");
                     printList(ps, p.getProtocols(), "          ");
                     ps.print("      Cipher Suites: ");
@@ -552,18 +563,18 @@ public class Reporter implements Serializable {
 
             try {
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                tmf.init((KeyStore)null);
+                tmf.init((KeyStore) null);
                 TrustManager[] trustManagers = tmf.getTrustManagers();
 
-                for(int i = 0; i < trustManagers.length; ++i) {
+                for (int i = 0; i < trustManagers.length; ++i) {
                     TrustManager tm = trustManagers[i];
-                    ps.println(" - TrustManager: " + i + " ("+tm.getClass()+")");
+                    ps.println(" - TrustManager: " + i + " (" + tm.getClass() + ")");
                     if (tm instanceof X509TrustManager) {
-                        X509TrustManager x509tm = (X509TrustManager)tm;
+                        X509TrustManager x509tm = (X509TrustManager) tm;
                         X509Certificate[] certificates = x509tm.getAcceptedIssuers();
                         for (int j = 0; j < certificates.length; j++) {
                             final X509Certificate cert = certificates[j];
-                            ps.println("   - Certificate #"+j);
+                            ps.println("   - Certificate #" + j);
                             ps.println("       Subject: " + cert.getSubjectX500Principal());
                             ps.println("       Issuer: " + cert.getIssuerX500Principal());
                             ps.println("       #: " + cert.getSerialNumber() + " From: " + cert.getNotBefore() + " Until: " + cert.getNotAfter());
