@@ -23,8 +23,27 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 /**
- * A servlet that logs a report according to the URL suffix.
- * 
+ * A servlet that logs system reports based on the URL path provided in the HTTP request.
+ * <p>
+ * This servlet handles HTTP GET requests and triggers the appropriate {@link Reporter} module
+ * based on the path suffix. The corresponding system report is logged using the SLF4J logger.
+ * <p>
+ * The following path suffixes are supported:
+ * <ul>
+ *   <li><code>/VM</code> — Logs Java Virtual Machine information.</li>
+ *   <li><code>/FileSystem</code> — Logs information about available and used disk space.</li>
+ *   <li><code>/Memory</code> — Logs memory usage details.</li>
+ *   <li><code>/User</code> — Logs information about the current user.</li>
+ *   <li><code>/PhysicalSystem</code> — Logs physical hardware information.</li>
+ *   <li><code>/OperatingSystem</code> — Logs operating system details.</li>
+ *   <li><code>/Calendar</code> — Logs date, time, and timezone information.</li>
+ *   <li><code>/Locale</code> — Logs current and available locale settings.</li>
+ *   <li><code>/Charset</code> — Logs current and available character sets.</li>
+ *   <li><code>/NetworkInterface</code> — Logs information for each available network interface.</li>
+ * </ul>
+ * <p>
+ * If the path does not match any known suffix, no action is taken and the request is silently ignored.
+ *
  * @author Daniel Felix Ferber
  */
 public class ReportServlet extends HttpServlet {
