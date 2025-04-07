@@ -19,27 +19,40 @@ import javax.servlet.ServletContextEvent;
 import java.util.concurrent.Executor;
 
 /**
- * A servlet context listener that logs reports when server is started. The
- * reports to be logged are configured using system properties.
+ * A {@link javax.servlet.ServletContextListener} that triggers diagnostic reports when the web application starts.
+ * <p>
+ * The reports to be logged are determined by system properties and executed through a simple {@link Executor}. This is useful for logging
+ * environment/configuration details at application startup time.
+ * <p>
+ * To use it, register this listener in <code>web.xml</code.
  *
- * @author Daniel
+ * <pre>{@code
+ * <listener>
+ *     <listener-class>org.usefultoys.slf4j.report.ReportContextListener</listener-class>
+ * </listener>
+ * }</pre>
+ *
+ * @author Daniel Felix Ferber
  */
 public class ReportContextListener implements javax.servlet.ServletContextListener {
 
+    /**
+     * Invoked when the web application is shutting down. No action is taken.
+     *
+     * @param event the servlet context event
+     */
     @Override
-    public void contextDestroyed(final ServletContextEvent arg0) {
-        // nothing
+    public void contextDestroyed(final ServletContextEvent event) {
+        // No cleanup required
     }
 
+    /**
+     * Invoked when the web application is starting up. Triggers the {@link Reporter} to log the default reports using a simple synchronous executor.
+     *
+     * @param event the servlet context event
+     */
     @Override
-    public void contextInitialized(final ServletContextEvent arg0) {
-        new Reporter().logDefaultReports(new ExecutorImpl());
-    }
-
-    private static class ExecutorImpl implements Executor {
-        @Override
-        public void execute(final Runnable command) {
-            command.run();
-        }
+    public void contextInitialized(final ServletContextEvent event) {
+        new Reporter().logDefaultReports(Reporter.sameThreadExecutor);
     }
 }

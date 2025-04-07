@@ -32,28 +32,57 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
+ * Reports details about a JDBC {@link Connection}, such as catalog, schema, metadata, properties,
+ * transaction settings, client info, and optionally the type map.
+ * <p>
+ * This class logs information using a SLF4J {@link Logger}, formatting it to resemble a structured diagnostic output.
+ * It is useful for debugging or documenting the JDBC environment at runtime.
+ * <p>
+ * Typical usage:
+ * <pre>{@code
+ * JdbcConnectionReporter reporter = new JdbcConnectionReporter(logger)
+ *     .printTypeMap(true);
+ * reporter.run(connection);
+ * }</pre>
  *
  * @author Daniel
  */
 @SuppressWarnings("Since15")
 public class JdbcConnectionReporter {
 
-    /**
-     * Logger that prints reports as information messages.
-     */
+    /** Logger that prints the JDBC connection report. */
     private final Logger logger;
 
+    /** Whether to print the JDBC type map. */
     private boolean printTypeMap;
 
+    /**
+     * Creates a new reporter that logs to the given SLF4J logger.
+     *
+     * @param logger the SLF4J logger to use for output
+     */
     public JdbcConnectionReporter(final Logger logger) {
         this.logger = logger;
     }
 
+    /**
+     * Defines whether the JDBC type map should be printed.
+     *
+     * @param printTypeMap {@code true} to print the type map; {@code false} to skip it
+     * @return this instance, for method chaining
+     */
     public JdbcConnectionReporter printTypeMap(final boolean printTypeMap) {
         this.printTypeMap = printTypeMap;
         return this;
     }
 
+    /**
+     * Runs the report on the given JDBC connection.
+     * <p>
+     * This method is blocking and logs the output using {@link LoggerFactory#getInfoPrintStream(Logger)}.
+     *
+     * @param connection the JDBC connection to inspect
+     */
     public void run(final Connection connection) {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("JDBC connection");
@@ -181,5 +210,4 @@ public class JdbcConnectionReporter {
             ps.close();
         }
     }
-
 }

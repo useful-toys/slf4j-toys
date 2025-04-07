@@ -22,25 +22,30 @@ import org.usefultoys.slf4j.watcher.Watcher;
 import org.usefultoys.slf4j.watcher.WatcherData;
 
 /**
- * Collection of properties that drive all common behavior ({@link Watcher}, {@link WatcherData}, {@link Meter}, {@link MeterData}).
- * Initial values are read from system properties at application startup, if available.
- * They may be assigned at application startup, before calling any methods from this library.
- * Some properties allow reassigning their values later at runtime.
+ * Collection of properties that control the common behavior of {@link Watcher}, {@link WatcherData}, {@link Meter}, and {@link MeterData}.
+ * <p>
+ * Initial values are read from system properties at application startup, if available. These properties should ideally be configured before calling any method
+ * from this library. Some properties can be reassigned at runtime, depending on their purpose.
+ * <p>
+ * This class is not meant to be instantiated.
  */
 @SuppressWarnings("CanBeFinal")
 public final class SessionConfig {
 
+    private SessionConfig() {
+        // prevent instances
+    }
+
     public static final int UUID_LENGHT = 32;
+
     /**
-     * Size of the UUID to print on {@link Watcher} and {@link Meter} messages.
-     * The UUID has 32 digits. If you want just to distinguish one application instace from another (server running more than one node,
-     * new instance after deploy, new execution of standalone application), less digits may be enough.
-     * If set to 0 (zero), no UUID is print.
-     * <p>Value is read from system property {@code slf4jtoys.session.print.uuid.size} at application startup, defaults to 5.
-     * You may assign a new value at runtime.
+     * Number of digits of the UUID printed in {@link Watcher} and {@link Meter} messages. The full UUID has 32 digits. If the goal is simply to distinguish
+     * application instances (e.g., in multi-node servers, after a deployment, or in standalone executions), a shorter prefix may be sufficient.
+     * <p>
+     * If set to 0, the UUID will not be printed.
+     * <p>
+     * This value is initialized from the system property {@code slf4jtoys.session.print.uuid.size} at application startup, and defaults to 5. It may be
+     * reassigned at runtime.
      */
     public static int uuidSize = Config.getProperty("slf4jtoys.session.print.uuid.size", 5);
-
-    private SessionConfig() {
-    }
 }
