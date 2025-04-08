@@ -5,5 +5,4 @@ include 'examples'
 include 'example_jul'
 include 'example_log4j'
 include 'example_logback'
-include 'example_no_slf4jtoys'
 
