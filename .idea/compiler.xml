@@ -17,7 +17,7 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.j2objc/j2objc-annotations/1.1/ed28ded51a8b1c6b112568def5f4b455e6809019/j2objc-annotations-1.1.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.mojo/animal-sniffer-annotations/1.17/f97ce6decaea32b36101e37979f8b647f00681fb/animal-sniffer-annotations-1.17.jar" />
         </processorPath>
-        <module name="slf4j-toys-root.slf4j-toys.main" />
+        <module name="org.usefultoys.slf4j-toys-root.slf4j-toys.main" />
       </profile>
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
@@ -28,9 +28,30 @@
         </processorPath>
         <module name="slf4j-toys-root.example_logback.main" />
       </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/slf4j-toys/build/libs/slf4j-toys-1.8.0.jar" />
+          <entry name="D:/Programas/adopt-jdk8u282-b08-x64/lib/tools.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.28/2cd9b264f76e3d087ee21bfc99305928e1bdb443/slf4j-api-1.7.28.jar" />
+        </processorPath>
+        <module name="git.slf4j-toys-root.example_logback.main" />
+      </profile>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="log4j-example" />
+        <module name="examples" />
+        <module name="jul-example" />
+        <module name="slf4j-toys" />
+        <module name="logback-example" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
-      <module name="slf4j-toys" target="1.6" />
+      <module name="slf4j-toys (1)" target="1.5" />
+      <module name="slf4j-toys (3)" target="1.5" />
+      <module name="slf4j-toys (4)" target="1.5" />
       <module name="slf4j-toys-root-example_logback_main" target="1.8" />
       <module name="slf4j-toys-root-example_logback_test" target="1.8" />
       <module name="slf4j-toys-root-examples_main" target="1.8" />
