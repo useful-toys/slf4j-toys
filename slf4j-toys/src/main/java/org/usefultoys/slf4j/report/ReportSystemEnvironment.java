@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ public class ReportSystemEnvironment implements Runnable {
 
     @Override
     public void run() {
+        @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("System Environment:");
         final SortedMap<String, String> sortedProperties = new TreeMap<>(System.getenv());

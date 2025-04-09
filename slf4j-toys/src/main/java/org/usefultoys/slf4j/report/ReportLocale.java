@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ public class ReportLocale implements Runnable {
 
     @Override
     public void run() {
+        @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         final Locale loc = Locale.getDefault();
         ps.println("Locale");

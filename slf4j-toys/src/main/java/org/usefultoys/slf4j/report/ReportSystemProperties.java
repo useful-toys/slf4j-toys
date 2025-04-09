@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ public class ReportSystemProperties implements Runnable {
 
     @Override
     public void run() {
+        @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("System Properties:");
         final SortedMap<Object, Object> sortedProperties = new TreeMap<>(System.getProperties());

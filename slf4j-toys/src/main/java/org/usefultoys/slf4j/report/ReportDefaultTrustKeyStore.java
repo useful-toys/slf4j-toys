@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class ReportDefaultTrustKeyStore implements Runnable {
 
     @Override
     public void run() {
-        final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+        @Cleanup final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Trust Keystore");
 
         try {

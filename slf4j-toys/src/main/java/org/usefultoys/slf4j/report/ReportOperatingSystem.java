@@ -17,6 +17,7 @@ public class ReportOperatingSystem implements Runnable {
 
     @Override
     public void run() {
+        @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Operating System");
         ps.printf(" - architecture: %s%n", System.getProperty("os.arch"));

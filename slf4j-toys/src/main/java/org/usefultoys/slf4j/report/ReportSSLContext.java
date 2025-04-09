@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ public class ReportSSLContext implements Runnable {
     @Override
     public void run() {
         for (final String contextName : contextNames) {
+            @Cleanup
             final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
             ps.printf("SSL Context %s%n", contextName);
 

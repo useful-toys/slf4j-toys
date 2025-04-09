@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ public class ReportPhysicalSystem implements Runnable {
 
     @Override
     public void run() {
+        @Cleanup
         final Runtime runtime = Runtime.getRuntime();
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Physical system");

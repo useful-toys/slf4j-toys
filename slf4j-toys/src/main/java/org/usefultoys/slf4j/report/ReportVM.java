@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ public class ReportVM implements Runnable {
 
     @Override
     public void run() {
+        @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Java Virtual Machine");
         ps.println(" - vendor: " + System.getProperty("java.vendor"));
