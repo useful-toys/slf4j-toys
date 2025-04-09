@@ -24,7 +24,7 @@ import java.util.concurrent.Executor;
  * The reports to be logged are determined by system properties and executed through a simple {@link Executor}. This is useful for logging
  * environment/configuration details at application startup time.
  * <p>
- * To use it, register this listener in <code>web.xml</code.
+ * To use it, register this listener in {@code web.xml}.
  *
  * <pre>{@code
  * <listener>

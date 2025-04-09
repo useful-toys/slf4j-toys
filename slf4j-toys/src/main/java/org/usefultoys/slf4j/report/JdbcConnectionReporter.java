@@ -57,9 +57,9 @@ public class JdbcConnectionReporter {
     private boolean printTypeMap;
 
     /**
-     * Creates a new reporter that logs to the given SLF4J logger.
+     * Creates a new reporter that logs output using the specified SLF4J logger.
      *
-     * @param logger the SLF4J logger to use for output
+     * @param logger the SLF4J logger to use for reporting
      */
     public JdbcConnectionReporter(final Logger logger) {
         this.logger = logger;
@@ -77,9 +77,10 @@ public class JdbcConnectionReporter {
     }
 
     /**
-     * Runs the report on the given JDBC connection.
-     * <p>
-     * This method is blocking and logs the output using {@link LoggerFactory#getInfoPrintStream(Logger)}.
+     * Executes the report for the specified JDBC {@link Connection}.
+     *
+     * <p>This method logs the output using {@link LoggerFactory#getInfoPrintStream(Logger)}.
+     * If the connection is closed, it logs a message and exits early.</p>
      *
      * @param connection the JDBC connection to inspect
      */
@@ -135,7 +136,7 @@ public class JdbcConnectionReporter {
                     ps.print("read-uncommited; ");
                     break;
                 case Connection.TRANSACTION_READ_COMMITTED:
-                    ps.print("read-commited; ");
+                    ps.print("read-committed; ");
                     break;
                 case Connection.TRANSACTION_REPEATABLE_READ:
                     ps.print("repeatable-read; ");

@@ -34,11 +34,12 @@ import java.util.*;
 import java.util.concurrent.Executor;
 
 /**
- * Produces reports about available and used system resources, and the current runtime configuration. Reports are logged as information-level messages using
- * SLF4J.
+ * Produces diagnostic reports about system resources and the current runtime environment.
  * <p>
- * The specific reports to be generated are controlled by {@link ReporterConfig}, including which aspects are enabled and the logger name to use, as long as not
- * configured otherwiese.
+ * Reports are logged as information-level messages using SLF4J. The set of reports to be generated is controlled by
+ * {@link ReporterConfig}, including which sections are enabled and the default logger name (unless overridden).
+ *
+ * <p>This is useful for troubleshooting or recording system configuration at application startup or runtime.</p>
  *
  * @author Daniel Felix Ferber
  */
@@ -52,7 +53,8 @@ public class Reporter implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Executor that runs tasks synchronously on the current thread. Useful for environments where multithreading is restricted or undesired.
+     * An {@link Executor} that runs tasks synchronously on the current thread. Useful for environments where
+     * multithreading is restricted or undesired.
      */
     public static final Executor sameThreadExecutor = new Executor() {
         @Override
@@ -64,8 +66,8 @@ public class Reporter implements Serializable {
     /**
      * Runs the default report on the current thread using {@link #sameThreadExecutor}.
      * <p>
-     * Intended for simple applications or environments where blocking the current thread is acceptable. May not be suitable for JavaEE or reactive environments
-     * that restrict long-running tasks on request threads.
+     * Intended for simple applications or environments where blocking the current thread is acceptable. May not be
+     * suitable for JavaEE or reactive environments that restrict long-running tasks on request threads.
      */
     public static void runDefaultReport() {
         new Reporter().logDefaultReports(sameThreadExecutor);
@@ -79,34 +81,35 @@ public class Reporter implements Serializable {
     }
 
     /**
-     * Creates a new {@code Reporter} that logs to the specified {@link Logger}.
+     * Creates a new {@code Reporter} instance that logs messages to the specified {@link Logger}.
      *
-     * @param logger Logger used to write report messages.
+     * @param logger the SLF4J logger to use for reporting
      */
     public Reporter(final Logger logger) {
         this.logger = logger;
     }
 
     /**
-     * Returns the logger used by this reporter instance.
+     * Returns the SLF4J logger used by this {@code Reporter} instance.
      *
-     * @return the logger that writes report messages.
+     * @return the logger associated with this reporter
      */
     public Logger getLogger() {
         return logger;
     }
 
     /**
-     * Runs all available reports and logs them as information-level messages.
-     * <p>
-     * Each report is executed using the provided {@link Executor}, allowing for synchronous or asynchronous execution depending on the context.
-     * <p>
-     * <strong>Note:</strong> Some reports may involve system calls or resource access operations
-     * that can block the thread for a noticeable amount of time. It is recommended to avoid using shared or latency-sensitive executors. *
-     * <p>
-     * If network interfaces cannot be retrieved, a warning is logged.
+     * Runs all available diagnostic reports and logs them as information-level messages.
      *
-     * @param executor the executor responsible for running each report task
+     * <p>Each report is executed via the provided {@link Executor}, which can be synchronous or asynchronous depending
+     * on the application context.</p>
+     *
+     * <p><strong>Note:</strong> Some reports may involve blocking operations, such as system or network calls.
+     * It is recommended not to use a shared or latency-sensitive executor for this.</p>
+     *
+     * <p>If network interfaces cannot be retrieved, a warning is logged.</p>
+     *
+     * @param executor the executor used to run each report
      */
     public void logAllReports(final Executor executor) {
         executor.execute(this.new ReportPhysicalSystem());
@@ -120,7 +123,7 @@ public class Reporter implements Serializable {
         executor.execute(this.new ReportCalendar());
         executor.execute(this.new ReportLocale());
         executor.execute(this.new ReportCharset());
-        executor.execute(this.new ReportSSLContex());
+        executor.execute(this.new ReportSSLContext());
         executor.execute(this.new ReportDefaultTrustKeyStore());
         try {
             final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -134,9 +137,11 @@ public class Reporter implements Serializable {
     }
 
     /**
-     * Run the reports enabled in {@link ReporterConfig} and writes them as information messages to logger.
+     * Runs only the reports that are enabled in {@link ReporterConfig} and logs them as information-level messages.
      *
-     * @param executor Executor that runs each report.
+     * <p>Each enabled report is executed via the provided {@link Executor}.</p>
+     *
+     * @param executor the executor used to run each report
      */
     public void logDefaultReports(final Executor executor) {
         if (ReporterConfig.reportPhysicalSystem) {
@@ -184,13 +189,17 @@ public class Reporter implements Serializable {
             }
         }
         if (ReporterConfig.reportSSLContext) {
-            executor.execute(this.new ReportSSLContex());
+            executor.execute(this.new ReportSSLContext());
         }
         if (ReporterConfig.reportDefaultTrustKeyStore) {
             executor.execute(this.new ReportDefaultTrustKeyStore());
         }
     }
 
+    /**
+     * Reports basic information about the Java Virtual Machine (JVM), including vendor, version, and installation
+     * directory.
+     */
     public class ReportVM implements Runnable {
 
         @Override
@@ -204,6 +213,9 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports information about the file system roots, including total, free, and usable space.
+     */
     public class ReportFileSystem implements Runnable {
 
         @Override
@@ -225,6 +237,10 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports memory usage of the JVM, including maximum available memory, currently allocated memory, and currently
+     * used memory.
+     */
     public class ReportMemory implements Runnable {
 
         @Override
@@ -242,6 +258,9 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports environment variables available to the current process.
+     */
     public class ReportUser implements Runnable {
 
         @Override
@@ -254,6 +273,9 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports environment variables available to the current process.
+     */
     public class ReportSystemEnvironment implements Runnable {
 
         @Override
@@ -268,6 +290,9 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports all Java system properties in sorted order.
+     */
     public class ReportSystemProperties implements Runnable {
 
         @Override
@@ -282,6 +307,9 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports basic information about the physical system, such as the number of available processors.
+     */
     public class ReportPhysicalSystem implements Runnable {
 
         @Override
@@ -294,6 +322,10 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports properties of the operating system, including architecture, name, version, and path/file/line
+     * separators.
+     */
     public class ReportOperatingSystem implements Runnable {
 
         @Override
@@ -310,6 +342,9 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports the current date and time, default time zone configuration, and lists all available time zone IDs.
+     */
     @SuppressWarnings("Since15")
     public class ReportCalendar implements Runnable {
 
@@ -344,6 +379,10 @@ public class Reporter implements Serializable {
     }
 
     @SuppressWarnings("Since15")
+    /**
+     * Reports the default system locale and lists all available locales
+     * with their respective language, country, script, and variant.
+     */
     public class ReportLocale implements Runnable {
 
         @Override
@@ -373,6 +412,10 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports the default system locale and lists all available locales with their respective language, country,
+     * script, and variant.
+     */
     public class ReportCharset implements Runnable {
 
         @Override
@@ -396,6 +439,10 @@ public class Reporter implements Serializable {
         }
     }
 
+    /**
+     * Reports details of a specific network interface, including name, MTU, status flags (e.g., loopback, multicast),
+     * hardware address, and associated IP addresses.
+     */
     public class ReportNetworkInterface implements Runnable {
 
         private final NetworkInterface nif;
@@ -471,7 +518,7 @@ public class Reporter implements Serializable {
                     ps.print("link-local; ");
                 }
                 if (inetAddress.isMulticastAddress()) {
-                    ps.print("multicas; ");
+                    ps.print("multicast; ");
                 }
                 if (inetAddress.isReachable(5000)) {
                     ps.print("reachable; ");
@@ -483,7 +530,11 @@ public class Reporter implements Serializable {
         }
     }
 
-    public class ReportSSLContex implements Runnable {
+    /**
+     * Reports details of SSL contexts supported by the JVM, including cipher suites, protocols, and supported SSL
+     * parameters for each context.
+     */
+    public class ReportSSLContext implements Runnable {
         final String contextNames[] = {
                 "Default", "SSL", "SSLv2", "SSLv3", "TLS", "TLSv1", "TLSv1.1", "TLSv1.2"
         };
@@ -554,6 +605,9 @@ public class Reporter implements Serializable {
     }
 
 
+    /**
+     * Reports the trusted certificate authorities from the default JVM trust store.
+     */
     public class ReportDefaultTrustKeyStore implements Runnable {
 
         @Override
@@ -587,5 +641,4 @@ public class Reporter implements Serializable {
             ps.close();
         }
     }
-
 }

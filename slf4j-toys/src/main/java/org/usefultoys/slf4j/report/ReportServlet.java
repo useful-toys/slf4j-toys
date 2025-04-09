@@ -123,7 +123,7 @@ public class ReportServlet extends HttpServlet {
                 new Reporter().getLogger().warn("Cannot report interfaces", e);
             }
         } else if ("/sslcontext".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportSSLContex().run();
+            new Reporter().new ReportSSLContext().run();
         } else if ("/defaulttrustkeystore".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportDefaultTrustKeyStore().run();
         } else {
