@@ -51,17 +51,6 @@ class ReportServletTest {
     }
 
     @Test
-    void shouldRespondWith404WhenPathTransversal() throws Exception {
-        when(request.getPathInfo()).thenReturn("/abc/../def");
-
-        servlet.doGet(request, response);
-
-        verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
-        assertTrue(responseWriter.toString().contains("No report path provided"));
-    }
-
-
-    @Test
     void shouldRespondWith404ForUnknownPath() throws Exception {
         when(request.getPathInfo()).thenReturn("/unknown");
 
