@@ -173,7 +173,7 @@ public class JdbcConnectionReporter {
             }
             if (metadata != null) {
                 ps.println(" - database: " + metadata.getDatabaseProductName() + " (" + metadata.getDatabaseProductVersion() + ")");
-                ps.print(" - driver: " + metadata.getDriverName() + " (" + metadata.getDriverVersion() + ")");
+                ps.print(" - driver: " + metadata.getDriverName() + " (" + metadata.getDriverVersion() + "); ");
                 ps.print("jdbc-version=" + metadata.getJDBCMajorVersion() + "." + metadata.getJDBCMinorVersion() + "; ");
                 ps.print("max-connections=" + metadata.getMaxConnections() + "; ");
                 ps.print("sql-state-type=");
@@ -191,16 +191,16 @@ public class JdbcConnectionReporter {
             }
             if (printTypeMap) {
                 final Map<String, Class<?>> map = connection.getTypeMap();
-                ps.println(" - type map: ");
+                ps.print(" - type map: ");
                 if (map == null || map.isEmpty()) {
                     ps.println("n/a");
                 } else {
                     int i = 1;
                     for (final Map.Entry<String, Class<?>> entry : map.entrySet()) {
-                        if (i++ % 5 == 0) {
+                        if (i++ % 3 == 0) {
                             ps.print("\n      ");
                         }
-                        ps.println(entry.getKey() + "->" + entry.getClass() + "; ");
+                        ps.print(entry.getKey() + "->" + entry.getValue().getSimpleName() + "; ");
                     }
                     ps.println();
                 }

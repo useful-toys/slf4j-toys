@@ -89,10 +89,6 @@ public class ReportServlet extends HttpServlet {
                 .toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9/_-]", "");
 
-        if (pathinfo.contains("..")) {
-            LOGGER.warn("No report path provided.");
-            return;
-        }
 
         if ("/VM".equalsIgnoreCase(pathinfo)) {
             new Reporter().new ReportVM().run();
