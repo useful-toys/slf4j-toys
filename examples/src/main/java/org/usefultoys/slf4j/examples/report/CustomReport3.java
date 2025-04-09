@@ -17,7 +17,12 @@ package org.usefultoys.slf4j.examples.report;
 
 import java.util.concurrent.Executor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.report.ReportMemory;
+import org.usefultoys.slf4j.report.ReportPhysicalSystem;
 import org.usefultoys.slf4j.report.Reporter;
+import org.usefultoys.slf4j.report.ReporterConfig;
 
 /**
  * Example that demonstrates generating specific reports manually.
@@ -32,8 +37,8 @@ public class CustomReport3 {
     public static void main(String[] args) {
 
         final Executor executor = Reporter.sameThreadExecutor;
-        final Reporter reporter = new Reporter();
-        executor.execute(reporter.new ReportPhysicalSystem());
-        executor.execute(reporter.new ReportMemory());
+        Logger logger = LoggerFactory.getLogger(ReporterConfig.name);
+        executor.execute(new ReportPhysicalSystem(logger));
+        executor.execute(new ReportMemory(logger));
     }
 }

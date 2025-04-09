@@ -29,8 +29,7 @@ import org.usefultoys.slf4j.report.ReporterConfig;
 public class CustomReport5 {
 
     public static void main(String[] args) {
-        ReporterConfig.reportSSLContext = true;
-        ReporterConfig.reportDefaultTrustKeyStore = true;
+        ReporterConfig.reportNetworkInterface = true;
         Reporter.runDefaultReport();
     }
 }

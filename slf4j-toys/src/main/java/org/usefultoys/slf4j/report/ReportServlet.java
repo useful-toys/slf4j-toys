@@ -89,39 +89,39 @@ public class ReportServlet extends HttpServlet {
                 .toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9/_-]", "");
 
-
+        final Logger logger = LoggerFactory.getLogger(ReporterConfig.name);
         if ("/VM".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportVM().run();
+            new ReportVM(logger).run();
         } else if ("/filesystem".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportFileSystem().run();
+            new ReportFileSystem(logger).run();
         } else if ("/memory".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportMemory().run();
+            new ReportMemory(logger).run();
         } else if ("/user".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportUser().run();
+            new ReportUser(logger).run();
         } else if ("/physicalsystem".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportPhysicalSystem().run();
+            new ReportPhysicalSystem(logger).run();
         } else if ("/operatingsystem".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportOperatingSystem().run();
+            new ReportOperatingSystem(logger).run();
         } else if ("/calendar".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportCalendar().run();
+            new ReportCalendar(logger).run();
         } else if ("/locale".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportLocale().run();
+            new ReportLocale(logger).run();
         } else if ("/charset".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportCharset().run();
+            new ReportCharset(logger).run();
         } else if ("/networkinterface".equalsIgnoreCase(pathinfo)) {
             try {
                 final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
                     final NetworkInterface nif = interfaces.nextElement();
-                    new Reporter().new ReportNetworkInterface(nif).run();
+                    new ReportNetworkInterface(logger, nif).run();
                 }
             } catch (final SocketException e) {
-                new Reporter().getLogger().warn("Cannot report interfaces", e);
+                LOGGER.warn("Cannot report network interface", e);
             }
         } else if ("/sslcontext".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportSSLContext().run();
+            new ReportSSLContext(logger).run();
         } else if ("/defaulttrustkeystore".equalsIgnoreCase(pathinfo)) {
-            new Reporter().new ReportDefaultTrustKeyStore().run();
+            new ReportDefaultTrustKeyStore(logger).run();
         } else {
             LOGGER.warn("Unrecognized report path: {}", pathinfo);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
