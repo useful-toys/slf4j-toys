@@ -6,14 +6,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>log4j-example</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.9.0-SNAPSHOT</version>
     <name>log4j-example</name>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>org.usefultoys</groupId>
         <artifactId>slf4j-toys-root</artifactId>
-        <version>1.8.0-SNAPSHOT</version>
+        <version>1.9.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
