@@ -16,6 +16,7 @@ import java.util.Enumeration;
  * Reports details of a specific network interface, including name, MTU, status flags (e.g., loopback, multicast),
  * hardware address, and associated IP addresses.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportNetworkInterface implements Runnable {
 

@@ -48,6 +48,7 @@ import java.util.Properties;
  *
  * @author Daniel
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportJdbcConnection implements Runnable {
 
@@ -153,7 +154,7 @@ public class ReportJdbcConnection implements Runnable {
                 int i = 1;
                 for (final Map.Entry<Object, Object> entry : info.entrySet()) {
                     if (i++ % 5 == 0) {
-                        ps.print("\n      ");
+                        ps.printf("%n      ");
                     }
                     final String name = (String) entry.getKey();
                     if (name.toLowerCase().contains("password")) {
@@ -191,7 +192,7 @@ public class ReportJdbcConnection implements Runnable {
                     int i = 1;
                     for (final Map.Entry<String, Class<?>> entry : map.entrySet()) {
                         if (i++ % 3 == 0) {
-                            ps.print("\n      ");
+                            ps.printf("%n      ");
                         }
                         ps.printf("%s->%s; ", entry.getKey(), entry.getValue().getSimpleName());
                     }

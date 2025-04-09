@@ -34,6 +34,7 @@ import java.util.concurrent.Executor;
  *
  * @author Daniel Felix Ferber
  */
+@SuppressWarnings("NonConstantLogger")
 public class Reporter implements Serializable {
 
     /**

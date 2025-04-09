@@ -12,6 +12,7 @@ import java.util.TimeZone;
 /**
  * Reports the current date and time, default time zone configuration, and lists all available time zone IDs.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportCalendar implements Runnable {
 
@@ -40,7 +41,7 @@ public class ReportCalendar implements Runnable {
         int i = 1;
         for (final String id : TimeZone.getAvailableIDs()) {
             if (i++ % 8 == 0) {
-                ps.print("\n      ");
+                ps.printf("%n      ");
             }
             ps.printf("%s; ", id);
         }

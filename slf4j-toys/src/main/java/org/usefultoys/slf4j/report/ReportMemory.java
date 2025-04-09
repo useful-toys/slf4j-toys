@@ -11,6 +11,7 @@ import java.io.PrintStream;
  * Reports memory usage of the JVM, including maximum available memory, currently allocated memory, and currently used
  * memory.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportMemory implements Runnable {
 

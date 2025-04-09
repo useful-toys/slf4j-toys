@@ -11,6 +11,7 @@ import java.util.Locale;
  * Reports the default system locale and lists all available locales
  * with their respective language, country, script, and variant.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportLocale implements Runnable {
 
@@ -36,7 +37,7 @@ public class ReportLocale implements Runnable {
         int i = 1;
         for (final Locale l : Locale.getAvailableLocales()) {
             if (i++ % 8 == 0) {
-                ps.print("\n      ");
+                ps.printf("%n      ");
             }
             ps.printf("%s; ", l.getDisplayName());
         }

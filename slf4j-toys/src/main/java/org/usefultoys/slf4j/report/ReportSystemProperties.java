@@ -12,6 +12,7 @@ import java.util.TreeMap;
 /**
  * Reports all Java system properties in sorted order.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportSystemProperties implements Runnable {
 

@@ -12,6 +12,7 @@ import java.util.TreeMap;
 /**
  * Reports environment variables available to the current process.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportSystemEnvironment implements Runnable {
 

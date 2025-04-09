@@ -10,6 +10,7 @@ import java.io.PrintStream;
  * Reports basic information about the Java Virtual Machine (JVM), including vendor, version, and installation
  * directory.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportVM implements Runnable {
 

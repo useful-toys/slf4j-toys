@@ -16,6 +16,7 @@ import java.util.TreeMap;
  * Reports details of SSL contexts supported by the JVM, including cipher suites, protocols, and supported SSL
  * parameters for each context.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportSSLContext implements Runnable {
     private final Logger logger;
@@ -82,7 +83,7 @@ public class ReportSSLContext implements Runnable {
                 ps.print("      Cipher Suites: ");
                 printList(ps, p.getCipherSuites(), "          ");
             } catch (Exception e) {
-                ps.println("Falha ao detalhar SSLContext: " + e.getMessage());
+                ps.printf("Falha ao detalhar SSLContext: %s%n", e.getMessage());
             }
             ps.close();
         }

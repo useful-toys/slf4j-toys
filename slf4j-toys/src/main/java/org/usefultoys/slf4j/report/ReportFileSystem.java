@@ -11,6 +11,7 @@ import java.io.PrintStream;
 /**
  * Reports information about the file system roots, including total, free, and usable space.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportFileSystem implements Runnable {
 

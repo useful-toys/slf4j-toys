@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
  * Reports the default system locale and lists all available locales with their respective language, country, script,
  * and variant.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportCharset implements Runnable {
 
@@ -21,7 +22,7 @@ public class ReportCharset implements Runnable {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         final Charset charset = Charset.defaultCharset();
         ps.println("Charset");
-        ps.print(" - default charset: " + charset.displayName());
+        ps.printf(" - default charset: %s", charset.displayName());
         ps.printf("; name=%s", charset.name());
         ps.printf("; canEncode=%s", charset.canEncode());
         ps.println();
@@ -29,7 +30,7 @@ public class ReportCharset implements Runnable {
         int i = 1;
         for (final Charset l : Charset.availableCharsets().values()) {
             if (i++ % 15 == 0) {
-                ps.print("\n      ");
+                ps.printf("%n      ");
             }
             ps.printf("%s; ", l.displayName());
         }

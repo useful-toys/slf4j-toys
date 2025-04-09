@@ -9,6 +9,7 @@ import java.io.PrintStream;
 /**
  * Reports properties of the operating system, including architecture, name, version, and path/file/line separators.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportOperatingSystem implements Runnable {
 

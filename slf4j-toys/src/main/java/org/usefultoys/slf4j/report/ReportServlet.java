@@ -63,6 +63,7 @@ import java.util.Locale;
  *
  * @author Daniel Felix Ferber
  */
+@SuppressWarnings("ClassWithMultipleLoggers")
 @Slf4j
 public class ReportServlet extends HttpServlet {
 

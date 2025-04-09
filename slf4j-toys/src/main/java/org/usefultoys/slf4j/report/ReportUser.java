@@ -9,6 +9,7 @@ import java.io.PrintStream;
 /**
  * Reports environment variables available to the current process.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportUser implements Runnable {
 

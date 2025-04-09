@@ -9,6 +9,7 @@ import java.io.PrintStream;
 /**
  * Reports basic information about the physical system, such as the number of available processors.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportPhysicalSystem implements Runnable {
 

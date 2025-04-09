@@ -14,6 +14,7 @@ import java.security.cert.X509Certificate;
 /**
  * Reports the trusted certificate authorities from the default JVM trust store.
  */
+@SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportDefaultTrustKeyStore implements Runnable {
 
