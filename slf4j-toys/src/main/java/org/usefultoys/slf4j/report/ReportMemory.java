@@ -24,9 +24,9 @@ public class ReportMemory implements Runnable {
         final long maxMemory = runtime.maxMemory();
         final long totalMemory = runtime.totalMemory();
         final long freeMemory = runtime.freeMemory();
-        ps.println(" - maximum allowed: " + (maxMemory == Long.MAX_VALUE ? "no limit" : UnitFormatter.bytes(maxMemory)));
-        ps.println(" - currently allocated: " + UnitFormatter.bytes(totalMemory) + " (" + UnitFormatter.bytes(maxMemory - totalMemory) + " more available)");
-        ps.println(" - currently used: " + UnitFormatter.bytes(totalMemory - freeMemory) + " (" + UnitFormatter.bytes(freeMemory) + " free)");
+        ps.printf(" - maximum allowed: %s%n", maxMemory == Long.MAX_VALUE ? "no limit" : UnitFormatter.bytes(maxMemory));
+        ps.printf(" - currently allocated: %s (%s more available)%n", UnitFormatter.bytes(totalMemory), UnitFormatter.bytes(maxMemory - totalMemory));
+        ps.printf(" - currently used: %s (%s free)%n", UnitFormatter.bytes(totalMemory - freeMemory), UnitFormatter.bytes(freeMemory));
         ps.close();
     }
 }

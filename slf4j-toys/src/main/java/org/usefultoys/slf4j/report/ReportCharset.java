@@ -22,8 +22,8 @@ public class ReportCharset implements Runnable {
         final Charset charset = Charset.defaultCharset();
         ps.println("Charset");
         ps.print(" - default charset: " + charset.displayName());
-        ps.print("; name=" + charset.name());
-        ps.print("; canEncode=" + charset.canEncode());
+        ps.printf("; name=%s", charset.name());
+        ps.printf("; canEncode=%s", charset.canEncode());
         ps.println();
         ps.print(" - available charsets: ");
         int i = 1;
@@ -31,7 +31,7 @@ public class ReportCharset implements Runnable {
             if (i++ % 15 == 0) {
                 ps.print("\n      ");
             }
-            ps.print(l.displayName() + "; ");
+            ps.printf("%s; ", l.displayName());
         }
         ps.close();
     }

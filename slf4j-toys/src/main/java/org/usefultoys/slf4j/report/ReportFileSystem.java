@@ -27,9 +27,9 @@ public class ReportFileSystem implements Runnable {
             } else {
                 ps.println();
             }
-            ps.println("File system root: " + root.getAbsolutePath());
-            ps.println(" - total space: " + UnitFormatter.bytes(root.getTotalSpace()));
-            ps.println(" - currently free space: " + UnitFormatter.bytes(root.getFreeSpace()) + " (" + UnitFormatter.bytes(root.getUsableSpace()) + " usable)");
+            ps.printf("File system root: %s%n", root.getAbsolutePath());
+            ps.printf(" - total space: %s%n", UnitFormatter.bytes(root.getTotalSpace()));
+            ps.printf(" - currently free space: %s (%s usable)%n", UnitFormatter.bytes(root.getFreeSpace()), UnitFormatter.bytes(root.getUsableSpace()));
         }
         ps.close();
     }

@@ -6,6 +6,7 @@ import org.usefultoys.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
@@ -20,9 +21,9 @@ public class ReportSystemProperties implements Runnable {
     public void run() {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("System Properties:");
-        final TreeMap<Object, Object> sortedProperties = new TreeMap<>(System.getProperties());
+        final SortedMap<Object, Object> sortedProperties = new TreeMap<>(System.getProperties());
         for (final Map.Entry<Object, Object> entry : sortedProperties.entrySet()) {
-            ps.println(" - " + entry.getKey() + ": " + entry.getValue());
+            ps.printf(" - %s: %s%n", entry.getKey(), entry.getValue());
         }
         ps.close();
     }

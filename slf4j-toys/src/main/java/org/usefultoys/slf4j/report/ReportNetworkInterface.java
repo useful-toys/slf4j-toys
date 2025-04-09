@@ -26,10 +26,10 @@ public class ReportNetworkInterface implements Runnable {
     public void run() {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         try {
-            ps.println("Network Interface " + nif.getName() + ":");
-            ps.println(" - display name: " + nif.getDisplayName());
+            ps.printf("Network Interface %s:%n", nif.getName());
+            ps.printf(" - display name: %s%n", nif.getDisplayName());
             ps.print(" - properties: ");
-            ps.print("mtu=" + nif.getMTU() + "; ");
+            ps.printf("mtu=%d; ", nif.getMTU());
             if (nif.isLoopback()) {
                 ps.print("loopback; ");
             }
@@ -69,12 +69,12 @@ public class ReportNetworkInterface implements Runnable {
     private static void reportNetworkAddress(final PrintStream ps, final InetAddress inetAddress) {
         try {
             if (inetAddress instanceof Inet4Address) {
-                ps.println(" - NET address (IPV4): " + inetAddress.getHostAddress());
+                ps.printf(" - NET address (IPV4): %s%n", inetAddress.getHostAddress());
             } else if (inetAddress instanceof Inet6Address) {
-                ps.println(" - NET address (IPV6): " + inetAddress.getHostAddress());
+                ps.printf(" - NET address (IPV6): %s%n", inetAddress.getHostAddress());
             }
-            ps.println("      host name: " + inetAddress.getHostName());
-            ps.println("      canonical host name : " + inetAddress.getCanonicalHostName());
+            ps.printf("      host name: %s%n", inetAddress.getHostName());
+            ps.printf("      canonical host name : %s%n", inetAddress.getCanonicalHostName());
             ps.print("      properties: ");
             if (inetAddress.isLoopbackAddress()) {
                 ps.print("loopback; ");
@@ -96,7 +96,7 @@ public class ReportNetworkInterface implements Runnable {
             }
             ps.println();
         } catch (final IOException e) {
-            ps.println("   Cannot read property: " + e.getLocalizedMessage());
+            ps.printf("   Cannot read property: %s%n", e.getLocalizedMessage());
         }
     }
 }

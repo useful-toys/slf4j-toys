@@ -19,7 +19,7 @@ public class ReportPhysicalSystem implements Runnable {
         final Runtime runtime = Runtime.getRuntime();
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Physical system");
-        ps.println(" - processors: " + runtime.availableProcessors());
+        ps.printf(" - processors: %d%n", runtime.availableProcessors());
         ps.close();
     }
 }

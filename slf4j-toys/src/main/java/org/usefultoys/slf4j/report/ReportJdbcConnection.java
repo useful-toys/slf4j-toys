@@ -84,19 +84,20 @@ public class ReportJdbcConnection implements Runnable {
                 return;
             }
             if (connection.getCatalog() != null) {
-                ps.println(" - catalog: " + connection.getCatalog());
+                ps.printf(" - catalog: %s%n", connection.getCatalog());
             }
+            //noinspection ErrorNotRethrown
             try {
                 if (connection.getSchema() != null) {
-                    ps.println(" - schema: " + connection.getSchema());
+                    ps.printf(" - schema: %s%n", connection.getSchema());
                 }
             } catch (final NoSuchMethodError ignore) {
                 // only since 1.7
             }
             final DatabaseMetaData metadata = connection.getMetaData();
             if (metadata != null) {
-                ps.println("    URL: " + metadata.getURL());
-                ps.println("    user name: " + metadata.getUserName());
+                ps.printf("    URL: %s%n", metadata.getURL());
+                ps.printf("    user name: %s%n", metadata.getUserName());
             }
             ps.print(" - properties: ");
             if (connection.isReadOnly()) {
@@ -116,6 +117,7 @@ public class ReportJdbcConnection implements Runnable {
                 default:
                     ps.print("unknown; ");
             }
+            //noinspection ErrorNotRethrown
             try {
                 ps.printf("timeout=%dms; ", connection.getNetworkTimeout());
             } catch (final NoSuchMethodError ignore) {
@@ -155,18 +157,18 @@ public class ReportJdbcConnection implements Runnable {
                     }
                     final String name = (String) entry.getKey();
                     if (name.toLowerCase().contains("password")) {
-                        ps.print(name + "=?; ");
+                        ps.printf("%s=?; ", name);
                         continue;
                     }
-                    ps.print(name + "=" + entry.getValue());
+                    ps.printf("%s=%s", name, entry.getValue());
                 }
                 ps.println();
             }
             if (metadata != null) {
-                ps.println(" - database: " + metadata.getDatabaseProductName() + " (" + metadata.getDatabaseProductVersion() + ")");
-                ps.print(" - driver: " + metadata.getDriverName() + " (" + metadata.getDriverVersion() + "); ");
-                ps.print("jdbc-version=" + metadata.getJDBCMajorVersion() + "." + metadata.getJDBCMinorVersion() + "; ");
-                ps.print("max-connections=" + metadata.getMaxConnections() + "; ");
+                ps.printf(" - database: %s (%s)%n", metadata.getDatabaseProductName(), metadata.getDatabaseProductVersion());
+                ps.printf(" - driver: %s (%s); ", metadata.getDriverName(), metadata.getDriverVersion());
+                ps.printf("jdbc-version=%d.%d; ", metadata.getJDBCMajorVersion(), metadata.getJDBCMinorVersion());
+                ps.printf("max-connections=%d; ", metadata.getMaxConnections());
                 ps.print("sql-state-type=");
                 switch (metadata.getSQLStateType()) {
                     case DatabaseMetaData.sqlStateSQL99:
@@ -191,13 +193,13 @@ public class ReportJdbcConnection implements Runnable {
                         if (i++ % 3 == 0) {
                             ps.print("\n      ");
                         }
-                        ps.print(entry.getKey() + "->" + entry.getValue().getSimpleName() + "; ");
+                        ps.printf("%s->%s; ", entry.getKey(), entry.getValue().getSimpleName());
                     }
                     ps.println();
                 }
             }
         } catch (final SQLException e) {
-            ps.println("   Cannot read property: " + e.getLocalizedMessage());
+            ps.printf("   Cannot read property: %s%n", e.getLocalizedMessage());
         } finally {
             ps.close();
         }

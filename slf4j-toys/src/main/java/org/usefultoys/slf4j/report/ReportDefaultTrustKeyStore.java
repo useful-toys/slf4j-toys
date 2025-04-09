@@ -31,21 +31,21 @@ public class ReportDefaultTrustKeyStore implements Runnable {
 
             for (int i = 0; i < trustManagers.length; ++i) {
                 TrustManager tm = trustManagers[i];
-                ps.println(" - TrustManager: " + i + " (" + tm.getClass() + ")");
+                ps.printf(" - TrustManager: %d (%s)%n", i, tm.getClass());
                 if (tm instanceof X509TrustManager) {
                     X509TrustManager x509tm = (X509TrustManager) tm;
                     X509Certificate[] certificates = x509tm.getAcceptedIssuers();
                     for (int j = 0; j < certificates.length; j++) {
                         final X509Certificate cert = certificates[j];
-                        ps.println("   - Certificate #" + j);
-                        ps.println("       Subject: " + cert.getSubjectX500Principal());
-                        ps.println("       Issuer: " + cert.getIssuerX500Principal());
-                        ps.println("       #: " + cert.getSerialNumber() + " From: " + cert.getNotBefore() + " Until: " + cert.getNotAfter());
+                        ps.printf("   - Certificate #%d%n", j);
+                        ps.printf("       Subject: %s%n", cert.getSubjectX500Principal());
+                        ps.printf("       Issuer: %s%n", cert.getIssuerX500Principal());
+                        ps.printf("       #: %s From: %s Until: %s%n", cert.getSerialNumber(), cert.getNotBefore(), cert.getNotAfter());
                     }
                 }
             }
         } catch (Exception e) {
-            ps.println("Cannot read TrustManager: " + e.getMessage());
+            ps.printf("Cannot read TrustManager: %s%n", e.getMessage());
         }
         ps.close();
     }

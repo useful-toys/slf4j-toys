@@ -66,6 +66,9 @@ import java.util.Locale;
 @Slf4j
 public class ReportServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
+    public static final Logger LOGGER = LoggerFactory.getLogger(ReportServlet.class);
+
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
         String pathinfo = request.getPathInfo();
@@ -127,7 +130,7 @@ public class ReportServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.setContentType("text/plain");
             try {
-                response.getWriter().write("Unknown report path: " + pathinfo);
+                response.getWriter().write(String.format("Unknown report path: %s", pathinfo));
             } catch (Exception ignored) {
                 // no-op
             }
@@ -137,7 +140,7 @@ public class ReportServlet extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("text/plain");
         try {
-            response.getWriter().write("Report logged for: " + pathinfo);
+            response.getWriter().write(String.format("Report logged for: %s", pathinfo));
         } catch (Exception ignored) {
             // no-op
         }

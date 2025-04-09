@@ -18,12 +18,12 @@ public class ReportOperatingSystem implements Runnable {
     public void run() {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Operating System");
-        ps.println(" - architecture: " + System.getProperty("os.arch"));
-        ps.println(" - name: " + System.getProperty("os.name"));
-        ps.println(" - version: " + System.getProperty("os.version"));
-        ps.println(" - file separator: " + Integer.toHexString(System.getProperty("file.separator").charAt(0)));
-        ps.println(" - path separator: " + Integer.toHexString(System.getProperty("path.separator").charAt(0)));
-        ps.println(" - line separator: " + Integer.toHexString(System.getProperty("line.separator").charAt(0)));
+        ps.printf(" - architecture: %s%n", System.getProperty("os.arch"));
+        ps.printf(" - name: %s%n", System.getProperty("os.name"));
+        ps.printf(" - version: %s%n", System.getProperty("os.version"));
+        ps.printf(" - file separator: %s%n", Integer.toHexString(System.getProperty("file.separator").charAt(0)));
+        ps.printf(" - path separator: %s%n", Integer.toHexString(System.getProperty("path.separator").charAt(0)));
+        ps.printf(" - line separator: %s%n", Integer.toHexString(System.getProperty("line.separator").charAt(0)));
         ps.close();
     }
 }
