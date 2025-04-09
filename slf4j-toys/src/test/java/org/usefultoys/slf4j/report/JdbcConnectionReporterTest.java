@@ -22,24 +22,26 @@ import static org.mockito.Mockito.*;
 
 class JdbcConnectionReporterTest {
     private TestLogger logger;
+    private Connection connection;
     private JdbcConnectionReporter reporter;
 
     @BeforeEach
     void setUp() {
         logger = (TestLogger) LoggerFactory.getLogger("test.jdbc");
         logger.clearEvents();
-        reporter = new JdbcConnectionReporter(logger);
+
+        connection = mock(Connection.class);
+        reporter = new JdbcConnectionReporter(logger, connection);
     }
 
     @Test
     void shouldLogClosedJdbcConnectionInfo() throws SQLException {
-        Connection connection = mock(Connection.class);
 
         // Arrange
         when(connection.isClosed()).thenReturn(true);
 
         // Act
-        reporter.run(connection);
+        reporter.run();
 
         // Assert
         TestLogger testLogger = (TestLogger) logger;
@@ -52,7 +54,6 @@ class JdbcConnectionReporterTest {
     void shouldLogJdbcConnectionInfo() throws SQLException {
 
         // Arrange
-        Connection connection = mock(Connection.class);
         DatabaseMetaData metaData = mock(DatabaseMetaData.class);
         Properties clientInfo = new Properties();
         clientInfo.setProperty("appName", "testApp");
@@ -80,7 +81,7 @@ class JdbcConnectionReporterTest {
         when(metaData.getSQLStateType()).thenReturn(DatabaseMetaData.sqlStateSQL99);
 
         // Act
-        reporter.run(connection);
+        reporter.run();
 
         // Assert
         TestLogger testLogger = (TestLogger) logger;
@@ -100,8 +101,6 @@ class JdbcConnectionReporterTest {
 
     @Test
     void shouldLogJdbcConnectionInfoOtherAttributes() throws SQLException {
-        Connection connection = mock(Connection.class);
-
         // Arrange
         when(connection.isClosed()).thenReturn(false);
         when(connection.getCatalog()).thenReturn(null);
@@ -114,9 +113,8 @@ class JdbcConnectionReporterTest {
         when(connection.getClientInfo()).thenReturn(null);
         when(connection.getTypeMap()).thenReturn(null);
 
-
         // Act
-        reporter.run(connection);
+        reporter.run();
 
         // Assert
         TestLogger testLogger = (TestLogger) logger;
@@ -132,7 +130,7 @@ class JdbcConnectionReporterTest {
         // Arrange
         reporter.printTypeMap(true);
 
-        Connection connection = mock(Connection.class);
+
         when(connection.isClosed()).thenReturn(false);
         when(connection.getCatalog()).thenReturn(null);
         when(connection.getMetaData()).thenReturn(null);
@@ -149,7 +147,7 @@ class JdbcConnectionReporterTest {
         when(connection.getTypeMap()).thenReturn(typeMap);
 
         // Act
-        reporter.run(connection);
+        reporter.run();
 
         // Assert
         TestLogger testLogger = (TestLogger) logger;
@@ -163,7 +161,7 @@ class JdbcConnectionReporterTest {
         // Arrange
         reporter.printTypeMap(true);
 
-        Connection connection = mock(Connection.class);
+
         when(connection.isClosed()).thenReturn(false);
         when(connection.getCatalog()).thenReturn(null);
         when(connection.getMetaData()).thenReturn(null);
@@ -178,7 +176,7 @@ class JdbcConnectionReporterTest {
         when(connection.getTypeMap()).thenReturn(typeMap);
 
         // Act
-        reporter.run(connection);
+        reporter.run();
 
         // Assert
         TestLogger testLogger = (TestLogger) logger;
