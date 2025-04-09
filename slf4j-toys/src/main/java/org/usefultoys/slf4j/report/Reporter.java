@@ -99,44 +99,6 @@ public class Reporter implements Serializable {
     }
 
     /**
-     * Runs all available diagnostic reports and logs them as information-level messages.
-     *
-     * <p>Each report is executed via the provided {@link Executor}, which can be synchronous or asynchronous depending
-     * on the application context.</p>
-     *
-     * <p><strong>Note:</strong> Some reports may involve blocking operations, such as system or network calls.
-     * It is recommended not to use a shared or latency-sensitive executor for this.</p>
-     *
-     * <p>If network interfaces cannot be retrieved, a warning is logged.</p>
-     *
-     * @param executor the executor used to run each report
-     */
-    public void logAllReports(final Executor executor) {
-        executor.execute(this.new ReportPhysicalSystem());
-        executor.execute(this.new ReportOperatingSystem());
-        executor.execute(this.new ReportUser());
-        executor.execute(this.new ReportVM());
-        executor.execute(this.new ReportMemory());
-        executor.execute(this.new ReportSystemEnvironment());
-        executor.execute(this.new ReportSystemProperties());
-        executor.execute(this.new ReportFileSystem());
-        executor.execute(this.new ReportCalendar());
-        executor.execute(this.new ReportLocale());
-        executor.execute(this.new ReportCharset());
-        executor.execute(this.new ReportSSLContext());
-        executor.execute(this.new ReportDefaultTrustKeyStore());
-        try {
-            final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            while (interfaces.hasMoreElements()) {
-                final NetworkInterface nif = interfaces.nextElement();
-                executor.execute(this.new ReportNetworkInterface(nif));
-            }
-        } catch (final SocketException e) {
-            logger.warn("Cannot report interfaces.", e);
-        }
-    }
-
-    /**
      * Runs only the reports that are enabled in {@link ReporterConfig} and logs them as information-level messages.
      *
      * <p>Each enabled report is executed via the provided {@link Executor}.</p>
