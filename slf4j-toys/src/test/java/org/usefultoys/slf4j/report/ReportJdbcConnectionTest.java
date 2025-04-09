@@ -2,17 +2,13 @@ package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.report.JdbcConnectionReporter;
 import org.slf4j.impl.TestLogger;
-import org.slf4j.impl.TestLoggerEvent;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -20,10 +16,10 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class JdbcConnectionReporterTest {
+class ReportJdbcConnectionTest {
     private TestLogger logger;
     private Connection connection;
-    private JdbcConnectionReporter reporter;
+    private ReportJdbcConnection reporter;
 
     @BeforeEach
     void setUp() {
@@ -31,7 +27,7 @@ class JdbcConnectionReporterTest {
         logger.clearEvents();
 
         connection = mock(Connection.class);
-        reporter = new JdbcConnectionReporter(logger, connection);
+        reporter = new ReportJdbcConnection(logger, connection);
     }
 
     @Test

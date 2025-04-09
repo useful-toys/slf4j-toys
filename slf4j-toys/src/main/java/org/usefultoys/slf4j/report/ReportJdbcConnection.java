@@ -48,7 +48,7 @@ import java.util.Properties;
  * @author Daniel
  */
 @SuppressWarnings("Since15")
-public class JdbcConnectionReporter implements Runnable {
+public class ReportJdbcConnection implements Runnable {
 
     /** Logger that prints the JDBC connection report. */
     private final Logger logger;
@@ -62,7 +62,7 @@ public class JdbcConnectionReporter implements Runnable {
      *
      * @param logger the SLF4J logger to use for reporting
      */
-    public JdbcConnectionReporter(final Logger logger, final Connection connection) {
+    public ReportJdbcConnection(final Logger logger, final Connection connection) {
         this.logger = logger;
         this.connection = connection;
     }
@@ -73,7 +73,7 @@ public class JdbcConnectionReporter implements Runnable {
      * @param printTypeMap {@code true} to print the type map; {@code false} to skip it
      * @return this instance, for method chaining
      */
-    public JdbcConnectionReporter printTypeMap(final boolean printTypeMap) {
+    public ReportJdbcConnection printTypeMap(final boolean printTypeMap) {
         this.printTypeMap = printTypeMap;
         return this;
     }
