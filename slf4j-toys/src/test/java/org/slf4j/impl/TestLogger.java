@@ -25,6 +25,30 @@ import org.slf4j.Marker;
 import org.slf4j.impl.TestLoggerEvent.Level;
 
 /**
+ * A test-friendly implementation of the SLF4J {@link Logger} interface.
+ * <p>
+ * This logger captures log events in memory, allowing tests to inspect log output by accessing the recorded
+ * {@link TestLoggerEvent} instances. It supports all log levels (TRACE, DEBUG, INFO, WARN, ERROR) and provides
+ * configuration methods to enable or disable specific levels during test execution.
+ * <p>
+ * Each log event is printed to {@code System.out} or {@code System.err} based on its severity, and is also stored in an
+ * internal list for later inspection.
+ * <p>
+ * This logger is primarily intended to be used together with {@link TestLoggerFactory} during test runs, where SLF4J
+ * dynamically loads this implementation via its SPI mechanism.
+ * <p>
+ * Example usage in test assertions:
+ * <pre>{@code
+ * Logger logger = LoggerFactory.getLogger("test.logger");
+ * logger.info("Sample message");
+ *
+ * TestLogger testLogger = (TestLogger) logger;
+ * assertEquals(1, testLogger.getEventCount());
+ * assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Sample"));
+ * }</pre>
+ * <p>
+ * Note: This class is not thread-safe and should be used in single-threaded test contexts only.
+ *
  * @author Daniel Felix Ferber
  */
 public class TestLogger implements Logger {

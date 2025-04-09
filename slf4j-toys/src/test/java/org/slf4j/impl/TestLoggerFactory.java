@@ -17,10 +17,30 @@ package org.slf4j.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
 /**
+ * A mock implementation of {@link ILoggerFactory} intended for use in unit tests.
+ *
+ * <p>
+ * Provides {@link TestLogger} instances that capture log output in-memory, allowing assertions on logged content
+ * without requiring access to external files or consoles.
+ * <p>
+ * This factory is discovered automatically by SLF4J when present on the test classpath, and should not be referenced or
+ * instantiated directly in test code.
+ * <p>
+ * To use this in tests, ensure the service provider configuration is in place:
+ * <code>META-INF/services/org.slf4j.ILoggerFactory</code> should contain:</p>
+ * <pre>
+ * org.usefultoys.slf4j.report.TestLoggerFactory
+ * </pre>
+ * <p>
+ * No other SLF4J implementation should be present on the classepath.
+ * <p>
+ * When configured, all SLF4J logger requests in test code will return {@link TestLogger} instances.
+ * </p>
  *
  * @author Daniel Felix Ferber
  */

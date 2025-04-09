@@ -17,10 +17,31 @@ package org.slf4j.impl;
 
 import java.util.Arrays;
 import java.util.Map;
+
 import org.slf4j.Marker;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
+ * Represents a single log event captured by {@link TestLogger}.
+ * <p>
+ * This class holds all details of a logging call, including the logger name, log level, marker, original message,
+ * arguments, and optional throwable.
+ * <p>
+ * It also provides a formatted version of the message by applying SLF4J's {@link MessageFormatter}, as well as access
+ * to raw data for assertions in test environments.
+ * <p>
+ * If no throwable is explicitly passed but the last argument is a {@link Throwable}, it is extracted automatically and
+ * stored separately.
+ * <p>
+ * Example usage in tests:
+ * <pre>{@code
+ * TestLogger logger = ...
+ * TestLoggerEvent event = logger.getEvent(0);
+ * assertEquals(Level.INFO, event.getLevel());
+ * assertTrue(event.getFormattedMessage().contains("Expected text"));
+ * }</pre>
+ * <p>
+ * This class is immutable and thread-safe.
  *
  * @author Daniel Felix Ferber
  */
@@ -41,13 +62,13 @@ public class TestLoggerEvent {
     }
 
     public TestLoggerEvent(
-        final String loggerName,
-        final Level level,
-        final Map<String, String> mdc,
-        final Marker marker,
-        final Throwable throwable,
-        final String message,
-        final Object... arguments) {
+            final String loggerName,
+            final Level level,
+            final Map<String, String> mdc,
+            final Marker marker,
+            final Throwable throwable,
+            final String message,
+            final Object... arguments) {
 
         this.loggerName = loggerName;
         this.level = level;
