@@ -20,6 +20,7 @@
  */
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -47,25 +48,14 @@ import java.util.Properties;
  *
  * @author Daniel
  */
-@SuppressWarnings("Since15")
+@RequiredArgsConstructor
 public class ReportJdbcConnection implements Runnable {
 
-    /** Logger that prints the JDBC connection report. */
     private final Logger logger;
     private final Connection connection;
 
     /** Whether to print the JDBC type map. */
-    private boolean printTypeMap;
-
-    /**
-     * Creates a new reporter that logs output using the specified SLF4J logger.
-     *
-     * @param logger the SLF4J logger to use for reporting
-     */
-    public ReportJdbcConnection(final Logger logger, final Connection connection) {
-        this.logger = logger;
-        this.connection = connection;
-    }
+    private boolean printTypeMap = false;
 
     /**
      * Defines whether the JDBC type map should be printed.
@@ -83,8 +73,6 @@ public class ReportJdbcConnection implements Runnable {
      *
      * <p>This method logs the output using {@link LoggerFactory#getInfoPrintStream(Logger)}.
      * If the connection is closed, it logs a message and exits early.</p>
-     *
-     * @param connection the JDBC connection to inspect
      */
     @Override
     public void run() {
@@ -129,7 +117,7 @@ public class ReportJdbcConnection implements Runnable {
                     ps.print("unknown; ");
             }
             try {
-                ps.print("timeout=" + connection.getNetworkTimeout() + "ms; ");
+                ps.printf("timeout=%dms; ", connection.getNetworkTimeout());
             } catch (final NoSuchMethodError ignore) {
                 // only since 1.7
             }

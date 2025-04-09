@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.report;
 
+import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.internal.Config;
 
 /**
@@ -28,11 +29,8 @@ import org.usefultoys.slf4j.internal.Config;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("CanBeFinal")
+@UtilityClass
 public final class ReporterConfig {
-
-    private ReporterConfig() {
-        // prevent instances
-    }
 
     // System property keys
     public static final String PROP_VM = "slf4jtoys.report.vm";

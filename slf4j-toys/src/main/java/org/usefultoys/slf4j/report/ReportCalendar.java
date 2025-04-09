@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -11,14 +12,10 @@ import java.util.TimeZone;
 /**
  * Reports the current date and time, default time zone configuration, and lists all available time zone IDs.
  */
-@SuppressWarnings("Since15")
+@RequiredArgsConstructor
 public class ReportCalendar implements Runnable {
 
     private final Logger logger;
-
-    public ReportCalendar(final Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void run() {
@@ -27,16 +24,16 @@ public class ReportCalendar implements Runnable {
         ps.print(" - current date/time: " + DateFormat.getDateTimeInstance().format(new Date()));
         final TimeZone tz = TimeZone.getDefault();
         ps.print(" - default timezone: " + tz.getDisplayName());
-        ps.print(" (" + tz.getID() + ")");
-        ps.print("; DST=" + tz.getDSTSavings() / 60000 + "min");
+        ps.printf(" (%s)", tz.getID());
+        ps.printf("; DST=%dmin", tz.getDSTSavings() / 60000);
         try {
             ps.print("; observesDT=" + tz.observesDaylightTime());
         } catch (final NoSuchMethodError ignored) {
             // Ignore property that exists only from Java 1.7 on.
         }
-        ps.print("; useDT=" + tz.useDaylightTime());
-        ps.print("; inDT=" + tz.inDaylightTime(new Date()));
-        ps.print("; offset=" + tz.getRawOffset() / 60000 + "min");
+        ps.printf("; useDT=%s", tz.useDaylightTime());
+        ps.printf("; inDT=%s", tz.inDaylightTime(new Date()));
+        ps.printf("; offset=%dmin", tz.getRawOffset() / 60000);
         ps.println();
         ps.print(" - available IDs: ");
         int i = 1;

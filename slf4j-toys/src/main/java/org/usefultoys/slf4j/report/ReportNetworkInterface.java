@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -15,15 +16,11 @@ import java.util.Enumeration;
  * Reports details of a specific network interface, including name, MTU, status flags (e.g., loopback, multicast),
  * hardware address, and associated IP addresses.
  */
+@RequiredArgsConstructor
 public class ReportNetworkInterface implements Runnable {
 
     private final Logger logger;
     private final NetworkInterface nif;
-
-    public ReportNetworkInterface(final Logger logger, final NetworkInterface nif) {
-        this.logger = logger;
-        this.nif = nif;
-    }
 
     @Override
     public void run() {
@@ -55,7 +52,7 @@ public class ReportNetworkInterface implements Runnable {
                 ps.println("n/a");
             } else {
                 for (final byte b : macAddress) {
-                    ps.print(String.format("%1$02X ", b));
+                    ps.printf("%1$02X ", b);
                 }
                 ps.println();
             }
@@ -64,12 +61,12 @@ public class ReportNetworkInterface implements Runnable {
                 reportNetworkAddress(ps, inetAddresses.nextElement());
             }
         } catch (final IOException e) {
-            ps.println("   Cannot read property: " + e.getLocalizedMessage());
+            ps.printf("   Cannot read property: %s%n", e.getLocalizedMessage());
         }
         ps.close();
     }
 
-    private void reportNetworkAddress(final PrintStream ps, final InetAddress inetAddress) {
+    private static void reportNetworkAddress(final PrintStream ps, final InetAddress inetAddress) {
         try {
             if (inetAddress instanceof Inet4Address) {
                 ps.println(" - NET address (IPV4): " + inetAddress.getHostAddress());

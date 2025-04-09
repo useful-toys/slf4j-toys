@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -8,13 +9,10 @@ import java.io.PrintStream;
 /**
  * Reports basic information about the physical system, such as the number of available processors.
  */
+@RequiredArgsConstructor
 public class ReportPhysicalSystem implements Runnable {
 
     private final Logger logger;
-
-    public ReportPhysicalSystem(final Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void run() {

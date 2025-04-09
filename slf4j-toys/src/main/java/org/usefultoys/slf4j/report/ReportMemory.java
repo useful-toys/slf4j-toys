@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.utils.UnitFormatter;
@@ -10,13 +11,10 @@ import java.io.PrintStream;
  * Reports memory usage of the JVM, including maximum available memory, currently allocated memory, and currently used
  * memory.
  */
+@RequiredArgsConstructor
 public class ReportMemory implements Runnable {
 
     private final Logger logger;
-
-    public ReportMemory(final Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void run() {

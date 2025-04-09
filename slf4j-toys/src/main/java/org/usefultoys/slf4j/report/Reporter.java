@@ -19,8 +19,9 @@ import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.net.*;
-import java.util.*;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.concurrent.Executor;
 
 /**

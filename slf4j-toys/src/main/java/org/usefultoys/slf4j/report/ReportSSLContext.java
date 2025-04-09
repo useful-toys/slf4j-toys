@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ import java.util.TreeMap;
  * Reports details of SSL contexts supported by the JVM, including cipher suites, protocols, and supported SSL
  * parameters for each context.
  */
+@RequiredArgsConstructor
 public class ReportSSLContext implements Runnable {
     private final Logger logger;
 
@@ -21,11 +23,7 @@ public class ReportSSLContext implements Runnable {
             "Default", "SSL", "SSLv2", "SSLv3", "TLS", "TLSv1", "TLSv1.1", "TLSv1.2"
     };
 
-    public ReportSSLContext(final Logger logger) {
-        this.logger = logger;
-    }
-
-    private void printList(final PrintStream ps, final String[] list, final String newLineSpace) {
+    private static void printList(final PrintStream ps, final String[] list, final String newLineSpace) {
         int i = 1;
         for (final String s : list) {
             if (i++ % 10 == 0) {

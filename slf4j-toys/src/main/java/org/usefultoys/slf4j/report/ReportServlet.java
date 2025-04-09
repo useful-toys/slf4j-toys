@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.report;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,16 +35,16 @@ import java.util.Locale;
  * <p>
  * The following path suffixes are supported:
  * <ul>
- *   <li><code>/VM</code> — Logs Java Virtual Machine information.</li>
- *   <li><code>/FileSystem</code> — Logs information about available and used disk space.</li>
- *   <li><code>/Memory</code> — Logs memory usage details.</li>
- *   <li><code>/User</code> — Logs information about the current user.</li>
- *   <li><code>/PhysicalSystem</code> — Logs physical hardware information.</li>
- *   <li><code>/OperatingSystem</code> — Logs operating system details.</li>
- *   <li><code>/Calendar</code> — Logs date, time, and timezone information.</li>
- *   <li><code>/Locale</code> — Logs current and available locale settings.</li>
- *   <li><code>/Charset</code> — Logs current and available character sets.</li>
- *   <li><code>/NetworkInterface</code> — Logs information for each available network interface.</li>
+ *   <li>{@code /VM} — Logs Java Virtual Machine information.</li>
+ *   <li>{@code /FileSystem} — Logs information about available and used disk space.</li>
+ *   <li>{@code /Memory} — Logs memory usage details.</li>
+ *   <li>{@code /User} — Logs information about the current user.</li>
+ *   <li>{@code /PhysicalSystem} — Logs physical hardware information.</li>
+ *   <li>{@code /OperatingSystem} — Logs operating system details.</li>
+ *   <li>{@code /Calendar} — Logs date, time, and timezone information.</li>
+ *   <li>{@code /Locale} — Logs current and available locale settings.</li>
+ *   <li>{@code /Charset} — Logs current and available character sets.</li>
+ *   <li>{@code /NetworkInterface} — Logs information for each available network interface.</li>
  * </ul>
  * <p>
  * If the path does not match any known suffix, no action is taken and the request is silently ignored.
@@ -57,21 +58,20 @@ import java.util.Locale;
  *    <li>Use a <strong>read-only, non-sensitive logger configuration</strong> to avoid side effects.</li>
  *    <li><strong>Use a secure logging strategy</strong> — logged reports may contain sensitive data and should not be publicly accessible or retained longer than necessary.</li>
  *    <li><strong>Be aware of log injection and log disclosure risks</strong>: an attacker could trigger this servlet and indirectly cause logs to capture sensitive or excessive system information. Limit logging verbosity and protect log files appropriately.</li>
- *   <li><strong>Protect against denial-of-service (DoS) attacks</strong>: repeated requests to expensive endpoints such as <code>/NetworkInterface</code> can overload the system or exhaust resources. Consider adding rate limiting or caching to mitigate abuse.</li>
+ *   <li><strong>Protect against denial-of-service (DoS) attacks</strong>: repeated requests to expensive endpoints such as {@code /NetworkInterface} can overload the system or exhaust resources. Consider adding rate limiting or caching to mitigate abuse.</li>
  *  </ul>
  *
  * @author Daniel Felix Ferber
  */
+@Slf4j
 public class ReportServlet extends HttpServlet {
-
-    public static final Logger LOGGER = LoggerFactory.getLogger(ReportServlet.class);
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
         String pathinfo = request.getPathInfo();
 
         if (pathinfo == null) {
-            LOGGER.warn("No report path provided.");
+            log.warn("No report path provided.");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.setContentType("text/plain");
             try {
@@ -116,14 +116,14 @@ public class ReportServlet extends HttpServlet {
                     new ReportNetworkInterface(logger, nif).run();
                 }
             } catch (final SocketException e) {
-                LOGGER.warn("Cannot report network interface", e);
+                log.warn("Cannot report network interface", e);
             }
         } else if ("/sslcontext".equalsIgnoreCase(pathinfo)) {
             new ReportSSLContext(logger).run();
         } else if ("/defaulttrustkeystore".equalsIgnoreCase(pathinfo)) {
             new ReportDefaultTrustKeyStore(logger).run();
         } else {
-            LOGGER.warn("Unrecognized report path: {}", pathinfo);
+            log.warn("Unrecognized report path: {}", pathinfo);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.setContentType("text/plain");
             try {

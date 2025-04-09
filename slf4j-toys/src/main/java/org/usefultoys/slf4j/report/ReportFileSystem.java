@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.utils.UnitFormatter;
@@ -10,13 +11,10 @@ import java.io.PrintStream;
 /**
  * Reports information about the file system roots, including total, free, and usable space.
  */
+@RequiredArgsConstructor
 public class ReportFileSystem implements Runnable {
 
     private final Logger logger;
-
-    public ReportFileSystem(final Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void run() {

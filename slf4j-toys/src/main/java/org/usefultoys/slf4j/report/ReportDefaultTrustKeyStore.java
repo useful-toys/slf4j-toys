@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -13,13 +14,10 @@ import java.security.cert.X509Certificate;
 /**
  * Reports the trusted certificate authorities from the default JVM trust store.
  */
+@RequiredArgsConstructor
 public class ReportDefaultTrustKeyStore implements Runnable {
 
     private final Logger logger;
-
-    public ReportDefaultTrustKeyStore(final Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void run() {

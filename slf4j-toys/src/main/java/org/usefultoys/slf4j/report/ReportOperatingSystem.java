@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -8,13 +9,10 @@ import java.io.PrintStream;
 /**
  * Reports properties of the operating system, including architecture, name, version, and path/file/line separators.
  */
+@RequiredArgsConstructor
 public class ReportOperatingSystem implements Runnable {
 
     private final Logger logger;
-
-    public ReportOperatingSystem(final Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void run() {

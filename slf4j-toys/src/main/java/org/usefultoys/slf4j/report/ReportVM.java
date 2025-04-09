@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -9,13 +10,10 @@ import java.io.PrintStream;
  * Reports basic information about the Java Virtual Machine (JVM), including vendor, version, and installation
  * directory.
  */
+@RequiredArgsConstructor
 public class ReportVM implements Runnable {
 
     private final Logger logger;
-
-    public ReportVM(final Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void run() {

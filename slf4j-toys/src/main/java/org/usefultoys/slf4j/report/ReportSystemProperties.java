@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -10,13 +11,10 @@ import java.util.TreeMap;
 /**
  * Reports all Java system properties in sorted order.
  */
+@RequiredArgsConstructor
 public class ReportSystemProperties implements Runnable {
 
     private final Logger logger;
-
-    public ReportSystemProperties(final Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void run() {

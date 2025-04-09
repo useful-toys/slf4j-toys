@@ -1,5 +1,6 @@
 package org.usefultoys.slf4j.report;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -10,13 +11,10 @@ import java.nio.charset.Charset;
  * Reports the default system locale and lists all available locales with their respective language, country, script,
  * and variant.
  */
+@RequiredArgsConstructor
 public class ReportCharset implements Runnable {
 
     private final Logger logger;
-
-    public ReportCharset(final Logger logger) {
-        this.logger = logger;
-    }
 
     @Override
     public void run() {
