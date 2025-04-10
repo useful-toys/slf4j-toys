@@ -87,31 +87,29 @@ public class ReportServlet extends HttpServlet {
 
         // Sanitize and normalize
         pathinfo = pathinfo.trim()
-                .replaceAll("/+$", "")
-                .replaceAll("/{2,}", "/")
                 .toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9/_-]", "");
+                .replaceAll("[^a-z]", "");
 
         final Logger logger = LoggerFactory.getLogger(ReporterConfig.name);
-        if ("/VM".equalsIgnoreCase(pathinfo)) {
+        if ("vm".equalsIgnoreCase(pathinfo)) {
             new ReportVM(logger).run();
-        } else if ("/filesystem".equalsIgnoreCase(pathinfo)) {
+        } else if ("filesystem".equalsIgnoreCase(pathinfo)) {
             new ReportFileSystem(logger).run();
-        } else if ("/memory".equalsIgnoreCase(pathinfo)) {
+        } else if ("memory".equalsIgnoreCase(pathinfo)) {
             new ReportMemory(logger).run();
-        } else if ("/user".equalsIgnoreCase(pathinfo)) {
+        } else if ("user".equalsIgnoreCase(pathinfo)) {
             new ReportUser(logger).run();
-        } else if ("/physicalsystem".equalsIgnoreCase(pathinfo)) {
+        } else if ("physicalsystem".equalsIgnoreCase(pathinfo)) {
             new ReportPhysicalSystem(logger).run();
-        } else if ("/operatingsystem".equalsIgnoreCase(pathinfo)) {
+        } else if ("operatingsystem".equalsIgnoreCase(pathinfo)) {
             new ReportOperatingSystem(logger).run();
-        } else if ("/calendar".equalsIgnoreCase(pathinfo)) {
+        } else if ("calendar".equalsIgnoreCase(pathinfo)) {
             new ReportCalendar(logger).run();
-        } else if ("/locale".equalsIgnoreCase(pathinfo)) {
+        } else if ("locale".equalsIgnoreCase(pathinfo)) {
             new ReportLocale(logger).run();
-        } else if ("/charset".equalsIgnoreCase(pathinfo)) {
+        } else if ("charset".equalsIgnoreCase(pathinfo)) {
             new ReportCharset(logger).run();
-        } else if ("/networkinterface".equalsIgnoreCase(pathinfo)) {
+        } else if ("networkinterface".equalsIgnoreCase(pathinfo)) {
             try {
                 final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
@@ -121,9 +119,9 @@ public class ReportServlet extends HttpServlet {
             } catch (final SocketException e) {
                 log.warn("Cannot report network interface", e);
             }
-        } else if ("/sslcontext".equalsIgnoreCase(pathinfo)) {
+        } else if ("sslcontext".equalsIgnoreCase(pathinfo)) {
             new ReportSSLContext(logger).run();
-        } else if ("/defaulttrustkeystore".equalsIgnoreCase(pathinfo)) {
+        } else if ("defaulttrustkeystore".equalsIgnoreCase(pathinfo)) {
             new ReportDefaultTrustKeyStore(logger).run();
         } else {
             log.warn("Unrecognized report path: {}", pathinfo);

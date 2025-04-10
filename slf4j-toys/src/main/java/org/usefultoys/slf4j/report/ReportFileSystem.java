@@ -1,6 +1,7 @@
 package org.usefultoys.slf4j.report;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -16,7 +17,7 @@ import java.io.PrintStream;
 @RequiredArgsConstructor
 public class ReportFileSystem implements Runnable {
 
-    private final Logger logger;
+    private final @NonNull Logger logger;
 
     @Override
     public void run() {

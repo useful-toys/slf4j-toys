@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.report;
 
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public class Reporter implements Serializable {
     /**
      * Logger that prints reports as information messages.
      */
-    private final Logger logger;
+    private final @NonNull Logger logger;
 
     private static final long serialVersionUID = 1L;
 
@@ -88,7 +89,7 @@ public class Reporter implements Serializable {
      *
      * @param executor the executor used to run each report
      */
-    public void logDefaultReports(final Executor executor) {
+    public void logDefaultReports(final @NonNull Executor executor) {
         if (ReporterConfig.reportPhysicalSystem) {
             executor.execute(new ReportPhysicalSystem(logger));
         }

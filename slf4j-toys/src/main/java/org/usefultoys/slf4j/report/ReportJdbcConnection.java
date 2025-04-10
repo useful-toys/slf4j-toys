@@ -21,6 +21,7 @@
 package org.usefultoys.slf4j.report;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -53,8 +54,8 @@ import java.util.Properties;
 @RequiredArgsConstructor
 public class ReportJdbcConnection implements Runnable {
 
-    private final Logger logger;
-    private final Connection connection;
+    private final @NonNull Logger logger;
+    private final @NonNull Connection connection;
 
     /** Whether to print the JDBC type map. */
     private boolean printTypeMap = false;

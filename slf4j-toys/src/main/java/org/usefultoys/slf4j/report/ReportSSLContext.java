@@ -1,6 +1,7 @@
 package org.usefultoys.slf4j.report;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -20,7 +21,8 @@ import java.util.TreeMap;
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
 public class ReportSSLContext implements Runnable {
-    private final Logger logger;
+
+    private final @NonNull Logger logger;
 
     final String[] contextNames = {
             "Default", "SSL", "SSLv2", "SSLv3", "TLS", "TLSv1", "TLSv1.1", "TLSv1.2"

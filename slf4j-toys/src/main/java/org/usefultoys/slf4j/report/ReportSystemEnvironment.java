@@ -1,6 +1,7 @@
 package org.usefultoys.slf4j.report;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ import java.util.TreeMap;
 @RequiredArgsConstructor
 public class ReportSystemEnvironment implements Runnable {
 
-    private final Logger logger;
+    private final @NonNull Logger logger;
 
     @Override
     public void run() {
