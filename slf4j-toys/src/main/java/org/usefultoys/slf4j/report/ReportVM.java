@@ -7,6 +7,8 @@ import org.usefultoys.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 
+import static org.usefultoys.slf4j.report.ReporterConfig.getPropertySafely;
+
 /**
  * Reports basic information about the Java Virtual Machine (JVM), including vendor, version, and installation
  * directory.
@@ -22,9 +24,8 @@ public class ReportVM implements Runnable {
         @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Java Virtual Machine");
-        ps.println(" - vendor: " + System.getProperty("java.vendor"));
-        ps.println(" - version: " + System.getProperty("java.version"));
-        ps.println(" - installation directory: " + System.getProperty("java.home"));
-        ps.close();
+        ps.printf(" - vendor: %s%n", getPropertySafely("java.vendor"));
+        ps.printf(" - version: %s%n", getPropertySafely("java.version"));
+        ps.printf(" - installation directory: %s%n", getPropertySafely("java.home"));
     }
 }

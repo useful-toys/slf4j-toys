@@ -23,11 +23,16 @@ public class ReportSystemEnvironment implements Runnable {
     public void run() {
         @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+        final SortedMap<String, String> sortedProperties;
+        try {
+            sortedProperties = new TreeMap<>(System.getenv());
+        } catch (SecurityException ignored) {
+            ps.println("System Environment: access denied");
+            return;
+        }
         ps.println("System Environment:");
-        final SortedMap<String, String> sortedProperties = new TreeMap<>(System.getenv());
         for (final Map.Entry<String, String> entry : sortedProperties.entrySet()) {
             ps.printf(" - %s: %s%n", entry.getKey(), entry.getValue());
         }
-        ps.close();
     }
 }

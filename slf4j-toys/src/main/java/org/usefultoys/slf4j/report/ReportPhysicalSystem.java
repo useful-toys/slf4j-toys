@@ -18,11 +18,10 @@ public class ReportPhysicalSystem implements Runnable {
 
     @Override
     public void run() {
-        @Cleanup
         final Runtime runtime = Runtime.getRuntime();
+        @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Physical system");
         ps.printf(" - processors: %d%n", runtime.availableProcessors());
-        ps.close();
     }
 }

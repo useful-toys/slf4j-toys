@@ -7,6 +7,8 @@ import org.usefultoys.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 
+import static org.usefultoys.slf4j.report.ReporterConfig.getPropertySafely;
+
 /**
  * Reports environment variables available to the current process.
  */
@@ -21,8 +23,7 @@ public class ReportUser implements Runnable {
         @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("User:");
-        ps.println(" - name: " + System.getProperty("user.name"));
-        ps.println(" - home: " + System.getProperty("user.home"));
-        ps.close();
+        ps.printf(" - name: %s%n", getPropertySafely("user.name"));
+        ps.printf(" - home: %s%n", getPropertySafely("user.home"));
     }
 }

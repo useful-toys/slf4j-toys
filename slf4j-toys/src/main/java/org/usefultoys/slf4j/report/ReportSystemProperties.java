@@ -23,11 +23,16 @@ public class ReportSystemProperties implements Runnable {
     public void run() {
         @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+        final SortedMap<Object, Object> sortedProperties;
+        try {
+            sortedProperties = new TreeMap<>(System.getProperties());
+        } catch (SecurityException ignored) {
+            ps.println("System Properties: access denied");
+            return;
+        }
         ps.println("System Properties:");
-        final SortedMap<Object, Object> sortedProperties = new TreeMap<>(System.getProperties());
         for (final Map.Entry<Object, Object> entry : sortedProperties.entrySet()) {
             ps.printf(" - %s: %s%n", entry.getKey(), entry.getValue());
         }
-        ps.close();
     }
 }

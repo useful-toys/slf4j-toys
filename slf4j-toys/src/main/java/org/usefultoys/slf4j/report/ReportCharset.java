@@ -36,6 +36,5 @@ public class ReportCharset implements Runnable {
             }
             ps.printf("%s; ", l.displayName());
         }
-        ps.close();
     }
 }

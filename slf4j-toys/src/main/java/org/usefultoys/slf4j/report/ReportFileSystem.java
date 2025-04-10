@@ -34,6 +34,5 @@ public class ReportFileSystem implements Runnable {
             ps.printf(" - total space: %s%n", UnitFormatter.bytes(root.getTotalSpace()));
             ps.printf(" - currently free space: %s (%s usable)%n", UnitFormatter.bytes(root.getFreeSpace()), UnitFormatter.bytes(root.getUsableSpace()));
         }
-        ps.close();
     }
 }

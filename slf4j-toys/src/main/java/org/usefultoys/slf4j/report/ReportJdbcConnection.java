@@ -202,9 +202,7 @@ public class ReportJdbcConnection implements Runnable {
                 }
             }
         } catch (final SQLException e) {
-            ps.printf("   Cannot read property: %s%n", e.getLocalizedMessage());
-        } finally {
-            ps.close();
+            ps.printf("   Cannot read connection property: %s%n", e.getLocalizedMessage());
         }
     }
 }

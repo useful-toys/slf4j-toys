@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.report;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.internal.Config;
 
@@ -154,4 +155,12 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.name}. Defaults to {@code report}. Can be changed at runtime.
      */
     public String name = Config.getProperty(PROP_NAME, "report");
+
+    static String getPropertySafely(final @NonNull String key) {
+        try {
+            return System.getProperty(key);
+        } catch (final SecurityException ignored) {
+            return "(Access denied)";
+        }
+    }
 }

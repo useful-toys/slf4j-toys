@@ -66,7 +66,6 @@ public class ReportNetworkInterface implements Runnable {
         } catch (final IOException e) {
             ps.printf("   Cannot read property: %s%n", e.getLocalizedMessage());
         }
-        ps.close();
     }
 
     private static void reportNetworkAddress(final PrintStream ps, final InetAddress inetAddress) {

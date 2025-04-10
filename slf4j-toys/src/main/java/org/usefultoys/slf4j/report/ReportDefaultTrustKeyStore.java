@@ -10,6 +10,8 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.io.PrintStream;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 /**
@@ -46,9 +48,8 @@ public class ReportDefaultTrustKeyStore implements Runnable {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (final KeyStoreException | NoSuchAlgorithmException e) {
             ps.printf("Cannot read TrustManager: %s%n", e.getMessage());
         }
-        ps.close();
     }
 }

@@ -87,7 +87,6 @@ public class ReportSSLContext implements Runnable {
             } catch (Exception e) {
                 ps.printf("Falha ao detalhar SSLContext: %s%n", e.getMessage());
             }
-            ps.close();
         }
     }
 }

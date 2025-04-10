@@ -43,6 +43,5 @@ public class ReportLocale implements Runnable {
             }
             ps.printf("%s; ", l.getDisplayName());
         }
-        ps.close();
     }
 }

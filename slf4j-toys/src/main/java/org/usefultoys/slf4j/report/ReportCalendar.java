@@ -47,6 +47,5 @@ public class ReportCalendar implements Runnable {
             }
             ps.printf("%s; ", id);
         }
-        ps.close();
     }
 }
