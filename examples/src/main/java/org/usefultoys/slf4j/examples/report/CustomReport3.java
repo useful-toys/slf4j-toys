@@ -37,7 +37,7 @@ public class CustomReport3 {
     public static void main(String[] args) {
 
         final Executor executor = Reporter.sameThreadExecutor;
-        Logger logger = LoggerFactory.getLogger(ReporterConfig.name);
+        final Logger logger = LoggerFactory.getLogger(ReporterConfig.name);
         executor.execute(new ReportPhysicalSystem(logger));
         executor.execute(new ReportMemory(logger));
     }
