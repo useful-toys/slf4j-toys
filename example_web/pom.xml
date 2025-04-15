@@ -4,7 +4,7 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>web-example</artifactId>
+    <artifactId>slf4j-toys-web-example</artifactId>
     <version>1.9.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>web-example</name>
@@ -19,7 +19,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
