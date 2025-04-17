@@ -2,8 +2,6 @@
 
 A lightweight diagnostic logging toolkit for Java applications. Useful for logging detailed system environment reports at startup, debugging, or during runtime analysis.
 
----
-
 ## Reporter
 
 Generates and logs detailed system reports such as JVM info, OS details, memory, locale, network interfaces, SSL contexts, and more.
@@ -117,6 +115,24 @@ Each build-in report module is a Runnable that can be run individually. For exam
   executor.execute(new ReportPhysicalSystem(logger));
   executor.execute(new ReportMemory(logger));
 ```
+
+## Troubleshooting
+
+### Logs Not Appearing
+- Verify that the SLF4J implementation is properly configured
+- Check that the logging level for `ReporterConfig.name` is set appropriately (INFO)
+- Confirm that log appenders are correctly configured
+
+### Performance Considerations
+- Run reports in separate threads with a dedicated executor for minimal impact on application startup
+- Disable unnecessary reports in production environments
+- Consider scheduling reports during low-traffic periods
+
+## Additional Resources
+
+- [GitHub Repository](https://github.com/useful-toys/slf4j-toys)
+- [Javadoc](https://javadoc.io/doc/org.usefultoys/slf4j-toys)
+- [Configuration Examples](https://github.com/useful-toys/slf4j-toys/examples)
 
 ## 🛡️ Recommended Practices
 
