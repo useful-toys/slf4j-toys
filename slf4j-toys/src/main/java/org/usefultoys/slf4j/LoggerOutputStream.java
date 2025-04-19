@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * An {@link OutputStream} implementation that buffers data and redirects it to a logger when {@link #flush()} or
- * {@link #close()} is called.
+ * An {@link OutputStream} implementation that buffers data and redirects it to a logger when {@link #close()} is called.
  * <p>
  * Intended for handling moderate volumes of output data that should be logged as complete messages instead of
  * character-by-character.
@@ -60,12 +59,6 @@ abstract class LoggerOutputStream extends OutputStream {
         super.close();
     }
 
-    /**
-     * Flushes this stream and forces any buffered data to be written to the logger.
-     * <p>
-     * This implementation only flushes the internal buffer; writing to the logger is deferred to {@link #close()} or
-     * can be invoked manually via {@link #writeToLogger()}.
-     */
     @Override
     public void flush() throws IOException {
         os.flush();
