@@ -20,11 +20,16 @@ import org.jetbrains.annotations.NotNull;
 import java.io.OutputStream;
 
 /**
- * An {@link OutputStream} that discards everything.
- * Used instead of {@link LoggerOutputStream} as an optimization when logging level would prevent output anyway.
+ * A {@link OutputStream} implementation that silently discards all output.
+ * <p>
+ * Used as a performance optimization when log output is unnecessary (e.g., when the logging level disables output).
+ * This avoids the overhead of formatting and I/O operations.
+ * <p>
+ * Replaces {@link LoggerOutputStream} in scenarios where output would be suppressed anyway.
+ * <p>
+ * This class is package-private and not intended for use outside this library.
  *
  * @author Daniel Felix Ferber
- *
  */
 class NullOutputStream extends OutputStream {
 
