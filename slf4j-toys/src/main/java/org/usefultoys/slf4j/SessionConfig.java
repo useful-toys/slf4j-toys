@@ -15,39 +15,70 @@
  */
 package org.usefultoys.slf4j;
 
+import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.internal.Config;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterData;
 import org.usefultoys.slf4j.watcher.Watcher;
 import org.usefultoys.slf4j.watcher.WatcherData;
 
+import java.nio.charset.StandardCharsets;
+
 /**
- * Collection of properties that control the common behavior of {@link Watcher}, {@link WatcherData}, {@link Meter}, and {@link MeterData}.
+ * Centralized configuration holder for controlling the behavior of {@link Watcher}, {@link WatcherData}, {@link Meter},
+ * and {@link MeterData}.
  * <p>
- * Initial values are read from system properties at application startup, if available. These properties should ideally be configured before calling any method
- * from this library. Some properties can be reassigned at runtime, depending on their purpose.
+ * This class exposes configurable properties that influence how the session-related logging behaves at runtime. It
+ * supports reading initial values from system properties during application startup, allowing applications to
+ * externalize configuration.
  * <p>
- * This class is not meant to be instantiated.
+ * These properties should ideally be defined <em>before</em> invoking any method from this library, to ensure
+ * consistent behavior. Some properties can be modified dynamically at runtime, although care should be taken in
+ * concurrent environments.
+ * <p>
+ * <strong>Security note:</strong> These configuration parameters may influence logging output. Avoid using untrusted
+ * input when modifying runtime values,
+ * as it could cause unintended exposure or log format manipulation.
+ * <p>
+ * This class is a utility holder and should not be instantiated.
  */
-@SuppressWarnings("CanBeFinal")
-public final class SessionConfig {
+@UtilityClass
+public class SessionConfig {
 
-    private SessionConfig() {
-        // prevent instances
-    }
-
-    // System property keys
-    public static final int UUID_LENGHT = 32;
-
-    public static final String PROP_SESSION_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
     /**
-     * Number of digits of the UUID printed in {@link Watcher} and {@link Meter} messages. The full UUID has 32 digits. If the goal is simply to distinguish
-     * application instances (e.g., in multi-node servers, after a deployment, or in standalone executions), a shorter prefix may be sufficient.
-     * <p>
-     * If set to 0, the UUID will not be printed.
-     * <p>
-     * This value is initialized from the system property {@code slf4jtoys.session.print.uuid.size} at application startup, and defaults to 5. It may be
-     * reassigned at runtime.
+     * The number of hexadecimal characters in a full UUID, without separators.
      */
-    public static int uuidSize = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, 5);
+    public final int UUID_LENGTH = 32;
+
+    /**
+     * System property key used to define how many UUID digits should be printed in log messages.
+     * <p>
+     * Property name: {@code slf4jtoys.session.print.uuid.size}
+     */
+    public final String PROP_SESSION_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
+    /**
+     * Number of UUID digits to print in messages from {@link Watcher} and {@link Meter}.
+     * <p>
+     * The full UUID (32 hex digits) uniquely identifies the application instance. In most cases, a shorter prefix
+     * (e.g., 5 digits) is sufficient to distinguish between instances or nodes.
+     * <ul>
+     *   <li>If set to <code>0</code>, the UUID will not be printed.</li>
+     *   <li>If set to a value greater than {@link #UUID_LENGTH}, it will be truncated.</li>
+     * </ul>
+     * <p>
+     * Default value: <code>5</code><br>
+     * Can be initialized via system property {@code slf4jtoys.session.print.uuid.size}.
+     */
+    public int uuidSize = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, 5);
+
+    /**
+     * Character encoding used when printing logs or performing string operations related to session behavior.
+     * <p>
+     * This property is read from the same system property {@code slf4jtoys.session.print.uuid.size}, which may be a
+     * mistake.
+     * <strong>Note:</strong> Consider defining a separate property name for this configuration to avoid ambiguity.
+     * <p>
+     * Default value: {@link StandardCharsets#UTF_8}.
+     */
+    public String charset = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, StandardCharsets.UTF_8.name());
 }
