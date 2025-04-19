@@ -20,7 +20,8 @@ import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
- * Augments the {@link SystemData} to semantics required by Watcher. Further, {@link Watcher} events are deserialized back to {@link WatcherData}.
+ * Augments the {@link SystemData} to semantics required by Watcher. Further, {@link Watcher} events are deserialized
+ * back to {@link WatcherData}.
  *
  * @author Daniel Felix Ferber
  */
@@ -62,7 +63,7 @@ public class WatcherData extends SystemData {
                 builder.append("; ");
             }
             builder.append("UUID: ");
-            builder.append(this.sessionUuid.substring(SessionConfig.UUID_LENGHT - SessionConfig.uuidSize));
+            builder.append(this.sessionUuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize));
         }
         return builder;
     }
