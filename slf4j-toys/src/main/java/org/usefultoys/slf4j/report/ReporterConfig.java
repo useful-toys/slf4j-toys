@@ -39,7 +39,10 @@ import org.usefultoys.slf4j.internal.Config;
  */
 @UtilityClass
 public class ReporterConfig {
-
+    {
+        init();
+    }
+    
     // System property keys
     public final String PROP_VM = "slf4jtoys.report.vm";
     public final String PROP_FILE_SYSTEM = "slf4jtoys.report.fileSystem";

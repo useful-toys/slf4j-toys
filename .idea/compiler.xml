@@ -8,14 +8,19 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="web-example" />
-        <module name="examples" />
         <module name="jul-example" />
+        <module name="slf4j-toys-jul-example" />
+        <module name="slf4j-toys-examples" />
+        <module name="example-log4j" />
+        <module name="slf4j-toys-logback-example" />
+        <module name="slf4j-toys-web-example" />
+        <module name="examples" />
+        <module name="slf4j-toys-log4j-example" />
         <module name="slf4j-toys" />
         <module name="log4j-example" />
         <module name="example-logback" />
         <module name="logback-example" />
         <module name="example-jul" />
-        <module name="example-log4j" />
       </profile>
     </annotationProcessing>
   </component>

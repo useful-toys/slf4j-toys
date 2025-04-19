@@ -44,17 +44,17 @@ import java.nio.charset.StandardCharsets;
  */
 @UtilityClass
 public class SessionConfig {
+    static { 
+        init(); 
+    }
+
+    // System property keys
+    public final String PROP_SESSION_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
 
     /**
      * The number of hexadecimal characters in a full UUID, without separators.
      */
     public final int UUID_LENGTH = 32;
-
-    public final String PROP_SESSION_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
-
-    static { 
-        init(); 
-    }
 
     /**
      * Number of UUID digits to print in messages from {@link Watcher} and {@link Meter}.

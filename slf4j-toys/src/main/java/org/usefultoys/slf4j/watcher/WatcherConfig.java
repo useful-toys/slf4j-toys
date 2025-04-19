@@ -34,6 +34,11 @@ import org.usefultoys.slf4j.internal.Config;
  */
 @UtilityClass
 public class WatcherConfig {
+    static {
+        init();
+    }
+        
+    // System property keys
     public final String PROP_DELAY = "slf4jtoys.watcher.delay";
     public final String PROP_PERIOD = "slf4jtoys.watcher.period";
     public final String PROP_DATA_PREFIX = "slf4jtoys.watcher.data.prefix";
