@@ -40,16 +40,16 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class MeterConfig {
     
-    private static final String PROP_MESSAGE_SUFFIX = "slf4jtoys.meter.message.suffix";
-    private static final String PROP_MESSAGE_PREFIX = "slf4jtoys.meter.message.prefix";
-    private static final String PROP_DATA_SUFFIX = "slf4jtoys.meter.data.suffix";
-    private static final String PROP_DATA_PREFIX = "slf4jtoys.meter.data.prefix";
-    private static final String PROP_PRINT_MEMORY = "slf4jtoys.meter.print.memory";
-    private static final String PROP_PRINT_CATEGORY = "slf4jtoys.meter.print.category";
-    private static final String PROP_PRINT_LOAD = "slf4jtoys.meter.print.load";
-    private static final String PROP_PROGRESS_PERIOD = "slf4jtoys.meter.progress.period";
-    private static final String PROP_PRINT_POSITION = "slf4jtoys.meter.print.position";
-    private static final String PROP_PRINT_STATUS = "slf4jtoys.meter.print.status";
+    public static final String PROP_MESSAGE_SUFFIX = "slf4jtoys.meter.message.suffix";
+    public static final String PROP_MESSAGE_PREFIX = "slf4jtoys.meter.message.prefix";
+    public static final String PROP_DATA_SUFFIX = "slf4jtoys.meter.data.suffix";
+    public static final String PROP_DATA_PREFIX = "slf4jtoys.meter.data.prefix";
+    public static final String PROP_PRINT_MEMORY = "slf4jtoys.meter.print.memory";
+    public static final String PROP_PRINT_CATEGORY = "slf4jtoys.meter.print.category";
+    public static final String PROP_PRINT_LOAD = "slf4jtoys.meter.print.load";
+    public static final String PROP_PROGRESS_PERIOD = "slf4jtoys.meter.progress.period";
+    public static final String PROP_PRINT_POSITION = "slf4jtoys.meter.print.position";
+    public static final String PROP_PRINT_STATUS = "slf4jtoys.meter.print.status";
 
     {
         init();
