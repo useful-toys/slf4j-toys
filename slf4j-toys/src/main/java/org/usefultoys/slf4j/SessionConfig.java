@@ -49,7 +49,8 @@ public class SessionConfig {
     }
 
     // System property keys
-    public final String PROP_SESSION_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
+    public final String PROP_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
+    public final String PROP_PRINT_CHARSET = "slf4jtoys.session.print.charset";
 
     /**
      * The number of hexadecimal characters in a full UUID, without separators.
@@ -74,20 +75,16 @@ public class SessionConfig {
     /**
      * Character encoding used when printing logs or performing string operations related to session behavior.
      * <p>
-     * This property is read from the same system property {@code slf4jtoys.session.print.uuid.size}, which may be a
-     * mistake.
-     * <strong>Note:</strong> Consider defining a separate property name for this configuration to avoid ambiguity.
-     * <p>
-     * Default value: {@link StandardCharsets#UTF_8}.
+     * Defaults to {@link StandardCharsets#UTF_8}. May be changed at runtime.
      */
-    public String charset;
+    public String charset = StandardCharsets.UTF_8.name();
 
     /**
      * Initializes the configurable properties of the SessionConfig class.
      * This method should be called during application startup to ensure consistent behavior.
      */
     public void init() {
-        uuidSize = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, 5);
-        charset = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, StandardCharsets.UTF_8.name());
+        uuidSize = Config.getProperty(PROP_PRINT_UUID_SIZE, 5);
+        charset = Config.getProperty(PROP_PRINT_CHARSET, StandardCharsets.UTF_8.name());
     }
 }
