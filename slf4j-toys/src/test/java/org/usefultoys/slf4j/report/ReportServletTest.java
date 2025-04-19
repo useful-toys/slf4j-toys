@@ -67,7 +67,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
 
         verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertTrue(responseWriter.toString().contains("Report logged for: /vm"));
+        assertTrue(responseWriter.toString().contains("Report logged for: vm"));
 
         // Verifica se o log contém algo da JVM
         assertTrue(reportLogger.getEventCount() > 0);
@@ -111,7 +111,7 @@ class ReportServletTest {
 
         // Assert
         verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertTrue(responseWriter.toString().contains("Report logged for: " + path.toLowerCase()));
+        assertTrue(responseWriter.toString().contains("Report logged for: " + path.toLowerCase().substring(1)));
 
         assertTrue(reportLogger.getEventCount() > 0, "Expected some logs for path: " + path);
     }
