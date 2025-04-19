@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j;
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.ILoggerFactory;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.slf4j.LoggerFactory.getILoggerFactory;
 
@@ -104,11 +106,12 @@ public class LoggerFactory {
      * @param logger the logger to which messages will be written
      * @return a PrintStream for trace-level logging
      */
+    @SneakyThrows
     public PrintStream getTracePrintStream(final @NonNull Logger logger) {
         if (!logger.isTraceEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(getTraceOutputStream(logger));
+        return new PrintStream(getTraceOutputStream(logger), false, SessionConfig.charset);
     }
 
     /**
@@ -120,11 +123,12 @@ public class LoggerFactory {
      * @param logger the logger to which messages will be written
      * @return a PrintStream for debug-level logging
      */
+    @SneakyThrows
     public PrintStream getDebugPrintStream(final @NonNull Logger logger) {
         if (!logger.isDebugEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(getDebugOutputStream(logger));
+        return new PrintStream(getDebugOutputStream(logger), false, SessionConfig.charset);
     }
 
     /**
@@ -136,11 +140,12 @@ public class LoggerFactory {
      * @param logger the logger to which messages will be written
      * @return a PrintStream for info-level logging
      */
+    @SneakyThrows
     public PrintStream getInfoPrintStream(final @NonNull Logger logger) {
         if (!logger.isInfoEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(getInfoOutputStream(logger));
+        return new PrintStream(getInfoOutputStream(logger), false, SessionConfig.charset);
     }
 
     /**
@@ -152,11 +157,12 @@ public class LoggerFactory {
      * @param logger the logger to which messages will be written
      * @return a PrintStream for warn-level logging
      */
+    @SneakyThrows
     public PrintStream getWarnPrintStream(final @NonNull Logger logger) {
         if (!logger.isWarnEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(getWarnOutputStream(logger));
+        return new PrintStream(getWarnOutputStream(logger), false, SessionConfig.charset);
     }
 
     /**
@@ -168,11 +174,12 @@ public class LoggerFactory {
      * @param logger the logger to which messages will be written
      * @return a PrintStream for error-level logging
      */
+    @SneakyThrows
     public PrintStream getErrorPrintStream(final @NonNull Logger logger) {
         if (!logger.isErrorEnabled()) {
             return new NullPrintStream();
         }
-        return new PrintStream(getErrorOutputStream(logger));
+        return new PrintStream(getErrorOutputStream(logger), false, SessionConfig.charset);
     }
 
     /**
