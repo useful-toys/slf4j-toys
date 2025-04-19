@@ -1,0 +1,76 @@
+package org.usefultoys.slf4j;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
+
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class LoggerOutputStreamTest {
+
+    static class TestLoggerOutputStream extends LoggerOutputStream {
+        private StringBuilder loggedData = new StringBuilder();
+
+        @Override
+        protected void writeToLogger() {
+            loggedData.append(extractString());
+        }
+
+        public String getLoggedData() {
+            return loggedData.toString();
+        }
+    }
+
+    @Test
+    void testWriteAndExtractString() throws IOException {
+        TestLoggerOutputStream stream = new TestLoggerOutputStream();
+        stream.write("Hello, World!".getBytes());
+        assertEquals("Hello, World!", stream.extractString());
+        assertEquals("", stream.getLoggedData());
+    }
+
+    @Test
+    void testFlushDoesNotLog() throws IOException {
+        TestLoggerOutputStream stream = new TestLoggerOutputStream();
+        stream.write("Hello, World!".getBytes());
+        stream.flush();
+        assertEquals("Hello, World!", stream.extractString());
+        assertEquals("", stream.getLoggedData());
+    }
+
+    @Test
+    void testCloseLogsData() throws IOException {
+        TestLoggerOutputStream stream = new TestLoggerOutputStream();
+        stream.write("Hello, World!".getBytes());
+        stream.close();
+        assertEquals("Hello, World!", stream.extractString());
+        assertEquals("Hello, World!", stream.getLoggedData());
+    }
+
+    @Test
+    void testWriteWithOffset() throws IOException {
+        TestLoggerOutputStream stream = new TestLoggerOutputStream();
+        byte[] data = "Hello, World!".getBytes();
+        stream.write(data, 7, 6); // Write "World!"
+        stream.close();
+        assertEquals("World!", stream.extractString());
+        assertEquals("World!", stream.getLoggedData());
+    }
+
+    @Test
+    void testWrite() throws IOException {
+        TestLoggerOutputStream stream = new TestLoggerOutputStream();
+        stream.write("Hello, World!".getBytes());
+        stream.close();
+        assertEquals("Hello, World!", stream.extractString());
+        assertEquals("Hello, World!", stream.getLoggedData());
+    }
+
+    @Test
+    void testToString() throws IOException {
+        TestLoggerOutputStream stream = new TestLoggerOutputStream();
+        stream.write("Hello, World!".getBytes());
+        assertEquals("Hello, World!", stream.toString ());
+    }
+}

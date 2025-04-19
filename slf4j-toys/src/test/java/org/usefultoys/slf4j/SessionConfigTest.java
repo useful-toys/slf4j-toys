@@ -1,0 +1,38 @@
+package org.usefultoys.slf4j;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class SessionConfigTest {
+
+    @BeforeEach
+    void setUp() {
+        System.clearProperty(SessionConfig.PROP_PRINT_UUID_SIZE);
+        System.clearProperty(SessionConfig.PROP_PRINT_CHARSET);
+
+        // Reinitialize SessionConfig to ensure clean state for each test
+        SessionConfig.init();
+    }
+
+    @Test
+    void testDefaultValues() {
+        assertEquals(5, SessionConfig.uuidSize, "Default value for uuidSize should be 5");
+        assertEquals("UTF-8", SessionConfig.charset, "Default value for charset should be UTF-8");
+    }
+
+    @Test
+    void testUuidSizeProperty() {
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "10");
+        SessionConfig.init(); // Reinitialize to apply new system properties
+        assertEquals(10, SessionConfig.uuidSize, "uuidSize should reflect the system property value");
+    }
+
+    @Test
+    void testCharsetProperty() {
+        System.setProperty(SessionConfig.PROP_PRINT_CHARSET, "ISO-8859-1");
+        SessionConfig.init(); // Reinitialize to apply new system properties
+        assertEquals("ISO-8859-1", SessionConfig.charset, "charset should reflect the system property value");
+    }
+}
