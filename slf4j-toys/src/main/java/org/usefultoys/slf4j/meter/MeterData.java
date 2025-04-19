@@ -445,7 +445,7 @@ public class MeterData extends SystemData {
         }
         if (SessionConfig.uuidSize != 0 && this.sessionUuid != null) {
             builder.append("; ");
-            builder.append(this.sessionUuid.substring(SessionConfig.UUID_LENGHT - SessionConfig.uuidSize));
+            builder.append(this.sessionUuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize));
         }
 
         return builder;
