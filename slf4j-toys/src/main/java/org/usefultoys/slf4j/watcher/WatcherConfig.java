@@ -37,8 +37,9 @@ public class WatcherConfig {
     static {
         init();
     }
-        
+
     // System property keys
+    public static final String PROP_NAME = "slf4jtoys.watcher.name";
     public final String PROP_DELAY = "slf4jtoys.watcher.delay";
     public final String PROP_PERIOD = "slf4jtoys.watcher.period";
     public final String PROP_DATA_PREFIX = "slf4jtoys.watcher.data.prefix";
@@ -128,7 +129,7 @@ public class WatcherConfig {
     public String messageSuffix;
 
     public void init() {
-        name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
+        name = Config.getProperty(PROP_NAME, "watcher");
         delayMilliseconds = Config.getMillisecondsProperty(PROP_DELAY, 60000L);
         periodMilliseconds = Config.getMillisecondsProperty(PROP_PERIOD, 600000L);
         dataPrefix = Config.getProperty(PROP_DATA_PREFIX, "");
