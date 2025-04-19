@@ -120,19 +120,21 @@ public final class Config {
         }
         try {
             int multiplicador = 1;
-            int suffixLength = 1;
+            int suffixLength = 0;
             if (value.endsWith("ms")) {
                 suffixLength = 2;
             } else if (value.endsWith("s")) {
+                suffixLength = 1;
                 multiplicador = 1000;
             } else if (value.endsWith("m")) {
+                suffixLength = 1;
                 multiplicador = 60 * 1000;
             } else if (value.endsWith("min")) {
+                suffixLength = 3;
                 multiplicador = 60 * 1000;
             } else if (value.endsWith("h")) {
+                suffixLength = 1;
                 multiplicador = 60 * 60 * 1000;
-            } else {
-                return defaultValue;
             }
             return Long.parseLong(value.substring(0, value.length() - suffixLength)) * multiplicador;
 
