@@ -18,17 +18,32 @@ package org.usefultoys.slf4j.watcher;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+import lombok.experimental.UtilityClass;
+
 /**
- * Collection of SLF4J {@link Marker}s used to identify {@link Watcher} log messages.
- *
+ * Utility class that provides a collection of SLF4J {@link Marker}s 
+ * specifically used to categorize and identify log messages generated 
+ * by the {@link Watcher} component.
+ * 
+ * <p>
+ * Markers are used to enrich log messages with additional metadata, 
+ * enabling better filtering and analysis of logs.
+ * </p>
+ * 
+ * <ul>
+ *   <li>{@link #MSG_WATCHER} - Marker for general {@link Watcher} log messages.</li>
+ *   <li>{@link #DATA_WATCHER} - Marker for {@link Watcher} data-related log messages.</li>
+ * </ul>
+ * 
+ * <p>
+ * These markers can be used in conjunction with SLF4J logging frameworks 
+ * to provide structured and meaningful log categorization.
+ * </p>
+ * 
  * @author Daniel Felix Ferber
  */
+@UtilityClass
 public final class Markers {
-
-    private Markers() {
-        // utility class
-    }
-
-    public static final Marker MSG_WATCHER = MarkerFactory.getMarker("WATCHER_MSG");
-    public static final Marker DATA_WATCHER = MarkerFactory.getMarker("WATCHER_DATA");
+    public final Marker MSG_WATCHER = MarkerFactory.getMarker("WATCHER");
+    public final Marker DATA_WATCHER = MarkerFactory.getMarker("WATCHER_DATA");
 }
