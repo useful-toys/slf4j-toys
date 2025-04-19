@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j;
 
+import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.watcher.Watcher;
 
@@ -22,26 +23,23 @@ import java.util.UUID;
 
 
 /**
- * Holds session-level attributes related to the current JVM instance, such as those used by {@link Meter} and {@link Watcher}.
+ * Holds session-level attributes related to the current JVM instance, such as those used by {@link Meter} and
+ * {@link Watcher}.
  * <p>
  * This class is not meant to be instantiated.
  *
  * @author Daniel Felix Ferber
  */
-
-public final class Session {
-
-    private Session() {
-        // prevent instances
-    }
+@UtilityClass
+public class Session {
 
     /**
      * Unique identifier for this SLF4J-Toys session.
      * <p>
-     * This UUID is added to all trace messages and can be used to distinguish log entries
-     * originating from different JVM instances, especially when log files are aggregated.
+     * This UUID is added to all trace messages and can be used to distinguish log entries originating from different
+     * JVM instances, especially when log files are aggregated.
      * <p>
      * The value is assigned once at application startup and remains constant during runtime.
      */
-    public static final String uuid = UUID.randomUUID().toString().replace("-", "");
+    public final String uuid = UUID.randomUUID().toString().replace("-", "");
 }
