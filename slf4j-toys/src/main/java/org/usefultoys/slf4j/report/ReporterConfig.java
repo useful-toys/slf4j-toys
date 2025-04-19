@@ -63,7 +63,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.vm}. Defaults to {@code true}. May be changed at
      * runtime.
      */
-    public boolean reportVM = Config.getProperty(PROP_VM, true);
+    public boolean reportVM;
 
     /**
      * Whether the default report includes information about available and used disk space.
@@ -71,7 +71,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.fileSystem}. Defaults to {@code false}. May be changed
      * at runtime.
      */
-    public boolean reportFileSystem = Config.getProperty(PROP_FILE_SYSTEM, false);
+    public boolean reportFileSystem;
 
     /**
      * Whether the default report includes memory usage information.
@@ -79,7 +79,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.memory}. Defaults to {@code true}. May be changed at
      * runtime.
      */
-    public boolean reportMemory = Config.getProperty(PROP_MEMORY, true);
+    public boolean reportMemory;
 
     /**
      * Whether the default report includes current user information.
@@ -87,7 +87,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.user}. Defaults to {@code true}. May be changed at
      * runtime.
      */
-    public boolean reportUser = Config.getProperty(PROP_USER, true);
+    public boolean reportUser;
 
     /**
      * Whether the default report includes system properties.
@@ -95,7 +95,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.properties}. Defaults to {@code true}. May be changed
      * at runtime.
      */
-    public boolean reportProperties = Config.getProperty(PROP_PROPERTIES, true);
+    public boolean reportProperties;
 
     /**
      * Whether the default report includes environment variables.
@@ -103,7 +103,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.environment}. Defaults to {@code false}. May be changed
      * at runtime.
      */
-    public boolean reportEnvironment = Config.getProperty(PROP_ENVIRONMENT, false);
+    public boolean reportEnvironment;
 
     /**
      * Whether the default report includes physical machine information.
@@ -111,7 +111,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.physicalSystem}. Defaults to {@code true}. May be
      * changed at runtime.
      */
-    public boolean reportPhysicalSystem = Config.getProperty(PROP_PHYSICAL_SYSTEM, true);
+    public boolean reportPhysicalSystem;
 
     /**
      * Whether the default report includes operating system information.
@@ -119,7 +119,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.operatingSystem}. Defaults to {@code true}. May be
      * changed at runtime.
      */
-    public boolean reportOperatingSystem = Config.getProperty(PROP_OPERATING_SYSTEM, true);
+    public boolean reportOperatingSystem;
 
     /**
      * Whether the default report includes calendar, date, time, and timezone information.
@@ -127,7 +127,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.calendar}. Defaults to {@code true}. May be changed at
      * runtime.
      */
-    public boolean reportCalendar = Config.getProperty(PROP_CALENDAR, true);
+    public boolean reportCalendar;
 
     /**
      * Whether the default report includes current and available locales.
@@ -135,7 +135,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.locale}. Defaults to {@code true}. May be changed at
      * runtime.
      */
-    public boolean reportLocale = Config.getProperty(PROP_LOCALE, true);
+    public boolean reportLocale;
 
     /**
      * Whether the default report includes current and available character sets.
@@ -143,7 +143,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.charset}. Defaults to {@code true}. May be changed at
      * runtime.
      */
-    public boolean reportCharset = Config.getProperty(PROP_CHARSET, true);
+    public boolean reportCharset;
 
     /**
      * Whether the default report includes network interface information.
@@ -151,7 +151,7 @@ public class ReporterConfig {
      * This operation may block the thread for a significant amount of time. Controlled by the system property
      * {@code slf4jtoys.report.networkInterface}. Defaults to {@code false}. May be changed at runtime.
      */
-    public boolean reportNetworkInterface = Config.getProperty(PROP_NETWORK_INTERFACE, false);
+    public boolean reportNetworkInterface;
 
     /**
      * Whether the default report includes SSL context information.
@@ -159,7 +159,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.SSLContext}. Defaults to {@code false}. May be changed
      * at runtime.
      */
-    public boolean reportSSLContext = Config.getProperty(PROP_SSL_CONTEXT, false);
+    public boolean reportSSLContext;
 
     /**
      * Whether the default report includes information about the default trusted keystore.
@@ -167,8 +167,7 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.defaultTrustKeyStore}. Defaults to {@code false}. May
      * be changed at runtime.
      */
-
-    public boolean reportDefaultTrustKeyStore = Config.getProperty(PROP_DEFAULT_TRUST_KEYSTORE, false);
+    public boolean reportDefaultTrustKeyStore;
 
     /**
      * Defines the default name used for generated reports.
@@ -176,7 +175,30 @@ public class ReporterConfig {
      * Controlled by the system property {@code slf4jtoys.report.name}. Defaults to {@code "report"}. May be changed at
      * runtime.
      */
-    public String name = Config.getProperty(PROP_NAME, "report");
+    public String name;
+
+    /**
+     * Initializes the configuration attributes by reading the corresponding system properties.
+     * This method should be called before accessing any configuration attributes to ensure
+     * they are properly initialized.
+     */
+    public void init() {
+        reportVM = Config.getProperty(PROP_VM, true);
+        reportFileSystem = Config.getProperty(PROP_FILE_SYSTEM, false);
+        reportMemory = Config.getProperty(PROP_MEMORY, true);
+        reportUser = Config.getProperty(PROP_USER, true);
+        reportProperties = Config.getProperty(PROP_PROPERTIES, true);
+        reportEnvironment = Config.getProperty(PROP_ENVIRONMENT, false);
+        reportPhysicalSystem = Config.getProperty(PROP_PHYSICAL_SYSTEM, true);
+        reportOperatingSystem = Config.getProperty(PROP_OPERATING_SYSTEM, true);
+        reportCalendar = Config.getProperty(PROP_CALENDAR, true);
+        reportLocale = Config.getProperty(PROP_LOCALE, true);
+        reportCharset = Config.getProperty(PROP_CHARSET, true);
+        reportNetworkInterface = Config.getProperty(PROP_NETWORK_INTERFACE, false);
+        reportSSLContext = Config.getProperty(PROP_SSL_CONTEXT, false);
+        reportDefaultTrustKeyStore = Config.getProperty(PROP_DEFAULT_TRUST_KEYSTORE, false);
+        name = Config.getProperty(PROP_NAME, "report");
+    }
 
     /**
      * Attempts to read the given system property while gracefully handling {@link SecurityException}, if thrown.
