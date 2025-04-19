@@ -15,28 +15,33 @@
  */
 package org.usefultoys.slf4j.utils;
 
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+
 /**
- * Collection of methods to format numbers, rounding them to an unit that reduces their string representation.
+ * Utility class that provides methods to format numbers by rounding them to a unit, 
+ * thereby reducing their string representation.
+ *
+ * <p>This class supports formatting for time durations, memory sizes, and iteration-related values.</p>
+ *
+ * <p>For example, it can convert large numbers into human-readable formats such as "1.2kB" or "3.4ms".</p>
  *
  * @author Daniel Felix Ferber
  */
+@UtilityClass
 public final class UnitFormatter {
 
-    private UnitFormatter() {
-        // prevent instances
-    }
-
-    private static final int[] TIME_FACTORS = {1000, 1000, 1000, 60, 60};
-    private static final String[] TIME_UNITS = {"ns", "us", "ms", "s", "m", "h"};
-    private static final String[] MEMORY_UNITS = {"B", "kB", "MB", "GB"};
-    private static final int[] MEMORY_FACTORS = {1000, 1000, 1000};
-    private static final String[] ITERATIONS_PER_TIME_UNITS = {"/s", "k/s", "M/s"};
-    private static final int[] ITERATIONS_PER_TIME_FACTORS = {1000, 1000, 1000};
-    private static final String[] ITERATIONS_UNITS = {"", "k", "M"};
-    private static final int[] ITERATIONS_FACTORS = {1000, 1000, 1000};
+    private final int[] TIME_FACTORS = {1000, 1000, 1000, 60, 60};
+    private final String[] TIME_UNITS = {"ns", "us", "ms", "s", "m", "h"};
+    private final String[] MEMORY_UNITS = {"B", "kB", "MB", "GB"};
+    private final int[] MEMORY_FACTORS = {1000, 1000, 1000};
+    private final String[] ITERATIONS_PER_TIME_UNITS = {"/s", "k/s", "M/s"};
+    private final int[] ITERATIONS_PER_TIME_FACTORS = {1000, 1000, 1000};
+    private final String[] ITERATIONS_UNITS = {"", "k", "M"};
+    private final int[] ITERATIONS_FACTORS = {1000, 1000, 1000};
 
     @SuppressWarnings("AssignmentToMethodParameter")
-    static String longUnit(long value, final String[] units, final int[] factors) {
+    String longUnit(long value, @NonNull final String[] units, @NonNull final int[] factors) {
         int index = 0;
         final int limit = factors[index] + factors[index] / 10;
         if (value < limit) {
@@ -54,10 +59,10 @@ public final class UnitFormatter {
         return String.format("%.1f%s", doubleValue, units[index]);
     }
 
-    static final double Epsylon = 0.001;
+    final double Epsylon = 0.001;
 
     @SuppressWarnings("AssignmentToMethodParameter")
-    static String doubleUnit(double value, final String[] units, final int[] factors) {
+    String doubleUnit(double value, @NonNull final String[] units, @NonNull final int[] factors) {
         if (value == 0.0) {
             return "0" + units[0];
         }
@@ -73,65 +78,72 @@ public final class UnitFormatter {
     }
 
     /**
-     * Format number of bytes as string.
-     * @param value number of bytes
-     * @return formatted string
+     * Formats a number of bytes into a human-readable string with appropriate units.
+     *
+     * @param value The number of bytes.
+     * @return A formatted string representing the value in bytes, kilobytes, megabytes, or gigabytes.
      */
-    public static String bytes(final long value) {
+    public String bytes(final long value) {
         return longUnit(value, MEMORY_UNITS, MEMORY_FACTORS);
     }
 
     /**
-     * Format number of nanoseconds as string.
-     * @param value number of nanoseconds
-     * @return formatted string
+     * Formats a duration in nanoseconds into a human-readable string with appropriate time units.
+     *
+     * @param value The duration in nanoseconds.
+     * @return A formatted string representing the value in nanoseconds, microseconds, milliseconds, seconds, minutes, or hours.
      */
-    public static String nanoseconds(final long value) {
+    public String nanoseconds(final long value) {
         return longUnit(value, TIME_UNITS, TIME_FACTORS);
     }
 
     /**
-     * Format number of nanoseconds as string.
-     * @param value number of nanoseconds
-     * @return formatted string
+     * Formats a duration in nanoseconds (as a double) into a human-readable string with appropriate time units.
+     *
+     * @param value The duration in nanoseconds.
+     * @return A formatted string representing the value in nanoseconds, microseconds, milliseconds, seconds, minutes, or hours.
      */
-    public static String nanoseconds(final double value) {
+    public String nanoseconds(final double value) {
         return doubleUnit(value, TIME_UNITS, TIME_FACTORS);
     }
 
     /**
-     * Format number of iterations as string.
-     * @param value number of iterations
-     * @return formatted string
+     * Formats a number of iterations into a human-readable string with appropriate units.
+     *
+     * @param value The number of iterations.
+     * @return A formatted string representing the value in iterations, thousands, or millions.
      */
-    public static String iterations(final long value) {
+    public String iterations(final long value) {
         return longUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
     }
 
     /**
-     * Format number of iterations as string.
-     * @param value number of iterations
-     * @return formatted string
+     * Formats a number of iterations (as a double) into a human-readable string with appropriate units.
+     *
+     * @param value The number of iterations.
+     * @return A formatted string representing the value in iterations, thousands, or millions.
      */
-    public static String iterations(final double value) {
+    public String iterations(final double value) {
         return doubleUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
     }
 
     /**
-     * Format number of iterations/second as string.
-     * @param value number of iterations
-     * @return formatted string
+     * Formats a number of iterations per second into a human-readable string with appropriate units.
+     *
+     * @param value The number of iterations per second.
+     * @return A formatted string representing the value in iterations per second, thousands per second, or millions per second.
      */
-    public static String iterationsPerSecond(final long value) {
+    public String iterationsPerSecond(final long value) {
         return longUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
     }
 
     /**
-     * Format number of iterations/second as string.
-     * @param value number of iterations
-     * @return formatted string
+     * Formats a number of iterations per second (as a double) into a human-readable string with appropriate units.
+     *
+     * @param value The number of iterations per second.
+     * @return A formatted string representing the value in iterations per second, thousands per second, or millions per second.
      */
-    public static String iterationsPerSecond(final double value) {
+    public String iterationsPerSecond(final double value) {
         return doubleUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
     }
 }

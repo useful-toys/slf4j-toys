@@ -72,5 +72,4 @@ public class UnitFormatterTest {
         assertEquals("1000.0B", UnitFormatter.longUnit(1000000, UNITS, FACTORS));
         assertEquals("1.1C", UnitFormatter.longUnit(1100000, UNITS, FACTORS));
     }
-
 }
