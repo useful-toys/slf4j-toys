@@ -19,7 +19,7 @@ import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.internal.Config;
 
 /**
- * Collection of configuration properties that control {@link Watcher} and {@link WatcherData} behavior.
+ * Centralized configuration holder for controlling the  the behavior of the {@link Watcher} and {@link WatcherData} behavior.
  *
  * <p>
  * This class exposes configurable properties that influence how the session-related logging behaves at runtime. It
@@ -34,19 +34,19 @@ import org.usefultoys.slf4j.internal.Config;
  */
 @UtilityClass
 public class WatcherConfig {
-    /**
-     * Logger name used by {@link WatcherSingleton#DEFAULT_WATCHER} to write messages.
-     * <p>
-     * Value is read from system property {@code slf4jtoys.watcher.name}, defaulting to {@code "watcher"}.
-     */
-    public String name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
-
     public final String PROP_DELAY = "slf4jtoys.watcher.delay";
     public final String PROP_PERIOD = "slf4jtoys.watcher.period";
     public final String PROP_DATA_PREFIX = "slf4jtoys.watcher.data.prefix";
     public final String PROP_DATA_SUFFIX = "slf4jtoys.watcher.data.suffix";
     public final String PROP_MESSAGE_PREFIX = "slf4jtoys.watcher.message.prefix";
     public final String PROP_MESSAGE_SUFFIX = "slf4jtoys.watcher.message.suffix";
+
+    /**
+     * Logger name used by {@link WatcherSingleton#DEFAULT_WATCHER} to write messages.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.watcher.name}, defaulting to {@code "watcher"}.
+     */
+    public String name;
 
     /**
      * Initial delay before the first status report by {@link WatcherSingleton#DEFAULT_WATCHER}, in milliseconds.
@@ -57,7 +57,7 @@ public class WatcherConfig {
      * You may assign a new value at runtime, but restarting the default watcher is required for the change to take
      * effect.
      */
-    public long delayMilliseconds = Config.getMillisecondsProperty(PROP_DELAY, 60000L);
+    public long delayMilliseconds;
 
     /**
      * Interval between subsequent status reports by {@link WatcherSingleton#DEFAULT_WATCHER}, in milliseconds.
@@ -68,7 +68,7 @@ public class WatcherConfig {
      * You may assign a new value at runtime, but restarting the default watcher is required for the change to take
      * effect.
      */
-    public long periodMilliseconds = Config.getMillisecondsProperty(PROP_PERIOD, 600000L);
+    public long periodMilliseconds;
 
     /**
      * Prefix added to the logger name used for encoded data messages.
@@ -81,7 +81,7 @@ public class WatcherConfig {
      * <p>
      * Value is read from system property {@code slf4jtoys.watcher.data.prefix}, defaulting to an empty string.
      */
-    public String dataPrefix = Config.getProperty(PROP_DATA_PREFIX, "");
+    public String dataPrefix;
 
     /**
      * Suffix added to the logger name used for encoded data messages.
@@ -94,7 +94,7 @@ public class WatcherConfig {
      * <p>
      * Value is read from system property {@code slf4jtoys.watcher.data.suffix}, defaulting to an empty string.
      */
-    public String dataSuffix = Config.getProperty(PROP_DATA_SUFFIX, "");
+    public String dataSuffix;
 
     /**
      * Prefix added to the logger name used for human-readable messages.
@@ -107,7 +107,7 @@ public class WatcherConfig {
      * <p>
      * Value is read from system property {@code slf4jtoys.watcher.message.prefix}, defaulting to an empty string.
      */
-    public String messagePrefix = Config.getProperty(PROP_MESSAGE_PREFIX, "");
+    public String messagePrefix;
 
     /**
      * Suffix added to the logger name used for human-readable messages.
@@ -120,5 +120,15 @@ public class WatcherConfig {
      * <p>
      * Value is read from system property {@code slf4jtoys.watcher.message.suffix}, defaulting to an empty string.
      */
-    public String messageSuffix = Config.getProperty(PROP_MESSAGE_SUFFIX, "");
+    public String messageSuffix;
+
+    public void init() {
+        name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
+        delayMilliseconds = Config.getMillisecondsProperty(PROP_DELAY, 60000L);
+        periodMilliseconds = Config.getMillisecondsProperty(PROP_PERIOD, 600000L);
+        dataPrefix = Config.getProperty(PROP_DATA_PREFIX, "");
+        dataSuffix = Config.getProperty(PROP_DATA_SUFFIX, "");
+        messagePrefix = Config.getProperty(PROP_MESSAGE_PREFIX, "");
+        messageSuffix = Config.getProperty(PROP_MESSAGE_SUFFIX, "");
+    }
 }
