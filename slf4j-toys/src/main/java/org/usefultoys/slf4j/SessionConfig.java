@@ -50,12 +50,12 @@ public class SessionConfig {
      */
     public final int UUID_LENGTH = 32;
 
-    /**
-     * System property key used to define how many UUID digits should be printed in log messages.
-     * <p>
-     * Property name: {@code slf4jtoys.session.print.uuid.size}
-     */
     public final String PROP_SESSION_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
+
+    static { 
+        init(); 
+    }
+
     /**
      * Number of UUID digits to print in messages from {@link Watcher} and {@link Meter}.
      * <p>
@@ -69,7 +69,7 @@ public class SessionConfig {
      * Default value: <code>5</code><br>
      * Can be initialized via system property {@code slf4jtoys.session.print.uuid.size}.
      */
-    public int uuidSize = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, 5);
+    public int uuidSize = 5;
 
     /**
      * Character encoding used when printing logs or performing string operations related to session behavior.
@@ -80,5 +80,14 @@ public class SessionConfig {
      * <p>
      * Default value: {@link StandardCharsets#UTF_8}.
      */
-    public String charset = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, StandardCharsets.UTF_8.name());
+    public String charset;
+
+    /**
+     * Initializes the configurable properties of the SessionConfig class.
+     * This method should be called during application startup to ensure consistent behavior.
+     */
+    public void init() {
+        uuidSize = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, 5);
+        charset = Config.getProperty(PROP_SESSION_PRINT_UUID_SIZE, StandardCharsets.UTF_8.name());
+    }
 }
