@@ -15,99 +15,110 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.internal.Config;
 
 /**
- * Collection of properties that drive {@link Watcher} and {@link WatcherData} behavior. Initial values are read from system properties at application startup,
- * if available. They may be assigned at application startup, before calling any {@link Watcher} methods. Some properties allow reassigning their values later
- * at runtime.
+ * Collection of configuration properties that control {@link Watcher} and {@link WatcherData} behavior.
+ *
+ * <p>
+ * This class exposes configurable properties that influence how the session-related logging behaves at runtime. It
+ * supports reading initial values from system properties during application startup, allowing applications to
+ * externalize configuration.
+ * <p>
+ * These properties should ideally be defined <em>before</em> invoking any method from this library, to ensure
+ * consistent behavior. Some properties can be modified dynamically at runtime, although care should be taken in
+ * concurrent environments.
+ * <p>
+ * This class is intended as a utility container and is not meant to be instantiated.
  */
-@SuppressWarnings("CanBeFinal")
-public final class WatcherConfig {
-    private WatcherConfig() {
-        // Utility class
-    }
+@UtilityClass
+public class WatcherConfig {
+    /**
+     * Logger name used by {@link WatcherSingleton#DEFAULT_WATCHER} to write messages.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.watcher.name}, defaulting to {@code "watcher"}.
+     */
+    public String name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
+
+    public final String PROP_DELAY = "slf4jtoys.watcher.delay";
+    public final String PROP_PERIOD = "slf4jtoys.watcher.period";
+    public final String PROP_DATA_PREFIX = "slf4jtoys.watcher.data.prefix";
+    public final String PROP_DATA_SUFFIX = "slf4jtoys.watcher.data.suffix";
+    public final String PROP_MESSAGE_PREFIX = "slf4jtoys.watcher.message.prefix";
+    public final String PROP_MESSAGE_SUFFIX = "slf4jtoys.watcher.message.suffix";
 
     /**
-     * For {@link WatcherSingleton#DEFAULT_WATCHER}, name where the watcher writes messages to.
+     * Initial delay before the first status report by {@link WatcherSingleton#DEFAULT_WATCHER}, in milliseconds.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.watcher.delay}, defaulting to {@code 60000} (1 minute). The
+     * value can be suffixed with {@code ms}, {@code s}, {@code m}, or {@code h}.
+     * <p>
+     * You may assign a new value at runtime, but restarting the default watcher is required for the change to take
+     * effect.
      */
-    @org.jetbrains.annotations.NonNls
-    public static String name = Config.getProperty("slf4jtoys.watcher.name", "watcher");
+    public long delayMilliseconds = Config.getMillisecondsProperty(PROP_DELAY, 60000L);
+
     /**
-     * For {@link WatcherSingleton#DEFAULT_WATCHER}, time to wait before reporting the first watcher status, in milliseconds.
+     * Interval between subsequent status reports by {@link WatcherSingleton#DEFAULT_WATCHER}, in milliseconds.
      * <p>
-     * Value is read from system property {@code slf4jtoys.watcher.delay} at application startup and defaults to {@code 1 minute}. The number represents a long
-     * integer that represents milliseconds. The system property allows the number suffixed with 'ms', 's', 'm' and 'h' to represent milliseconds, seconds,
-     * minutes and hours.You may assign a new value at runtime, but if the default watcher is already running, you need to restart it.
+     * Value is read from system property {@code slf4jtoys.watcher.period}, defaulting to {@code 600000} (10 minutes).
+     * The value can be suffixed with {@code ms}, {@code s}, {@code m}, or {@code h}.
+     * <p>
+     * You may assign a new value at runtime, but restarting the default watcher is required for the change to take
+     * effect.
      */
-    @org.jetbrains.annotations.NonNls
-    public static long delayMilliseconds = Config.getMillisecondsProperty("slf4jtoys.watcher.delay", 60000L);
+    public long periodMilliseconds = Config.getMillisecondsProperty(PROP_PERIOD, 600000L);
+
     /**
-     * For {@link WatcherSingleton#DEFAULT_WATCHER}, time period to wait before reporting further watcher status, in milliseconds. Time to wait before reporting
-     * the first watcher status, in milliseconds.
+     * Prefix added to the logger name used for encoded data messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.watcher.period} at application startup and defaults to {@code 10 minutes}. The number represents a
-     * long integer that represents milliseconds. The system property allows the number suffixed with 'ms', 's', 'm' and 'h' to represent milliseconds, seconds,
-     * minutes and hours. You may assign a new value at runtime, but if the default watcher is already running, you need to restart it.
+     * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows directing
+     * encoded data to a different logger.
+     * <p>
+     * Example: with prefix {@code data.}, a logger {@code a.b.c.MyClass} becomes {@code data.a.b.c.MyClass} for encoded
+     * data.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.watcher.data.prefix}, defaulting to an empty string.
      */
-    @org.jetbrains.annotations.NonNls
-    public static long periodMilliseconds = Config.getMillisecondsProperty("slf4jtoys.watcher.period", 600000L);
+    public String dataPrefix = Config.getProperty(PROP_DATA_PREFIX, "");
+
     /**
-     * A prefix added to the logger that writes encoded data for {@link Watcher}.
+     * Suffix added to the logger name used for encoded data messages.
      * <p>
-     * By default, readable messages and encoded data are written to the same logger. In order to handle readable messages and encoded data separately without
-     * creating filter rules, you may write encoded data to another logger which name has the given prefix or suffix, and configure these loggers separately.
+     * By default, encoded and human-readable messages are written to the same logger. Setting a suffix allows directing
+     * encoded data to a different logger.
      * <p>
-     * For example, by setting the prefix to {@code 'data.'}, a {@link Watcher} using logger {@code a.b.c.MyClass} will write readable messages to {@code
-     * a.b.c.MyClass} and encoded data to {@code data.a.b.c.MyClass}.
+     * Example: with suffix {@code .data}, a logger {@code a.b.c.MyClass} becomes {@code a.b.c.MyClass.data} for encoded
+     * data.
      * <p>
-     * Value is read from system property {@code slf4jtoys.watcher.data.prefix} at application startup, defaults to empty. You may assign a new value at
-     * runtime.
+     * Value is read from system property {@code slf4jtoys.watcher.data.suffix}, defaulting to an empty string.
      */
-    @org.jetbrains.annotations.NonNls
-    public static String dataPrefix = Config.getProperty("slf4jtoys.watcher.data.prefix", "");
+    public String dataSuffix = Config.getProperty(PROP_DATA_SUFFIX, "");
+
     /**
-     * A suffix added to the logger that writes encoded data for {@link Watcher}.
+     * Prefix added to the logger name used for human-readable messages.
      * <p>
-     * By default, readable messages and encoded data are written to the same logger. In order to handle readable messages and encoded data separately without
-     * creating filter rules, you may write encoded data to another logger which name has the given prefix or suffix, and configure these loggers separately.
+     * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows directing
+     * readable messages to a different logger.
      * <p>
-     * For example, by setting the suffix to {@code '.data'}, a {@link Watcher} using logger {@code a.b.c.MyClass} will write readable messages to {@code
-     * a.b.c.MyClass} and encoded event data to {@code data.a.b.c.MyClass}.
+     * Example: with prefix {@code message.}, a logger {@code a.b.c.MyClass} becomes {@code message.a.b.c.MyClass} for
+     * readable messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.watcher.data.prefix} at application startup, defaults to empty. You may assign a new value at
-     * runtime.
+     * Value is read from system property {@code slf4jtoys.watcher.message.prefix}, defaulting to an empty string.
      */
-    @org.jetbrains.annotations.NonNls
-    public static String dataSuffix = Config.getProperty("slf4jtoys.watcher.data.suffix", "");
+    public String messagePrefix = Config.getProperty(PROP_MESSAGE_PREFIX, "");
+
     /**
-     * A prefix added to the logger that writes readable message for {@link Watcher}.
+     * Suffix added to the logger name used for human-readable messages.
      * <p>
-     * By default, readable messages and encoded data are written to the same logger. In order to handle readable messages and encoded data separately without
-     * creating filter rules, you may write readable message to another logger which name has the given prefix or suffix, and configure these loggers
-     * separately.
+     * By default, encoded and human-readable messages are written to the same logger. Setting a suffix allows directing
+     * readable messages to a different logger.
      * <p>
-     * For example, by setting the prefix to {@code 'message.'}, a {@link Watcher} using logger {@code a.b.c.MyClass} will write readable messages to {@code
-     * message.a.b.c.MyClass} and encoded data to {@code a.b.c.MyClass}.
+     * Example: with suffix {@code .message}, a logger {@code a.b.c.MyClass} becomes {@code a.b.c.MyClass.message} for
+     * readable messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.watcher.message.prefix} at application startup, defaults to empty. You may assign a new value at
-     * runtime.
+     * Value is read from system property {@code slf4jtoys.watcher.message.suffix}, defaulting to an empty string.
      */
-    @org.jetbrains.annotations.NonNls
-    public static String messagePrefix = Config.getProperty("slf4jtoys.watcher.message.prefix", "");
-    /**
-     * A suffix added to the logger that writes readable message for {@link Watcher}.
-     * <p>
-     * By default, readable messages and encoded data are written to the same logger. In order to handle readable messages and encoded data separately without
-     * creating filter rules, you may write readable message to another logger which name has the given prefix or suffix, and configure these loggers
-     * separately.
-     * <p>
-     * For example, by setting the suffix to {@code '.message'}, a {@link Watcher} using logger {@code a.b.c.MyClass} will write readable messages to {@code
-     * a.b.c.MyClass.message} and encoded event data to {@code a.b.c.MyClass}.
-     * <p>
-     * Value is read from system property {@code slf4jtoys.watcher.data.prefix} at application startup, defaults to empty. You may assign a new value at
-     * runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static String messageSuffix = Config.getProperty("slf4jtoys.watcher.message.suffix", "");
+    public String messageSuffix = Config.getProperty(PROP_MESSAGE_SUFFIX, "");
 }
