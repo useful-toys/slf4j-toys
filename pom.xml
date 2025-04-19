@@ -19,6 +19,7 @@
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
         <junit5.version>5.11.2</junit5.version>
+        <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
     </properties>
     <packaging>pom</packaging>
     <description>An useful complement to SLF4J to promote clean and organized log files.</description>
@@ -133,7 +134,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>${maven-deploy-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.13</version>
                 </plugin>
             </plugins>
         </pluginManagement>
