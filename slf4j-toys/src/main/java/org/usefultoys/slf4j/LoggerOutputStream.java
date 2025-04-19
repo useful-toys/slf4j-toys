@@ -22,30 +22,36 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * An {@link OutputStream} that redirects the written data to a logger whenever
- * {@link #close()} or {@link #flush()} is called.
+ * An {@link OutputStream} implementation that buffers data and redirects it to a logger when {@link #flush()} or
+ * {@link #close()} is called.
  * <p>
- * Instance of this class are obtained by calling factory methods from
- * {@link LoggerFactory}.
+ * Intended for handling moderate volumes of output data that should be logged as complete messages instead of
+ * character-by-character.
  * <p>
- * Intended for moderated amount of data, that is buffered before being
- * redirected to the logger.
+ * Instances should be obtained via the factory methods in {@link LoggerFactory}.
+ * <p>
+ * This class is package-private and not intended to be instantiated directly outside this library.
  *
  * @author Daniel Felix Ferber
  */
 abstract class LoggerOutputStream extends OutputStream {
 
+    /**
+     * Creates a new logger output stream.
+     */
     LoggerOutputStream() {
         // prevent instances outside this library
     }
 
     /**
-     * Buffer that buffers data until it is redirected to the logger.
+     * Internal buffer to accumulate written data until flushed or closed.
      */
     private final ByteArrayOutputStream os = new ByteArrayOutputStream(0x3FFF);
 
     /**
-     * Closes this output stream and writes any buffered output bytes as a message to the logger.
+     * Closes this stream and writes any buffered data to the logger.
+     * <p>
+     * Also closes the internal buffer.
      */
     @Override
     public void close() throws IOException {
@@ -55,7 +61,10 @@ abstract class LoggerOutputStream extends OutputStream {
     }
 
     /**
-     * Flushes this output stream and forces any buffered output bytes to be written as a message to the logger.
+     * Flushes this stream and forces any buffered data to be written to the logger.
+     * <p>
+     * This implementation only flushes the internal buffer; writing to the logger is deferred to {@link #close()} or
+     * can be invoked manually via {@link #writeToLogger()}.
      */
     @Override
     public void flush() throws IOException {
@@ -78,14 +87,16 @@ abstract class LoggerOutputStream extends OutputStream {
     }
 
     /**
-     * Writes any buffered output bytes as a message to the logger.
+     * Transfers any buffered data to the logger.
+     * <p>
+     * Subclasses must implement how the buffered data is logged.
      */
     protected abstract void writeToLogger();
 
     /**
-     * Converts any buffered output bytes to string.
+     * Returns the buffered content as a string.
      *
-     * @return string representing any buffered output bytes
+     * @return the buffered data, converted to a string
      */
     protected String extractString() {
         return os.toString();
