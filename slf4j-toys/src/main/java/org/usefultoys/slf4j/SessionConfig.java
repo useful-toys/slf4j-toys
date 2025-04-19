@@ -16,9 +16,10 @@
 package org.usefultoys.slf4j;
 
 import lombok.experimental.UtilityClass;
-import org.usefultoys.slf4j.internal.Config;
+
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterData;
+import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.slf4j.watcher.Watcher;
 import org.usefultoys.slf4j.watcher.WatcherData;
 
@@ -84,7 +85,7 @@ public class SessionConfig {
      * This method should be called during application startup to ensure consistent behavior.
      */
     public void init() {
-        uuidSize = Config.getProperty(PROP_PRINT_UUID_SIZE, 5);
-        charset = Config.getProperty(PROP_PRINT_CHARSET, StandardCharsets.UTF_8.name());
+        uuidSize = ConfigParser.getProperty(PROP_PRINT_UUID_SIZE, 5);
+        charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, StandardCharsets.UTF_8.name());
     }
 }

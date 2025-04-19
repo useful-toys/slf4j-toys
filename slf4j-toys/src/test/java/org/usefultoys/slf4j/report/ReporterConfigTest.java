@@ -3,7 +3,7 @@ package org.usefultoys.slf4j.report;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.usefultoys.slf4j.internal.Config;
+import org.usefultoys.slf4j.utils.ConfigParser;
 
 import static org.junit.jupiter.api.Assertions.*;
 

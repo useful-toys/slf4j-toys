@@ -15,9 +15,10 @@
  */
 package org.usefultoys.slf4j.report;
 
+import org.usefultoys.slf4j.utils.ConfigParser;
+
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.usefultoys.slf4j.internal.Config;
 
 /**
  * Centralized configuration holder for controlling the behavior of the {@link Reporter}.
@@ -186,21 +187,21 @@ public class ReporterConfig {
      * they are properly initialized.
      */
     public void init() {
-        reportVM = Config.getProperty(PROP_VM, true);
-        reportFileSystem = Config.getProperty(PROP_FILE_SYSTEM, false);
-        reportMemory = Config.getProperty(PROP_MEMORY, true);
-        reportUser = Config.getProperty(PROP_USER, true);
-        reportProperties = Config.getProperty(PROP_PROPERTIES, true);
-        reportEnvironment = Config.getProperty(PROP_ENVIRONMENT, false);
-        reportPhysicalSystem = Config.getProperty(PROP_PHYSICAL_SYSTEM, true);
-        reportOperatingSystem = Config.getProperty(PROP_OPERATING_SYSTEM, true);
-        reportCalendar = Config.getProperty(PROP_CALENDAR, true);
-        reportLocale = Config.getProperty(PROP_LOCALE, true);
-        reportCharset = Config.getProperty(PROP_CHARSET, true);
-        reportNetworkInterface = Config.getProperty(PROP_NETWORK_INTERFACE, false);
-        reportSSLContext = Config.getProperty(PROP_SSL_CONTEXT, false);
-        reportDefaultTrustKeyStore = Config.getProperty(PROP_DEFAULT_TRUST_KEYSTORE, false);
-        name = Config.getProperty(PROP_NAME, "report");
+        reportVM = ConfigParser.getProperty(PROP_VM, true);
+        reportFileSystem = ConfigParser.getProperty(PROP_FILE_SYSTEM, false);
+        reportMemory = ConfigParser.getProperty(PROP_MEMORY, true);
+        reportUser = ConfigParser.getProperty(PROP_USER, true);
+        reportProperties = ConfigParser.getProperty(PROP_PROPERTIES, true);
+        reportEnvironment = ConfigParser.getProperty(PROP_ENVIRONMENT, false);
+        reportPhysicalSystem = ConfigParser.getProperty(PROP_PHYSICAL_SYSTEM, true);
+        reportOperatingSystem = ConfigParser.getProperty(PROP_OPERATING_SYSTEM, true);
+        reportCalendar = ConfigParser.getProperty(PROP_CALENDAR, true);
+        reportLocale = ConfigParser.getProperty(PROP_LOCALE, true);
+        reportCharset = ConfigParser.getProperty(PROP_CHARSET, true);
+        reportNetworkInterface = ConfigParser.getProperty(PROP_NETWORK_INTERFACE, false);
+        reportSSLContext = ConfigParser.getProperty(PROP_SSL_CONTEXT, false);
+        reportDefaultTrustKeyStore = ConfigParser.getProperty(PROP_DEFAULT_TRUST_KEYSTORE, false);
+        name = ConfigParser.getProperty(PROP_NAME, "report");
     }
 
     /**

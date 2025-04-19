@@ -16,8 +16,9 @@
 package org.usefultoys.slf4j;
 
 import lombok.experimental.UtilityClass;
-import org.usefultoys.slf4j.internal.Config;
+
 import org.usefultoys.slf4j.internal.SystemData;
+import org.usefultoys.slf4j.utils.ConfigParser;
 
 /**
  * Centralized configuration holder for controlling how {@link SystemData} gathers runtime metrics from the Java
@@ -99,10 +100,10 @@ public class SystemConfig {
     public boolean usePlatformManagedBean;
 
     public void init() {
-        useMemoryManagedBean = Config.getProperty(SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN, false);
-        useClassLoadingManagedBean = Config.getProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN, false);
-        useCompilationManagedBean = Config.getProperty(PROP_USE_COMPILATION_MANAGED_BEAN, false);
-        useGarbageCollectionManagedBean = Config.getProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, false);
-        usePlatformManagedBean = Config.getProperty(PROP_USE_PLATFORM_MANAGED_BEAN, false);
+        useMemoryManagedBean = ConfigParser.getProperty(SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN, false);
+        useClassLoadingManagedBean = ConfigParser.getProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN, false);
+        useCompilationManagedBean = ConfigParser.getProperty(PROP_USE_COMPILATION_MANAGED_BEAN, false);
+        useGarbageCollectionManagedBean = ConfigParser.getProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, false);
+        usePlatformManagedBean = ConfigParser.getProperty(PROP_USE_PLATFORM_MANAGED_BEAN, false);
 }
 }

@@ -15,8 +15,9 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import org.usefultoys.slf4j.utils.ConfigParser;
+
 import lombok.experimental.UtilityClass;
-import org.usefultoys.slf4j.internal.Config;
 
 /**
  * Centralized configuration holder for controlling the  the behavior of the {@link Watcher} and {@link WatcherData} behavior.
@@ -129,12 +130,12 @@ public class WatcherConfig {
     public String messageSuffix;
 
     public void init() {
-        name = Config.getProperty(PROP_NAME, "watcher");
-        delayMilliseconds = Config.getMillisecondsProperty(PROP_DELAY, 60000L);
-        periodMilliseconds = Config.getMillisecondsProperty(PROP_PERIOD, 600000L);
-        dataPrefix = Config.getProperty(PROP_DATA_PREFIX, "");
-        dataSuffix = Config.getProperty(PROP_DATA_SUFFIX, "");
-        messagePrefix = Config.getProperty(PROP_MESSAGE_PREFIX, "");
-        messageSuffix = Config.getProperty(PROP_MESSAGE_SUFFIX, "");
+        name = ConfigParser.getProperty(PROP_NAME, "watcher");
+        delayMilliseconds = ConfigParser.getMillisecondsProperty(PROP_DELAY, 60000L);
+        periodMilliseconds = ConfigParser.getMillisecondsProperty(PROP_PERIOD, 600000L);
+        dataPrefix = ConfigParser.getProperty(PROP_DATA_PREFIX, "");
+        dataSuffix = ConfigParser.getProperty(PROP_DATA_SUFFIX, "");
+        messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
+        messageSuffix = ConfigParser.getProperty(PROP_MESSAGE_SUFFIX, "");
     }
 }

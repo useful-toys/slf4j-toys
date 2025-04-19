@@ -15,7 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.usefultoys.slf4j.internal.Config;
+import org.usefultoys.slf4j.utils.ConfigParser;
 
 import lombok.experimental.UtilityClass;
 
@@ -168,15 +168,15 @@ public class MeterConfig {
      * they are properly initialized.
      */
     public void init() {
-        progressPeriodMilliseconds = Config.getMillisecondsProperty(PROP_PROGRESS_PERIOD, 2000L);
-        printCategory = Config.getProperty(PROP_PRINT_CATEGORY, false);
-        printStatus = Config.getProperty(PROP_PRINT_STATUS, true);
-        printPosition = Config.getProperty(PROP_PRINT_POSITION, false);
-        printLoad = Config.getProperty(PROP_PRINT_LOAD, false);
-        printMemory = Config.getProperty(PROP_PRINT_MEMORY, false);
-        dataPrefix = Config.getProperty(PROP_DATA_PREFIX, "");
-        dataSuffix = Config.getProperty(PROP_DATA_SUFFIX, "");
-        messagePrefix = Config.getProperty(PROP_MESSAGE_PREFIX, "");
-        messageSuffix = Config.getProperty(PROP_MESSAGE_SUFFIX, "");
+        progressPeriodMilliseconds = ConfigParser.getMillisecondsProperty(PROP_PROGRESS_PERIOD, 2000L);
+        printCategory = ConfigParser.getProperty(PROP_PRINT_CATEGORY, false);
+        printStatus = ConfigParser.getProperty(PROP_PRINT_STATUS, true);
+        printPosition = ConfigParser.getProperty(PROP_PRINT_POSITION, false);
+        printLoad = ConfigParser.getProperty(PROP_PRINT_LOAD, false);
+        printMemory = ConfigParser.getProperty(PROP_PRINT_MEMORY, false);
+        dataPrefix = ConfigParser.getProperty(PROP_DATA_PREFIX, "");
+        dataSuffix = ConfigParser.getProperty(PROP_DATA_SUFFIX, "");
+        messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
+        messageSuffix = ConfigParser.getProperty(PROP_MESSAGE_SUFFIX, "");
     }
 }

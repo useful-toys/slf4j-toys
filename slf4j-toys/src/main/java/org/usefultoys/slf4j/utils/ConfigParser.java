@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.internal;
+package org.usefultoys.slf4j.utils;
 
 import lombok.experimental.UtilityClass;
 
@@ -28,7 +28,7 @@ import lombok.experimental.UtilityClass;
  * @author Daniel Felix Ferber
  */
 @UtilityClass
-public class Config {
+public class ConfigParser {
 
     /**
      * Retrieves the value of a system property as a string. If the property is not set, the default value is returned.
