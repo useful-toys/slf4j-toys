@@ -41,18 +41,6 @@ public class SystemConfig {
      * This is detected automatically at class load time and cannot be changed at runtime.
      */
     public final boolean hasSunOperatingSystemMXBean;
-
-    static {
-        boolean tmpHasSunOperatingSystemMXBean = false;
-        try {
-            Class.forName("com.sun.management.OperatingSystemMXBean");
-            tmpHasSunOperatingSystemMXBean = true;
-        } catch (final ClassNotFoundException ignored) {
-            // ignora
-        }
-        hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
-    }
-
     public final String SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN = "slf4jtoys.useMemoryManagedBean";
     public final String PROP_USE_CLASS_LOADING_MANAGED_BEAN = "slf4jtoys.useClassLoadingManagedBean";
     public final String PROP_USE_COMPILATION_MANAGED_BEAN = "slf4jtoys.useCompilationManagedBean";
@@ -65,33 +53,54 @@ public class SystemConfig {
      * Controlled by the system property {@code slf4jtoys.useMemoryManagedBean}. Defaults to {@code false}. May be
      * changed at runtime.
      */
-    public boolean useMemoryManagedBean = Config.getProperty(SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN, false);
+    public boolean useMemoryManagedBean;
     /**
      * Whether class loading metrics are retrieved from the {@link java.lang.management.ClassLoadingMXBean}.
      * <p>
      * Controlled by the system property {@code slf4jtoys.useClassLoadingManagedBean}. Defaults to {@code false}. May be
      * changed at runtime.
      */
-    public boolean useClassLoadingManagedBean = Config.getProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN, false);
+    public boolean useClassLoadingManagedBean;
     /**
      * Whether JIT compiler metrics are retrieved from the {@link java.lang.management.CompilationMXBean}.
      * <p>
      * Controlled by the system property {@code slf4jtoys.useCompilationManagedBean}. Defaults to {@code false}. May be
      * changed at runtime.
      */
-    public boolean useCompilationManagedBean = Config.getProperty(PROP_USE_COMPILATION_MANAGED_BEAN, false);
+    public boolean useCompilationManagedBean;
     /**
      * Whether garbage collection metrics are retrieved from the {@link java.lang.management.GarbageCollectorMXBean}s.
      * <p>
      * Controlled by the system property {@code slf4jtoys.useGarbageCollectionManagedBean}. Defaults to {@code false}.
      * May be changed at runtime.
      */
-    public boolean useGarbageCollectionManagedBean = Config.getProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, false);
+    public boolean useGarbageCollectionManagedBean;
     /**
      * Whether operating system metrics are retrieved from the {@link java.lang.management.OperatingSystemMXBean}.
      * <p>
      * Controlled by the system property {@code slf4jtoys.usePlatformManagedBean}. Defaults to {@code false}. May be
      * changed at runtime.
      */
-    public boolean usePlatformManagedBean = Config.getProperty(PROP_USE_PLATFORM_MANAGED_BEAN, false);
+    public boolean usePlatformManagedBean;
+
+    static {
+        boolean tmpHasSunOperatingSystemMXBean = false;
+        try {
+            Class.forName("com.sun.management.OperatingSystemMXBean");
+            tmpHasSunOperatingSystemMXBean = true;
+        } catch (final ClassNotFoundException ignored) {
+            // ignora
+        }
+        hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
+        
+        init();
+    }
+
+    public void init() {
+        useMemoryManagedBean = Config.getProperty(SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN, false);
+        useClassLoadingManagedBean = Config.getProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN, false);
+        useCompilationManagedBean = Config.getProperty(PROP_USE_COMPILATION_MANAGED_BEAN, false);
+        useGarbageCollectionManagedBean = Config.getProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, false);
+        usePlatformManagedBean = Config.getProperty(PROP_USE_PLATFORM_MANAGED_BEAN, false);
+}
 }
