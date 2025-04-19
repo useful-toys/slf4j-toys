@@ -1,6 +1,7 @@
 package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,6 +15,12 @@ class SessionConfigTest {
 
         // Reinitialize SessionConfig to ensure clean state for each test
         SessionConfig.init();
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.clearProperty(SessionConfig.PROP_PRINT_UUID_SIZE);
+        System.clearProperty(SessionConfig.PROP_PRINT_CHARSET);
     }
 
     @Test

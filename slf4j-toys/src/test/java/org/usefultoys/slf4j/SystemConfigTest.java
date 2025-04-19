@@ -1,6 +1,7 @@
 package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,6 +17,15 @@ class SystemConfigTest {
         System.clearProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN);
         System.clearProperty(SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN);
 
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.clearProperty(SystemConfig.SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN);
+        System.clearProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN);
+        System.clearProperty(SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN);
+        System.clearProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN);
+        System.clearProperty(SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN);
     }
 
     @Test

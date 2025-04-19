@@ -1,6 +1,7 @@
 package org.usefultoys.slf4j.watcher;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +20,17 @@ class WatcherConfigTest {
 
         // Reinitialize WatcherConfig to ensure clean state for each test
         WatcherConfig.init();
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.clearProperty(WatcherConfig.PROP_NAME);
+        System.clearProperty(WatcherConfig.PROP_DELAY);
+        System.clearProperty(WatcherConfig.PROP_PERIOD);
+        System.clearProperty(WatcherConfig.PROP_DATA_PREFIX);
+        System.clearProperty(WatcherConfig.PROP_DATA_SUFFIX);
+        System.clearProperty(WatcherConfig.PROP_MESSAGE_PREFIX);
+        System.clearProperty(WatcherConfig.PROP_MESSAGE_SUFFIX);
     }
 
     @Test

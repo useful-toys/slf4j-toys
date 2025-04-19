@@ -2,9 +2,10 @@ package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.usefultoys.slf4j.meter.MeterConfig;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.AfterEach;
 
 class MeterConfigTest {
 
@@ -23,6 +24,20 @@ class MeterConfigTest {
         System.clearProperty(MeterConfig.PROP_MESSAGE_SUFFIX);
 
         MeterConfig.init(); // Reinitialize MeterConfig
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.clearProperty(MeterConfig.PROP_PROGRESS_PERIOD);
+        System.clearProperty(MeterConfig.PROP_PRINT_CATEGORY);
+        System.clearProperty(MeterConfig.PROP_PRINT_STATUS);
+        System.clearProperty(MeterConfig.PROP_PRINT_POSITION);
+        System.clearProperty(MeterConfig.PROP_PRINT_LOAD);
+        System.clearProperty(MeterConfig.PROP_PRINT_MEMORY);
+        System.clearProperty(MeterConfig.PROP_DATA_PREFIX);
+        System.clearProperty(MeterConfig.PROP_DATA_SUFFIX);
+        System.clearProperty(MeterConfig.PROP_MESSAGE_PREFIX);
+        System.clearProperty(MeterConfig.PROP_MESSAGE_SUFFIX);
     }
 
     @Test
