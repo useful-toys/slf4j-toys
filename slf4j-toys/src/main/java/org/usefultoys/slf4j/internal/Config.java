@@ -15,43 +15,43 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import lombok.experimental.UtilityClass;
+
 /**
- * Collection of static utility methods to read system properties, with support for default values and typed conversion.
+ * Collection of utility methods to read system properties, with support for default values and typed conversion.
  * <p>
- * These methods provide safe access to system properties as {@code String}, {@code boolean}, {@code int}, and {@code long}, and include additional logic for
- * parsing time-based values with unit suffixes (e.g., "10s", "5min").
+ * These methods provide safe access to system properties as {@code String}, {@code boolean}, {@code int}, and {@code long}, 
+ * and include additional logic for parsing time-based values with unit suffixes (e.g., "10s", "5min").
  * <p>
  * This class is not meant to be instantiated.
  *
  * @author Daniel Felix Ferber
  */
-public final class Config {
-    private Config() {
-        // prevent instances
-    }
+@UtilityClass
+public class Config {
 
     /**
-     * Retrieves the value of a system property as a string. Returns the default value if the property is not set.
+     * Retrieves the value of a system property as a string. If the property is not set, the default value is returned.
      *
-     * @param name         the system property name
+     * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set
-     * @return the property value, or the default value if unset
+     * @return the property value as a string, or the default value if the property is not set
      */
-    public static String getProperty(final String name, final String defaultValue) {
+    public String getProperty(final String name, final String defaultValue) {
         final String value = System.getProperty(name);
         return value == null ? defaultValue : value;
     }
 
     /**
-     * Retrieves the value of a system property as a boolean. Returns the default value if the property is not set.
+     * Retrieves the value of a system property as a boolean. If the property is not set, the default value is returned.
      * <p>
      * The property value is parsed using {@link Boolean#parseBoolean(String)}.
      *
-     * @param name         the system property name
+     * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set
-     * @return the boolean value, or the default value if unset
+     * @return the property value as a boolean, or the default value if the property is not set
      */
-    public static boolean getProperty(final String name, final boolean defaultValue) {
+    public boolean getProperty(final String name, final boolean defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
@@ -60,13 +60,14 @@ public final class Config {
     }
 
     /**
-     * Retrieves the value of a system property as an integer. Returns the default value if the property is not set or cannot be parsed as an integer.
+     * Retrieves the value of a system property as an integer. If the property is not set or cannot be parsed as an integer, 
+     * the default value is returned.
      *
-     * @param name         the system property name
+     * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set or invalid
-     * @return the integer value, or the default value if unset or invalid
+     * @return the property value as an integer, or the default value if the property is not set or invalid
      */
-    public static int getProperty(final String name, final int defaultValue) {
+    public int getProperty(final String name, final int defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
@@ -79,13 +80,14 @@ public final class Config {
     }
 
     /**
-     * Retrieves the value of a system property as a long integer. Returns the default value if the property is not set or cannot be parsed as a long.
+     * Retrieves the value of a system property as a long integer. If the property is not set or cannot be parsed as a long, 
+     * the default value is returned.
      *
-     * @param name         the system property name
+     * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set or invalid
-     * @return the long value, or the default value if unset or invalid
+     * @return the property value as a long, or the default value if the property is not set or invalid
      */
-    public static long getProperty(final String name, final long defaultValue) {
+    public long getProperty(final String name, final long defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
@@ -109,11 +111,11 @@ public final class Config {
      * </ul>
      * If the property is not set or cannot be parsed, the default value is returned.
      *
-     * @param name         the system property name
+     * @param name         the name of the system property
      * @param defaultValue the default value (in milliseconds) to return if the property is not set or invalid
-     * @return the parsed duration in milliseconds, or the default value if unset or invalid
+     * @return the parsed duration in milliseconds, or the default value if the property is not set or invalid
      */
-    public static long getMillisecondsProperty(final String name, final long defaultValue) {
+    public long getMillisecondsProperty(final String name, final long defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
