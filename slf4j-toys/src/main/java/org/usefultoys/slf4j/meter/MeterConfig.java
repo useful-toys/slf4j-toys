@@ -17,132 +17,151 @@ package org.usefultoys.slf4j.meter;
 
 import org.usefultoys.slf4j.internal.Config;
 
+import lombok.experimental.UtilityClass;
+
 /**
- * Collection of properties that drive {@link Meter} and {@link MeterData} behavior. Initial values are read from system properties at application startup, if
- * available. They may be assigned at application startup, before calling any {@link Meter} methods. Some properties allow reassigning their values at runtime.
- *
+ * Centralized configuration holder for controlling the behavior of the {@link Meter} and {@link MeterData}.
+ * <p>
+ * This class exposes a set of flags and properties that determine the behavior of meters, such as progress reporting,
+ * logging categories, and encoded data handling. These properties can be configured at application startup or modified
+ * dynamically at runtime.
+ * <p>
+ * These properties should ideally be defined <em>before</em> invoking any method from this library, to ensure
+ * consistent behavior. Some properties can be modified dynamically at runtime, although care should be taken in
+ * concurrent environments.
+ * <p>
+* <strong>Performance note:</strong> Some properties, such as progress reporting intervals, may impact performance
+ * if configured with very low values.
+ * <p>
+ * This class is a utility holder and should not be instantiated.
+* <p>
  * @author Daniel Felix Ferber
  */
-@SuppressWarnings("CanBeFinal")
-public final class MeterConfig {
+@UtilityClass
+public class MeterConfig {
 
     /**
-     * Time to wait before reporting next progress status, in milliseconds.
+     * Time to wait before reporting the next progress status, in milliseconds.
      * <p>
-     * Meter allows reporting progress status of incremental operations by calling the {@link Meter#inc()}, {@link Meter#incBy(long)} and {@link
-     * Meter#incTo(long)} method on each step. To prevent crowding the log file and to prevent performance degradation, Meter waits a minimal amount of time
-     * before printing the next status message. Value is read from system property {@code slf4jtoys.meter.progress.period} at application startup and defaults
-     * to {@code 2 seconds}. The number represents a long integer that represents milliseconds.
+     * Value is read from system property {@code slf4jtoys.meter.progress.period}, defaulting to {@code 2000} (2 seconds).
+     * The value can be suffixed with {@code ms}, {@code s}, {@code m}, or {@code h}.
      * <p>
-     * The system property allows the number suffixed with 'ms', 's', 'm' and 'h' to represent milliseconds, seconds, minutes and hours. You may assign a new
-     * value at runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static long progressPeriodMilliseconds = Config.getMillisecondsProperty("slf4jtoys.meter.progress.period", 2000L);
-    /**
-     * If {@link Meter} and {@link MeterData} print the category on the readable message.
-     * <p>
-     * The Meter status is closely related to the logger name. The category is the logger's last name. The usual logger configuration already includes the
-     * logger name on each message. If using a logging frameworks that does not support logger name, one may set this property to true to include the category.
-     * <p>
-     * Value is read from system property {@code slf4jtoys.meter.print.category} at application startup, defaults to {@code false}. You may assign a new value
-     * at runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static boolean printCategory = Config.getProperty("slf4jtoys.meter.print.category", false);
-    /**
-     * If {@link Meter} and {@link MeterData} print the status on the readable message.
-     * <p>
-     * The Meter status is closely related to the logger level. If using Logback as logging framework, it is possible to display the Meter status instead of the
-     * logger level and one may set this property to false to omit the status from the message.
-     * <p>
-     * Value is read from system property {@code slf4jtoys.meter.print.status} at application startup, defaults to {@code true}. You may assign a new value at
-     * runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static boolean printStatus = Config.getProperty("slf4jtoys.meter.print.status", true);
-    /**
-     * If {@link Meter} and {@link MeterData} print the position (event counter) load on the readable message.
-     *
-     * <p>Value is read from system property {@code slf4jtoys.meter.print.position} at application startup, defaults to {@code false}.
      * You may assign a new value at runtime.
      */
-    @org.jetbrains.annotations.NonNls
-    public static boolean printPosition = Config.getProperty("slf4jtoys.meter.print.position", false);
-    /**
-     * If {@link Meter} and {@link MeterData} print the cpu load on the readable message.
-     *
-     * <p>Value is read from system property {@code slf4jtoys.meter.print.load} at application startup, defaults to {@code false}.
-     * You may assign a new value at runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static boolean printLoad = Config.getProperty("slf4jtoys.meter.print.load", false);
-    /**
-     * If {@link Meter} and {@link MeterData} print the memory load on the readable message.
-     * <p>Value is read from system property {@code slf4jtoys.meter.print.memory} at application startup, defaults to {@code false}.
-     * You may assign a new value at runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static boolean printMemory = Config.getProperty("slf4jtoys.meter.print.memory", false);
-    /**
-     * A prefix added to the logger that writes encoded data for {@link Meter}.
-     * <p>
-     * By default, readable messages and encoded data are written to the same logger. In order to handle readable messages and encoded data separately without
-     * creating filter rules, you may write encoded data to another logger which name has the given prefix or suffix, and configure these loggers separately.
-     * <p>
-     * For example, by setting the prefix to {@code 'data.'}, a {@link Meter} using logger {@code a.b.c.MyClass} will write readable messages to {@code
-     * a.b.c.MyClass} and encoded data to {@code data.a.b.c.MyClass}.
-     * <p>
-     * Value is read from system property {@code slf4jtoys.meter.data.prefix} at application startup, defaults to empty. You may assign a new value at
-     * runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static String dataPrefix = Config.getProperty("slf4jtoys.meter.data.prefix", "");
-    /**
-     * A suffix added to the logger that writes encoded data for {@link Meter}.
-     * <p>
-     * By default, readable messages and encoded data are written to the same logger. In order to handle readable messages and encoded data separately without
-     * creating filter rules, you may write encoded data to another logger which name has the given prefix or suffix, and configure these loggers separately.
-     * <p>
-     * For example, by setting the suffix to {@code '.data'}, a {@link Meter} using logger {@code a.b.c.MyClass} will write readable messages to {@code
-     * a.b.c.MyClass} and encoded event data to {@code data.a.b.c.MyClass}.
-     * <p>
-     * Value is read from system property {@code slf4jtoys.meter.data.prefix} at application startup, defaults to empty. You may assign a new value at
-     * runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static String dataSuffix = Config.getProperty("slf4jtoys.meter.data.suffix", "");
-    /**
-     * A prefix added to the logger that writes readable message for {@link Meter}.
-     * <p>
-     * By default, readable messages and encoded data are written to the same logger. In order to handle readable messages and encoded data separately without
-     * creating filter rules, you may write readable message to another logger which name has the given prefix or suffix, and configure these loggers
-     * separately.
-     * <p>
-     * For example, by setting the prefix to {@code 'message.'}, a {@link Meter} using logger {@code a.b.c.MyClass} will write readable messages to {@code
-     * message.a.b.c.MyClass} and encoded data to {@code a.b.c.MyClass}.
-     * <p>
-     * Value is read from system property {@code slf4jtoys.meter.message.prefix} at application startup, defaults to empty. You may assign a new value at
-     * runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static String messagePrefix = Config.getProperty("slf4jtoys.meter.message.prefix", "");
-    /**
-     * A suffix added to the logger that writes readable message for {@link Meter}.
-     * <p>
-     * By default, readable messages and encoded data are written to the same logger. In order to handle readable messages and encoded data separately without
-     * creating filter rules, you may write readable message to another logger which name has the given prefix or suffix, and configure these loggers
-     * separately.
-     * <p>
-     * For example, by setting the suffix to {@code '.message'}, a {@link Meter} using logger {@code a.b.c.MyClass} will write readable messages to {@code
-     * a.b.c.MyClass.message} and encoded event data to {@code a.b.c.MyClass}.
-     * <p>
-     * Value is read from system property {@code slf4jtoys.meter.data.prefix} at application startup, defaults to empty. You may assign a new value at
-     * runtime.
-     */
-    @org.jetbrains.annotations.NonNls
-    public static String messageSuffix = Config.getProperty("slf4jtoys.meter.message.suffix", "");
+    public long progressPeriodMilliseconds;
 
-    private MeterConfig() {
+    /**
+     * Whether the meter includes the category in readable messages.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.print.category}, defaulting to {@code false}.
+     * <p>
+     * You may assign a new value at runtime.
+     */
+    public boolean printCategory;
+
+    /**
+     * Whether the meter includes the status in readable messages.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.print.status}, defaulting to {@code true}.
+     * <p>
+     * You may assign a new value at runtime.
+     */
+    public boolean printStatus;
+
+    /**
+     * Whether the meter includes the position (event counter) in readable messages.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.print.position}, defaulting to {@code false}.
+     * <p>
+     * You may assign a new value at runtime.
+     */
+    public boolean printPosition;
+
+    /**
+     * Whether the meter includes the CPU load in readable messages.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.print.load}, defaulting to {@code false}.
+     * <p>
+     * You may assign a new value at runtime.
+     */
+    public boolean printLoad;
+
+    /**
+     * Whether the meter includes the memory load in readable messages.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.print.memory}, defaulting to {@code false}.
+     * <p>
+     * You may assign a new value at runtime.
+     */
+    public boolean printMemory;
+
+    /**
+     * Prefix added to the logger name used for encoded data messages.
+     * <p>
+     * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows directing
+     * encoded data to a different logger.
+     * <p>
+     * Example: with prefix {@code data.}, a logger {@code a.b.c.MyClass} becomes {@code data.a.b.c.MyClass} for encoded
+     * data.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.data.prefix}, defaulting to an empty string.
+     */
+    public String dataPrefix;
+
+    /**
+     * Suffix added to the logger name used for encoded data messages.
+     * <p>
+     * By default, encoded and human-readable messages are written to the same logger. Setting a suffix allows directing
+     * encoded data to a different logger.
+     * <p>
+     * Example: with suffix {@code .data}, a logger {@code a.b.c.MyClass} becomes {@code a.b.c.MyClass.data} for encoded
+     * data.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.data.suffix}, defaulting to an empty string.
+     */
+    public String dataSuffix;
+
+    /**
+     * Prefix added to the logger name used for human-readable messages.
+     * <p>
+     * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows directing
+     * readable messages to a different logger.
+     * <p>
+     * Example: with prefix {@code message.}, a logger {@code a.b.c.MyClass} becomes {@code message.a.b.c.MyClass} for
+     * readable messages.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.message.prefix}, defaulting to an empty string.
+     */
+    public String messagePrefix;
+
+    /**
+     * Suffix added to the logger name used for human-readable messages.
+     * <p>
+     * By default, encoded and human-readable messages are written to the same logger. Setting a suffix allows directing
+     * readable messages to a different logger.
+     * <p>
+     * Example: with suffix {@code .message}, a logger {@code a.b.c.MyClass} becomes {@code a.b.c.MyClass.message} for
+     * readable messages.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.message.suffix}, defaulting to an empty string.
+     */
+    public String messageSuffix;
+
+    /**
+     * Initializes the configuration attributes by reading the corresponding system properties.
+     * This method should be called before accessing any configuration attributes to ensure
+     * they are properly initialized.
+     */
+    public void init() {
+        progressPeriodMilliseconds = Config.getMillisecondsProperty("slf4jtoys.meter.progress.period", 2000L);
+        printCategory = Config.getProperty("slf4jtoys.meter.print.category", false);
+        printStatus = Config.getProperty("slf4jtoys.meter.print.status", true);
+        printPosition = Config.getProperty("slf4jtoys.meter.print.position", false);
+        printLoad = Config.getProperty("slf4jtoys.meter.print.load", false);
+        printMemory = Config.getProperty("slf4jtoys.meter.print.memory", false);
+        dataPrefix = Config.getProperty("slf4jtoys.meter.data.prefix", "");
+        dataSuffix = Config.getProperty("slf4jtoys.meter.data.suffix", "");
+        messagePrefix = Config.getProperty("slf4jtoys.meter.message.prefix", "");
+        messageSuffix = Config.getProperty("slf4jtoys.meter.message.suffix", "");
     }
 }
