@@ -15,20 +15,32 @@
  */
 package org.usefultoys.slf4j;
 
+import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.internal.Config;
 import org.usefultoys.slf4j.internal.SystemData;
 
 /**
- * Collection of properties that drive {@link SystemData} behavior.
+ * Centralized configuration holder for controlling how {@link SystemData} gathers runtime metrics from the Java
+ * platform.
+ * <p>
+ * This class determines whether various {@code java.lang.management.*MXBean} interfaces are queried to collect data.
+ * These interfaces may not be available in all JVM implementations or may be restricted by the security manager. * <p>
+ * These properties should ideally be defined <em>before</em> invoking any method from this library, to ensure
+ * consistent behavior. Some properties can be modified dynamically at runtime, although care should be taken in
+ * concurrent environments.
+ * <p>
+ * This class is a utility holder and should not be instantiated.
  *
  * @author Daniel Felix Ferber
  */
-@SuppressWarnings("CanBeFinal")
-public final class SystemConfig {
+@UtilityClass
+public class SystemConfig {
     /**
-     * If Sun native OperatingSystemMXBean is available.
+     * Whether the Sun-specific {@code com.sun.management.OperatingSystemMXBean} is available in the current JVM.
+     * <p>
+     * This is detected automatically at class load time and cannot be changed at runtime.
      */
-    public static final boolean hasSunOperatingSystemMXBean;
+    public final boolean hasSunOperatingSystemMXBean;
 
     static {
         boolean tmpHasSunOperatingSystemMXBean = false;
@@ -41,42 +53,45 @@ public final class SystemConfig {
         hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
     }
 
-    /**
-     * If memory usage status is retrieved from MemoryMXBean.
-     * Not all JVM may support or allow MemoryMXBean usage.
-     * Value is read from system property {@code slf4jtoys.useMemoryManagedBean} at application startup, defaults to {@code false}.
-     * You may assign a new value at runtime.
-     */
-    public static boolean useMemoryManagedBean = Config.getProperty("slf4jtoys.useMemoryManagedBean", false);
-    /**
-     * If class loading status is retrieved from ClassLoadingMXBean.
-     * Not all JVM may support or allow ClassLoadingMXBean usage.
-     * Value is read from system property {@code slf4jtoys.useClassLoadingManagedBean} at application startup, defaults to {@code false}.
-     * You may assign a new value at runtime.
-     */
-    public static boolean useClassLoadingManagedBean = Config.getProperty("slf4jtoys.useClassLoadingManagedBean", false);
-    /**
-     * If JIT compiler status is retrieved from CompilationMXBean.
-     * Not all JVM may support or allow CompilationMXBean usage.
-     * Value is read from system property {@code slf4jtoys.useCompilationManagedBean} at application startup, defaults to {@code false}.
-     * You may assign a new value at runtime.
-     */
-    public static boolean useCompilationManagedBean = Config.getProperty("slf4jtoys.useCompilationManagedBean", false);
-    /**
-     * If garbage collector status is retrieved from GarbageCollectorMXBean.
-     * Not all JVM may support or allow GarbageCollectorMXBean usage.
-     * Value is read from system property {@code slf4jtoys.useGarbageCollectionManagedBean} at application startup, defaults to {@code false}.
-     * You may assign a new value at runtime.
-     */
-    public static boolean useGarbageCollectionManagedBean = Config.getProperty("slf4jtoys.useGarbageCollectionManagedBean", false);
-    /**
-     * If operating system status is retrieved from OperatingSystemMXBean.
-     * Not all JVM may support or allow OperatingSystemMXBean usage.
-     * Value is read from system property {@code slf4jtoys.usePlatformManagedBean} at application startup, defaults to {@code false}.
-     * You may assign a new value at runtime.
-     */
-    public static boolean usePlatformManagedBean = Config.getProperty("slf4jtoys.usePlatformManagedBean", false);
+    public final String SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN = "slf4jtoys.useMemoryManagedBean";
+    public final String PROP_USE_CLASS_LOADING_MANAGED_BEAN = "slf4jtoys.useClassLoadingManagedBean";
+    public final String PROP_USE_COMPILATION_MANAGED_BEAN = "slf4jtoys.useCompilationManagedBean";
+    public final String PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN = "slf4jtoys.useGarbageCollectionManagedBean";
+    public final String PROP_USE_PLATFORM_MANAGED_BEAN = "slf4jtoys.usePlatformManagedBean";
 
-    private SystemConfig() {
-    }
+    /**
+     * Whether memory usage metrics are retrieved from the {@link java.lang.management.MemoryMXBean}.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.useMemoryManagedBean}. Defaults to {@code false}. May be
+     * changed at runtime.
+     */
+    public boolean useMemoryManagedBean = Config.getProperty(SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN, false);
+    /**
+     * Whether class loading metrics are retrieved from the {@link java.lang.management.ClassLoadingMXBean}.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.useClassLoadingManagedBean}. Defaults to {@code false}. May be
+     * changed at runtime.
+     */
+    public boolean useClassLoadingManagedBean = Config.getProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN, false);
+    /**
+     * Whether JIT compiler metrics are retrieved from the {@link java.lang.management.CompilationMXBean}.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.useCompilationManagedBean}. Defaults to {@code false}. May be
+     * changed at runtime.
+     */
+    public boolean useCompilationManagedBean = Config.getProperty(PROP_USE_COMPILATION_MANAGED_BEAN, false);
+    /**
+     * Whether garbage collection metrics are retrieved from the {@link java.lang.management.GarbageCollectorMXBean}s.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.useGarbageCollectionManagedBean}. Defaults to {@code false}.
+     * May be changed at runtime.
+     */
+    public boolean useGarbageCollectionManagedBean = Config.getProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, false);
+    /**
+     * Whether operating system metrics are retrieved from the {@link java.lang.management.OperatingSystemMXBean}.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.usePlatformManagedBean}. Defaults to {@code false}. May be
+     * changed at runtime.
+     */
+    public boolean usePlatformManagedBean = Config.getProperty(PROP_USE_PLATFORM_MANAGED_BEAN, false);
 }
