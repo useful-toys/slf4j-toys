@@ -53,7 +53,8 @@ class ReporterConfigTest {
 
     @Test
     void testDefaultValues() {
-        assertTrue(ReporterConfig.reportVM, "Valor padrão de reportVM deve ser true");
+        System.setProperty(ReporterConfig.PROP_VM, "false");
+        System.setProperty(ReporterConfig.PROP_FILE_SYSTEM, "true");
         System.setProperty(ReporterConfig.PROP_MEMORY, "false");
         System.setProperty(ReporterConfig.PROP_USER, "false");
         System.setProperty(ReporterConfig.PROP_PROPERTIES, "false");

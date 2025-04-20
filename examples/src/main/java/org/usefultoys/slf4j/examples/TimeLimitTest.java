@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.demo;
+package org.usefultoys.slf4j.examples;
 
-import org.junit.Test;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterFactory;
 
@@ -25,7 +24,6 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  */
 public class TimeLimitTest {
 
-    @Test
     public void testFast() {
         final Meter m = MeterFactory.getMeter("teste").limitMilliseconds(2000).start();
         try {
@@ -36,7 +34,6 @@ public class TimeLimitTest {
         m.ok();
     }
 
-    @Test
     public void testSlow() {
         final Meter m = MeterFactory.getMeter("teste").limitMilliseconds(2000).start();
         try {
@@ -46,5 +43,4 @@ public class TimeLimitTest {
         }
         m.ok();
     }
-
 }

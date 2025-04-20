@@ -40,7 +40,7 @@ public class WatcherConfig {
     }
 
     // System property keys
-    public static final String PROP_NAME = "slf4jtoys.watcher.name";
+    public final String PROP_NAME = "slf4jtoys.watcher.name";
     public final String PROP_DELAY = "slf4jtoys.watcher.delay";
     public final String PROP_PERIOD = "slf4jtoys.watcher.period";
     public final String PROP_DATA_PREFIX = "slf4jtoys.watcher.data.prefix";

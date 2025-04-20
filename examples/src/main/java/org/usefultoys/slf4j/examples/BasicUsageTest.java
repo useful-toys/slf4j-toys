@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.demo;
+package org.usefultoys.slf4j.examples;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.meter.Meter;
@@ -30,12 +28,10 @@ public class BasicUsageTest {
 
     int a;
 
-    @Before
     public void before() {
         a = 12;
     }
 
-    @Test
     public void test1() {
         final Meter m = MeterFactory.getMeter("teste").ctx("in", a).start();
         try {
@@ -46,7 +42,6 @@ public class BasicUsageTest {
         }
     }
 
-    @Test
     public void test2() {
         final Meter m = MeterFactory.getMeter("teste").ctx("in", a).start();
         try {
@@ -57,7 +52,6 @@ public class BasicUsageTest {
         }
     }
 
-    @Test
     public void test3() {
         final Meter m = MeterFactory.getMeter("teste").ctx("in", a).start();
         try {
@@ -85,7 +79,6 @@ public class BasicUsageTest {
         }
     }
 
-        @Test
     public void test4() {
         final Logger logger = LoggerFactory.getLogger(BasicUsageTest.class);
         final Meter m = MeterFactory.getMeter(logger, "test4").ctx("in", a).start();
@@ -114,5 +107,4 @@ public class BasicUsageTest {
             m.ctx("error", a).fail(e);
         }
     }
-
 }

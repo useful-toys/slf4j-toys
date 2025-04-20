@@ -40,7 +40,7 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class ReporterConfig {
-    {
+    static {
         init();
     }
     

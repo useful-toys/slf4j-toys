@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.demo;
+package org.usefultoys.slf4j.examples;
 
-import org.junit.Test;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterFactory;
 
@@ -25,7 +24,6 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  */
 public class ProgressTest {
 
-    @Test
     public void testFastProgress() {
         final Meter m = MeterFactory.getMeter("teste").iterations(20).start();
         for (int i = 0; i < 20; i++) {
@@ -39,7 +37,6 @@ public class ProgressTest {
         m.ok();
     }
 
-    @Test
     public void testFastProgressLargeMeterProgressPeriod() {
         System.setProperty("meter.progress.period", "5s");
         final Meter m = MeterFactory.getMeter("teste").iterations(20).start();
@@ -54,7 +51,6 @@ public class ProgressTest {
         m.ok();
     }
 
-    @Test
     public void testFastProgressSmallMeterProgressPeriod() {
         System.setProperty("meter.progress.period", "500ms");
         final Meter m = MeterFactory.getMeter("teste").iterations(20).start();
