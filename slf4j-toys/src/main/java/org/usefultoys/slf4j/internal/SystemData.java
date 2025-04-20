@@ -22,8 +22,7 @@ import java.lang.management.*;
 import java.util.List;
 
 /**
- * Augments the {@link EventData} with status collected from the virtual
- * machine.
+ * Augments the {@link EventData} with status collected from the virtual machine.
  *
  * @author Daniel Felix Ferber
  */
@@ -148,18 +147,26 @@ public abstract class SystemData extends EventData {
         if (!SystemConfig.usePlatformManagedBean) {
             return;
         }
-        if (SystemConfig.hasSunOperatingSystemMXBean) {
-            final com.sun.management.OperatingSystemMXBean os = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class);
-            final double systemLoadAverage = os.getSystemCpuLoad();
-            if (systemLoadAverage > 0) {
-                systemLoad = systemLoadAverage;
+
+        final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+
+        if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
+            final com.sun.management.OperatingSystemMXBean sunOsBean =
+                    (com.sun.management.OperatingSystemMXBean) osBean;
+            final double cpuLoad = sunOsBean.getSystemCpuLoad();
+            if (cpuLoad >= 0) {
+                // may report negative values on some platforms, specifically Windows
+                systemLoad = cpuLoad;
+                return;
             }
-        } else {
-            final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-            final double systemLoadAverage = os.getSystemLoadAverage();
-            if (systemLoadAverage > 0) {
-                systemLoad = systemLoadAverage;
-            }
+        }
+
+        // Fallback:
+        double loadAverage = osBean.getSystemLoadAverage();
+        int availableProcessors = osBean.getAvailableProcessors();
+        if (loadAverage >= 0 && availableProcessors > 0) {
+            // may report negative values on some platforms, specifically Windows
+            systemLoad = loadAverage / availableProcessors;
         }
     }
 

@@ -40,14 +40,6 @@ class SystemConfigTest {
     }
 
     @Test
-    void testHasSunOperatingSystemMXBean() {
-        SystemConfig.init();
-
-        // This value is determined at runtime and cannot be changed
-        assertNotNull(SystemConfig.hasSunOperatingSystemMXBean, "hasSunOperatingSystemMXBean should not be null");
-    }
-
-    @Test
     void testUseClassLoadingManagedBean() {
         System.setProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
