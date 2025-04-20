@@ -37,31 +37,15 @@ import org.usefultoys.slf4j.utils.ConfigParser;
 @UtilityClass
 public class SystemConfig {
     static {
-        boolean tmpHasSunOperatingSystemMXBean = false;
-        try {
-            Class.forName("com.sun.management.OperatingSystemMXBean");
-            tmpHasSunOperatingSystemMXBean = true;
-        } catch (final ClassNotFoundException ignored) {
-            // ignora
-        }
-        hasSunOperatingSystemMXBean = tmpHasSunOperatingSystemMXBean;
-        
         init();
     }
-        
+
     // System property keys
-     public final String SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN = "slf4jtoys.useMemoryManagedBean";
-     public final String PROP_USE_CLASS_LOADING_MANAGED_BEAN = "slf4jtoys.useClassLoadingManagedBean";
-     public final String PROP_USE_COMPILATION_MANAGED_BEAN = "slf4jtoys.useCompilationManagedBean";
-     public final String PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN = "slf4jtoys.useGarbageCollectionManagedBean";
-     public final String PROP_USE_PLATFORM_MANAGED_BEAN = "slf4jtoys.usePlatformManagedBean";
- 
-    /**
-     * Whether the Sun-specific {@code com.sun.management.OperatingSystemMXBean} is available in the current JVM.
-     * <p>
-     * This is detected automatically at class load time and cannot be changed at runtime.
-     */
-    public final boolean hasSunOperatingSystemMXBean;
+    public final String SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN = "slf4jtoys.useMemoryManagedBean";
+    public final String PROP_USE_CLASS_LOADING_MANAGED_BEAN = "slf4jtoys.useClassLoadingManagedBean";
+    public final String PROP_USE_COMPILATION_MANAGED_BEAN = "slf4jtoys.useCompilationManagedBean";
+    public final String PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN = "slf4jtoys.useGarbageCollectionManagedBean";
+    public final String PROP_USE_PLATFORM_MANAGED_BEAN = "slf4jtoys.usePlatformManagedBean";
 
     /**
      * Whether memory usage metrics are retrieved from the {@link java.lang.management.MemoryMXBean}.
@@ -105,5 +89,5 @@ public class SystemConfig {
         useCompilationManagedBean = ConfigParser.getProperty(PROP_USE_COMPILATION_MANAGED_BEAN, false);
         useGarbageCollectionManagedBean = ConfigParser.getProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, false);
         usePlatformManagedBean = ConfigParser.getProperty(PROP_USE_PLATFORM_MANAGED_BEAN, false);
-}
+    }
 }

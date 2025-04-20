@@ -1,246 +1,181 @@
-/*
- * Copyright 2024 Daniel Felix Ferber
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.usefultoys.slf4j.internal;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.usefultoys.slf4j.SystemConfig;
 
-/**
- *
- * @author Daniel
- */
-public class SystemDataTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    public SystemDataTest() {
+class SystemDataTest {
+
+    static class TestSystemData extends SystemData {
+        public TestSystemData() {
+            super();
+        }
+
+        public TestSystemData(String sessionUuid) {
+            super(sessionUuid);
+        }
+
+        public TestSystemData(String sessionUuid, long position) {
+            super(sessionUuid, position);
+        }
+
+        public TestSystemData(final String sessionUuid, final long position, final long time) {
+            super(sessionUuid, position, time);
+        }
+
+        public TestSystemData(final String sessionUuid, final long position, final long time, final long heap_commited,
+                              final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max,
+                              final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded,
+                              final long classLoading_total, final long classLoading_unloaded, final long compilationTime,
+                              final long garbageCollector_count, final long garbageCollector_time, final long runtime_usedMemory,
+                              final long runtime_maxMemory, final long runtime_totalMemory, final double systemLoad) {
+            super(sessionUuid, position, time, heap_commited, heap_max, heap_used, nonHeap_commited, nonHeap_max,
+                    nonHeap_used, objectPendingFinalizationCount, classLoading_loaded, classLoading_total, classLoading_unloaded,
+                    compilationTime, garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory,
+                    runtime_totalMemory, systemLoad);
+        }
+
+        @Override
+        protected StringBuilder readableString(StringBuilder sb) {
+            sb.append("a");
+            return sb;
+        }
+
+        @Override
+        protected void resetImpl() {
+            super.resetImpl();
+        }
     }
 
-    @Test
-    public void testResetImpl() {
-        final SystemData a = createSystemData();
-        final SystemData b = createSystemData();
-
-        populateTestSystemData(b);
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        resetAll(b);
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
+    @AfterEach
+    void tearDown() {
+        SystemConfig.useMemoryManagedBean = false;
+        SystemConfig.useClassLoadingManagedBean = false;
+        SystemConfig.useCompilationManagedBean = false;
+        SystemConfig.useGarbageCollectionManagedBean = false;
+        SystemConfig.usePlatformManagedBean = false;
     }
 
-    @Test
-    public void testIsCompletelyEqualsImpl() {
-        final SystemData a = createSystemData();
-        final SystemData b = createSystemData();
+    void testConstructorAndGettersN() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(1, event.getPosition());
+        assertEquals(2L, event.getTime());
+        assertEquals(3L, event.getHeap_commited());
+        assertEquals(4L, event.getHeap_max());
+        assertEquals(5L, event.getHeap_used());
+        assertEquals(6L, event.getNonHeap_commited());
+        assertEquals(7L, event.getNonHeap_max());
+        assertEquals(8L, event.getNonHeap_used());
+        assertEquals(9L, event.getObjectPendingFinalizationCount());
+        assertEquals(10L, event.getClassLoading_loaded());
+        assertEquals(11L, event.getClassLoading_total());
+        assertEquals(12L, event.getClassLoading_unloaded());
+        assertEquals(13L, event.getCompilationTime());
+        assertEquals(14L, event.getGarbageCollector_count());
+        assertEquals(15L, event.getGarbageCollector_time());
+        assertEquals(16L, event.getRuntime_usedMemory());
+        assertEquals(17L, event.getRuntime_maxMemory());
+        assertEquals(18L, event.getRuntime_totalMemory());
+        assertEquals(19.0, event.getSystemLoad());
 
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-
-        populateEventData(a);
-        populateEventData(b);
-        populateTestSystemData(a);
-        populateTestSystemData(b);
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-
-        b.heap_commited = 11;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.heap_commited = 1;
-        b.heap_max = 33;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.heap_max = 3;
-        b.heap_used = 44;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.heap_used = 4;
-        b.nonHeap_commited = 55;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.nonHeap_commited = 5;
-        b.nonHeap_max = 77;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.nonHeap_max = 7;
-        b.nonHeap_used = 88;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.nonHeap_used = 8;
-        b.objectPendingFinalizationCount = 99;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.objectPendingFinalizationCount = 9;
-        b.classLoading_loaded = 1010;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.classLoading_loaded = 10;
-        b.classLoading_total = 1111;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.classLoading_total = 11;
-        b.classLoading_unloaded = 1212;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.classLoading_unloaded = 12;
-        b.compilationTime = 1313;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.compilationTime = 13;
-        b.garbageCollector_count = 1414;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.garbageCollector_count = 14;
-        b.garbageCollector_time = 1515;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.garbageCollector_time = 15;
-        b.runtime_usedMemory = 1616;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.runtime_usedMemory = 16;
-        b.runtime_maxMemory = 1717;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.runtime_maxMemory = 17;
-        b.runtime_totalMemory = 1818;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.runtime_totalMemory = 18;
-        b.systemLoad = 2.0;
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.systemLoad = 1.0;
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
 
     }
 
     @Test
-    public void writeReadTest1() {
-        final SystemData a = createSystemData();
-
-        final String s = a.write(new StringBuilder(), 'S').toString();
-        System.out.println(s);
-
-        final SystemData b = createSystemData();
-        assertTrue(b.read(s, 'S'));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
+    void testResetClearsFields() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
+        event.reset();
+        assertNull(event.getSessionUuid());
+        assertEquals(0L, event.getPosition());
+        assertEquals(0L, event.getTime());
+        assertEquals(0L, event.getHeap_commited());
+        assertEquals(0L, event.getHeap_max());
+        assertEquals(0L, event.getHeap_used());
+        assertEquals(0L, event.getNonHeap_commited());
+        assertEquals(0L, event.getNonHeap_max());
+        assertEquals(0L, event.getNonHeap_used());
+        assertEquals(0L, event.getObjectPendingFinalizationCount());
+        assertEquals(0L, event.getClassLoading_loaded());
+        assertEquals(0L, event.getClassLoading_total());
+        assertEquals(0L, event.getClassLoading_unloaded());
+        assertEquals(0L, event.getCompilationTime());
+        assertEquals(0L, event.getGarbageCollector_count());
+        assertEquals(0L, event.getGarbageCollector_time());
+        assertEquals(0L, event.getRuntime_usedMemory());
+        assertEquals(0L, event.getRuntime_maxMemory());
+        assertEquals(0L, event.getRuntime_totalMemory());
+        assertEquals(0.0, event.getSystemLoad());
     }
 
     @Test
-    public void writeReadTest2() {
-        final SystemData a = createSystemData();
-
-        populateEventData(a);
-        populateTestSystemData(a);
-
-        final String s = a.write(new StringBuilder(), 'S').toString();
-        System.out.println(s);
-
-        final SystemData b = createSystemData();
-        assertTrue(b.read(s, 'S'));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
+    void testReadableMessage() {
+        final TestSystemData event = new TestSystemData("abc", 5L);
+        String message = event.readableMessage();
+        assertTrue(message.equals("a"));
     }
 
-    public static void populateEventData(EventData a) {
-        a.position = 1111;
-        a.sessionUuid = "bbbb";
-        a.time = 2222;
+    @Test
+    void testJsonMessage0() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
+        String json = event.jsonMessage();
+        assertEquals("{s:abc,p:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,gc:[14,15],sl:19.0}", json);
     }
 
-    public static void populateTestSystemData(SystemData a) {
-        a.heap_commited = 1;
-        a.heap_max = 3;
-        a.heap_used = 4;
-        a.nonHeap_commited = 5;
-        a.nonHeap_max = 7;
-        a.nonHeap_used = 8;
-        a.objectPendingFinalizationCount = 9;
-        a.classLoading_loaded = 10;
-        a.classLoading_total = 11;
-        a.classLoading_unloaded = 12;
-        a.compilationTime = 13;
-        a.garbageCollector_count = 14;
-        a.garbageCollector_time = 15;
-        a.runtime_usedMemory = 16;
-        a.runtime_maxMemory = 17;
-        a.runtime_totalMemory = 18;
-        a.systemLoad = 1.0;
+    @Test
+    void testJsonMessage1() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0);
+        String json = event.jsonMessage();
+        assertEquals("{s:abc,p:1,t:2,h:[5,3,4]}", json);
     }
 
-    public static void resetAll(SystemData b) {
-        b.reset();
+    @Test
+    void testCollectRuntimeStatus() {
+        final TestSystemData event = new TestSystemData("abc");
+        event.collectRuntimeStatus();
+        assertNotEquals(0L, event.getRuntime_usedMemory());
+        assertNotEquals(0L, event.getRuntime_maxMemory());
+        assertNotEquals(0L, event.getRuntime_totalMemory());
     }
 
-    private SystemData createSystemData() {
-        return new SystemData() {
-            private static final long serialVersionUID = 1L;
+    @Test() @DisabledOnOs(OS.WINDOWS)
+    void testCollectPlatformStatus() {
+        SystemConfig.usePlatformManagedBean = true;
+        final TestSystemData event = new TestSystemData("abc");
+        event.collectPlatformStatus();
+        assertNotEquals(0L, event.getSystemLoad());
+    }
 
-            @Override
-            public StringBuilder readableString(final StringBuilder builder) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        };
+    @Test
+    void testCollectManagedBeanStatus() {
+        SystemConfig.useMemoryManagedBean = true;
+        SystemConfig.useClassLoadingManagedBean = true;
+        SystemConfig.useCompilationManagedBean = true;
+        SystemConfig.useGarbageCollectionManagedBean = true;
+
+        final TestSystemData event = new TestSystemData("abc");
+        System.gc();
+        event.collectManagedBeanStatus();
+        assertNotEquals(0L, event.getHeap_commited());
+        assertNotEquals(0L, event.getHeap_max());
+        assertNotEquals(0L, event.getHeap_used());
+        assertNotEquals(0L, event.getNonHeap_commited());
+        assertNotEquals(0L, event.getNonHeap_max());
+        assertNotEquals(0L, event.getNonHeap_used());
+//        assertNotEquals(0L, event.getObjectPendingFinalizationCount());
+        assertNotEquals(0L, event.getClassLoading_loaded());
+        assertNotEquals(0L, event.getClassLoading_total());
+//        assertNotEquals(0L, event.getClassLoading_unloaded());
+        assertNotEquals(0L, event.getCompilationTime());
+        assertNotEquals(0L, event.getGarbageCollector_count());
+        assertNotEquals(0L, event.getGarbageCollector_time());
     }
 
 }

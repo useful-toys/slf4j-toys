@@ -42,4 +42,8 @@ public class Session {
      * The value is assigned once at application startup and remains constant during runtime.
      */
     public final String uuid = UUID.randomUUID().toString().replace("-", "");
+
+    public static String getSessionUuid() {
+        return uuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize);
+    }
 }

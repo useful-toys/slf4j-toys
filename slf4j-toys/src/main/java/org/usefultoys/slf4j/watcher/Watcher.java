@@ -43,9 +43,9 @@ public class Watcher extends WatcherData implements Runnable {
      * @param logger Logger that reports messages.
      */
     public Watcher(final Logger logger) {
-        super(Session.uuid);
-        this.messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
-        this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
+        super(Session.getSessionUuid());
+        messageLogger = org.slf4j.LoggerFactory.getLogger(String.format("%s%s%s", messagePrefix, logger.getName(), messageSuffix));
+        dataLogger = org.slf4j.LoggerFactory.getLogger(String.format("%s%s%s", dataPrefix, logger.getName(), dataSuffix));
     }
 
     @Override
@@ -64,8 +64,8 @@ public class Watcher extends WatcherData implements Runnable {
             collectManagedBeanStatus();
             messageLogger.info(Markers.MSG_WATCHER, readableMessage());
         }
-        if (messageLogger.isTraceEnabled()) {
-            dataLogger.trace(Markers.DATA_WATCHER, encodeAttributosAsString());
+        if (dataLogger != null && dataLogger.isTraceEnabled()) {
+            dataLogger.trace(Markers.DATA_WATCHER, jsonMessage());
         }
     }
 }

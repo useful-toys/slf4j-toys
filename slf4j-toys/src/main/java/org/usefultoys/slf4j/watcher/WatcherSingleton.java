@@ -55,7 +55,7 @@ public final class WatcherSingleton {
      * {@code slf4jtoys.watcher.name}, defaulting to {@code watcher}.
      */
     @SuppressWarnings("NonFinalStaticVariableUsedInClassInitialization")
-    final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(WatcherConfig.name));
+    public final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(WatcherConfig.name));
 
     /** Executor service for running the default watcher periodically. */
     ScheduledExecutorService defaultWatcherExecutor = null;
@@ -69,7 +69,7 @@ public final class WatcherSingleton {
      * Starts the executor that periodically invokes the default watcher to report system status. Intended for simple architectures. May not be suitable for
      * JavaEE environments that manage threads by itself.
      */
-    synchronized void startDefaultWatcherExecutor() {
+    public synchronized void startDefaultWatcherExecutor() {
         if (defaultWatcherExecutor == null) {
             defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
         }
@@ -86,9 +86,10 @@ public final class WatcherSingleton {
     /**
      * Stops the executor that periodically invokes the default watcher periodically.
      */
-    synchronized void stopDefaultWatcherExecutor() {
+    public synchronized void stopDefaultWatcherExecutor() {
         if (scheduledDefaultWatcher != null) {
             scheduledDefaultWatcher.cancel(true);
+            scheduledDefaultWatcher = null;
         }
         if (defaultWatcherExecutor != null) {
             defaultWatcherExecutor.shutdownNow();
@@ -100,7 +101,7 @@ public final class WatcherSingleton {
      * Starts the timer that periodically invokes the default watcher to report system status. Intended for simple architectures. May not be suitable for JavaEE
      * environments that manage threads by itself.
      */
-    synchronized void startDefaultWatcherTimer() {
+    public synchronized void startDefaultWatcherTimer() {
         if (defaultWatcherTimer == null) {
             defaultWatcherTimer = new Timer("Watcher");
         }
@@ -122,9 +123,10 @@ public final class WatcherSingleton {
     /**
      * Stops the timer that periodically invokes the default watcher periodically.
      */
-    synchronized void stopDefaultWatcherTimer() {
+    public synchronized void stopDefaultWatcherTimer() {
         if (defaultWatcherTimer != null) {
             defaultWatcherTimer.cancel();
+            defaultWatcherTimer = null;
         }
         if (defaultWatcherTask != null) {
             defaultWatcherTask = null;

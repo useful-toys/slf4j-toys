@@ -28,7 +28,6 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
 public class WatcherData extends SystemData {
 
     private static final long serialVersionUID = 1L;
-    public static final char DETAILED_MESSAGE_PREFIX = 'W';
 
     public WatcherData() {
     }
@@ -37,47 +36,47 @@ public class WatcherData extends SystemData {
         super(uuid);
     }
 
+    // For tests only
+    WatcherData(final String sessionUuid, final long position, final long time, final long heap_commited,
+                final long heap_max, final long heap_used,
+                final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
+                final long objectPendingFinalizationCount,
+                final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded,
+                final long compilationTime,
+                final long garbageCollector_count, final long garbageCollector_time,
+                final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory,
+                final double systemLoad) {
+        super(sessionUuid, position, time, heap_commited, heap_max, heap_used, nonHeap_commited, nonHeap_max, nonHeap_used,
+                objectPendingFinalizationCount, classLoading_loaded, classLoading_total, classLoading_unloaded, compilationTime,
+                garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory, runtime_totalMemory, systemLoad);
+    }
+
     @Override
-    public StringBuilder readableString(final StringBuilder builder) {
+    protected StringBuilder readableString(final StringBuilder builder) {
         boolean hasPrevious = false;
-        if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
-            builder.append("Memory: ");
-            builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
-            builder.append(' ');
-            builder.append(UnitFormatter.bytes(this.runtime_totalMemory));
-            builder.append(' ');
-            builder.append(UnitFormatter.bytes(this.runtime_maxMemory));
+        if (runtime_usedMemory > 0 || runtime_maxMemory > 0 || runtime_totalMemory > 0) {
+            builder.append(String.format("Memory: %s %s %s",
+                            UnitFormatter.bytes(runtime_usedMemory),
+                            UnitFormatter.bytes(runtime_totalMemory),
+                            UnitFormatter.bytes(runtime_maxMemory)));
             hasPrevious = true;
         }
-        if (this.systemLoad > 0) {
+        if (systemLoad > 0) {
             if (hasPrevious) {
                 builder.append("; ");
             }
             builder.append("System load: ");
-            builder.append(Math.round(this.systemLoad * 100));
+            builder.append(Math.round(systemLoad * 100));
             builder.append("%");
             hasPrevious = true;
         }
-        if (SessionConfig.uuidSize != 0 && this.sessionUuid != null) {
+        if (SessionConfig.uuidSize != 0 && sessionUuid != null) {
             if (hasPrevious) {
                 builder.append("; ");
             }
             builder.append("UUID: ");
-            builder.append(this.sessionUuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize));
+            builder.append(sessionUuid);
         }
         return builder;
     }
-
-    public final boolean decodeAttributesFromString(final String message) {
-        return this.read(message, DETAILED_MESSAGE_PREFIX);
-    }
-
-    public final String encodeAttributosAsString() {
-        return write(new StringBuilder(200), DETAILED_MESSAGE_PREFIX).toString();
-    }
-
-    public final String readableMessage() {
-        return readableString(new StringBuilder(200)).toString();
-    }
-
 }

@@ -15,19 +15,21 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.usefultoys.slf4j.SystemConfig;
 
 import java.io.IOException;
 import java.lang.management.*;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * Augments the {@link EventData} with status collected from the virtual
- * machine.
+ * Augments the {@link EventData} with status collected from the virtual machine.
  *
  * @author Daniel Felix Ferber
  */
-@SuppressWarnings("Since15")
 public abstract class SystemData extends EventData {
 
     private static final long serialVersionUID = 1L;
@@ -35,107 +37,101 @@ public abstract class SystemData extends EventData {
     protected SystemData() {
     }
 
-    protected SystemData(final String uuid) {
-        super(uuid);
+    protected SystemData(final String sessionUuid) {
+        super(sessionUuid);
     }
 
     protected SystemData(final String sessionUuid, final long position) {
         super(sessionUuid, position);
     }
 
+    protected SystemData(final String sessionUuid, final long position, final long time) {
+        super(sessionUuid, position, time);
+    }
+
+    // For tests only
+    protected SystemData(final String sessionUuid, final long position, final long time, final long heap_commited, final long heap_max,
+                         final long heap_used, final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
+                         final long objectPendingFinalizationCount, final long classLoading_loaded, final long classLoading_total,
+                         final long classLoading_unloaded, final long compilationTime, final long garbageCollector_count,
+                         final long garbageCollector_time, final long runtime_usedMemory, final long runtime_maxMemory,
+                         final long runtime_totalMemory, final double systemLoad) {
+        super(sessionUuid, position, time);
+        this.heap_commited = heap_commited;
+        this.heap_max = heap_max;
+        this.heap_used = heap_used;
+        this.nonHeap_commited = nonHeap_commited;
+        this.nonHeap_max = nonHeap_max;
+        this.nonHeap_used = nonHeap_used;
+        this.objectPendingFinalizationCount = objectPendingFinalizationCount;
+        this.classLoading_loaded = classLoading_loaded;
+        this.classLoading_total = classLoading_total;
+        this.classLoading_unloaded = classLoading_unloaded;
+        this.compilationTime = compilationTime;
+        this.garbageCollector_count = garbageCollector_count;
+        this.garbageCollector_time = garbageCollector_time;
+        this.runtime_usedMemory = runtime_usedMemory;
+        this.runtime_maxMemory = runtime_maxMemory;
+        this.runtime_totalMemory = runtime_totalMemory;
+        this.systemLoad = systemLoad;
+    }
+
+    @Getter
     protected long heap_commited = 0;
+    @Getter
     protected long heap_max = 0;
+    @Getter
     protected long heap_used = 0;
+    @Getter
     protected long nonHeap_commited = 0;
+    @Getter
     protected long nonHeap_max = 0;
+    @Getter
     protected long nonHeap_used = 0;
+    @Getter
     protected long objectPendingFinalizationCount = 0;
+    @Getter
     protected long classLoading_loaded = 0;
+    @Getter
     protected long classLoading_total = 0;
+    @Getter
     protected long classLoading_unloaded = 0;
+    @Getter
     protected long compilationTime = 0;
+    @Getter
     protected long garbageCollector_count = 0;
+    @Getter
     protected long garbageCollector_time = 0;
+    @Getter
     protected long runtime_usedMemory = 0;
+    @Getter
     protected long runtime_maxMemory = 0;
+    @Getter
     protected long runtime_totalMemory = 0;
+    @Getter
     protected double systemLoad = 0.0;
 
     @Override
     protected void resetImpl() {
-        this.heap_commited = 0;
-        this.heap_max = 0;
-        this.heap_used = 0;
-        this.nonHeap_commited = 0;
-        this.nonHeap_max = 0;
-        this.nonHeap_used = 0;
-        this.objectPendingFinalizationCount = 0;
-        this.classLoading_loaded = 0;
-        this.classLoading_total = 0;
-        this.classLoading_unloaded = 0;
-        this.compilationTime = 0;
-        this.garbageCollector_count = 0;
-        this.garbageCollector_time = 0;
-        this.runtime_usedMemory = 0;
-        this.runtime_maxMemory = 0;
-        this.runtime_totalMemory = 0;
-        this.systemLoad = 0;
+        super.resetImpl();
+        heap_commited = 0;
+        heap_max = 0;
+        heap_used = 0;
+        nonHeap_commited = 0;
+        nonHeap_max = 0;
+        nonHeap_used = 0;
+        objectPendingFinalizationCount = 0;
+        classLoading_loaded = 0;
+        classLoading_total = 0;
+        classLoading_unloaded = 0;
+        compilationTime = 0;
+        garbageCollector_count = 0;
+        garbageCollector_time = 0;
+        runtime_usedMemory = 0;
+        runtime_maxMemory = 0;
+        runtime_totalMemory = 0;
+        systemLoad = 0;
     }
-
-    @Override
-    protected boolean isCompletelyEqualsImpl(final EventData obj) {
-        final SystemData other = (SystemData) obj;
-        if (this.heap_commited != other.heap_commited) {
-            return false;
-        }
-        if (this.heap_max != other.heap_max) {
-            return false;
-        }
-        if (this.heap_used != other.heap_used) {
-            return false;
-        }
-        if (this.nonHeap_commited != other.nonHeap_commited) {
-            return false;
-        }
-        if (this.nonHeap_max != other.nonHeap_max) {
-            return false;
-        }
-        if (this.nonHeap_used != other.nonHeap_used) {
-            return false;
-        }
-        if (this.objectPendingFinalizationCount != other.objectPendingFinalizationCount) {
-            return false;
-        }
-        if (this.classLoading_loaded != other.classLoading_loaded) {
-            return false;
-        }
-        if (this.classLoading_total != other.classLoading_total) {
-            return false;
-        }
-        if (this.classLoading_unloaded != other.classLoading_unloaded) {
-            return false;
-        }
-        if (this.compilationTime != other.compilationTime) {
-            return false;
-        }
-        if (this.garbageCollector_count != other.garbageCollector_count) {
-            return false;
-        }
-        if (this.garbageCollector_time != other.garbageCollector_time) {
-            return false;
-        }
-        if (this.runtime_usedMemory != other.runtime_usedMemory) {
-            return false;
-        }
-        if (this.runtime_maxMemory != other.runtime_maxMemory) {
-            return false;
-        }
-        if (this.runtime_totalMemory != other.runtime_totalMemory) {
-            return false;
-        }
-        return Double.doubleToLongBits(this.systemLoad) == Double.doubleToLongBits(other.systemLoad);
-    }
-
 
     protected void collectRuntimeStatus() {
         final Runtime runtime = Runtime.getRuntime();
@@ -148,18 +144,24 @@ public abstract class SystemData extends EventData {
         if (!SystemConfig.usePlatformManagedBean) {
             return;
         }
-        if (SystemConfig.hasSunOperatingSystemMXBean) {
-            final com.sun.management.OperatingSystemMXBean os = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class);
-            final double systemLoadAverage = os.getSystemCpuLoad();
-            if (systemLoadAverage > 0) {
-                systemLoad = systemLoadAverage;
+
+        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+
+        if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
+            com.sun.management.OperatingSystemMXBean sunOsBean =
+                    (com.sun.management.OperatingSystemMXBean) osBean;
+            double cpuLoad = sunOsBean.getSystemCpuLoad();
+            if (cpuLoad >= 0) {
+                systemLoad = cpuLoad;
+                return; // Valor de alta precisão encontrado, não precisa do fallback.
             }
-        } else {
-            final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-            final double systemLoadAverage = os.getSystemLoadAverage();
-            if (systemLoadAverage > 0) {
-                systemLoad = systemLoadAverage;
-            }
+        }
+
+        // Fallback: load average normalizada pela quantidade de CPUs (se disponível)
+        double loadAverage = osBean.getSystemLoadAverage();
+        int availableProcessors = osBean.getAvailableProcessors();
+        if (loadAverage >= 0 && availableProcessors > 0) {
+            systemLoad = loadAverage / availableProcessors;
         }
     }
 
@@ -211,85 +213,46 @@ public abstract class SystemData extends EventData {
     public static final String PROP_SYSTEM_LOAD = "sl";
 
     @Override
-    protected void writePropertiesImpl(final EventWriter w) {
+    protected void writeJsonImpl(final StringBuilder sb) {
+        super.writeJsonImpl(sb);
         /* memory usage */
-        if (this.runtime_usedMemory > 0 || this.runtime_totalMemory > 0 || this.runtime_maxMemory > 0) {
-            w.property(PROP_MEMORY, this.runtime_usedMemory, this.runtime_totalMemory, this.runtime_maxMemory);
+        if (runtime_usedMemory > 0 || runtime_totalMemory > 0 || runtime_maxMemory > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_MEMORY, runtime_usedMemory, runtime_totalMemory, runtime_maxMemory));
         }
 
         /* heap usage */
-        if (this.heap_commited > 0 || this.heap_max > 0 || this.heap_used > 0) {
-            w.property(PROP_HEAP, this.heap_used, this.heap_commited, this.heap_max);
+        if (heap_commited > 0 || heap_max > 0 || heap_used > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_HEAP, heap_used, heap_commited, heap_max));
         }
 
         /* non heap usage */
-        if (this.nonHeap_commited > 0 || this.nonHeap_max > 0 || this.nonHeap_used > 0) {
-            w.property(PROP_NON_HEAP, this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
+        if (nonHeap_commited > 0 || nonHeap_max > 0 || nonHeap_used > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_NON_HEAP, nonHeap_used, nonHeap_commited, nonHeap_max));
         }
 
         /* objectPendingFinalizationCount */
-        if (this.objectPendingFinalizationCount > 0) {
-            w.property(PROP_FINALIZATION_COUNT, this.objectPendingFinalizationCount);
+        if (objectPendingFinalizationCount > 0) {
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_FINALIZATION_COUNT, objectPendingFinalizationCount));
         }
 
         /* class loading */
-        if (this.classLoading_loaded > 0 || this.classLoading_total > 0 || this.classLoading_unloaded > 0) {
-            w.property(PROP_CLASS_LOADING, this.classLoading_total, this.classLoading_loaded, this.classLoading_unloaded);
+        if (classLoading_loaded > 0 || classLoading_total > 0 || classLoading_unloaded > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_CLASS_LOADING, classLoading_total, classLoading_loaded, classLoading_unloaded));
         }
 
         /* compiler */
-        if (this.compilationTime > 0) {
-            w.property(PROP_COMPILATION_TIME, this.compilationTime);
+        if (compilationTime > 0) {
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_COMPILATION_TIME, compilationTime));
         }
 
         /* garbage collector. */
-        if (this.garbageCollector_count > 0 || this.garbageCollector_time > 0) {
-            w.property(PROP_GARBAGE_COLLECTOR, this.garbageCollector_count, this.garbageCollector_time);
+        if (garbageCollector_count > 0 || garbageCollector_time > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d]", PROP_GARBAGE_COLLECTOR, garbageCollector_count, garbageCollector_time));
         }
 
         /* system load */
-        if (this.systemLoad > 0) {
-            w.property(PROP_SYSTEM_LOAD, this.systemLoad);
+        if (systemLoad > 0) {
+            sb.append(String.format(Locale.US, ",%s:%.1f", PROP_SYSTEM_LOAD, systemLoad));
         }
-
-    }
-
-    @Override
-    protected boolean readPropertyImpl(final EventReader r, final String propertyName) throws IOException {
-        if (PROP_MEMORY.equals(propertyName)) {
-            this.runtime_usedMemory = r.readLong();
-            this.runtime_totalMemory = r.readLong();
-            this.runtime_maxMemory = r.readLong();
-            return true;
-        } else if (PROP_HEAP.equals(propertyName)) {
-            this.heap_used = r.readLong();
-            this.heap_commited = r.readLong();
-            this.heap_max = r.readLong();
-            return true;
-        } else if (PROP_NON_HEAP.equals(propertyName)) {
-            this.nonHeap_used = r.readLong();
-            this.nonHeap_commited = r.readLong();
-            this.nonHeap_max = r.readLong();
-            return true;
-        } else if (PROP_FINALIZATION_COUNT.equals(propertyName)) {
-            this.objectPendingFinalizationCount = r.readLong();
-            return true;
-        } else if (PROP_CLASS_LOADING.equals(propertyName)) {
-            this.classLoading_total = r.readLong();
-            this.classLoading_loaded = r.readLong();
-            this.classLoading_unloaded = r.readLong();
-            return true;
-        } else if (PROP_COMPILATION_TIME.equals(propertyName)) {
-            this.compilationTime = r.readLong();
-            return true;
-        } else if (PROP_GARBAGE_COLLECTOR.equals(propertyName)) {
-            this.garbageCollector_count = r.readLong();
-            this.garbageCollector_time = r.readLong();
-            return true;
-        } else if (PROP_SYSTEM_LOAD.equals(propertyName)) {
-            this.systemLoad = r.readDouble();
-            return true;
-        }
-        return false;
     }
 }

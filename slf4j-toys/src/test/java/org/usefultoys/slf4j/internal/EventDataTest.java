@@ -1,146 +1,107 @@
-/*
- * Copyright 2024 Daniel Felix Ferber
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.usefultoys.slf4j.internal;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-/**
- *
- * @author Daniel
- */
-public class EventDataTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    public EventDataTest() {
+class EventDataTest {
+
+    static class TestEventData extends EventData {
+        boolean resetCalled = false;
+
+        public TestEventData() {
+            super();
+        }
+
+        public TestEventData(String sessionUuid) {
+            super(sessionUuid);
+        }
+
+        public TestEventData(String sessionUuid, long position) {
+            super(sessionUuid, position);
+        }
+
+        public TestEventData(final String sessionUuid, final long position, final long time) {
+            super(sessionUuid, position, time);
+        }
+
+        @Override
+        protected StringBuilder readableString(StringBuilder sb) {
+            sb.append("a");
+            return sb;
+        }
+
+        @Override
+        protected void resetImpl() {
+            resetCalled = true;
+        }
     }
 
     @Test
-    public void isCompletelyEqualTest() {
-        final EventData a = createEventData();
-        final EventData b = createEventData();
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-
-        populateEventData(a);
-
-        populateEventData(b);
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-
-        b.position = 11;
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.position = 1;
-
-        b.sessionUuid = "uuiduuid";
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.sessionUuid = "uuid";
-
-        b.time = 22;
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.time = 2;
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
+    void testConstructorAndGetters0() {
+        final TestEventData event = new TestEventData();
+        assertNull(event.getSessionUuid());
+        assertEquals(0L, event.getPosition());
+        assertEquals(0L, event.getTime()); // time should be 0 before nextPosition
     }
 
     @Test
-    public void resetTest() {
-        final EventData a = createEventData();
-        final EventData b = createEventData();
-
-        populateEventData(b);
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.reset();
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
+    void testConstructorAndGetters1() {
+        final TestEventData event = new TestEventData("abc");
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(0L, event.getPosition());
+        assertEquals(0L, event.getTime());
     }
 
     @Test
-    public void writeReadTest1() {
-        final EventData a = createEventData();
-
-        final String s = a.write(new StringBuilder(), 'E').toString();
-        System.out.println(s);
-
-        final EventData b = createEventData();
-        b.read(s, 'E');
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
+    void testConstructorAndGetters2() {
+        final TestEventData event = new TestEventData("abc", 5L);
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(5L, event.getPosition());
+        assertEquals(0L, event.getTime());
     }
 
     @Test
-    public void writeReadTest2() {
-        final EventData a = createEventData();
-        populateEventData(a);
-
-        final String s = a.write(new StringBuilder(), 'E').toString();
-        System.out.println(s);
-
-        final EventData b = createEventData();
-        assertTrue(b.read(s, 'E'));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
+    void testConstructorAndGetters3() {
+        final TestEventData event = new TestEventData("abc", 5L, 10L);
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(5L, event.getPosition());
+        assertEquals(10L, event.getTime());
     }
 
-    public static void populateEventData(EventData a) {
-        a.position = 1;
-        a.sessionUuid = "uuid";
-        a.time = 2;
+    @Test
+    void testNextPositionUpdatesPositionAndTime() {
+        final TestEventData event = new TestEventData("abc", 5L);
+        long before = System.nanoTime();
+        event.nextPosition();
+        long after = System.nanoTime();
+
+        assertEquals(6L, event.getPosition());
+        assertTrue(event.getTime() >= before && event.getTime() <= after);
     }
 
-    private EventData createEventData() {
-        return new EventData() {
-            private static final long serialVersionUID = 1L;
+    @Test
+    void testResetClearsFields() {
+        final TestEventData event = new TestEventData("abc", 5L);
+        event.nextPosition(); // just to update time/position
+        event.reset();
+        assertNull(event.getSessionUuid());
+        assertEquals(0L, event.getPosition());
+        assertEquals(0L, event.getTime());
+        assertTrue(event.resetCalled);
+    }
 
-            @Override
-            public StringBuilder readableString(final StringBuilder builder) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
+    @Test
+    void testReadableMessage() {
+        final TestEventData event = new TestEventData("abc", 5L);
+        final String message = event.readableMessage();
+        assertTrue(message.equals("a"));
+    }
 
-            @Override
-            protected void writePropertiesImpl(final EventWriter w) {
-                // empty
-            }
-
-            @Override
-            protected boolean readPropertyImpl(final EventReader r, final String key) {
-                return false;
-            }
-
-            @Override
-            protected void resetImpl() {
-                // empty
-            }
-
-            @Override
-            protected boolean isCompletelyEqualsImpl(final EventData other) {
-                return true;
-            }
-        };
+    @Test
+    void testJsonMessage() {
+        final TestEventData event = new TestEventData("abc", 5L);
+        final String json = event.jsonMessage();
+        assertEquals("{s:abc,p:5,t:0}", json);
     }
 }

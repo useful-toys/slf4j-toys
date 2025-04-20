@@ -51,7 +51,7 @@ public class MeterConfig {
     public static final String PROP_PRINT_POSITION = "slf4jtoys.meter.print.position";
     public static final String PROP_PRINT_STATUS = "slf4jtoys.meter.print.status";
 
-    {
+    static {
         init();
     }
 
