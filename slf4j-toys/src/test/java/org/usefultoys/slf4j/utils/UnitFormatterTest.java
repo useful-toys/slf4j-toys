@@ -16,7 +16,6 @@
 package org.usefultoys.slf4j.utils;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -261,39 +260,53 @@ public class UnitFormatterTest {
         assertEquals(expected, UnitFormatter.iterations(value));
     }
 
-    @Test
-    public void testTimeUnit() {
-        assertEquals("0ns", UnitFormatter.nanoseconds(0));
-        assertEquals("1ns", UnitFormatter.nanoseconds(1));
-        assertEquals("999ns", UnitFormatter.nanoseconds(999));
-        assertEquals("1000ns", UnitFormatter.nanoseconds(1000));
-        assertEquals("1001ns", UnitFormatter.nanoseconds(1001));
-        assertEquals("1.1us", UnitFormatter.nanoseconds(1100));
-        assertEquals("1000.0ms", UnitFormatter.nanoseconds(1000000000L));
-        assertEquals("1.1s", UnitFormatter.nanoseconds(1100000000L));
-        assertEquals("60.0s", UnitFormatter.nanoseconds(60000000000L));
-        assertEquals("61.0s", UnitFormatter.nanoseconds(61000000000L));
-        assertEquals("1.1m", UnitFormatter.nanoseconds(66000000000L));
-        assertEquals("10.0m", UnitFormatter.nanoseconds(600000000000L));
-        assertEquals("60.0m", UnitFormatter.nanoseconds(3600000000000L));
-        assertEquals("1.2h", UnitFormatter.nanoseconds(4400000000000L));
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideTimeUnitTestCases() {
+        return Stream.of(
+            of(0L, "0ns"),
+            of(1L, "1ns"),
+            of(999L, "999ns"),
+            of(1000L, "1000ns"),
+            of(1001L, "1001ns"),
+            of(1100L, "1.1us"),
+            of(1000000000L, "1000.0ms"),
+            of(1100000000L, "1.1s"),
+            of(60000000000L, "60.0s"),
+            of(61000000000L, "61.0s"),
+            of(66000000000L, "1.1m"),
+            of(600000000000L, "10.0m"),
+            of(3600000000000L, "60.0m"),
+            of(4400000000000L, "1.2h")
+        );
     }
 
-    @Test
-    public void testDoubleTimeUnit() {
-        assertEquals("0ns", UnitFormatter.nanoseconds(0f));
-        assertEquals("1.0ns", UnitFormatter.nanoseconds(1f));
-        assertEquals("999.0ns", UnitFormatter.nanoseconds(999f));
-        assertEquals("1000.0ns", UnitFormatter.nanoseconds(1000f));
-        assertEquals("1001.0ns", UnitFormatter.nanoseconds(1001f));
-        assertEquals("1.1us", UnitFormatter.nanoseconds(1100f));
-        assertEquals("1000.0ms", UnitFormatter.nanoseconds(1000000000f));
-        assertEquals("1.1s", UnitFormatter.nanoseconds(1100000000f));
-        assertEquals("60.0s", UnitFormatter.nanoseconds(60000000000f));
-        assertEquals("61.0s", UnitFormatter.nanoseconds(61000000000f));
-        assertEquals("1.1m", UnitFormatter.nanoseconds(66000000000f));
-        assertEquals("10.0m", UnitFormatter.nanoseconds(600000000000f));
-        assertEquals("60.0m", UnitFormatter.nanoseconds(3600000000000f));
-        assertEquals("1.2h", UnitFormatter.nanoseconds(4400000000000f));
+    @ParameterizedTest
+    @MethodSource("provideTimeUnitTestCases")
+    public void testTimeUnit(long value, String expected) {
+        assertEquals(expected, UnitFormatter.nanoseconds(value));
+    }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideDoubleTimeUnitTestCases() {
+        return Stream.of(
+            of(0f, "0ns"),
+            of(1f, "1.0ns"),
+            of(999f, "999.0ns"),
+            of(1000f, "1000.0ns"),
+            of(1001f, "1001.0ns"),
+            of(1100f, "1.1us"),
+            of(1000000000f, "1000.0ms"),
+            of(1100000000f, "1.1s"),
+            of(60000000000f, "60.0s"),
+            of(61000000000f, "61.0s"),
+            of(66000000000f, "1.1m"),
+            of(600000000000f, "10.0m"),
+            of(3600000000000f, "60.0m"),
+            of(4400000000000f, "1.2h")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDoubleTimeUnitTestCases")
+    public void testDoubleTimeUnit(float value, String expected) {
+        assertEquals(expected, UnitFormatter.nanoseconds(value));
     }
 }
