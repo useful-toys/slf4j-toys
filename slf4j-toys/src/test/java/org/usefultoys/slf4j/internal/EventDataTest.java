@@ -28,56 +28,6 @@ public class EventDataTest {
     public EventDataTest() {
     }
 
-    @Test
-    public void isCompletelyEqualTest() {
-        final EventData a = createEventData();
-        final EventData b = createEventData();
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-
-        populateEventData(a);
-
-        populateEventData(b);
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-
-        b.position = 11;
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.position = 1;
-
-        b.sessionUuid = "uuiduuid";
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.sessionUuid = "uuid";
-
-        b.time = 22;
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-        b.time = 2;
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-    }
-
-    @Test
-    public void resetTest() {
-        final EventData a = createEventData();
-        final EventData b = createEventData();
-
-        populateEventData(b);
-
-        assertFalse(a.isCompletelyEqualsTo(b));
-        assertFalse(b.isCompletelyEqualsTo(a));
-
-        b.reset();
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-    }
-
     public static void populateEventData(EventData a) {
         a.position = 1;
         a.sessionUuid = "uuid";
@@ -101,11 +51,6 @@ public class EventDataTest {
                   @Override
             protected void resetImpl() {
                 // empty
-            }
-
-            @Override
-            protected boolean isCompletelyEqualsImpl(final EventData other) {
-                return true;
             }
         };
     }

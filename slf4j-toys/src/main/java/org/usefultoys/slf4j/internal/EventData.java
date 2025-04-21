@@ -84,46 +84,6 @@ public abstract class EventData implements Serializable {
         // no-op
     }
 
-    /**
-     * Indicates weather all properties are equal to the respective properties
-     * of the other instance given as argument. Used only in unit tests.
-     *
-     * @param other the other EventData instance been compared to.
-     * @return true if all properties are equal on the other instance, false
-     * otherwise.
-     */
-    public final boolean isCompletelyEqualsTo(final EventData other) {
-        if (other == null) {
-            throw new IllegalArgumentException("other == null");
-        }
-        if (position != other.position) {
-            return false;
-        }
-        if (sessionUuid == null) {
-            if (other.sessionUuid != null) {
-                return false;
-            }
-        } else if (!sessionUuid.equals(other.sessionUuid)) {
-            return false;
-        }
-        if (time != other.time) {
-            return false;
-        }
-        return isCompletelyEqualsImpl(other);
-    }
-
-    /**
-     * Subclasses shall provide an implementation that compares its specific
-     * properties to the respective properties of the other instance given as
-     * argument. This method is called once and shall compare all specific
-     * properties.
-     *
-     * @param other the other EventData instance been compared to.
-     * @return true if all specific properties are equal on the other instance,
-     * false otherwise.
-     */
-    protected abstract boolean isCompletelyEqualsImpl(EventData other);
-
     public static final String SESSION_UUID = "s";
     public static final String EVENT_POSITION = "#";
     public static final String EVENT_TIME = "t";

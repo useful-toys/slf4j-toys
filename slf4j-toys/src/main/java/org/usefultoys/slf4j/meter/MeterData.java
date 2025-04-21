@@ -252,57 +252,6 @@ public class MeterData extends SystemData {
     }
 
     @Override
-    protected boolean isCompletelyEqualsImpl(final EventData obj) {
-        final MeterData other = (MeterData) obj;
-        if ((this.description == null) ? (other.description != null) : !this.description.equals(other.description)) {
-            return false;
-        }
-        if ((this.category == null) ? (other.category != null) : !this.category.equals(other.category)) {
-            return false;
-        }
-        if ((this.operation == null) ? (other.operation != null) : !this.operation.equals(other.operation)) {
-            return false;
-        }
-        if ((this.parent == null) ? (other.parent != null) : !this.parent.equals(other.parent)) {
-            return false;
-        }
-        if ((this.okPath == null) ? (other.okPath != null) : !this.okPath.equals(other.okPath)) {
-            return false;
-        }
-        if ((this.rejectPath == null) ? (other.rejectPath != null) : !this.rejectPath.equals(other.rejectPath)) {
-            return false;
-        }
-        if (this.createTime != other.createTime) {
-            return false;
-        }
-        if (this.startTime != other.startTime) {
-            return false;
-        }
-        if (this.stopTime != other.stopTime) {
-            return false;
-        }
-        if (this.currentIteration != other.currentIteration) {
-            return false;
-        }
-        if (this.expectedIterations != other.expectedIterations) {
-            return false;
-        }
-        if ((this.failPath == null) ? (other.failPath != null) : !this.failPath.equals(other.failPath)) {
-            return false;
-        }
-        if ((this.failMessage == null) ? (other.failMessage != null) : !this.failMessage.equals(other.failMessage)) {
-            return false;
-        }
-        if (this.timeLimit != other.timeLimit) {
-            return false;
-        }
-        if (this.context != other.context && (this.context == null || !this.context.equals(other.context))) {
-            return false;
-        }
-        return super.isCompletelyEqualsImpl(obj);
-    }
-
-    @Override
     protected void collectRuntimeStatus() {
         super.collectRuntimeStatus();
     }

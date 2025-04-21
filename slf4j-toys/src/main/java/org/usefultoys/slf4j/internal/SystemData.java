@@ -134,62 +134,7 @@ public abstract class SystemData extends EventData {
         systemLoad = 0;
     }
 
-    @Override
-    protected boolean isCompletelyEqualsImpl(final EventData obj) {
-        final SystemData other = (SystemData) obj;
-        if (this.heap_commited != other.heap_commited) {
-            return false;
-        }
-        if (this.heap_max != other.heap_max) {
-            return false;
-        }
-        if (this.heap_used != other.heap_used) {
-            return false;
-        }
-        if (this.nonHeap_commited != other.nonHeap_commited) {
-            return false;
-        }
-        if (this.nonHeap_max != other.nonHeap_max) {
-            return false;
-        }
-        if (this.nonHeap_used != other.nonHeap_used) {
-            return false;
-        }
-        if (this.objectPendingFinalizationCount != other.objectPendingFinalizationCount) {
-            return false;
-        }
-        if (this.classLoading_loaded != other.classLoading_loaded) {
-            return false;
-        }
-        if (this.classLoading_total != other.classLoading_total) {
-            return false;
-        }
-        if (this.classLoading_unloaded != other.classLoading_unloaded) {
-            return false;
-        }
-        if (this.compilationTime != other.compilationTime) {
-            return false;
-        }
-        if (this.garbageCollector_count != other.garbageCollector_count) {
-            return false;
-        }
-        if (this.garbageCollector_time != other.garbageCollector_time) {
-            return false;
-        }
-        if (this.runtime_usedMemory != other.runtime_usedMemory) {
-            return false;
-        }
-        if (this.runtime_maxMemory != other.runtime_maxMemory) {
-            return false;
-        }
-        if (this.runtime_totalMemory != other.runtime_totalMemory) {
-            return false;
-        }
-        return Double.doubleToLongBits(this.systemLoad) == Double.doubleToLongBits(other.systemLoad);
-    }
-
-
-    protected void collectRuntimeStatus() {
+      protected void collectRuntimeStatus() {
         final Runtime runtime = Runtime.getRuntime();
         runtime_totalMemory = runtime.totalMemory();
         runtime_usedMemory = runtime_totalMemory - runtime.freeMemory();
