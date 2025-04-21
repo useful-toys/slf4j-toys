@@ -68,6 +68,15 @@ class LoggerOutputStreamTest {
     }
 
     @Test
+    void testWriteByte() throws IOException {
+        TestLoggerOutputStream stream = new TestLoggerOutputStream();
+        stream.write('H');
+        stream.close();
+        assertEquals("H", stream.extractString());
+        assertEquals("H", stream.getLoggedData());
+    }
+
+    @Test
     void testToString() throws IOException {
         TestLoggerOutputStream stream = new TestLoggerOutputStream();
         stream.write("Hello, World!".getBytes());
