@@ -18,6 +18,9 @@ package org.usefultoys.slf4j.internal;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Abstract class representing events collected by slf4j-toys.
@@ -83,8 +86,8 @@ public abstract class EventData implements Serializable {
         // no-op
     }
 
-    public static final String SESSION_UUID = "s";
-    public static final String EVENT_POSITION = "#";
+    public static final String SESSION_UUID = "_";
+    public static final String EVENT_POSITION = "$";
     public static final String EVENT_TIME = "t";
 
     /**
@@ -146,4 +149,48 @@ public abstract class EventData implements Serializable {
      * @param w The EventWriter that encodes the properties.
      */
     protected abstract void writePropertiesImpl(EventWriter w);
+
+
+    /**
+     * Writes a JSON encoded representation of the event into the supplied StringBuilder.
+     *
+     * @param sb            The StringBuilder that receives the encoded representation.
+     * @return The StringBuilder passed as argument to allow chained StringBuilder method calls.
+     */
+    protected final StringBuilder writeJson5(final StringBuilder sb) {
+        sb.append("{");
+        sb.append(String.format(Locale.US, "%s:%s,%s:%d,%s:%d", SESSION_UUID, this.sessionUuid, EVENT_POSITION, this.position, EVENT_TIME, this.time));
+        writeJson5Impl(sb);
+        sb.append("}");
+        return sb;
+    }
+
+    protected void writeJson5Impl(final StringBuilder sb) {
+        // no-op
+    }
+
+    protected final String jsonMessage5() {
+        return writeJson5(new StringBuilder(200)).toString();
+    }
+
+    private final static Pattern patternSession = Pattern.compile(SESSION_UUID+"\\s*:\\s*([^,}\\s]+)");
+    private final static Pattern patternPosition = Pattern.compile("\\"+EVENT_POSITION+"\\s*:\\s*([^,}\\s]+)");
+    private final static Pattern patternTime = Pattern.compile(EVENT_TIME+"\\s*:\\s*([^,}\\s]+)");
+
+    protected final void readJson5(final String json5) {
+        final Matcher matcherSession = patternSession.matcher(json5);
+        if (matcherSession.find()) {
+            sessionUuid = matcherSession.group(1);
+        }
+
+        final Matcher matcherPosition = patternPosition.matcher(json5);
+        if (matcherPosition.find()) {
+            position = Long.parseLong(matcherPosition.group(1));
+        }
+
+        final Matcher matcherTime = patternTime.matcher(json5);
+        if (matcherTime.find()) {
+            time = Long.parseLong(matcherTime.group(1));
+        }
+    }
 }

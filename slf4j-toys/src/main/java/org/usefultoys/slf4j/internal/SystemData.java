@@ -18,9 +18,9 @@ package org.usefultoys.slf4j.internal;
 import lombok.Getter;
 import org.usefultoys.slf4j.SystemConfig;
 
-import java.io.IOException;
 import java.lang.management.*;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Augments the {@link EventData} with status collected from the virtual machine.
@@ -255,6 +255,50 @@ public abstract class SystemData extends EventData {
         /* system load */
         if (this.systemLoad > 0) {
             w.property(PROP_SYSTEM_LOAD, this.systemLoad);
+        }
+    }
+
+    @Override
+    protected void writeJson5Impl(final StringBuilder sb) {
+        super.writeJson5Impl(sb);
+        /* memory usage */
+        if (runtime_usedMemory > 0 || runtime_totalMemory > 0 || runtime_maxMemory > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_MEMORY, runtime_usedMemory, runtime_totalMemory, runtime_maxMemory));
+        }
+
+        /* heap usage */
+        if (heap_commited > 0 || heap_max > 0 || heap_used > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_HEAP, heap_used, heap_commited, heap_max));
+        }
+
+        /* non heap usage */
+        if (nonHeap_commited > 0 || nonHeap_max > 0 || nonHeap_used > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_NON_HEAP, nonHeap_used, nonHeap_commited, nonHeap_max));
+        }
+
+        /* objectPendingFinalizationCount */
+        if (objectPendingFinalizationCount > 0) {
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_FINALIZATION_COUNT, objectPendingFinalizationCount));
+        }
+
+        /* class loading */
+        if (classLoading_loaded > 0 || classLoading_total > 0 || classLoading_unloaded > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_CLASS_LOADING, classLoading_total, classLoading_loaded, classLoading_unloaded));
+        }
+
+        /* compiler */
+        if (compilationTime > 0) {
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_COMPILATION_TIME, compilationTime));
+        }
+
+        /* garbage collector. */
+        if (garbageCollector_count > 0 || garbageCollector_time > 0) {
+            sb.append(String.format(Locale.US, ",%s:[%d,%d]", PROP_GARBAGE_COLLECTOR, garbageCollector_count, garbageCollector_time));
+        }
+
+        /* system load */
+        if (systemLoad > 0) {
+            sb.append(String.format(Locale.US, ",%s:%.1f", PROP_SYSTEM_LOAD, systemLoad));
         }
     }
 }

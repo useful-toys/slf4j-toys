@@ -15,10 +15,7 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -179,4 +176,17 @@ class SystemDataTest {
         assertNotEquals(0L, event.getGarbageCollector_time());
     }
 
+    @Test
+    void testJsonMessage0() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
+        String json = event.jsonMessage5();
+        assertEquals("{_:abc,$:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,gc:[14,15],sl:19.0}", json);
+    }
+
+    @Test
+    void testJsonMessage1() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0);
+        String json = event.jsonMessage5();
+        assertEquals("{_:abc,$:1,t:2,h:[5,3,4]}", json);
+    }
 }

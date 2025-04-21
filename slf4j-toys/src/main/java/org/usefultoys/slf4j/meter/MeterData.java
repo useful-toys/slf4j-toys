@@ -474,4 +474,71 @@ public class MeterData extends SystemData {
         result = 31 * result + (sessionUuid != null ? sessionUuid.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public void writeJson5Impl(final StringBuilder sb) {
+        super.writeJson5Impl(sb);
+        if (description != null) {
+            sb.append(String.format(",%s:%s", PROP_DESCRIPTION, description));
+        }
+        if (rejectPath != null) {
+            sb.append(String.format(",%s:%s",PROP_REJECT_ID, rejectPath));
+        }
+        if (okPath != null) {
+            sb.append(String.format(",%s:%s",PROP_PATH_ID, okPath));
+        }
+        if (failPath != null) {
+            sb.append(String.format(",%s:%s",PROP_FAIL_ID, failPath, failMessage != null ? failMessage : ""));
+        }
+        if (category != null) {
+            sb.append(String.format(",%s:%s",EVENT_CATEGORY, category));
+        }
+        if (operation != null) {
+            sb.append(String.format(",%s:%s",EVENT_NAME, operation));
+        }
+        if (parent != null) {
+            sb.append(String.format(",%s:%s",EVENT_PARENT, parent));
+        }
+
+        /* Create, start, stop time. */
+        if (createTime != 0) {
+            sb.append(String.format(",%s:%d",PROP_CREATE_TIME, createTime));
+        }
+        if (startTime != 0) {
+            sb.append(String.format(",%s:%d",PROP_START_TIME, startTime));
+        }
+        if (stopTime != 0) {
+            sb.append(String.format(",%s:%d",PROP_STOP_TIME, stopTime));
+        }
+        if (currentIteration != 0) {
+            sb.append(String.format(",%s:%d",PROP_ITERATION, currentIteration));
+        }
+        if (expectedIterations != 0) {
+            sb.append(String.format(",%s:%d",PROP_EXPECTED_ITERATION, expectedIterations));
+        }
+        if (timeLimit != 0) {
+            sb.append(String.format(",%s:%d",PROP_LIMIT_TIME, timeLimit));
+        }
+
+        /* Context */
+        if (context != null && !context.isEmpty()) {
+            sb.append(',');
+            sb.append(PROP_CONTEXT);
+            sb.append(":{");
+            boolean separatorNeeded = false;
+            for (final Entry<String, String> entry : context.entrySet()) {
+                if (separatorNeeded) {
+                    sb.append(',');
+                } else {
+                    separatorNeeded = true;
+                }
+                sb.append(entry.getKey());
+                sb.append(':');
+                if (entry.getValue() != null) {
+                    sb.append(entry.getValue());
+                }
+            }
+            sb.append('}');
+        }
+    }
 }

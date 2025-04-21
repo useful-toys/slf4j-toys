@@ -114,4 +114,20 @@ class EventDataTest {
         final String message = event.readableMessage();
         assertTrue(message.equals("a"));
     }
+
+    @Test
+    void testWriteJson5Message() {
+        final TestEventData event = new TestEventData("abc", 5L, 10L);
+        final String json = event.jsonMessage5();
+        assertEquals("{_:abc,$:5,t:10}", json);
+    }
+
+    @Test
+    void testReadJson5Message() {
+        final TestEventData event = new TestEventData();
+        event.readJson5("{_:abc,$:5,t:10}");
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(5L, event.getPosition());
+        assertEquals(10L, event.getTime());
+    }
 }
