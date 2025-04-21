@@ -39,23 +39,35 @@ class ConfigParserTest {
     void testGetPropertyLong() {
         System.setProperty("test.property", "123456789");
         assertEquals(123456789L, ConfigParser.getProperty("test.property", 0L));
-        assertEquals(0L, ConfigParser.getProperty("nonexistent.property", 0L));
         System.setProperty("test.property", "invalid");
         assertEquals(0L, ConfigParser.getProperty("test.property", 0L));
+    }
+
+    @Test
+    void testGetPropertyLongNotFound() {
+        assertEquals(0L, ConfigParser.getProperty("nonexistent.property", 0L));
     }
 
     @Test
     void testGetMillisecondsProperty() {
         System.setProperty("test.property", "10");
         assertEquals(10L, ConfigParser.getMillisecondsProperty("test.property", 0L));
+        System.setProperty("test.property", "10ms");
+        assertEquals(10L, ConfigParser.getMillisecondsProperty("test.property", 0L));
         System.setProperty("test.property", "10s");
         assertEquals(10000L, ConfigParser.getMillisecondsProperty("test.property", 0L));
         System.setProperty("test.property", "5min");
+        assertEquals(300000L, ConfigParser.getMillisecondsProperty("test.property", 0L));
+        System.setProperty("test.property", "5m");
         assertEquals(300000L, ConfigParser.getMillisecondsProperty("test.property", 0L));
         System.setProperty("test.property", "1h");
         assertEquals(3600000L, ConfigParser.getMillisecondsProperty("test.property", 0L));
         System.setProperty("test.property", "invalid");
         assertEquals(0L, ConfigParser.getMillisecondsProperty("test.property", 0L));
+    }
+
+    @Test
+    void testGetMillisecondsPropertyNotFound() {
         assertEquals(0L, ConfigParser.getMillisecondsProperty("nonexistent.property", 0L));
     }
 }
