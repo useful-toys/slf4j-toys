@@ -15,6 +15,8 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import lombok.Getter;
+
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -29,21 +31,24 @@ public abstract class EventData implements Serializable {
     /**
      * Session UUID of JVM where this event data was collected.
      */
+    @Getter
     protected String sessionUuid = null;
     /**
      * Time ordered position for multiple occurrences of the same event.
      */
+    @Getter
     protected long position = 0;
     /**
      * Timestamp when the event data was collected.
      */
+    @Getter
     protected long time = 0;
 
     protected EventData() {
     }
 
-    protected EventData(final String uuid) {
-        this.sessionUuid = uuid;
+    protected EventData(final String sessionUuid) {
+        this.sessionUuid = sessionUuid;
         this.position = 0;
     }
 
@@ -52,31 +57,11 @@ public abstract class EventData implements Serializable {
         this.position = position;
     }
 
+    // For tests
     protected EventData(final String sessionUuid, final long position, final long time) {
         this.sessionUuid = sessionUuid;
         this.position = position;
         this.time = time;
-    }
-
-    /**
-     * @return Session UUID of JVM where this event data was collected.
-     */
-    public String getSessionUuid() {
-        return sessionUuid;
-    }
-
-    /**
-     * @return Time ordered position for multiple occurrences of the same event.
-     */
-    public long getPosition() {
-        return position;
-    }
-
-    /**
-     * @return Timestamp when the event data was collected.
-     */
-    public long getTime() {
-        return time;
     }
 
     /**
@@ -95,7 +80,9 @@ public abstract class EventData implements Serializable {
      * properties to their constructor initial value. This method is called once
      * and shall compare all specific properties.
      */
-    protected abstract void resetImpl();
+    protected void resetImpl() {
+        // no-op
+    }
 
     /**
      * Indicates weather all properties are equal to the respective properties

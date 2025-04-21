@@ -37,6 +37,27 @@ public class WatcherData extends SystemData {
         super(uuid);
     }
 
+    public WatcherData(final String sessionUuid, final long position) {
+        super(sessionUuid, position);
+    }
+
+    public WatcherData(final String sessionUuid, final long position, final long time) {
+        super(sessionUuid, position, time);
+    }
+
+    public WatcherData(final String sessionUuid, final long position, final long time,
+                       final long heap_commited, final long heap_max, final long heap_used,
+                       final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
+                       final long objectPendingFinalizationCount,
+                       final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded,
+                       final long compilationTime, final long garbageCollector_count, final long garbageCollector_time,
+                       final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory,
+                       final double systemLoad) {
+        super(sessionUuid, position, time, heap_commited, heap_max, heap_used, nonHeap_commited, nonHeap_max, nonHeap_used,
+                objectPendingFinalizationCount, classLoading_loaded, classLoading_total, classLoading_unloaded, compilationTime,
+                garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory, runtime_totalMemory, systemLoad);
+    }
+
     @Override
     public StringBuilder readableString(final StringBuilder builder) {
         boolean hasPrevious = false;

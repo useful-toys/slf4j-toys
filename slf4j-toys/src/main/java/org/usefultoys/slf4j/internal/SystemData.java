@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import lombok.Getter;
 import org.usefultoys.slf4j.SystemConfig;
 
 import java.io.IOException;
@@ -42,43 +43,95 @@ public abstract class SystemData extends EventData {
         super(sessionUuid, position);
     }
 
+    // For tests
+    protected SystemData(final String sessionUuid, final long position, final long time) {
+        super(sessionUuid, position, time);
+    }
+
+    // For tests
+    protected SystemData(final String sessionUuid, final long position, final long time,
+                         final long heap_commited, final long heap_max, final long heap_used,
+                         final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
+                         final long objectPendingFinalizationCount,
+                         final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded,
+                         final long compilationTime, final long garbageCollector_count, final long garbageCollector_time,
+                         final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory,
+                         final double systemLoad) {
+        super(sessionUuid, position, time);
+        this.heap_commited = heap_commited;
+        this.heap_max = heap_max;
+        this.heap_used = heap_used;
+        this.nonHeap_commited = nonHeap_commited;
+        this.nonHeap_max = nonHeap_max;
+        this.nonHeap_used = nonHeap_used;
+        this.objectPendingFinalizationCount = objectPendingFinalizationCount;
+        this.classLoading_loaded = classLoading_loaded;
+        this.classLoading_total = classLoading_total;
+        this.classLoading_unloaded = classLoading_unloaded;
+        this.compilationTime = compilationTime;
+        this.garbageCollector_count = garbageCollector_count;
+        this.garbageCollector_time = garbageCollector_time;
+        this.runtime_usedMemory = runtime_usedMemory;
+        this.runtime_maxMemory = runtime_maxMemory;
+        this.runtime_totalMemory = runtime_totalMemory;
+        this.systemLoad = systemLoad;
+    }
+
+    @Getter
     protected long heap_commited = 0;
+    @Getter
     protected long heap_max = 0;
+    @Getter
     protected long heap_used = 0;
+    @Getter
     protected long nonHeap_commited = 0;
+    @Getter
     protected long nonHeap_max = 0;
+    @Getter
     protected long nonHeap_used = 0;
+    @Getter
     protected long objectPendingFinalizationCount = 0;
+    @Getter
     protected long classLoading_loaded = 0;
+    @Getter
     protected long classLoading_total = 0;
+    @Getter
     protected long classLoading_unloaded = 0;
+    @Getter
     protected long compilationTime = 0;
+    @Getter
     protected long garbageCollector_count = 0;
+    @Getter
     protected long garbageCollector_time = 0;
+    @Getter
     protected long runtime_usedMemory = 0;
+    @Getter
     protected long runtime_maxMemory = 0;
+    @Getter
     protected long runtime_totalMemory = 0;
+    @Getter
     protected double systemLoad = 0.0;
 
     @Override
     protected void resetImpl() {
-        this.heap_commited = 0;
-        this.heap_max = 0;
-        this.heap_used = 0;
-        this.nonHeap_commited = 0;
-        this.nonHeap_max = 0;
-        this.nonHeap_used = 0;
-        this.objectPendingFinalizationCount = 0;
-        this.classLoading_loaded = 0;
-        this.classLoading_total = 0;
-        this.classLoading_unloaded = 0;
-        this.compilationTime = 0;
-        this.garbageCollector_count = 0;
-        this.garbageCollector_time = 0;
-        this.runtime_usedMemory = 0;
-        this.runtime_maxMemory = 0;
-        this.runtime_totalMemory = 0;
-        this.systemLoad = 0;
+        super.resetImpl();
+        heap_commited = 0;
+        heap_max = 0;
+        heap_used = 0;
+        nonHeap_commited = 0;
+        nonHeap_max = 0;
+        nonHeap_used = 0;
+        objectPendingFinalizationCount = 0;
+        classLoading_loaded = 0;
+        classLoading_total = 0;
+        classLoading_unloaded = 0;
+        compilationTime = 0;
+        garbageCollector_count = 0;
+        garbageCollector_time = 0;
+        runtime_usedMemory = 0;
+        runtime_maxMemory = 0;
+        runtime_totalMemory = 0;
+        systemLoad = 0;
     }
 
     @Override

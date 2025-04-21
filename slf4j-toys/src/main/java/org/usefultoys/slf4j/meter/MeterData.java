@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.Getter;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.internal.EventData;
 import org.usefultoys.slf4j.internal.EventReader;
@@ -40,6 +41,10 @@ public class MeterData extends SystemData {
     public MeterData() {
     }
 
+    public MeterData(final String uuid) {
+        super(uuid);
+    }
+
     protected MeterData(final String uuid, final long position, final String category, final String operation, final String parent) {
         super(uuid, position);
         this.category = category;
@@ -48,64 +53,97 @@ public class MeterData extends SystemData {
         this.createTime = System.nanoTime();
     }
 
+    public MeterData(final String sessionUuid, final long position, final long time, final long heap_commited, final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded, final long compilationTime, final long garbageCollector_count, final long garbageCollector_time, final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory, final double systemLoad, final String category, final String operation, final String parent, final String description, final long createTime, final long startTime, final long stopTime, final long timeLimit, final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage, final Map<String, String> context) {
+        super(sessionUuid, position, time, heap_commited, heap_max, heap_used, nonHeap_commited, nonHeap_max, nonHeap_used, objectPendingFinalizationCount, classLoading_loaded, classLoading_total, classLoading_unloaded, compilationTime, garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory, runtime_totalMemory, systemLoad);
+        this.category = category;
+        this.operation = operation;
+        this.parent = parent;
+        this.description = description;
+        this.createTime = createTime;
+        this.startTime = startTime;
+        this.stopTime = stopTime;
+        this.timeLimit = timeLimit;
+        this.currentIteration = currentIteration;
+        this.expectedIterations = expectedIterations;
+        this.okPath = okPath;
+        this.rejectPath = rejectPath;
+        this.failPath = failPath;
+        this.failMessage = failMessage;
+        this.context = context;
+    }
+
     /**
      * Name of the category that the operation being measured belongs to. By default, it is the last name of the logger.
      */
+    @Getter
     protected String category = null;
     /**
      * Name of the operation. May be null if the category already describes the operation itself.
      */
+    @Getter
     protected String operation = null;
     /**
      * If the Meter was created as a child for another Meter, references category name, operation name and position of these other Meter. Null otherwise.
      */
+    @Getter
     protected String parent = null;
     /**
      * An arbitrary short, human readable message to describe the operation being measured.
      */
+    @Getter
     protected String description = null;
     /**
      * Timestamp when the operation was created/scheduled (nanoseconds).
      */
+    @Getter
     protected long createTime = 0;
     /**
      * Timestamp when the operation started execution (nanoseconds). Zero if the operation has not yet started.
      */
+    @Getter
     protected long startTime = 0;
     /**
      * Timestamp when the operation finished execution (either success, rejection or failure) (nanoseconds). Zero if the operation has not yet finished.
      */
+    @Getter
     protected long stopTime = 0;
     /**
      * Time limit considered reasonable for successful execution of the operation (nanoseconds). Zero if there is no time limit for the operation.
      */
+    @Getter
     protected long timeLimit = 0;
     /**
      * How many iterations were run by the operation. Zero if no iteration has yet run.
      */
+    @Getter
     protected long currentIteration = 0;
     /**
      * How many iterations were expected by the operation. Zero if no iterations were expected.
      */
+    @Getter
     protected long expectedIterations = 0;
     /**
      * For successful execution, the string that identifies the execution path. Mutually exclusive with {@link #rejectPath} and {@link #failPath}. Set only when
      * operation finishes with success and a path was given.
      */
+    @Getter
     protected String okPath = null;
     /**
      * For rejected execution, the string that identifies the rejection cause. Mutually exclusive with {@link #okPath} and {@link #failPath}. Set only when
      * operation finishes with rejection.
      */
+    @Getter
     protected String rejectPath = null;
     /**
      * For failed execution, the string that identifies the failure caused. Usually, the class name of the exception that describes the failure. Mutually
      * exclusive with {@link #okPath} and {@link #rejectPath}. Set only when operation finishes with failure.
      */
+    @Getter
     protected String failPath = null;
     /**
      * For failed execution, an optional message that caused the failure. Usually, the message of the exception. Only set in conjuction with {@link #failPath}.
      */
+    @Getter
     protected String failMessage = null;
 
     /**
@@ -118,58 +156,6 @@ public class MeterData extends SystemData {
             return category + '/' + position;
         }
         return category + '/' + operation + '#' + position;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getOperation() {
-        return operation;
-    }
-
-    public String getParent() {
-        return parent;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getOkPath() {
-        return okPath;
-    }
-
-    public String getRejectPath() {
-        return rejectPath;
-    }
-
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public long getStopTime() {
-        return stopTime;
-    }
-
-    public long getCurrentIteration() {
-        return currentIteration;
-    }
-
-    public long getExpectedIterations() {
-        return expectedIterations;
-    }
-
-    public String getFailPath() {
-        return failPath;
-    }
-
-    public String getFailMessage() {
-        return failMessage;
     }
 
     public boolean isStarted() {
@@ -190,10 +176,6 @@ public class MeterData extends SystemData {
 
     public boolean isFail() {
         return (stopTime != 0) && (failPath != null);
-    }
-
-    public long getTimeLimit() {
-        return timeLimit;
     }
 
     public Map<String, String> getContext() {
