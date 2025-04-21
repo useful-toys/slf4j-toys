@@ -23,7 +23,6 @@ import static org.usefultoys.slf4j.internal.SyntaxDefinition.*;
 
 /**
  * Provides methods that implement recurrent serialization patterns.
- * These patterns are recognized by {@link EventReader}.
  * <p>
  * To ease serialization of one event and to reduce the amount of parameters,
  * EventWrite keeps state of the serialization of the event. For sake of
