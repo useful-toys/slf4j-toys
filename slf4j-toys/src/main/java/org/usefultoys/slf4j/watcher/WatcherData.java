@@ -88,8 +88,4 @@ public class WatcherData extends SystemData {
         }
         return builder;
     }
-
-    public final String encodedMessage() {
-        return encodedStringBuilder(new StringBuilder(200), DETAILED_MESSAGE_PREFIX).toString();
-    }
 }

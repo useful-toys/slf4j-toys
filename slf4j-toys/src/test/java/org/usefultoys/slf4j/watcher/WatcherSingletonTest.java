@@ -49,7 +49,10 @@ class WatcherSingletonTest {
 
         assertTrue(testLogger.getEventCount() > 0);
         assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
-        assertTrue(testLogger.getEvent(1).getFormattedMessage().contains("W{"));
+        final String json5 = testLogger.getEvent(1).getMessage();
+        final WatcherData data = new WatcherData();
+        data.readJson5(json5);
+        assertEquals(json5, data.json5Message());
     }
 
     @Test
@@ -66,7 +69,10 @@ class WatcherSingletonTest {
 
         assertTrue(testLogger.getEventCount() > 0);
         assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
-        assertTrue(testLogger.getEvent(1).getFormattedMessage().contains("W{"));
+        final String json5 = testLogger.getEvent(1).getMessage();
+        final WatcherData data = new WatcherData();
+        data.readJson5(json5);
+        assertEquals(json5, data.json5Message());
     }
 
     @Test

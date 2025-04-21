@@ -105,53 +105,6 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Writes an encoded string representation of the event into the supplied
-     * StringBuilder.
-     *
-     * @param sb            The StringBuilder that receives the encoded representation.
-     * @param messagePrefix A prefix character used by an parser to recognize
-     *                      the encoded message.
-     * @return The StringBuilder passed as argument to allow chained
-     * StringBuilder method calls.
-     */
-    public final StringBuilder encodedStringBuilder(final StringBuilder sb, final char messagePrefix) {
-        final EventWriter w = new EventWriter(sb);
-        w.open(messagePrefix);
-        writeKeyProperties(w);
-        writePropertiesImpl(w);
-        w.close();
-        return sb;
-    }
-
-    public abstract String encodedMessage();
-
-    private void writeKeyProperties(final EventWriter w) {
-        /* Session UUID */
-        if (this.sessionUuid != null) {
-            w.property(SESSION_UUID, this.sessionUuid);
-        }
-        /* Event position */
-        if (this.position > 0) {
-            w.property(EVENT_POSITION, this.position);
-        }
-
-        /* Event time */
-        if (this.time > 0) {
-            w.property(EVENT_TIME, this.time);
-        }
-    }
-
-    /**
-     * Subclasses shall provide an implementation that appends its specific
-     * properties to the encoded string representation. This method is called
-     * once and shall append all specific properties using the EventWriter.
-     *
-     * @param w The EventWriter that encodes the properties.
-     */
-    protected abstract void writePropertiesImpl(EventWriter w);
-
-
-    /**
      * Writes a JSON encoded representation of the event into the supplied StringBuilder.
      *
      * @param sb            The StringBuilder that receives the encoded representation.
@@ -169,7 +122,7 @@ public abstract class EventData implements Serializable {
         // no-op
     }
 
-    protected final String json5Message() {
+    public final String json5Message() {
         return writeJson5(new StringBuilder(200)).toString();
     }
 
@@ -177,7 +130,7 @@ public abstract class EventData implements Serializable {
     private final static Pattern patternPosition = Pattern.compile("\\"+EVENT_POSITION+"\\s*:\\s*([^,}\\s]+)");
     private final static Pattern patternTime = Pattern.compile(EVENT_TIME+"\\s*:\\s*([^,}\\s]+)");
 
-    protected void readJson5(final String json5) {
+    public void readJson5(final String json5) {
         final Matcher matcherSession = patternSession.matcher(json5);
         if (matcherSession.find()) {
             sessionUuid = matcherSession.group(1);
@@ -192,5 +145,9 @@ public abstract class EventData implements Serializable {
         if (matcherTime.find()) {
             time = Long.parseLong(matcherTime.group(1));
         }
+    }
+
+    public final String encodedMessage() {
+        return json5Message();
     }
 }

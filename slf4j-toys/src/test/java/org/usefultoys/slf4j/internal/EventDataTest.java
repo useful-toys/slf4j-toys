@@ -54,16 +54,6 @@ class EventDataTest {
         protected void resetImpl() {
             resetCalled = true;
         }
-
-        @Override
-        public String encodedMessage() {
-            return "";
-        }
-
-        @Override
-        protected void writePropertiesImpl(final EventWriter w) {
-            // no-op
-        }
     }
 
     @Test

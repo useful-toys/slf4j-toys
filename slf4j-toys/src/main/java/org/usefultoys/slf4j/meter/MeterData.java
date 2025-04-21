@@ -395,63 +395,6 @@ public class MeterData extends SystemData {
     public static final String EVENT_PARENT = "ep";
 
     @Override
-    public void writePropertiesImpl(final EventWriter w) {
-        if (this.description != null) {
-            w.property(PROP_DESCRIPTION, this.description);
-        }
-        if (this.rejectPath != null) {
-            w.property(PROP_REJECT_ID, this.rejectPath);
-        }
-        if (this.okPath != null) {
-            w.property(PROP_PATH_ID, this.okPath);
-        }
-        if (this.failPath != null) {
-            w.property(PROP_FAIL_ID, this.failPath, this.failMessage != null ? this.failMessage : "");
-        }
-        if (this.category != null) {
-            w.property(EVENT_CATEGORY, this.category);
-        }
-        if (this.operation != null) {
-            w.property(EVENT_NAME, this.operation);
-        }
-        if (this.parent != null) {
-            w.property(EVENT_PARENT, this.parent);
-        }
-
-        /* Create, start, stop time. */
-        if (this.createTime != 0) {
-            w.property(PROP_CREATE_TIME, this.createTime);
-        }
-        if (this.startTime != 0) {
-            w.property(PROP_START_TIME, this.startTime);
-        }
-        if (this.stopTime != 0) {
-            w.property(PROP_STOP_TIME, this.stopTime);
-        }
-        if (this.currentIteration != 0) {
-            w.property(PROP_ITERATION, this.currentIteration);
-        }
-        if (this.expectedIterations != 0) {
-            w.property(PROP_EXPECTED_ITERATION, this.expectedIterations);
-        }
-        if (this.timeLimit != 0) {
-            w.property(PROP_LIMIT_TIME, timeLimit);
-        }
-
-        /* Context */
-        if (this.context != null && !this.context.isEmpty()) {
-            w.property(PROP_CONTEXT, this.context);
-        }
-
-        super.writePropertiesImpl(w);
-    }
-
-    @Override
-    public final String encodedMessage() {
-        return encodedStringBuilder(new StringBuilder(200), DETAILED_MESSAGE_PREFIX).toString();
-    }
-
-    @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

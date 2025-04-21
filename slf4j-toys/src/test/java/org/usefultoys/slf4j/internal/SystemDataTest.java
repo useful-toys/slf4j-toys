@@ -59,11 +59,6 @@ class SystemDataTest {
             sb.append("a");
             return sb;
         }
-
-        @Override
-        public String encodedMessage() {
-            return "";
-        }
     }
 
     @AfterEach
@@ -230,16 +225,6 @@ class SystemDataTest {
             @Override
             protected StringBuilder readableStringBuilder(StringBuilder sb) {
                 return sb;
-            }
-
-            @Override
-            protected void writePropertiesImpl(EventWriter w) {
-                // no-op
-            }
-
-            @Override
-            public String encodedMessage() {
-                return "";
             }
         };
 

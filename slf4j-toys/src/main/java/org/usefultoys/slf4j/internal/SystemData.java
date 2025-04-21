@@ -217,50 +217,6 @@ public abstract class SystemData extends EventData {
     public static final String PROP_GARBAGE_COLLECTOR = "gc";
     public static final String PROP_SYSTEM_LOAD = "sl";
 
-
-    @Override
-    protected void writePropertiesImpl(final EventWriter w) {
-        /* memory usage */
-        if (this.runtime_usedMemory > 0 || this.runtime_totalMemory > 0 || this.runtime_maxMemory > 0) {
-            w.property(PROP_MEMORY, this.runtime_usedMemory, this.runtime_totalMemory, this.runtime_maxMemory);
-        }
-
-        /* heap usage */
-        if (this.heap_commited > 0 || this.heap_max > 0 || this.heap_used > 0) {
-            w.property(PROP_HEAP, this.heap_used, this.heap_commited, this.heap_max);
-        }
-
-        /* non heap usage */
-        if (this.nonHeap_commited > 0 || this.nonHeap_max > 0 || this.nonHeap_used > 0) {
-            w.property(PROP_NON_HEAP, this.nonHeap_used, this.nonHeap_commited, this.nonHeap_max);
-        }
-
-        /* objectPendingFinalizationCount */
-        if (this.objectPendingFinalizationCount > 0) {
-            w.property(PROP_FINALIZATION_COUNT, this.objectPendingFinalizationCount);
-        }
-
-        /* class loading */
-        if (this.classLoading_loaded > 0 || this.classLoading_total > 0 || this.classLoading_unloaded > 0) {
-            w.property(PROP_CLASS_LOADING, this.classLoading_total, this.classLoading_loaded, this.classLoading_unloaded);
-        }
-
-        /* compiler */
-        if (this.compilationTime > 0) {
-            w.property(PROP_COMPILATION_TIME, this.compilationTime);
-        }
-
-        /* garbage collector. */
-        if (this.garbageCollector_count > 0 || this.garbageCollector_time > 0) {
-            w.property(PROP_GARBAGE_COLLECTOR, this.garbageCollector_count, this.garbageCollector_time);
-        }
-
-        /* system load */
-        if (this.systemLoad > 0) {
-            w.property(PROP_SYSTEM_LOAD, this.systemLoad);
-        }
-    }
-
     @Override
     protected void writeJson5Impl(final StringBuilder sb) {
         super.writeJson5Impl(sb);
@@ -315,7 +271,7 @@ public abstract class SystemData extends EventData {
     private final static Pattern patternSystemLoad = Pattern.compile(PROP_SYSTEM_LOAD + "\\s*:\\s*([^,}\\s]+)");
 
     @Override
-    protected void readJson5(final String json5) {
+    public void readJson5(final String json5) {
         super.readJson5(json5);
 
         final Matcher matcherMemory = patternMemory.matcher(json5);
