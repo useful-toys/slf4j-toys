@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.internal;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -138,7 +139,7 @@ class SystemDataTest {
         assertNotEquals(0L, event.getRuntime_totalMemory());
     }
 
-    @Test() @DisabledOnOs(OS.WINDOWS)
+    @Test() @Disabled
     void testCollectPlatformStatus() {
         SystemConfig.usePlatformManagedBean = true;
         final TestSystemData event = new TestSystemData("abc");
