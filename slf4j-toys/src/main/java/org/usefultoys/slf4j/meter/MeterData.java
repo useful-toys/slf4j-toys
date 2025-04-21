@@ -17,7 +17,6 @@ package org.usefultoys.slf4j.meter;
 
 import lombok.Getter;
 import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.internal.EventWriter;
 import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
