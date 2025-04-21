@@ -78,35 +78,6 @@ public class EventDataTest {
         assertTrue(b.isCompletelyEqualsTo(a));
     }
 
-    @Test
-    public void writeReadTest1() {
-        final EventData a = createEventData();
-
-        final String s = a.write(new StringBuilder(), 'E').toString();
-        System.out.println(s);
-
-        final EventData b = createEventData();
-        b.read(s, 'E');
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-    }
-
-    @Test
-    public void writeReadTest2() {
-        final EventData a = createEventData();
-        populateEventData(a);
-
-        final String s = a.write(new StringBuilder(), 'E').toString();
-        System.out.println(s);
-
-        final EventData b = createEventData();
-        assertTrue(b.read(s, 'E'));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-    }
-
     public static void populateEventData(EventData a) {
         a.position = 1;
         a.sessionUuid = "uuid";
@@ -127,12 +98,7 @@ public class EventDataTest {
                 // empty
             }
 
-            @Override
-            protected boolean readPropertyImpl(final EventReader r, final String key) {
-                return false;
-            }
-
-            @Override
+                  @Override
             protected void resetImpl() {
                 // empty
             }

@@ -500,59 +500,6 @@ public class MeterData extends SystemData {
         super.writePropertiesImpl(w);
     }
 
-    @Override
-    protected boolean readPropertyImpl(final EventReader r, final String propertyName) throws IOException {
-        if (PROP_DESCRIPTION.equals(propertyName)) {
-            this.description = r.readString();
-            return true;
-        } else if (EVENT_CATEGORY.equals(propertyName)) {
-            this.category = r.readString();
-            return true;
-        } else if (EVENT_NAME.equals(propertyName)) {
-            this.operation = r.readString();
-            return true;
-        } else if (EVENT_PARENT.equals(propertyName)) {
-            this.parent = r.readString();
-            return true;
-        } else if (PROP_FAIL_ID.equals(propertyName)) {
-            this.failPath = r.readString();
-            this.failMessage = r.readString();
-            return true;
-        } else if (PROP_REJECT_ID.equals(propertyName)) {
-            this.rejectPath = r.readString();
-            return true;
-        } else if (PROP_PATH_ID.equals(propertyName)) {
-            this.okPath = r.readString();
-            return true;
-        } else if (PROP_CREATE_TIME.equals(propertyName)) {
-            this.createTime = r.readLong();
-            return true;
-        } else if (PROP_START_TIME.equals(propertyName)) {
-            this.startTime = r.readLong();
-            return true;
-        } else if (PROP_STOP_TIME.equals(propertyName)) {
-            this.stopTime = r.readLong();
-            return true;
-        } else if (PROP_ITERATION.equals(propertyName)) {
-            this.currentIteration = r.readLong();
-            return true;
-        } else if (PROP_EXPECTED_ITERATION.equals(propertyName)) {
-            this.expectedIterations = r.readLong();
-            return true;
-        } else if (PROP_LIMIT_TIME.equals(propertyName)) {
-            this.timeLimit = r.readLong();
-            return true;
-        } else if (PROP_CONTEXT.equals(propertyName)) {
-            this.context = r.readMap();
-            return true;
-        }
-        return super.readPropertyImpl(r, propertyName);
-    }
-
-    public final boolean read(final String message) {
-        return this.read(message, DETAILED_MESSAGE_PREFIX);
-    }
-
     public final String write() {
         return write(new StringBuilder(), DETAILED_MESSAGE_PREFIX).toString();
     }

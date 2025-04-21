@@ -171,38 +171,7 @@ public class SystemDataTest {
 
     }
 
-    @Test
-    public void writeReadTest1() {
-        final SystemData a = createSystemData();
-
-        final String s = a.write(new StringBuilder(), 'S').toString();
-        System.out.println(s);
-
-        final SystemData b = createSystemData();
-        assertTrue(b.read(s, 'S'));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-    }
-
-    @Test
-    public void writeReadTest2() {
-        final SystemData a = createSystemData();
-
-        populateEventData(a);
-        populateTestSystemData(a);
-
-        final String s = a.write(new StringBuilder(), 'S').toString();
-        System.out.println(s);
-
-        final SystemData b = createSystemData();
-        assertTrue(b.read(s, 'S'));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-    }
-
-    public static void populateEventData(EventData a) {
+       public static void populateEventData(EventData a) {
         a.position = 1111;
         a.sessionUuid = "bbbb";
         a.time = 2222;

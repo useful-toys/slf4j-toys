@@ -89,10 +89,6 @@ public class WatcherData extends SystemData {
         return builder;
     }
 
-    public final boolean decodeAttributesFromString(final String message) {
-        return this.read(message, DETAILED_MESSAGE_PREFIX);
-    }
-
     public final String encodeAttributosAsString() {
         return write(new StringBuilder(200), DETAILED_MESSAGE_PREFIX).toString();
     }

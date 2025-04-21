@@ -311,45 +311,5 @@ public abstract class SystemData extends EventData {
         if (this.systemLoad > 0) {
             w.property(PROP_SYSTEM_LOAD, this.systemLoad);
         }
-
-    }
-
-    @Override
-    protected boolean readPropertyImpl(final EventReader r, final String propertyName) throws IOException {
-        if (PROP_MEMORY.equals(propertyName)) {
-            this.runtime_usedMemory = r.readLong();
-            this.runtime_totalMemory = r.readLong();
-            this.runtime_maxMemory = r.readLong();
-            return true;
-        } else if (PROP_HEAP.equals(propertyName)) {
-            this.heap_used = r.readLong();
-            this.heap_commited = r.readLong();
-            this.heap_max = r.readLong();
-            return true;
-        } else if (PROP_NON_HEAP.equals(propertyName)) {
-            this.nonHeap_used = r.readLong();
-            this.nonHeap_commited = r.readLong();
-            this.nonHeap_max = r.readLong();
-            return true;
-        } else if (PROP_FINALIZATION_COUNT.equals(propertyName)) {
-            this.objectPendingFinalizationCount = r.readLong();
-            return true;
-        } else if (PROP_CLASS_LOADING.equals(propertyName)) {
-            this.classLoading_total = r.readLong();
-            this.classLoading_loaded = r.readLong();
-            this.classLoading_unloaded = r.readLong();
-            return true;
-        } else if (PROP_COMPILATION_TIME.equals(propertyName)) {
-            this.compilationTime = r.readLong();
-            return true;
-        } else if (PROP_GARBAGE_COLLECTOR.equals(propertyName)) {
-            this.garbageCollector_count = r.readLong();
-            this.garbageCollector_time = r.readLong();
-            return true;
-        } else if (PROP_SYSTEM_LOAD.equals(propertyName)) {
-            this.systemLoad = r.readDouble();
-            return true;
-        }
-        return false;
     }
 }

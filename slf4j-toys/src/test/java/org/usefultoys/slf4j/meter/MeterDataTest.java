@@ -189,38 +189,6 @@ public class MeterDataTest {
         assertTrue(a.hashCode() == b.hashCode());
     }
 
-    @Test
-    public void writeReadTest1() {
-        final MeterData a = createMeterData();
-
-        final String s = a.write(new StringBuilder(), 'M').toString();
-        System.out.println(s);
-
-        final MeterData b = createMeterData();
-        assertTrue(b.read(s));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-    }
-
-    @Test
-    public void writeReadTest2() {
-        final MeterData a = createMeterData();
-
-        SystemDataTest.populateEventData(a);
-        SystemDataTest.populateTestSystemData(a);
-
-        populateMeterData(a, "a", "b", "c", "d");
-
-        final String s = a.write(new StringBuilder(), 'M').toString();
-        System.out.println(s);
-
-        final MeterData b = createMeterData();
-        assertTrue(b.read(s));
-
-        assertTrue(a.isCompletelyEqualsTo(b));
-        assertTrue(b.isCompletelyEqualsTo(a));
-    }
 
     public static void populateMeterData(MeterData a, String e, String f, String g, String h) {
         a.description = "a";
