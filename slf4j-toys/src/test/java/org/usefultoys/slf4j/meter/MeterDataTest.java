@@ -95,7 +95,7 @@ public class MeterDataTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public StringBuilder readableString(final StringBuilder builder) {
+            public StringBuilder readableStringBuilder(final StringBuilder builder) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         };

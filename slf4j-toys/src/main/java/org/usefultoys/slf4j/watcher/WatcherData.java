@@ -59,7 +59,7 @@ public class WatcherData extends SystemData {
     }
 
     @Override
-    public StringBuilder readableString(final StringBuilder builder) {
+    public StringBuilder readableStringBuilder(final StringBuilder builder) {
         boolean hasPrevious = false;
         if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
             builder.append("Memory: ");
@@ -89,12 +89,7 @@ public class WatcherData extends SystemData {
         return builder;
     }
 
-    public final String encodeAttributosAsString() {
-        return write(new StringBuilder(200), DETAILED_MESSAGE_PREFIX).toString();
+    public final String encodedMessage() {
+        return encodedStringBuilder(new StringBuilder(200), DETAILED_MESSAGE_PREFIX).toString();
     }
-
-    public final String readableMessage() {
-        return readableString(new StringBuilder(200)).toString();
-    }
-
 }

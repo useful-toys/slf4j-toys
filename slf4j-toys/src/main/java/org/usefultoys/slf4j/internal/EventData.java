@@ -17,7 +17,6 @@ package org.usefultoys.slf4j.internal;
 
 import lombok.Getter;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -96,7 +95,11 @@ public abstract class EventData implements Serializable {
      * @return The StringBuilder passed as argument to allow chained
      * StringBuilder method calls.
      */
-    public abstract StringBuilder readableString(StringBuilder builder);
+    protected abstract StringBuilder readableStringBuilder(StringBuilder builder);
+
+    public final String readableMessage() {
+        return readableStringBuilder(new StringBuilder(200)).toString();
+    }
 
     /**
      * Writes an encoded string representation of the event into the supplied
@@ -108,7 +111,7 @@ public abstract class EventData implements Serializable {
      * @return The StringBuilder passed as argument to allow chained
      * StringBuilder method calls.
      */
-    public final StringBuilder write(final StringBuilder sb, final char messagePrefix) {
+    public final StringBuilder encodedStringBuilder(final StringBuilder sb, final char messagePrefix) {
         final EventWriter w = new EventWriter(sb);
         w.open(messagePrefix);
         writeKeyProperties(w);
@@ -116,6 +119,8 @@ public abstract class EventData implements Serializable {
         w.close();
         return sb;
     }
+
+    public abstract String encodedMessage();
 
     private void writeKeyProperties(final EventWriter w) {
         /* Session UUID */

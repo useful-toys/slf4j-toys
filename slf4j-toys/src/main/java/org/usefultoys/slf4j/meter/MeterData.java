@@ -17,13 +17,10 @@ package org.usefultoys.slf4j.meter;
 
 import lombok.Getter;
 import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.internal.EventData;
-import org.usefultoys.slf4j.internal.EventReader;
 import org.usefultoys.slf4j.internal.EventWriter;
 import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -257,7 +254,7 @@ public class MeterData extends SystemData {
     }
 
     @Override
-    public StringBuilder readableString(final StringBuilder builder) {
+    public StringBuilder readableStringBuilder(final StringBuilder builder) {
         if (MeterConfig.printStatus) {
             if (stopTime != 0) {
                 if (failPath == null && rejectPath == null) {
@@ -449,12 +446,9 @@ public class MeterData extends SystemData {
         super.writePropertiesImpl(w);
     }
 
-    public final String write() {
-        return write(new StringBuilder(), DETAILED_MESSAGE_PREFIX).toString();
-    }
-
-    public final String readableWrite() {
-        return readableString(new StringBuilder()).toString();
+    @Override
+    public final String encodedMessage() {
+        return encodedStringBuilder(new StringBuilder(200), DETAILED_MESSAGE_PREFIX).toString();
     }
 
     @Override
