@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.utils;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -149,30 +150,150 @@ public class UnitFormatterTest {
         assertEquals(expected, UnitFormatter.doubleUnit(value, UNITS, FACTORS));
     }
 
-    @Test
-    void testBytes() {
-        assertEquals("500B", UnitFormatter.bytes(500));
-        assertEquals("1000B", UnitFormatter.bytes(1000));
-        assertEquals("1.5kB", UnitFormatter.bytes(1500));
-        assertEquals("1000.0kB", UnitFormatter.bytes(1_000_000));
-        assertEquals("1000.0MB", UnitFormatter.bytes(1_000_000_000));
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideBytesTestCases() {
+        return Stream.of(
+            of(500, "500B"),
+            of(1000, "1000B"),
+            of(1500, "1.5kB"),
+            of(1_000_000, "1000.0kB"),
+            of(1_500_000, "1.5MB"),
+            of(1_000_000_000, "1000.0MB"),
+            of(1_000_500_000, "1000.5MB")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideBytesTestCases")
+    void testBytes(long value, String expected) {
+        assertEquals(expected, UnitFormatter.bytes(value));
+    }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideNanosecondsLongTestCases() {
+        return Stream.of(
+            of(500, "500ns"),
+            of(1000, "1000ns"),
+            of(1500, "1.5us"),
+            of(1_000_000, "1000.0us"),
+            of(1_040_000, "1040.0us"),
+            of(1_050_000, "1050.0us"),
+            of(1_305_000, "1.3ms"),
+            of(1_500_000, "1.5ms"),
+            of(1_550_000, "1.6ms"),
+            of(1_000_000_000, "1000.0ms"),
+            of(1_000_500_000, "1000.5ms"),
+            of(1_000_040_000, "1000.0ms"),
+            of(1_000_050_000, "1000.1ms"),
+            of(1_000_005_000, "1000.0ms")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNanosecondsLongTestCases")
+    void testNanosecondsLong(long value, String expected) {
+        assertEquals(expected, UnitFormatter.nanoseconds(value));
+    }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideNanosecondsDoubleTestCases() {
+        return Stream.of(
+            of(500.0, "500.0ns"),
+            of(1000.0, "1000.0ns"),
+            of(1500.0, "1.5us"),
+            of(1_000_000.0, "1000.0us"),
+            of(1_000_000_000.0, "1000.0ms")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNanosecondsDoubleTestCases")
+    void testNanosecondsDouble(double value, String expected) {
+        assertEquals(expected, UnitFormatter.nanoseconds(value));
+    }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsPerSecondTestCases() {
+        return Stream.of(
+            of(0.4, "0.4/s"),
+            of(0.5, "0.5/s"),
+            of(0.6, "0.6/s"),
+            of(0.9, "0.9/s"),
+            of(1.0, "1.0/s"),
+            of(2.0, "2.0/s"),
+            of(2.89, "2.9/s"),
+            of(2.9, "2.9/s"),
+            of(3.0, "3.0/s"),
+            of(3.1, "3.1/s"),
+            of(3.11, "3.1/s"),
+            of(3.111, "3.1/s"),
+            of(12.0, "12.0/s"),
+            of(120.0, "120.0/s"),
+            of(1_200.0, "1.2k/s"),
+            of(12_000.0, "12.0k/s"),
+            of(120_000.0, "120.0k/s"),
+            of(1_200_000.0, "1.2M/s"),
+            of(12_000_000.0, "12.0M/s"),
+            of(120_000_000.0, "120.0M/s")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIterationsPerSecondTestCases")
+    void testIterationsPerSecond(double value, String expected) {
+        assertEquals(expected, UnitFormatter.iterationsPerSecond(value));
+    }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsTestCases() {
+        return Stream.of(
+            of(0, "0"),
+            of(1, "1"),
+            of(12, "12"),
+            of(120, "120"),
+            of(1_200, "1.2k"),
+            of(12_000, "12.0k"),
+            of(120_000, "120.0k"),
+            of(1_200_000, "1.2M"),
+            of(12_000_000, "12.0M"),
+            of(120_000_000, "120.0M")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIterationsTestCases")
+    void testIterationsPerSecond(long value, String expected) {
+        assertEquals(expected, UnitFormatter.iterations(value));
     }
 
     @Test
-    void testNanosecondsLong() {
-        assertEquals("500ns", UnitFormatter.nanoseconds(500));
+    public void testTimeUnit() {
+        assertEquals("0ns", UnitFormatter.nanoseconds(0));
+        assertEquals("1ns", UnitFormatter.nanoseconds(1));
+        assertEquals("999ns", UnitFormatter.nanoseconds(999));
         assertEquals("1000ns", UnitFormatter.nanoseconds(1000));
-        assertEquals("1.5us", UnitFormatter.nanoseconds(1500));
-        assertEquals("1000.0us", UnitFormatter.nanoseconds(1_000_000));
-        assertEquals("1000.0ms", UnitFormatter.nanoseconds(1_000_000_000));
+        assertEquals("1001ns", UnitFormatter.nanoseconds(1001));
+        assertEquals("1.1us", UnitFormatter.nanoseconds(1100));
+        assertEquals("1000.0ms", UnitFormatter.nanoseconds(1000000000L));
+        assertEquals("1.1s", UnitFormatter.nanoseconds(1100000000L));
+        assertEquals("60.0s", UnitFormatter.nanoseconds(60000000000L));
+        assertEquals("61.0s", UnitFormatter.nanoseconds(61000000000L));
+        assertEquals("1.1m", UnitFormatter.nanoseconds(66000000000L));
+        assertEquals("10.0m", UnitFormatter.nanoseconds(600000000000L));
+        assertEquals("60.0m", UnitFormatter.nanoseconds(3600000000000L));
+        assertEquals("1.2h", UnitFormatter.nanoseconds(4400000000000L));
     }
 
     @Test
-    void testNanosecondsDouble() {
-        assertEquals("500.0ns", UnitFormatter.nanoseconds(500.0));
-        assertEquals("1000.0ns", UnitFormatter.nanoseconds(1000.0));
-        assertEquals("1.5us", UnitFormatter.nanoseconds(1500.0));
-        assertEquals("1000.0us", UnitFormatter.nanoseconds(1_000_000.0));
-        assertEquals("1000.0ms", UnitFormatter.nanoseconds(1_000_000_000.0));
+    public void testDoubleTimeUnit() {
+        assertEquals("0ns", UnitFormatter.nanoseconds(0f));
+        assertEquals("1.0ns", UnitFormatter.nanoseconds(1f));
+        assertEquals("999.0ns", UnitFormatter.nanoseconds(999f));
+        assertEquals("1000.0ns", UnitFormatter.nanoseconds(1000f));
+        assertEquals("1001.0ns", UnitFormatter.nanoseconds(1001f));
+        assertEquals("1.1us", UnitFormatter.nanoseconds(1100f));
+        assertEquals("1000.0ms", UnitFormatter.nanoseconds(1000000000f));
+        assertEquals("1.1s", UnitFormatter.nanoseconds(1100000000f));
+        assertEquals("60.0s", UnitFormatter.nanoseconds(60000000000f));
+        assertEquals("61.0s", UnitFormatter.nanoseconds(61000000000f));
+        assertEquals("1.1m", UnitFormatter.nanoseconds(66000000000f));
+        assertEquals("10.0m", UnitFormatter.nanoseconds(600000000000f));
+        assertEquals("60.0m", UnitFormatter.nanoseconds(3600000000000f));
+        assertEquals("1.2h", UnitFormatter.nanoseconds(4400000000000f));
     }
 }
