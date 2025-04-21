@@ -20,8 +20,14 @@ class NullPrintStreamTest {
     void testPrintMethods() {
         NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.print("test"));
-        assertDoesNotThrow(() -> nullPrintStream.print(123));
+        assertDoesNotThrow(() -> nullPrintStream.print(' '));
         assertDoesNotThrow(() -> nullPrintStream.print(true));
+        assertDoesNotThrow(() -> nullPrintStream.print(123));
+        assertDoesNotThrow(() -> nullPrintStream.print(123L));
+        assertDoesNotThrow(() -> nullPrintStream.print(123.0));
+        assertDoesNotThrow(() -> nullPrintStream.print(123.0f));
+        assertDoesNotThrow(() -> nullPrintStream.print(true));
+        assertDoesNotThrow(() -> nullPrintStream.print(new Object()));
         assertDoesNotThrow(() -> nullPrintStream.print(new char[]{'a', 'b'}));
     }
 
@@ -30,8 +36,13 @@ class NullPrintStreamTest {
         NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.println());
         assertDoesNotThrow(() -> nullPrintStream.println("test"));
+        assertDoesNotThrow(() -> nullPrintStream.println(' '));
         assertDoesNotThrow(() -> nullPrintStream.println(123));
+        assertDoesNotThrow(() -> nullPrintStream.println(123L));
+        assertDoesNotThrow(() -> nullPrintStream.println(123.0));
+        assertDoesNotThrow(() -> nullPrintStream.println(123.0f));
         assertDoesNotThrow(() -> nullPrintStream.println(true));
+        assertDoesNotThrow(() -> nullPrintStream.println(new Object()));
         assertDoesNotThrow(() -> nullPrintStream.println(new char[]{'a', 'b'}));
     }
 
