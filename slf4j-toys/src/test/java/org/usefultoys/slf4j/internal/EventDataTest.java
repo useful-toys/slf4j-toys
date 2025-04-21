@@ -15,48 +15,103 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
  * @author Daniel
  */
-public class EventDataTest {
+class EventDataTest {
 
-    public EventDataTest() {
+    static class TestEventData extends EventData {
+        boolean resetCalled = false;
+
+        public TestEventData() {
+            super();
+        }
+
+        public TestEventData(String sessionUuid) {
+            super(sessionUuid);
+        }
+
+        public TestEventData(String sessionUuid, long position) {
+            super(sessionUuid, position);
+        }
+
+        public TestEventData(final String sessionUuid, final long position, final long time) {
+            super(sessionUuid, position, time);
+        }
+
+        @Override
+        protected StringBuilder readableStringBuilder(StringBuilder sb) {
+            sb.append("a");
+            return sb;
+        }
+
+        @Override
+        protected void resetImpl() {
+            resetCalled = true;
+        }
+
+        @Override
+        public String encodedMessage() {
+            return "";
+        }
+
+        @Override
+        protected void writePropertiesImpl(final EventWriter w) {
+            // no-op
+        }
     }
 
-    public static void populateEventData(EventData a) {
-        a.position = 1;
-        a.sessionUuid = "uuid";
-        a.time = 2;
+    @Test
+    void testConstructorAndGetters0() {
+        final TestEventData event = new TestEventData();
+        assertNull(event.getSessionUuid());
+        assertEquals(0L, event.getPosition());
+        assertEquals(0L, event.getTime()); // time should be 0 before nextPosition
     }
 
-    private EventData createEventData() {
-        return new EventData() {
-            private static final long serialVersionUID = 1L;
+    @Test
+    void testConstructorAndGetters1() {
+        final TestEventData event = new TestEventData("abc");
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(0L, event.getPosition());
+        assertEquals(0L, event.getTime());
+    }
 
-            @Override
-            public StringBuilder readableStringBuilder(final StringBuilder builder) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
+    @Test
+    void testConstructorAndGetters2() {
+        final TestEventData event = new TestEventData("abc", 5L);
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(5L, event.getPosition());
+        assertEquals(0L, event.getTime());
+    }
 
-            @Override
-            protected void writePropertiesImpl(final EventWriter w) {
-                // empty
-            }
+    @Test
+    void testConstructorAndGetters3() {
+        final TestEventData event = new TestEventData("abc", 5L, 10L);
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(5L, event.getPosition());
+        assertEquals(10L, event.getTime());
+    }
 
-                  @Override
-            protected void resetImpl() {
-                // empty
-            }
+    @Test
+    void testResetClearsFields() {
+        final TestEventData event = new TestEventData("abc", 5L,10L);
+        event.reset();
+        assertNull(event.getSessionUuid());
+        assertEquals(0L, event.getPosition());
+        assertEquals(0L, event.getTime());
+        assertTrue(event.resetCalled);
+    }
 
-            @Override
-            public String encodedMessage() {
-                return "";
-            }
-        };
+    @Test
+    void testReadableMessage() {
+        final TestEventData event = new TestEventData("abc", 5L);
+        final String message = event.readableMessage();
+        assertTrue(message.equals("a"));
     }
 }
