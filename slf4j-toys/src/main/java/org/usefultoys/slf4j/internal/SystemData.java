@@ -21,6 +21,8 @@ import org.usefultoys.slf4j.SystemConfig;
 import java.lang.management.*;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Augments the {@link EventData} with status collected from the virtual machine.
@@ -134,7 +136,7 @@ public abstract class SystemData extends EventData {
         systemLoad = 0;
     }
 
-      protected void collectRuntimeStatus() {
+    protected void collectRuntimeStatus() {
         final Runtime runtime = Runtime.getRuntime();
         runtime_totalMemory = runtime.totalMemory();
         runtime_usedMemory = runtime_totalMemory - runtime.freeMemory();
@@ -214,6 +216,7 @@ public abstract class SystemData extends EventData {
     public static final String PROP_COMPILATION_TIME = "ct";
     public static final String PROP_GARBAGE_COLLECTOR = "gc";
     public static final String PROP_SYSTEM_LOAD = "sl";
+
 
     @Override
     protected void writePropertiesImpl(final EventWriter w) {
@@ -299,6 +302,69 @@ public abstract class SystemData extends EventData {
         /* system load */
         if (systemLoad > 0) {
             sb.append(String.format(Locale.US, ",%s:%.1f", PROP_SYSTEM_LOAD, systemLoad));
+        }
+    }
+
+    private final static Pattern patternMemory = Pattern.compile(PROP_MEMORY + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]");
+    private final static Pattern patternHeap = Pattern.compile(PROP_HEAP + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]");
+    private final static Pattern patternNonHeap = Pattern.compile(PROP_NON_HEAP + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]");
+    private final static Pattern patternFinalizationCount = Pattern.compile(PROP_FINALIZATION_COUNT + "\\s*:\\s*([^,}\\s]+)");
+    private final static Pattern patternClassLoading = Pattern.compile(PROP_CLASS_LOADING + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]");
+    private final static Pattern patternCompilationTime = Pattern.compile(PROP_COMPILATION_TIME + "\\s*:\\s*([^,}\\s]+)");
+    private final static Pattern patternGarbageCollector = Pattern.compile(PROP_GARBAGE_COLLECTOR + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+)\\]");
+    private final static Pattern patternSystemLoad = Pattern.compile(PROP_SYSTEM_LOAD + "\\s*:\\s*([^,}\\s]+)");
+
+    @Override
+    protected void readJson5(final String json5) {
+        super.readJson5(json5);
+
+        final Matcher matcherMemory = patternMemory.matcher(json5);
+        if (matcherMemory.find()) {
+            runtime_usedMemory = Long.parseLong(matcherMemory.group(1));
+            runtime_totalMemory = Long.parseLong(matcherMemory.group(2));
+            runtime_maxMemory = Long.parseLong(matcherMemory.group(3));
+        }
+
+        final Matcher matcherHeap = patternHeap.matcher(json5);
+        if (matcherHeap.find()) {
+            heap_used = Long.parseLong(matcherHeap.group(1));
+            heap_commited = Long.parseLong(matcherHeap.group(2));
+            heap_max = Long.parseLong(matcherHeap.group(3));
+        }
+
+        final Matcher matcherNonHeap = patternNonHeap.matcher(json5);
+        if (matcherNonHeap.find()) {
+            nonHeap_used = Long.parseLong(matcherNonHeap.group(1));
+            nonHeap_commited = Long.parseLong(matcherNonHeap.group(2));
+            nonHeap_max = Long.parseLong(matcherNonHeap.group(3));
+        }
+
+        final Matcher matcherFinalizationCount = patternFinalizationCount.matcher(json5);
+        if (matcherFinalizationCount.find()) {
+            objectPendingFinalizationCount = Long.parseLong(matcherFinalizationCount.group(1));
+        }
+
+        final Matcher matcherClassLoading = patternClassLoading.matcher(json5);
+        if (matcherClassLoading.find()) {
+            classLoading_total = Long.parseLong(matcherClassLoading.group(1));
+            classLoading_loaded = Long.parseLong(matcherClassLoading.group(2));
+            classLoading_unloaded = Long.parseLong(matcherClassLoading.group(3));
+        }
+
+        final Matcher matcherCompilationTime = patternCompilationTime.matcher(json5);
+        if (matcherCompilationTime.find()) {
+            compilationTime = Long.parseLong(matcherCompilationTime.group(1));
+        }
+
+        final Matcher matcherGarbageCollector = patternGarbageCollector.matcher(json5);
+        if (matcherGarbageCollector.find()) {
+            garbageCollector_count = Long.parseLong(matcherGarbageCollector.group(1));
+            garbageCollector_time = Long.parseLong(matcherGarbageCollector.group(2));
+        }
+
+        final Matcher matcherSystemLoad = patternSystemLoad.matcher(json5);
+        if (matcherSystemLoad.find()) {
+            systemLoad = Double.parseDouble(matcherSystemLoad.group(1));
         }
     }
 }

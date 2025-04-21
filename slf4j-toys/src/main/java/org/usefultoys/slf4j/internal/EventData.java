@@ -169,7 +169,7 @@ public abstract class EventData implements Serializable {
         // no-op
     }
 
-    protected final String jsonMessage5() {
+    protected final String json5Message() {
         return writeJson5(new StringBuilder(200)).toString();
     }
 
@@ -177,7 +177,7 @@ public abstract class EventData implements Serializable {
     private final static Pattern patternPosition = Pattern.compile("\\"+EVENT_POSITION+"\\s*:\\s*([^,}\\s]+)");
     private final static Pattern patternTime = Pattern.compile(EVENT_TIME+"\\s*:\\s*([^,}\\s]+)");
 
-    protected final void readJson5(final String json5) {
+    protected void readJson5(final String json5) {
         final Matcher matcherSession = patternSession.matcher(json5);
         if (matcherSession.find()) {
             sessionUuid = matcherSession.group(1);

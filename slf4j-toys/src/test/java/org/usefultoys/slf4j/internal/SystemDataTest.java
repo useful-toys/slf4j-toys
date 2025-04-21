@@ -177,16 +177,92 @@ class SystemDataTest {
     }
 
     @Test
-    void testJsonMessage0() {
+    void testJsonMessageAllAttributes() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
-        String json = event.jsonMessage5();
+        String json = event.json5Message();
         assertEquals("{_:abc,$:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,gc:[14,15],sl:19.0}", json);
     }
 
     @Test
-    void testJsonMessage1() {
+    void testJsonMessageEssentialAttributes() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0);
-        String json = event.jsonMessage5();
+        String json = event.json5Message();
         assertEquals("{_:abc,$:1,t:2,h:[5,3,4]}", json);
+    }
+
+    @Test
+    void testJsonMessageWithoutHeapAttributes() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 0, 0, 0, 0, 0, 0, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
+        String json = event.json5Message();
+        assertEquals("{_:abc,$:1,t:2,m:[16,18,17],fc:9,cl:[11,10,12],ct:13,gc:[14,15],sl:19.0}", json);
+    }
+
+    @Test
+    void testJsonMessageWithoutClassLoadingAttributes() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 13, 14, 15, 16, 17, 18, 19.0);
+        String json = event.json5Message();
+        assertEquals("{_:abc,$:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],ct:13,gc:[14,15],sl:19.0}", json);
+    }
+
+    @Test
+    void testJsonMessageWithoutGarbageCollectorAttributes() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 0, 16, 17, 18, 19.0);
+        String json = event.json5Message();
+        assertEquals("{_:abc,$:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,sl:19.0}", json);
+    }
+
+    @Test
+    void testJsonMessageWithoutSystemLoad() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 0.0);
+        String json = event.json5Message();
+        assertEquals("{_:abc,$:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,gc:[14,15]}", json);
+    }
+
+    void testJsonMessageMemory() {
+        final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 0, 0, 19.0);
+        String json = event.json5Message();
+        assertEquals("{_:abc,$:1,t:2,h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,gc:[14,15],sl:19.0}", json);
+    }
+
+    @Test
+    void testReadJson5SystemDataMessage() {
+        final SystemData systemData = new SystemData() {
+            @Override
+            protected StringBuilder readableStringBuilder(StringBuilder sb) {
+                return sb;
+            }
+
+            @Override
+            protected void writePropertiesImpl(EventWriter w) {
+                // no-op
+            }
+
+            @Override
+            public String encodedMessage() {
+                return "";
+            }
+        };
+
+        systemData.readJson5("{_:abc,$:5,t:6,m:[100,200,300],h:[400,500,600],nh:[700,800,900],fc:10,cl:[20,30,40],ct:50,gc:[60,70],sl:0.8}");
+        assertEquals("abc", systemData.getSessionUuid());
+        assertEquals(5L, systemData.getPosition());
+        assertEquals(6L, systemData.getTime());
+        assertEquals(100L, systemData.getRuntime_usedMemory());
+        assertEquals(200L, systemData.getRuntime_totalMemory());
+        assertEquals(300L, systemData.getRuntime_maxMemory());
+        assertEquals(400L, systemData.getHeap_used());
+        assertEquals(500L, systemData.getHeap_commited());
+        assertEquals(600L, systemData.getHeap_max());
+        assertEquals(700L, systemData.getNonHeap_used());
+        assertEquals(800L, systemData.getNonHeap_commited());
+        assertEquals(900L, systemData.getNonHeap_max());
+        assertEquals(10L, systemData.getObjectPendingFinalizationCount());
+        assertEquals(20L, systemData.getClassLoading_total());
+        assertEquals(30L, systemData.getClassLoading_loaded());
+        assertEquals(40L, systemData.getClassLoading_unloaded());
+        assertEquals(50L, systemData.getCompilationTime());
+        assertEquals(60L, systemData.getGarbageCollector_count());
+        assertEquals(70L, systemData.getGarbageCollector_time());
+        assertEquals(0.8, systemData.getSystemLoad(), 0.01);
     }
 }

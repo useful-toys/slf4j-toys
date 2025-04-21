@@ -118,7 +118,7 @@ class EventDataTest {
     @Test
     void testWriteJson5Message() {
         final TestEventData event = new TestEventData("abc", 5L, 10L);
-        final String json = event.jsonMessage5();
+        final String json = event.json5Message();
         assertEquals("{_:abc,$:5,t:10}", json);
     }
 
