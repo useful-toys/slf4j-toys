@@ -20,6 +20,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.impl.TestLoggerEvent.Level;
@@ -54,10 +56,16 @@ import org.slf4j.impl.TestLoggerEvent.Level;
 public class TestLogger implements Logger {
 
     private final String name;
+    /* No concept of "LEVEL" here, because it is not a real logger implementation. */
+    @Getter @Setter
     private boolean traceEnabled = true;
+    @Getter @Setter
     private boolean debugEnabled = true;
+    @Getter @Setter
     private boolean infoEnabled = true;
+    @Getter @Setter
     private boolean warnEnabled = true;
+    @Getter @Setter
     private boolean errorEnabled = true;
 
     private final List<TestLoggerEvent> loggerEvents = new ArrayList<TestLoggerEvent>();
@@ -71,11 +79,6 @@ public class TestLogger implements Logger {
         return name;
     }
 
-    @Override
-    public boolean isTraceEnabled() {
-        return traceEnabled;
-    }
-
     private void addEvent(final TestLoggerEvent event) {
         loggerEvents.add(event);
     }
@@ -84,32 +87,12 @@ public class TestLogger implements Logger {
         loggerEvents.clear();
     }
 
-    public void setTraceEnabled(final boolean traceEnabled) {
-        this.traceEnabled = traceEnabled;
-    }
-
-    public void setDebugEnabled(final boolean debugEnabled) {
-        this.debugEnabled = debugEnabled;
-    }
-
-    public void setInfoEnabled(final boolean infoEnabled) {
-        this.infoEnabled = infoEnabled;
-    }
-
-    public void setWarnEnabled(final boolean warnEnabled) {
-        this.warnEnabled = warnEnabled;
-    }
-
-    public void setErrorEnabled(final boolean errorEnabled) {
-        this.errorEnabled = errorEnabled;
-    }
-
     public void setEnabled(final boolean enabled) {
-        this.errorEnabled = enabled;
-        this.warnEnabled = enabled;
-        this.infoEnabled = enabled;
-        this.debugEnabled = enabled;
-        this.traceEnabled = enabled;
+        errorEnabled = enabled;
+        warnEnabled = enabled;
+        infoEnabled = enabled;
+        debugEnabled = enabled;
+        traceEnabled = enabled;
     }
 
     @Override
@@ -168,11 +151,6 @@ public class TestLogger implements Logger {
     }
 
     @Override
-    public boolean isDebugEnabled() {
-        return debugEnabled;
-    }
-
-    @Override
     public void debug(final String message) {
         log(Level.DEBUG, message);
     }
@@ -225,11 +203,6 @@ public class TestLogger implements Logger {
     @Override
     public void debug(final Marker marker, final String msg, final Throwable throwable) {
         log(Level.DEBUG, marker, msg, throwable);
-    }
-
-    @Override
-    public boolean isInfoEnabled() {
-        return infoEnabled;
     }
 
     @Override
@@ -287,12 +260,7 @@ public class TestLogger implements Logger {
         log(Level.INFO, marker, msg, throwable);
     }
 
-    @Override
-    public boolean isWarnEnabled() {
-        return warnEnabled;
-    }
-
-    @Override
+     @Override
     public void warn(final String message) {
         log(Level.WARN, message);
     }
@@ -345,11 +313,6 @@ public class TestLogger implements Logger {
     @Override
     public void warn(final Marker marker, final String msg, final Throwable throwable) {
         log(Level.WARN, marker, msg, throwable);
-    }
-
-    @Override
-    public boolean isErrorEnabled() {
-        return errorEnabled;
     }
 
     @Override
