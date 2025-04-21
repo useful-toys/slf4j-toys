@@ -52,10 +52,10 @@ public abstract class EventData implements Serializable {
         this.position = position;
     }
 
-    /** Increments {@link #position} and stores system time to {@link #time}. */
-    protected final void nextPosition() {
-        time = System.nanoTime();
-        position++;
+    protected EventData(final String sessionUuid, final long position, final long time) {
+        this.sessionUuid = sessionUuid;
+        this.position = position;
+        this.time = time;
     }
 
     /**

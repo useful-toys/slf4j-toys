@@ -57,7 +57,8 @@ public class Watcher extends WatcherData implements Runnable {
      * Logs about the current system status.
      */
     public void logCurrentStatus() {
-        nextPosition();
+        time = System.nanoTime();
+        position++;
         if (messageLogger.isInfoEnabled()) {
             collectRuntimeStatus();
             collectPlatformStatus();

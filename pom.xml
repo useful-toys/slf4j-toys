@@ -23,6 +23,7 @@
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
         <mockito.version>4.11.0</mockito.version>
         <lombok.version>1.18.34</lombok.version>
+        <awaitility.version>4.2.0</awaitility.version>
     </properties>
     <packaging>pom</packaging>
     <description>An useful complement to SLF4J to promote clean and organized log files.</description>
@@ -113,6 +114,12 @@
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
                 <version>${annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
