@@ -118,26 +118,6 @@ public final class UnitFormatter {
     }
 
     /**
-     * Formats a number of iterations (as a double) into a human-readable string with appropriate units.
-     *
-     * @param value The number of iterations.
-     * @return A formatted string representing the value in iterations, thousands, or millions.
-     */
-    public String iterations(final double value) {
-        return doubleUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
-    }
-
-    /**
-     * Formats a number of iterations per second into a human-readable string with appropriate units.
-     *
-     * @param value The number of iterations per second.
-     * @return A formatted string representing the value in iterations per second, thousands per second, or millions per second.
-     */
-    public String iterationsPerSecond(final long value) {
-        return longUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
-    }
-
-    /**
      * Formats a number of iterations per second (as a double) into a human-readable string with appropriate units.
      *
      * @param value The number of iterations per second.
