@@ -3,10 +3,18 @@ package org.usefultoys.slf4j.watcher;
 import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.TestLogger;
+import org.usefultoys.slf4j.SessionConfig;
+
+import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.*;
 class WatcherTest {
     private static final TestLogger testLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name);
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     @BeforeEach
     void setupLogger() {

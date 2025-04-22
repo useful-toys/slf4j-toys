@@ -1,13 +1,20 @@
 package org.usefultoys.slf4j;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestClassOrder;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoggerOutputStreamTest {
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     static class TestLoggerOutputStream extends LoggerOutputStream {
         private StringBuilder loggedData = new StringBuilder();

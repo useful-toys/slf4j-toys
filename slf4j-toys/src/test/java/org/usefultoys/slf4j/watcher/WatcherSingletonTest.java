@@ -4,12 +4,19 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.TestLogger;
+import org.usefultoys.slf4j.SessionConfig;
 
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class WatcherSingletonTest {
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     private static TestLogger testLogger;
 

@@ -1,13 +1,21 @@
 package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.Charset;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SessionConfigTest {
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     @BeforeEach
     void setUp() {
@@ -29,8 +37,8 @@ class SessionConfigTest {
 
     @Test
     void testDefaultValues() {
-        assertEquals(5, SessionConfig.uuidSize, "Default value for uuidSize should be 5");
-        assertEquals("UTF-8", SessionConfig.charset, "Default value for charset should be UTF-8");
+        assertEquals(5, SessionConfig.uuidSize);
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset);
     }
 
     @Test
