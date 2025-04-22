@@ -15,11 +15,18 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.SessionConfig;
+
+import java.nio.charset.Charset;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -33,7 +40,12 @@ public class MeterStateAttributesTest {
         logger.setEnabled(false);
     }
 
-    @Before
+    @BeforeAll
+    public static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeEach
     public void clearEvents() {
         logger.clearEvents();
     }
@@ -42,270 +54,270 @@ public class MeterStateAttributesTest {
     public void testTimeAttributesOk() {
         final Meter m = new Meter(logger);
 
-        Assert.assertFalse(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertFalse(m.isStarted());
+        assertFalse(m.isStopped());
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.start();
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-       Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertFalse(m.isStopped());
+       assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.ok();
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertTrue(m.isStopped());
-        Assert.assertTrue(m.isOK());
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertTrue(m.isStopped());
+        assertTrue(m.isOK());
+        assertTrue(m.isStarted());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
     }
     
     @Test
     public void testTimeAttributesOkWithFlow() {
         final Meter m = new Meter(logger);
 
-        Assert.assertFalse(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-       Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertFalse(m.isStarted());
+        assertFalse(m.isStopped());
+       assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.start();
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-       Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertFalse(m.isStopped());
+       assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.ok("Flow");
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertTrue(m.isStopped());
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Flow", m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertTrue(m.isStopped());
+        assertTrue(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertEquals("Flow", m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
     }
   
     @Test
     public void testTimeAttributesFlow() {
         final Meter m = new Meter(logger);
 
-        Assert.assertFalse(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-       Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertFalse(m.isStarted());
+        assertFalse(m.isStopped());
+       assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.start();
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertFalse(m.isStopped());
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.path("Flow");
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Flow", m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertFalse(m.isStopped());
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertEquals("Flow", m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.ok();
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertTrue(m.isStopped());
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Flow", m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertTrue(m.isStopped());
+        assertTrue(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertEquals("Flow", m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
     }
       
     @Test
     public void testTimeAttributesFlow2() {
         final Meter m = new Meter(logger);
 
-        Assert.assertFalse(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertFalse(m.isStarted());
+        assertFalse(m.isStopped());
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.start();
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-       Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertFalse(m.isStopped());
+       assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.path("Flow");
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Flow", m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertFalse(m.isStopped());
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertEquals("Flow", m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.path("Path");
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Path", m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertFalse(m.isStopped());
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertEquals("Path", m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
     	m.ok();
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertTrue(m.isStopped());
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertEquals("Path", m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertTrue(m.isStopped());
+        assertTrue(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertEquals("Path", m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
     }
       
     @Test
     public void testTimeAttributesReject() {
         final Meter m = new Meter(logger);
 
-        Assert.assertFalse(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-       Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertFalse(m.isStarted());
+        assertFalse(m.isStopped());
+       assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.start();
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-      Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertFalse(m.isStopped());
+      assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.reject("Reject");
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertTrue(m.isStopped());
-        Assert.assertFalse(m.isOK());
-        Assert.assertTrue(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertEquals("Reject", m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertTrue(m.isStopped());
+        assertFalse(m.isOK());
+        assertTrue(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertEquals("Reject", m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
     }
 
     @Test
     public void testTimeAttributesFail() {
         final Meter m = new Meter(logger);
 
-        Assert.assertFalse(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertFalse(m.isStarted());
+        assertFalse(m.isStopped());
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.start();
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertFalse(m.isStopped());
-       Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertNull(m.getFailMessage());
-        Assert.assertNull(m.getFailPath());
+        assertTrue(m.isStarted());
+        assertFalse(m.isStopped());
+       assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailMessage());
+        assertNull(m.getFailPath());
 
         m.fail(new IllegalStateException("ISE"));
 
-        Assert.assertTrue(m.isStarted());
-        Assert.assertTrue(m.isStopped());
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertTrue(m.isFail());
-        Assert.assertNull(m.getOkPath());
-        Assert.assertNull(m.getRejectPath());
-        Assert.assertEquals("ISE", m.getFailMessage());
-        Assert.assertEquals("java.lang.IllegalStateException", m.getFailPath());
+        assertTrue(m.isStarted());
+        assertTrue(m.isStopped());
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertTrue(m.isFail());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertEquals("ISE", m.getFailMessage());
+        assertEquals("java.lang.IllegalStateException", m.getFailPath());
     }
  }

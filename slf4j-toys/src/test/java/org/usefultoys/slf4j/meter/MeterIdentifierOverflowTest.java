@@ -15,15 +15,18 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.impl.TestLogger;
 import org.slf4j.impl.TestLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.SessionConfig;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.nio.charset.Charset;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Daniel
@@ -35,12 +38,17 @@ public class MeterIdentifierOverflowTest {
     public MeterIdentifierOverflowTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeAll
     public static void configureMeterSettings() {
         System.setProperty("slf4jtoys.meter.progress.period", "0ms");
     }
 
-    @Before
+    @BeforeEach
     public void clearEvents() {
         logger.clearEvents();
     }
@@ -57,19 +65,19 @@ public class MeterIdentifierOverflowTest {
     }
 
     private void assertEvents(Meter m, int expectedMessageCount, long expectedEventPosition) {
-//        Assert.assertEquals(expectedEventPosition, m.getPosition());
-//        Assert.assertEquals(null, m.getOperation());
-//        Assert.assertEquals(meterName, m.getCategory());
+//        Assertions.assertEquals(expectedEventPosition, m.getPosition());
+//        Assertions.assertEquals(null, m.getOperation());
+//        Assertions.assertEquals(meterName, m.getCategory());
 //        final TestLoggerEvent startEvent = logger.getEvent(expectedMessageCount - 4);
 //        final TestLoggerEvent startDataEvent = logger.getEvent(expectedMessageCount - 3);
 //        final TestLoggerEvent stopEvent = logger.getEvent(expectedMessageCount - 2);
 //        final TestLoggerEvent stopDataEvent = logger.getEvent(expectedMessageCount - 1);
 //
 //        String str = "$=" + Long.toString(expectedEventPosition);
-//        Assert.assertEquals(expectedEventPosition, m.getPosition());
-//        Assert.assertFalse(startEvent.getFormattedMessage().contains(str));
-//        Assert.assertTrue(startDataEvent.getFormattedMessage().contains(str));
-//        Assert.assertFalse(stopEvent.getFormattedMessage().contains(str));
-//        Assert.assertTrue(stopDataEvent.getFormattedMessage().contains(str));
+//        Assertions.assertEquals(expectedEventPosition, m.getPosition());
+//        Assertions.assertFalse(startEvent.getFormattedMessage().contains(str));
+//        Assertions.assertTrue(startDataEvent.getFormattedMessage().contains(str));
+//        Assertions.assertFalse(stopEvent.getFormattedMessage().contains(str));
+//        Assertions.assertTrue(stopDataEvent.getFormattedMessage().contains(str));
     }
 }

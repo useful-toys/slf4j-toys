@@ -15,13 +15,18 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.slf4j.impl.TestLogger;
 import org.slf4j.impl.TestLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.SessionConfig;
+
+import java.nio.charset.Charset;
 
 /**
  * @author Daniel Felix Ferber
@@ -35,14 +40,19 @@ public class MeterRunnableTest {
     public MeterRunnableTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeAll
     public static void configureMeterSettings() {
         MeterConfig.progressPeriodMilliseconds = 0;
         MeterConfig.printCategory = false;
         MeterConfig.printStatus = true;
     }
 
-    @Before
+    @BeforeEach
     public void clearEvents() {
         logger.clearEvents();
         MeterConfig.printCategory = false;
@@ -54,24 +64,24 @@ public class MeterRunnableTest {
         m.run(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(m, Meter.getCurrentInstance());
+                assertEquals(m, Meter.getCurrentInstance());
                 m.ok();
             }
         });
 
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        assertTrue(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertFalse(m.isSlow());
+        assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
+        assertEquals(Markers.MSG_START, startEvent.getMarker());
+        assertEquals(Markers.MSG_OK, stopEvent.getMarker());
+        assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
     }
 
     @Test
@@ -80,24 +90,24 @@ public class MeterRunnableTest {
         m.run(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(m, Meter.getCurrentInstance());
+                assertEquals(m, Meter.getCurrentInstance());
                 m.ok();
             }
         });
 
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        assertTrue(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertFalse(m.isSlow());
+        assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
+        assertEquals(Markers.MSG_START, startEvent.getMarker());
+        assertEquals(Markers.MSG_OK, stopEvent.getMarker());
+        assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
     }
 
     @Test
@@ -106,23 +116,23 @@ public class MeterRunnableTest {
         m.run(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(m, Meter.getCurrentInstance());
+                assertEquals(m, Meter.getCurrentInstance());
             }
         });
 
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        assertTrue(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertFalse(m.isSlow());
+        assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
+        assertEquals(Markers.MSG_START, startEvent.getMarker());
+        assertEquals(Markers.MSG_OK, stopEvent.getMarker());
+        assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
     }
 
     @Test
@@ -131,23 +141,23 @@ public class MeterRunnableTest {
         m.run(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(m, Meter.getCurrentInstance());
+                assertEquals(m, Meter.getCurrentInstance());
             }
         });
 
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        assertTrue(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertFalse(m.isSlow());
+        assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
+        assertEquals(Markers.MSG_START, startEvent.getMarker());
+        assertEquals(Markers.MSG_OK, stopEvent.getMarker());
+        assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
     }
 
     @Test
@@ -156,24 +166,24 @@ public class MeterRunnableTest {
         m.run(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(m, Meter.getCurrentInstance());
+                assertEquals(m, Meter.getCurrentInstance());
                 m.reject("a");
             }
         });
 
-        Assert.assertFalse(m.isOK());
-        Assert.assertTrue(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        assertFalse(m.isOK());
+        assertTrue(m.isReject());
+        assertFalse(m.isFail());
+        assertFalse(m.isSlow());
+        assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_REJECT, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_REJECT, stopDataEvent.getMarker());
+        assertEquals(Markers.MSG_START, startEvent.getMarker());
+        assertEquals(Markers.MSG_REJECT, stopEvent.getMarker());
+        assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        assertEquals(Markers.DATA_REJECT, stopDataEvent.getMarker());
     }
 
     @Test
@@ -182,24 +192,24 @@ public class MeterRunnableTest {
         m.run(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(m, Meter.getCurrentInstance());
+                assertEquals(m, Meter.getCurrentInstance());
                 m.fail("a");
             }
         });
 
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertTrue(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertTrue(m.isFail());
+        assertFalse(m.isSlow());
+        assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
+        assertEquals(Markers.MSG_START, startEvent.getMarker());
+        assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
+        assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
     }
 
     @Test
@@ -209,28 +219,28 @@ public class MeterRunnableTest {
             m.run(new Runnable() {
                 @Override
                 public void run() {
-                    Assert.assertEquals(m, Meter.getCurrentInstance());
+                    assertEquals(m, Meter.getCurrentInstance());
                     throw new IllegalArgumentException("someException");
                 }
             });
         } catch (IllegalArgumentException e) {
-            Assert.assertEquals("someException", e.getMessage());
+            assertEquals("someException", e.getMessage());
         }
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertTrue(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
-        Assert.assertEquals("java.lang.IllegalArgumentException", m.failPath);
-        Assert.assertEquals("someException", m.failMessage);
+        assertFalse(m.isOK());
+        assertFalse(m.isReject());
+        assertTrue(m.isFail());
+        assertFalse(m.isSlow());
+        assertEquals(4, logger.getEventCount());
+        assertEquals("java.lang.IllegalArgumentException", m.failPath);
+        assertEquals("someException", m.failMessage);
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains("someException"));
+        assertEquals(Markers.MSG_START, startEvent.getMarker());
+        assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
+        assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
+        assertTrue(stopEvent.getFormattedMessage().contains("someException"));
     }
 }

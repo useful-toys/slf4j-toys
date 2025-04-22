@@ -15,11 +15,16 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.SessionConfig;
+
+import java.nio.charset.Charset;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Validates incorrect use cases for meter and threadlocal, to ensure
@@ -28,55 +33,60 @@ import org.usefultoys.slf4j.LoggerFactory;
  */
 public class MeterThreadLocalMisuseTest {
 
+    @BeforeAll
+    public static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
     final String meterName = "name";
     final TestLogger loggerName = (TestLogger) LoggerFactory.getLogger(meterName);
     final String meterOther = "other";
     final TestLogger loggerOther = (TestLogger) LoggerFactory.getLogger(meterOther);
 
-    @Before
+    @BeforeEach
     public void clearEvents() {
         loggerOther.clearEvents();
     }
 
     @Test
     public void testCurrentMeter1() {
-        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
+        assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         final Meter m1 = MeterFactory.getMeter(loggerName);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
+        assertEquals("???", Meter.getCurrentInstance().getCategory());
         // forgets to call m1.start(); and current meter is not set to m1
-        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
+        assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         final Meter m2 = MeterFactory.getMeter(loggerOther);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
+        assertEquals("???", Meter.getCurrentInstance().getCategory());
         m2.start();
-        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
+        assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
 
         m2.ok();
-        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
+        assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         m1.ok(); // reports error
-        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
+        assertEquals("???", Meter.getCurrentInstance().getCategory());
     }
 
     @Test
     public void testCurrentMeter2() {
-        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
+        assertEquals("???", Meter.getCurrentInstance().getCategory());
 
         final Meter m1 = MeterFactory.getMeter(loggerName);
-        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
+        assertEquals("???", Meter.getCurrentInstance().getCategory());
         m1.start();
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory());
 
         final Meter m2 = MeterFactory.getMeter(loggerOther);
-        Assert.assertEquals(meterName, Meter.getCurrentInstance().getCategory());
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory());
         m2.start();
-        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
+        assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
 
         // forgets to call m2.ok();
-        Assert.assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
+        assertEquals(meterOther, Meter.getCurrentInstance().getCategory());
 
         m1.ok(); // reports error
-        Assert.assertEquals("???", Meter.getCurrentInstance().getCategory());
+        assertEquals("???", Meter.getCurrentInstance().getCategory());
     }
 }

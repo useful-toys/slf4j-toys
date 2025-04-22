@@ -15,10 +15,22 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.usefultoys.slf4j.SessionConfig;
+
+import java.nio.charset.Charset;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * @author Daniel
  */
 public class MeterDataTest {
+
+    @BeforeAll
+    public static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
 }

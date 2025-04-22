@@ -15,14 +15,20 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.SessionConfig;
+
+import java.nio.charset.Charset;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- *
  * @author Daniel Felix Ferber
  */
 public class MeterAttributesTest {
@@ -33,7 +39,12 @@ public class MeterAttributesTest {
         logger.setEnabled(false);
     }
 
-    @Before
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeEach
     public void clearEvents() {
         logger.clearEvents();
     }
@@ -42,28 +53,28 @@ public class MeterAttributesTest {
     public void testMessageAttributes() {
         final String description1 = "Test Message";
         final Meter m1 = new Meter(logger).m(description1);
-        Assert.assertEquals(description1, m1.getDescription());
+        assertEquals(description1, m1.getDescription());
 
         final String description2 = "Test  %d Message";
         final Meter m2 = new Meter(logger).m(description2, 10);
-        Assert.assertEquals(String.format(description2, 10), m2.getDescription());
+        assertEquals(String.format(description2, 10), m2.getDescription());
     }
 
     @Test
     public void testIterationAttributes() {
         final int iterationCount = 10;
         final Meter m1 = new Meter(logger).iterations(iterationCount).start();
-        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
-        Assert.assertEquals(0, m1.getCurrentIteration());
+        assertEquals(iterationCount, m1.getExpectedIterations());
+        assertEquals(0, m1.getCurrentIteration());
         m1.inc();
-        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
-        Assert.assertEquals(1, m1.getCurrentIteration());
+        assertEquals(iterationCount, m1.getExpectedIterations());
+        assertEquals(1, m1.getCurrentIteration());
         m1.incBy(2);
-        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
-        Assert.assertEquals(3, m1.getCurrentIteration());
+        assertEquals(iterationCount, m1.getExpectedIterations());
+        assertEquals(3, m1.getCurrentIteration());
         m1.incTo(4);
-        Assert.assertEquals(iterationCount, m1.getExpectedIterations());
-        Assert.assertEquals(4, m1.getCurrentIteration());
+        assertEquals(iterationCount, m1.getExpectedIterations());
+        assertEquals(4, m1.getCurrentIteration());
         m1.ok();
     }
- }
+}

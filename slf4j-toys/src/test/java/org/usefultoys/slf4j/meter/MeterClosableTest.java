@@ -15,13 +15,18 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.impl.TestLogger;
 import org.slf4j.impl.TestLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.slf4j.SessionConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.nio.charset.Charset;
 
 /**
  * @author Daniel Felix Ferber
@@ -35,14 +40,19 @@ public class MeterClosableTest {
     public MeterClosableTest() {
     }
 
-    @BeforeClass
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeAll
     public static void configureMeterSettings() {
         MeterConfig.progressPeriodMilliseconds = 0;
         MeterConfig.printCategory = false;
         MeterConfig.printStatus = true;
     }
 
-    @Before
+    @BeforeEach
     public void clearEvents() {
         logger.clearEvents();
         MeterConfig.printCategory = false;
@@ -52,162 +62,162 @@ public class MeterClosableTest {
     public void testWithStartWithOk() {
         Meter m;
         try (Meter m2 = m = new Meter(logger, "testWithStartWithOk").start()) {
-            Assert.assertEquals(m, Meter.getCurrentInstance());
+            Assertions.assertEquals(m, Meter.getCurrentInstance());
             m2.ok();
         }
 
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        Assertions.assertTrue(m.isOK());
+        Assertions.assertFalse(m.isReject());
+        Assertions.assertFalse(m.isFail());
+        Assertions.assertFalse(m.isSlow());
+        Assertions.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_START, startEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
     }
 
     @Test
     public void testNoStartWithOk() {
         Meter m;
         try (Meter m2 = m = new Meter(logger, "testNoStartWithOk")) {
-            Assert.assertNotEquals(m, Meter.getCurrentInstance());
+            Assertions.assertNotEquals(m, Meter.getCurrentInstance());
             m2.ok();
         }
 
-        Assert.assertTrue(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(3, logger.getEventCount());
+        Assertions.assertTrue(m.isOK());
+        Assertions.assertFalse(m.isReject());
+        Assertions.assertFalse(m.isFail());
+        Assertions.assertFalse(m.isSlow());
+        Assertions.assertEquals(3, logger.getEventCount());
         final TestLoggerEvent startErrorEvent = logger.getEvent(0);
         final TestLoggerEvent stopEvent = logger.getEvent(1);
         final TestLoggerEvent stopDataEvent = logger.getEvent(2);
-        Assert.assertEquals(Markers.INCONSISTENT_OK, startErrorEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
+        Assertions.assertEquals(Markers.INCONSISTENT_OK, startErrorEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_OK, stopEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
     }
 
     @Test
     public void testNoStartNoOk() {
         Meter m;
         try (Meter m2 = m = new Meter(logger, "testNoStartNoOk")) {
-            Assert.assertNotEquals(m, Meter.getCurrentInstance());
+            Assertions.assertNotEquals(m, Meter.getCurrentInstance());
         }
 
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertTrue(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals("try-with-resources", m.getFailPath());
-        Assert.assertEquals(3, logger.getEventCount());
+        Assertions.assertFalse(m.isOK());
+        Assertions.assertFalse(m.isReject());
+        Assertions.assertTrue(m.isFail());
+        Assertions.assertFalse(m.isSlow());
+        Assertions.assertEquals("try-with-resources", m.getFailPath());
+        Assertions.assertEquals(3, logger.getEventCount());
         final TestLoggerEvent startErrorEvent = logger.getEvent(0);
         final TestLoggerEvent stopEvent = logger.getEvent(1);
         final TestLoggerEvent stopDataEvent = logger.getEvent(2);
-        Assert.assertEquals(Markers.INCONSISTENT_CLOSE, startErrorEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains("try-with-resources"));
+        Assertions.assertEquals(Markers.INCONSISTENT_CLOSE, startErrorEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
+        Assertions.assertTrue(stopEvent.getFormattedMessage().contains("try-with-resources"));
     }
 
     @Test
     public void testWithStartNoOk() {
         Meter m;
         try (Meter m2 = m = new Meter(logger, "testWithStartNoOk").start()) {
-            Assert.assertEquals(m, Meter.getCurrentInstance());
+            Assertions.assertEquals(m, Meter.getCurrentInstance());
         }
 
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertTrue(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals("try-with-resources", m.getFailPath());
-        Assert.assertEquals(4, logger.getEventCount());
+        Assertions.assertFalse(m.isOK());
+        Assertions.assertFalse(m.isReject());
+        Assertions.assertTrue(m.isFail());
+        Assertions.assertFalse(m.isSlow());
+        Assertions.assertEquals("try-with-resources", m.getFailPath());
+        Assertions.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains("try-with-resources"));
+        Assertions.assertEquals(Markers.MSG_START, startEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
+        Assertions.assertTrue(stopEvent.getFormattedMessage().contains("try-with-resources"));
     }
 
     @Test
     public void testWithStartWithReject() {
         Meter m;
         try (Meter m2 = m = new Meter(logger, "testWithStartWithReject").start()) {
-            Assert.assertEquals(m, Meter.getCurrentInstance());
+            Assertions.assertEquals(m, Meter.getCurrentInstance());
             m2.reject("a");
         }
 
-        Assert.assertFalse(m.isOK());
-        Assert.assertTrue(m.isReject());
-        Assert.assertFalse(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        Assertions.assertFalse(m.isOK());
+        Assertions.assertTrue(m.isReject());
+        Assertions.assertFalse(m.isFail());
+        Assertions.assertFalse(m.isSlow());
+        Assertions.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_REJECT, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_REJECT, stopDataEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_START, startEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_REJECT, stopEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_REJECT, stopDataEvent.getMarker());
     }
 
     @Test
     public void testWithStartWithFail() {
         Meter m;
         try (Meter m2 = m = new Meter(logger, "testWithStartWithFail").start()) {
-            Assert.assertEquals(m, Meter.getCurrentInstance());
+            Assertions.assertEquals(m, Meter.getCurrentInstance());
             m2.fail("a");
         }
 
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertTrue(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        Assertions.assertFalse(m.isOK());
+        Assertions.assertFalse(m.isReject());
+        Assertions.assertTrue(m.isFail());
+        Assertions.assertFalse(m.isSlow());
+        Assertions.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_START, startEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
     }
 
     @Test
     public void testWithStartWithException() {
         Meter m = null;
         try (Meter m2 = m = new Meter(logger, "testWithStartWithException").start()) {
-            Assert.assertEquals(m, Meter.getCurrentInstance());
+            Assertions.assertEquals(m, Meter.getCurrentInstance());
             throw new RuntimeException("someException");
         } catch (RuntimeException e) {
             // ignore
         }
 
-        Assert.assertFalse(m.isOK());
-        Assert.assertFalse(m.isReject());
-        Assert.assertTrue(m.isFail());
-        Assert.assertFalse(m.isSlow());
-        Assert.assertEquals(4, logger.getEventCount());
+        Assertions.assertFalse(m.isOK());
+        Assertions.assertFalse(m.isReject());
+        Assertions.assertTrue(m.isFail());
+        Assertions.assertFalse(m.isSlow());
+        Assertions.assertEquals(4, logger.getEventCount());
         final TestLoggerEvent startEvent = logger.getEvent(0);
         final TestLoggerEvent startDataEvent = logger.getEvent(1);
         final TestLoggerEvent stopEvent = logger.getEvent(2);
         final TestLoggerEvent stopDataEvent = logger.getEvent(3);
-        Assert.assertEquals(Markers.MSG_START, startEvent.getMarker());
-        Assert.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
-        Assert.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
-        Assert.assertTrue(stopEvent.getFormattedMessage().contains("try-with-resources"));
+        Assertions.assertEquals(Markers.MSG_START, startEvent.getMarker());
+        Assertions.assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_START, startDataEvent.getMarker());
+        Assertions.assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
+        Assertions.assertTrue(stopEvent.getFormattedMessage().contains("try-with-resources"));
     }
 
 }
