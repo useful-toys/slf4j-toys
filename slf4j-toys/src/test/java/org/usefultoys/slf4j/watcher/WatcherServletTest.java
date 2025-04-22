@@ -43,13 +43,17 @@ class WatcherServletTest {
 
     @BeforeEach
     void setupLogger() {
+        testLogger.setEnabled(true);
         testLogger.clearEvents();
+        watcherLogger.setEnabled(true);
         watcherLogger.clearEvents();
     }
 
     @AfterEach
     void clearLogger() {
+        testLogger.setEnabled(true);
         testLogger.clearEvents();
+        watcherLogger.setEnabled(true);
         watcherLogger.clearEvents();
     }
 
@@ -70,14 +74,10 @@ class WatcherServletTest {
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertEquals("System status logged successfully.", responseWriter.toString().trim());
 
-        assertTrue(testLogger.getEventCount() > 0);
+        assertTrue(testLogger.getEventCount() == 1);
         assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("WatcherServlet accessed"));
 
-        assertTrue(watcherLogger.getEventCount() > 1);
+        assertTrue(watcherLogger.getEventCount() == 1);
         assertTrue(watcherLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
-        final String json5 = watcherLogger.getEvent(1).getMessage();
-        final WatcherData data = new WatcherData();
-        data.readJson5(json5);
-        assertEquals(json5, data.json5Message());
     }
 }

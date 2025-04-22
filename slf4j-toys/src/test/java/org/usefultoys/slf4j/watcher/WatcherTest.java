@@ -10,7 +10,9 @@ import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.*;
 class WatcherTest {
-    private static final TestLogger testLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name);
+    private TestLogger testLogger;
+    private TestLogger messageLogger;
+    private TestLogger dataLogger;
 
     @BeforeAll
     static void validate() {
@@ -35,94 +37,153 @@ class WatcherTest {
 
     @BeforeEach
     void setupLogger() {
+        testLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name);
+        messageLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name + ".message");
+        dataLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name + ".data");
         testLogger.clearEvents();
+        messageLogger.clearEvents();
+        dataLogger.clearEvents();
     }
 
     @AfterEach
     void clearLogger() {
+        testLogger.setEnabled(true);
         testLogger.clearEvents();
-    }
-
-    @AfterAll
-    static void resetLogger() {
-        testLogger.setTraceEnabled(true);
-        testLogger.setDebugEnabled(true);
-        testLogger.setInfoEnabled(true);
-        testLogger.setWarnEnabled(true);
-        testLogger.setErrorEnabled(true);
-        testLogger.clearEvents();
+        messageLogger.setEnabled(true);
+        messageLogger.clearEvents();
+        dataLogger.setEnabled(true);
+        dataLogger.clearEvents();
     }
 
     @Test
-    void shouldIncrementPositionAndTimeUsingTraceLogger() {
+    void shouldIncrementPositionAndTimeUsingSeparatedTraceLogger() {
         WatcherConfig.dataEnabled = true;
-        testLogger.setTraceEnabled(true);
-        testLogger.setDebugEnabled(true);
-        testLogger.setInfoEnabled(true);
-        testLogger.setWarnEnabled(true);
-        testLogger.setErrorEnabled(true);
-        final long position = WatcherSingleton.DEFAULT_WATCHER.getPosition();
-        final long time = WatcherSingleton.DEFAULT_WATCHER.getTime();
-        WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
-        assertTrue(WatcherSingleton.DEFAULT_WATCHER.getPosition() == position + 1);
-        assertTrue(WatcherSingleton.DEFAULT_WATCHER.getTime() > time);
+        WatcherConfig.dataSuffix = ".data";
+        WatcherConfig.messageSuffix = ".message";
+        messageLogger.setEnabled(true);
+        dataLogger.setEnabled(true);
+        testLogger.setEnabled(true);
+
+        final Watcher watcher = new Watcher(WatcherConfig.name);
+        final long position = watcher.getPosition();
+        final long time = watcher.getTime();
+        watcher.logCurrentStatus();
+        assertTrue(watcher.getPosition() == position + 1);
+        assertTrue(watcher.getTime() > time);
+        assertTrue(watcher.getRuntime_usedMemory() > 0);
+
+        // Readable and encoded messages are written to the separated logs
+        assertTrue(testLogger.getEventCount() == 0);
+        assertTrue(messageLogger.getEventCount() == 1);
+        assertTrue(messageLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
+        assertTrue(dataLogger.getEventCount() == 1);
+        final String json5 = dataLogger.getEvent(0).getMessage();
+        assertEquals(json5, watcher.json5Message());
+    }
+
+    @Test
+    void shouldIncrementPositionAndTimeUsingSameTraceLogger() {
+        WatcherConfig.dataEnabled = true;
+        WatcherConfig.dataSuffix = "";
+        WatcherConfig.messageSuffix = "";
+        messageLogger.setEnabled(true);
+        dataLogger.setEnabled(true);
+        testLogger.setEnabled(true);
+
+        final Watcher watcher = new Watcher(WatcherConfig.name);
+        final long position = watcher.getPosition();
+        final long time = watcher.getTime();
+        watcher.logCurrentStatus();
+        assertTrue(watcher.getPosition() == position + 1);
+        assertTrue(watcher.getTime() > time);
+        assertTrue(watcher.getRuntime_usedMemory() > 0);
+
+        // Readable and encoded messages are written to the same log
+        assertTrue(messageLogger.getEventCount() == 0);
+        assertTrue(dataLogger.getEventCount() == 0);
         assertTrue(testLogger.getEventCount() == 2);
         assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
         final String json5 = testLogger.getEvent(1).getMessage();
-        final WatcherData data = new WatcherData();
-        data.readJson5(json5);
-        assertEquals(json5, data.json5Message());
+        assertEquals(json5, watcher.json5Message());
     }
 
     @Test
     void shouldIncrementPositionAndTimeDisabledDataLogger() {
         WatcherConfig.dataEnabled = false;
-        testLogger.setTraceEnabled(true);
-        testLogger.setDebugEnabled(true);
-        testLogger.setInfoEnabled(true);
-        testLogger.setWarnEnabled(true);
-        testLogger.setErrorEnabled(true);
-        final long position = WatcherSingleton.DEFAULT_WATCHER.getPosition();
-        final long time = WatcherSingleton.DEFAULT_WATCHER.getTime();
-        WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
-        assertTrue(WatcherSingleton.DEFAULT_WATCHER.getPosition() == position + 1);
-        assertTrue(WatcherSingleton.DEFAULT_WATCHER.getTime() > time);
-        assertTrue(testLogger.getEventCount() == 2);
+        WatcherConfig.dataSuffix = "";
+        WatcherConfig.messageSuffix = "";
+        messageLogger.setEnabled(true);
+        dataLogger.setEnabled(true);
+        testLogger.setEnabled(true);
+
+        final Watcher watcher = new Watcher(WatcherConfig.name);
+        final long position = watcher.getPosition();
+        final long time = watcher.getTime();
+        watcher.logCurrentStatus();
+        assertTrue(watcher.getPosition() == position + 1);
+        assertTrue(watcher.getTime() > time);
+        assertTrue(watcher.getRuntime_usedMemory() > 0);
+
+        // Only readable message is written to log
+        assertTrue(messageLogger.getEventCount() == 0);
+        assertTrue(dataLogger.getEventCount() == 0);
+        assertTrue(testLogger.getEventCount() == 1);
         assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
-        final String json5 = testLogger.getEvent(1).getMessage();
-        final WatcherData data = new WatcherData();
-        data.readJson5(json5);
-        assertEquals(json5, data.json5Message());
     }
 
     @Test
     void shouldIncrementPositionAndTimeInfoLogger() {
+        WatcherConfig.dataEnabled = true;
+        WatcherConfig.dataSuffix = "";
+        WatcherConfig.messageSuffix = "";
+        messageLogger.setEnabled(true);
+        dataLogger.setEnabled(true);
         testLogger.setTraceEnabled(false);
         testLogger.setDebugEnabled(false);
         testLogger.setInfoEnabled(true);
         testLogger.setWarnEnabled(true);
         testLogger.setErrorEnabled(true);
-        final long position = WatcherSingleton.DEFAULT_WATCHER.getPosition();
-        final long time = WatcherSingleton.DEFAULT_WATCHER.getTime();
-        WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
-        assertTrue(WatcherSingleton.DEFAULT_WATCHER.getPosition() == position + 1);
-        assertTrue(WatcherSingleton.DEFAULT_WATCHER.getTime() > time);
+
+        final Watcher watcher = new Watcher(WatcherConfig.name);
+        final long position = watcher.getPosition();
+        final long time = watcher.getTime();
+        watcher.logCurrentStatus();
+        assertTrue(watcher.getPosition() == position + 1);
+        assertTrue(watcher.getTime() > time);
+        assertTrue(watcher.getRuntime_usedMemory() > 0);
+
+        // Only readable message is written to log
+        assertTrue(messageLogger.getEventCount() == 0);
+        assertTrue(dataLogger.getEventCount() == 0);
         assertTrue(testLogger.getEventCount() == 1);
         assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
     }
 
     @Test
     void shouldIncrementPositionAndTimeErrorLogger() {
+        WatcherConfig.dataEnabled = true;
+        WatcherConfig.dataSuffix = "";
+        WatcherConfig.messageSuffix = "";
+        messageLogger.setEnabled(true);
+        dataLogger.setEnabled(true);
         testLogger.setTraceEnabled(false);
         testLogger.setDebugEnabled(false);
         testLogger.setInfoEnabled(false);
         testLogger.setWarnEnabled(false);
-        testLogger.setErrorEnabled(true);
-        final long position = WatcherSingleton.DEFAULT_WATCHER.getPosition();
-        final long time = WatcherSingleton.DEFAULT_WATCHER.getTime();
-        WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
-        assertTrue(WatcherSingleton.DEFAULT_WATCHER.getPosition() == position + 1);
-        assertTrue(WatcherSingleton.DEFAULT_WATCHER.getTime() > time);
+        testLogger.setErrorEnabled(false);
+
+        final Watcher watcher = new Watcher(WatcherConfig.name);
+        final long position = watcher.getPosition();
+        final long time = watcher.getTime();
+        watcher.logCurrentStatus();
+        assertTrue(watcher.getPosition() == position + 1);
+        assertTrue(watcher.getTime() > time);
+        // As nothing is logged, the memory usage won't be collected and should be 0
+        assertTrue(watcher.getRuntime_usedMemory() == 0);
+
+        // No messages a written to log
+        assertTrue(messageLogger.getEventCount() == 0);
+        assertTrue(dataLogger.getEventCount() == 0);
         assertTrue(testLogger.getEventCount() == 0);
     }
 }

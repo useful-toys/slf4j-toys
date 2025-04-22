@@ -15,10 +15,8 @@
  */
 package org.usefultoys.slf4j.watcher;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.Session;
-import org.usefultoys.slf4j.SessionConfig;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -42,12 +40,16 @@ public class Watcher extends WatcherData implements Runnable {
     /**
      * Constructor. Events produced by this watcher will use the given logger.
      *
-     * @param logger Logger that reports messages.
+     * @param name Logger that reports messages.
      */
-    public Watcher(final Logger logger) {
+    public Watcher(final String name) {
         super(Session.shortSessionUudi());
-        this.messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
-        this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
+        this.messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + name + messageSuffix);
+        if (dataEnabled) {
+            this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + name + dataSuffix);
+        } else {
+            this.dataLogger = null;
+        }
     }
 
     @Override
@@ -61,13 +63,15 @@ public class Watcher extends WatcherData implements Runnable {
     public void logCurrentStatus() {
         time = System.nanoTime();
         position++;
-        if (messageLogger.isInfoEnabled()) {
+        if (messageLogger.isInfoEnabled() || (dataLogger != null && dataLogger.isTraceEnabled())) {
             collectRuntimeStatus();
             collectPlatformStatus();
             collectManagedBeanStatus();
+        }
+        if (messageLogger.isInfoEnabled()) {
             messageLogger.info(Markers.MSG_WATCHER, readableMessage());
         }
-        if (dataLogger.isTraceEnabled()) {
+        if (dataLogger != null && dataLogger.isTraceEnabled()) {
             dataLogger.trace(Markers.DATA_WATCHER, encodedMessage());
         }
     }

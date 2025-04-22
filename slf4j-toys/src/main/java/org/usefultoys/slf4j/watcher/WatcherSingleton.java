@@ -55,7 +55,7 @@ public final class WatcherSingleton {
      * {@code slf4jtoys.watcher.name}, defaulting to {@code watcher}.
      */
     @SuppressWarnings("NonFinalStaticVariableUsedInClassInitialization")
-    public final Watcher DEFAULT_WATCHER = new Watcher(LoggerFactory.getLogger(WatcherConfig.name));
+    public final Watcher DEFAULT_WATCHER = new Watcher(WatcherConfig.name);
 
     /** Executor service for running the default watcher periodically. */
     ScheduledExecutorService defaultWatcherExecutor = null;
