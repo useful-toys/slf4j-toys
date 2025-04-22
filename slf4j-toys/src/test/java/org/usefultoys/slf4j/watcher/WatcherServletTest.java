@@ -1,13 +1,10 @@
 package org.usefultoys.slf4j.watcher;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
+import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.SystemConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,14 +22,34 @@ class WatcherServletTest {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
-    private TestLogger testLogger;
-    private TestLogger watcherLogger;
+    @BeforeEach
+    void resetWatcherConfigBeforeEach() {
+        // Reinitialize WatcherConfig to ensure clean configuration before each test
+        WatcherConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    @AfterAll
+    static void resetWatcherConfigAfterAll() {
+        // Reinitialize WatcherConfig to ensure clean configuration for further tests
+        WatcherConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    private TestLogger testLogger = (TestLogger) LoggerFactory.getLogger(WatcherServlet.class);
+    private TestLogger watcherLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name);
 
     @BeforeEach
-    void setUp() {
-        testLogger = (TestLogger) LoggerFactory.getLogger(WatcherServlet.class);
+    void setupLogger() {
         testLogger.clearEvents();
-        watcherLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name);
+        watcherLogger.clearEvents();
+    }
+
+    @AfterEach
+    void clearLogger() {
+        testLogger.clearEvents();
         watcherLogger.clearEvents();
     }
 

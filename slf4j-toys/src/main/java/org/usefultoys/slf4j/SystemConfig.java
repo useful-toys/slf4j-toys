@@ -41,7 +41,7 @@ public class SystemConfig {
     }
         
     // System property keys
-     public final String SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN = "slf4jtoys.useMemoryManagedBean";
+     public final String PROP_USE_MEMORY_MANAGED_BEAN = "slf4jtoys.useMemoryManagedBean";
      public final String PROP_USE_CLASS_LOADING_MANAGED_BEAN = "slf4jtoys.useClassLoadingManagedBean";
      public final String PROP_USE_COMPILATION_MANAGED_BEAN = "slf4jtoys.useCompilationManagedBean";
      public final String PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN = "slf4jtoys.useGarbageCollectionManagedBean";
@@ -84,10 +84,23 @@ public class SystemConfig {
     public boolean usePlatformManagedBean;
 
     public void init() {
-        useMemoryManagedBean = ConfigParser.getProperty(SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN, false);
+        useMemoryManagedBean = ConfigParser.getProperty(PROP_USE_MEMORY_MANAGED_BEAN, false);
         useClassLoadingManagedBean = ConfigParser.getProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN, false);
         useCompilationManagedBean = ConfigParser.getProperty(PROP_USE_COMPILATION_MANAGED_BEAN, false);
         useGarbageCollectionManagedBean = ConfigParser.getProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, false);
         usePlatformManagedBean = ConfigParser.getProperty(PROP_USE_PLATFORM_MANAGED_BEAN, false);
+    }
+
+    /**
+     * Resets the configuration properties to their default values.
+     * This method is useful for testing purposes or when reinitializing the configuration.
+     */
+    public void reset() {
+        System.clearProperty(PROP_USE_MEMORY_MANAGED_BEAN);
+        System.clearProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN);
+        System.clearProperty(PROP_USE_COMPILATION_MANAGED_BEAN);
+        System.clearProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN);
+        System.clearProperty(PROP_USE_PLATFORM_MANAGED_BEAN);
+        init();
     }
 }

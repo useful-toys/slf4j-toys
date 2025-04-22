@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.usefultoys.slf4j.watcher.WatcherConfig;
 
 import java.nio.charset.Charset;
 
@@ -16,6 +17,19 @@ class SessionConfigTest {
     static void validate() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
+
+    @BeforeEach
+    void resetWatcherConfigBeforeEach() {
+        // Reinitialize WatcherConfig to ensure clean configuration before each test
+        SessionConfig.reset();
+    }
+
+    @AfterAll
+    static void resetWatcherConfigAfterAll() {
+        // Reinitialize WatcherConfig to ensure clean configuration for further tests
+        SessionConfig.reset();
+    }
+
 
     @BeforeEach
     void setUp() {
@@ -37,6 +51,14 @@ class SessionConfigTest {
 
     @Test
     void testDefaultValues() {
+        SessionConfig.init();
+        assertEquals(5, SessionConfig.uuidSize);
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset);
+    }
+
+    @Test
+    void testResetValues() {
+        SessionConfig.reset();
         assertEquals(5, SessionConfig.uuidSize);
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset);
     }
@@ -49,7 +71,7 @@ class SessionConfigTest {
     }
 
     @Test
-    void testCharsetProperty() {
+    public void testCharsetProperty() {
         System.setProperty(SessionConfig.PROP_PRINT_CHARSET, "ISO-8859-1");
         SessionConfig.init(); // Reinitialize to apply new system properties
         assertEquals("ISO-8859-1", SessionConfig.charset, "charset should reflect the system property value");

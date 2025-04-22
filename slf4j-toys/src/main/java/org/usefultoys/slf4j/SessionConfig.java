@@ -89,4 +89,14 @@ public class SessionConfig {
         uuidSize = ConfigParser.getProperty(PROP_PRINT_UUID_SIZE, 5);
         charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, Charset.defaultCharset().name());
     }
+
+    /**
+     * Resets the configuration properties to their default values.
+     * This method is useful for testing purposes or when reinitializing the configuration.
+     */
+    public void reset() {
+        System.clearProperty(PROP_PRINT_UUID_SIZE);
+        System.clearProperty(PROP_PRINT_CHARSET);
+        init();
+    }
 }

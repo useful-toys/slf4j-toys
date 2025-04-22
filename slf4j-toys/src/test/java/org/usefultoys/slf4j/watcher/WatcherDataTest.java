@@ -1,11 +1,38 @@
 package org.usefultoys.slf4j.watcher;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.SystemConfig;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.nio.charset.Charset;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class WatcherDataTest {
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeEach
+    void resetWatcherConfigBeforeEach() {
+        // Reinitialize WatcherConfig to ensure clean configuration before each test
+        WatcherConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    @AfterAll
+    static void resetWatcherConfigAfterAll() {
+        // Reinitialize WatcherConfig to ensure clean configuration for further tests
+        WatcherConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
 
     @Test
     void testReadableMessageWithMemoryAndSystemLoad() {

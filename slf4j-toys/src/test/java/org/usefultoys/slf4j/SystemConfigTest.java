@@ -19,7 +19,7 @@ class SystemConfigTest {
     @BeforeEach
     void setUp() {
         // Reinitialize SystemConfig to ensure clean state for each test
-        System.clearProperty(SystemConfig.SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN);
+        System.clearProperty(SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN);
         System.clearProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN);
         System.clearProperty(SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN);
         System.clearProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN);
@@ -29,7 +29,7 @@ class SystemConfigTest {
 
     @AfterEach
     void tearDown() {
-        System.clearProperty(SystemConfig.SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN);
+        System.clearProperty(SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN);
         System.clearProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN);
         System.clearProperty(SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN);
         System.clearProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN);
@@ -48,6 +48,17 @@ class SystemConfigTest {
     }
 
     @Test
+    void testResetValues() {
+        SystemConfig.reset();
+
+        assertFalse(SystemConfig.useMemoryManagedBean, "Default value for useMemoryManagedBean should be false");
+        assertFalse(SystemConfig.useClassLoadingManagedBean, "Default value for useClassLoadingManagedBean should be false");
+        assertFalse(SystemConfig.useCompilationManagedBean, "Default value for useCompilationManagedBean should be false");
+        assertFalse(SystemConfig.useGarbageCollectionManagedBean, "Default value for useGarbageCollectionManagedBean should be false");
+        assertFalse(SystemConfig.usePlatformManagedBean, "Default value for usePlatformManagedBean should be false");
+    }
+
+    @Test
     void testUseClassLoadingManagedBean() {
         System.setProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
@@ -56,7 +67,7 @@ class SystemConfigTest {
 
     @Test
     void testUseMemoryManagedBean() {
-        System.setProperty(SystemConfig.SLF_4_JTOYS_USE_MEMORY_MANAGED_BEAN, "true");
+        System.setProperty(SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
         assertTrue(SystemConfig.useMemoryManagedBean, "useMemoryManagedBean should reflect the system property value");
     }

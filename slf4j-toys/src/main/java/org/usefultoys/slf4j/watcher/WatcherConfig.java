@@ -45,6 +45,7 @@ public class WatcherConfig {
     public final String PROP_PERIOD = "slf4jtoys.watcher.period";
     public final String PROP_DATA_PREFIX = "slf4jtoys.watcher.data.prefix";
     public final String PROP_DATA_SUFFIX = "slf4jtoys.watcher.data.suffix";
+    public final String PROP_DATA_ENABLED = "slf4jtoys.watcher.data.enabled";
     public final String PROP_MESSAGE_PREFIX = "slf4jtoys.watcher.message.prefix";
     public final String PROP_MESSAGE_SUFFIX = "slf4jtoys.watcher.message.suffix";
 
@@ -104,6 +105,15 @@ public class WatcherConfig {
     public String dataSuffix;
 
     /**
+     * Whether the watcher writes encoded data messages to log.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.watcher.message.prefix}, defaulting to false.
+     * <p>
+     * You may assign a new value at runtime.
+     */
+    public boolean dataEnabled;
+
+    /**
      * Prefix added to the logger name used for human-readable messages.
      * <p>
      * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows directing
@@ -135,7 +145,24 @@ public class WatcherConfig {
         periodMilliseconds = ConfigParser.getMillisecondsProperty(PROP_PERIOD, 600000L);
         dataPrefix = ConfigParser.getProperty(PROP_DATA_PREFIX, "");
         dataSuffix = ConfigParser.getProperty(PROP_DATA_SUFFIX, "");
+        dataEnabled = ConfigParser.getProperty(PROP_DATA_ENABLED, false);
         messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
         messageSuffix = ConfigParser.getProperty(PROP_MESSAGE_SUFFIX, "");
+    }
+
+    /**
+     * Resets the configuration properties to their default values.
+     * This method is useful for testing purposes or when reinitializing the configuration.
+     */
+    void reset() {
+        System.clearProperty(WatcherConfig.PROP_NAME);
+        System.clearProperty(WatcherConfig.PROP_DELAY);
+        System.clearProperty(WatcherConfig.PROP_PERIOD);
+        System.clearProperty(WatcherConfig.PROP_DATA_PREFIX);
+        System.clearProperty(WatcherConfig.PROP_DATA_SUFFIX);
+        System.clearProperty(WatcherConfig.PROP_DATA_ENABLED);
+        System.clearProperty(WatcherConfig.PROP_MESSAGE_PREFIX);
+        System.clearProperty(WatcherConfig.PROP_MESSAGE_SUFFIX);
+        init();
     }
 }

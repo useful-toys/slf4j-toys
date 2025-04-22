@@ -1,10 +1,8 @@
 package org.usefultoys.slf4j.watcher;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.SystemConfig;
 
 import java.nio.charset.Charset;
 
@@ -18,43 +16,53 @@ class WatcherConfigTest {
     }
 
     @BeforeEach
-    void setUp() {
-        System.clearProperty(WatcherConfig.PROP_NAME);
-        System.clearProperty(WatcherConfig.PROP_DELAY);
-        System.clearProperty(WatcherConfig.PROP_PERIOD);
-        System.clearProperty(WatcherConfig.PROP_DATA_PREFIX);
-        System.clearProperty(WatcherConfig.PROP_DATA_SUFFIX);
-        System.clearProperty(WatcherConfig.PROP_MESSAGE_PREFIX);
-        System.clearProperty(WatcherConfig.PROP_MESSAGE_SUFFIX);
-
-        // Reinitialize WatcherConfig to ensure clean state for each test
-        WatcherConfig.init();
+    void resetWatcherConfigBeforeEach() {
+        // Reinitialize WatcherConfig to ensure clean configuration before each test
+        WatcherConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
     }
 
-    @AfterEach
-    void tearDown() {
-        System.clearProperty(WatcherConfig.PROP_NAME);
-        System.clearProperty(WatcherConfig.PROP_DELAY);
-        System.clearProperty(WatcherConfig.PROP_PERIOD);
-        System.clearProperty(WatcherConfig.PROP_DATA_PREFIX);
-        System.clearProperty(WatcherConfig.PROP_DATA_SUFFIX);
-        System.clearProperty(WatcherConfig.PROP_MESSAGE_PREFIX);
-        System.clearProperty(WatcherConfig.PROP_MESSAGE_SUFFIX);
+    @AfterAll
+    static void resetWatcherConfigAfterAll() {
+        // Reinitialize WatcherConfig to ensure clean configuration for further tests
+        WatcherConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
     }
 
     @Test
     void testDefaultValues() {
+        WatcherConfig.init();
         assertEquals("watcher", WatcherConfig.name, "Default value for name should be 'watcher'");
         assertEquals(60000L, WatcherConfig.delayMilliseconds, "Default value for delayMilliseconds should be 60000");
         assertEquals(600000L, WatcherConfig.periodMilliseconds, "Default value for periodMilliseconds should be 600000");
         assertEquals("", WatcherConfig.dataPrefix, "Default value for dataPrefix should be an empty string");
         assertEquals("", WatcherConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
+        assertFalse(WatcherConfig.dataEnabled, "Default value for dataEnabled should be false");
+        assertEquals("", WatcherConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
+        assertEquals("", WatcherConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
+    }
+
+    @Test
+    void testResetValues() {
+        WatcherConfig.reset();
+        assertEquals("watcher", WatcherConfig.name, "Default value for name should be 'watcher'");
+        assertEquals(60000L, WatcherConfig.delayMilliseconds, "Default value for delayMilliseconds should be 60000");
+        assertEquals(600000L, WatcherConfig.periodMilliseconds, "Default value for periodMilliseconds should be 600000");
+        assertEquals("", WatcherConfig.dataPrefix, "Default value for dataPrefix should be an empty string");
+        assertEquals("", WatcherConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
+        assertFalse(WatcherConfig.dataEnabled, "Default value for dataEnabled should be false");
         assertEquals("", WatcherConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
         assertEquals("", WatcherConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
     }
 
     @Test
     void testDelayMillisecondsProperty() {
+        System.setProperty(WatcherConfig.PROP_DELAY, "120000ms");
+        WatcherConfig.init(); // Reinitialize to apply new system properties
+        assertEquals(120000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
+
         System.setProperty(WatcherConfig.PROP_DELAY, "120000");
         WatcherConfig.init(); // Reinitialize to apply new system properties
         assertEquals(120000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
@@ -67,6 +75,10 @@ class WatcherConfigTest {
         WatcherConfig.init(); // Reinitialize to apply new system properties
         assertEquals(120000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
 
+        System.setProperty(WatcherConfig.PROP_DELAY, "2min");
+        WatcherConfig.init(); // Reinitialize to apply new system properties
+        assertEquals(120000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
+
         System.setProperty(WatcherConfig.PROP_DELAY, "1h");
         WatcherConfig.init(); // Reinitialize to apply new system properties
         assertEquals(3600000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
@@ -74,6 +86,10 @@ class WatcherConfigTest {
 
     @Test
     void testPeriodMillisecondsProperty() {
+        System.setProperty(WatcherConfig.PROP_PERIOD, "120000ms");
+        WatcherConfig.init(); // Reinitialize to apply new system properties
+        assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
+
         System.setProperty(WatcherConfig.PROP_PERIOD, "120000");
         WatcherConfig.init(); // Reinitialize to apply new system properties
         assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
@@ -83,6 +99,10 @@ class WatcherConfigTest {
         assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
 
         System.setProperty(WatcherConfig.PROP_PERIOD, "2m");
+        WatcherConfig.init(); // Reinitialize to apply new system properties
+        assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
+
+        System.setProperty(WatcherConfig.PROP_PERIOD, "2min");
         WatcherConfig.init(); // Reinitialize to apply new system properties
         assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
 
@@ -103,6 +123,13 @@ class WatcherConfigTest {
         System.setProperty(WatcherConfig.PROP_DATA_SUFFIX, ".data");
         WatcherConfig.init(); // Reinitialize to apply new system properties
         assertEquals(".data", WatcherConfig.dataSuffix, "dataSuffix should reflect the system property value");
+    }
+
+    @Test
+    void testDataEnabledProperty() {
+        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
+        WatcherConfig.init(); // Reinitialize to apply new system properties
+        assertTrue(WatcherConfig.dataEnabled, "dataEnabled should reflect the system property value");
     }
 
     @Test

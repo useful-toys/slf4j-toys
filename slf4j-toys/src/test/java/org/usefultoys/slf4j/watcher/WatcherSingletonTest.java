@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.TestLogger;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.SystemConfig;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
@@ -18,19 +19,38 @@ class WatcherSingletonTest {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
-    private static TestLogger testLogger;
+    @BeforeEach
+    void resetWatcherConfigBeforeEach() {
+        // Reinitialize WatcherConfig to ensure clean configuration before each test
+        WatcherConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
 
-    @BeforeAll
-    static void setupLogger() {
-        testLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name);;
+    @AfterAll
+    static void resetWatcherConfigAfterAll() {
+        // Reinitialize WatcherConfig to ensure clean configuration for further tests
+        WatcherConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    private TestLogger testLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name);;
+
+    @BeforeEach
+    void setupLogger() {
         testLogger.clearEvents();
     }
 
     @AfterEach
-    void stopAllSchedulers() {
+    void clearLogger() {
+        testLogger.clearEvents();
+    }
+
+    @AfterEach
+    void stopAllWatchers() {
         WatcherSingleton.stopDefaultWatcherExecutor();
         WatcherSingleton.stopDefaultWatcherTimer();
-        testLogger.clearEvents();
     }
 
     @Test
