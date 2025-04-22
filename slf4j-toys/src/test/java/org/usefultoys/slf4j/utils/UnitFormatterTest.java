@@ -17,10 +17,11 @@ package org.usefultoys.slf4j.utils;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.usefultoys.slf4j.SessionConfig;
 
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.stream.Stream;
 
@@ -31,26 +32,29 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  *
  * @author Daniel
  */
-public class UnitFormatterTest {
+class UnitFormatterTest {
 
-    private static Locale originalLocal;
+    private static Locale originalLocale;
 
-    public UnitFormatterTest() {
-    }
     private static final int[] FACTORS = {1000, 1000, 1000};
     private static final String[] UNITS = {"A", "B", "C"};
 
     @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeAll
     public static void setUpClass() {
         // Set the default locale to English for consistent formatting
-        originalLocal = Locale.getDefault();
+        originalLocale = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
     }
 
     @AfterAll
     public static void tearDownClass() {
         // Reset the default locale to the system default
-        Locale.setDefault(originalLocal);
+        Locale.setDefault(originalLocale);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideLongUnitTestCases() {

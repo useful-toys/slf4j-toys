@@ -1,12 +1,15 @@
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.TestLogger;
+import org.usefultoys.slf4j.SessionConfig;
 
 import javax.servlet.ServletContextEvent;
 
+import java.nio.charset.Charset;
 import java.sql.Connection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +18,11 @@ import static org.mockito.Mockito.mock;
 class ReportContextListenerTest {
     private TestLogger testLogger;
     private ReportContextListener listener;
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     @BeforeEach
     void setUp() {
