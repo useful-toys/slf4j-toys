@@ -30,4 +30,10 @@ class SessionTest {
     void testUuidFormat() {
         assertTrue(Session.uuid.matches("^[a-f0-9]{32}$"), "Session UUID should be a 32-character hexadecimal string");
     }
+
+    @Test
+    void testShortSessionUudi() {
+        assertNotNull(Session.shortSessionUudi(), "shortSessionUudi() should not return null");
+        assertTrue(Session.uuid.endsWith(Session.shortSessionUudi()));
+    }
 }
