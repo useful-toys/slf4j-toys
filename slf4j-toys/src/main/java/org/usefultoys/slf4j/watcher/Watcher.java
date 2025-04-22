@@ -67,7 +67,7 @@ public class Watcher extends WatcherData implements Runnable {
             collectManagedBeanStatus();
             messageLogger.info(Markers.MSG_WATCHER, readableMessage());
         }
-        if (messageLogger.isTraceEnabled()) {
+        if (dataLogger.isTraceEnabled()) {
             dataLogger.trace(Markers.DATA_WATCHER, encodedMessage());
         }
     }
