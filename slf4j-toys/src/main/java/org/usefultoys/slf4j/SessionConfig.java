@@ -23,6 +23,7 @@ import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.slf4j.watcher.Watcher;
 import org.usefultoys.slf4j.watcher.WatcherData;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -78,7 +79,7 @@ public class SessionConfig {
      * <p>
      * Defaults to {@link StandardCharsets#UTF_8}. May be changed at runtime.
      */
-    public String charset = StandardCharsets.UTF_8.name();
+    public String charset = Charset.defaultCharset().name();
 
     /**
      * Initializes the configurable properties of the SessionConfig class.
@@ -86,6 +87,6 @@ public class SessionConfig {
      */
     public void init() {
         uuidSize = ConfigParser.getProperty(PROP_PRINT_UUID_SIZE, 5);
-        charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, StandardCharsets.UTF_8.name());
+        charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, Charset.defaultCharset().name());
     }
 }
