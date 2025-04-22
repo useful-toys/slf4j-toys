@@ -16,11 +16,15 @@
 package org.usefultoys.slf4j.internal;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
+
+import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -60,6 +64,11 @@ class SystemDataTest {
             sb.append("a");
             return sb;
         }
+    }
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
     @AfterEach

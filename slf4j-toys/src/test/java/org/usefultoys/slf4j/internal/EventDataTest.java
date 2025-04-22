@@ -15,15 +15,20 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.usefultoys.slf4j.SessionConfig;
+
+import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- *
- * @author Daniel
- */
 class EventDataTest {
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     static class TestEventData extends EventData {
         boolean resetCalled = false;
