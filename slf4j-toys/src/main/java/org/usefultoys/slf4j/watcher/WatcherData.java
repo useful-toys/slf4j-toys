@@ -30,22 +30,15 @@ public class WatcherData extends SystemData {
     private static final long serialVersionUID = 1L;
     public static final char DETAILED_MESSAGE_PREFIX = 'W';
 
-    public WatcherData() {
+    protected WatcherData() {
     }
 
     protected WatcherData(final String uuid) {
         super(uuid);
     }
 
-    public WatcherData(final String sessionUuid, final long position) {
-        super(sessionUuid, position);
-    }
-
-    public WatcherData(final String sessionUuid, final long position, final long time) {
-        super(sessionUuid, position, time);
-    }
-
-    public WatcherData(final String sessionUuid, final long position, final long time,
+    // for tests only
+    WatcherData(final String sessionUuid, final long position, final long time,
                        final long heap_commited, final long heap_max, final long heap_used,
                        final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
                        final long objectPendingFinalizationCount,
@@ -70,7 +63,7 @@ public class WatcherData extends SystemData {
             builder.append(UnitFormatter.bytes(this.runtime_maxMemory));
             hasPrevious = true;
         }
-        if (this.systemLoad > 0) {
+        if (systemLoad > 0) {
             if (hasPrevious) {
                 builder.append("; ");
             }
@@ -79,12 +72,12 @@ public class WatcherData extends SystemData {
             builder.append("%");
             hasPrevious = true;
         }
-        if (SessionConfig.uuidSize != 0 && this.sessionUuid != null) {
+        if (this.sessionUuid != null) {
             if (hasPrevious) {
                 builder.append("; ");
             }
             builder.append("UUID: ");
-            builder.append(this.sessionUuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize));
+            builder.append(this.sessionUuid);
         }
         return builder;
     }

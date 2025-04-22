@@ -15,8 +15,10 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.Session;
+import org.usefultoys.slf4j.SessionConfig;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -43,7 +45,7 @@ public class Watcher extends WatcherData implements Runnable {
      * @param logger Logger that reports messages.
      */
     public Watcher(final Logger logger) {
-        super(Session.uuid);
+        super(Session.shortSessionUudi());
         this.messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
         this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
     }

@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j;
 
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.watcher.Watcher;
 
@@ -42,4 +43,8 @@ public class Session {
      * The value is assigned once at application startup and remains constant during runtime.
      */
     public final String uuid = UUID.randomUUID().toString().replace("-", "");
+
+    public @NotNull String shortSessionUudi() {
+        return Session.uuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize);
+    }
 }
