@@ -33,11 +33,11 @@ class SystemDataTest {
             super();
         }
 
-        public TestSystemData(String sessionUuid) {
+        public TestSystemData(final String sessionUuid) {
             super(sessionUuid);
         }
 
-        public TestSystemData(String sessionUuid, long position) {
+        public TestSystemData(final String sessionUuid, final long position) {
             super(sessionUuid, position);
         }
 
@@ -58,7 +58,7 @@ class SystemDataTest {
         }
 
         @Override
-        protected StringBuilder readableStringBuilder(StringBuilder sb) {
+        protected StringBuilder readableStringBuilder(final StringBuilder sb) {
             sb.append("a");
             return sb;
         }
@@ -133,7 +133,7 @@ class SystemDataTest {
     @Test
     void testReadableMessage() {
         final TestSystemData event = new TestSystemData("abc", 5L);
-        String message = event.readableMessage();
+        final String message = event.readableMessage();
         assertTrue(message.equals("a"));
     }
 
@@ -182,48 +182,48 @@ class SystemDataTest {
     @Test
     void testJsonMessageAllAttributes() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
-        String json = event.json5Message();
+        final String json = event.json5Message();
         assertEquals("{_:abc,$:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,gc:[14,15],sl:19.0}", json);
     }
 
     @Test
     void testJsonMessageEssentialAttributes() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0);
-        String json = event.json5Message();
+        final String json = event.json5Message();
         assertEquals("{_:abc,$:1,t:2,h:[5,3,4]}", json);
     }
 
     @Test
     void testJsonMessageWithoutHeapAttributes() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 0, 0, 0, 0, 0, 0, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
-        String json = event.json5Message();
+        final String json = event.json5Message();
         assertEquals("{_:abc,$:1,t:2,m:[16,18,17],fc:9,cl:[11,10,12],ct:13,gc:[14,15],sl:19.0}", json);
     }
 
     @Test
     void testJsonMessageWithoutClassLoadingAttributes() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 13, 14, 15, 16, 17, 18, 19.0);
-        String json = event.json5Message();
+        final String json = event.json5Message();
         assertEquals("{_:abc,$:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],ct:13,gc:[14,15],sl:19.0}", json);
     }
 
     @Test
     void testJsonMessageWithoutGarbageCollectorAttributes() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 0, 16, 17, 18, 19.0);
-        String json = event.json5Message();
+        final String json = event.json5Message();
         assertEquals("{_:abc,$:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,sl:19.0}", json);
     }
 
     @Test
     void testJsonMessageWithoutSystemLoad() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 0.0);
-        String json = event.json5Message();
+        final String json = event.json5Message();
         assertEquals("{_:abc,$:1,t:2,m:[16,18,17],h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,gc:[14,15]}", json);
     }
 
     void testJsonMessageMemory() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 0, 0, 19.0);
-        String json = event.json5Message();
+        final String json = event.json5Message();
         assertEquals("{_:abc,$:1,t:2,h:[5,3,4],nh:[8,6,7],fc:9,cl:[11,10,12],ct:13,gc:[14,15],sl:19.0}", json);
     }
 
@@ -231,7 +231,7 @@ class SystemDataTest {
     void testReadJson5SystemDataMessage() {
         final SystemData systemData = new SystemData() {
             @Override
-            protected StringBuilder readableStringBuilder(StringBuilder sb) {
+            protected StringBuilder readableStringBuilder(final StringBuilder sb) {
                 return sb;
             }
         };

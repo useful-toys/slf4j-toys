@@ -162,8 +162,8 @@ public abstract class SystemData extends EventData {
         }
 
         // Fallback:
-        double loadAverage = osBean.getSystemLoadAverage();
-        int availableProcessors = osBean.getAvailableProcessors();
+        final double loadAverage = osBean.getSystemLoadAverage();
+        final int availableProcessors = osBean.getAvailableProcessors();
         if (loadAverage >= 0 && availableProcessors > 0) {
             // may report negative values on some platforms, specifically Windows
             systemLoad = loadAverage / availableProcessors;

@@ -23,7 +23,7 @@ class ReportUserTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = LoggerFactory.getLogger("test.report.user");
+        final Logger logger = LoggerFactory.getLogger("test.report.user");
         mockLogger = (MockLogger) logger;
         mockLogger.clearEvents();
     }
@@ -31,7 +31,7 @@ class ReportUserTest {
     @Test
     void shouldLogUserInformation() {
         // Arrange
-        ReportUser report = new ReportUser(mockLogger);
+        final ReportUser report = new ReportUser(mockLogger);
 
         // Act
         report.run();

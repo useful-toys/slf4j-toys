@@ -21,8 +21,8 @@ class SessionTest {
 
     @Test
     void testUuidIsImmutable() {
-        String firstUuid = Session.uuid;
-        String secondUuid = Session.uuid;
+        final String firstUuid = Session.uuid;
+        final String secondUuid = Session.uuid;
         assertEquals(firstUuid, secondUuid, "Session UUID should remain constant");
     }
 

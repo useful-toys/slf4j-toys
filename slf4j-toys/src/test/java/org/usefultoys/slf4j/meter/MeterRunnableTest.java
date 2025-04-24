@@ -223,7 +223,7 @@ public class MeterRunnableTest {
                     throw new IllegalArgumentException("someException");
                 }
             });
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             assertEquals("someException", e.getMessage());
         }
         assertFalse(m.isOK());

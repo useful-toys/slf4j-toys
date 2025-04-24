@@ -23,7 +23,7 @@ class ReportFileSystemTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = LoggerFactory.getLogger("test.report.fs");
+        final Logger logger = LoggerFactory.getLogger("test.report.fs");
         mockLogger = (MockLogger) logger;
         mockLogger.clearEvents();
     }
@@ -31,8 +31,8 @@ class ReportFileSystemTest {
     @Test
     void shouldLogFileSystemInformation() {
         // Arrange
-        ReportFileSystem report = new ReportFileSystem(mockLogger);
-        File[] roots = File.listRoots();
+        final ReportFileSystem report = new ReportFileSystem(mockLogger);
+        final File[] roots = File.listRoots();
         assertTrue(roots.length > 0, "Expected at least one file system root");
 
         // Act

@@ -37,7 +37,7 @@ class WatcherDataTest {
     @Test
     void testReadableMessageWithMemoryAndSystemLoad() {
         // Arrange
-        WatcherData watcherData = new WatcherData("test-session-uuid", 1, System.currentTimeMillis(),
+        final WatcherData watcherData = new WatcherData("test-session-uuid", 1, System.currentTimeMillis(),
                 1024, 2048, 512, // heap
                 512, 1024, 256,  // non-heap
                 0,               // finalization count
@@ -49,7 +49,7 @@ class WatcherDataTest {
                 0.75);           // system load
 
         // Act
-        String readableMessage = watcherData.readableMessage();
+        final String readableMessage = watcherData.readableMessage();
 
         // Assert
         assertTrue(readableMessage.contains("Memory: 512B 514B 513B"), "Readable message should include memory details");
@@ -60,7 +60,7 @@ class WatcherDataTest {
     @Test
     void testReadableMessageWithoutSystemLoad() {
         // Arrange
-        WatcherData watcherData = new WatcherData("test-session-uuid", 1, System.currentTimeMillis(),
+        final WatcherData watcherData = new WatcherData("test-session-uuid", 1, System.currentTimeMillis(),
                 1024, 2048, 512, // heap
                 512, 1024, 256,  // non-heap
                 0,               // finalization count
@@ -72,7 +72,7 @@ class WatcherDataTest {
                 0.0);            // system load
 
         // Act
-        String readableMessage = watcherData.readableMessage();
+        final String readableMessage = watcherData.readableMessage();
 
         // Assert
         assertTrue(readableMessage.contains("Memory: 512B 514B 513B"), "Readable message should include memory details");
@@ -83,7 +83,7 @@ class WatcherDataTest {
     @Test
     void testReadableMessageWithoutMemory() {
         // Arrange
-        WatcherData watcherData = new WatcherData("test-session-uuid", 1, System.currentTimeMillis(),
+        final WatcherData watcherData = new WatcherData("test-session-uuid", 1, System.currentTimeMillis(),
                 1024, 2048, 512, // heap
                 512, 1024, 256,  // non-heap
                 12,               // finalization count
@@ -94,7 +94,7 @@ class WatcherDataTest {
                 0.75);            // system load
 
         // Act
-        String readableMessage = watcherData.readableMessage();
+        final String readableMessage = watcherData.readableMessage();
 
         // Assert
         assertFalse(readableMessage.contains("Memory:"), "Readable message should not include memory details");
@@ -105,7 +105,7 @@ class WatcherDataTest {
     @Test
     void testReadableMessageWithoutMemoryAndSystemLoad() {
         // Arrange
-        WatcherData watcherData = new WatcherData("test-session-uuid", 1, System.currentTimeMillis(),
+        final WatcherData watcherData = new WatcherData("test-session-uuid", 1, System.currentTimeMillis(),
                 1024, 2048, 512, // heap
                 512, 1024, 256,  // non-heap
                 12,               // finalization count
@@ -116,7 +116,7 @@ class WatcherDataTest {
                 0.0);            // system load
 
         // Act
-        String readableMessage = watcherData.readableMessage();
+        final String readableMessage = watcherData.readableMessage();
 
         // Assert
         assertFalse(readableMessage.contains("Memory:"), "Readable message should not include memory details");

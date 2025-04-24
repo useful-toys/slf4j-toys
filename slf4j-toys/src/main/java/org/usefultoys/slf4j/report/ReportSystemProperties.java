@@ -27,7 +27,7 @@ public class ReportSystemProperties implements Runnable {
         final SortedMap<Object, Object> sortedProperties;
         try {
             sortedProperties = new TreeMap<>(System.getProperties());
-        } catch (SecurityException ignored) {
+        } catch (final SecurityException ignored) {
             ps.println("System Properties: access denied");
             return;
         }

@@ -30,7 +30,7 @@ class ReportVMTest {
     @Test
     void shouldLogJvmInformation() {
         // Arrange
-        ReportVM report = new ReportVM(mockLogger);
+        final ReportVM report = new ReportVM(mockLogger);
 
         // Act
         report.run();

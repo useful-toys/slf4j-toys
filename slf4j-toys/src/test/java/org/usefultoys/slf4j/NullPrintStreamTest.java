@@ -18,7 +18,7 @@ class NullPrintStreamTest {
 
     @Test
     void testWriteMethods() {
-        NullPrintStream nullPrintStream = new NullPrintStream();
+        final NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.write(new byte[]{1, 2, 3}));
         assertDoesNotThrow(() -> nullPrintStream.write(1));
         assertDoesNotThrow(() -> nullPrintStream.write(new byte[]{1, 2, 3}, 0, 2));
@@ -26,7 +26,7 @@ class NullPrintStreamTest {
 
     @Test
     void testPrintMethods() {
-        NullPrintStream nullPrintStream = new NullPrintStream();
+        final NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.print("test"));
         assertDoesNotThrow(() -> nullPrintStream.print(' '));
         assertDoesNotThrow(() -> nullPrintStream.print(true));
@@ -41,7 +41,7 @@ class NullPrintStreamTest {
 
     @Test
     void testPrintlnMethods() {
-        NullPrintStream nullPrintStream = new NullPrintStream();
+        final NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.println());
         assertDoesNotThrow(() -> nullPrintStream.println("test"));
         assertDoesNotThrow(() -> nullPrintStream.println(' '));
@@ -56,7 +56,7 @@ class NullPrintStreamTest {
 
     @Test
     void testAppendMethods() {
-        NullPrintStream nullPrintStream = new NullPrintStream();
+        final NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.append("test"));
         assertDoesNotThrow(() -> nullPrintStream.append('c'));
         assertDoesNotThrow(() -> nullPrintStream.append("test", 0, 2));
@@ -64,14 +64,14 @@ class NullPrintStreamTest {
 
     @Test
     void testFormatMethods() {
-        NullPrintStream nullPrintStream = new NullPrintStream();
+        final NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.format("test %s", "value"));
         assertDoesNotThrow(() -> nullPrintStream.format(Locale.US, "test %s", "value"));
     }
 
     @Test
     void testPrintfMethods() {
-        NullPrintStream nullPrintStream = new NullPrintStream();
+        final NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.printf("test %s", "value"));
         assertDoesNotThrow(() -> nullPrintStream.printf(Locale.US, "test %s", "value"));
     }

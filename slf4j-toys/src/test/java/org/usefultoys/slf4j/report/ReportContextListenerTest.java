@@ -48,7 +48,7 @@ class ReportContextListenerTest {
 
     @Test
     void shouldLogReportsOnContextInitialization() {
-        ServletContextEvent event = mock(ServletContextEvent.class);
+        final ServletContextEvent event = mock(ServletContextEvent.class);
 
         // Act
         listener.contextInitialized(event);
@@ -56,13 +56,13 @@ class ReportContextListenerTest {
         // Assert
         assertTrue(mockLogger.getEventCount() > 0, "Expected at least one log event");
 
-        boolean vmReported = mockLogger.getEvent(0).getFormattedMessage().contains("Java Virtual Machine");
+        final boolean vmReported = mockLogger.getEvent(0).getFormattedMessage().contains("Java Virtual Machine");
         assertTrue(vmReported, "Expected VM report to be logged");
     }
 
     @Test
     void shouldDoNothingOnContextDestroyed() {
-        ServletContextEvent event = mock(ServletContextEvent.class);
+        final ServletContextEvent event = mock(ServletContextEvent.class);
 
         // Act
         listener.contextDestroyed(event);

@@ -49,13 +49,13 @@ public class ReportSSLContext implements Runnable {
             ps.printf("SSL Context %s%n", contextName);
 
             try {
-                SSLContext sslContext = SSLContext.getInstance(contextName);
+                final SSLContext sslContext = SSLContext.getInstance(contextName);
                 ps.printf("   Protocol: %s%n", sslContext.getProtocol());
                 ps.printf("   Class: %s%n", sslContext.getClass());
                 ps.println("   Provider:");
                 final Provider provider = sslContext.getProvider();
                 final SortedMap<Object, Object> sortedProperties = new TreeMap<>(provider);
-                for (Map.Entry<Object, Object> entry : sortedProperties.entrySet()) {
+                for (final Map.Entry<Object, Object> entry : sortedProperties.entrySet()) {
                     ps.printf("    - %s: %s%n", entry.getKey(), entry.getValue());
                 }
                 ps.println("   SocketFactory: ");
@@ -86,7 +86,7 @@ public class ReportSSLContext implements Runnable {
                 printList(ps, p.getProtocols(), "          ");
                 ps.print("      Cipher Suites: ");
                 printList(ps, p.getCipherSuites(), "          ");
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 ps.printf("Falha ao detalhar SSLContext: %s%n", e.getMessage());
             }
         }

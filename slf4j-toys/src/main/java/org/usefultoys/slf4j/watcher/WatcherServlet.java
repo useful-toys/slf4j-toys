@@ -43,19 +43,19 @@ public class WatcherServlet extends HttpServlet {
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
-        Logger logger = LoggerFactory.getLogger(WatcherServlet.class);
+        final Logger logger = LoggerFactory.getLogger(WatcherServlet.class);
         try {
             WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
             logger.info("WatcherServlet accessed. Logging current system status.");
             response.setContentType("text/plain");
             response.getWriter().write("System status logged successfully.");
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("Failed to log system status.", e);
             response.setContentType("text/plain");
             try {
                 response.getWriter().write("Failed to log system status.");
-            } catch (Exception ignored) {
+            } catch (final Exception ignored) {
                 // Ignorar falhas ao escrever na resposta
             }
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

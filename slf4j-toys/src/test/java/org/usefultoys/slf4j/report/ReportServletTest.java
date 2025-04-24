@@ -39,7 +39,7 @@ class ReportServletTest {
         response = mock(HttpServletResponse.class);
 
         responseWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(responseWriter);
+        final PrintWriter writer = new PrintWriter(responseWriter);
         when(response.getWriter()).thenReturn(writer);
 
         reportLogger = (MockLogger) (MockLogger) LoggerFactory.getLogger(ReporterConfig.name);
@@ -79,7 +79,7 @@ class ReportServletTest {
 
         // Verifica se o log contém algo da JVM
         assertTrue(reportLogger.getEventCount() > 0);
-        String fullLog = reportLogger.getEvent(0).getFormattedMessage();
+        final String fullLog = reportLogger.getEvent(0).getFormattedMessage();
         assertTrue(fullLog.contains("Java Virtual Machine"));
     }
 
@@ -98,19 +98,19 @@ class ReportServletTest {
             "/DefaultTrustKeyStore"
             // "/NetworkInterface" pode ser separado se quiser mockar interfaces
     })
-    void shouldRespondWithOkAndLogReport(String path) throws Exception {
+    void shouldRespondWithOkAndLogReport(final String path) throws Exception {
         // Arrange
-        ReportServlet servlet = new ReportServlet();
+        final ReportServlet servlet = new ReportServlet();
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
         when(request.getPathInfo()).thenReturn(path);
 
-        StringWriter responseWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(responseWriter);
+        final StringWriter responseWriter = new StringWriter();
+        final PrintWriter writer = new PrintWriter(responseWriter);
         when(response.getWriter()).thenReturn(writer);
 
-        MockLogger logger = (MockLogger) LoggerFactory.getLogger("org.usefultoys.slf4j.report.ReportServlet");
+        final MockLogger logger = (MockLogger) LoggerFactory.getLogger("org.usefultoys.slf4j.report.ReportServlet");
         logger.clearEvents();
 
         // Act

@@ -100,7 +100,7 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideLongUnitTestCases")
-    public void testLongUnit(long value, String expected) {
+    public void testLongUnit(final long value, final String expected) {
         assertEquals(expected, UnitFormatter.longUnit(value, UNITS, FACTORS));
     }
 
@@ -149,7 +149,7 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideLongUnitWithLongParametersTestCases")
-    public void testLongUnitWithLongParameters(double value, String expected) {
+    public void testLongUnitWithLongParameters(final double value, final String expected) {
         assertEquals(expected, UnitFormatter.doubleUnit(value, UNITS, FACTORS));
     }
 
@@ -167,7 +167,7 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideBytesTestCases")
-    void testBytes(long value, String expected) {
+    void testBytes(final long value, final String expected) {
         assertEquals(expected, UnitFormatter.bytes(value));
     }
 
@@ -192,7 +192,7 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideNanosecondsLongTestCases")
-    void testNanosecondsLong(long value, String expected) {
+    void testNanosecondsLong(final long value, final String expected) {
         assertEquals(expected, UnitFormatter.nanoseconds(value));
     }
 
@@ -208,7 +208,7 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideNanosecondsDoubleTestCases")
-    void testNanosecondsDouble(double value, String expected) {
+    void testNanosecondsDouble(final double value, final String expected) {
         assertEquals(expected, UnitFormatter.nanoseconds(value));
     }
 
@@ -239,7 +239,7 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideIterationsPerSecondTestCases")
-    void testIterationsPerSecond(double value, String expected) {
+    void testIterationsPerSecond(final double value, final String expected) {
         assertEquals(expected, UnitFormatter.iterationsPerSecond(value));
     }
 
@@ -260,7 +260,7 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideIterationsTestCases")
-    void testIterationsPerSecond(long value, String expected) {
+    void testIterationsPerSecond(final long value, final String expected) {
         assertEquals(expected, UnitFormatter.iterations(value));
     }
 
@@ -285,7 +285,7 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideTimeUnitTestCases")
-    public void testTimeUnit(long value, String expected) {
+    public void testTimeUnit(final long value, final String expected) {
         assertEquals(expected, UnitFormatter.nanoseconds(value));
     }
 
@@ -310,7 +310,7 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideDoubleTimeUnitTestCases")
-    public void testDoubleTimeUnit(float value, String expected) {
+    public void testDoubleTimeUnit(final float value, final String expected) {
         assertEquals(expected, UnitFormatter.nanoseconds(value));
     }
 }

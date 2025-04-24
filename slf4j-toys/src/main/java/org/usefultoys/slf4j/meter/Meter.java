@@ -1133,7 +1133,7 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
-    public void runOrReject(Runnable runnable, Class<? extends Exception>... exceptionsToReject) {
+    public void runOrReject(final Runnable runnable, final Class<? extends Exception>... exceptionsToReject) {
         if (this.startTime == 0L) {
             this.start();
         }
@@ -1143,10 +1143,10 @@ public class Meter extends MeterData implements Closeable {
             if (this.stopTime == 0L) {
                 this.ok();
             }
-        } catch (Exception e) {
-            int length = exceptionsToReject.length;
+        } catch (final Exception e) {
+            final int length = exceptionsToReject.length;
             for(int i = 0; i < length; ++i) {
-                Class<? extends Exception> ee = exceptionsToReject[i];
+                final Class<? extends Exception> ee = exceptionsToReject[i];
                 if (ee.isAssignableFrom(e.getClass())) {
                     this.reject(e);
                     unsafe.throwException(e);
@@ -1170,46 +1170,46 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
-    public <T> T callOrRejectChecked(Callable<T> callable) {
+    public <T> T callOrRejectChecked(final Callable<T> callable) {
         if (this.startTime == 0L) {
             this.start();
         }
 
         try {
-            T result = callable.call();
+            final T result = callable.call();
             this.ctx("result", result);
             if (this.stopTime == 0L) {
                 this.ok();
             }
 
             return result;
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             this.fail(e);
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             this.reject(e);
             unsafe.throwException(e);
             return null;
         }
     }
 
-    public <T> T callOrReject(Callable<T> callable, Class<? extends Exception>... exceptionsToReject) {
+    public <T> T callOrReject(final Callable<T> callable, final Class<? extends Exception>... exceptionsToReject) {
         if (this.startTime == 0L) {
             this.start();
         }
 
         try {
-            T result = callable.call();
+            final T result = callable.call();
             this.ctx("result", result);
             if (this.stopTime == 0L) {
                 this.ok();
             }
 
             return result;
-        } catch (Exception e) {
-            int length = exceptionsToReject.length;
+        } catch (final Exception e) {
+            final int length = exceptionsToReject.length;
             for(int i = 0; i < length; ++i) {
-                Class<? extends Exception> ee = exceptionsToReject[i];
+                final Class<? extends Exception> ee = exceptionsToReject[i];
                 if (ee.isAssignableFrom(e.getClass())) {
                     this.reject(e);
                     unsafe.throwException(e);
@@ -1279,7 +1279,7 @@ public class Meter extends MeterData implements Closeable {
 
         try {
             f = Unsafe.class.getDeclaredField("theUnsafe");
-        } catch (NoSuchFieldException e) {
+        } catch (final NoSuchFieldException e) {
             e.printStackTrace();
         }
 
@@ -1287,7 +1287,7 @@ public class Meter extends MeterData implements Closeable {
 
         try {
             unsafe = (Unsafe)f.get((Object)null);
-        } catch (IllegalAccessException var2) {
+        } catch (final IllegalAccessException var2) {
             var2.printStackTrace();
         }
     }

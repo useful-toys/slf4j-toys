@@ -30,16 +30,16 @@ public class ReportDefaultTrustKeyStore implements Runnable {
         ps.println("Trust Keystore");
 
         try {
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            final TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init((KeyStore) null);
-            TrustManager[] trustManagers = tmf.getTrustManagers();
+            final TrustManager[] trustManagers = tmf.getTrustManagers();
 
             for (int i = 0; i < trustManagers.length; ++i) {
-                TrustManager tm = trustManagers[i];
+                final TrustManager tm = trustManagers[i];
                 ps.printf(" - TrustManager: %d (%s)%n", i, tm.getClass());
                 if (tm instanceof X509TrustManager) {
-                    X509TrustManager x509tm = (X509TrustManager) tm;
-                    X509Certificate[] certificates = x509tm.getAcceptedIssuers();
+                    final X509TrustManager x509tm = (X509TrustManager) tm;
+                    final X509Certificate[] certificates = x509tm.getAcceptedIssuers();
                     for (int j = 0; j < certificates.length; j++) {
                         final X509Certificate cert = certificates[j];
                         ps.printf("   - Certificate #%d%n", j);

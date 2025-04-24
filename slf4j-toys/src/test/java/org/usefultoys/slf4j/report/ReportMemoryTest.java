@@ -23,7 +23,7 @@ class ReportMemoryTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = LoggerFactory.getLogger("test.report.memory");
+        final Logger logger = LoggerFactory.getLogger("test.report.memory");
         mockLogger = (MockLogger) logger;
         mockLogger.clearEvents();
     }
@@ -31,7 +31,7 @@ class ReportMemoryTest {
     @Test
     void shouldLogJvmMemoryInformation() {
         // Arrange
-        ReportMemory report = new ReportMemory(mockLogger);
+        final ReportMemory report = new ReportMemory(mockLogger);
 
         // Act
         report.run();

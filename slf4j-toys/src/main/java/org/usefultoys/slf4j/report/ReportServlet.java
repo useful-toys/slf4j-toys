@@ -79,7 +79,7 @@ public class ReportServlet extends HttpServlet {
             response.setContentType("text/plain");
             try {
                 response.getWriter().write("No report path provided.");
-            } catch (Exception ignored) {
+            } catch (final Exception ignored) {
                 // no-op
             }
             return;
@@ -129,7 +129,7 @@ public class ReportServlet extends HttpServlet {
             response.setContentType("text/plain");
             try {
                 response.getWriter().write(String.format("Unknown report path: %s", pathinfo));
-            } catch (Exception ignored) {
+            } catch (final Exception ignored) {
                 // no-op
             }
             return;
@@ -139,7 +139,7 @@ public class ReportServlet extends HttpServlet {
         response.setContentType("text/plain");
         try {
             response.getWriter().write(String.format("Report logged for: %s", pathinfo));
-        } catch (Exception ignored) {
+        } catch (final Exception ignored) {
             // no-op
         }
     }

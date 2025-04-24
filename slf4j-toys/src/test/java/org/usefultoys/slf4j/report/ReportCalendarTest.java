@@ -24,7 +24,7 @@ class ReportCalendarTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = LoggerFactory.getLogger("test.report.calendar");
+        final Logger logger = LoggerFactory.getLogger("test.report.calendar");
         mockLogger = (MockLogger) logger;
         mockLogger.clearEvents();
     }
@@ -32,8 +32,8 @@ class ReportCalendarTest {
     @Test
     void shouldLogCalendarInformation() {
         // Arrange
-        ReportCalendar report = new ReportCalendar(mockLogger);
-        TimeZone tz = TimeZone.getDefault();
+        final ReportCalendar report = new ReportCalendar(mockLogger);
+        final TimeZone tz = TimeZone.getDefault();
 
         // Act
         report.run();

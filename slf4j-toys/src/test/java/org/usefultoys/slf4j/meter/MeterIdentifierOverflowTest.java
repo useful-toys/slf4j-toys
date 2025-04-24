@@ -63,7 +63,7 @@ public class MeterIdentifierOverflowTest {
         assertEvents(MeterFactory.getMeter(meterName).start().ok(), 20, 3);
     }
 
-    private void assertEvents(Meter m, int expectedMessageCount, long expectedEventPosition) {
+    private void assertEvents(final Meter m, final int expectedMessageCount, final long expectedEventPosition) {
 //        Assertions.assertEquals(expectedEventPosition, m.getPosition());
 //        Assertions.assertEquals(null, m.getOperation());
 //        Assertions.assertEquals(meterName, m.getCategory());

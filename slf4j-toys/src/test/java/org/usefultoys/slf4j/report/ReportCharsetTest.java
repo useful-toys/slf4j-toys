@@ -23,7 +23,7 @@ class ReportCharsetTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = LoggerFactory.getLogger("test.report.charset");
+        final Logger logger = LoggerFactory.getLogger("test.report.charset");
         mockLogger = (MockLogger) logger;
         mockLogger.clearEvents();
     }
@@ -31,8 +31,8 @@ class ReportCharsetTest {
     @Test
     void shouldLogCharsetInformation() {
         // Arrange
-        ReportCharset report = new ReportCharset(mockLogger);
-        Charset defaultCharset = Charset.defaultCharset();
+        final ReportCharset report = new ReportCharset(mockLogger);
+        final Charset defaultCharset = Charset.defaultCharset();
 
         // Act
         report.run();

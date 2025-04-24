@@ -60,8 +60,8 @@ public class MeterClosableTest {
 
     @Test
     public void testWithStartWithOk() {
-        Meter m;
-        try (Meter m2 = m = new Meter(logger, "testWithStartWithOk").start()) {
+        final Meter m;
+        try (final Meter m2 = m = new Meter(logger, "testWithStartWithOk").start()) {
             Assertions.assertEquals(m, Meter.getCurrentInstance());
             m2.ok();
         }
@@ -83,8 +83,8 @@ public class MeterClosableTest {
 
     @Test
     public void testNoStartWithOk() {
-        Meter m;
-        try (Meter m2 = m = new Meter(logger, "testNoStartWithOk")) {
+        final Meter m;
+        try (final Meter m2 = m = new Meter(logger, "testNoStartWithOk")) {
             Assertions.assertNotEquals(m, Meter.getCurrentInstance());
             m2.ok();
         }
@@ -104,8 +104,8 @@ public class MeterClosableTest {
 
     @Test
     public void testNoStartNoOk() {
-        Meter m;
-        try (Meter m2 = m = new Meter(logger, "testNoStartNoOk")) {
+        final Meter m;
+        try (final Meter m2 = m = new Meter(logger, "testNoStartNoOk")) {
             Assertions.assertNotEquals(m, Meter.getCurrentInstance());
         }
 
@@ -126,8 +126,8 @@ public class MeterClosableTest {
 
     @Test
     public void testWithStartNoOk() {
-        Meter m;
-        try (Meter m2 = m = new Meter(logger, "testWithStartNoOk").start()) {
+        final Meter m;
+        try (final Meter m2 = m = new Meter(logger, "testWithStartNoOk").start()) {
             Assertions.assertEquals(m, Meter.getCurrentInstance());
         }
 
@@ -150,8 +150,8 @@ public class MeterClosableTest {
 
     @Test
     public void testWithStartWithReject() {
-        Meter m;
-        try (Meter m2 = m = new Meter(logger, "testWithStartWithReject").start()) {
+        final Meter m;
+        try (final Meter m2 = m = new Meter(logger, "testWithStartWithReject").start()) {
             Assertions.assertEquals(m, Meter.getCurrentInstance());
             m2.reject("a");
         }
@@ -173,8 +173,8 @@ public class MeterClosableTest {
 
     @Test
     public void testWithStartWithFail() {
-        Meter m;
-        try (Meter m2 = m = new Meter(logger, "testWithStartWithFail").start()) {
+        final Meter m;
+        try (final Meter m2 = m = new Meter(logger, "testWithStartWithFail").start()) {
             Assertions.assertEquals(m, Meter.getCurrentInstance());
             m2.fail("a");
         }
@@ -197,10 +197,10 @@ public class MeterClosableTest {
     @Test
     public void testWithStartWithException() {
         Meter m = null;
-        try (Meter m2 = m = new Meter(logger, "testWithStartWithException").start()) {
+        try (final Meter m2 = m = new Meter(logger, "testWithStartWithException").start()) {
             Assertions.assertEquals(m, Meter.getCurrentInstance());
             throw new RuntimeException("someException");
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             // ignore
         }
 

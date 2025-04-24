@@ -48,8 +48,8 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        MockLogger mockLogger = (MockLogger) logger;
-        String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
+        final MockLogger mockLogger = (MockLogger) logger;
+        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
 
         assertTrue(fullLog.contains("Closed!"));
     }
@@ -58,8 +58,8 @@ class ReportJdbcConnectionTest {
     void shouldLogJdbcConnectionInfo() throws SQLException {
 
         // Arrange
-        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
-        Properties clientInfo = new Properties();
+        final DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+        final Properties clientInfo = new Properties();
         clientInfo.setProperty("appName", "testApp");
 
         when(connection.isClosed()).thenReturn(false);
@@ -88,8 +88,8 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        MockLogger mockLogger = (MockLogger) logger;
-        String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
+        final MockLogger mockLogger = (MockLogger) logger;
+        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
 
         assertTrue(fullLog.contains("JDBC connection"));
         assertTrue(fullLog.contains("catalog: catalog1"));
@@ -121,8 +121,8 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        MockLogger mockLogger = (MockLogger) logger;
-        String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
+        final MockLogger mockLogger = (MockLogger) logger;
+        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
 
         assertTrue(fullLog.contains("JDBC connection"));
         assertTrue(fullLog.contains("properties: read-only; holdability=close-cursors-at-commit; timeout=0ms; transaction=repeatable-read;"));
@@ -145,7 +145,7 @@ class ReportJdbcConnectionTest {
         when(connection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_NONE);
         when(connection.getClientInfo()).thenReturn(null);
 
-        Map<String, Class<?>> typeMap = new LinkedHashMap<>();
+        final Map<String, Class<?>> typeMap = new LinkedHashMap<>();
         typeMap.put("uuid", java.util.UUID.class);
         typeMap.put("jsonb", java.lang.String.class);
         when(connection.getTypeMap()).thenReturn(typeMap);
@@ -154,8 +154,8 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        MockLogger mockLogger = (MockLogger) logger;
-        String fullLog = mockLogger.getEvent(0).getFormattedMessage();
+        final MockLogger mockLogger = (MockLogger) logger;
+        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();
 
         assertTrue(fullLog.contains("type map: uuid->UUID; jsonb->String; "));
     }
@@ -176,15 +176,15 @@ class ReportJdbcConnectionTest {
         when(connection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_READ_COMMITTED);
         when(connection.getClientInfo()).thenReturn(null);
 
-        Map<String, Class<?>> typeMap = new LinkedHashMap<>();
+        final Map<String, Class<?>> typeMap = new LinkedHashMap<>();
         when(connection.getTypeMap()).thenReturn(typeMap);
 
         // Act
         reporter.run();
 
         // Assert
-        MockLogger mockLogger = (MockLogger) logger;
-        String fullLog = mockLogger.getEvent(0).getFormattedMessage();
+        final MockLogger mockLogger = (MockLogger) logger;
+        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();
 
         assertTrue(fullLog.contains("type map: n/a"));
     }

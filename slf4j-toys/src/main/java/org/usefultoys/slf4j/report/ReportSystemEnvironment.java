@@ -27,7 +27,7 @@ public class ReportSystemEnvironment implements Runnable {
         final SortedMap<String, String> sortedProperties;
         try {
             sortedProperties = new TreeMap<>(System.getenv());
-        } catch (SecurityException ignored) {
+        } catch (final SecurityException ignored) {
             ps.println("System Environment: access denied");
             return;
         }

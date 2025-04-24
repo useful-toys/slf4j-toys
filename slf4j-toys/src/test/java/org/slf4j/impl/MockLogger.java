@@ -407,9 +407,9 @@ public class MockLogger implements Logger {
         if (event.getThrowable() == null) {
             return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage();
         }
-        ByteArrayOutputStream s = new ByteArrayOutputStream();
+        final ByteArrayOutputStream s = new ByteArrayOutputStream();
         event.getThrowable().printStackTrace(new PrintStream(s));
-        String st = new String(s.toByteArray());
+        final String st = new String(s.toByteArray());
         return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage() + "\n" + st;
     }
 

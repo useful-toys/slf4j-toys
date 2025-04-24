@@ -37,11 +37,11 @@ class EventDataTest {
             super();
         }
 
-        public TestEventData(String sessionUuid) {
+        public TestEventData(final String sessionUuid) {
             super(sessionUuid);
         }
 
-        public TestEventData(String sessionUuid, long position) {
+        public TestEventData(final String sessionUuid, final long position) {
             super(sessionUuid, position);
         }
 
@@ -50,7 +50,7 @@ class EventDataTest {
         }
 
         @Override
-        protected StringBuilder readableStringBuilder(StringBuilder sb) {
+        protected StringBuilder readableStringBuilder(final StringBuilder sb) {
             sb.append("a");
             return sb;
         }

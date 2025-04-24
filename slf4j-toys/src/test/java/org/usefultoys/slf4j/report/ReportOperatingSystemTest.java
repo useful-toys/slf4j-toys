@@ -23,7 +23,7 @@ class ReportOperatingSystemTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = LoggerFactory.getLogger("test.report.os");
+        final Logger logger = LoggerFactory.getLogger("test.report.os");
         mockLogger = (MockLogger) logger;
         mockLogger.clearEvents();
     }
@@ -31,7 +31,7 @@ class ReportOperatingSystemTest {
     @Test
     void shouldLogOperatingSystemInformation() {
         // Arrange
-        ReportOperatingSystem report = new ReportOperatingSystem(mockLogger);
+        final ReportOperatingSystem report = new ReportOperatingSystem(mockLogger);
 
         // Act
         report.run();

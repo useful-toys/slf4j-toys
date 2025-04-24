@@ -24,7 +24,7 @@ class ReportLocaleTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = LoggerFactory.getLogger("test.report.locale");
+        final Logger logger = LoggerFactory.getLogger("test.report.locale");
         mockLogger = (MockLogger) logger;
         mockLogger.clearEvents();
     }
@@ -32,8 +32,8 @@ class ReportLocaleTest {
     @Test
     void shouldLogLocaleInformation() {
         // Arrange
-        ReportLocale report = new ReportLocale(mockLogger);
-        Locale defaultLocale = Locale.getDefault();
+        final ReportLocale report = new ReportLocale(mockLogger);
+        final Locale defaultLocale = Locale.getDefault();
 
         // Act
         report.run();

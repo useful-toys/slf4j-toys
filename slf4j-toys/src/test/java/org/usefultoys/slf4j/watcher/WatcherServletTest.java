@@ -60,10 +60,10 @@ class WatcherServletTest {
     @Test
     void shouldLogSystemStatusSuccessfully() throws Exception {
         // Arrange
-        WatcherServlet servlet = new WatcherServlet();
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        StringWriter responseWriter = new StringWriter();
+        final WatcherServlet servlet = new WatcherServlet();
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
         when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
 
         // Act

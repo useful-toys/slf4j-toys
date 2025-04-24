@@ -17,19 +17,19 @@ class NullOutputStreamTest {
 
     @Test
     void testWriteSingleByte() {
-        NullOutputStream nullOutputStream = new NullOutputStream();
+        final NullOutputStream nullOutputStream = new NullOutputStream();
         assertDoesNotThrow(() -> nullOutputStream.write(0));
     }
 
     @Test
     void testWriteByteArray() {
-        NullOutputStream nullOutputStream = new NullOutputStream();
+        final NullOutputStream nullOutputStream = new NullOutputStream();
         assertDoesNotThrow(() -> nullOutputStream.write(new byte[]{1, 2, 3}));
     }
 
     @Test
     void testWriteByteArrayWithOffsetAndLength() {
-        NullOutputStream nullOutputStream = new NullOutputStream();
+        final NullOutputStream nullOutputStream = new NullOutputStream();
         assertDoesNotThrow(() -> nullOutputStream.write(new byte[]{1, 2, 3, 4}, 1, 2));
     }
 }

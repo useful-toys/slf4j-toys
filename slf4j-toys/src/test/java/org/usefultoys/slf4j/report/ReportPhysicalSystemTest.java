@@ -23,7 +23,7 @@ class ReportPhysicalSystemTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = LoggerFactory.getLogger("test.report.physical");
+        final Logger logger = LoggerFactory.getLogger("test.report.physical");
         mockLogger = (MockLogger) logger;
         mockLogger.clearEvents();
     }
@@ -31,8 +31,8 @@ class ReportPhysicalSystemTest {
     @Test
     void shouldLogPhysicalSystemInformation() {
         // Arrange
-        ReportPhysicalSystem report = new ReportPhysicalSystem(mockLogger);
-        int expectedProcessors = Runtime.getRuntime().availableProcessors();
+        final ReportPhysicalSystem report = new ReportPhysicalSystem(mockLogger);
+        final int expectedProcessors = Runtime.getRuntime().availableProcessors();
 
         // Act
         report.run();

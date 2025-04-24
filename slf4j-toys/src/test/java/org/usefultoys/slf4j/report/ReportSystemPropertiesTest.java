@@ -23,7 +23,7 @@ class ReportSystemPropertiesTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = LoggerFactory.getLogger("test.report.sysprops");
+        final Logger logger = LoggerFactory.getLogger("test.report.sysprops");
         mockLogger = (MockLogger) logger;
         mockLogger.clearEvents();
     }
@@ -31,7 +31,7 @@ class ReportSystemPropertiesTest {
     @Test
     void shouldLogSystemProperties() {
         // Arrange
-        ReportSystemProperties report = new ReportSystemProperties(mockLogger);
+        final ReportSystemProperties report = new ReportSystemProperties(mockLogger);
 
         // Act
         report.run();

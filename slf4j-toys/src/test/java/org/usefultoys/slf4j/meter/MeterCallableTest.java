@@ -63,7 +63,7 @@ public class MeterCallableTest {
     @Test
     public void testWithStartWithOk() throws Exception {
         final Meter m = new Meter(logger, "testWithStartWithOk").start();
-        Object result = m.call(new Callable<Void>() {
+        final Object result = m.call(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 Assertions.assertEquals(m, Meter.getCurrentInstance());
@@ -91,7 +91,7 @@ public class MeterCallableTest {
     @Test
     public void testWithStartWithOkAndIgnoredReturn() throws Exception {
         final Meter m = new Meter(logger, "testWithStartWithOk").start();
-        Object result = m.call(new Callable<Integer>() {
+        final Object result = m.call(new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
                 Assertions.assertEquals(m, Meter.getCurrentInstance());
@@ -121,7 +121,7 @@ public class MeterCallableTest {
     @Test
     public void testNoStartNoOkAndReturn() throws Exception {
         final Meter m = new Meter(logger, "testWithStartWithOk");
-        Object result = m.call(new Callable<Integer>() {
+        final Object result = m.call(new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
                 Assertions.assertEquals(m, Meter.getCurrentInstance());
@@ -150,7 +150,7 @@ public class MeterCallableTest {
     @Test
     public void testNoStartWithOk() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithOk");
-        Object result = m.call(new Callable<Void>() {
+        final Object result = m.call(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 Assertions.assertEquals(m, Meter.getCurrentInstance());
@@ -178,7 +178,7 @@ public class MeterCallableTest {
     @Test
     public void testNoStartNoOk() throws Exception {
         final Meter m = new Meter(logger, "testNoStartNoOk");
-        Object result = m.call(new Callable<Void>() {
+        final Object result = m.call(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 Assertions.assertEquals(m, Meter.getCurrentInstance());
@@ -205,7 +205,7 @@ public class MeterCallableTest {
     @Test
     public void testWithStartNoOk() throws Exception {
         final Meter m = new Meter(logger, "testWithStartNoOk").start();
-        Object result = m.call(new Callable<Void>() {
+        final Object result = m.call(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 Assertions.assertEquals(m, Meter.getCurrentInstance());
@@ -232,7 +232,7 @@ public class MeterCallableTest {
     @Test
     public void testNoStartWithReject() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithReject");
-        Object result = m.call(new Callable<Void>() {
+        final Object result = m.call(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 Assertions.assertEquals(m, Meter.getCurrentInstance());
@@ -260,7 +260,7 @@ public class MeterCallableTest {
     @Test
     public void testNoStartWithFail() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithFail");
-        Object result = m.call(new Callable<Void>() {
+        final Object result = m.call(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 Assertions.assertEquals(m, Meter.getCurrentInstance());
@@ -296,7 +296,7 @@ public class MeterCallableTest {
                     throw new IllegalArgumentException("someException");
                 }
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             Assertions.assertEquals("someException", e.getMessage());
             Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
         }
@@ -329,7 +329,7 @@ public class MeterCallableTest {
                     throw new IOException("someException");
                 }
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             Assertions.assertEquals("someException", e.getMessage());
             Assertions.assertEquals(IOException.class, e.getClass());
         }
