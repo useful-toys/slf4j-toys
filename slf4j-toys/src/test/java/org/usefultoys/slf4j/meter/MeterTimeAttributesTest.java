@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.charset.Charset;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
 
@@ -32,7 +32,7 @@ import org.usefultoys.slf4j.SessionConfig;
  */
 public class MeterTimeAttributesTest {
 
-    TestLogger logger = (TestLogger) LoggerFactory.getLogger("Test");
+    MockLogger logger = (MockLogger) LoggerFactory.getLogger("Test");
 
     public MeterTimeAttributesTest() {
         logger.setEnabled(false);

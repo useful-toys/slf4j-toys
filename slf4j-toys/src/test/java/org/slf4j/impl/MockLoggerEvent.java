@@ -22,7 +22,7 @@ import org.slf4j.Marker;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
- * Represents a single log event captured by {@link TestLogger}.
+ * Represents a single log event captured by {@link MockLogger}.
  * <p>
  * This class holds all details of a logging call, including the logger name, log level, marker, original message,
  * arguments, and optional throwable.
@@ -35,8 +35,8 @@ import org.slf4j.helpers.MessageFormatter;
  * <p>
  * Example usage in tests:
  * <pre>{@code
- * TestLogger logger = ...
- * TestLoggerEvent event = logger.getEvent(0);
+ * MockLogger logger = ...
+ * MockLoggerEvent event = logger.getEvent(0);
  * assertEquals(Level.INFO, event.getLevel());
  * assertTrue(event.getFormattedMessage().contains("Expected text"));
  * }</pre>
@@ -45,7 +45,7 @@ import org.slf4j.helpers.MessageFormatter;
  *
  * @author Daniel Felix Ferber
  */
-public class TestLoggerEvent {
+public class MockLoggerEvent {
 
     private final String loggerName;
 
@@ -61,7 +61,7 @@ public class TestLoggerEvent {
         ERROR, WARN, INFO, DEBUG, TRACE
     }
 
-    public TestLoggerEvent(
+    public MockLoggerEvent(
             final String loggerName,
             final Level level,
             final Map<String, String> mdc,
@@ -120,7 +120,7 @@ public class TestLoggerEvent {
 
     @Override
     public String toString() {
-        return "TestLoggerEvent{" + "loggerName=" + loggerName + ", level=" + level + ", marker=" + marker + ", throwable=" + throwable + ", message=" + message + ", arguments=" + Arrays.toString(arguments) + '}';
+        return "MockLoggerEvent{" + "loggerName=" + loggerName + ", level=" + level + ", marker=" + marker + ", throwable=" + throwable + ", message=" + message + ", arguments=" + Arrays.toString(arguments) + '}';
     }
 
     public String getFormattedMessage() {

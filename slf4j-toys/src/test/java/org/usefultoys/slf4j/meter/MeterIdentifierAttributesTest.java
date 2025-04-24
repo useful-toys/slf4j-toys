@@ -17,7 +17,7 @@ package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.SessionConfig;
@@ -40,7 +40,7 @@ public class MeterIdentifierAttributesTest {
     @org.junit.jupiter.api.Test
     public void testIdentifierAttributes() {
         final String category1 = "TestCategory1";
-        final TestLogger logger1 = (TestLogger) LoggerFactory.getLogger(category1);
+        final MockLogger logger1 = (MockLogger) LoggerFactory.getLogger(category1);
         logger1.setEnabled(false);
         logger1.clearEvents();
 
@@ -57,7 +57,7 @@ public class MeterIdentifierAttributesTest {
         assertEquals(2L, m2.getPosition());
 
         final String category2 = "TestCategory2";
-        final TestLogger logger2 = (TestLogger) LoggerFactory.getLogger(category2);
+        final MockLogger logger2 = (MockLogger) LoggerFactory.getLogger(category2);
         logger2.setEnabled(false);
         logger2.clearEvents();
 
@@ -77,7 +77,7 @@ public class MeterIdentifierAttributesTest {
     @Test
     public void testIdentifierAttributesWithName() {
         final String category = "TestCategory3";
-        final TestLogger logger = (TestLogger) LoggerFactory.getLogger(category);
+        final MockLogger logger = (MockLogger) LoggerFactory.getLogger(category);
         logger.setEnabled(false);
         logger.clearEvents();
 
@@ -115,7 +115,7 @@ public class MeterIdentifierAttributesTest {
     @Test
     public void testIdentifierAttributesWithSubmeter() {
         final String category = "TestCategory4";
-        final TestLogger logger = (TestLogger) LoggerFactory.getLogger(category);
+        final MockLogger logger = (MockLogger) LoggerFactory.getLogger(category);
         logger.setEnabled(false);
         logger.clearEvents();
 
@@ -153,7 +153,7 @@ public class MeterIdentifierAttributesTest {
     @Test
     public void testIdentifierAttributesWithSubSubmeter() {
         final String category = "TestCategory5";
-        final TestLogger logger = (TestLogger) LoggerFactory.getLogger(category);
+        final MockLogger logger = (MockLogger) LoggerFactory.getLogger(category);
         logger.setEnabled(false);
         logger.clearEvents();
 
@@ -191,7 +191,7 @@ public class MeterIdentifierAttributesTest {
     @Test
     public void testIdentifierAttributesWithNameAndSubmeter() {
         final String category = "TestCategory6";
-        final TestLogger logger = (TestLogger) LoggerFactory.getLogger(category);
+        final MockLogger logger = (MockLogger) LoggerFactory.getLogger(category);
         logger.setEnabled(false);
         logger.clearEvents();
 

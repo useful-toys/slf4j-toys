@@ -18,7 +18,7 @@ package org.usefultoys.slf4j.meter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
 
@@ -38,9 +38,9 @@ public class MeterThreadLocalTest {
     }
 
     final String meterName = "name";
-    final TestLogger loggerName = (TestLogger) LoggerFactory.getLogger(meterName);
+    final MockLogger loggerName = (MockLogger) LoggerFactory.getLogger(meterName);
     final String meterOther = "other";
-    final TestLogger loggerOther = (TestLogger) LoggerFactory.getLogger(meterOther);
+    final MockLogger loggerOther = (MockLogger) LoggerFactory.getLogger(meterOther);
 
     @BeforeEach
     public void clearEvents() {

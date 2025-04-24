@@ -21,8 +21,8 @@ import org.junit.jupiter.api.BeforeAll;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.slf4j.impl.TestLogger;
-import org.slf4j.impl.TestLoggerEvent;
+import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
 
@@ -35,7 +35,7 @@ import java.nio.charset.Charset;
 public class MeterRunnableTest {
 
     static final String meterCategory = "category";
-    static final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterCategory);
+    static final MockLogger logger = (MockLogger) LoggerFactory.getLogger(meterCategory);
 
     public MeterRunnableTest() {
     }
@@ -74,10 +74,10 @@ public class MeterRunnableTest {
         assertFalse(m.isFail());
         assertFalse(m.isSlow());
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -100,10 +100,10 @@ public class MeterRunnableTest {
         assertFalse(m.isFail());
         assertFalse(m.isSlow());
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -125,10 +125,10 @@ public class MeterRunnableTest {
         assertFalse(m.isFail());
         assertFalse(m.isSlow());
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -150,10 +150,10 @@ public class MeterRunnableTest {
         assertFalse(m.isFail());
         assertFalse(m.isSlow());
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -176,10 +176,10 @@ public class MeterRunnableTest {
         assertFalse(m.isFail());
         assertFalse(m.isSlow());
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_REJECT, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -202,10 +202,10 @@ public class MeterRunnableTest {
         assertTrue(m.isFail());
         assertFalse(m.isSlow());
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -233,10 +233,10 @@ public class MeterRunnableTest {
         assertEquals(4, logger.getEventCount());
         assertEquals("java.lang.IllegalArgumentException", m.failPath);
         assertEquals("someException", m.failMessage);
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());

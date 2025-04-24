@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.SessionConfig;
 
 import javax.servlet.ServletContextEvent;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 class ReportContextListenerTest {
-    private TestLogger testLogger;
+    private MockLogger mockLogger;
     private ReportContextListener listener;
 
     @BeforeAll
@@ -25,8 +25,8 @@ class ReportContextListenerTest {
 
     @BeforeEach
     void setUp() {
-        testLogger = (TestLogger) LoggerFactory.getLogger(ReporterConfig.name);
-        testLogger.clearEvents();
+        mockLogger = (MockLogger) LoggerFactory.getLogger(ReporterConfig.name);
+        mockLogger.clearEvents();
         listener = new ReportContextListener();
 
         // Enable only one report to simplify the test
@@ -54,9 +54,9 @@ class ReportContextListenerTest {
         listener.contextInitialized(event);
 
         // Assert
-        assertTrue(testLogger.getEventCount() > 0, "Expected at least one log event");
+        assertTrue(mockLogger.getEventCount() > 0, "Expected at least one log event");
 
-        boolean vmReported = testLogger.getEvent(0).getFormattedMessage().contains("Java Virtual Machine");
+        boolean vmReported = mockLogger.getEvent(0).getFormattedMessage().contains("Java Virtual Machine");
         assertTrue(vmReported, "Expected VM report to be logged");
     }
 
@@ -69,6 +69,6 @@ class ReportContextListenerTest {
 
         // Assert
         // No side effect expected — especially no logging
-        assertEquals(0, testLogger.getEventCount(), "Expected no log output on contextDestroyed");
+        assertEquals(0, mockLogger.getEventCount(), "Expected no log output on contextDestroyed");
     }
 }

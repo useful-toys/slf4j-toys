@@ -23,7 +23,7 @@ import org.slf4j.spi.MDCAdapter;
  *
  * @author Daniel Felix Ferber
  */
-public class TestMDCAdapter implements MDCAdapter {
+public class MockMDCAdapter implements MDCAdapter {
 
     private final ThreadLocal<Map<String, String>> value = new ThreadLocal<Map<String, String>>() {
         @Override

@@ -29,11 +29,11 @@ public final class StaticLoggerBinder implements LoggerFactoryBinder {
 
     @Override
 	public ILoggerFactory getLoggerFactory() {
-        return TestLoggerFactory.getInstance();
+        return MockLoggerFactory.getInstance();
     }
 
     @Override
 	public String getLoggerFactoryClassStr() {
-        return TestLoggerFactory.class.getName();
+        return MockLoggerFactory.class.getName();
     }
 }

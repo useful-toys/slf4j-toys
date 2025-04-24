@@ -18,9 +18,9 @@ package org.usefultoys.slf4j.meter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.impl.TestLogger;
-import org.slf4j.impl.TestLoggerEvent;
-import org.slf4j.impl.TestLoggerEvent.Level;
+import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.slf4j.impl.MockLoggerEvent.Level;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
 
@@ -40,7 +40,7 @@ public class MeterMessageTest {
     static final String meterName = "name";
     static final String meterName2 = "eman";
     final String title = "Example of execution.";
-    static final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterCategory);
+    static final MockLogger logger = (MockLogger) LoggerFactory.getLogger(meterCategory);
 
     static final String MESSAGE_START_PREFIX = "STARTED";
     static final String MESSAGE_PROGRESS_PREFIX = "PROGRESS";
@@ -75,10 +75,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().ok();
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -117,10 +117,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().ok();
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -158,10 +158,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).m(title).start().ok();
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -201,10 +201,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger, meterName).start().ok();
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -245,10 +245,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger, meterName).start().ok();
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -288,10 +288,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger, meterName).m(title).start().ok();
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -335,14 +335,14 @@ public class MeterMessageTest {
         m.ok();
 
         assertEquals(8, logger.getEventCount());
-        final TestLoggerEvent startEvent1 = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent1 = logger.getEvent(1);
-        final TestLoggerEvent startEvent2 = logger.getEvent(2);
-        final TestLoggerEvent startDataEvent2 = logger.getEvent(3);
-        final TestLoggerEvent stopEvent2 = logger.getEvent(4);
-        final TestLoggerEvent stopDataEvent2 = logger.getEvent(5);
-        final TestLoggerEvent stopEvent1 = logger.getEvent(6);
-        final TestLoggerEvent stopDataEvent1 = logger.getEvent(7);
+        final MockLoggerEvent startEvent1 = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent1 = logger.getEvent(1);
+        final MockLoggerEvent startEvent2 = logger.getEvent(2);
+        final MockLoggerEvent startDataEvent2 = logger.getEvent(3);
+        final MockLoggerEvent stopEvent2 = logger.getEvent(4);
+        final MockLoggerEvent stopDataEvent2 = logger.getEvent(5);
+        final MockLoggerEvent stopEvent1 = logger.getEvent(6);
+        final MockLoggerEvent stopDataEvent1 = logger.getEvent(7);
         assertEquals(Markers.MSG_START, startEvent2.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent2.getMarker());
@@ -385,14 +385,14 @@ public class MeterMessageTest {
         m.ok();
 
         assertEquals(8, logger.getEventCount());
-        final TestLoggerEvent startEvent1 = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent1 = logger.getEvent(1);
-        final TestLoggerEvent startEvent2 = logger.getEvent(2);
-        final TestLoggerEvent startDataEvent2 = logger.getEvent(3);
-        final TestLoggerEvent stopEvent2 = logger.getEvent(4);
-        final TestLoggerEvent stopDataEvent2 = logger.getEvent(5);
-        final TestLoggerEvent stopEvent1 = logger.getEvent(6);
-        final TestLoggerEvent stopDataEvent1 = logger.getEvent(7);
+        final MockLoggerEvent startEvent1 = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent1 = logger.getEvent(1);
+        final MockLoggerEvent startEvent2 = logger.getEvent(2);
+        final MockLoggerEvent startDataEvent2 = logger.getEvent(3);
+        final MockLoggerEvent stopEvent2 = logger.getEvent(4);
+        final MockLoggerEvent stopDataEvent2 = logger.getEvent(5);
+        final MockLoggerEvent stopEvent1 = logger.getEvent(6);
+        final MockLoggerEvent stopDataEvent1 = logger.getEvent(7);
         assertEquals(Markers.MSG_START, startEvent2.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent2.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent2.getMarker());
@@ -433,10 +433,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().ok(path);
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
         assertTrue(stopEvent.getFormattedMessage().contains("[" + path + "]"));
 
@@ -459,10 +459,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().path(path).ok();
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
         assertTrue(stopEvent.getFormattedMessage().contains("[" + path + "]"));
 
@@ -486,10 +486,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().path(path).path(path2).ok();
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
         assertFalse(startEvent.getFormattedMessage().contains("[" + path2 + "]"));
         assertTrue(stopEvent.getFormattedMessage().contains("[" + path2 + "]"));
@@ -514,10 +514,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().path(path).ok(path2);
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
         assertFalse(startEvent.getFormattedMessage().contains("[" + path2 + "]"));
         assertTrue(stopEvent.getFormattedMessage().contains("[" + path2 + "]"));
@@ -541,10 +541,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().reject(reject);
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_REJECT, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -581,10 +581,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().path(path).reject(reject);
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_REJECT, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -622,10 +622,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().fail(new Exception(exceptionStr));
 
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_FAIL, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -670,10 +670,10 @@ public class MeterMessageTest {
         assertFalse(m.isFail());
         assertTrue(m.isSlow());
         assertEquals(4, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent stopEvent = logger.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(3);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent stopEvent = logger.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_SLOW_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -713,18 +713,18 @@ public class MeterMessageTest {
         assertFalse(m.isFail());
         assertFalse(m.isSlow());
         assertEquals(12, logger.getEventCount());
-        final TestLoggerEvent startEvent = logger.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger.getEvent(1);
-        final TestLoggerEvent progressEvent1 = logger.getEvent(2);
-        final TestLoggerEvent progressDataEvent1 = logger.getEvent(3);
-        final TestLoggerEvent progressEvent2 = logger.getEvent(4);
-        final TestLoggerEvent progressDataEvent2 = logger.getEvent(5);
-        final TestLoggerEvent progressEvent3 = logger.getEvent(6);
-        final TestLoggerEvent progressDataEvent3 = logger.getEvent(7);
-        final TestLoggerEvent progressEvent4 = logger.getEvent(8);
-        final TestLoggerEvent progressDataEvent4 = logger.getEvent(9);
-        final TestLoggerEvent stopEvent = logger.getEvent(10);
-        final TestLoggerEvent stopDataEvent = logger.getEvent(11);
+        final MockLoggerEvent startEvent = logger.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger.getEvent(1);
+        final MockLoggerEvent progressEvent1 = logger.getEvent(2);
+        final MockLoggerEvent progressDataEvent1 = logger.getEvent(3);
+        final MockLoggerEvent progressEvent2 = logger.getEvent(4);
+        final MockLoggerEvent progressDataEvent2 = logger.getEvent(5);
+        final MockLoggerEvent progressEvent3 = logger.getEvent(6);
+        final MockLoggerEvent progressDataEvent3 = logger.getEvent(7);
+        final MockLoggerEvent progressEvent4 = logger.getEvent(8);
+        final MockLoggerEvent progressDataEvent4 = logger.getEvent(9);
+        final MockLoggerEvent stopEvent = logger.getEvent(10);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(11);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.MSG_PROGRESS, progressEvent1.getMarker());
@@ -822,7 +822,7 @@ public class MeterMessageTest {
         System.out.println("testContext1:");
         final String title = "Example of execution that succeeds and reports context.";
 
-        final TestLogger logger2 = (TestLogger) LoggerFactory.getLogger("context");
+        final MockLogger logger2 = (MockLogger) LoggerFactory.getLogger("context");
         logger2.clearEvents();
         logger2.setTraceEnabled(true);
         logger2.setDebugEnabled(true);
@@ -847,10 +847,10 @@ public class MeterMessageTest {
         assertTrue(m.isOK());
         assertFalse(m.isSlow());
         assertEquals(4, logger2.getEventCount());
-        final TestLoggerEvent startEvent = logger2.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger2.getEvent(1);
-        final TestLoggerEvent stopEvent = logger2.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger2.getEvent(3);
+        final MockLoggerEvent startEvent = logger2.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger2.getEvent(1);
+        final MockLoggerEvent stopEvent = logger2.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger2.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());
@@ -887,7 +887,7 @@ public class MeterMessageTest {
         System.out.println("testContext1:");
         final String title = "Example of execution that succeeds and reports context.";
 
-        final TestLogger logger2 = (TestLogger) LoggerFactory.getLogger("context");
+        final MockLogger logger2 = (MockLogger) LoggerFactory.getLogger("context");
         logger2.clearEvents();
         logger2.setTraceEnabled(false);
         logger2.setDebugEnabled(false);
@@ -912,7 +912,7 @@ public class MeterMessageTest {
         assertTrue(m.isOK());
         assertFalse(m.isSlow());
         assertEquals(1, logger2.getEventCount());
-        final TestLoggerEvent stopEvent = logger2.getEvent(0);
+        final MockLoggerEvent stopEvent = logger2.getEvent(0);
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Level.INFO, stopEvent.getLevel());
         assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_OK_PREFIX));
@@ -933,7 +933,7 @@ public class MeterMessageTest {
         System.out.println("testContext1:");
         final String title = "Example of execution that succeeds and reports context.";
 
-        final TestLogger logger2 = (TestLogger) LoggerFactory.getLogger("context");
+        final MockLogger logger2 = (MockLogger) LoggerFactory.getLogger("context");
         logger2.clearEvents();
         logger2.setTraceEnabled(true);
         logger2.setDebugEnabled(true);
@@ -970,10 +970,10 @@ public class MeterMessageTest {
         assertTrue(m.isOK());
         assertFalse(m.isSlow());
         assertEquals(4, logger2.getEventCount());
-        final TestLoggerEvent startEvent = logger2.getEvent(0);
-        final TestLoggerEvent startDataEvent = logger2.getEvent(1);
-        final TestLoggerEvent stopEvent = logger2.getEvent(2);
-        final TestLoggerEvent stopDataEvent = logger2.getEvent(3);
+        final MockLoggerEvent startEvent = logger2.getEvent(0);
+        final MockLoggerEvent startDataEvent = logger2.getEvent(1);
+        final MockLoggerEvent stopEvent = logger2.getEvent(2);
+        final MockLoggerEvent stopDataEvent = logger2.getEvent(3);
         assertEquals(Markers.MSG_START, startEvent.getMarker());
         assertEquals(Markers.MSG_OK, stopEvent.getMarker());
         assertEquals(Markers.DATA_START, startDataEvent.getMarker());

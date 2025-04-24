@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.SessionConfig;
 
 import java.nio.charset.Charset;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReportVMTest {
 
-    private TestLogger testLogger;
+    private MockLogger mockLogger;
 
     @BeforeAll
     static void validate() {
@@ -23,21 +23,21 @@ class ReportVMTest {
 
     @BeforeEach
     void setUp() {
-        testLogger = (TestLogger) LoggerFactory.getLogger("test.report.vm");
-        testLogger.clearEvents();
+        mockLogger = (MockLogger) LoggerFactory.getLogger("test.report.vm");
+        mockLogger.clearEvents();
     }
 
     @Test
     void shouldLogJvmInformation() {
         // Arrange
-        ReportVM report = new ReportVM(testLogger);
+        ReportVM report = new ReportVM(mockLogger);
 
         // Act
         report.run();
 
         // Assert
-        assertTrue(testLogger.getEventCount() > 0);
-        final String logs = testLogger.getEvent(0).getFormattedMessage();
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
         assertTrue(logs.contains("Java Virtual Machine"));
         assertTrue(logs.contains("vendor: " + System.getProperty("java.vendor")));
         assertTrue(logs.contains("version: " + System.getProperty("java.version")));

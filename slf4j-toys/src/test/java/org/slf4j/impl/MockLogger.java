@@ -24,19 +24,19 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
-import org.slf4j.impl.TestLoggerEvent.Level;
+import org.slf4j.impl.MockLoggerEvent.Level;
 
 /**
  * A test-friendly implementation of the SLF4J {@link Logger} interface.
  * <p>
  * This logger captures log events in memory, allowing tests to inspect log output by accessing the recorded
- * {@link TestLoggerEvent} instances. It supports all log levels (TRACE, DEBUG, INFO, WARN, ERROR) and provides
+ * {@link MockLoggerEvent} instances. It supports all log levels (TRACE, DEBUG, INFO, WARN, ERROR) and provides
  * configuration methods to enable or disable specific levels during test execution.
  * <p>
  * Each log event is printed to {@code System.out} or {@code System.err} based on its severity, and is also stored in an
  * internal list for later inspection.
  * <p>
- * This logger is primarily intended to be used together with {@link TestLoggerFactory} during test runs, where SLF4J
+ * This logger is primarily intended to be used together with {@link MockLoggerFactory} during test runs, where SLF4J
  * dynamically loads this implementation via its SPI mechanism.
  * <p>
  * Example usage in test assertions:
@@ -44,7 +44,7 @@ import org.slf4j.impl.TestLoggerEvent.Level;
  * Logger logger = LoggerFactory.getLogger("test.logger");
  * logger.info("Sample message");
  *
- * TestLogger testLogger = (TestLogger) logger;
+ * MockLogger testLogger = (MockLogger) logger;
  * assertEquals(1, testLogger.getEventCount());
  * assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Sample"));
  * }</pre>
@@ -53,7 +53,7 @@ import org.slf4j.impl.TestLoggerEvent.Level;
  *
  * @author Daniel Felix Ferber
  */
-public class TestLogger implements Logger {
+public class MockLogger implements Logger {
 
     private final String name;
     /* No concept of "LEVEL" here, because it is not a real logger implementation. */
@@ -68,9 +68,9 @@ public class TestLogger implements Logger {
     @Getter @Setter
     private boolean errorEnabled = true;
 
-    private final List<TestLoggerEvent> loggerEvents = new ArrayList<TestLoggerEvent>();
+    private final List<MockLoggerEvent> loggerEvents = new ArrayList<MockLoggerEvent>();
 
-    public TestLogger(final String name) {
+    public MockLogger(final String name) {
         this.name = name;
     }
 
@@ -79,7 +79,7 @@ public class TestLogger implements Logger {
         return name;
     }
 
-    private void addEvent(final TestLoggerEvent event) {
+    private void addEvent(final MockLoggerEvent event) {
         loggerEvents.add(event);
     }
 
@@ -392,18 +392,18 @@ public class TestLogger implements Logger {
             final Throwable throwable,
             final String format,
             final Object... args) {
-        final TestLoggerEvent event = new TestLoggerEvent(name, level, null, marker, throwable, format, args);
+        final MockLoggerEvent event = new MockLoggerEvent(name, level, null, marker, throwable, format, args);
         loggerEvents.add(event);
         print(event);
     }
 
-    private void print(final TestLoggerEvent event) {
+    private void print(final MockLoggerEvent event) {
         final PrintStream ps = event.getLevel() == Level.ERROR || event.getLevel() == Level.WARN ? System.err : System.out;
         ps.println(formatLogStatement(event));
         ps.flush();
     }
 
-    private String formatLogStatement(final TestLoggerEvent event) {
+    private String formatLogStatement(final MockLoggerEvent event) {
         if (event.getThrowable() == null) {
             return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage();
         }
@@ -417,7 +417,7 @@ public class TestLogger implements Logger {
         return loggerEvents.size();
     }
 
-    public TestLoggerEvent getEvent(final int i) {
+    public MockLoggerEvent getEvent(final int i) {
         return loggerEvents.get(i);
     }
 }

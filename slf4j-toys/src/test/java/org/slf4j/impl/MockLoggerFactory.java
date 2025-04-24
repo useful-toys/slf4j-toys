@@ -25,7 +25,7 @@ import org.slf4j.Logger;
  * A mock implementation of {@link ILoggerFactory} intended for use in unit tests.
  *
  * <p>
- * Provides {@link TestLogger} instances that capture log output in-memory, allowing assertions on logged content
+ * Provides {@link MockLogger} instances that capture log output in-memory, allowing assertions on logged content
  * without requiring access to external files or consoles.
  * <p>
  * This factory is discovered automatically by SLF4J when present on the test classpath, and should not be referenced or
@@ -34,20 +34,20 @@ import org.slf4j.Logger;
  * To use this in tests, ensure the service provider configuration is in place:
  * <code>META-INF/services/org.slf4j.ILoggerFactory</code> should contain:</p>
  * <pre>
- * org.usefultoys.slf4j.report.TestLoggerFactory
+ * org.usefultoys.slf4j.report.MockLoggerFactory
  * </pre>
  * <p>
  * No other SLF4J implementation should be present on the classepath.
  * <p>
- * When configured, all SLF4J logger requests in test code will return {@link TestLogger} instances.
+ * When configured, all SLF4J logger requests in test code will return {@link MockLogger} instances.
  * </p>
  *
  * @author Daniel Felix Ferber
  */
-public class TestLoggerFactory implements ILoggerFactory {
+public class MockLoggerFactory implements ILoggerFactory {
 
     private final Map<String, Logger> nameToLogger = new HashMap<String, Logger>();
-    private static final TestLoggerFactory instance = new TestLoggerFactory();
+    private static final MockLoggerFactory instance = new MockLoggerFactory();
 
     public static ILoggerFactory getInstance() {
         return instance;
@@ -59,7 +59,7 @@ public class TestLoggerFactory implements ILoggerFactory {
         if (logger != null) {
             return logger;
         }
-        nameToLogger.put(name, logger = new TestLogger(name));
+        nameToLogger.put(name, logger = new MockLogger(name));
         return logger;
     }
 }

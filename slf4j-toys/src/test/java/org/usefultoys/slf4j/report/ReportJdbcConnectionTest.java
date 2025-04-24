@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.SessionConfig;
 
 import java.nio.charset.Charset;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ReportJdbcConnectionTest {
-    private TestLogger logger;
+    private MockLogger logger;
     private Connection connection;
     private ReportJdbcConnection reporter;
 
@@ -31,7 +31,7 @@ class ReportJdbcConnectionTest {
 
     @BeforeEach
     void setUp() {
-        logger = (TestLogger) LoggerFactory.getLogger("test.jdbc");
+        logger = (MockLogger) LoggerFactory.getLogger("test.jdbc");
         logger.clearEvents();
 
         connection = mock(Connection.class);
@@ -48,8 +48,8 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        TestLogger testLogger = (TestLogger) logger;
-        String fullLog = testLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
+        MockLogger mockLogger = (MockLogger) logger;
+        String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
 
         assertTrue(fullLog.contains("Closed!"));
     }
@@ -88,8 +88,8 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        TestLogger testLogger = (TestLogger) logger;
-        String fullLog = testLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
+        MockLogger mockLogger = (MockLogger) logger;
+        String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
 
         assertTrue(fullLog.contains("JDBC connection"));
         assertTrue(fullLog.contains("catalog: catalog1"));
@@ -121,8 +121,8 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        TestLogger testLogger = (TestLogger) logger;
-        String fullLog = testLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
+        MockLogger mockLogger = (MockLogger) logger;
+        String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
 
         assertTrue(fullLog.contains("JDBC connection"));
         assertTrue(fullLog.contains("properties: read-only; holdability=close-cursors-at-commit; timeout=0ms; transaction=repeatable-read;"));
@@ -154,8 +154,8 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        TestLogger testLogger = (TestLogger) logger;
-        String fullLog = testLogger.getEvent(0).getFormattedMessage();
+        MockLogger mockLogger = (MockLogger) logger;
+        String fullLog = mockLogger.getEvent(0).getFormattedMessage();
 
         assertTrue(fullLog.contains("type map: uuid->UUID; jsonb->String; "));
     }
@@ -183,8 +183,8 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        TestLogger testLogger = (TestLogger) logger;
-        String fullLog = testLogger.getEvent(0).getFormattedMessage();
+        MockLogger mockLogger = (MockLogger) logger;
+        String fullLog = mockLogger.getEvent(0).getFormattedMessage();
 
         assertTrue(fullLog.contains("type map: n/a"));
     }

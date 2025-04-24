@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeAll;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
 
@@ -34,7 +34,7 @@ import java.nio.charset.Charset;
 @SuppressWarnings("UnusedAssignment")
 public class MeterIterationAttributesTest {
 
-    TestLogger logger = (TestLogger) LoggerFactory.getLogger("Test");
+    MockLogger logger = (MockLogger) LoggerFactory.getLogger("Test");
 
     public MeterIterationAttributesTest() {
         logger.setEnabled(false);

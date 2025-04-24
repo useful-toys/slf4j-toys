@@ -22,16 +22,16 @@ public final class StaticMDCBinder {
 
     public static final org.slf4j.impl.StaticMDCBinder SINGLETON = new org.slf4j.impl.StaticMDCBinder();
 
-    private final TestMDCAdapter testMDCAdapter = new TestMDCAdapter();
+    private final MockMDCAdapter mockMDCAdapter = new MockMDCAdapter();
 
     private StaticMDCBinder() {
     }
 
     public MDCAdapter getMDCA() {
-        return testMDCAdapter;
+        return mockMDCAdapter;
     }
 
     public String getMDCAdapterClassStr() {
-        return TestMDCAdapter.class.getName();
+        return MockMDCAdapter.class.getName();
     }
 }

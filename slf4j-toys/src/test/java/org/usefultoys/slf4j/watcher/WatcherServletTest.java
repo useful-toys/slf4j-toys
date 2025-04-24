@@ -2,7 +2,7 @@ package org.usefultoys.slf4j.watcher;
 
 import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 
@@ -38,21 +38,21 @@ class WatcherServletTest {
         SystemConfig.reset();
     }
 
-    private TestLogger testLogger = (TestLogger) LoggerFactory.getLogger(WatcherServlet.class);
-    private TestLogger watcherLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name);
+    private MockLogger mockLogger = (MockLogger) LoggerFactory.getLogger(WatcherServlet.class);
+    private MockLogger watcherLogger = (MockLogger) LoggerFactory.getLogger(WatcherConfig.name);
 
     @BeforeEach
     void setupLogger() {
-        testLogger.setEnabled(true);
-        testLogger.clearEvents();
+        mockLogger.setEnabled(true);
+        mockLogger.clearEvents();
         watcherLogger.setEnabled(true);
         watcherLogger.clearEvents();
     }
 
     @AfterEach
     void clearLogger() {
-        testLogger.setEnabled(true);
-        testLogger.clearEvents();
+        mockLogger.setEnabled(true);
+        mockLogger.clearEvents();
         watcherLogger.setEnabled(true);
         watcherLogger.clearEvents();
     }
@@ -74,8 +74,8 @@ class WatcherServletTest {
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertEquals("System status logged successfully.", responseWriter.toString().trim());
 
-        assertTrue(testLogger.getEventCount() == 1);
-        assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("WatcherServlet accessed"));
+        assertTrue(mockLogger.getEventCount() == 1);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("WatcherServlet accessed"));
 
         assertTrue(watcherLogger.getEventCount() == 1);
         assertTrue(watcherLogger.getEvent(0).getFormattedMessage().contains("Memory:"));

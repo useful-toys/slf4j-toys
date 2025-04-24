@@ -18,7 +18,7 @@ package org.usefultoys.slf4j.meter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
 
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MeterIdentifierOverflowTest {
     final String meterName = "name";
-    final TestLogger logger = (TestLogger) LoggerFactory.getLogger(meterName);
+    final MockLogger logger = (MockLogger) LoggerFactory.getLogger(meterName);
 
     public MeterIdentifierOverflowTest() {
     }
@@ -67,10 +67,10 @@ public class MeterIdentifierOverflowTest {
 //        Assertions.assertEquals(expectedEventPosition, m.getPosition());
 //        Assertions.assertEquals(null, m.getOperation());
 //        Assertions.assertEquals(meterName, m.getCategory());
-//        final TestLoggerEvent startEvent = logger.getEvent(expectedMessageCount - 4);
-//        final TestLoggerEvent startDataEvent = logger.getEvent(expectedMessageCount - 3);
-//        final TestLoggerEvent stopEvent = logger.getEvent(expectedMessageCount - 2);
-//        final TestLoggerEvent stopDataEvent = logger.getEvent(expectedMessageCount - 1);
+//        final MockLoggerEvent startEvent = logger.getEvent(expectedMessageCount - 4);
+//        final MockLoggerEvent startDataEvent = logger.getEvent(expectedMessageCount - 3);
+//        final MockLoggerEvent stopEvent = logger.getEvent(expectedMessageCount - 2);
+//        final MockLoggerEvent stopDataEvent = logger.getEvent(expectedMessageCount - 1);
 //
 //        String str = "$=" + Long.toString(expectedEventPosition);
 //        Assertions.assertEquals(expectedEventPosition, m.getPosition());

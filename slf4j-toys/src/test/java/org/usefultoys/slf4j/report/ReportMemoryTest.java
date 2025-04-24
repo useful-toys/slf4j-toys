@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.SessionConfig;
 
 import java.nio.charset.Charset;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ReportMemoryTest {
 
-    private TestLogger testLogger;
+    private MockLogger mockLogger;
 
     @BeforeAll
     static void validate() {
@@ -24,21 +24,21 @@ class ReportMemoryTest {
     @BeforeEach
     void setUp() {
         Logger logger = LoggerFactory.getLogger("test.report.memory");
-        testLogger = (TestLogger) logger;
-        testLogger.clearEvents();
+        mockLogger = (MockLogger) logger;
+        mockLogger.clearEvents();
     }
 
     @Test
     void shouldLogJvmMemoryInformation() {
         // Arrange
-        ReportMemory report = new ReportMemory(testLogger);
+        ReportMemory report = new ReportMemory(mockLogger);
 
         // Act
         report.run();
 
         // Assert
-        assertTrue(testLogger.getEventCount() > 0);
-        final String logs = testLogger.getEvent(0).getFormattedMessage();
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
 
         assertTrue(logs.contains("Memory:"));
         assertTrue(logs.contains("maximum allowed:"));

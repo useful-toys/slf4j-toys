@@ -2,7 +2,7 @@ package org.usefultoys.slf4j.watcher;
 
 import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 
@@ -10,9 +10,9 @@ import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.*;
 class WatcherTest {
-    private TestLogger testLogger;
-    private TestLogger messageLogger;
-    private TestLogger dataLogger;
+    private MockLogger mockLogger;
+    private MockLogger messageLogger;
+    private MockLogger dataLogger;
 
     @BeforeAll
     static void validate() {
@@ -37,18 +37,18 @@ class WatcherTest {
 
     @BeforeEach
     void setupLogger() {
-        testLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name);
-        messageLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name + ".message");
-        dataLogger = (TestLogger) LoggerFactory.getLogger(WatcherConfig.name + ".data");
-        testLogger.clearEvents();
+        mockLogger = (MockLogger) LoggerFactory.getLogger(WatcherConfig.name);
+        messageLogger = (MockLogger) LoggerFactory.getLogger(WatcherConfig.name + ".message");
+        dataLogger = (MockLogger) LoggerFactory.getLogger(WatcherConfig.name + ".data");
+        mockLogger.clearEvents();
         messageLogger.clearEvents();
         dataLogger.clearEvents();
     }
 
     @AfterEach
     void clearLogger() {
-        testLogger.setEnabled(true);
-        testLogger.clearEvents();
+        mockLogger.setEnabled(true);
+        mockLogger.clearEvents();
         messageLogger.setEnabled(true);
         messageLogger.clearEvents();
         dataLogger.setEnabled(true);
@@ -62,7 +62,7 @@ class WatcherTest {
         WatcherConfig.messageSuffix = ".message";
         messageLogger.setEnabled(true);
         dataLogger.setEnabled(true);
-        testLogger.setEnabled(true);
+        mockLogger.setEnabled(true);
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
@@ -73,7 +73,7 @@ class WatcherTest {
         assertTrue(watcher.getRuntime_usedMemory() > 0);
 
         // Readable and encoded messages are written to the separated logs
-        assertTrue(testLogger.getEventCount() == 0);
+        assertTrue(mockLogger.getEventCount() == 0);
         assertTrue(messageLogger.getEventCount() == 1);
         assertTrue(messageLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
         assertTrue(dataLogger.getEventCount() == 1);
@@ -88,7 +88,7 @@ class WatcherTest {
         WatcherConfig.messageSuffix = "";
         messageLogger.setEnabled(true);
         dataLogger.setEnabled(true);
-        testLogger.setEnabled(true);
+        mockLogger.setEnabled(true);
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
@@ -101,9 +101,9 @@ class WatcherTest {
         // Readable and encoded messages are written to the same log
         assertTrue(messageLogger.getEventCount() == 0);
         assertTrue(dataLogger.getEventCount() == 0);
-        assertTrue(testLogger.getEventCount() == 2);
-        assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
-        final String json5 = testLogger.getEvent(1).getMessage();
+        assertTrue(mockLogger.getEventCount() == 2);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
+        final String json5 = mockLogger.getEvent(1).getMessage();
         assertEquals(json5, watcher.json5Message());
     }
 
@@ -114,7 +114,7 @@ class WatcherTest {
         WatcherConfig.messageSuffix = "";
         messageLogger.setEnabled(true);
         dataLogger.setEnabled(true);
-        testLogger.setEnabled(true);
+        mockLogger.setEnabled(true);
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
@@ -127,8 +127,8 @@ class WatcherTest {
         // Only readable message is written to log
         assertTrue(messageLogger.getEventCount() == 0);
         assertTrue(dataLogger.getEventCount() == 0);
-        assertTrue(testLogger.getEventCount() == 1);
-        assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
+        assertTrue(mockLogger.getEventCount() == 1);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
     }
 
     @Test
@@ -138,11 +138,11 @@ class WatcherTest {
         WatcherConfig.messageSuffix = "";
         messageLogger.setEnabled(true);
         dataLogger.setEnabled(true);
-        testLogger.setTraceEnabled(false);
-        testLogger.setDebugEnabled(false);
-        testLogger.setInfoEnabled(true);
-        testLogger.setWarnEnabled(true);
-        testLogger.setErrorEnabled(true);
+        mockLogger.setTraceEnabled(false);
+        mockLogger.setDebugEnabled(false);
+        mockLogger.setInfoEnabled(true);
+        mockLogger.setWarnEnabled(true);
+        mockLogger.setErrorEnabled(true);
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
@@ -155,8 +155,8 @@ class WatcherTest {
         // Only readable message is written to log
         assertTrue(messageLogger.getEventCount() == 0);
         assertTrue(dataLogger.getEventCount() == 0);
-        assertTrue(testLogger.getEventCount() == 1);
-        assertTrue(testLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
+        assertTrue(mockLogger.getEventCount() == 1);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
     }
 
     @Test
@@ -166,11 +166,11 @@ class WatcherTest {
         WatcherConfig.messageSuffix = "";
         messageLogger.setEnabled(true);
         dataLogger.setEnabled(true);
-        testLogger.setTraceEnabled(false);
-        testLogger.setDebugEnabled(false);
-        testLogger.setInfoEnabled(false);
-        testLogger.setWarnEnabled(false);
-        testLogger.setErrorEnabled(false);
+        mockLogger.setTraceEnabled(false);
+        mockLogger.setDebugEnabled(false);
+        mockLogger.setInfoEnabled(false);
+        mockLogger.setWarnEnabled(false);
+        mockLogger.setErrorEnabled(false);
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
@@ -184,6 +184,6 @@ class WatcherTest {
         // No messages a written to log
         assertTrue(messageLogger.getEventCount() == 0);
         assertTrue(dataLogger.getEventCount() == 0);
-        assertTrue(testLogger.getEventCount() == 0);
+        assertTrue(mockLogger.getEventCount() == 0);
     }
 }

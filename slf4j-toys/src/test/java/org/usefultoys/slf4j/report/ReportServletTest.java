@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.TestLogger;
+import org.slf4j.impl.MockLogger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,8 +24,8 @@ class ReportServletTest {
     private HttpServletRequest request;
     private HttpServletResponse response;
     private StringWriter responseWriter;
-    private TestLogger reportLogger;
-    private TestLogger servletLogger;
+    private MockLogger reportLogger;
+    private MockLogger servletLogger;
 
     @BeforeAll
     static void validate() {
@@ -42,9 +42,9 @@ class ReportServletTest {
         PrintWriter writer = new PrintWriter(responseWriter);
         when(response.getWriter()).thenReturn(writer);
 
-        reportLogger = (TestLogger) (TestLogger) LoggerFactory.getLogger(ReporterConfig.name);
+        reportLogger = (MockLogger) (MockLogger) LoggerFactory.getLogger(ReporterConfig.name);
         reportLogger.clearEvents();
-        servletLogger = (TestLogger) LoggerFactory.getLogger(ReportServlet.class);
+        servletLogger = (MockLogger) LoggerFactory.getLogger(ReportServlet.class);
         servletLogger.clearEvents();
     }
 
@@ -110,7 +110,7 @@ class ReportServletTest {
         PrintWriter writer = new PrintWriter(responseWriter);
         when(response.getWriter()).thenReturn(writer);
 
-        TestLogger logger = (TestLogger) LoggerFactory.getLogger("org.usefultoys.slf4j.report.ReportServlet");
+        MockLogger logger = (MockLogger) LoggerFactory.getLogger("org.usefultoys.slf4j.report.ReportServlet");
         logger.clearEvents();
 
         // Act
