@@ -1001,7 +1001,11 @@ public class Meter extends MeterData implements Closeable {
             if (messageLogger.isErrorEnabled()) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
-                messageLogger.error(Markers.MSG_FAIL, readableMessage());
+                if (cause instanceof Throwable) {
+                    messageLogger.error(Markers.MSG_FAIL, readableMessage(), (Throwable) cause);
+                } else {
+                    messageLogger.error(Markers.MSG_FAIL, readableMessage());
+                }
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_FAIL, encodedMessage());
                 }
