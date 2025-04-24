@@ -1,0 +1,14 @@
+Atualizar versão dos headers, via IntellJ
+ - Plugins maven não funcionaram - investigar um dia por que...
+    Vá em Settings > Editor > Copyright > Copyright Profiles
+    Clique no + para criar um novo perfil
+    Digite o texto da licença Apache 2.0
+    Em Settings > Editor > Copyright, selecione o perfil criado como padrão
+    Configure o escopo (quais arquivos devem receber o cabeçalho)
+    Clicar na raiz do projeto -> Analyse -> Update Copyright
+
+Atualizar a versão
+
+mvn versions:set -DnewVersion=1.2.3 -DprocessAllModules=true
+ou
+mvn versions:set -DremoveSnapshot=true
