@@ -18,13 +18,11 @@ package org.usefultoys.slf4j;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 
 import static org.slf4j.LoggerFactory.getILoggerFactory;
 

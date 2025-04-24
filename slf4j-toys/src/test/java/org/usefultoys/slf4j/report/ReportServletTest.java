@@ -3,7 +3,6 @@ package org.usefultoys.slf4j.report;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.TestLogger;
 

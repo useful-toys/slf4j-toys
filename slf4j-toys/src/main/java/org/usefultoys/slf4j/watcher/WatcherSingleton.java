@@ -16,7 +16,6 @@
 package org.usefultoys.slf4j.watcher;
 
 import lombok.experimental.UtilityClass;
-import org.usefultoys.slf4j.LoggerFactory;
 
 import java.util.Timer;
 import java.util.TimerTask;

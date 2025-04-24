@@ -15,7 +15,6 @@
  */
 package org.usefultoys.slf4j.watcher;
 
-import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 

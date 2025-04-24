@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.utils.ConfigParser;
 
 import java.nio.charset.Charset;
 

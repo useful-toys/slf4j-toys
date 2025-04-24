@@ -2,7 +2,6 @@ package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestClassOrder;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

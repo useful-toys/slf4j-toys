@@ -10,7 +10,6 @@ import org.usefultoys.slf4j.SessionConfig;
 import javax.servlet.ServletContextEvent;
 
 import java.nio.charset.Charset;
-import java.sql.Connection;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;

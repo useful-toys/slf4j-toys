@@ -15,8 +15,6 @@
  */
 package org.usefultoys.slf4j.examples.report;
 
-import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.report.Reporter;
 import org.usefultoys.slf4j.report.ReporterConfig;
 
