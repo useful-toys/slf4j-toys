@@ -386,10 +386,6 @@ public class TestLogger implements Logger {
         addLoggingEvent(level, marker, throwable, msg, (Object[]) null);
     }
 
-    private void log(final Level level, final String format, final Marker marker, final Object[] args) {
-        addLoggingEvent(level, marker, null, format, args);
-    }
-
     private void addLoggingEvent(
             final Level level,
             final Marker marker,
