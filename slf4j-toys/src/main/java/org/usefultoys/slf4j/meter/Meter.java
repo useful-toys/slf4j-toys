@@ -43,6 +43,7 @@ import static org.usefultoys.slf4j.meter.MeterConfig.*;
  *
  * @author Daniel Felix Ferber
  */
+@SuppressWarnings({"OverlyBroadCatchBlock", "FinalizeDeclaration"})
 public class Meter extends MeterData implements Closeable {
 
     private static final long serialVersionUID = 1L;
@@ -1038,7 +1039,7 @@ public class Meter extends MeterData implements Closeable {
             this(framesToDiscard + 1, null);
         }
 
-        @SuppressWarnings("AssignmentToMethodParameter")
+        @SuppressWarnings({"AssignmentToMethodParameter", "OverridableMethodCallDuringObjectConstruction"})
         MeterThrowable(int framesToDiscard, final Throwable e) {
             super(e);
             framesToDiscard++;
