@@ -15,18 +15,19 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A simple servlet that responds to GET requests by invoking the default watcher to report the system status.
  * This servlet can be bound to a specific URL and triggered periodically, for example, by a CRON job.
  *
  * <p>Usage: Bind this servlet to a URL in your web application configuration, and ensure the URL is called
- * periodically to log the current system status.</p>
+ * periodically to log the current system status.
  *
  * @author Daniel Felix Ferber
  */

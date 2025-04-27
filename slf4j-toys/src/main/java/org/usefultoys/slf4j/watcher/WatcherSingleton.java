@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * The default watcher instance is created at application startup and is named according to the system property
  * {@code slf4jtoys.watcher.name}, which defaults to {@code watcher}. The default watcher cannot be reassigned at runtime.
- * </p>
+ * 
  * 
  * <p>
  * This utility class provides two mechanisms for periodic execution:
@@ -38,11 +38,11 @@ import java.util.concurrent.TimeUnit;
  *   <li>A {@link ScheduledExecutorService}-based executor</li>
  *   <li>A {@link Timer}-based timer</li>
  * </ul>
- * </p>
+ * 
  * 
  * <p>
  * Note: Ensure proper lifecycle management when using this class to avoid resource leaks.
- * </p>
+ * 
  * 
  * @author Daniel Felix Ferber
  */

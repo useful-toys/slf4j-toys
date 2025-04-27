@@ -31,7 +31,7 @@ import java.util.concurrent.Executor;
  * Reports are logged as information-level messages using SLF4J. The set of reports to be generated is controlled by
  * {@link ReporterConfig}, including which sections are enabled and the default logger name (unless overridden).
  *
- * <p>This is useful for troubleshooting or recording system configuration at application startup or runtime.</p>
+ * <p>This is useful for troubleshooting or recording system configuration at application startup or runtime.
  *
  * @author Daniel Felix Ferber
  */
@@ -85,7 +85,7 @@ public class Reporter implements Serializable {
     /**
      * Runs only the reports that are enabled in {@link ReporterConfig} and logs them as information-level messages.
      *
-     * <p>Each enabled report is executed via the provided {@link Executor}.</p>
+     * <p>Each enabled report is executed via the provided {@link Executor}.
      *
      * @param executor the executor used to run each report
      */

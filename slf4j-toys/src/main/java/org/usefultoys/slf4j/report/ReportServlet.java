@@ -50,7 +50,7 @@ import java.util.Locale;
  * If the path does not match any known suffix, no action is taken and the request is silently ignored.
  * <p>
  * <strong>Security considerations</strong>
- *  <p>This servlet accesses and logs potentially sensitive system information. Therefore, the following security measures are strongly recommended:</p>
+ *  <p>This servlet accesses and logs potentially sensitive system information. Therefore, the following security measures are strongly recommended:
  *  <ul>
  *    <li><strong>Restrict access</strong> to the servlet endpoint using authentication or IP whitelisting.</li>
  *    <li><strong>Avoid exposing this servlet</strong> in production environments or public networks without proper protection.</li>

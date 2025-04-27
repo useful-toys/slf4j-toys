@@ -75,7 +75,7 @@ public class ReportJdbcConnection implements Runnable {
      * Executes the report for the specified JDBC {@link Connection}.
      *
      * <p>This method logs the output using {@link LoggerFactory#getInfoPrintStream(Logger)}.
-     * If the connection is closed, it logs a message and exits early.</p>
+     * If the connection is closed, it logs a message and exits early.
      */
     @Override
     public void run() {

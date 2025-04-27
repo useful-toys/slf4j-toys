@@ -30,7 +30,7 @@ import static org.slf4j.LoggerFactory.getILoggerFactory;
  * An alternative to {@link org.slf4j.LoggerFactory}, providing additional utility methods for creating and managing
  * loggers.
  *
- * <p>This class is final and cannot be instantiated.</p>
+ * <p>This class is final and cannot be instantiated.
  *
  * @author Daniel Felix Ferber
  */
@@ -41,7 +41,7 @@ public class LoggerFactory {
      * {@link ILoggerFactory} instance.
      *
      * <p>This is recommended for obtaining a logger with a custom name that
-     * does not follow the fully qualified class name convention.</p>
+     * does not follow the fully qualified class name convention.
      *
      * @param name the name of the logger
      * @return the logger instance
@@ -55,7 +55,7 @@ public class LoggerFactory {
      * bound {@link ILoggerFactory} instance.
      *
      * <p>This is recommended for obtaining a logger that tracks features
-     * provided by the specified class.</p>
+     * provided by the specified class.
      *
      * @param clazz the class whose name will be used for the logger
      * @return the logger instance
@@ -69,7 +69,7 @@ public class LoggerFactory {
      * or feature, using the statically bound {@link ILoggerFactory} instance.
      *
      * <p>This is recommended for obtaining a logger that is subordinate to
-     * an existing logger named after a class.</p>
+     * an existing logger named after a class.
      *
      * @param clazz the parent class whose name will be used as a base
      * @param name the name of the operation or feature appended to the parent logger name
@@ -85,7 +85,7 @@ public class LoggerFactory {
      * or feature, using the statically bound {@link ILoggerFactory} instance.
      *
      * <p>This is recommended for obtaining a logger that is subordinate to
-     * an existing logger.</p>
+     * an existing logger.
      *
      * @param logger the parent logger
      * @param name the name of the operation or feature appended to the parent logger name
@@ -99,7 +99,7 @@ public class LoggerFactory {
      * Returns a {@link PrintStream} that writes structured text as trace-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link PrintStream} triggers the logging of the
-     *  accumulated text.</p>
+     *  accumulated text.
      *
      * @param logger the logger to which messages will be written
      * @return a PrintStream for trace-level logging
@@ -116,7 +116,7 @@ public class LoggerFactory {
      * Returns a {@link PrintStream} that writes structured text as  debug-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link PrintStream} triggers the logging of the
-     *  accumulated text.</p>
+     *  accumulated text.
      *
      * @param logger the logger to which messages will be written
      * @return a PrintStream for debug-level logging
@@ -133,7 +133,7 @@ public class LoggerFactory {
      * Returns a {@link PrintStream} that writes structured text as  info-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link PrintStream} triggers the logging of the
-     *  accumulated text.</p>
+     *  accumulated text.
      *
      * @param logger the logger to which messages will be written
      * @return a PrintStream for info-level logging
@@ -150,7 +150,7 @@ public class LoggerFactory {
      * Returns a {@link PrintStream} that writes structured text as  warn-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link PrintStream} triggerss the logging of the
-     *  accumulated text.</p>
+     *  accumulated text.
      *
      * @param logger the logger to which messages will be written
      * @return a PrintStream for warn-level logging
@@ -167,7 +167,7 @@ public class LoggerFactory {
      * Returns a {@link PrintStream} that writes structured text as  error-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link PrintStream} triggerss the logging of the
-     *  accumulated text.</p>
+     *  accumulated text.
      *  
      * @param logger the logger to which messages will be written
      * @return a PrintStream for error-level logging
@@ -184,7 +184,7 @@ public class LoggerFactory {
      * Returns a {@link OutputStream} that writes trace-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link OutputStream} triggerss the logging of the
-     *  accumulated bytes.</p>
+     *  accumulated bytes.
      * 
      * @param logger the logger to which messages will be written
      * @return a OutputStream for trace-level logging
@@ -205,7 +205,7 @@ public class LoggerFactory {
      * Returns a {@link OutputStream} that writes debug-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link OutputStream} triggerss the logging of the
-     *  accumulated bytes.</p>
+     *  accumulated bytes.
      * 
      * @param logger the logger to which messages will be written
      * @return a OutputStream for debug-level logging
@@ -226,7 +226,7 @@ public class LoggerFactory {
      * Returns a {@link OutputStream} that writes info-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link OutputStream} triggerss the logging of the
-     *  accumulated bytes.</p>
+     *  accumulated bytes.
      * 
      * @param logger the logger to which messages will be written
      * @return a OutputStream for info-level logging
@@ -247,7 +247,7 @@ public class LoggerFactory {
      * Returns a {@link OutputStream} that writes warn-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link OutputStream} triggerss the logging of the
-     *  accumulated bytes.</p>
+     *  accumulated bytes.
      * 
      * @param logger the logger to which messages will be written
      * @return a OutputStream for warn-level logging
@@ -268,7 +268,7 @@ public class LoggerFactory {
      * Returns a {@link OutputStream} that writes error-level messages to the specified logger.
      *
      * <p>The {@code close} method of the returned {@link OutputStream} triggerss the logging of the
-     *  accumulated bytes.</p>
+     *  accumulated bytes.
 
      * @param logger the logger to which messages will be written
      * @return a OutputStream for error-level logging

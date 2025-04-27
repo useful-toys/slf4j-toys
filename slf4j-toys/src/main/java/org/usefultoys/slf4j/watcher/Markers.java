@@ -15,10 +15,9 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import lombok.experimental.UtilityClass;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-
-import lombok.experimental.UtilityClass;
 
 /**
  * Utility class that provides a collection of SLF4J {@link Marker}s 
@@ -28,7 +27,7 @@ import lombok.experimental.UtilityClass;
  * <p>
  * Markers are used to enrich log messages with additional metadata, 
  * enabling better filtering and analysis of logs.
- * </p>
+ * 
  * 
  * <ul>
  *   <li>{@link #MSG_WATCHER} - Marker for general {@link Watcher} log messages.</li>
@@ -38,7 +37,7 @@ import lombok.experimental.UtilityClass;
  * <p>
  * These markers can be used in conjunction with SLF4J logging frameworks 
  * to provide structured and meaningful log categorization.
- * </p>
+ * 
  * 
  * @author Daniel Felix Ferber
  */

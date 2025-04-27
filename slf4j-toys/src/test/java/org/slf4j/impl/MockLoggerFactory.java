@@ -15,11 +15,11 @@
  */
 package org.slf4j.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A mock implementation of {@link ILoggerFactory} intended for use in unit tests.
@@ -32,7 +32,7 @@ import org.slf4j.Logger;
  * instantiated directly in test code.
  * <p>
  * To use this in tests, ensure the service provider configuration is in place:
- * <code>META-INF/services/org.slf4j.ILoggerFactory</code> should contain:</p>
+ * <code>META-INF/services/org.slf4j.ILoggerFactory</code> should contain:
  * <pre>
  * org.usefultoys.slf4j.report.MockLoggerFactory
  * </pre>
@@ -40,7 +40,7 @@ import org.slf4j.Logger;
  * No other SLF4J implementation should be present on the classepath.
  * <p>
  * When configured, all SLF4J logger requests in test code will return {@link MockLogger} instances.
- * </p>
+ * 
  *
  * @author Daniel Felix Ferber
  */

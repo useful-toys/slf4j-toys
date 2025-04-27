@@ -22,9 +22,9 @@ import lombok.experimental.UtilityClass;
  * Utility class that provides methods to format numbers by rounding them to a unit, 
  * thereby reducing their string representation.
  *
- * <p>This class supports formatting for time durations, memory sizes, and iteration-related values.</p>
+ * <p>This class supports formatting for time durations, memory sizes, and iteration-related values.
  *
- * <p>For example, it can convert large numbers into human-readable formats such as "1.2kB" or "3.4ms".</p>
+ * <p>For example, it can convert large numbers into human-readable formats such as "1.2kB" or "3.4ms".
  *
  * @author Daniel Felix Ferber
  */
