@@ -1137,25 +1137,25 @@ public class Meter extends MeterData implements Closeable {
 
     @SneakyThrows
     public void runOrReject(final Runnable runnable, final Class<? extends Exception>... exceptionsToReject) {
-        if (this.startTime == 0L) {
-            this.start();
+        if (startTime == 0L) {
+            start();
         }
 
         try {
             runnable.run();
-            if (this.stopTime == 0L) {
-                this.ok();
+            if (stopTime == 0L) {
+                ok();
             }
         } catch (final Exception e) {
             final int length = exceptionsToReject.length;
             for(int i = 0; i < length; ++i) {
                 final Class<? extends Exception> ee = exceptionsToReject[i];
                 if (ee.isAssignableFrom(e.getClass())) {
-                    this.reject(e);
+                    reject(e);
                     throw e;
                 }
             }
-            this.fail(e);
+            fail(e);
             throw e;
         }
     }
@@ -1175,38 +1175,38 @@ public class Meter extends MeterData implements Closeable {
 
     @SneakyThrows
     public <T> T callOrRejectChecked(final Callable<T> callable) {
-        if (this.startTime == 0L) {
-            this.start();
+        if (startTime == 0L) {
+            start();
         }
 
         try {
             final T result = callable.call();
-            this.ctx("result", result);
-            if (this.stopTime == 0L) {
-                this.ok();
+            ctx("result", result);
+            if (stopTime == 0L) {
+                ok();
             }
 
             return result;
         } catch (final RuntimeException e) {
-            this.fail(e);
+            fail(e);
             throw e;
         } catch (final Exception e) {
-            this.reject(e);
+            reject(e);
             throw e;
         }
     }
 
     @SneakyThrows
     public <T> T callOrReject(final Callable<T> callable, final Class<? extends Exception>... exceptionsToReject) {
-        if (this.startTime == 0L) {
-            this.start();
+        if (startTime == 0L) {
+            start();
         }
 
         try {
             final T result = callable.call();
-            this.ctx("result", result);
-            if (this.stopTime == 0L) {
-                this.ok();
+            ctx("result", result);
+            if (stopTime == 0L) {
+                ok();
             }
 
             return result;
@@ -1215,12 +1215,12 @@ public class Meter extends MeterData implements Closeable {
             for(int i = 0; i < length; ++i) {
                 final Class<? extends Exception> ee = exceptionsToReject[i];
                 if (ee.isAssignableFrom(e.getClass())) {
-                    this.reject(e);
+                    reject(e);
                     throw e;
                 }
             }
 
-            this.fail(e);
+            fail(e);
             throw e;
         }
     }
