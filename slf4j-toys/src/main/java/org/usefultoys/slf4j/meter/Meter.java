@@ -15,14 +15,13 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
-import sun.misc.Unsafe;
 
 import java.io.Closeable;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -99,7 +98,6 @@ public class Meter extends MeterData implements Closeable {
      * stack of Meters.
      */
     private WeakReference<Meter> previousInstance;
-    private static Unsafe unsafe;
 
     /**
      * Creates a new meter for the category given by the logger's name.
@@ -1137,6 +1135,7 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    @SneakyThrows
     public void runOrReject(final Runnable runnable, final Class<? extends Exception>... exceptionsToReject) {
         if (this.startTime == 0L) {
             this.start();
@@ -1153,11 +1152,11 @@ public class Meter extends MeterData implements Closeable {
                 final Class<? extends Exception> ee = exceptionsToReject[i];
                 if (ee.isAssignableFrom(e.getClass())) {
                     this.reject(e);
-                    unsafe.throwException(e);
+                    throw e;
                 }
             }
             this.fail(e);
-            unsafe.throwException(e);
+            throw e;
         }
     }
 
@@ -1174,6 +1173,7 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    @SneakyThrows
     public <T> T callOrRejectChecked(final Callable<T> callable) {
         if (this.startTime == 0L) {
             this.start();
@@ -1192,11 +1192,11 @@ public class Meter extends MeterData implements Closeable {
             throw e;
         } catch (final Exception e) {
             this.reject(e);
-            unsafe.throwException(e);
-            return null;
+            throw e;
         }
     }
 
+    @SneakyThrows
     public <T> T callOrReject(final Callable<T> callable, final Class<? extends Exception>... exceptionsToReject) {
         if (this.startTime == 0L) {
             this.start();
@@ -1216,13 +1216,12 @@ public class Meter extends MeterData implements Closeable {
                 final Class<? extends Exception> ee = exceptionsToReject[i];
                 if (ee.isAssignableFrom(e.getClass())) {
                     this.reject(e);
-                    unsafe.throwException(e);
+                    throw e;
                 }
             }
 
             this.fail(e);
-            unsafe.throwException(e);
-            return null;
+            throw e;
         }
     }
 
@@ -1276,23 +1275,5 @@ public class Meter extends MeterData implements Closeable {
             messageLogger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         }
         return new RuntimeException(e);
-    }
-
-    static {
-        Field f = null;
-
-        try {
-            f = Unsafe.class.getDeclaredField("theUnsafe");
-        } catch (final NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        f.setAccessible(true);
-
-        try {
-            unsafe = (Unsafe)f.get((Object)null);
-        } catch (final IllegalAccessException var2) {
-            var2.printStackTrace();
-        }
     }
 }
