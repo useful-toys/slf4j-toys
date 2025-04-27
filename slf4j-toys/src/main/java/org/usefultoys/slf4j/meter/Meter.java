@@ -999,11 +999,7 @@ public class Meter extends MeterData implements Closeable {
             if (messageLogger.isErrorEnabled()) {
                 collectRuntimeStatus();
                 collectPlatformStatus();
-                if (cause instanceof Throwable) {
-                    messageLogger.error(Markers.MSG_FAIL, readableMessage(), (Throwable) cause);
-                } else {
-                    messageLogger.error(Markers.MSG_FAIL, readableMessage());
-                }
+                messageLogger.error(Markers.MSG_FAIL, readableMessage());
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_FAIL, encodedMessage());
                 }
@@ -1148,8 +1144,7 @@ public class Meter extends MeterData implements Closeable {
             }
         } catch (final Exception e) {
             final int length = exceptionsToReject.length;
-            for(int i = 0; i < length; ++i) {
-                final Class<? extends Exception> ee = exceptionsToReject[i];
+            for (final Class<? extends Exception> ee : exceptionsToReject) {
                 if (ee.isAssignableFrom(e.getClass())) {
                     reject(e);
                     throw e;
@@ -1261,17 +1256,8 @@ public class Meter extends MeterData implements Closeable {
         final String message = "Failed: " + (description != null ? description : category);
         try {
             return exceptionClass.getConstructor(String.class, Throwable.class).newInstance(message, e);
-        } catch (final NoSuchMethodException ignored) {
-            messageLogger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final SecurityException ignored) {
-            messageLogger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final InstantiationException ignored) {
-            messageLogger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final IllegalAccessException ignored) {
-            messageLogger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final IllegalArgumentException ignored) {
-            messageLogger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        } catch (final InvocationTargetException ignored) {
+        } catch (final NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException |
+                       IllegalArgumentException | InvocationTargetException ignored) {
             messageLogger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         }
         return new RuntimeException(e);
