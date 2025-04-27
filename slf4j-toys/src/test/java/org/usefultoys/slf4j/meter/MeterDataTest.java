@@ -15,8 +15,11 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.SystemConfig;
 
 import java.nio.charset.Charset;
 
@@ -33,4 +36,19 @@ public class MeterDataTest {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
+    @BeforeEach
+    void resetMeterConfigBeforeEach() {
+        // Reinitialize MeterConfig to ensure clean configuration before each test
+        MeterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    @AfterAll
+    static void resetMeterConfigAfterAll() {
+        // Reinitialize MeterConfig to ensure clean configuration for further tests
+        MeterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
 }

@@ -16,7 +16,10 @@
 
 package org.usefultoys.slf4j.watcher;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 
@@ -33,7 +36,7 @@ class WatcherConfigTest {
 
     @BeforeEach
     void resetWatcherConfigBeforeEach() {
-        // Reinitialize WatcherConfig to ensure clean configuration before each test
+        // Reinitialize each configuration to ensure a clean configuration before each test
         WatcherConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
@@ -41,7 +44,7 @@ class WatcherConfigTest {
 
     @AfterAll
     static void resetWatcherConfigAfterAll() {
-        // Reinitialize WatcherConfig to ensure clean configuration for further tests
+        // Reinitialize each configuration to ensure a clean configuration before each test
         WatcherConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();

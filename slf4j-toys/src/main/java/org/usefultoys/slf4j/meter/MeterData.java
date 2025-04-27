@@ -41,6 +41,7 @@ public class MeterData extends SystemData {
         super(uuid);
     }
 
+
     protected MeterData(final String uuid, final long position, final String category, final String operation, final String parent) {
         super(uuid, position);
         this.category = category;

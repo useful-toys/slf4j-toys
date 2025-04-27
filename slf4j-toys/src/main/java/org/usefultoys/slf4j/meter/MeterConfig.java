@@ -15,9 +15,8 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.usefultoys.slf4j.utils.ConfigParser;
-
 import lombok.experimental.UtilityClass;
+import org.usefultoys.slf4j.utils.ConfigParser;
 
 /**
  * Centralized configuration holder for controlling the behavior of the {@link Meter} and {@link MeterData}.
@@ -179,4 +178,22 @@ public class MeterConfig {
         messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
         messageSuffix = ConfigParser.getProperty(PROP_MESSAGE_SUFFIX, "");
     }
-}
+    
+    /**
+     * Resets the configuration properties to their default values.
+     * This method is useful for testing purposes or when reinitializing the configuration.
+     */
+    void reset() {
+        System.clearProperty(PROP_PROGRESS_PERIOD);
+        System.clearProperty(PROP_PRINT_CATEGORY);
+        System.clearProperty(PROP_PRINT_STATUS);
+        System.clearProperty(PROP_PRINT_POSITION);
+        System.clearProperty(PROP_PRINT_LOAD);
+        System.clearProperty(PROP_PRINT_MEMORY);
+        System.clearProperty(PROP_DATA_PREFIX);
+        System.clearProperty(PROP_DATA_SUFFIX);
+        System.clearProperty(PROP_MESSAGE_PREFIX);
+        System.clearProperty(PROP_MESSAGE_SUFFIX);
+        init();
+    }
+  }

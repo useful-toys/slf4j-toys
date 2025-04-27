@@ -16,17 +16,16 @@
 
 package org.usefultoys.slf4j.meter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.nio.charset.Charset;
-
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.SystemConfig;
+
+import java.nio.charset.Charset;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class MeterConfigTest {
 
@@ -36,38 +35,38 @@ class MeterConfigTest {
     }
 
     @BeforeEach
-    void setUp() {
-        // Limpa as propriedades do sistema para garantir um estado limpo antes de cada teste
-        System.clearProperty(MeterConfig.PROP_PROGRESS_PERIOD);
-        System.clearProperty(MeterConfig.PROP_PRINT_CATEGORY);
-        System.clearProperty(MeterConfig.PROP_PRINT_STATUS);
-        System.clearProperty(MeterConfig.PROP_PRINT_POSITION);
-        System.clearProperty(MeterConfig.PROP_PRINT_LOAD);
-        System.clearProperty(MeterConfig.PROP_PRINT_MEMORY);
-        System.clearProperty(MeterConfig.PROP_DATA_PREFIX);
-        System.clearProperty(MeterConfig.PROP_DATA_SUFFIX);
-        System.clearProperty(MeterConfig.PROP_MESSAGE_PREFIX);
-        System.clearProperty(MeterConfig.PROP_MESSAGE_SUFFIX);
-
-        MeterConfig.init(); // Reinitialize MeterConfig
+    void resetWatcherConfigBeforeEach() {
+        // Reinitialize each configuration to ensure a clean configuration before each test
+        MeterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
     }
 
-    @AfterEach
-    void tearDown() {
-        System.clearProperty(MeterConfig.PROP_PROGRESS_PERIOD);
-        System.clearProperty(MeterConfig.PROP_PRINT_CATEGORY);
-        System.clearProperty(MeterConfig.PROP_PRINT_STATUS);
-        System.clearProperty(MeterConfig.PROP_PRINT_POSITION);
-        System.clearProperty(MeterConfig.PROP_PRINT_LOAD);
-        System.clearProperty(MeterConfig.PROP_PRINT_MEMORY);
-        System.clearProperty(MeterConfig.PROP_DATA_PREFIX);
-        System.clearProperty(MeterConfig.PROP_DATA_SUFFIX);
-        System.clearProperty(MeterConfig.PROP_MESSAGE_PREFIX);
-        System.clearProperty(MeterConfig.PROP_MESSAGE_SUFFIX);
+    @AfterAll
+    static void resetWatcherConfigAfterAll() {
+        // Reinitialize each configuration to ensure a clean configuration before each test
+        MeterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
     }
 
     @Test
     void testDefaultValues() {
+        MeterConfig.init();
+        assertFalse(MeterConfig.printCategory, "Default value for printCategory should be false");
+        assertTrue(MeterConfig.printStatus, "Default value for printStatus should be true");
+        assertFalse(MeterConfig.printPosition, "Default value for printPosition should be false");
+        assertFalse(MeterConfig.printLoad, "Default value for printLoad should be false");
+        assertFalse(MeterConfig.printMemory, "Default value for printMemory should be false");
+        assertEquals("", MeterConfig.dataPrefix, "Default value for dataPrefix should be an empty string");
+        assertEquals("", MeterConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
+        assertEquals("", MeterConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
+        assertEquals("", MeterConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
+    }
+
+    @Test
+    void testResetValues() {
+        MeterConfig.reset();
         assertEquals(2000L, MeterConfig.progressPeriodMilliseconds, "Default value for progressPeriodMilliseconds should be 2000ms");
         assertFalse(MeterConfig.printCategory, "Default value for printCategory should be false");
         assertTrue(MeterConfig.printStatus, "Default value for printStatus should be true");
@@ -79,6 +78,7 @@ class MeterConfigTest {
         assertEquals("", MeterConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
         assertEquals("", MeterConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
     }
+
 
     @Test
     void testProgressPeriodMillisecondsProperty() {
