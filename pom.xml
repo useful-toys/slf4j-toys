@@ -25,8 +25,8 @@
     <artifactId>slf4j-toys-root</artifactId>
     <version>1.9.0</version>
     <name>parent</name>
-
     <packaging>pom</packaging>
+
     <description>An useful complement to SLF4J to promote clean and organized log files.</description>
     <url>https://github.com/useful-toys/slf4j-toys</url>
     <inceptionYear>2010</inceptionYear>
@@ -45,6 +45,9 @@
             <email>dff4321@gmail.com</email>
             <organization>None</organization>
             <organizationUrl>https://github.com/danielferber</organizationUrl>
+            <roles>
+                <role>Lead Developer</role>
+            </roles>
         </developer>
     </developers>
 
