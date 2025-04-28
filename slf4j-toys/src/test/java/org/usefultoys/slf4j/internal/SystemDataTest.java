@@ -15,10 +15,7 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 
@@ -45,7 +42,8 @@ class SystemDataTest {
             super(sessionUuid, position, time);
         }
 
-        public TestSystemData(final String sessionUuid, final long position, final long time, final long heap_commited,
+        // for tests only
+        protected TestSystemData(final String sessionUuid, final long position, final long time, final long heap_commited,
                               final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max,
                               final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded,
                               final long classLoading_total, final long classLoading_unloaded, final long compilationTime,
@@ -69,16 +67,22 @@ class SystemDataTest {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
-    @AfterEach
-    void tearDown() {
-        SystemConfig.useMemoryManagedBean = false;
-        SystemConfig.useClassLoadingManagedBean = false;
-        SystemConfig.useCompilationManagedBean = false;
-        SystemConfig.useGarbageCollectionManagedBean = false;
-        SystemConfig.usePlatformManagedBean = false;
+    @BeforeEach
+    void resetWatcherConfigBeforeEach() {
+        // Reinitialize WatcherConfig to ensure clean configuration before each test
+        SessionConfig.reset();
+        SystemConfig.reset();
     }
 
-    void testConstructorAndGettersN() {
+    @AfterAll
+    static void resetWatcherConfigAfterAll() {
+        // Reinitialize WatcherConfig to ensure clean configuration for further tests
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+
+    void testConstructorAndGetters() {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
         assertEquals("abc", event.getSessionUuid());
         assertEquals(1, event.getPosition());

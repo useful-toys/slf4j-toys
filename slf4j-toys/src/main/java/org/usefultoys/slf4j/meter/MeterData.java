@@ -21,8 +21,11 @@ import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Augments the {@link SystemData} with start, stop, failure and path information for an operation measured by Meter.
@@ -50,7 +53,8 @@ public class MeterData extends SystemData {
         this.createTime = System.nanoTime();
     }
 
-    public MeterData(final String sessionUuid, final long position, final long time, final long heap_commited, final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded, final long compilationTime, final long garbageCollector_count, final long garbageCollector_time, final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory, final double systemLoad, final String category, final String operation, final String parent, final String description, final long createTime, final long startTime, final long stopTime, final long timeLimit, final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage, final Map<String, String> context) {
+    // for tests only
+    protected MeterData(final String sessionUuid, final long position, final long time, final long heap_commited, final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded, final long compilationTime, final long garbageCollector_count, final long garbageCollector_time, final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory, final double systemLoad, final String category, final String operation, final String parent, final String description, final long createTime, final long startTime, final long stopTime, final long timeLimit, final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage, final Map<String, String> context) {
         super(sessionUuid, position, time, heap_commited, heap_max, heap_used, nonHeap_commited, nonHeap_max, nonHeap_used, objectPendingFinalizationCount, classLoading_loaded, classLoading_total, classLoading_unloaded, compilationTime, garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory, runtime_totalMemory, systemLoad);
         this.category = category;
         this.operation = operation;
@@ -379,21 +383,129 @@ public class MeterData extends SystemData {
         return builder;
     }
 
-    public static final String PROP_DESCRIPTION = "d";
-    public static final String PROP_PATH_ID = "p";
-    public static final String PROP_REJECT_ID = "r";
-    public static final String PROP_FAIL_ID = "f";
-    public static final String PROP_CREATE_TIME = "t0";
-    public static final String PROP_START_TIME = "t1";
-    public static final String PROP_STOP_TIME = "t2";
-    public static final String PROP_ITERATION = "i";
-    public static final String PROP_EXPECTED_ITERATION = "ei";
-    public static final String PROP_LIMIT_TIME = "tl";
-    public static final String PROP_CONTEXT = "ctx";
-    public static final String EVENT_CATEGORY = "c";
-    public static final String EVENT_NAME = "n";
-    public static final String EVENT_PARENT = "ep";
+    private static final String PROP_DESCRIPTION = "d";
+    private static final String PROP_PATH_ID = "p";
+    private static final String PROP_REJECT_ID = "r";
+    private static final String PROP_FAIL_ID = "f";
+    private static final String PROP_FAIL_MESSAGE = "fm";
+    private static final String PROP_CREATE_TIME = "t0";
+    private static final String PROP_START_TIME = "t1";
+    private static final String PROP_STOP_TIME = "t2";
+    private static final String PROP_ITERATION = "i";
+    private static final String PROP_EXPECTED_ITERATION = "ei";
+    private static final String PROP_LIMIT_TIME = "tl";
+    private static final String PROP_CONTEXT = "ctx";
+    private static final String EVENT_CATEGORY = "c";
+    private static final String EVENT_NAME = "n";
+    private static final String EVENT_PARENT = "ep";
 
+    private final static Pattern patternDescription = Pattern.compile(REGEX_START +PROP_DESCRIPTION + REGEX_STRING_VALUE);
+    private final static Pattern patternPathId = Pattern.compile(REGEX_START +PROP_PATH_ID + REGEX_WORD_VALUE);
+    private final static Pattern patternRejectId = Pattern.compile(REGEX_START +PROP_REJECT_ID + REGEX_WORD_VALUE);
+    private final static Pattern patternFailId = Pattern.compile(REGEX_START +PROP_FAIL_ID + REGEX_WORD_VALUE);
+    private final static Pattern patternFailMessage = Pattern.compile(REGEX_START +PROP_FAIL_MESSAGE + REGEX_STRING_VALUE);
+    private final static Pattern patternCreateTime = Pattern.compile(REGEX_START +PROP_CREATE_TIME + REGEX_WORD_VALUE);
+    private final static Pattern patternStartTime = Pattern.compile(REGEX_START +PROP_START_TIME + REGEX_WORD_VALUE);
+    private final static Pattern patternStopTime = Pattern.compile(REGEX_START +PROP_STOP_TIME + REGEX_WORD_VALUE);
+    private final static Pattern patternIteration = Pattern.compile(REGEX_START +PROP_ITERATION + REGEX_WORD_VALUE);
+    private final static Pattern patternExpectedIteration = Pattern.compile(REGEX_START +PROP_EXPECTED_ITERATION + REGEX_WORD_VALUE);
+    private final static Pattern patternLimitTime = Pattern.compile(REGEX_START +PROP_LIMIT_TIME + REGEX_WORD_VALUE);
+    private final static Pattern patternEventCategory = Pattern.compile(REGEX_START +EVENT_CATEGORY + REGEX_WORD_VALUE);
+    private final static Pattern patternEventName = Pattern.compile(REGEX_START +EVENT_NAME + REGEX_WORD_VALUE);
+    private final static Pattern patternEventParent = Pattern.compile(REGEX_START +EVENT_PARENT + REGEX_WORD_VALUE);
+    private final static Pattern patternContext = Pattern.compile(REGEX_START +PROP_CONTEXT + "\\s*:\\s*\\{([^}]*)\\}");
+    
+    public void readJson5(final String json5) {
+        super.readJson5(json5);
+        
+        final Matcher matcherDescription = patternDescription.matcher(json5);
+        if (matcherDescription.find()) {
+            description = matcherDescription.group(1);
+        }
+        
+        final Matcher matcherPathId = patternPathId.matcher(json5);
+        if (matcherPathId.find()) {
+            okPath = matcherPathId.group(1);
+        }
+        
+        final Matcher matcherRejectId = patternRejectId.matcher(json5);
+        if (matcherRejectId.find()) {
+            rejectPath = matcherRejectId.group(1);
+        }
+        
+        final Matcher matcherFailId = patternFailId.matcher(json5);
+        if (matcherFailId.find()) {
+            failPath = matcherFailId.group(1);
+        }
+        
+        final Matcher matcherFailMessage = patternFailMessage.matcher(json5);
+        if (matcherFailMessage.find()) {
+            failMessage = matcherFailMessage.group(1);
+        }
+
+        final Matcher matcherCreateTime = patternCreateTime.matcher(json5);
+        if (matcherCreateTime.find()) {
+            createTime = Long.parseLong(matcherCreateTime.group(1));
+        }
+        
+        final Matcher matcherStartTime = patternStartTime.matcher(json5);
+        if (matcherStartTime.find()) {
+            startTime = Long.parseLong(matcherStartTime.group(1));
+        }
+        
+        final Matcher matcherStopTime = patternStopTime.matcher(json5);
+        if (matcherStopTime.find()) {
+            stopTime = Long.parseLong(matcherStopTime.group(1));
+        }
+        
+        final Matcher matcherIteration = patternIteration.matcher(json5);
+        if (matcherIteration.find()) {
+            currentIteration = Long.parseLong(matcherIteration.group(1));
+        }
+        
+        final Matcher matcherExpectedIteration = patternExpectedIteration.matcher(json5);
+        if (matcherExpectedIteration.find()) {
+            expectedIterations = Long.parseLong(matcherExpectedIteration.group(1));
+        }
+        
+        final Matcher matcherLimitTime = patternLimitTime.matcher(json5);
+        if (matcherLimitTime.find()) {
+            timeLimit = Long.parseLong(matcherLimitTime.group(1));
+        }
+        
+        final Matcher matcherEventCategory = patternEventCategory.matcher(json5);
+        if (matcherEventCategory.find()) {
+            category = matcherEventCategory.group(1);
+        }
+        
+        final Matcher matcherEventName = patternEventName.matcher(json5);
+        if (matcherEventName.find()) {
+            operation = matcherEventName.group(1);
+        }
+        
+        final Matcher matcherEventParent = patternEventParent.matcher(json5);
+        if (matcherEventParent.find()) {
+            parent = matcherEventParent.group(1);
+        }
+        
+        final Matcher matcherContext = patternContext.matcher(json5);
+        if (matcherContext.find()) {
+            final String contextString = matcherContext.group(1);
+            if (contextString != null && !contextString.isEmpty()) {
+                final String[] contextEntries = contextString.split(",");
+                context = new HashMap<>();
+                for (final String entry : contextEntries) {
+                    final String[] keyValue = entry.split(":");
+                    if (keyValue.length >= 1) {
+                        final String key = keyValue[0].trim();
+                        final String value = (keyValue.length > 1) ? keyValue[1].trim() : null;
+                        context.put(key, value);
+                    }
+                }
+            }
+        }
+    }
+    
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -422,7 +534,7 @@ public class MeterData extends SystemData {
     public void writeJson5Impl(final StringBuilder sb) {
         super.writeJson5Impl(sb);
         if (description != null) {
-            sb.append(String.format(",%s:%s", PROP_DESCRIPTION, description));
+            sb.append(String.format(",%s:'%s'", PROP_DESCRIPTION, description));
         }
         if (rejectPath != null) {
             sb.append(String.format(",%s:%s",PROP_REJECT_ID, rejectPath));
@@ -431,7 +543,10 @@ public class MeterData extends SystemData {
             sb.append(String.format(",%s:%s",PROP_PATH_ID, okPath));
         }
         if (failPath != null) {
-            sb.append(String.format(",%s:%s",PROP_FAIL_ID, failPath, failMessage != null ? failMessage : ""));
+            sb.append(String.format(",%s:%s",PROP_FAIL_ID, failPath, failPath));
+        }
+        if (failMessage != null) {
+            sb.append(String.format(",%s:'%s'", PROP_FAIL_MESSAGE, failMessage));
         }
         if (category != null) {
             sb.append(String.format(",%s:%s",EVENT_CATEGORY, category));

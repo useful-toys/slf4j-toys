@@ -51,7 +51,7 @@ public abstract class EventData implements Serializable {
 
     protected EventData(final String sessionUuid) {
         this.sessionUuid = sessionUuid;
-        this.position = 0;
+        position = 0;
     }
 
     protected EventData(final String sessionUuid, final long position) {
@@ -70,11 +70,11 @@ public abstract class EventData implements Serializable {
      * Reverts all event attributes to their constructor initial value. Useful
      * to reuse the event instance and avoid creation of new objects.
      */
-    protected final void reset() {
-        this.sessionUuid = null;
-        this.position = 0;
-        this.time = 0;
-        this.resetImpl();
+    public final void reset() {
+        sessionUuid = null;
+        position = 0;
+        time = 0;
+        resetImpl();
     }
 
     /**
@@ -112,7 +112,7 @@ public abstract class EventData implements Serializable {
      */
     protected final StringBuilder writeJson5(final StringBuilder sb) {
         sb.append("{");
-        sb.append(String.format(Locale.US, "%s:%s,%s:%d,%s:%d", SESSION_UUID, this.sessionUuid, EVENT_POSITION, this.position, EVENT_TIME, this.time));
+        sb.append(String.format(Locale.US, "%s:%s,%s:%d,%s:%d", SESSION_UUID, sessionUuid, EVENT_POSITION, position, EVENT_TIME, time));
         writeJson5Impl(sb);
         sb.append("}");
         return sb;
@@ -125,10 +125,14 @@ public abstract class EventData implements Serializable {
     public final String json5Message() {
         return writeJson5(new StringBuilder(200)).toString();
     }
+    protected static final String REGEX_START = "[{,]";
+    protected static final String REGEX_STRING_VALUE = "\\s*:\\s*'([^']*)'";
+    protected static final String REGEX_WORD_VALUE = "\\s*:\\s*([^,}\\s]+)";
 
-    private final static Pattern patternSession = Pattern.compile(SESSION_UUID+"\\s*:\\s*([^,}\\s]+)");
-    private final static Pattern patternPosition = Pattern.compile("\\"+EVENT_POSITION+"\\s*:\\s*([^,}\\s]+)");
-    private final static Pattern patternTime = Pattern.compile(EVENT_TIME+"\\s*:\\s*([^,}\\s]+)");
+    private static final Pattern patternSession = Pattern.compile(REGEX_START+SESSION_UUID+REGEX_WORD_VALUE);
+    private static final Pattern patternPosition = Pattern.compile(REGEX_START+"\\"+EVENT_POSITION+REGEX_WORD_VALUE);
+    private static final Pattern patternTime = Pattern.compile(REGEX_START+EVENT_TIME+REGEX_WORD_VALUE);
+
 
     public void readJson5(final String json5) {
         final Matcher matcherSession = patternSession.matcher(json5);

@@ -37,7 +37,7 @@ public class WatcherData extends SystemData {
     }
 
     // for tests only
-    WatcherData(final String sessionUuid, final long position, final long time,
+    protected WatcherData(final String sessionUuid, final long position, final long time,
                        final long heap_commited, final long heap_max, final long heap_used,
                        final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
                        final long objectPendingFinalizationCount,

@@ -50,7 +50,7 @@ public abstract class SystemData extends EventData {
         super(sessionUuid, position, time);
     }
 
-    // For tests
+    // for tests only
     protected SystemData(final String sessionUuid, final long position, final long time,
                          final long heap_commited, final long heap_max, final long heap_used,
                          final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
@@ -261,14 +261,16 @@ public abstract class SystemData extends EventData {
         }
     }
 
-    private final static Pattern patternMemory = Pattern.compile(PROP_MEMORY + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]");
-    private final static Pattern patternHeap = Pattern.compile(PROP_HEAP + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]");
-    private final static Pattern patternNonHeap = Pattern.compile(PROP_NON_HEAP + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]");
-    private final static Pattern patternFinalizationCount = Pattern.compile(PROP_FINALIZATION_COUNT + "\\s*:\\s*([^,}\\s]+)");
-    private final static Pattern patternClassLoading = Pattern.compile(PROP_CLASS_LOADING + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]");
-    private final static Pattern patternCompilationTime = Pattern.compile(PROP_COMPILATION_TIME + "\\s*:\\s*([^,}\\s]+)");
-    private final static Pattern patternGarbageCollector = Pattern.compile(PROP_GARBAGE_COLLECTOR + "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+)\\]");
-    private final static Pattern patternSystemLoad = Pattern.compile(PROP_SYSTEM_LOAD + "\\s*:\\s*([^,}\\s]+)");
+    private static final String REGEX_3_TUPLE = "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]";
+    private static final String REGEX_2_TUPLE = "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+)\\]";
+    private static final Pattern patternMemory = Pattern.compile(REGEX_START+PROP_MEMORY + REGEX_3_TUPLE);
+    private static final Pattern patternHeap = Pattern.compile(REGEX_START+PROP_HEAP + REGEX_3_TUPLE);
+    private static final Pattern patternNonHeap = Pattern.compile(REGEX_START+PROP_NON_HEAP + REGEX_3_TUPLE);
+    private static final Pattern patternFinalizationCount = Pattern.compile(REGEX_START+PROP_FINALIZATION_COUNT + REGEX_WORD_VALUE);
+    private static final Pattern patternClassLoading = Pattern.compile(REGEX_START+PROP_CLASS_LOADING + REGEX_3_TUPLE);
+    private static final Pattern patternCompilationTime = Pattern.compile(REGEX_START+PROP_COMPILATION_TIME + REGEX_WORD_VALUE);
+    private static final Pattern patternGarbageCollector = Pattern.compile(REGEX_START+PROP_GARBAGE_COLLECTOR + REGEX_2_TUPLE);
+    private static final Pattern patternSystemLoad = Pattern.compile(REGEX_START+PROP_SYSTEM_LOAD + REGEX_WORD_VALUE);
 
     @Override
     public void readJson5(final String json5) {
