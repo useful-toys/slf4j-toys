@@ -53,13 +53,13 @@ public class WatcherData extends SystemData {
     @Override
     public StringBuilder readableStringBuilder(final StringBuilder builder) {
         boolean hasPrevious = false;
-        if (this.runtime_usedMemory > 0 || this.runtime_maxMemory > 0 || this.runtime_totalMemory > 0) {
+        if (runtime_usedMemory > 0 || runtime_maxMemory > 0 || runtime_totalMemory > 0) {
             builder.append("Memory: ");
-            builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
+            builder.append(UnitFormatter.bytes(runtime_usedMemory));
             builder.append(' ');
-            builder.append(UnitFormatter.bytes(this.runtime_totalMemory));
+            builder.append(UnitFormatter.bytes(runtime_totalMemory));
             builder.append(' ');
-            builder.append(UnitFormatter.bytes(this.runtime_maxMemory));
+            builder.append(UnitFormatter.bytes(runtime_maxMemory));
             hasPrevious = true;
         }
         if (systemLoad > 0) {
@@ -67,16 +67,16 @@ public class WatcherData extends SystemData {
                 builder.append("; ");
             }
             builder.append("System load: ");
-            builder.append(Math.round(this.systemLoad * 100));
+            builder.append(Math.round(systemLoad * 100));
             builder.append("%");
             hasPrevious = true;
         }
-        if (this.sessionUuid != null) {
+        if (sessionUuid != null) {
             if (hasPrevious) {
                 builder.append("; ");
             }
             builder.append("UUID: ");
-            builder.append(this.sessionUuid);
+            builder.append(sessionUuid);
         }
         return builder;
     }
