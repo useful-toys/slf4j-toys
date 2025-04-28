@@ -40,13 +40,8 @@ public class MeterData extends SystemData {
     public MeterData() {
     }
 
-    public MeterData(final String uuid) {
-        super(uuid);
-    }
-
-
-    protected MeterData(final String uuid, final long position, final String category, final String operation, final String parent) {
-        super(uuid, position);
+    protected MeterData(final String uuid, final long position, final long time, final String category, final String operation, final String parent) {
+        super(uuid, position, time);
         this.category = category;
         this.operation = operation;
         this.parent = parent;

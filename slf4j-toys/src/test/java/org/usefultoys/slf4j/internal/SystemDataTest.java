@@ -26,18 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class SystemDataTest {
 
     static class TestSystemData extends SystemData {
-        public TestSystemData() {
-            super();
-        }
-
-        public TestSystemData(final String sessionUuid) {
-            super(sessionUuid);
-        }
-
-        public TestSystemData(final String sessionUuid, final long position) {
-            super(sessionUuid, position);
-        }
-
         public TestSystemData(final String sessionUuid, final long position, final long time) {
             super(sessionUuid, position, time);
         }
@@ -136,14 +124,14 @@ class SystemDataTest {
 
     @Test
     void testReadableMessage() {
-        final TestSystemData event = new TestSystemData("abc", 5L);
+        final TestSystemData event = new TestSystemData("abc", 5L, 0);
         final String message = event.readableMessage();
         assertTrue(message.equals("a"));
     }
 
     @Test
     void testCollectRuntimeStatus() {
-        final TestSystemData event = new TestSystemData("abc");
+        final TestSystemData event = new TestSystemData("abc", 5L, 0);
         event.collectRuntimeStatus();
         assertNotEquals(0L, event.getRuntime_usedMemory());
         assertNotEquals(0L, event.getRuntime_maxMemory());
@@ -153,7 +141,7 @@ class SystemDataTest {
     @Test() @Disabled
     void testCollectPlatformStatus() {
         SystemConfig.usePlatformManagedBean = true;
-        final TestSystemData event = new TestSystemData("abc");
+        final TestSystemData event = new TestSystemData("abc", 5L, 0);
         event.collectPlatformStatus();
         assertNotEquals(0L, event.getSystemLoad());
     }

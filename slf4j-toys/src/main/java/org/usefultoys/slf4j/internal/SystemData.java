@@ -41,11 +41,6 @@ public abstract class SystemData extends EventData {
         super(uuid);
     }
 
-    protected SystemData(final String sessionUuid, final long position) {
-        super(sessionUuid, position);
-    }
-
-    // For tests
     protected SystemData(final String sessionUuid, final long position, final long time) {
         super(sessionUuid, position, time);
     }
