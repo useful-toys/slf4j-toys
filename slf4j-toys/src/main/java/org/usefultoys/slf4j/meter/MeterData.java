@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,7 +50,7 @@ public class MeterData extends SystemData {
         this.category = category;
         this.operation = operation;
         this.parent = parent;
-        this.createTime = retrieveCreateTime();
+        createTime = retrieveCreateTime();
     }
 
     // Overriden by unit tests
@@ -238,27 +239,27 @@ public class MeterData extends SystemData {
         if (executionTimeNS == 0) {
             return 0.0d;
         }
-        return ((double) this.currentIteration) / executionTimeNS * 1000000000;
+        return ((double) currentIteration) / executionTimeNS * 1000000000;
     }
 
     @Override
     protected void resetImpl() {
         super.resetImpl();
-        this.category = null;
-        this.operation = null;
-        this.parent = null;
-        this.description = null;
-        this.okPath = null;
-        this.rejectPath = null;
-        this.createTime = 0;
-        this.startTime = 0;
-        this.stopTime = 0;
-        this.currentIteration = 0;
-        this.expectedIterations = 0;
-        this.failPath = null;
-        this.failMessage = null;
-        this.timeLimit = 0;
-        this.context = null;
+        category = null;
+        operation = null;
+        parent = null;
+        description = null;
+        okPath = null;
+        rejectPath = null;
+        createTime = 0;
+        startTime = 0;
+        stopTime = 0;
+        currentIteration = 0;
+        expectedIterations = 0;
+        failPath = null;
+        failMessage = null;
+        timeLimit = 0;
+        context = null;
     }
 
     @Override
@@ -332,16 +333,16 @@ public class MeterData extends SystemData {
 
         if (startTime != 0 && currentIteration > 0) {
             builder.append(' ');
-            builder.append(UnitFormatter.iterations(this.currentIteration));
-            if (this.expectedIterations > 0) {
+            builder.append(UnitFormatter.iterations(currentIteration));
+            if (expectedIterations > 0) {
                 builder.append('/');
-                builder.append(UnitFormatter.iterations(this.expectedIterations));
+                builder.append(UnitFormatter.iterations(expectedIterations));
             }
         }
 
         if (description != null) {
             builder.append(" '");
-            builder.append(this.description);
+            builder.append(description);
             builder.append('\'');
         }
 
@@ -356,13 +357,13 @@ public class MeterData extends SystemData {
             }
         }
 
-        if (this.startTime != 0) {
+        if (startTime != 0) {
             final long executionTime = getExecutionTime();
             if (executionTime > MeterConfig.progressPeriodMilliseconds) {
                 builder.append("; ");
                 builder.append(UnitFormatter.nanoseconds(executionTime));
             }
-            if (this.currentIteration > 0) {
+            if (currentIteration > 0) {
                 builder.append("; ");
                 final double iterationsPerSecond = getIterationsPerSecond();
                 builder.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
@@ -375,16 +376,16 @@ public class MeterData extends SystemData {
             builder.append(UnitFormatter.nanoseconds(getWaitingTime()));
         }
 
-        if (MeterConfig.printMemory && this.runtime_usedMemory > 0) {
+        if (MeterConfig.printMemory && runtime_usedMemory > 0) {
             builder.append("; ");
-            builder.append(UnitFormatter.bytes(this.runtime_usedMemory));
+            builder.append(UnitFormatter.bytes(runtime_usedMemory));
         }
-        if (MeterConfig.printLoad && this.systemLoad > 0) {
+        if (MeterConfig.printLoad && systemLoad > 0) {
             builder.append("; ");
-            builder.append(Math.round(this.systemLoad * 100));
+            builder.append(Math.round(systemLoad * 100));
             builder.append("%");
         }
-        if (this.sessionUuid != null) {
+        if (sessionUuid != null) {
             builder.append("; ");
             builder.append(sessionUuid);
         }
@@ -408,21 +409,21 @@ public class MeterData extends SystemData {
     private static final String EVENT_NAME = "n";
     private static final String EVENT_PARENT = "ep";
 
-    private final static Pattern patternDescription = Pattern.compile(REGEX_START +PROP_DESCRIPTION + REGEX_STRING_VALUE);
-    private final static Pattern patternPathId = Pattern.compile(REGEX_START +PROP_PATH_ID + REGEX_WORD_VALUE);
-    private final static Pattern patternRejectId = Pattern.compile(REGEX_START +PROP_REJECT_ID + REGEX_WORD_VALUE);
-    private final static Pattern patternFailId = Pattern.compile(REGEX_START +PROP_FAIL_ID + REGEX_WORD_VALUE);
-    private final static Pattern patternFailMessage = Pattern.compile(REGEX_START +PROP_FAIL_MESSAGE + REGEX_STRING_VALUE);
-    private final static Pattern patternCreateTime = Pattern.compile(REGEX_START +PROP_CREATE_TIME + REGEX_WORD_VALUE);
-    private final static Pattern patternStartTime = Pattern.compile(REGEX_START +PROP_START_TIME + REGEX_WORD_VALUE);
-    private final static Pattern patternStopTime = Pattern.compile(REGEX_START +PROP_STOP_TIME + REGEX_WORD_VALUE);
-    private final static Pattern patternIteration = Pattern.compile(REGEX_START +PROP_ITERATION + REGEX_WORD_VALUE);
-    private final static Pattern patternExpectedIteration = Pattern.compile(REGEX_START +PROP_EXPECTED_ITERATION + REGEX_WORD_VALUE);
-    private final static Pattern patternLimitTime = Pattern.compile(REGEX_START +PROP_LIMIT_TIME + REGEX_WORD_VALUE);
-    private final static Pattern patternEventCategory = Pattern.compile(REGEX_START +EVENT_CATEGORY + REGEX_WORD_VALUE);
-    private final static Pattern patternEventName = Pattern.compile(REGEX_START +EVENT_NAME + REGEX_WORD_VALUE);
-    private final static Pattern patternEventParent = Pattern.compile(REGEX_START +EVENT_PARENT + REGEX_WORD_VALUE);
-    private final static Pattern patternContext = Pattern.compile(REGEX_START +PROP_CONTEXT + "\\s*:\\s*\\{([^}]*)\\}");
+    private static final Pattern patternDescription = Pattern.compile(REGEX_START +PROP_DESCRIPTION + REGEX_STRING_VALUE);
+    private static final Pattern patternPathId = Pattern.compile(REGEX_START +PROP_PATH_ID + REGEX_WORD_VALUE);
+    private static final Pattern patternRejectId = Pattern.compile(REGEX_START +PROP_REJECT_ID + REGEX_WORD_VALUE);
+    private static final Pattern patternFailId = Pattern.compile(REGEX_START +PROP_FAIL_ID + REGEX_WORD_VALUE);
+    private static final Pattern patternFailMessage = Pattern.compile(REGEX_START +PROP_FAIL_MESSAGE + REGEX_STRING_VALUE);
+    private static final Pattern patternCreateTime = Pattern.compile(REGEX_START +PROP_CREATE_TIME + REGEX_WORD_VALUE);
+    private static final Pattern patternStartTime = Pattern.compile(REGEX_START +PROP_START_TIME + REGEX_WORD_VALUE);
+    private static final Pattern patternStopTime = Pattern.compile(REGEX_START +PROP_STOP_TIME + REGEX_WORD_VALUE);
+    private static final Pattern patternIteration = Pattern.compile(REGEX_START +PROP_ITERATION + REGEX_WORD_VALUE);
+    private static final Pattern patternExpectedIteration = Pattern.compile(REGEX_START +PROP_EXPECTED_ITERATION + REGEX_WORD_VALUE);
+    private static final Pattern patternLimitTime = Pattern.compile(REGEX_START +PROP_LIMIT_TIME + REGEX_WORD_VALUE);
+    private static final Pattern patternEventCategory = Pattern.compile(REGEX_START +EVENT_CATEGORY + REGEX_WORD_VALUE);
+    private static final Pattern patternEventName = Pattern.compile(REGEX_START +EVENT_NAME + REGEX_WORD_VALUE);
+    private static final Pattern patternEventParent = Pattern.compile(REGEX_START +EVENT_PARENT + REGEX_WORD_VALUE);
+    private static final Pattern patternContext = Pattern.compile(REGEX_START +PROP_CONTEXT + "\\s*:\\s*\\{([^}]*)\\}");
     
     public void readJson5(final String json5) {
         super.readJson5(json5);
@@ -522,12 +523,12 @@ public class MeterData extends SystemData {
 
         final MeterData meterData = (MeterData) o;
 
-        if (category != null ? !category.equals(meterData.category) : meterData.category != null)
+        if (!Objects.equals(category, meterData.category))
             return false;
-        if (sessionUuid != null ? !sessionUuid.equals(meterData.sessionUuid) : meterData.sessionUuid != null)
+        if (!Objects.equals(sessionUuid, meterData.sessionUuid))
             return false;
         if (position != meterData.position) return false;
-        return operation != null ? operation.equals(meterData.operation) : meterData.operation == null;
+        return Objects.equals(operation, meterData.operation);
     }
 
     @Override
