@@ -49,7 +49,17 @@ public class MeterData extends SystemData {
         this.category = category;
         this.operation = operation;
         this.parent = parent;
-        this.createTime = System.nanoTime();
+        this.createTime = retrieveCreateTime();
+    }
+
+    // Overriden by unit tests
+    protected long retrieveCreateTime() {
+        return System.nanoTime();
+    }
+
+    // Overriden by unit tests
+    protected long retrieveCurrentTime() {
+        return System.nanoTime();
     }
 
     // for tests only
@@ -205,7 +215,7 @@ public class MeterData extends SystemData {
         if (startTime == 0) {
             return 0;
         } else if (stopTime == 0) {
-            return System.nanoTime() - startTime;
+            return retrieveCurrentTime() - startTime;
         }
         return stopTime - startTime;
     }
@@ -215,7 +225,7 @@ public class MeterData extends SystemData {
      */
     public long getWaitingTime() {
         if (startTime == 0) {
-            return System.nanoTime() - createTime;
+            return retrieveCurrentTime() - createTime;
         }
         return startTime - createTime;
     }
