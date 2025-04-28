@@ -194,28 +194,6 @@ public class MeterData extends SystemData {
         return okPath;
     }
 
-    /**
-     * @return The execution time after start (until stop for finished or until now for ongoing execution).
-     */
-    public long getExecutionTime() {
-        if (startTime == 0) {
-            return 0;
-        } else if (stopTime == 0) {
-            return time - startTime;
-        }
-        return stopTime - startTime;
-    }
-
-    /**
-     * @return The waiting time since Meter was created and before it was started.
-     */
-    public long getWaitingTime() {
-        if (startTime == 0) {
-            return time - createTime;
-        }
-        return startTime - createTime;
-    }
-
     public double getIterationsPerSecond() {
         if (currentIteration == 0 || startTime == 0) {
             return 0.0d;
