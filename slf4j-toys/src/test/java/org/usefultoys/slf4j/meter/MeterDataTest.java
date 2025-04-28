@@ -489,116 +489,442 @@ public class MeterDataTest {
     }
 
     private static Arguments example(final String expected, final String operation,
-                                     final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit) {
-        return Arguments.of(new MockMeterData("uuid", 1, null, operation, null, null,
-                createTime, startTime,stopTime,currentTime,timeLimit,0,0,
-                null,null,null,null), expected);
+                                     final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit,
+                                     final long currentIteration, final long expectedIterations) {
+        return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, null,
+                createTime, startTime, stopTime, currentTime, timeLimit, currentIteration, expectedIterations,
+                null, null, null, null), expected);
     }
 
     private static Arguments example(final String expected, final String operation,
                                      final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit,
-                                     final long currentIteration, final long expectedIterations, String okPath, String rejectPath) {
-        return Arguments.of(new MockMeterData("uuid", 1, null, operation, null, null,
+                                     final long currentIteration, final long expectedIterations, String okPath, String rejectPath, String failPath, String failMessage) {
+        return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, null,
                 createTime, startTime,stopTime,currentTime,timeLimit,currentIteration,expectedIterations,
-                okPath,rejectPath,null,null), expected);
+                okPath,rejectPath,failPath,failMessage), expected);
     }
 
-    static Stream<Arguments> provideTimeStatusTestCases() {
+    static Stream<Arguments> provideTimeStatusTestCasesNoCategoryNoPosition() {
         return Stream.of(
-                example("SCHEDULED: 190ns; uuid", null,10, 0,0, 200, 0),
-                example("SCHEDULED: op 190ns; uuid", "op",10, 0,0, 200, 0),
+                example("SCHEDULED: 190ns; uuid", null,10, 0,0, 200, 0,0,0),
+                example("SCHEDULED: op 190ns; uuid", "op",10, 0,0, 200, 0,0,0),
 
-                example("STARTED: uuid", null,10, 20,0, 200, 0),
-                example("STARTED: op uuid", "op",10, 20,0, 200, 0),
+                example("STARTED: uuid", null,10, 20,0, 200, 0,0,0),
+                example("STARTED: op uuid", "op",10, 20,0, 200, 0,0,0),
 
-                example("STARTED: 3,0us; uuid", null,10, 20,0, 3000, 0),
-                example("STARTED: op 3,0us; uuid", "op",10, 20,0, 3000, 0),
+                example("STARTED: 3,0us; uuid", null,10, 20,0, 3000, 0,0,0),
+                example("STARTED: op 3,0us; uuid", "op",10, 20,0, 3000, 0,0,0),
 
-                example("PROGRESS: 1/10; uuid", null,10, 20,0, 200, 0, 1,10, null, null),
-                example("PROGRESS: op 1/10; uuid", "op",10, 20,0, 200, 0,1,10, null, null),
-                example("PROGRESS: 1; uuid", null,10, 20,0, 200, 0, 1,0, null, null),
-                example("PROGRESS: op 1; uuid", "op",10, 20,0, 200, 0,1,0, null, null),
-                example("PROGRESS: 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 0, 1,10, null, null),
-                example("PROGRESS: op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 0,1,10, null, null),
-                example("PROGRESS: 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 0, 2,10, null, null),
-                example("PROGRESS: op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 0,2,10, null, null),
+                example("PROGRESS: 1/10; uuid", null,10, 20,0, 200, 0, 1,10),
+                example("PROGRESS: op 1/10; uuid", "op",10, 20,0, 200, 0,1,10),
+                example("PROGRESS: 1; uuid", null,10, 20,0, 200, 0, 1,0),
+                example("PROGRESS: op 1; uuid", "op",10, 20,0, 200, 0,1,0),
+                example("PROGRESS: 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 0, 1,10),
+                example("PROGRESS: op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 0,1,10),
+                example("PROGRESS: 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 0, 2,10),
+                example("PROGRESS: op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 0,2,10),
 
-                example("PROGRESS (Slow): 1/10; uuid", null,10, 20,0, 600, 500, 1,10, null, null),
-                example("PROGRESS (Slow): op 1/10; uuid", "op",10, 20,0, 600, 500,1,10, null, null),
-                example("PROGRESS (Slow): 1; uuid", null,10, 20,0, 600, 500, 1,0, null, null),
-                example("PROGRESS (Slow): op 1; uuid", "op",10, 20,0, 600, 500,1,0, null, null),
-                example("PROGRESS (Slow): 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 500, 1,10, null, null),
-                example("PROGRESS (Slow): op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 500,1,10, null, null),
-                example("PROGRESS (Slow): 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 500, 2,10, null, null),
-                example("PROGRESS (Slow): op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 500,2,10, null, null),
+                example("PROGRESS (Slow): 1/10; uuid", null,10, 20,0, 600, 500, 1,10),
+                example("PROGRESS (Slow): op 1/10; uuid", "op",10, 20,0, 600, 500,1,10),
+                example("PROGRESS (Slow): 1; uuid", null,10, 20,0, 600, 500, 1,0),
+                example("PROGRESS (Slow): op 1; uuid", "op",10, 20,0, 600, 500,1,0),
+                example("PROGRESS (Slow): 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 500, 1,10),
+                example("PROGRESS (Slow): op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 500,1,10),
+                example("PROGRESS (Slow): 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 500, 2,10),
+                example("PROGRESS (Slow): op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 500,2,10),
 
-                example("OK: 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, null, null),
-                example("OK: op 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, null, null),
+                example("OK: 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, null, null, null, null),
+                example("OK: op 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, null, null, null, null),
 
-                example("OK (Slow): 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, null, null),
-                example("OK (Slow): op 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, null, null),
+                example("OK (Slow): 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, null, null, null, null),
+                example("OK (Slow): op 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, null, null, null, null),
 
-                example("OK: 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, null, null),
-                example("OK: op 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, null, null),
-                example("OK: 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, null, null),
-                example("OK: op 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, null, null),
-                example("OK: 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, null, null),
-                example("OK: op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, null, null),
-                example("OK: 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, null, null),
-                example("OK: op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, null, null),
+                example("OK: 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, null, null, null, null),
+                example("OK: op 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, null, null, null, null),
+                example("OK: 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, null, null, null, null),
+                example("OK: op 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, null, null, null, null),
+                example("OK: 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, null, null, null, null),
+                example("OK: op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, null, null, null, null),
+                example("OK: 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, null, null, null, null),
+                example("OK: op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, null, null, null, null),
 
-                example("OK (Slow): 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, null, null),
-                example("OK (Slow): op 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, null, null),
-                example("OK (Slow): 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, null, null),
-                example("OK (Slow): op 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, null, null),
-                example("OK (Slow): 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, null, null),
-                example("OK (Slow): op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, null, null),
-                example("OK (Slow): 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, null, null),
-                example("OK (Slow): op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, null, null),
+                example("OK: 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,10, null, null, null, null),
+                example("OK: op 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,10, null, null, null, null),
+                example("OK: 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,0, null, null, null, null),
+                example("OK: op 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,0, null, null, null, null),
+                example("OK: 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 4000, 1,10, null, null, null, null),
+                example("OK: op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 4000,1,10, null, null, null, null),
+                example("OK: 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 4000, 2,10, null, null, null, null),
+                example("OK: op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 4000,2,10, null, null, null, null),
 
-                example("OK: [abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, "abc", null),
-                example("OK: op[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, "abc", null),
+                example("OK (Slow): 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, null, null, null, null),
+                example("OK (Slow): op 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, null, null, null, null),
+                example("OK (Slow): 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, null, null, null, null),
+                example("OK (Slow): op 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, null, null, null, null),
+                example("OK (Slow): 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, null, null, null, null),
+                example("OK (Slow): op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, null, null, null, null),
+                example("OK (Slow): 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, null, null, null, null),
+                example("OK (Slow): op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, null, null, null, null),
 
-                example("OK (Slow): [abc] 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, "abc", null),
-                example("OK (Slow): op[abc] 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, "abc", null),
+                example("OK: [abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, "abc", null, null, null),
+                example("OK: op[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, "abc", null, null, null),
 
-                example("OK: [abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, "abc", null),
-                example("OK: op[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, "abc", null),
-                example("OK: [abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, "abc", null),
-                example("OK: op[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, "abc", null),
-                example("OK: [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, "abc", null),
-                example("OK: op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, "abc", null),
-                example("OK: [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, "abc", null),
-                example("OK: op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, "abc", null),
+                example("OK (Slow): [abc] 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, "abc", null, null, null),
+                example("OK (Slow): op[abc] 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, "abc", null, null, null),
 
-                example("OK (Slow): [abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, "abc", null),
-                example("OK (Slow): op[abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, "abc", null),
-                example("OK (Slow): [abc] 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, "abc", null),
-                example("OK (Slow): op[abc] 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, "abc", null),
-                example("OK (Slow): [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, "abc", null),
-                example("OK (Slow): op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, "abc", null),
-                example("OK (Slow): [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, "abc", null),
-                example("OK (Slow): op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, "abc", null),
+                example("OK: [abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, "abc", null, null, null),
+                example("OK: op[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, "abc", null, null, null),
+                example("OK: [abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, "abc", null, null, null),
+                example("OK: op[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, "abc", null, null, null),
+                example("OK: [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, "abc", null, null, null),
+                example("OK: op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, "abc", null, null, null),
+                example("OK: [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, "abc", null, null, null),
+                example("OK: op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, "abc", null, null, null),
 
-                example("REJECT: [abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, "abc"),
-                example("REJECT: op[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, "abc"),
+                example("OK: [abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,10, "abc", null, null, null),
+                example("OK: op[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,10, "abc", null, null, null),
+                example("OK: [abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,0, "abc", null, null, null),
+                example("OK: op[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,0, "abc", null, null, null),
+                example("OK: [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 4000, 1,10, "abc", null, null, null),
+                example("OK: op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 4000,1,10, "abc", null, null, null),
+                example("OK: [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 4000, 2,10, "abc", null, null, null),
+                example("OK: op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 4000,2,10, "abc", null, null, null),
 
-                example("REJECT: [abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, "abc"),
-                example("REJECT: op[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, "abc"),
-                example("REJECT: [abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, "abc"),
-                example("REJECT: op[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, "abc"),
-                example("REJECT: [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, "abc"),
-                example("REJECT: op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, "abc"),
-                example("REJECT: [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, "abc"),
-                example("REJECT: op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, "abc")
+                example("OK (Slow): [abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, "abc", null, null, null),
+                example("OK (Slow): op[abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, "abc", null, null, null),
+                example("OK (Slow): [abc] 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, "abc", null, null, null),
+                example("OK (Slow): op[abc] 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, "abc", null, null, null),
+                example("OK (Slow): [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, "abc", null, null, null),
+                example("OK (Slow): op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, "abc", null, null, null),
+                example("OK (Slow): [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, "abc", null, null, null),
+                example("OK (Slow): op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, "abc", null, null, null),
+
+                example("REJECT: [abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, "abc", null, null),
+                example("REJECT: op[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, "abc", null, null),
+
+                example("REJECT: [abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, "abc", null, null),
+                example("REJECT: op[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, "abc", null, null),
+                example("REJECT: [abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, "abc", null, null),
+                example("REJECT: op[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, "abc", null, null),
+                example("REJECT: [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, "abc", null, null),
+                example("REJECT: op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, "abc", null, null),
+                example("REJECT: [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, "abc", null, null),
+                example("REJECT: op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, "abc", null, null),
+
+                example("FAIL: [abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, null, "abc", null),
+                example("FAIL: op[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, null, "abc", null),
+
+                example("FAIL: [abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, null, "abc", null),
+                example("FAIL: op[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, null, "abc", null),
+                example("FAIL: [abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, null, "abc", null),
+                example("FAIL: op[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, null, "abc", null),
+                example("FAIL: [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, null, "abc", null),
+                example("FAIL: op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, null, "abc", null),
+                example("FAIL: [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, null, "abc", null),
+                example("FAIL: op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, null, "abc", null),
+
+                example("FAIL: [abc; def] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, null, "abc", "def"),
+                example("FAIL: op[abc; def] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, null, "abc", "def"),
+
+                example("FAIL: [abc; def] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, null, "abc", "def"),
+                example("FAIL: op[abc; def] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, null, "abc", "def"),
+                example("FAIL: [abc; def] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, null, "abc", "def"),
+                example("FAIL: op[abc; def] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, null, "abc", "def"),
+                example("FAIL: [abc; def] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, null, "abc", "def"),
+                example("FAIL: op[abc; def] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, null, "abc", "def"),
+                example("FAIL: [abc; def] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, null, "abc", "def"),
+                example("FAIL: op[abc; def] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, null, "abc", "def")
+        );
+    }
+
+    static Stream<Arguments> provideTimeStatusTestCasesNoCategory() {
+        return Stream.of(
+                example("SCHEDULED: #1 190ns; uuid", null,10, 0,0, 200, 0,0,0),
+                example("SCHEDULED: op#1 190ns; uuid", "op",10, 0,0, 200, 0,0,0),
+
+                example("STARTED: #1 uuid", null,10, 20,0, 200, 0,0,0),
+                example("STARTED: op#1 uuid", "op",10, 20,0, 200, 0,0,0),
+
+                example("STARTED: #1 3,0us; uuid", null,10, 20,0, 3000, 0,0,0),
+                example("STARTED: op#1 3,0us; uuid", "op",10, 20,0, 3000, 0,0,0),
+
+                example("PROGRESS: #1 1/10; uuid", null,10, 20,0, 200, 0, 1,10),
+                example("PROGRESS: op#1 1/10; uuid", "op",10, 20,0, 200, 0,1,10),
+                example("PROGRESS: #1 1; uuid", null,10, 20,0, 200, 0, 1,0),
+                example("PROGRESS: op#1 1; uuid", "op",10, 20,0, 200, 0,1,0),
+                example("PROGRESS: #1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 0, 1,10),
+                example("PROGRESS: op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 0,1,10),
+                example("PROGRESS: #1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 0, 2,10),
+                example("PROGRESS: op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 0,2,10),
+
+                example("PROGRESS (Slow): #1 1/10; uuid", null,10, 20,0, 600, 500, 1,10),
+                example("PROGRESS (Slow): op#1 1/10; uuid", "op",10, 20,0, 600, 500,1,10),
+                example("PROGRESS (Slow): #1 1; uuid", null,10, 20,0, 600, 500, 1,0),
+                example("PROGRESS (Slow): op#1 1; uuid", "op",10, 20,0, 600, 500,1,0),
+                example("PROGRESS (Slow): #1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 500, 1,10),
+                example("PROGRESS (Slow): op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 500,1,10),
+                example("PROGRESS (Slow): #1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 500, 2,10),
+                example("PROGRESS (Slow): op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 500,2,10),
+
+                example("OK: #1 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, null, null, null, null),
+                example("OK: op#1 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, null, null, null, null),
+
+                example("OK (Slow): #1 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, null, null, null, null),
+                example("OK (Slow): op#1 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, null, null, null, null),
+
+                example("OK: #1 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, null, null, null, null),
+                example("OK: op#1 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, null, null, null, null),
+                example("OK: #1 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, null, null, null, null),
+                example("OK: op#1 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, null, null, null, null),
+                example("OK: #1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, null, null, null, null),
+                example("OK: op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, null, null, null, null),
+                example("OK: #1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, null, null, null, null),
+                example("OK: op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, null, null, null, null),
+
+                example("OK: #1 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,10, null, null, null, null),
+                example("OK: op#1 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,10, null, null, null, null),
+                example("OK: #1 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,0, null, null, null, null),
+                example("OK: op#1 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,0, null, null, null, null),
+                example("OK: #1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 4000, 1,10, null, null, null, null),
+                example("OK: op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 4000,1,10, null, null, null, null),
+                example("OK: #1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 4000, 2,10, null, null, null, null),
+                example("OK: op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 4000,2,10, null, null, null, null),
+
+                example("OK (Slow): #1 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, null, null, null, null),
+                example("OK (Slow): op#1 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, null, null, null, null),
+                example("OK (Slow): #1 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, null, null, null, null),
+                example("OK (Slow): op#1 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, null, null, null, null),
+                example("OK (Slow): #1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, null, null, null, null),
+                example("OK (Slow): op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, null, null, null, null),
+                example("OK (Slow): #1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, null, null, null, null),
+                example("OK (Slow): op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, null, null, null, null),
+
+                example("OK: #1[abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, "abc", null, null, null),
+                example("OK: op#1[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, "abc", null, null, null),
+
+                example("OK (Slow): #1[abc] 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, "abc", null, null, null),
+                example("OK (Slow): op#1[abc] 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, "abc", null, null, null),
+
+                example("OK: #1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, "abc", null, null, null),
+                example("OK: op#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, "abc", null, null, null),
+                example("OK: #1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, "abc", null, null, null),
+                example("OK: op#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, "abc", null, null, null),
+                example("OK: #1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, "abc", null, null, null),
+                example("OK: op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, "abc", null, null, null),
+                example("OK: #1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, "abc", null, null, null),
+                example("OK: op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, "abc", null, null, null),
+
+                example("OK: #1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,10, "abc", null, null, null),
+                example("OK: op#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,10, "abc", null, null, null),
+                example("OK: #1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,0, "abc", null, null, null),
+                example("OK: op#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,0, "abc", null, null, null),
+                example("OK: #1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 4000, 1,10, "abc", null, null, null),
+                example("OK: op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 4000,1,10, "abc", null, null, null),
+                example("OK: #1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 4000, 2,10, "abc", null, null, null),
+                example("OK: op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 4000,2,10, "abc", null, null, null),
+
+                example("OK (Slow): #1[abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, "abc", null, null, null),
+                example("OK (Slow): op#1[abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, "abc", null, null, null),
+                example("OK (Slow): #1[abc] 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, "abc", null, null, null),
+                example("OK (Slow): op#1[abc] 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, "abc", null, null, null),
+                example("OK (Slow): #1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, "abc", null, null, null),
+                example("OK (Slow): op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, "abc", null, null, null),
+                example("OK (Slow): #1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, "abc", null, null, null),
+                example("OK (Slow): op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, "abc", null, null, null),
+
+                example("REJECT: #1[abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, "abc", null, null),
+                example("REJECT: op#1[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, "abc", null, null),
+
+                example("REJECT: #1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, "abc", null, null),
+                example("REJECT: op#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, "abc", null, null),
+                example("REJECT: #1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, "abc", null, null),
+                example("REJECT: op#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, "abc", null, null),
+                example("REJECT: #1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, "abc", null, null),
+                example("REJECT: op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, "abc", null, null),
+                example("REJECT: #1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, "abc", null, null),
+                example("REJECT: op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, "abc", null, null),
+
+                example("FAIL: #1[abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, null, "abc", null),
+                example("FAIL: op#1[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, null, "abc", null),
+
+                example("FAIL: #1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, null, "abc", null),
+                example("FAIL: op#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, null, "abc", null),
+                example("FAIL: #1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, null, "abc", null),
+                example("FAIL: op#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, null, "abc", null),
+                example("FAIL: #1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, null, "abc", null),
+                example("FAIL: op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, null, "abc", null),
+                example("FAIL: #1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, null, "abc", null),
+                example("FAIL: op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, null, "abc", null),
+
+                example("FAIL: #1[abc; def] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, null, "abc", "def"),
+                example("FAIL: op#1[abc; def] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, null, "abc", "def"),
+
+                example("FAIL: #1[abc; def] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, null, "abc", "def"),
+                example("FAIL: op#1[abc; def] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, null, "abc", "def"),
+                example("FAIL: #1[abc; def] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, null, "abc", "def"),
+                example("FAIL: op#1[abc; def] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, null, "abc", "def"),
+                example("FAIL: #1[abc; def] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, null, "abc", "def"),
+                example("FAIL: op#1[abc; def] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, null, "abc", "def"),
+                example("FAIL: #1[abc; def] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, null, "abc", "def"),
+                example("FAIL: op#1[abc; def] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, null, "abc", "def")
+        );
+    }
+
+    static Stream<Arguments> provideTimeStatusTestCasesNoStatus() {
+        return Stream.of(
+                example("cat#1 190ns; uuid", null,10, 0,0, 200, 0,0,0),
+                example("cat/op#1 190ns; uuid", "op",10, 0,0, 200, 0,0,0),
+
+                example("cat#1 uuid", null,10, 20,0, 200, 0,0,0),
+                example("cat/op#1 uuid", "op",10, 20,0, 200, 0,0,0),
+
+                example("cat#1 3,0us; uuid", null,10, 20,0, 3000, 0,0,0),
+                example("cat/op#1 3,0us; uuid", "op",10, 20,0, 3000, 0,0,0),
+
+                example("cat#1 1/10; uuid", null,10, 20,0, 200, 0, 1,10),
+                example("cat/op#1 1/10; uuid", "op",10, 20,0, 200, 0,1,10),
+                example("cat#1 1; uuid", null,10, 20,0, 200, 0, 1,0),
+                example("cat/op#1 1; uuid", "op",10, 20,0, 200, 0,1,0),
+                example("cat#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 0, 1,10),
+                example("cat/op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 0,1,10),
+                example("cat#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 0, 2,10),
+                example("cat/op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 0,2,10),
+
+                example("cat#1 1/10; uuid", null,10, 20,0, 600, 500, 1,10),
+                example("cat/op#1 1/10; uuid", "op",10, 20,0, 600, 500,1,10),
+                example("cat#1 1; uuid", null,10, 20,0, 600, 500, 1,0),
+                example("cat/op#1 1; uuid", "op",10, 20,0, 600, 500,1,0),
+                example("cat#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 500, 1,10),
+                example("cat/op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 500,1,10),
+                example("cat#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 500, 2,10),
+                example("cat/op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 500,2,10),
+
+                example("cat#1 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, null, null, null, null),
+                example("cat/op#1 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, null, null, null, null),
+
+                example("cat#1 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, null, null, null, null),
+                example("cat/op#1 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, null, null, null, null),
+
+                example("cat#1 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, null, null, null, null),
+                example("cat/op#1 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, null, null, null, null),
+                example("cat#1 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, null, null, null, null),
+                example("cat/op#1 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, null, null, null, null),
+                example("cat#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, null, null, null, null),
+                example("cat/op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, null, null, null, null),
+                example("cat#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, null, null, null, null),
+                example("cat/op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, null, null, null, null),
+
+                example("cat#1 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,10, null, null, null, null),
+                example("cat/op#1 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,10, null, null, null, null),
+                example("cat#1 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,0, null, null, null, null),
+                example("cat/op#1 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,0, null, null, null, null),
+                example("cat#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 4000, 1,10, null, null, null, null),
+                example("cat/op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 4000,1,10, null, null, null, null),
+                example("cat#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 4000, 2,10, null, null, null, null),
+                example("cat/op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 4000,2,10, null, null, null, null),
+
+                example("cat#1 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, null, null, null, null),
+                example("cat/op#1 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, null, null, null, null),
+                example("cat#1 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, null, null, null, null),
+                example("cat/op#1 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, null, null, null, null),
+                example("cat#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, null, null, null, null),
+                example("cat/op#1 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, null, null, null, null),
+                example("cat#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, null, null, null, null),
+                example("cat/op#1 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, null, null, null, null),
+
+                example("cat#1[abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, "abc", null, null, null),
+                example("cat/op#1[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, "abc", null, null, null),
+
+                example("cat#1[abc] 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, "abc", null, null, null),
+                example("cat/op#1[abc] 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, "abc", null, null, null),
+
+                example("cat#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, "abc", null, null, null),
+                example("cat/op#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, "abc", null, null, null),
+                example("cat#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, "abc", null, null, null),
+                example("cat/op#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, "abc", null, null, null),
+                example("cat#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, "abc", null, null, null),
+                example("cat/op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, "abc", null, null, null),
+                example("cat#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, "abc", null, null, null),
+                example("cat/op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, "abc", null, null, null),
+
+                example("cat#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,10, "abc", null, null, null),
+                example("cat/op#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,10, "abc", null, null, null),
+                example("cat#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 4000, 1,0, "abc", null, null, null),
+                example("cat/op#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 4000,1,0, "abc", null, null, null),
+                example("cat#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 4000, 1,10, "abc", null, null, null),
+                example("cat/op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 4000,1,10, "abc", null, null, null),
+                example("cat#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 4000, 2,10, "abc", null, null, null),
+                example("cat/op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 4000,2,10, "abc", null, null, null),
+
+                example("cat#1[abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, "abc", null, null, null),
+                example("cat/op#1[abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, "abc", null, null, null),
+                example("cat#1[abc] 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, "abc", null, null, null),
+                example("cat/op#1[abc] 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, "abc", null, null, null),
+                example("cat#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, "abc", null, null, null),
+                example("cat/op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, "abc", null, null, null),
+                example("cat#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, "abc", null, null, null),
+                example("cat/op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, "abc", null, null, null),
+
+                example("cat#1[abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, "abc", null, null),
+                example("cat/op#1[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, "abc", null, null),
+
+                example("cat#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, "abc", null, null),
+                example("cat/op#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, "abc", null, null),
+                example("cat#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, "abc", null, null),
+                example("cat/op#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, "abc", null, null),
+                example("cat#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, "abc", null, null),
+                example("cat/op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, "abc", null, null),
+                example("cat#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, "abc", null, null),
+                example("cat/op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, "abc", null, null),
+
+                example("cat#1[abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, null, "abc", null),
+                example("cat/op#1[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, null, "abc", null),
+
+                example("cat#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, null, "abc", null),
+                example("cat/op#1[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, null, "abc", null),
+                example("cat#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, null, "abc", null),
+                example("cat/op#1[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, null, "abc", null),
+                example("cat#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, null, "abc", null),
+                example("cat/op#1[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, null, "abc", null),
+                example("cat#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, null, "abc", null),
+                example("cat/op#1[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, null, "abc", null),
+
+                example("cat#1[abc; def] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, null, "abc", "def"),
+                example("cat/op#1[abc; def] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, null, "abc", "def"),
+
+                example("cat#1[abc; def] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, null, "abc", "def"),
+                example("cat/op#1[abc; def] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, null, "abc", "def"),
+                example("cat#1[abc; def] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, null, "abc", "def"),
+                example("cat/op#1[abc; def] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, null, "abc", "def"),
+                example("cat#1[abc; def] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, null, "abc", "def"),
+                example("cat/op#1[abc; def] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, null, "abc", "def"),
+                example("cat#1[abc; def] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, null, "abc", "def"),
+                example("cat/op#1[abc; def] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, null, "abc", "def")
         );
     }
 
     @ParameterizedTest
-    @MethodSource("provideTimeStatusTestCases")
-    void testReadableMessageTimeStatus(final MockMeterData value, final String expected) {
+    @MethodSource("provideTimeStatusTestCasesNoCategoryNoPosition")
+    void testReadableMessageTimeStatusNoCategoryNoPosition(final MockMeterData value, final String expected) {
         assertEquals(expected, value.readableMessage());
     }
+
+    @ParameterizedTest
+    @MethodSource("provideTimeStatusTestCasesNoCategory")
+    void testReadableMessageTimeStatusNoCategory(final MockMeterData value, final String expected) {
+        MeterConfig.printPosition = true;
+        assertEquals(expected, value.readableMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTimeStatusTestCasesNoStatus")
+    void testReadableMessageTimeStatusNoStatus(final MockMeterData value, final String expected) {
+        MeterConfig.printPosition = true;
+        MeterConfig.printCategory = true;
+        MeterConfig.printStatus = false;
+        assertEquals(expected, value.readableMessage());
+    }
+
 
     private static class MockMeterData extends MeterData {
 

@@ -336,15 +336,11 @@ public class MeterData extends SystemData {
             builder.append(']');
             hasId = true;
         }
-        if (failPath != null || failMessage != null) {
+        if (failPath != null) {
             builder.append("[");
-            if (failPath != null) {
-                builder.append(failPath);
-            }
-            if (failPath != null && failMessage != null) {
-                builder.append("; ");
-            }
+            builder.append(failPath);
             if (failMessage != null) {
+                builder.append("; ");
                 builder.append(failMessage);
             }
             builder.append(']');
@@ -392,7 +388,7 @@ public class MeterData extends SystemData {
         /* Meta data. */
         if (description != null) {
             hasPrevious = separator(builder, hasPrevious);
-            builder.append(" '");
+            builder.append('\'');
             builder.append(description);
             builder.append('\'');
         }
