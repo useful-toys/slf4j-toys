@@ -127,7 +127,7 @@ public class Meter extends MeterData implements Closeable {
      * @param parent    ID of the parent Meter or null.
      */
     public Meter(final Logger logger, final String operation, final String parent) {
-        super(Session.uuid, extractNextPosition(logger.getName(), operation), logger.getName(), operation, parent);
+        super(Session.shortSessionUudi(), extractNextPosition(logger.getName(), operation), logger.getName(), operation, parent);
         messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
         dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
     }
