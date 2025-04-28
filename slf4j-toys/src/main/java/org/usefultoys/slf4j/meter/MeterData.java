@@ -16,7 +16,6 @@
 package org.usefultoys.slf4j.meter;
 
 import lombok.Getter;
-import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
@@ -330,7 +329,7 @@ public class MeterData extends SystemData {
             }
         }
 
-        if (this.description != null) {
+        if (description != null) {
             builder.append(" '");
             builder.append(this.description);
             builder.append('\'');
@@ -375,9 +374,9 @@ public class MeterData extends SystemData {
             builder.append(Math.round(this.systemLoad * 100));
             builder.append("%");
         }
-        if (SessionConfig.uuidSize != 0 && this.sessionUuid != null) {
+        if (this.sessionUuid != null) {
             builder.append("; ");
-            builder.append(this.sessionUuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize));
+            builder.append(sessionUuid);
         }
 
         return builder;
