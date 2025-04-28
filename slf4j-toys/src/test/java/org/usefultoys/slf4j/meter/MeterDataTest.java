@@ -19,12 +19,16 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -482,5 +486,131 @@ public class MeterDataTest {
         assertEquals("reject", meterData.getRejectPath());
         assertEquals("fail", meterData.getFailPath());
         assertEquals("Fail message", meterData.getFailMessage());
+    }
+
+    private static Arguments example(final String expected, final String operation,
+                                     final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit) {
+        return Arguments.of(new MockMeterData("uuid", 1, null, operation, null, null,
+                createTime, startTime,stopTime,currentTime,timeLimit,0,0,
+                null,null,null,null), expected);
+    }
+
+    private static Arguments example(final String expected, final String operation,
+                                     final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit,
+                                     final long currentIteration, final long expectedIterations, String okPath, String rejectPath) {
+        return Arguments.of(new MockMeterData("uuid", 1, null, operation, null, null,
+                createTime, startTime,stopTime,currentTime,timeLimit,currentIteration,expectedIterations,
+                okPath,rejectPath,null,null), expected);
+    }
+
+    static Stream<Arguments> provideTimeStatusTestCases() {
+        return Stream.of(
+                example("SCHEDULED: 190ns; uuid", null,10, 0,0, 200, 0),
+                example("SCHEDULED: op 190ns; uuid", "op",10, 0,0, 200, 0),
+
+                example("STARTED: uuid", null,10, 20,0, 200, 0),
+                example("STARTED: op uuid", "op",10, 20,0, 200, 0),
+
+                example("STARTED: 3,0us; uuid", null,10, 20,0, 3000, 0),
+                example("STARTED: op 3,0us; uuid", "op",10, 20,0, 3000, 0),
+
+                example("PROGRESS: 1/10; uuid", null,10, 20,0, 200, 0, 1,10, null, null),
+                example("PROGRESS: op 1/10; uuid", "op",10, 20,0, 200, 0,1,10, null, null),
+                example("PROGRESS: 1; uuid", null,10, 20,0, 200, 0, 1,0, null, null),
+                example("PROGRESS: op 1; uuid", "op",10, 20,0, 200, 0,1,0, null, null),
+                example("PROGRESS: 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 0, 1,10, null, null),
+                example("PROGRESS: op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 0,1,10, null, null),
+                example("PROGRESS: 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 0, 2,10, null, null),
+                example("PROGRESS: op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 0,2,10, null, null),
+
+                example("PROGRESS (Slow): 1/10; uuid", null,10, 20,0, 600, 500, 1,10, null, null),
+                example("PROGRESS (Slow): op 1/10; uuid", "op",10, 20,0, 600, 500,1,10, null, null),
+                example("PROGRESS (Slow): 1; uuid", null,10, 20,0, 600, 500, 1,0, null, null),
+                example("PROGRESS (Slow): op 1; uuid", "op",10, 20,0, 600, 500,1,0, null, null),
+                example("PROGRESS (Slow): 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,0, 3000, 500, 1,10, null, null),
+                example("PROGRESS (Slow): op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,0, 3000, 500,1,10, null, null),
+                example("PROGRESS (Slow): 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,0, 3000, 500, 2,10, null, null),
+                example("PROGRESS (Slow): op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,0, 3000, 500,2,10, null, null),
+
+                example("OK: 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, null, null),
+                example("OK: op 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, null, null),
+
+                example("OK (Slow): 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, null, null),
+                example("OK (Slow): op 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, null, null),
+
+                example("OK: 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, null, null),
+                example("OK: op 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, null, null),
+                example("OK: 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, null, null),
+                example("OK: op 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, null, null),
+                example("OK: 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, null, null),
+                example("OK: op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, null, null),
+                example("OK: 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, null, null),
+                example("OK: op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, null, null),
+
+                example("OK (Slow): 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, null, null),
+                example("OK (Slow): op 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, null, null),
+                example("OK (Slow): 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, null, null),
+                example("OK (Slow): op 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, null, null),
+                example("OK (Slow): 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, null, null),
+                example("OK (Slow): op 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, null, null),
+                example("OK (Slow): 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, null, null),
+                example("OK (Slow): op 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, null, null),
+
+                example("OK: [abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0, "abc", null),
+                example("OK: op[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0, "abc", null),
+
+                example("OK (Slow): [abc] 3,0us; uuid", null,10, 20,3000, 4000, 200, 0,0, "abc", null),
+                example("OK (Slow): op[abc] 3,0us; uuid", "op",10, 20,3000, 4000, 200,0,0, "abc", null),
+
+                example("OK: [abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10, "abc", null),
+                example("OK: op[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10, "abc", null),
+                example("OK: [abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0, "abc", null),
+                example("OK: op[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0, "abc", null),
+                example("OK: [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10, "abc", null),
+                example("OK: op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10, "abc", null),
+                example("OK: [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10, "abc", null),
+                example("OK: op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10, "abc", null),
+
+                example("OK (Slow): [abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,10, "abc", null),
+                example("OK (Slow): op[abc] 1/10; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,10, "abc", null),
+                example("OK (Slow): [abc] 1; 580ns; 1,7M/s 580,0ns; uuid", null,10, 20,600, 4000, 500, 1,0, "abc", null),
+                example("OK (Slow): op[abc] 1; 580ns; 1,7M/s 580,0ns; uuid", "op",10, 20,600, 4000, 500,1,0, "abc", null),
+                example("OK (Slow): [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 4000, 500, 1,10, "abc", null),
+                example("OK (Slow): op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 4000, 500,1,10, "abc", null),
+                example("OK (Slow): [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 4000, 500, 2,10, "abc", null),
+                example("OK (Slow): op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 4000, 500,2,10, "abc", null),
+
+                example("REJECT: [abc] 180ns; uuid", null,10, 20,200, 4000, 0, 0,0,  null, "abc"),
+                example("REJECT: op[abc] 180ns; uuid", "op",10, 20,200, 4000, 0,0,0,  null, "abc"),
+
+                example("REJECT: [abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,10,  null, "abc"),
+                example("REJECT: op[abc] 1/10; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,10,  null, "abc"),
+                example("REJECT: [abc] 1; 180ns; 5,6M/s 180,0ns; uuid", null,10, 20,200, 200, 0, 1,0,  null, "abc"),
+                example("REJECT: op[abc] 1; 180ns; 5,6M/s 180,0ns; uuid", "op",10, 20,200, 200, 0,1,0,  null, "abc"),
+                example("REJECT: [abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", null,10, 20,3000, 3000, 0, 1,10,  null, "abc"),
+                example("REJECT: op[abc] 1/10; 3,0us; 335,6k/s 3,0us; uuid", "op",10, 20,3000, 3000, 0,1,10,  null, "abc"),
+                example("REJECT: [abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", null,10, 20,3000, 3000, 0, 2,10,  null, "abc"),
+                example("REJECT: op[abc] 2/10; 3,0us; 671,1k/s 1,5us; uuid", "op",10, 20,3000, 3000, 0,2,10,  null, "abc")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTimeStatusTestCases")
+    void testReadableMessageTimeStatus(final MockMeterData value, final String expected) {
+        assertEquals(expected, value.readableMessage());
+    }
+
+    private static class MockMeterData extends MeterData {
+
+        public MockMeterData(final String sessionUuid, final long position,
+                             final String category, final String operation, final String parent, final String description,
+                             final long createTime, final long startTime, final long stopTime, final int currentTime,
+                             final long timeLimit, final long currentIteration, final long expectedIterations,
+                             final String okPath, final String rejectPath, final String failPath, final String failMessage) {
+            super(sessionUuid, position, currentTime,
+                    0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                    category, operation, parent, description, createTime, startTime, stopTime, timeLimit, currentIteration, expectedIterations, okPath, rejectPath, failPath, failMessage, null);
+        }
     }
 }

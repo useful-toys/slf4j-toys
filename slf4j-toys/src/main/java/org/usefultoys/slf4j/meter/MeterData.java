@@ -50,17 +50,7 @@ public class MeterData extends SystemData {
         this.category = category;
         this.operation = operation;
         this.parent = parent;
-        createTime = retrieveCreateTime();
-    }
-
-    // Overriden by unit tests
-    protected long retrieveCreateTime() {
-        return System.nanoTime();
-    }
-
-    // Overriden by unit tests
-    protected long retrieveCurrentTime() {
-        return System.nanoTime();
+        createTime = System.nanoTime();
     }
 
     // for tests only
@@ -200,7 +190,7 @@ public class MeterData extends SystemData {
      * @return If the operation execution time has exceeded (finished execution) or is exceeding (ongoing execution) the time limit.
      */
     public boolean isSlow() {
-        return timeLimit != 0 && stopTime != 0 && startTime != 0 && stopTime - startTime > timeLimit;
+        return timeLimit != 0 && startTime != 0 && getExecutionTime() > timeLimit;
     }
 
     public String getPath() {
@@ -216,7 +206,7 @@ public class MeterData extends SystemData {
         if (startTime == 0) {
             return 0;
         } else if (stopTime == 0) {
-            return retrieveCurrentTime() - startTime;
+            return time - startTime;
         }
         return stopTime - startTime;
     }
@@ -226,7 +216,7 @@ public class MeterData extends SystemData {
      */
     public long getWaitingTime() {
         if (startTime == 0) {
-            return retrieveCurrentTime() - createTime;
+            return time - createTime;
         }
         return startTime - createTime;
     }
@@ -267,58 +257,87 @@ public class MeterData extends SystemData {
         super.collectRuntimeStatus();
     }
 
+    private static boolean separator(final StringBuilder sb, final boolean hasPrevious) {
+        if (hasPrevious) {
+            sb.append("; ");
+        }
+        return true;
+    }
+
     @Override
     public StringBuilder readableStringBuilder(final StringBuilder builder) {
+        long executionTime;
+        if (startTime == 0) {
+            executionTime = 0;
+        } else if (stopTime == 0) {
+            executionTime = time - startTime;
+        } else {
+            executionTime = stopTime - startTime;
+        }
+        final boolean slow = timeLimit > 0 && executionTime > timeLimit;
+        final boolean progressInfoRequired = executionTime > MeterConfig.progressPeriodMilliseconds;
+
         if (MeterConfig.printStatus) {
             if (stopTime != 0) {
-                if (failPath == null && rejectPath == null) {
-                    if (timeLimit != 0 && startTime != 0 && stopTime - startTime > timeLimit) {
-                        builder.append("OK (Slow)");
-                    } else {
-                        builder.append("OK");
-                    }
-                } else if (rejectPath != null) {
+                if (rejectPath != null) {
                     builder.append("REJECT");
                 } else if (failPath != null) {
                     builder.append("FAIL");
+                } else if (slow) {
+                    builder.append("OK (Slow)");
+                } else {
+                    builder.append("OK");
                 }
-            } else if (startTime != 0 && currentIteration == 0) {
-                builder.append("STARTED");
             } else if (startTime != 0) {
-                builder.append("PROGRESS");
+                if (currentIteration == 0) {
+                    builder.append("STARTED");
+                } else if (slow) {
+                    builder.append("PROGRESS (Slow)");
+                } else {
+                    builder.append("PROGRESS");
+                }
             } else {
                 builder.append("SCHEDULED");
             }
             builder.append(": ");
         }
 
+
+        /* Identification. */
+        boolean hasId = false;
         if (MeterConfig.printCategory) {
             final int index = category.lastIndexOf('.') + 1;
             builder.append(category.substring(index));
+            hasId = true;
         }
         if (operation != null) {
             if (MeterConfig.printCategory) {
                 builder.append('/');
             }
             builder.append(operation);
+            hasId = true;
         }
         if (MeterConfig.printPosition) {
             builder.append('#');
             builder.append(position);
+            hasId = true;
         }
 
+        /* Execution path, if any. */
         if (okPath != null) {
-            builder.append(" [");
+            builder.append("[");
             builder.append(okPath);
             builder.append(']');
+            hasId = true;
         }
         if (rejectPath != null) {
-            builder.append(" [");
+            builder.append("[");
             builder.append(rejectPath);
             builder.append(']');
+            hasId = true;
         }
         if (failPath != null || failMessage != null) {
-            builder.append(" [");
+            builder.append("[");
             if (failPath != null) {
                 builder.append(failPath);
             }
@@ -329,10 +348,16 @@ public class MeterData extends SystemData {
                 builder.append(failMessage);
             }
             builder.append(']');
+            hasId = true;
+        }
+        if (hasId) {
+            builder.append(' ');
         }
 
+        /* Number of iterations. */
+        boolean hasPrevious = false;
         if (startTime != 0 && currentIteration > 0) {
-            builder.append(' ');
+            hasPrevious = separator(builder, hasPrevious);
             builder.append(UnitFormatter.iterations(currentIteration));
             if (expectedIterations > 0) {
                 builder.append('/');
@@ -340,15 +365,40 @@ public class MeterData extends SystemData {
             }
         }
 
+        /* Timing. */
+        if (startTime == 0) {
+            /* Not yet started, report waiting time. */
+            hasPrevious = separator(builder, hasPrevious);
+            builder.append(UnitFormatter.nanoseconds(getWaitingTime()));
+        } else {
+            if (stopTime != 0 || progressInfoRequired) {
+                /* Started, report elapsed time if waiting for a considerable amount of time. */
+                /* Or stopped, retport total time. */
+                hasPrevious = separator(builder, hasPrevious);
+                builder.append(UnitFormatter.nanoseconds(executionTime));
+            }
+
+            if (currentIteration > 0 && (stopTime != 0 || progressInfoRequired)) {
+                /* Doing iterations, report speed if waiting for a considerable amount of time of if stopped. */
+                hasPrevious = separator(builder, hasPrevious);
+                final double iterationsPerSecond = getIterationsPerSecond();
+                builder.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
+                builder.append(' ');
+                final double nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
+                builder.append(UnitFormatter.nanoseconds(nanoSecondsPerIteration));
+            }
+        }
+
+        /* Meta data. */
         if (description != null) {
+            hasPrevious = separator(builder, hasPrevious);
             builder.append(" '");
             builder.append(description);
             builder.append('\'');
         }
-
         if (context != null) {
             for (final Entry<String, String> entry : context.entrySet()) {
-                builder.append("; ");
+                hasPrevious = separator(builder, hasPrevious);
                 builder.append(entry.getKey());
                 if (entry.getValue() != null) {
                     builder.append("=");
@@ -357,36 +407,18 @@ public class MeterData extends SystemData {
             }
         }
 
-        if (startTime != 0) {
-            final long executionTime = getExecutionTime();
-            if (executionTime > MeterConfig.progressPeriodMilliseconds) {
-                builder.append("; ");
-                builder.append(UnitFormatter.nanoseconds(executionTime));
-            }
-            if (currentIteration > 0) {
-                builder.append("; ");
-                final double iterationsPerSecond = getIterationsPerSecond();
-                builder.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
-                builder.append(' ');
-                final double nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
-                builder.append(UnitFormatter.nanoseconds(nanoSecondsPerIteration));
-            }
-        } else {
-            builder.append("; ");
-            builder.append(UnitFormatter.nanoseconds(getWaitingTime()));
-        }
-
+        /* System Info */
         if (MeterConfig.printMemory && runtime_usedMemory > 0) {
-            builder.append("; ");
+            hasPrevious = separator(builder, hasPrevious);
             builder.append(UnitFormatter.bytes(runtime_usedMemory));
         }
         if (MeterConfig.printLoad && systemLoad > 0) {
-            builder.append("; ");
+            hasPrevious = separator(builder, hasPrevious);
             builder.append(Math.round(systemLoad * 100));
             builder.append("%");
         }
         if (sessionUuid != null) {
-            builder.append("; ");
+            hasPrevious = separator(builder, hasPrevious);
             builder.append(sessionUuid);
         }
 
@@ -424,30 +456,30 @@ public class MeterData extends SystemData {
     private static final Pattern patternEventName = Pattern.compile(REGEX_START +EVENT_NAME + REGEX_WORD_VALUE);
     private static final Pattern patternEventParent = Pattern.compile(REGEX_START +EVENT_PARENT + REGEX_WORD_VALUE);
     private static final Pattern patternContext = Pattern.compile(REGEX_START +PROP_CONTEXT + "\\s*:\\s*\\{([^}]*)\\}");
-    
+
     public void readJson5(final String json5) {
         super.readJson5(json5);
-        
+
         final Matcher matcherDescription = patternDescription.matcher(json5);
         if (matcherDescription.find()) {
             description = matcherDescription.group(1);
         }
-        
+
         final Matcher matcherPathId = patternPathId.matcher(json5);
         if (matcherPathId.find()) {
             okPath = matcherPathId.group(1);
         }
-        
+
         final Matcher matcherRejectId = patternRejectId.matcher(json5);
         if (matcherRejectId.find()) {
             rejectPath = matcherRejectId.group(1);
         }
-        
+
         final Matcher matcherFailId = patternFailId.matcher(json5);
         if (matcherFailId.find()) {
             failPath = matcherFailId.group(1);
         }
-        
+
         final Matcher matcherFailMessage = patternFailMessage.matcher(json5);
         if (matcherFailMessage.find()) {
             failMessage = matcherFailMessage.group(1);
@@ -457,47 +489,47 @@ public class MeterData extends SystemData {
         if (matcherCreateTime.find()) {
             createTime = Long.parseLong(matcherCreateTime.group(1));
         }
-        
+
         final Matcher matcherStartTime = patternStartTime.matcher(json5);
         if (matcherStartTime.find()) {
             startTime = Long.parseLong(matcherStartTime.group(1));
         }
-        
+
         final Matcher matcherStopTime = patternStopTime.matcher(json5);
         if (matcherStopTime.find()) {
             stopTime = Long.parseLong(matcherStopTime.group(1));
         }
-        
+
         final Matcher matcherIteration = patternIteration.matcher(json5);
         if (matcherIteration.find()) {
             currentIteration = Long.parseLong(matcherIteration.group(1));
         }
-        
+
         final Matcher matcherExpectedIteration = patternExpectedIteration.matcher(json5);
         if (matcherExpectedIteration.find()) {
             expectedIterations = Long.parseLong(matcherExpectedIteration.group(1));
         }
-        
+
         final Matcher matcherLimitTime = patternLimitTime.matcher(json5);
         if (matcherLimitTime.find()) {
             timeLimit = Long.parseLong(matcherLimitTime.group(1));
         }
-        
+
         final Matcher matcherEventCategory = patternEventCategory.matcher(json5);
         if (matcherEventCategory.find()) {
             category = matcherEventCategory.group(1);
         }
-        
+
         final Matcher matcherEventName = patternEventName.matcher(json5);
         if (matcherEventName.find()) {
             operation = matcherEventName.group(1);
         }
-        
+
         final Matcher matcherEventParent = patternEventParent.matcher(json5);
         if (matcherEventParent.find()) {
             parent = matcherEventParent.group(1);
         }
-        
+
         final Matcher matcherContext = patternContext.matcher(json5);
         if (matcherContext.find()) {
             final String contextString = matcherContext.group(1);
@@ -515,7 +547,7 @@ public class MeterData extends SystemData {
             }
         }
     }
-    
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
