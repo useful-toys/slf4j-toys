@@ -392,7 +392,7 @@ public class MeterData extends SystemData {
             builder.append(description);
             builder.append('\'');
         }
-        if (context != null) {
+        if (context != null && ! context.isEmpty()) {
             for (final Entry<String, String> entry : context.entrySet()) {
                 hasPrevious = separator(builder, hasPrevious);
                 builder.append(entry.getKey());
