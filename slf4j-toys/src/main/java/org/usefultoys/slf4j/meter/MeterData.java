@@ -15,7 +15,9 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
@@ -32,20 +34,17 @@ import java.util.regex.Pattern;
  *
  * @author Daniel Felix Ferber
  */
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MeterData extends SystemData {
 
     private static final long serialVersionUID = 2L;
-    public static final char DETAILED_MESSAGE_PREFIX = 'M';
 
-    public MeterData() {
-    }
-
-    protected MeterData(final String uuid, final long position, final long time, final String category, final String operation, final String parent) {
-        super(uuid, position, time);
+    protected MeterData(final String uuid, final long position, final String category, final String operation, final String parent) {
+        super(uuid, position);
         this.category = category;
         this.operation = operation;
         this.parent = parent;
-        createTime = System.nanoTime();
+        createTime = collectCurrentTime();
     }
 
     // for tests only
@@ -149,7 +148,7 @@ public class MeterData extends SystemData {
 
     public String getFullID() {
         if (operation == null) {
-            return category + '/' + position;
+            return category + '#' + position;
         }
         return category + '/' + operation + '#' + position;
     }
@@ -184,9 +183,6 @@ public class MeterData extends SystemData {
     /**
      * @return If the operation execution time has exceeded (finished execution) or is exceeding (ongoing execution) the time limit.
      */
-    public boolean isSlow() {
-        return timeLimit != 0 && startTime != 0 && getExecutionTime() > timeLimit;
-    }
 
     public String getPath() {
         if (failPath != null) return failPath;
@@ -197,12 +193,36 @@ public class MeterData extends SystemData {
     public double getIterationsPerSecond() {
         if (currentIteration == 0 || startTime == 0) {
             return 0.0d;
+        } else if (stopTime == 0) {
+            return ((double) currentIteration) / (lastCurrentTime - startTime) * 1000000000;
         }
-        final float executionTimeNS = getExecutionTime();
-        if (executionTimeNS == 0) {
-            return 0.0d;
+        return ((double) currentIteration) / (stopTime - startTime) * 1000000000;
+    }
+
+    /**
+     * @return The execution time after start (until stop for finished or until now for ongoing execution).
+     */
+    public long getExecutionTime() {
+        if (startTime == 0) {
+            return 0;
+        } else if (stopTime == 0) {
+            return lastCurrentTime - startTime;
         }
-        return ((double) currentIteration) / executionTimeNS * 1000000000;
+        return stopTime - startTime;
+    }
+
+    /**
+     * @return The waiting time since Meter was created and before it was started.
+     */
+    public long getWaitingTime() {
+        if (startTime == 0) {
+            return lastCurrentTime - createTime;
+        }
+        return startTime - createTime;
+    }
+
+    public boolean isSlow() {
+        return timeLimit != 0 && startTime != 0 && getExecutionTime() > timeLimit;
     }
 
     @Override
@@ -243,7 +263,7 @@ public class MeterData extends SystemData {
         if (startTime == 0) {
             executionTime = 0;
         } else if (stopTime == 0) {
-            executionTime = time - startTime;
+            executionTime = lastCurrentTime - startTime;
         } else {
             executionTime = stopTime - startTime;
         }
@@ -338,7 +358,7 @@ public class MeterData extends SystemData {
         if (startTime == 0) {
             /* Not yet started, report waiting time. */
             hasPrevious = separator(builder, hasPrevious);
-            builder.append(UnitFormatter.nanoseconds(getWaitingTime()));
+            builder.append(UnitFormatter.nanoseconds(lastCurrentTime -createTime));
         } else {
             if (stopTime != 0 || progressInfoRequired) {
                 /* Started, report elapsed time if waiting for a considerable amount of time. */

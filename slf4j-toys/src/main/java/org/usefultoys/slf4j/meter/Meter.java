@@ -127,13 +127,12 @@ public class Meter extends MeterData implements Closeable {
      * @param parent    ID of the parent Meter or null.
      */
     public Meter(final Logger logger, final String operation, final String parent) {
-        super(Session.shortSessionUudi(), extractNextPosition(logger.getName(), operation), currentNanoTime(), logger.getName(), operation, parent);
+        super(Session.shortSessionUudi(),
+                extractNextPosition(logger.getName(), operation),
+                logger.getName(), operation, parent);
+        createTime = collectCurrentTime();
         messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
         dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
-    }
-
-    private static long currentNanoTime() {
-        return System.nanoTime();
     }
 
     private static long extractNextPosition(final String eventCategory, final String operationName) {
@@ -156,26 +155,20 @@ public class Meter extends MeterData implements Closeable {
         return current;
     }
 
-    /**
-     * @return The execution time after start (until stop for finished or until now for ongoing execution).
-     */
-    public long getExecutionTime() {
+    public long collectCurrentWaitingTime() {
+        if (startTime == 0) {
+            return collectCurrentTime() - createTime;
+        }
+        return startTime - createTime;
+    }
+
+    public long collectCurrentExecutionTime() {
         if (startTime == 0) {
             return 0;
         } else if (stopTime == 0) {
-            return currentNanoTime() - startTime;
+            return collectCurrentTime() - startTime;
         }
         return stopTime - startTime;
-    }
-
-    /**
-     * @return The waiting time since Meter was created and before it was started.
-     */
-    public long getWaitingTime() {
-        if (startTime == 0) {
-            return currentNanoTime() - createTime;
-        }
-        return startTime - createTime;
     }
 
     // ========================================================================
@@ -653,7 +646,7 @@ public class Meter extends MeterData implements Closeable {
                 localThreadInstance.set(new WeakReference<Meter>(this));
             }
 
-            time = lastProgressTime = startTime = currentNanoTime();
+            lastProgressTime = startTime = collectCurrentTime();
 
             if (messageLogger.isDebugEnabled()) {
                 collectRuntimeStatus();
@@ -748,7 +741,7 @@ public class Meter extends MeterData implements Closeable {
                 messageLogger.error(Markers.INCONSISTENT_PROGRESS, ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
             }
 
-            final long now = time = currentNanoTime();
+            final long now = lastCurrentTime = collectCurrentTime();
             final long meterProgressPeriodNanoseconds = MeterConfig.progressPeriodMilliseconds * 1000 * 1000;
             if (currentIteration > lastProgressIteration && (now - lastProgressTime) > meterProgressPeriodNanoseconds) {
                 lastProgressIteration = currentIteration;
@@ -803,7 +796,7 @@ public class Meter extends MeterData implements Closeable {
      */
     public Meter ok() {
         try {
-            final long newStopTime = currentNanoTime();
+            final long newStopTime = collectCurrentTime();
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
@@ -815,7 +808,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            time = newStopTime;
+            lastCurrentTime = newStopTime;
             failPath = null;
             failMessage = null;
             rejectPath = null;
@@ -866,7 +859,7 @@ public class Meter extends MeterData implements Closeable {
      */
     public Meter ok(final Object pathId) {
         try {
-            final long newStopTime = currentNanoTime();
+            final long newStopTime = collectCurrentTime();
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
@@ -878,7 +871,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            time = newStopTime;
+            lastCurrentTime = newStopTime;
             failPath = null;
             failMessage = null;
             rejectPath = null;
@@ -936,7 +929,7 @@ public class Meter extends MeterData implements Closeable {
      */
     public Meter reject(final Object cause) {
         try {
-            final long newStopTime = currentNanoTime();
+            final long newStopTime = collectCurrentTime();
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
@@ -948,7 +941,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            time = newStopTime;
+            lastCurrentTime = newStopTime;
             failPath = null;
             failMessage = null;
             okPath = null;
@@ -998,7 +991,7 @@ public class Meter extends MeterData implements Closeable {
      */
     public Meter fail(final Object cause) {
         try {
-            final long newStopTime = currentNanoTime();
+            final long newStopTime = collectCurrentTime();
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
@@ -1010,7 +1003,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            time = newStopTime;
+            lastCurrentTime = newStopTime;
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
@@ -1116,7 +1109,7 @@ public class Meter extends MeterData implements Closeable {
                 return;
             }
 
-            final long newStopTime = currentNanoTime();
+            final long newStopTime = collectCurrentTime();
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
@@ -1128,7 +1121,7 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            time = newStopTime;
+            lastCurrentTime = newStopTime;
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);

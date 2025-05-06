@@ -66,7 +66,7 @@ class EventDataTest {
         final TestEventData event = new TestEventData();
         assertNull(event.getSessionUuid());
         assertEquals(0L, event.getPosition());
-        assertEquals(0L, event.getTime()); // time should be 0 before nextPosition
+        assertEquals(0L, event.getLastCurrentTime()); // time should be 0 before nextPosition
     }
 
     @Test
@@ -74,7 +74,7 @@ class EventDataTest {
         final TestEventData event = new TestEventData("abc");
         assertEquals("abc", event.getSessionUuid());
         assertEquals(0L, event.getPosition());
-        assertEquals(0L, event.getTime());
+        assertEquals(0L, event.getLastCurrentTime());
     }
 
     @Test
@@ -82,7 +82,7 @@ class EventDataTest {
         final TestEventData event = new TestEventData("abc", 5L);
         assertEquals("abc", event.getSessionUuid());
         assertEquals(5L, event.getPosition());
-        assertEquals(0L, event.getTime());
+        assertEquals(0L, event.getLastCurrentTime());
     }
 
     @Test
@@ -90,7 +90,7 @@ class EventDataTest {
         final TestEventData event = new TestEventData("abc", 5L, 10L);
         assertEquals("abc", event.getSessionUuid());
         assertEquals(5L, event.getPosition());
-        assertEquals(10L, event.getTime());
+        assertEquals(10L, event.getLastCurrentTime());
     }
 
     @Test
@@ -99,7 +99,7 @@ class EventDataTest {
         event.reset();
         assertNull(event.getSessionUuid());
         assertEquals(0L, event.getPosition());
-        assertEquals(0L, event.getTime());
+        assertEquals(0L, event.getLastCurrentTime());
         assertTrue(event.resetCalled);
     }
 
@@ -123,6 +123,6 @@ class EventDataTest {
         event.readJson5("{_:abc,$:5,t:10}");
         assertEquals("abc", event.getSessionUuid());
         assertEquals(5L, event.getPosition());
-        assertEquals(10L, event.getTime());
+        assertEquals(10L, event.getLastCurrentTime());
     }
 }

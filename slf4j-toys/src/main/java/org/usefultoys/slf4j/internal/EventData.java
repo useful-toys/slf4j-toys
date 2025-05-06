@@ -15,7 +15,9 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -27,6 +29,7 @@ import java.util.regex.Pattern;
  *
  * @author Daniel Felix Ferber
  */
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EventData implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -44,10 +47,7 @@ public abstract class EventData implements Serializable {
      * Timestamp when the event data was collected.
      */
     @Getter
-    protected long time = 0;
-
-    protected EventData() {
-    }
+    protected long lastCurrentTime = 0;
 
     protected EventData(final String sessionUuid) {
         this.sessionUuid = sessionUuid;
@@ -59,10 +59,14 @@ public abstract class EventData implements Serializable {
     }
 
     // For tests
-    protected EventData(final String sessionUuid, final long position, final long time) {
+    protected EventData(final String sessionUuid, final long position, final long lastCurrentTime) {
         this.sessionUuid = sessionUuid;
         this.position = position;
-        this.time = time;
+        this.lastCurrentTime = lastCurrentTime;
+    }
+
+    protected long collectCurrentTime() {
+        return lastCurrentTime = System.nanoTime();
     }
 
     /**
@@ -72,7 +76,7 @@ public abstract class EventData implements Serializable {
     public final void reset() {
         sessionUuid = null;
         position = 0;
-        time = 0;
+        lastCurrentTime = 0;
         resetImpl();
     }
 
@@ -111,7 +115,7 @@ public abstract class EventData implements Serializable {
      */
     protected final StringBuilder writeJson5(final StringBuilder sb) {
         sb.append("{");
-        sb.append(String.format(Locale.US, "%s:%s,%s:%d,%s:%d", SESSION_UUID, sessionUuid, EVENT_POSITION, position, EVENT_TIME, time));
+        sb.append(String.format(Locale.US, "%s:%s,%s:%d,%s:%d", SESSION_UUID, sessionUuid, EVENT_POSITION, position, EVENT_TIME, lastCurrentTime));
         writeJson5Impl(sb);
         sb.append("}");
         return sb;
@@ -146,7 +150,7 @@ public abstract class EventData implements Serializable {
 
         final Matcher matcherTime = patternTime.matcher(json5);
         if (matcherTime.find()) {
-            time = Long.parseLong(matcherTime.group(1));
+            lastCurrentTime = Long.parseLong(matcherTime.group(1));
         }
     }
 

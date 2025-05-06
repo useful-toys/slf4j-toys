@@ -63,13 +63,10 @@ public class MeterCallableTest {
     @Test
     public void testWithStartWithOk() throws Exception {
         final Meter m = new Meter(logger, "testWithStartWithOk").start();
-        final Object result = m.call(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Assertions.assertEquals(m, Meter.getCurrentInstance());
-                m.ok();
-                return null;
-            }
+        final Object result = m.call(() -> {
+            assertEquals(m, Meter.getCurrentInstance());
+            m.ok();
+            return null;
         });
 
         Assertions.assertNull(result);
@@ -91,13 +88,10 @@ public class MeterCallableTest {
     @Test
     public void testWithStartWithOkAndIgnoredReturn() throws Exception {
         final Meter m = new Meter(logger, "testWithStartWithOk").start();
-        final Object result = m.call(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                Assertions.assertEquals(m, Meter.getCurrentInstance());
-                m.ok();
-                return 1000;
-            }
+        final Integer result = m.call(() -> {
+            Assertions.assertEquals(m, Meter.getCurrentInstance());
+            m.ok();
+            return 1000;
         });
 
         Assertions.assertEquals(Integer.valueOf(1000), result);
@@ -121,12 +115,9 @@ public class MeterCallableTest {
     @Test
     public void testNoStartNoOkAndReturn() throws Exception {
         final Meter m = new Meter(logger, "testWithStartWithOk");
-        final Object result = m.call(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                Assertions.assertEquals(m, Meter.getCurrentInstance());
-                return 1000;
-            }
+        final Integer result = m.call(() -> {
+            Assertions.assertEquals(m, Meter.getCurrentInstance());
+            return 1000;
         });
 
         Assertions.assertEquals(Integer.valueOf(1000), result);
@@ -150,13 +141,10 @@ public class MeterCallableTest {
     @Test
     public void testNoStartWithOk() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithOk");
-        final Object result = m.call(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Assertions.assertEquals(m, Meter.getCurrentInstance());
-                m.ok();
-                return null;
-            }
+        final Object result = m.call(() -> {
+            assertEquals(m, Meter.getCurrentInstance());
+            m.ok();
+            return null;
         });
 
         Assertions.assertNull(result);
@@ -178,12 +166,9 @@ public class MeterCallableTest {
     @Test
     public void testNoStartNoOk() throws Exception {
         final Meter m = new Meter(logger, "testNoStartNoOk");
-        final Object result = m.call(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Assertions.assertEquals(m, Meter.getCurrentInstance());
-                return null;
-            }
+        final Object result = m.call(() -> {
+            assertEquals(m, Meter.getCurrentInstance());
+            return null;
         });
 
         Assertions.assertNull(result);
@@ -205,12 +190,9 @@ public class MeterCallableTest {
     @Test
     public void testWithStartNoOk() throws Exception {
         final Meter m = new Meter(logger, "testWithStartNoOk").start();
-        final Object result = m.call(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Assertions.assertEquals(m, Meter.getCurrentInstance());
-                return null;
-            }
+        final Object result = m.call(() -> {
+            assertEquals(m, Meter.getCurrentInstance());
+            return null;
         });
 
         Assertions.assertNull(result);
@@ -232,13 +214,10 @@ public class MeterCallableTest {
     @Test
     public void testNoStartWithReject() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithReject");
-        final Object result = m.call(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Assertions.assertEquals(m, Meter.getCurrentInstance());
-                m.reject("a");
-                return null;
-            }
+        final Object result = m.call(() -> {
+            assertEquals(m, Meter.getCurrentInstance());
+            m.reject("a");
+            return null;
         });
 
         Assertions.assertNull(result);
@@ -260,13 +239,10 @@ public class MeterCallableTest {
     @Test
     public void testNoStartWithFail() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithFail");
-        final Object result = m.call(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                Assertions.assertEquals(m, Meter.getCurrentInstance());
-                m.fail("a");
-                return null;
-            }
+        final Object result = m.call(() -> {
+            assertEquals(m, Meter.getCurrentInstance());
+            m.fail("a");
+            return null;
         });
 
         Assertions.assertNull(result);
@@ -289,12 +265,9 @@ public class MeterCallableTest {
     public void testNoStartWithException() {
         final Meter m = new Meter(logger, "testNoStartWithException");
         try {
-            m.call(new Callable<Void>() {
-                @Override
-                public Void call() throws Exception {
-                    Assertions.assertEquals(m, Meter.getCurrentInstance());
-                    throw new IllegalArgumentException("someException");
-                }
+            m.call(() -> {
+                assertEquals(m, Meter.getCurrentInstance());
+                throw new IllegalArgumentException("someException");
             });
         } catch (final Exception e) {
             Assertions.assertEquals("someException", e.getMessage());

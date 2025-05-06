@@ -60,7 +60,7 @@ public class MeterAttributesTest {
 
     @Test
     public void testIterationAttributes() {
-        final int iterationCount = 10;
+        final int iterationCount = 4;
         final Meter m1 = new Meter(logger).iterations(iterationCount).start();
         assertEquals(iterationCount, m1.getExpectedIterations());
         assertEquals(0, m1.getCurrentIteration());

@@ -15,7 +15,9 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.usefultoys.slf4j.SystemConfig;
 
 import java.lang.management.*;
@@ -30,23 +32,21 @@ import java.util.regex.Pattern;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("Since15")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class SystemData extends EventData {
 
     private static final long serialVersionUID = 1L;
-
-    protected SystemData() {
-    }
 
     protected SystemData(final String uuid) {
         super(uuid);
     }
 
-    protected SystemData(final String sessionUuid, final long position, final long time) {
-        super(sessionUuid, position, time);
+    protected SystemData(final String uuid, final long timestamp) {
+        super(uuid, timestamp);
     }
 
     // for tests only
-    protected SystemData(final String sessionUuid, final long position, final long time,
+    protected SystemData(final String sessionUuid, final long position, final long lastCurrentTime,
                          final long heap_commited, final long heap_max, final long heap_used,
                          final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
                          final long objectPendingFinalizationCount,
@@ -54,7 +54,7 @@ public abstract class SystemData extends EventData {
                          final long compilationTime, final long garbageCollector_count, final long garbageCollector_time,
                          final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory,
                          final double systemLoad) {
-        super(sessionUuid, position, time);
+        super(sessionUuid, position, lastCurrentTime);
         this.heap_commited = heap_commited;
         this.heap_max = heap_max;
         this.heap_used = heap_used;

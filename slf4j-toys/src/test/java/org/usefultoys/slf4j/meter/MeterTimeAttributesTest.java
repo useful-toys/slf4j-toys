@@ -56,16 +56,20 @@ public class MeterTimeAttributesTest {
         final long startTime1 = m.getStartTime();
         final long stopTime1 = m.getStopTime();
         final long waitingTime1 = m.getWaitingTime();
+        final long collectedWaitingTime1 = m.collectCurrentWaitingTime();
         final long executionTime1 = m.getExecutionTime();
+        final long collectedExecutionTime1 = m.collectCurrentExecutionTime();
         final long now1b = System.nanoTime();
 
         assertTrue(createTime1 >= now1a);
         assertTrue(createTime1 <= now1b);
         assertEquals(0, startTime1);
         assertEquals(0, stopTime1);
-        assertTrue(waitingTime1 > 0);
-        assertTrue(waitingTime1 <= now1b - now1a);
+        assertEquals(0, waitingTime1);
+        assertTrue(collectedWaitingTime1 > 0);
+        assertTrue(collectedWaitingTime1 <= now1b - now1a);
         assertEquals(0, executionTime1);
+        assertEquals(0, collectedExecutionTime1);
 
         final long now2a = System.nanoTime();
         m.start();
@@ -73,7 +77,9 @@ public class MeterTimeAttributesTest {
         final long startTime2 = m.getStartTime();
         final long stopTime2 = m.getStopTime();
         final long waitingTime2 = m.getWaitingTime();
+        final long collectedWaitingTime2 = m.collectCurrentWaitingTime();
         final long executionTime2 = m.getExecutionTime();
+        final long collectedExecutionTime2 = m.collectCurrentExecutionTime();
         final long now2b = System.nanoTime();
 
         assertEquals(createTime1, createTime2);
@@ -81,8 +87,10 @@ public class MeterTimeAttributesTest {
         assertTrue(startTime2 <= now2b);
         assertEquals(0, stopTime2);
         assertEquals(startTime2 - createTime2, waitingTime2);
-        assertTrue(executionTime2 > 0);
-        assertTrue(executionTime2 <= now2b - now2a);
+        assertEquals(waitingTime2, collectedWaitingTime2);
+        assertEquals(0, executionTime2);
+        assertTrue(collectedExecutionTime2 > 0);
+        assertTrue(collectedExecutionTime2 <= now2b - now2a);
 
         final long now3a = System.nanoTime();
         m.ok();
@@ -90,7 +98,9 @@ public class MeterTimeAttributesTest {
         final long startTime3 = m.getStartTime();
         final long stopTime3 = m.getStopTime();
         final long waitingTime3 = m.getWaitingTime();
+        final long collectedWaitingTime3 = m.collectCurrentWaitingTime();
         final long executionTime3 = m.getExecutionTime();
+        final long collectedExecutionTime3 = m.collectCurrentExecutionTime();
         final long now3b = System.nanoTime();
 
         assertEquals(createTime1, createTime3);
@@ -98,7 +108,9 @@ public class MeterTimeAttributesTest {
         assertTrue(stopTime3 >= now3a);
         assertTrue(stopTime3 <= now3b);
         assertEquals(waitingTime3, waitingTime2);
+        assertEquals(waitingTime2, collectedWaitingTime3);
         assertEquals(stopTime3 - startTime2, executionTime3);
+        assertEquals(executionTime3, collectedExecutionTime3);
     }
     
     @Test
@@ -109,16 +121,20 @@ public class MeterTimeAttributesTest {
         final long startTime1 = m.getStartTime();
         final long stopTime1 = m.getStopTime();
         final long waitingTime1 = m.getWaitingTime();
+        final long collectedWaitingTime1 = m.collectCurrentWaitingTime();
         final long executionTime1 = m.getExecutionTime();
+        final long collectedExecutionTime1 = m.collectCurrentExecutionTime();
         final long now1b = System.nanoTime();
 
         assertTrue(createTime1 >= now1a);
         assertTrue(createTime1 <= now1b);
         assertEquals(0, startTime1);
         assertEquals(0, stopTime1);
-        assertTrue(waitingTime1 > 0);
-        assertTrue(waitingTime1 <= now1b - now1a);
+        assertEquals(0, waitingTime1);
+        assertTrue(collectedWaitingTime1 > 0);
+        assertTrue(collectedWaitingTime1 <= now1b - now1a);
         assertEquals(0, executionTime1);
+        assertEquals(0, collectedExecutionTime1);
 
         final long now2a = System.nanoTime();
         m.start();
@@ -126,7 +142,9 @@ public class MeterTimeAttributesTest {
         final long startTime2 = m.getStartTime();
         final long stopTime2 = m.getStopTime();
         final long waitingTime2 = m.getWaitingTime();
+        final long collectedWaitingTime2 = m.collectCurrentWaitingTime();
         final long executionTime2 = m.getExecutionTime();
+        final long collectedExecutionTime2 = m.collectCurrentExecutionTime();
         final long now2b = System.nanoTime();
 
         assertEquals(createTime1, createTime2);
@@ -134,8 +152,10 @@ public class MeterTimeAttributesTest {
         assertTrue(startTime2 <= now2b);
         assertEquals(0, stopTime2);
         assertEquals(startTime2 - createTime2, waitingTime2);
-        assertTrue(executionTime2 > 0);
-        assertTrue(executionTime2 <= now2b - now2a);
+        assertEquals(waitingTime2, collectedWaitingTime2);
+        assertEquals(0, executionTime2);
+        assertTrue(collectedExecutionTime2 > 0);
+        assertTrue(collectedExecutionTime2 <= now2b - now2a);
 
         final long now3a = System.nanoTime();
         m.ok("Flow");
@@ -143,7 +163,9 @@ public class MeterTimeAttributesTest {
         final long startTime3 = m.getStartTime();
         final long stopTime3 = m.getStopTime();
         final long waitingTime3 = m.getWaitingTime();
+        final long collectedWaitingTime3 = m.collectCurrentWaitingTime();
         final long executionTime3 = m.getExecutionTime();
+        final long collectedExecutionTime3 = m.collectCurrentExecutionTime();
         final long now3b = System.nanoTime();
 
         assertEquals(createTime1, createTime3);
@@ -151,7 +173,9 @@ public class MeterTimeAttributesTest {
         assertTrue(stopTime3 >= now3a);
         assertTrue(stopTime3 <= now3b);
         assertEquals(waitingTime3, waitingTime2);
+        assertEquals(waitingTime2, collectedWaitingTime3);
         assertEquals(stopTime3 - startTime2, executionTime3);
+        assertEquals(executionTime3, collectedExecutionTime3);
     }
   
     @Test
@@ -162,16 +186,20 @@ public class MeterTimeAttributesTest {
         final long startTime1 = m.getStartTime();
         final long stopTime1 = m.getStopTime();
         final long waitingTime1 = m.getWaitingTime();
+        final long collectedWaitingTime1 = m.collectCurrentWaitingTime();
         final long executionTime1 = m.getExecutionTime();
+        final long collectedExecutionTime1 = m.collectCurrentExecutionTime();
         final long now1b = System.nanoTime();
 
         assertTrue(createTime1 >= now1a);
         assertTrue(createTime1 <= now1b);
         assertEquals(0, startTime1);
         assertEquals(0, stopTime1);
-        assertTrue(waitingTime1 > 0);
-        assertTrue(waitingTime1 <= now1b - now1a);
+        assertEquals(0, waitingTime1);
+        assertTrue(collectedWaitingTime1 > 0);
+        assertTrue(collectedWaitingTime1 <= now1b - now1a);
         assertEquals(0, executionTime1);
+        assertEquals(0, collectedExecutionTime1);
 
         final long now2a = System.nanoTime();
         m.start();
@@ -179,7 +207,9 @@ public class MeterTimeAttributesTest {
         final long startTime2 = m.getStartTime();
         final long stopTime2 = m.getStopTime();
         final long waitingTime2 = m.getWaitingTime();
+        final long collectedWaitingTime2 = m.collectCurrentWaitingTime();
         final long executionTime2 = m.getExecutionTime();
+        final long collectedExecutionTime2 = m.collectCurrentExecutionTime();
         final long now2b = System.nanoTime();
 
         assertEquals(createTime1, createTime2);
@@ -187,8 +217,10 @@ public class MeterTimeAttributesTest {
         assertTrue(startTime2 <= now2b);
         assertEquals(0, stopTime2);
         assertEquals(startTime2 - createTime2, waitingTime2);
-        assertTrue(executionTime2 > 0);
-        assertTrue(executionTime2 <= now2b - now2a);
+        assertEquals(waitingTime2, collectedWaitingTime2);
+        assertEquals(0, executionTime2);
+        assertTrue(collectedExecutionTime2 > 0);
+        assertTrue(collectedExecutionTime2 <= now2b - now2a);
 
         final long now3a = System.nanoTime();
         m.reject("Reject");
@@ -196,7 +228,9 @@ public class MeterTimeAttributesTest {
         final long startTime3 = m.getStartTime();
         final long stopTime3 = m.getStopTime();
         final long waitingTime3 = m.getWaitingTime();
+        final long collectedWaitingTime3 = m.collectCurrentWaitingTime();
         final long executionTime3 = m.getExecutionTime();
+        final long collectedExecutionTime3 = m.collectCurrentExecutionTime();
         final long now3b = System.nanoTime();
 
         assertEquals(createTime1, createTime3);
@@ -204,7 +238,9 @@ public class MeterTimeAttributesTest {
         assertTrue(stopTime3 >= now3a);
         assertTrue(stopTime3 <= now3b);
         assertEquals(waitingTime3, waitingTime2);
+        assertEquals(waitingTime2, collectedWaitingTime3);
         assertEquals(stopTime3 - startTime2, executionTime3);
+        assertEquals(executionTime3, collectedExecutionTime3);
     }
 
     @Test
@@ -215,16 +251,20 @@ public class MeterTimeAttributesTest {
         final long startTime1 = m.getStartTime();
         final long stopTime1 = m.getStopTime();
         final long waitingTime1 = m.getWaitingTime();
+        final long collectedWaitingTime1 = m.collectCurrentWaitingTime();
         final long executionTime1 = m.getExecutionTime();
+        final long collectedExecutionTime1 = m.collectCurrentExecutionTime();
         final long now1b = System.nanoTime();
 
         assertTrue(createTime1 >= now1a);
         assertTrue(createTime1 <= now1b);
         assertEquals(0, startTime1);
         assertEquals(0, stopTime1);
-        assertTrue(waitingTime1 > 0);
-        assertTrue(waitingTime1 <= now1b - now1a);
+        assertEquals(0, waitingTime1);
+        assertTrue(collectedWaitingTime1 > 0);
+        assertTrue(collectedWaitingTime1 <= now1b - now1a);
         assertEquals(0, executionTime1);
+        assertEquals(0, collectedExecutionTime1);
 
         final long now2a = System.nanoTime();
         m.start();
@@ -232,7 +272,9 @@ public class MeterTimeAttributesTest {
         final long startTime2 = m.getStartTime();
         final long stopTime2 = m.getStopTime();
         final long waitingTime2 = m.getWaitingTime();
+        final long collectedWaitingTime2 = m.collectCurrentWaitingTime();
         final long executionTime2 = m.getExecutionTime();
+        final long collectedExecutionTime2 = m.collectCurrentExecutionTime();
         final long now2b = System.nanoTime();
 
         assertEquals(createTime1, createTime2);
@@ -240,8 +282,10 @@ public class MeterTimeAttributesTest {
         assertTrue(startTime2 <= now2b);
         assertEquals(0, stopTime2);
         assertEquals(startTime2 - createTime2, waitingTime2);
-        assertTrue(executionTime2 > 0);
-        assertTrue(executionTime2 <= now2b - now2a);
+        assertEquals(waitingTime2, collectedWaitingTime2);
+        assertEquals(0, executionTime2);
+        assertTrue(collectedExecutionTime2 > 0);
+        assertTrue(collectedExecutionTime2 <= now2b - now2a);
 
         final long now3a = System.nanoTime();
         m.fail(new IllegalStateException("ISE"));
@@ -249,7 +293,9 @@ public class MeterTimeAttributesTest {
         final long startTime3 = m.getStartTime();
         final long stopTime3 = m.getStopTime();
         final long waitingTime3 = m.getWaitingTime();
+        final long collectedWaitingTime3 = m.collectCurrentWaitingTime();
         final long executionTime3 = m.getExecutionTime();
+        final long collectedExecutionTime3 = m.collectCurrentExecutionTime();
         final long now3b = System.nanoTime();
 
         assertEquals(createTime1, createTime3);
@@ -257,6 +303,8 @@ public class MeterTimeAttributesTest {
         assertTrue(stopTime3 >= now3a);
         assertTrue(stopTime3 <= now3b);
         assertEquals(waitingTime3, waitingTime2);
+        assertEquals(waitingTime2, collectedWaitingTime3);
         assertEquals(stopTime3 - startTime2, executionTime3);
+        assertEquals(executionTime3, collectedExecutionTime3);
     }
  }

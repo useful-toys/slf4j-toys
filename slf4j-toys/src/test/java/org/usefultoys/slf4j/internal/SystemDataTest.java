@@ -26,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class SystemDataTest {
 
     static class TestSystemData extends SystemData {
-        public TestSystemData(final String sessionUuid, final long position, final long time) {
-            super(sessionUuid, position, time);
+        public TestSystemData(final String sessionUuid, final long position) {
+            super(sessionUuid, position);
         }
 
         // for tests only
@@ -74,7 +74,7 @@ class SystemDataTest {
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
         assertEquals("abc", event.getSessionUuid());
         assertEquals(1, event.getPosition());
-        assertEquals(2L, event.getTime());
+        assertEquals(2L, event.getLastCurrentTime());
         assertEquals(3L, event.getHeap_commited());
         assertEquals(4L, event.getHeap_max());
         assertEquals(5L, event.getHeap_used());
@@ -102,7 +102,7 @@ class SystemDataTest {
         event.reset();
         assertNull(event.getSessionUuid());
         assertEquals(0L, event.getPosition());
-        assertEquals(0L, event.getTime());
+        assertEquals(0L, event.getLastCurrentTime());
         assertEquals(0L, event.getHeap_commited());
         assertEquals(0L, event.getHeap_max());
         assertEquals(0L, event.getHeap_used());
@@ -124,14 +124,14 @@ class SystemDataTest {
 
     @Test
     void testReadableMessage() {
-        final TestSystemData event = new TestSystemData("abc", 5L, 0);
+        final TestSystemData event = new TestSystemData("abc", 5L);
         final String message = event.readableMessage();
         assertTrue(message.equals("a"));
     }
 
     @Test
     void testCollectRuntimeStatus() {
-        final TestSystemData event = new TestSystemData("abc", 5L, 0);
+        final TestSystemData event = new TestSystemData("abc", 5L);
         event.collectRuntimeStatus();
         assertNotEquals(0L, event.getRuntime_usedMemory());
         assertNotEquals(0L, event.getRuntime_maxMemory());
@@ -141,7 +141,7 @@ class SystemDataTest {
     @Test() @Disabled
     void testCollectPlatformStatus() {
         SystemConfig.usePlatformManagedBean = true;
-        final TestSystemData event = new TestSystemData("abc", 5L, 0);
+        final TestSystemData event = new TestSystemData("abc", 5L);
         event.collectPlatformStatus();
         assertNotEquals(0L, event.getSystemLoad());
     }
@@ -153,7 +153,7 @@ class SystemDataTest {
         SystemConfig.useCompilationManagedBean = true;
         SystemConfig.useGarbageCollectionManagedBean = true;
 
-        final TestSystemData event = new TestSystemData("abc");
+        final TestSystemData event = new TestSystemData("abc", 5L);
         System.gc();
         event.collectManagedBeanStatus();
         assertNotEquals(0L, event.getHeap_commited());
@@ -231,7 +231,7 @@ class SystemDataTest {
         systemData.readJson5("{_:abc,$:5,t:6,m:[100,200,300],h:[400,500,600],nh:[700,800,900],fc:10,cl:[20,30,40],ct:50,gc:[60,70],sl:0.8}");
         assertEquals("abc", systemData.getSessionUuid());
         assertEquals(5L, systemData.getPosition());
-        assertEquals(6L, systemData.getTime());
+        assertEquals(6L, systemData.getLastCurrentTime());
         assertEquals(100L, systemData.getRuntime_usedMemory());
         assertEquals(200L, systemData.getRuntime_totalMemory());
         assertEquals(300L, systemData.getRuntime_maxMemory());
