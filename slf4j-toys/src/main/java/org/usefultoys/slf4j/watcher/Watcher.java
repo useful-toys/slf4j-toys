@@ -52,16 +52,12 @@ public class Watcher extends WatcherData implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
-        logCurrentStatus();
-    }
-
     /**
      * Logs about the current system status.
      */
-    public void logCurrentStatus() {
-        time = System.nanoTime();
+    @Override
+    public void run() {
+        collectCurrentTime();
         position++;
         if (messageLogger.isInfoEnabled() || (dataLogger != null && dataLogger.isTraceEnabled())) {
             collectRuntimeStatus();

@@ -82,10 +82,10 @@ class WatcherTest {
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
-        final long time = watcher.getTime();
-        watcher.logCurrentStatus();
+        final long time = watcher.getLastCurrentTime();
+        watcher.run();
         assertTrue(watcher.getPosition() == position + 1);
-        assertTrue(watcher.getTime() > time);
+        assertTrue(watcher.getLastCurrentTime() > time);
         assertTrue(watcher.getRuntime_usedMemory() > 0);
 
         // Readable and encoded messages are written to the separated logs
@@ -108,10 +108,10 @@ class WatcherTest {
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
-        final long time = watcher.getTime();
-        watcher.logCurrentStatus();
+        final long time = watcher.getLastCurrentTime();
+        watcher.run();
         assertTrue(watcher.getPosition() == position + 1);
-        assertTrue(watcher.getTime() > time);
+        assertTrue(watcher.getLastCurrentTime() > time);
         assertTrue(watcher.getRuntime_usedMemory() > 0);
 
         // Readable and encoded messages are written to the same log
@@ -134,10 +134,10 @@ class WatcherTest {
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
-        final long time = watcher.getTime();
-        watcher.logCurrentStatus();
+        final long time = watcher.getLastCurrentTime();
+        watcher.run();
         assertTrue(watcher.getPosition() == position + 1);
-        assertTrue(watcher.getTime() > time);
+        assertTrue(watcher.getLastCurrentTime() > time);
         assertTrue(watcher.getRuntime_usedMemory() > 0);
 
         // Only readable message is written to log
@@ -162,10 +162,10 @@ class WatcherTest {
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
-        final long time = watcher.getTime();
-        watcher.logCurrentStatus();
+        final long time = watcher.getLastCurrentTime();
+        watcher.run();
         assertTrue(watcher.getPosition() == position + 1);
-        assertTrue(watcher.getTime() > time);
+        assertTrue(watcher.getLastCurrentTime() > time);
         assertTrue(watcher.getRuntime_usedMemory() > 0);
 
         // Only readable message is written to log
@@ -190,10 +190,10 @@ class WatcherTest {
 
         final Watcher watcher = new Watcher(WatcherConfig.name);
         final long position = watcher.getPosition();
-        final long time = watcher.getTime();
-        watcher.logCurrentStatus();
+        final long time = watcher.getLastCurrentTime();
+        watcher.run();
         assertTrue(watcher.getPosition() == position + 1);
-        assertTrue(watcher.getTime() > time);
+        assertTrue(watcher.getLastCurrentTime() > time);
         // As nothing is logged, the memory usage won't be collected and should be 0
         assertTrue(watcher.getRuntime_usedMemory() == 0);
 

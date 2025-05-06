@@ -47,7 +47,7 @@ public class WithCustomTimer {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                WatcherSingleton.DEFAULT_WATCHER.logCurrentStatus();
+                WatcherSingleton.DEFAULT_WATCHER.run();
             }
         }, 1000, 1000);
 
