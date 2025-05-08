@@ -6,6 +6,7 @@ on:
     branches: # Specify your branches here
       - main # The 'main' branch
       - master # The 'master' branch
+      - develop
       - 'releases/*' # The release branches
 
 jobs:
