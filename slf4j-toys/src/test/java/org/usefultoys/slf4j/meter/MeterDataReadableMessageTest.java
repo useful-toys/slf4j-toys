@@ -28,12 +28,29 @@ import org.usefultoys.slf4j.SystemConfig;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MeterDataReadableMessageTest {
+
+    private static Locale originalLocale;
+
+    @BeforeAll
+    public static void setUpLocale() {
+        // Set the default locale to English for consistent formatting
+        originalLocale = Locale.getDefault();
+        Locale.setDefault(Locale.ENGLISH);
+    }
+
+    @AfterAll
+    public static void tearDownLocale() {
+        // Reset the default locale to the system default
+        Locale.setDefault(originalLocale);
+    }
+
 
     @BeforeAll
     public static void validate() {

@@ -34,7 +34,6 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  */
 class UnitFormatterTest {
 
-    private static Locale originalLocale;
 
     private static final int[] FACTORS = {1000, 1000, 1000};
     private static final String[] UNITS = {"A", "B", "C"};
@@ -44,15 +43,17 @@ class UnitFormatterTest {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
+    private static Locale originalLocale;
+
     @BeforeAll
-    public static void setUpClass() {
+    public static void setUpLocale() {
         // Set the default locale to English for consistent formatting
         originalLocale = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
     }
 
     @AfterAll
-    public static void tearDownClass() {
+    public static void tearDownLocale() {
         // Reset the default locale to the system default
         Locale.setDefault(originalLocale);
     }
