@@ -1,8 +1,47 @@
-**What is SLF4J-TOYS?**
+# SLF4J TOYS
 
-SLF4J-TOYS is collection of useful practices that complement SLF4J.
+*slf4j-toys* is a Java library that complements SLF4J with additional useful logging practices.
 
-**What is the purpose of SLF4J-TOYS?**
+## Goals
+
+ * A **LoggerFactory** that provides additional usefuly factory SLF4J Logger methods
+ * A **Meter** that works like a log message builder that promotes consistent messages all across the application.
+ * A **Watcher** that produces periodically memory and cpu status, for simple 
+
+*slf4j-toys* enables simple but effective observability, without relying on complex or expensive tool.
+
+## Download
+
+Gradle:
+```gradle
+dependencies {
+    implementation("org.usefultoys:slf4j-toys:1.9.0")
+}
+```
+
+Maven:
+```xml
+<dependency>
+    <groupId>org.usefultoys</groupId>
+    <artifactId>slf4j-toys</artifactId>
+    <version>1.9.0</version>
+</dependency>
+```
+
+## Requirements
+
+### Minimum Java version
+- *slf4j-toys* 1.9.0 and newer: Java 8
+- *slf4j-toys* 1.8.0 and older: Java 7
+
+> [!IMPORTANT]\
+> *slf4j-toys* will not work on Java 9 or above. This issue will be fixed.
+
+## Design consideration
+ * No dependencies other than SLF4J itself
+ * Small footprint
+
+
 
 SLF4J-TOYS promotes clean and organized log files, like:
 ```
@@ -12,25 +51,27 @@ SLF4J-TOYS promotes clean and organized log files, like:
 [main] 25/11/2015 14:38:52 INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0,1s; 1,5MB
 ```
 
-Such messages are not only easily readable, but also easily parsable for later automatic investigation, like statistics and  data mining.
 
-Most of SLF4J-TOYS is a kind of log message builder, that suggests a coding convention for consistent logging, like:
-```
+
+
+
+
+```java
 final Meter m = MeterFactory.getMeter(LOGGER, "saveUser").start();
 try {
     // Check if record exists in database   
     boolean exist = ...;
     if (exist) {
         // Insert record into database
-        m2.ok("Insert");
+        m.ok("Insert");
     } else {
         // Update record in database
-        m2.ok("Update");
+        m.ok("Update");
     }
 } catch (OutOfQuotaException e) {
-    m2.reject(e);
+    m.reject(e);
 } catch (SQLException e) {
-    m2.fail(e);
+    m.fail(e);
     throw new IllegalStateException(e);
 }
 ```
