@@ -24,11 +24,13 @@ import org.usefultoys.slf4j.SystemConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class WatcherServletTest {
@@ -96,4 +98,175 @@ class WatcherServletTest {
         assertTrue(watcherLogger.getEventCount() == 1);
         assertTrue(watcherLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
     }
+
+    /**
+     * Classe de teste que estende WatcherServlet para simular exceções
+     */
+    static class TestExceptionWatcherServlet extends WatcherServlet {
+        private final RuntimeException exceptionToThrow;
+
+        public TestExceptionWatcherServlet(RuntimeException exceptionToThrow) {
+            this.exceptionToThrow = exceptionToThrow;
+        }
+
+        @Override
+        protected void runWatcher()  {
+            throw exceptionToThrow;
+        }
+    }
+
+    @Test
+    void shouldHandleExceptionInRunWatcher() throws Exception {
+        // Arrange
+        final RuntimeException testException = new RuntimeException("Teste de falha no watcher");
+        final WatcherServlet servlet = new TestExceptionWatcherServlet(testException);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        verify(response).setContentType("text/plain");
+        verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        assertEquals("Failed to log system status.", responseWriter.toString().trim());
+        
+        assertEquals(1, mockLogger.getEventCount());
+        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+    }
+
+    @Test
+    void shouldHandleIOExceptionWhenWritingToResponse() throws Exception {
+        // Arrange
+        final RuntimeException testException = new RuntimeException("Teste de falha no watcher");
+        final WatcherServlet servlet = new TestExceptionWatcherServlet(testException);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        
+        // Simular exceção ao escrever na resposta
+        when(response.getWriter()).thenThrow(new IOException("Erro ao escrever na resposta"));
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        verify(response).setContentType("text/plain");
+        verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        
+        assertEquals(1, mockLogger.getEventCount());
+        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+    }
+
+    /**
+     * Classe estendida do WatcherServlet para simular exceções no método runWatcher
+     */
+    static class ExceptionThrowingWatcherServlet extends WatcherServlet {
+        private final RuntimeException exceptionToThrow;
+
+        public ExceptionThrowingWatcherServlet(RuntimeException exceptionToThrow) {
+            this.exceptionToThrow = exceptionToThrow;
+        }
+
+        @Override
+        protected void runWatcher() {
+            throw exceptionToThrow;
+        }
+    }
+
+    @Test
+    void shouldHandleRuntimeExceptionInRunWatcher() throws Exception {
+        // Arrange
+        final RuntimeException testException = new RuntimeException("Teste de exceção simulada");
+        final WatcherServlet servlet = new ExceptionThrowingWatcherServlet(testException);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        verify(response).setContentType("text/plain");
+        verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        assertEquals("Failed to log system status.", responseWriter.toString().trim());
+
+        assertEquals(1, mockLogger.getEventCount());
+        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+    }
+
+    @Test
+    void shouldHandleNullPointerExceptionInRunWatcher() throws Exception {
+        // Arrange
+        final NullPointerException testException = new NullPointerException("Erro de referência nula");
+        final WatcherServlet servlet = new ExceptionThrowingWatcherServlet(testException);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        verify(response).setContentType("text/plain");
+        verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        assertEquals("Failed to log system status.", responseWriter.toString().trim());
+
+        assertEquals(1, mockLogger.getEventCount());
+        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+    }
+
+    @Test
+    void shouldHandleWriterExceptionInErrorCase() throws Exception {
+        // Arrange
+        final RuntimeException testException = new RuntimeException("Teste de exceção primária");
+        final WatcherServlet servlet = new ExceptionThrowingWatcherServlet(testException);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+
+        // Simular IOException ao tentar escrever na resposta
+        when(response.getWriter()).thenThrow(new IOException("Erro ao escrever na resposta"));
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        verify(response).setContentType("text/plain");
+        verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+        assertEquals(1, mockLogger.getEventCount());
+        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+    }
+
+    @Test
+    void shouldHandleIllegalStateExceptionInRunWatcher() throws Exception {
+        // Arrange
+        final IllegalStateException testException = new IllegalStateException("Estado inválido do watcher");
+        final WatcherServlet servlet = new ExceptionThrowingWatcherServlet(testException);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // Act
+        servlet.doGet(request, response);
+
+        // Assert
+        verify(response).setContentType("text/plain");
+        verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        assertEquals("Failed to log system status.", responseWriter.toString().trim());
+
+        assertEquals(1, mockLogger.getEventCount());
+        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+    }
+
 }
