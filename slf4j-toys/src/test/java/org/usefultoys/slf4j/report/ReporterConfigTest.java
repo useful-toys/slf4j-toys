@@ -43,21 +43,7 @@ class ReporterConfigTest {
 
     @AfterEach
     void tearDown() {
-        System.clearProperty(ReporterConfig.PROP_VM);
-        System.clearProperty(ReporterConfig.PROP_FILE_SYSTEM);
-        System.clearProperty(ReporterConfig.PROP_MEMORY);
-        System.clearProperty(ReporterConfig.PROP_USER);
-        System.clearProperty(ReporterConfig.PROP_PROPERTIES);
-        System.clearProperty(ReporterConfig.PROP_ENVIRONMENT);
-        System.clearProperty(ReporterConfig.PROP_PHYSICAL_SYSTEM);
-        System.clearProperty(ReporterConfig.PROP_OPERATING_SYSTEM);
-        System.clearProperty(ReporterConfig.PROP_CALENDAR);
-        System.clearProperty(ReporterConfig.PROP_LOCALE);
-        System.clearProperty(ReporterConfig.PROP_CHARSET);
-        System.clearProperty(ReporterConfig.PROP_NETWORK_INTERFACE);
-        System.clearProperty(ReporterConfig.PROP_SSL_CONTEXT);
-        System.clearProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE);
-        System.clearProperty(ReporterConfig.PROP_NAME);
+        ReporterConfig.reset();
     }
 
     @Test
