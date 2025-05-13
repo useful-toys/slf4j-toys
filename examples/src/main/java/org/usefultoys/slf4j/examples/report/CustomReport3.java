@@ -15,14 +15,14 @@
  */
 package org.usefultoys.slf4j.examples.report;
 
-import java.util.concurrent.Executor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.report.ReportMemory;
 import org.usefultoys.slf4j.report.ReportPhysicalSystem;
 import org.usefultoys.slf4j.report.Reporter;
 import org.usefultoys.slf4j.report.ReporterConfig;
+
+import java.util.concurrent.Executor;
 
 /**
  * Example that demonstrates generating specific reports manually.
@@ -32,7 +32,7 @@ import org.usefultoys.slf4j.report.ReporterConfig;
  *
  * @author Daniel Felix Ferber
  */
-public class CustomReport3 {
+public final class CustomReport3 {
 
     public static void main(final String[] args) {
 

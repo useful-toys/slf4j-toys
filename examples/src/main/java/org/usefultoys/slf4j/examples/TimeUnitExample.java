@@ -21,7 +21,7 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
  *
  * @author Daniel
  */
-public class TimeUnitExample {
+public final class TimeUnitExample {
      public static void main(final String[] args) {
          System.out.println(UnitFormatter.nanoseconds(0L));
          System.out.println(UnitFormatter.nanoseconds(126L));

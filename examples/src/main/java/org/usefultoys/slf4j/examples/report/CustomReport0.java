@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
  *
  * @author Daniel Felix Ferber
  */
-public class CustomReport0 {
+public final class CustomReport0 {
 
     public static void main(final String[] args) {
         final Reporter reporter = new Reporter();

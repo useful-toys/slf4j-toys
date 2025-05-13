@@ -34,7 +34,7 @@ import java.util.logging.LogManager;
  *
  * @author Daniel Felix Ferber
  */
-public class Slf4JoverJulExample {
+public final class Slf4JoverJulExample {
 
     public static final Logger logger = LoggerFactory.getLogger("example");
 

@@ -15,17 +15,18 @@
  */
 package org.usefultoys.slf4j.examples;
 
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterFactory;
 
+import java.util.logging.Level;
+
 /**
  *
  * @author daniel
  */
-public class ExecutionTime {
+public final class ExecutionTime {
 
     static {
         /* Customizes the SLF4J simple logger to display trace messages that contain

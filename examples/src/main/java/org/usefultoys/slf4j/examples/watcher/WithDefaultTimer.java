@@ -15,17 +15,18 @@
  */
 package org.usefultoys.slf4j.examples.watcher;
 
-import org.usefultoys.slf4j.examples.ExampleCommons;
-import static org.usefultoys.slf4j.examples.ExampleCommons.doWork;
 import org.usefultoys.slf4j.SystemConfig;
+import org.usefultoys.slf4j.examples.ExampleCommons;
 import org.usefultoys.slf4j.watcher.WatcherConfig;
 import org.usefultoys.slf4j.watcher.WatcherSingleton;
+
+import static org.usefultoys.slf4j.examples.ExampleCommons.doWork;
 
 /**
  *
  * @author Daniel Felix Ferber
  */
-public class WithDefaultTimer {
+public final class WithDefaultTimer {
 
     static {
         ExampleCommons.configureSLF4J();

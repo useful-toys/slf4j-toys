@@ -28,7 +28,7 @@ import java.util.concurrent.Executor;
  *
  * @author Daniel Felix Ferber
  */
-public class DefaultReport {
+public final class DefaultReport {
 
     public static void main(final String[] args) {
         Reporter.runDefaultReport();

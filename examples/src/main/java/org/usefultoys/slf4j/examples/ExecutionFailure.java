@@ -24,7 +24,7 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  *
  * @author daniel
  */
-public class ExecutionFailure {
+public final class ExecutionFailure {
 
     public static final Logger logger = LoggerFactory.getLogger("example");
 

@@ -26,7 +26,7 @@ import org.usefultoys.slf4j.report.ReporterConfig;
  *
  * @author Daniel Felix Ferber
  */
-public class CustomReport4 {
+public final class CustomReport4 {
 
     public static void main(final String[] args) {
         System.setProperty(ReporterConfig.PROP_SSL_CONTEXT, "true");

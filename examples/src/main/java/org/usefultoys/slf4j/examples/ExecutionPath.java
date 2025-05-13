@@ -24,7 +24,7 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  *
  * @author Daniel Felix Ferber
  */
-public class ExecutionPath {
+public final class ExecutionPath {
 
     public static final Logger logger = LoggerFactory.getLogger("example");
 

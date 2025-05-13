@@ -32,7 +32,7 @@ import java.util.Locale;
  *
  * @author Daniel Felix Ferber
  */
-public class Slf4JoverLog4JExample {
+public final class Slf4JoverLog4JExample {
 
     public static final Logger logger = LoggerFactory.getLogger("example");
 

@@ -24,7 +24,7 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  *
  * @author daniel
  */
-public class ExecutionName {
+public final class ExecutionName {
 
     static {
         /* Customizes the SLF4J simple logger to display trace messages that contain

@@ -29,7 +29,7 @@ import org.usefultoys.slf4j.report.ReporterConfig;
  *
  * @author Daniel Felix Ferber
  */
-public class CustomReport2 {
+public final class CustomReport2 {
 
     public static void main(final String[] args) {
         final Reporter reporter = new Reporter(LoggerFactory.getLogger("customLogger"));

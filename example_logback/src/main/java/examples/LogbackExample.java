@@ -32,7 +32,7 @@ import java.util.Locale;
  *
  * @author Daniel Felix Ferber
  */
-public class LogbackExample {
+public final class LogbackExample {
 
     public static final Logger logger = LoggerFactory.getLogger("example");
 

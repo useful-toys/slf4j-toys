@@ -24,7 +24,7 @@ import org.usefultoys.slf4j.meter.MeterFactory;
  *
  * @author Daniel Felix Ferber
  */
-public class State {
+public final class State {
 
     static {
         /* Customizes the SLF4J simple logger to display trace messages that contain

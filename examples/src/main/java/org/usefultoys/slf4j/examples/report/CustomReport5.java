@@ -26,7 +26,7 @@ import org.usefultoys.slf4j.report.ReporterConfig;
  *
  * @author Daniel Felix Ferber
  */
-public class CustomReport5 {
+public final class CustomReport5 {
 
     public static void main(final String[] args) {
         ReporterConfig.reportNetworkInterface = true;
