@@ -84,9 +84,9 @@ class ReporterTest {
         ReporterConfig.reportSSLContext = false;
         ReporterConfig.reportDefaultTrustKeyStore = false;
 
-        Reporter reporter = new Reporter(mockLogger);
-        Executor executor = mock(Executor.class);
-        ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+        final Reporter reporter = new Reporter(mockLogger);
+        final Executor executor = mock(Executor.class);
+        final ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
 
         // Act
         reporter.logDefaultReports(executor);
@@ -113,9 +113,9 @@ class ReporterTest {
         ReporterConfig.reportSSLContext = false;
         ReporterConfig.reportDefaultTrustKeyStore = false;
 
-        Reporter reporter = new Reporter(mockLogger);
-        Executor executor = mock(Executor.class);
-        ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+        final Reporter reporter = new Reporter(mockLogger);
+        final Executor executor = mock(Executor.class);
+        final ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
 
         // Act
         reporter.logDefaultReports(executor);
@@ -124,10 +124,10 @@ class ReporterTest {
         verify(executor, times(4)).execute(captor.capture());
 
         // Verifica que os Runnables são das classes esperadas
-        boolean foundVM = captor.getAllValues().stream().anyMatch(r -> r.getClass().getSimpleName().equals("ReportVM"));
-        boolean foundFileSystem = captor.getAllValues().stream().anyMatch(r -> r.getClass().getSimpleName().equals("ReportFileSystem"));
-        boolean foundUser = captor.getAllValues().stream().anyMatch(r -> r.getClass().getSimpleName().equals("ReportUser"));
-        boolean foundMemory = captor.getAllValues().stream().anyMatch(r -> r.getClass().getSimpleName().equals("ReportMemory"));
+        final boolean foundVM = captor.getAllValues().stream().anyMatch(r -> r.getClass().getSimpleName().equals("ReportVM"));
+        final boolean foundFileSystem = captor.getAllValues().stream().anyMatch(r -> r.getClass().getSimpleName().equals("ReportFileSystem"));
+        final boolean foundUser = captor.getAllValues().stream().anyMatch(r -> r.getClass().getSimpleName().equals("ReportUser"));
+        final boolean foundMemory = captor.getAllValues().stream().anyMatch(r -> r.getClass().getSimpleName().equals("ReportMemory"));
 
         assertTrue(foundVM, "Esperado que ReportVM tenha sido executado");
         assertTrue(foundFileSystem, "Esperado que ReportFileSystem tenha sido executado");
@@ -152,9 +152,9 @@ class ReporterTest {
         ReporterConfig.reportSSLContext = false;
         ReporterConfig.reportDefaultTrustKeyStore = false;
 
-        Reporter reporter = new Reporter(mockLogger);
-        Executor executor = mock(Executor.class);
-        ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+        final Reporter reporter = new Reporter(mockLogger);
+        final Executor executor = mock(Executor.class);
+        final ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
 
         reporter.logDefaultReports(executor);
 
@@ -183,9 +183,9 @@ class ReporterTest {
         ReporterConfig.reportSSLContext = false;
         ReporterConfig.reportDefaultTrustKeyStore = false;
 
-        Reporter reporter = new Reporter(mockLogger);
-        Executor executor = mock(Executor.class);
-        ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+        final Reporter reporter = new Reporter(mockLogger);
+        final Executor executor = mock(Executor.class);
+        final ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
 
         reporter.logDefaultReports(executor);
 
@@ -215,9 +215,9 @@ class ReporterTest {
         ReporterConfig.reportSSLContext = false;
         ReporterConfig.reportDefaultTrustKeyStore = false;
 
-        Reporter reporter = new Reporter(mockLogger);
-        Executor executor = mock(Executor.class);
-        ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+        final Reporter reporter = new Reporter(mockLogger);
+        final Executor executor = mock(Executor.class);
+        final ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
 
         reporter.logDefaultReports(executor);
 
@@ -246,9 +246,9 @@ class ReporterTest {
         ReporterConfig.reportSSLContext = true;
         ReporterConfig.reportDefaultTrustKeyStore = true;
 
-        Reporter reporter = new Reporter(mockLogger);
-        Executor executor = mock(Executor.class);
-        ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+        final Reporter reporter = new Reporter(mockLogger);
+        final Executor executor = mock(Executor.class);
+        final ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
 
         reporter.logDefaultReports(executor);
 

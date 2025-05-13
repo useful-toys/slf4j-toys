@@ -38,12 +38,12 @@ public class State {
         example1(2, 3);
     }
 
-    private static void example1(int a, int b) {
+    private static void example1(final int a, final int b) {
         final Logger logger = LoggerFactory.getLogger("example");
         final Meter m1 = MeterFactory.getMeter(logger, "operation1")
                 .ctx("a", a).ctx("b", b).start();
         // ...
-        int sum = a + b;
+        final int sum = a + b;
         // ...
 
         m1.ctx("sum", sum).ok();

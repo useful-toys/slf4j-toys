@@ -50,15 +50,15 @@ public class LogbackExample {
         WatcherSingleton.stopDefaultWatcherExecutor();
     }
 
-    private static boolean runOperation(boolean expectedResult) {
-        try (Meter m = MeterFactory.getMeter(logger, "runOperation").iterations(3).start()) {
+    private static boolean runOperation(final boolean expectedResult) {
+        try (final Meter m = MeterFactory.getMeter(logger, "runOperation").iterations(3).start()) {
             Thread.sleep(1000);
             m.inc().progress();
             Thread.sleep(1000);
             m.inc().progress();
             Thread.sleep(1000);
             m.inc().ok();
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             ex.printStackTrace();
         }
         return expectedResult;

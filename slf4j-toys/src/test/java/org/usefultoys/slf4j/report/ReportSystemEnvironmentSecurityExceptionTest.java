@@ -60,7 +60,7 @@ package org.usefultoys.slf4j.report;
          // Configurar um SecurityManager que proíbe acesso a System.getProperties()
          System.setSecurityManager(new SecurityManager() {
              @Override
-             public void checkPermission(Permission perm) {
+             public void checkPermission(final Permission perm) {
                  if (perm instanceof RuntimePermission &&
                      perm.getName().equals("getenv.*")) {
                      throw new SecurityException("Access to environment properties denied for testing");
@@ -69,7 +69,7 @@ package org.usefultoys.slf4j.report;
          });
 
          // Criar e executar o ReportSystemProperties
-         ReportSystemEnvironment reporter = new ReportSystemEnvironment(mockLogger);
+         final ReportSystemEnvironment reporter = new ReportSystemEnvironment(mockLogger);
          reporter.run();
 
          // Verificar se a mensagem de negação de acesso foi registrada

@@ -90,7 +90,7 @@ public class ExecutionName {
     private static void runOperation() {
         try {
             Thread.sleep(100);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             // ignore
         }
     }

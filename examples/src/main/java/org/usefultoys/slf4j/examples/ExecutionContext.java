@@ -48,7 +48,7 @@ public class ExecutionContext {
     private static void runOperation() {
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             // ignore
         }
     }

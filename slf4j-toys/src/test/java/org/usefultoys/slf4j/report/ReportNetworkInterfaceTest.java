@@ -66,11 +66,11 @@ class ReportNetworkInterfaceTest {
     @Test
     void testRunWithLoopbackInterfaceLo() throws Exception {
         // Arrange using "lo" (Linux/macOS) interface
-        NetworkInterface nif = NetworkInterface.getByName("lo");
+        final NetworkInterface nif = NetworkInterface.getByName("lo");
         assertNotNull(nif, "A interface 'lo' não foi encontrada. Verifique se o teste está rodando em Linux/macOS.");
 
         // Act
-        ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, nif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, nif);
         report.run(); // A execução imprimirá no logger via LoggerFactory.getInfoPrintStream
 
         // Assert

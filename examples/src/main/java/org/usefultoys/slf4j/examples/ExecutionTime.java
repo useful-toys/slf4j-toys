@@ -40,7 +40,7 @@ public class ExecutionTime {
     public static void main(final String argv[]) {
         try {
             Thread.sleep(3000L);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             java.util.logging.Logger.getLogger(ExecutionTime.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -67,7 +67,7 @@ public class ExecutionTime {
         try {
             runOperation();
             m.ok();
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             m.fail(e);
         }
     }
@@ -75,7 +75,7 @@ public class ExecutionTime {
     private static void runOperation() {
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             // ignore
         }
     }

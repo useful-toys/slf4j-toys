@@ -44,7 +44,7 @@ public class ExecutionFailure {
 
         try {
             example2();
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             // ignore
         }
 
@@ -55,7 +55,7 @@ public class ExecutionFailure {
         try {
             failOperation();
             m.ok();
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             m.fail(e);
         }
     }
@@ -71,7 +71,7 @@ public class ExecutionFailure {
 
         private static final long serialVersionUID = 1L;
 
-        public CustomException(String message) {
+        public CustomException(final String message) {
             super(message);
         }
     }
@@ -80,7 +80,7 @@ public class ExecutionFailure {
         try {
             Thread.sleep(500);
             throw new CustomException("error message");
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             // ignore
         }
     }

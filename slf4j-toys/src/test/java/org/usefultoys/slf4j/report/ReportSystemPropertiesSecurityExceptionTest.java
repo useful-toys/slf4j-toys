@@ -61,7 +61,7 @@ class ReportSystemPropertiesSecurityExceptionTest {
         // Configurar um SecurityManager que proíbe acesso a System.getProperties()
         System.setSecurityManager(new SecurityManager() {
             @Override
-            public void checkPermission(Permission perm) {
+            public void checkPermission(final Permission perm) {
                 if (perm instanceof PropertyPermission && 
                     perm.getName().equals("*") && 
                     perm.getActions().contains("read")) {
@@ -71,7 +71,7 @@ class ReportSystemPropertiesSecurityExceptionTest {
         });
 
         // Criar e executar o ReportSystemProperties
-        ReportSystemProperties reporter = new ReportSystemProperties(mockLogger);
+        final ReportSystemProperties reporter = new ReportSystemProperties(mockLogger);
         reporter.run();
 
         // Verificar se a mensagem de negação de acesso foi registrada

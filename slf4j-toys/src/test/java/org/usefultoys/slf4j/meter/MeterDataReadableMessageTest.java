@@ -79,7 +79,7 @@ public class MeterDataReadableMessageTest {
                              final String category, final String operation, final String parent, final String description,
                              final long createTime, final long startTime, final long stopTime, final int currentTime,
                              final long timeLimit, final long currentIteration, final long expectedIterations,
-                             final String okPath, final String rejectPath, final String failPath, final String failMessage, Map<String, String> context) {
+                             final String okPath, final String rejectPath, final String failPath, final String failMessage, final Map<String, String> context) {
             super(sessionUuid, position, currentTime,
                     0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
@@ -105,7 +105,7 @@ public class MeterDataReadableMessageTest {
 
     private static Arguments example(final String expected, final String operation,
                                      final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit,
-                                     final long currentIteration, final long expectedIterations, String okPath, String rejectPath, String failPath, String failMessage) {
+                                     final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage) {
         return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, null,
                 createTime, startTime,stopTime,currentTime,timeLimit,currentIteration,expectedIterations,
                 okPath,rejectPath,failPath,failMessage, voidContext), expected);
@@ -120,7 +120,7 @@ public class MeterDataReadableMessageTest {
 
     private static Arguments exampleWithContext(final String expected, final String operation,
                                                 final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit,
-                                                final long currentIteration, final long expectedIterations, String okPath, String rejectPath, String failPath, String failMessage) {
+                                                final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage) {
         return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, null,
                 createTime, startTime,stopTime,currentTime,timeLimit,currentIteration,expectedIterations,
                 okPath,rejectPath,failPath,failMessage, sampleContext), expected);
@@ -136,7 +136,7 @@ public class MeterDataReadableMessageTest {
 
     private static Arguments exampleWithDescription(final String expected, final String operation,
                                                     final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit,
-                                                    final long currentIteration, final long expectedIterations, String okPath, String rejectPath, String failPath, String failMessage) {
+                                                    final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage) {
         return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, "desc",
                 createTime, startTime,stopTime,currentTime,timeLimit,currentIteration,expectedIterations,
                 okPath,rejectPath,failPath,failMessage, nullContext), expected);

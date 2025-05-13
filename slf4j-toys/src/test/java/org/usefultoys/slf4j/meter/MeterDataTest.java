@@ -65,7 +65,7 @@ public class MeterDataTest {
                              final String category, final String operation, final String parent, final String description,
                              final long createTime, final long startTime, final long stopTime, final int currentTime,
                              final long timeLimit, final long currentIteration, final long expectedIterations,
-                             final String okPath, final String rejectPath, final String failPath, final String failMessage, Map<String, String> context) {
+                             final String okPath, final String rejectPath, final String failPath, final String failMessage, final Map<String, String> context) {
             super(sessionUuid, position, currentTime,
                     0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
@@ -77,7 +77,7 @@ public class MeterDataTest {
     @Test
     void testConstructorAndGetters() {
         // Create a map for context
-        Map<String, String> contextMap = new HashMap<>();
+        final Map<String, String> contextMap = new HashMap<>();
         contextMap.put("key1", "value1");
         contextMap.put("key2", "value2");
 
@@ -159,7 +159,7 @@ public class MeterDataTest {
         assertNull(meterData.getFailMessage());
 
         // Verify context map
-        Map<String, String> returnedContext = meterData.getContext();
+        final Map<String, String> returnedContext = meterData.getContext();
         assertEquals(2, returnedContext.size());
         assertEquals("value1", returnedContext.get("key1"));
         assertEquals("value2", returnedContext.get("key2"));
@@ -175,7 +175,7 @@ public class MeterDataTest {
     @Test
     void testResetClearsFields() {
         // Create a map for context
-        Map<String, String> contextMap = new HashMap<>();
+        final Map<String, String> contextMap = new HashMap<>();
         contextMap.put("key1", "value1");
 
         // Create MeterData with all fields populated
@@ -270,7 +270,7 @@ public class MeterDataTest {
     @Test
     void testJsonMessageAllAttributes() {
         // Criar um mapa para o contexto
-        Map<String, String> contextMap = new HashMap<>();
+        final Map<String, String> contextMap = new HashMap<>();
         contextMap.put("key1", "value1");
         contextMap.put("key2", "value2");
 
@@ -436,7 +436,7 @@ public class MeterDataTest {
     @Test
     void testJsonMessageWithContext() {
         // Criar um mapa para o contexto
-        Map<String, String> contextMap = new HashMap<>();
+        final Map<String, String> contextMap = new HashMap<>();
         contextMap.put("env", "production");
         contextMap.put("user", "admin");
         contextMap.put("priority", "high");

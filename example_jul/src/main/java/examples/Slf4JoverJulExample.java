@@ -41,10 +41,10 @@ public class Slf4JoverJulExample {
     static {
         /* Force JUL to read configuration file. Use English local to prevent printing logger level in foreign language. */
         java.util.Locale.setDefault(Locale.ENGLISH);
-        InputStream inputStream = Slf4JoverJulExample.class.getResourceAsStream("/log.properties");
+        final InputStream inputStream = Slf4JoverJulExample.class.getResourceAsStream("/log.properties");
         try {
             LogManager.getLogManager().readConfiguration(inputStream);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 
@@ -60,15 +60,15 @@ public class Slf4JoverJulExample {
         WatcherSingleton.stopDefaultWatcherExecutor();
     }
 
-    private static boolean runOperation(boolean expectedResult) {
-        try (Meter m = MeterFactory.getMeter(logger, "runOperation").iterations(3).start()) {
+    private static boolean runOperation(final boolean expectedResult) {
+        try (final Meter m = MeterFactory.getMeter(logger, "runOperation").iterations(3).start()) {
             Thread.sleep(1000);
             m.inc().progress();
             Thread.sleep(1000);
             m.inc().progress();
             Thread.sleep(1000);
             m.inc().ok();
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             ex.printStackTrace();
         }
         return expectedResult;

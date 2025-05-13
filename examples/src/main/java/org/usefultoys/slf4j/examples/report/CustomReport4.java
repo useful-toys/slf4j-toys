@@ -28,7 +28,7 @@ import org.usefultoys.slf4j.report.ReporterConfig;
  */
 public class CustomReport4 {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         System.setProperty(ReporterConfig.PROP_SSL_CONTEXT, "true");
         System.setProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE, "true");
         Reporter.runDefaultReport();

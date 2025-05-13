@@ -58,7 +58,7 @@ public class ExecutionPath {
         /* Report execution flow with Meter.ok() with string parameter. */
         final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
         // Check if user exists in database
-        boolean exist = runOperation(true);
+        final boolean exist = runOperation(true);
         if (exist) {
             // Update user in database
             someOperation();
@@ -79,7 +79,7 @@ public class ExecutionPath {
         /* Report execution flow with Meter.ok() with enum parameter. */
         final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
         // Check if user exists in database
-        boolean exist = runOperation(true);
+        final boolean exist = runOperation(true);
         if (exist) {
             // Update user in database
             someOperation();
@@ -95,7 +95,7 @@ public class ExecutionPath {
         /* Report execution flow with Meter.flow() with string parameter. */
         final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
         // Check if user exists in database
-        boolean exist = runOperation(true);
+        final boolean exist = runOperation(true);
         if (exist) {
             // Update user in database
             someOperation();
@@ -112,7 +112,7 @@ public class ExecutionPath {
         /* Report execution flow with Meter.flow() with enum parameter. */
         final Meter m2 = MeterFactory.getMeter(logger, "operation2").start();
         // Check if user exists in database
-        boolean exist = runOperation(true);
+        final boolean exist = runOperation(true);
         if (exist) {
             // Update user in database
             someOperation();
@@ -129,7 +129,7 @@ public class ExecutionPath {
         /* Report execution flow with Meter.ok() and Meter.reject(). */
         final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
         // Check if user has permissions
-        boolean authorized = runOperation(false);
+        final boolean authorized = runOperation(false);
         if (authorized) {
             // Proceed
             someOperation();
@@ -148,7 +148,7 @@ public class ExecutionPath {
         /* Report execution flow with Meter.ok() and Meter.reject() with enum parameter. */
         final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
         // Check if user has permissions
-        boolean authorized = runOperation(false);
+        final boolean authorized = runOperation(false);
         if (authorized) {
             // Proceed
             someOperation();
@@ -166,22 +166,22 @@ public class ExecutionPath {
         final Meter m2 = MeterFactory.getMeter(logger, "operation3").start();
         try {
             // Check if user has permissions
-            boolean authorized = runOperation(false);
+            final boolean authorized = runOperation(false);
             if (!authorized) {
                 throw new UnauthorizedException();
             }
             // Proceed
             someOperation();
             m2.ok("Update");
-        } catch (UnauthorizedException e) {
+        } catch (final UnauthorizedException e) {
             m2.reject(e);
         }
     }
 
-    private static boolean runOperation(boolean expectedResult) {
+    private static boolean runOperation(final boolean expectedResult) {
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             // ignore
         }
         return expectedResult;
@@ -190,7 +190,7 @@ public class ExecutionPath {
     private static void someOperation() {
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             // ignore
         }
     }
@@ -198,7 +198,7 @@ public class ExecutionPath {
     private static void otherOperation() {
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             // ignore
         }
     }

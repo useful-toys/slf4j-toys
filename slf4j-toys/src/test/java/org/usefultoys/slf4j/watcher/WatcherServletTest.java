@@ -105,7 +105,7 @@ class WatcherServletTest {
     static class TestExceptionWatcherServlet extends WatcherServlet {
         private final RuntimeException exceptionToThrow;
 
-        public TestExceptionWatcherServlet(RuntimeException exceptionToThrow) {
+        public TestExceptionWatcherServlet(final RuntimeException exceptionToThrow) {
             this.exceptionToThrow = exceptionToThrow;
         }
 
@@ -167,7 +167,7 @@ class WatcherServletTest {
     static class ExceptionThrowingWatcherServlet extends WatcherServlet {
         private final RuntimeException exceptionToThrow;
 
-        public ExceptionThrowingWatcherServlet(RuntimeException exceptionToThrow) {
+        public ExceptionThrowingWatcherServlet(final RuntimeException exceptionToThrow) {
             this.exceptionToThrow = exceptionToThrow;
         }
 

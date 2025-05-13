@@ -30,7 +30,7 @@ import java.util.concurrent.Executor;
  */
 public class DefaultReport {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         Reporter.runDefaultReport();
     }
 }

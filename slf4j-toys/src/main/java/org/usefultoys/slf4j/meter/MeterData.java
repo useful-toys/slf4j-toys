@@ -259,7 +259,7 @@ public class MeterData extends SystemData {
 
     @Override
     public StringBuilder readableStringBuilder(final StringBuilder builder) {
-        long executionTime;
+        final long executionTime;
         if (startTime == 0) {
             executionTime = 0;
         } else if (stopTime == 0) {

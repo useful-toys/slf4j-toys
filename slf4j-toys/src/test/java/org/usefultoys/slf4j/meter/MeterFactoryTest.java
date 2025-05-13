@@ -51,7 +51,7 @@ class MeterFactoryTest {
     @Test
     void testGetMeterFromLogger() {
         // Test creating a Meter from a Logger
-        Meter meter = MeterFactory.getMeter(testLogger);
+        final Meter meter = MeterFactory.getMeter(testLogger);
         
         assertNotNull(meter, "The Meter should not be null");
         assertEquals(TEST_CATEGORY, meter.getCategory(), 
@@ -63,7 +63,7 @@ class MeterFactoryTest {
     @Test
     void testGetMeterFromCategory() {
         // Test creating a Meter from a category string
-        Meter meter = MeterFactory.getMeter(TEST_CATEGORY);
+        final Meter meter = MeterFactory.getMeter(TEST_CATEGORY);
         
         assertNotNull(meter, "The Meter should not be null");
         assertEquals(TEST_CATEGORY, meter.getCategory(), 
@@ -75,7 +75,7 @@ class MeterFactoryTest {
     @Test
     void testGetMeterFromClass() {
         // Test creating a Meter from a Class
-        Meter meter = MeterFactory.getMeter(MeterFactoryTest.class);
+        final Meter meter = MeterFactory.getMeter(MeterFactoryTest.class);
         
         assertNotNull(meter, "The Meter should not be null");
         assertEquals(MeterFactoryTest.class.getName(), meter.getCategory(), 
@@ -87,7 +87,7 @@ class MeterFactoryTest {
     @Test
     void testGetMeterFromClassAndOperation() {
         // Test creating a Meter from a Class and operation name
-        Meter meter = MeterFactory.getMeter(MeterFactoryTest.class, TEST_OPERATION);
+        final Meter meter = MeterFactory.getMeter(MeterFactoryTest.class, TEST_OPERATION);
         
         assertNotNull(meter, "The Meter should not be null");
         assertEquals(MeterFactoryTest.class.getName(), meter.getCategory(), 
@@ -99,7 +99,7 @@ class MeterFactoryTest {
     @Test
     void testGetMeterFromLoggerAndOperation() {
         // Test creating a Meter from a Logger and operation name
-        Meter meter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+        final Meter meter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
         
         assertNotNull(meter, "The Meter should not be null");
         assertEquals(TEST_CATEGORY, meter.getCategory(), 
@@ -111,11 +111,11 @@ class MeterFactoryTest {
     @Test
     void testGetCurrentMeter() {
         // Create and start a Meter
-        Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+        final Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
         originalMeter.start();
 
         // Get the current Meter
-        Meter currentMeter = MeterFactory.getCurrentMeter();
+        final Meter currentMeter = MeterFactory.getCurrentMeter();
 
         assertNotNull(currentMeter, "The current Meter should not be null");
         assertSame(originalMeter, currentMeter,
@@ -126,7 +126,7 @@ class MeterFactoryTest {
     @Test
     void testGetCurrentMeterWhenNoMeterStarted() {
         // Try to get the current Meter
-        Meter currentMeter = MeterFactory.getCurrentMeter();
+        final Meter currentMeter = MeterFactory.getCurrentMeter();
 
         assertNotNull(currentMeter, "The Meter should not be null");
         assertEquals("???", currentMeter.getCategory(),
@@ -137,11 +137,11 @@ class MeterFactoryTest {
     @Test
     void testGetCurrentSubMeter() {
         // Create and start a Meter
-        Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+        final Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
         originalMeter.start();
 
         // Create a sub-Meter
-        Meter subMeter = MeterFactory.getCurrentSubMeter(TEST_SUBOPERATION);
+        final Meter subMeter = MeterFactory.getCurrentSubMeter(TEST_SUBOPERATION);
 
         assertNotNull(subMeter, "The sub-Meter should not be null");
         assertEquals(TEST_CATEGORY, subMeter.getCategory(),
@@ -154,7 +154,7 @@ class MeterFactoryTest {
     @Test
     void testGetCurrentSubMeterWhenNoMeterStarted() {
         // Create a sub-Meter
-        Meter subMeter = MeterFactory.getCurrentSubMeter(TEST_SUBOPERATION);
+        final Meter subMeter = MeterFactory.getCurrentSubMeter(TEST_SUBOPERATION);
 
         assertNotNull(subMeter, "The sub-Meter should not be null");
         assertEquals("???", subMeter.getCategory(),
@@ -166,12 +166,12 @@ class MeterFactoryTest {
     @Test
     void testMultipleSubMeters() {
         // Create and start a Meter
-        Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+        final Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
         originalMeter.start();
 
         // Create multiple sub-Meters
-        Meter subMeter1 = MeterFactory.getCurrentSubMeter("sub1");
-        Meter subMeter2 = MeterFactory.getCurrentSubMeter("sub2");
+        final Meter subMeter1 = MeterFactory.getCurrentSubMeter("sub1");
+        final Meter subMeter2 = MeterFactory.getCurrentSubMeter("sub2");
 
         assertNotNull(subMeter1, "The first sub-Meter should not be null");
         assertNotNull(subMeter2, "The second sub-Meter should not be null");

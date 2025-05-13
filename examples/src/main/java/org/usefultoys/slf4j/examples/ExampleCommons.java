@@ -56,14 +56,14 @@ public class ExampleCommons {
 
     public static void doWork() {
         /* Start some calculation on separated thread to see CPU usage on Watcher log output. */
-        HeavyCalculation c1 = new HeavyCalculation();
-        HeavyCalculation c2 = new HeavyCalculation();
+        final HeavyCalculation c1 = new HeavyCalculation();
+        final HeavyCalculation c2 = new HeavyCalculation();
         c1.start();
         c2.start();
 
         try {
             Thread.sleep(10000L);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             Logger.getLogger(WithDefaultExecutor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

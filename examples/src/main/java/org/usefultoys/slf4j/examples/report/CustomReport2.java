@@ -31,7 +31,7 @@ import org.usefultoys.slf4j.report.ReporterConfig;
  */
 public class CustomReport2 {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         final Reporter reporter = new Reporter(LoggerFactory.getLogger("customLogger"));
         reporter.logDefaultReports(Reporter.sameThreadExecutor);
     }

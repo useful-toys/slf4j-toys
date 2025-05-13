@@ -31,7 +31,7 @@ import java.util.concurrent.Executors;
  */
 public class CustomReport0 {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         final Reporter reporter = new Reporter();
         reporter.logDefaultReports(Executors.newSingleThreadExecutor());
     }
