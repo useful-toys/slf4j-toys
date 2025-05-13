@@ -16,6 +16,7 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,10 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.SystemConfig;
 
 import java.nio.charset.Charset;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReportCharsetTest {
 
@@ -35,6 +38,22 @@ class ReportCharsetTest {
     @BeforeAll
     static void validate() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeEach
+    void resetWatcherConfigBeforeEach() {
+        // Reinitialize each configuration to ensure a clean configuration before each test
+        ReporterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    @AfterAll
+    static void resetWatcherConfigAfterAll() {
+        // Reinitialize each configuration to ensure a clean configuration before each test
+        ReporterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
     }
 
     @BeforeEach

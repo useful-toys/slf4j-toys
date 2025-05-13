@@ -16,9 +16,9 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.usefultoys.slf4j.SessionConfig;
 
@@ -36,22 +36,7 @@ class ReporterConfigTest {
     @BeforeEach
     void setUp() {
         // Limpa as propriedades do sistema para garantir um estado limpo
-        System.clearProperty(ReporterConfig.PROP_VM);
-        System.clearProperty(ReporterConfig.PROP_FILE_SYSTEM);
-        System.clearProperty(ReporterConfig.PROP_MEMORY);
-        System.clearProperty(ReporterConfig.PROP_USER);
-        System.clearProperty(ReporterConfig.PROP_PROPERTIES);
-        System.clearProperty(ReporterConfig.PROP_ENVIRONMENT);
-        System.clearProperty(ReporterConfig.PROP_PHYSICAL_SYSTEM);
-        System.clearProperty(ReporterConfig.PROP_OPERATING_SYSTEM);
-        System.clearProperty(ReporterConfig.PROP_CALENDAR);
-        System.clearProperty(ReporterConfig.PROP_LOCALE);
-        System.clearProperty(ReporterConfig.PROP_CHARSET);
-        System.clearProperty(ReporterConfig.PROP_NETWORK_INTERFACE);
-        System.clearProperty(ReporterConfig.PROP_SSL_CONTEXT);
-        System.clearProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE);
-        System.clearProperty(ReporterConfig.PROP_NAME);
-
+        ReporterConfig.reset();
         // Reinicializa o ReporterConfig
         ReporterConfig.init();
     }

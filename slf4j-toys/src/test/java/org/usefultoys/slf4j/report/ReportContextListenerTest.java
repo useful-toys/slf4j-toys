@@ -16,18 +16,20 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.SystemConfig;
 
 import javax.servlet.ServletContextEvent;
-
 import java.nio.charset.Charset;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class ReportContextListenerTest {
@@ -40,11 +42,30 @@ class ReportContextListenerTest {
     }
 
     @BeforeEach
+    void resetWatcherConfigBeforeEach() {
+        // Reinitialize each configuration to ensure a clean configuration before each test
+        ReporterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    @AfterAll
+    static void resetWatcherConfigAfterAll() {
+        // Reinitialize each configuration to ensure a clean configuration before each test
+        ReporterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    @BeforeEach
     void setUp() {
         mockLogger = (MockLogger) LoggerFactory.getLogger(ReporterConfig.name);
         mockLogger.clearEvents();
         listener = new ReportContextListener();
+    }
 
+    @Test
+    void shouldLogReportsOnContextInitialization() {
         // Enable only one report to simplify the test
         ReporterConfig.reportVM = true;
         ReporterConfig.reportMemory = false;
@@ -60,10 +81,6 @@ class ReportContextListenerTest {
         ReporterConfig.reportNetworkInterface = false;
         ReporterConfig.reportSSLContext = false;
         ReporterConfig.reportDefaultTrustKeyStore = false;
-    }
-
-    @Test
-    void shouldLogReportsOnContextInitialization() {
         final ServletContextEvent event = mock(ServletContextEvent.class);
 
         // Act
