@@ -4,3 +4,10 @@ profile:
   name: qodana.recommended
 include:
   - name: CheckDependencyLicenses
+exclude:
+  - name: All
+    paths:
+      - example_jul
+      - example_log4j
+      - example_logback
+      - examples
