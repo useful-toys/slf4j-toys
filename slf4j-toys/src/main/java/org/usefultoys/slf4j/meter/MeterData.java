@@ -524,7 +524,7 @@ public class MeterData extends SystemData {
             final String contextString = matcherContext.group(1);
             if (contextString != null && !contextString.isEmpty()) {
                 final String[] contextEntries = contextString.split(",");
-                context = new HashMap<>();
+                context = new HashMap<>(10);
                 for (final String entry : contextEntries) {
                     final String[] keyValue = entry.split(":");
                     if (keyValue.length >= 1) {
@@ -537,6 +537,7 @@ public class MeterData extends SystemData {
         }
     }
 
+    @SuppressWarnings("NonFinalFieldReferenceInEquals")
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -552,6 +553,7 @@ public class MeterData extends SystemData {
         return Objects.equals(operation, meterData.operation);
     }
 
+    @SuppressWarnings("NonFinalFieldReferencedInHashCode")
     @Override
     public int hashCode() {
         int result = category != null ? category.hashCode() : 0;
@@ -561,6 +563,7 @@ public class MeterData extends SystemData {
         return result;
     }
 
+    @SuppressWarnings("MagicCharacter")
     @Override
     public void writeJson5Impl(final StringBuilder sb) {
         super.writeJson5Impl(sb);
@@ -574,7 +577,7 @@ public class MeterData extends SystemData {
             sb.append(String.format(",%s:%s",PROP_PATH_ID, okPath));
         }
         if (failPath != null) {
-            sb.append(String.format(",%s:%s",PROP_FAIL_ID, failPath, failPath));
+            sb.append(String.format(",%s:%s",PROP_FAIL_ID, failPath));
         }
         if (failMessage != null) {
             sb.append(String.format(",%s:'%s'", PROP_FAIL_MESSAGE, failMessage));
