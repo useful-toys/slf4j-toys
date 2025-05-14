@@ -48,6 +48,7 @@ public class MeterData extends SystemData {
     }
 
     // for tests only
+    @SuppressWarnings("ConstructorWithTooManyParameters")
     protected MeterData(final String sessionUuid, final long position, final long time, final long heap_commited, final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded, final long compilationTime, final long garbageCollector_count, final long garbageCollector_time, final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory, final double systemLoad, final String category, final String operation, final String parent, final String description, final long createTime, final long startTime, final long stopTime, final long timeLimit, final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage, final Map<String, String> context) {
         super(sessionUuid, position, time, heap_commited, heap_max, heap_used, nonHeap_commited, nonHeap_max, nonHeap_used, objectPendingFinalizationCount, classLoading_loaded, classLoading_total, classLoading_unloaded, compilationTime, garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory, runtime_totalMemory, systemLoad);
         this.category = category;
@@ -146,11 +147,12 @@ public class MeterData extends SystemData {
      */
     protected Map<String, String> context = null;
 
+    @SuppressWarnings("MagicCharacter")
     public String getFullID() {
         if (operation == null) {
             return category + '#' + position;
         }
-        return category + '/' + operation + '#' + position;
+        return String.format("%s/%s#%d", category, operation, position);
     }
 
     public boolean isStarted() {
@@ -257,6 +259,7 @@ public class MeterData extends SystemData {
         return true;
     }
 
+    @SuppressWarnings("MagicCharacter")
     @Override
     public StringBuilder readableStringBuilder(final StringBuilder builder) {
         final long executionTime;
@@ -272,9 +275,11 @@ public class MeterData extends SystemData {
 
         if (MeterConfig.printStatus) {
             if (stopTime != 0) {
+                //noinspection VariableNotUsedInsideIf
                 if (rejectPath != null) {
                     builder.append("REJECT");
-                } else if (failPath != null) {
+                } else //noinspection VariableNotUsedInsideIf
+                    if (failPath != null) {
                     builder.append("FAIL");
                 } else if (slow) {
                     builder.append("OK (Slow)");
@@ -446,6 +451,7 @@ public class MeterData extends SystemData {
     private static final Pattern patternEventParent = Pattern.compile(REGEX_START +EVENT_PARENT + REGEX_WORD_VALUE);
     private static final Pattern patternContext = Pattern.compile(REGEX_START +PROP_CONTEXT + "\\s*:\\s*\\{([^}]*)\\}");
 
+    @SuppressWarnings("CallToSuspiciousStringMethod")
     public void readJson5(final String json5) {
         super.readJson5(json5);
 
