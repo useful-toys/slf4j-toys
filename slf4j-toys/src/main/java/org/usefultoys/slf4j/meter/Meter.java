@@ -60,7 +60,7 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_ILLEGAL_ARGUMENT = "Illegal call to Meter.{}: {}. id={}";
     private static final String ERROR_MSG_METER_OUT_OF_ORDER = "Meter out of order. id={}";
 
-    private static final String ERROR_MSG_NULL_ARGUMENT = "Null argument. id={}";
+    private static final String ERROR_MSG_NULL_ARGUMENT = "Null argument";
     private static final String ERROR_MSG_NON_POSITIVE_ARGUMENT = "Non positive argument";
     private static final String ERROR_MSG_ILLEGAL_STRING_FORMAT = "Illegal string format";
     private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non forward iteration";
@@ -227,7 +227,7 @@ public class Meter extends MeterData implements Closeable {
             description = String.format(format, args);
         } catch (final IllegalFormatException e) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(format, args...)", ERROR_MSG_ILLEGAL_STRING_FORMAT, getFullID(), new IllegalMeterUsage(2, e));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args...)", ERROR_MSG_ILLEGAL_STRING_FORMAT, getFullID(), new IllegalMeterUsage(2, e));
         }
         return this;
     }
@@ -300,7 +300,7 @@ public class Meter extends MeterData implements Closeable {
         }
         if (trueName == null) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition,name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition, trueName)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             return this;
         }
         if (context == null) {
@@ -322,7 +322,7 @@ public class Meter extends MeterData implements Closeable {
         if (condition) {
             if (trueName == null) {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition,name,name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition, trueName, falseName)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
                 return this;
             }
             if (context == null) {
@@ -332,7 +332,7 @@ public class Meter extends MeterData implements Closeable {
         } else {
             if (falseName == null) {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition,name,name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition, trueName, falseName)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
                 return this;
             }
             if (context == null) {
