@@ -124,7 +124,7 @@ public class MockLoggerEvent {
     }
 
     public String getFormattedMessage() {
-        return MessageFormatter.arrayFormat(getMessage(), getArguments()).getMessage();
+        return MessageFormatter.arrayFormat(message, arguments).getMessage();
     }
 
 }

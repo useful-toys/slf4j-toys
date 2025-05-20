@@ -22,6 +22,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.impl.MockLoggerEvent.Level;
@@ -67,6 +68,10 @@ public class MockLogger implements Logger {
     private boolean warnEnabled = true;
     @Getter @Setter
     private boolean errorEnabled = true;
+    @Getter @Setter
+    private boolean stdoutEnabled = false;
+    @Getter @Setter
+    private boolean stderrEnabled = false;
 
     private final List<MockLoggerEvent> loggerEvents = new ArrayList<MockLoggerEvent>();
 
@@ -397,8 +402,15 @@ public class MockLogger implements Logger {
         print(event);
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void print(final MockLoggerEvent event) {
-        final PrintStream ps = event.getLevel() == Level.ERROR || event.getLevel() == Level.WARN ? System.err : System.out;
+        boolean isStderr = event.getLevel() == Level.ERROR || event.getLevel() == Level.WARN;
+        if (isStderr && !stderrEnabled) {
+            return;
+        } else if (!stdoutEnabled) {
+            return;
+        }
+        final PrintStream ps = isStderr ? System.err : System.out;
         ps.println(formatLogStatement(event));
         ps.flush();
     }
@@ -419,5 +431,27 @@ public class MockLogger implements Logger {
 
     public MockLoggerEvent getEvent(final int i) {
         return loggerEvents.get(i);
+    }
+
+    public void assertEvent(final int index, final Level level, final String message) {
+        final MockLoggerEvent event = loggerEvents.get(index);
+        Assertions.assertTrue(index < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertSame(level, event.getLevel(), "Logger level does not match");
+        Assertions.assertTrue(event.getFormattedMessage().contains(message), "Message does not contain expected string");
+    }
+
+    public void assertEvent(final int index, final Level level, final Marker marker,  final String message) {
+        final MockLoggerEvent event = loggerEvents.get(index);
+        Assertions.assertTrue(index < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertSame(level, event.getLevel(), "Logger level does not match");
+        Assertions.assertTrue(event.getFormattedMessage().contains(message), "Message does not contain expected string");
+        Assertions.assertSame(marker, event.getMarker(), "Logger marker does not match");
+    }
+
+    public void assertEvent(final int index, final Level level, final Marker marker) {
+        final MockLoggerEvent event = loggerEvents.get(index);
+        Assertions.assertTrue(index < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertSame(level, event.getLevel(), "Logger level does not match");
+        Assertions.assertSame(marker, event.getMarker(), "Logger marker does not match");
     }
 }
