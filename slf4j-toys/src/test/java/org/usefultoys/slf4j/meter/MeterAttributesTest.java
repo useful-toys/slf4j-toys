@@ -354,6 +354,21 @@ public class MeterAttributesTest {
     }
 
     @Test
+    public void testInvalidIteration() {
+        Meter meter = new Meter(logger);
+
+        // Test m(message) with null
+        meter.iterations(-1);
+        logger.assertEvent(0, ERROR, ILLEGAL, "Illegal call to Meter.iterations(expectedIterations): Non positive argument. id=Test#");
+        meter.start();
+        meter.incBy(-1);
+        logger.assertEvent(3, ERROR, ILLEGAL, "Illegal call to Meter.incBy(increment): Non positive argument. id=Test#");
+        meter.incTo(-1);
+        logger.assertEvent(4, ERROR, ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non positive argument. id=Test#");
+        meter.ok();
+    }
+
+    @Test
     public void testMWithNullLogsError() {
         Meter meter = new Meter(logger);
 
