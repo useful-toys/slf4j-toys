@@ -15,17 +15,17 @@
  */
 package org.slf4j.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.impl.MockLoggerEvent.Level;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A test-friendly implementation of the SLF4J {@link Logger} interface.
@@ -34,7 +34,7 @@ import org.slf4j.impl.MockLoggerEvent.Level;
  * {@link MockLoggerEvent} instances. It supports all log levels (TRACE, DEBUG, INFO, WARN, ERROR) and provides
  * configuration methods to enable or disable specific levels during test execution.
  * <p>
- * Each log event is printed to {@code System.out} or {@code System.err} based on its severity, and is also stored in an
+ * Each log event may be printed to {@code System.out} or {@code System.err} based on its severity, and is always stored in an
  * internal list for later inspection.
  * <p>
  * This logger is primarily intended to be used together with {@link MockLoggerFactory} during test runs, where SLF4J
@@ -58,19 +58,32 @@ public class MockLogger implements Logger {
 
     private final String name;
     /* No concept of "LEVEL" here, because it is not a real logger implementation. */
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean traceEnabled = true;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean debugEnabled = true;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean infoEnabled = true;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean warnEnabled = true;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean errorEnabled = true;
-    @Getter @Setter
+    /**
+     * Whether to print log trace, debug and info events to stdout.
+     */
+    @Getter
+    @Setter
     private boolean stdoutEnabled = false;
-    @Getter @Setter
+    /**
+     * Whether to print log warn and error events to stderr.
+     */
+    @Getter
+    @Setter
     private boolean stderrEnabled = false;
 
     private final List<MockLoggerEvent> loggerEvents = new ArrayList<MockLoggerEvent>();
@@ -88,10 +101,18 @@ public class MockLogger implements Logger {
         loggerEvents.add(event);
     }
 
+    /**
+     * Clears all recorded log events.
+     */
     public void clearEvents() {
         loggerEvents.clear();
     }
 
+    /**
+     * Enables or disables all logging levels.
+     *
+     * @param enabled true to enable all levels, false to disable them
+     */
     public void setEnabled(final boolean enabled) {
         errorEnabled = enabled;
         warnEnabled = enabled;
@@ -265,7 +286,7 @@ public class MockLogger implements Logger {
         log(Level.INFO, marker, msg, throwable);
     }
 
-     @Override
+    @Override
     public void warn(final String message) {
         log(Level.WARN, message);
     }
@@ -402,6 +423,12 @@ public class MockLogger implements Logger {
         print(event);
     }
 
+    /**
+     * Prints the log event to the appropriate output stream (stdout or stderr) based on its level and if the
+     * logger had printing enabled.
+     *
+     * @param event the log event to print
+     */
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void print(final MockLoggerEvent event) {
         boolean isStderr = event.getLevel() == Level.ERROR || event.getLevel() == Level.WARN;
@@ -415,6 +442,12 @@ public class MockLogger implements Logger {
         ps.flush();
     }
 
+    /**
+     * Formats the log statement for printing.
+     *
+     * @param event the log event to format
+     * @return the formatted log statement
+     */
     private String formatLogStatement(final MockLoggerEvent event) {
         if (event.getThrowable() == null) {
             return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage();
@@ -425,33 +458,105 @@ public class MockLogger implements Logger {
         return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage() + "\n" + st;
     }
 
+    /**
+     * Returns the number of events recorded by this logger.
+     *
+     * @return the number of recorded events
+     */
     public int getEventCount() {
         return loggerEvents.size();
     }
 
-    public MockLoggerEvent getEvent(final int i) {
-        return loggerEvents.get(i);
+    /**
+     * Returns the event at the specified index.
+     *
+     * @param eventIndex the index of the event to retrieve
+     * @return the event at the specified index
+     */
+    public MockLoggerEvent getEvent(final int eventIndex) {
+        return loggerEvents.get(eventIndex);
     }
 
-    public void assertEvent(final int index, final Level level, final String message) {
-        final MockLoggerEvent event = loggerEvents.get(index);
-        Assertions.assertTrue(index < loggerEvents.size(), "Not enough logger messages");
-        Assertions.assertSame(level, event.getLevel(), "Logger level does not match");
-        Assertions.assertTrue(event.getFormattedMessage().contains(message), "Message does not contain expected string");
+    /**
+     * Asserts that the logger has recorded an event at the specified index with the expected message.
+     *
+     * @param eventIndex       the index of the event to check
+     * @param exepectedMessage a substring that should be present in the event's message
+     */
+    public void assertEvent(final int eventIndex, final String exepectedMessage) {
+        final MockLoggerEvent event = loggerEvents.get(eventIndex);
+        Assertions.assertTrue(eventIndex < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertTrue(event.getFormattedMessage().contains(exepectedMessage), "Message does not contain expected string");
     }
 
-    public void assertEvent(final int index, final Level level, final Marker marker,  final String message) {
-        final MockLoggerEvent event = loggerEvents.get(index);
-        Assertions.assertTrue(index < loggerEvents.size(), "Not enough logger messages");
-        Assertions.assertSame(level, event.getLevel(), "Logger level does not match");
-        Assertions.assertTrue(event.getFormattedMessage().contains(message), "Message does not contain expected string");
-        Assertions.assertSame(marker, event.getMarker(), "Logger marker does not match");
+    /**
+     * Asserts that the logger has recorded an event at the specified index with the expected marker.
+     *
+     * @param eventIndex       the index of the event to check
+     * @param expectedMarker   the expected marker of the event
+     */
+    public void assertEvent(final int eventIndex, final Marker expectedMarker) {
+        final MockLoggerEvent event = loggerEvents.get(eventIndex);
+        Assertions.assertTrue(eventIndex < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertSame(expectedMarker, event.getMarker(), "Logger expectedMarker does not match");
     }
 
-    public void assertEvent(final int index, final Level level, final Marker marker) {
-        final MockLoggerEvent event = loggerEvents.get(index);
-        Assertions.assertTrue(index < loggerEvents.size(), "Not enough logger messages");
-        Assertions.assertSame(level, event.getLevel(), "Logger level does not match");
-        Assertions.assertSame(marker, event.getMarker(), "Logger marker does not match");
+    /**
+     * Asserts that the logger has recorded an event at the specified index with the expected level and message.
+     *
+     * @param eventIndex       the index of the event to check
+     * @param expectedLevel    the expected log level of the event
+     * @param exepectedMessage a substring that should be present in the event's message
+     */
+    public void assertEvent(final int eventIndex, final Level expectedLevel, final String exepectedMessage) {
+        final MockLoggerEvent event = loggerEvents.get(eventIndex);
+        Assertions.assertTrue(eventIndex < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertSame(expectedLevel, event.getLevel(), "Logger expectedLevel does not match");
+        Assertions.assertTrue(event.getFormattedMessage().contains(exepectedMessage), "Message does not contain expected string");
+    }
+
+    /**
+     * Asserts that the logger has recorded an event at the specified index with the expected marker and message.
+     * @param eventIndex       the index of the event to check
+     * @param expectedMarker   the expected marker of the event
+     * @param exepectedMessage a substring that should be present in the event's message
+     */
+    public void assertEvent(final int eventIndex, final Marker expectedMarker, final String exepectedMessage) {
+        final MockLoggerEvent event = loggerEvents.get(eventIndex);
+        Assertions.assertTrue(eventIndex < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertTrue(event.getFormattedMessage().contains(exepectedMessage), "Message does not contain expected string");
+        Assertions.assertSame(expectedMarker, event.getMarker(), "Logger expectedMarker does not match");
+    }
+
+
+
+    /**
+     * Asserts that the logger has recorded an event at the specified index with the expected level, marker, and message.
+     *
+     * @param eventIndex       the index of the event to check
+     * @param expectedLevel    the expected log level of the event
+     * @param expectedMarker   the expected marker of the event
+     * @param exepectedMessage a substring that should be present in the event's message
+     */
+    public void assertEvent(final int eventIndex, final Level expectedLevel, final Marker expectedMarker, final String exepectedMessage) {
+        final MockLoggerEvent event = loggerEvents.get(eventIndex);
+        Assertions.assertTrue(eventIndex < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertSame(expectedLevel, event.getLevel(), "Logger expectedLevel does not match");
+        Assertions.assertTrue(event.getFormattedMessage().contains(exepectedMessage), "Message does not contain expected string");
+        Assertions.assertSame(expectedMarker, event.getMarker(), "Logger expectedMarker does not match");
+    }
+
+    /**
+     * Asserts that the logger has recorded an event at the specified index with the expected level and marker.
+     *
+     * @param eventIndex     the index of the event to check
+     * @param expectedLevel  the expected log level of the event
+     * @param expectedMarker the expected marker of the event
+     */
+    public void assertEvent(final int eventIndex, final Level expectedLevel, final Marker expectedMarker) {
+        final MockLoggerEvent event = loggerEvents.get(eventIndex);
+        Assertions.assertTrue(eventIndex < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertSame(expectedLevel, event.getLevel(), "Logger expectedLevel does not match");
+        Assertions.assertSame(expectedMarker, event.getMarker(), "Logger expectedMarker does not match");
     }
 }
