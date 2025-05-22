@@ -34,13 +34,10 @@ import static org.usefultoys.slf4j.meter.Markers.*;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("UnusedAssignment")
-public class MeterCallableTest {
+class MeterCallableTest {
 
     static final String meterCategory = "category";
     static final MockLogger logger = (MockLogger) LoggerFactory.getLogger(meterCategory);
-
-    public MeterCallableTest() {
-    }
 
     @BeforeAll
     static void validate() {
@@ -48,14 +45,14 @@ public class MeterCallableTest {
     }
 
     @BeforeAll
-    public static void setupMeterSettings() {
+    static void setupMeterSettings() {
         MeterConfig.progressPeriodMilliseconds = 0;
         MeterConfig.printCategory = false;
         MeterConfig.printStatus = true;
     }
 
     @AfterAll
-    public static void tearDownMeterSettings() {
+    static void tearDownMeterSettings() {
         MeterConfig.reset();
     }
 
@@ -72,7 +69,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testWithStartWithOk() throws Exception {
+    void testWithStartWithOk() throws Exception {
         final Meter m = new Meter(logger, "testWithStartWithOk").start();
         final Object result = m.call(() -> {
             assertEquals(m, Meter.getCurrentInstance());
@@ -95,7 +92,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testWithStartWithOkAndIgnoredReturn() throws Exception {
+    void testWithStartWithOkAndIgnoredReturn() throws Exception {
         final Meter m = new Meter(logger, "testWithStartWithOk").start();
         final Integer result = m.call(() -> {
             assertEquals(m, Meter.getCurrentInstance());
@@ -118,7 +115,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testNoStartNoOkAndReturn() throws Exception {
+    void testNoStartNoOkAndReturn() throws Exception {
         final Meter m = new Meter(logger, "testWithStartWithOk");
         final Integer result = m.call(() -> {
             assertEquals(m, Meter.getCurrentInstance());
@@ -140,7 +137,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testNoStartWithOk() throws Exception {
+    void testNoStartWithOk() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithOk");
         final Object result = m.call(() -> {
             assertEquals(m, Meter.getCurrentInstance());
@@ -163,7 +160,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testNoStartWithOkAndPath() throws Exception {
+    void testNoStartWithOkAndPath() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithOk");
         final Object result = m.call(() -> {
             assertEquals(m, Meter.getCurrentInstance());
@@ -186,7 +183,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testNoStartNoOk() throws Exception {
+    void testNoStartNoOk() throws Exception {
         final Meter m = new Meter(logger, "testNoStartNoOk");
         final Object result = m.call(() -> {
             assertEquals(m, Meter.getCurrentInstance());
@@ -208,7 +205,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testWithStartNoOk() throws Exception {
+    void testWithStartNoOk() throws Exception {
         final Meter m = new Meter(logger, "testWithStartNoOk").start();
         final Object result = m.call(() -> {
             assertEquals(m, Meter.getCurrentInstance());
@@ -230,7 +227,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testNoStartWithReject() throws Exception {
+    void testNoStartWithReject() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithReject");
         final Object result = m.call(() -> {
             assertEquals(m, Meter.getCurrentInstance());
@@ -253,7 +250,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testNoStartWithFail() throws Exception {
+    void testNoStartWithFail() throws Exception {
         final Meter m = new Meter(logger, "testNoStartWithFail");
         final Object result = m.call(() -> {
             assertEquals(m, Meter.getCurrentInstance());
@@ -276,7 +273,7 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testNoStartWithException() {
+    void testNoStartWithException() {
         final Meter m = new Meter(logger, "testNoStartWithException");
         try {
             m.call(() -> {
@@ -302,15 +299,12 @@ public class MeterCallableTest {
     }
 
     @Test
-    public void testNoStartWithException2() {
+    void testNoStartWithException2() {
         final Meter m = new Meter(logger, "testNoStartWithException");
         try {
-            m.call(new Callable<Void>() {
-                @Override
-                public Void call() throws Exception {
-                    assertEquals(m, Meter.getCurrentInstance());
-                    throw new IOException("someException");
-                }
+            m.call((Callable<Void>) () -> {
+                assertEquals(m, Meter.getCurrentInstance());
+                throw new IOException("someException");
             });
         } catch (final Exception e) {
             assertEquals("someException", e.getMessage());

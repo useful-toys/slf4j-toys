@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,13 +33,9 @@ import java.nio.charset.Charset;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("UnusedAssignment")
-public class MeterIterationAttributesTest {
+class MeterIterationAttributesTest {
 
     MockLogger logger = (MockLogger) LoggerFactory.getLogger("Test");
-
-    public MeterIterationAttributesTest() {
-        logger.setEnabled(false);
-    }
 
     @BeforeAll
     static void validate() {
@@ -46,12 +43,19 @@ public class MeterIterationAttributesTest {
     }
 
     @BeforeEach
-    public void clearEvents() {
+    void setupLogger() {
         logger.clearEvents();
+        logger.setEnabled(true);
+    }
+
+    @AfterEach
+    void clearLogger() {
+        logger.clearEvents();
+        logger.setEnabled(true);
     }
 
     @Test
-    public void testIterationAttributes() {
+    void testIterationAttributes() {
         final int iterationCount = 10;
         
         
@@ -98,7 +102,5 @@ public class MeterIterationAttributesTest {
         assertEquals(iterationCount, m1.getExpectedIterations());
         assertEquals(4, m1.getCurrentIteration());
         assertTrue(m1.getIterationsPerSecond() > 0.0);
-
-//        double minIterationsPerSecond = 1000000*(now2b-now1a)
     }
  }

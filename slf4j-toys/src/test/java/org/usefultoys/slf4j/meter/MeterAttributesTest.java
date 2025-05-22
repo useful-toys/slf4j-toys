@@ -32,13 +32,9 @@ import static org.usefultoys.slf4j.meter.Markers.ILLEGAL;
 /**
  * @author Daniel Felix Ferber
  */
-public class MeterAttributesTest {
+class MeterAttributesTest {
 
     MockLogger logger = (MockLogger) LoggerFactory.getLogger("Test");
-
-    public MeterAttributesTest() {
-        logger.setEnabled(false);
-    }
 
     @BeforeAll
     static void validate() {
@@ -58,7 +54,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testMessageAttributes() {
+    void testMessageAttributes() {
         final String description1 = "Test Message";
         final Meter m1 = new Meter(logger).m(description1);
         assertEquals(description1, m1.getDescription());
@@ -69,7 +65,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testIterationAttributes() {
+    void testIterationAttributes() {
         final int iterationCount = 4;
         final Meter m1 = new Meter(logger).iterations(iterationCount).start();
         assertEquals(iterationCount, m1.getExpectedIterations());
@@ -87,7 +83,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithoutValue() {
+    void testCtxWithoutValue() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key1");
@@ -103,7 +99,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndInt() {
+    void testCtxWithStringAndInt() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key2", 42);
@@ -116,7 +112,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndLong() {
+    void testCtxWithStringAndLong() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key3", 123456789L);
@@ -129,7 +125,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndBoolean() {
+    void testCtxWithStringAndBoolean() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key4", true);
@@ -142,7 +138,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndFloat() {
+    void testCtxWithStringAndFloat() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key5", 3.14f);
@@ -155,7 +151,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndDouble() {
+    void testCtxWithStringAndDouble() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key6", 2.71828);
@@ -168,7 +164,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndObject() {
+    void testCtxWithStringAndObject() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key7", new Object() {
@@ -193,7 +189,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndString() {
+    void testCtxWithStringAndString() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key8", "value8");
@@ -208,7 +204,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndFormattedString() {
+    void testCtxWithStringAndFormattedString() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key9", "formatted %d", 100);
@@ -221,7 +217,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndIntegerObject() {
+    void testCtxWithStringAndIntegerObject() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key19", Integer.valueOf(123));
@@ -236,7 +232,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndLongObject() {
+    void testCtxWithStringAndLongObject() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key19", Long.valueOf(123));
@@ -251,7 +247,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithBooleanAndString1() {
+    void testCtxWithBooleanAndString1() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx(true, "valueTrue");
@@ -266,7 +262,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithBooleanAndString2() {
+    void testCtxWithBooleanAndString2() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx(false, "valueTrue");
@@ -277,7 +273,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithBooleanAndStringString1() {
+    void testCtxWithBooleanAndStringString1() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx(true, "valueTrue", "falseTrue");
@@ -292,7 +288,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithBooleanAndStringString2() {
+    void testCtxWithBooleanAndStringString2() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx(false, "valueTrue", "falseTrue");
@@ -301,7 +297,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndFloatObject() {
+    void testCtxWithStringAndFloatObject() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key21", Float.valueOf(3.14f));
@@ -316,7 +312,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testCtxWithStringAndDoubleObject() {
+    void testCtxWithStringAndDoubleObject() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key23", Double.valueOf(2.71828));
@@ -326,12 +322,12 @@ public class MeterAttributesTest {
         assertFalse(meter.getContext().containsKey("key23"));
         meter.ctx("key24", Double.valueOf(1.41421));
         assertEquals("1.41421", meter.getContext().get("key24"));
-        meter.ctx("key28", (Double)null);
+        meter.ctx("key28", (Double) null);
         assertEquals("<null>", meter.getContext().get("key28"));
     }
 
     @Test
-    public void testCtxWithStringAndBooleanObject() {
+    void testCtxWithStringAndBooleanObject() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.ctx("key25", Boolean.TRUE);
@@ -341,12 +337,12 @@ public class MeterAttributesTest {
         assertFalse(meter.getContext().containsKey("key25"));
         meter.ctx("key26", Boolean.FALSE);
         assertEquals("false", meter.getContext().get("key26"));
-        meter.ctx("key27", (Boolean)null);
+        meter.ctx("key27", (Boolean) null);
         assertEquals("<null>", meter.getContext().get("key27"));
     }
 
     @Test
-    public void testUnctx() {
+    void testUnctx() {
         final Meter meter = new Meter(logger);
         assertNull(meter.getContext());
         meter.unctx("key25");
@@ -354,7 +350,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testSubmeterInheritsCtx() {
+    void testSubmeterInheritsCtx() {
         final Meter meter = new Meter(logger);
         final Meter meter1 = meter.sub("sub");
         assertNull(meter1.getContext());
@@ -372,7 +368,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testInvalidIteration() {
+    void testInvalidIteration() {
         final Meter meter = new Meter(logger);
 
         // Test m(message) with null
@@ -387,7 +383,7 @@ public class MeterAttributesTest {
     }
 
     @Test
-    public void testMWithNullLogsError() {
+    void testMWithNullLogsError() {
         final Meter meter = new Meter(logger);
 
         // Test m(message) with null
@@ -408,7 +404,7 @@ public class MeterAttributesTest {
 
 
     @Test
-    public void testCtxWithNullLogsError() {
+    void testCtxWithNullLogsError() {
         final Meter meter = new Meter(logger);
 
         // Test ctx(name) with null

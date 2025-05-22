@@ -45,13 +45,10 @@ import static org.usefultoys.slf4j.meter.Markers.MSG_REJECT;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("UnusedAssignment")
-public class MeterClosableTest {
+class MeterClosableTest {
 
     static final String meterCategory = "category";
     static final MockLogger logger = (MockLogger) LoggerFactory.getLogger(meterCategory);
-
-    public MeterClosableTest() {
-    }
 
     @BeforeAll
     static void validate() {
@@ -59,14 +56,14 @@ public class MeterClosableTest {
     }
 
     @BeforeAll
-    public static void setupMeterSettings() {
+    static void setupMeterSettings() {
         MeterConfig.progressPeriodMilliseconds = 0;
         MeterConfig.printCategory = false;
         MeterConfig.printStatus = true;
     }
 
     @AfterAll
-    public static void tearDownMeterSettings() {
+    static void tearDownMeterSettings() {
         MeterConfig.reset();
     }
 
@@ -83,7 +80,7 @@ public class MeterClosableTest {
     }
 
     @Test
-    public void testWithStartWithOk() {
+    void testWithStartWithOk() {
         final Meter m;
         try (final Meter m2 = m = new Meter(logger, "testWithStartWithOk").start()) {
             assertEquals(m, Meter.getCurrentInstance());
@@ -104,7 +101,7 @@ public class MeterClosableTest {
     }
 
     @Test
-    public void testNoStartWithOk() {
+    void testNoStartWithOk() {
         final Meter m;
         try (final Meter m2 = m = new Meter(logger, "testNoStartWithOk")) {
             assertNotEquals(m, Meter.getCurrentInstance());
@@ -124,7 +121,7 @@ public class MeterClosableTest {
     }
 
     @Test
-    public void testStartWithOkAndPath() {
+    void testStartWithOkAndPath() {
         final Meter m;
         try (final Meter m2 = m = new Meter(logger, "testStartWithOkAndPath").start()) {
             assertEquals(m, Meter.getCurrentInstance());
@@ -145,7 +142,7 @@ public class MeterClosableTest {
     }
 
     @Test
-    public void testNoStartNoOk() {
+    void testNoStartNoOk() {
         final Meter m;
         try (final Meter m2 = m = new Meter(logger, "testNoStartNoOk")) {
             assertNotEquals(m, Meter.getCurrentInstance());
@@ -164,7 +161,7 @@ public class MeterClosableTest {
     }
 
     @Test
-    public void testWithStartNoOk() {
+    void testWithStartNoOk() {
         final Meter m;
         try (final Meter m2 = m = new Meter(logger, "testWithStartNoOk").start()) {
             assertEquals(m, Meter.getCurrentInstance());
@@ -184,7 +181,7 @@ public class MeterClosableTest {
     }
 
     @Test
-    public void testWithStartWithReject() {
+    void testWithStartWithReject() {
         final Meter m;
         try (final Meter m2 = m = new Meter(logger, "testWithStartWithReject").start()) {
             assertEquals(m, Meter.getCurrentInstance());
@@ -205,7 +202,7 @@ public class MeterClosableTest {
     }
 
     @Test
-    public void testWithStartWithFail() {
+    void testWithStartWithFail() {
         final Meter m;
         try (final Meter m2 = m = new Meter(logger, "testWithStartWithFail").start()) {
             assertEquals(m, Meter.getCurrentInstance());
@@ -226,7 +223,7 @@ public class MeterClosableTest {
     }
 
     @Test
-    public void testWithStartWithException() {
+    void testWithStartWithException() {
         Meter m = null;
         try (final Meter m2 = m = new Meter(logger, "testWithStartWithException").start()) {
             assertEquals(m, Meter.getCurrentInstance());

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Daniel Felix Ferber
  */
-public class MeterIdentifierAttributesTest {
+class MeterIdentifierAttributesTest {
 
     @BeforeAll
     static void validate() {
@@ -42,7 +42,7 @@ public class MeterIdentifierAttributesTest {
     }
 
     @org.junit.jupiter.api.Test
-    public void testIdentifierAttributes() {
+    void testIdentifierAttributes() {
         final String category1 = "TestCategory1";
         final MockLogger logger1 = (MockLogger) LoggerFactory.getLogger(category1);
         logger1.setEnabled(false);
@@ -79,7 +79,7 @@ public class MeterIdentifierAttributesTest {
     }
     
     @Test
-    public void testIdentifierAttributesWithName() {
+    void testIdentifierAttributesWithName() {
         final String category = "TestCategory3";
         final MockLogger logger = (MockLogger) LoggerFactory.getLogger(category);
         logger.setEnabled(false);
@@ -117,7 +117,7 @@ public class MeterIdentifierAttributesTest {
     }
     
     @Test
-    public void testIdentifierAttributesWithSubmeter() {
+    void testIdentifierAttributesWithSubmeter() {
         final String category = "TestCategory4";
         final MockLogger logger = (MockLogger) LoggerFactory.getLogger(category);
         logger.setEnabled(false);
@@ -167,7 +167,7 @@ public class MeterIdentifierAttributesTest {
     }
     
     @Test
-    public void testIdentifierAttributesWithSubSubmeter() {
+    void testIdentifierAttributesWithSubSubmeter() {
         final String category = "TestCategory5";
         final MockLogger logger = (MockLogger) LoggerFactory.getLogger(category);
         logger.setEnabled(false);
@@ -216,7 +216,7 @@ public class MeterIdentifierAttributesTest {
     }
     
     @Test
-    public void testIdentifierAttributesWithNameAndSubmeter() {
+    void testIdentifierAttributesWithNameAndSubmeter() {
         final String category = "TestCategory6";
         final MockLogger logger = (MockLogger) LoggerFactory.getLogger(category);
         logger.setEnabled(false);

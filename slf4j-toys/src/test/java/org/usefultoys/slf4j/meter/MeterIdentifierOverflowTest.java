@@ -30,12 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Daniel
  */
-public class MeterIdentifierOverflowTest {
+class MeterIdentifierOverflowTest {
     final String meterName = "name";
     final MockLogger logger = (MockLogger) LoggerFactory.getLogger(meterName);
-
-    public MeterIdentifierOverflowTest() {
-    }
 
     @BeforeAll
     static void validate() {
@@ -43,40 +40,23 @@ public class MeterIdentifierOverflowTest {
     }
 
     @BeforeAll
-    public static void configureMeterSettings() {
+    static void configureMeterSettings() {
         System.setProperty("slf4jtoys.meter.progress.period", "0ms");
     }
 
     @BeforeEach
-    public void clearEvents() {
+    void clearEvents() {
         logger.clearEvents();
     }
 
     @Test
-    public void testResetImpl() {
+    void testResetImpl() {
         Meter.EVENT_COUNTER.put(meterName, new AtomicLong(Long.MAX_VALUE - 2));
 
-        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 4, Long.MAX_VALUE - 1);
-        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 8, Long.MAX_VALUE);
-        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 12, 1);
-        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 16, 2);
-        assertEvents(MeterFactory.getMeter(meterName).start().ok(), 20, 3);
+        assertEquals(Long.MAX_VALUE - 1, MeterFactory.getMeter(meterName).getPosition());
+        assertEquals(Long.MAX_VALUE , MeterFactory.getMeter(meterName).getPosition());
+        assertEquals(1, MeterFactory.getMeter(meterName).getPosition());
+        assertEquals(2, MeterFactory.getMeter(meterName).getPosition());
     }
 
-    private void assertEvents(final Meter m, final int expectedMessageCount, final long expectedEventPosition) {
-//        Assertions.assertEquals(expectedEventPosition, m.getPosition());
-//        Assertions.assertEquals(null, m.getOperation());
-//        Assertions.assertEquals(meterName, m.getCategory());
-//        final MockLoggerEvent startEvent = logger.getEvent(expectedMessageCount - 4);
-//        final MockLoggerEvent startDataEvent = logger.getEvent(expectedMessageCount - 3);
-//        final MockLoggerEvent stopEvent = logger.getEvent(expectedMessageCount - 2);
-//        final MockLoggerEvent stopDataEvent = logger.getEvent(expectedMessageCount - 1);
-//
-//        String str = "$=" + Long.toString(expectedEventPosition);
-//        Assertions.assertEquals(expectedEventPosition, m.getPosition());
-//        Assertions.assertFalse(startEvent.getFormattedMessage().contains(str));
-//        Assertions.assertTrue(startDataEvent.getFormattedMessage().contains(str));
-//        Assertions.assertFalse(stopEvent.getFormattedMessage().contains(str));
-//        Assertions.assertTrue(stopDataEvent.getFormattedMessage().contains(str));
-    }
 }
