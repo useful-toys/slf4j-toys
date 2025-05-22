@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.slf4j.impl.MockLoggerEvent.Level.ERROR;
+import static org.usefultoys.slf4j.meter.Markers.ILLEGAL;
 
 import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -55,7 +57,26 @@ class MeterIterationAttributesTest {
     }
 
     @Test
-    void testIterationAttributes() {
+    void testIterationAttributes1() {
+        final int iterationCount = 4;
+        final Meter m1 = new Meter(logger).iterations(iterationCount).start();
+        assertEquals(iterationCount, m1.getExpectedIterations());
+        assertEquals(0, m1.getCurrentIteration());
+        m1.inc();
+        assertEquals(iterationCount, m1.getExpectedIterations());
+        assertEquals(1, m1.getCurrentIteration());
+        m1.incBy(2);
+        assertEquals(iterationCount, m1.getExpectedIterations());
+        assertEquals(3, m1.getCurrentIteration());
+        m1.incTo(4);
+        assertEquals(iterationCount, m1.getExpectedIterations());
+        assertEquals(4, m1.getCurrentIteration());
+        m1.ok();
+    }
+
+
+    @Test
+    void testIterationAttributes2() {
         final int iterationCount = 10;
         
         
@@ -102,5 +123,24 @@ class MeterIterationAttributesTest {
         assertEquals(iterationCount, m1.getExpectedIterations());
         assertEquals(4, m1.getCurrentIteration());
         assertTrue(m1.getIterationsPerSecond() > 0.0);
+    }
+
+    @Test
+    void testInvalidIteration() {
+        final Meter meter = new Meter(logger);
+
+        // Test m(message) with null
+        meter.iterations(-1);
+        logger.assertEvent(0, ERROR, ILLEGAL, "Illegal call to Meter.iterations(expectedIterations): Non positive argument. id=Test#");
+        meter.start();
+        meter.incBy(-1);
+        logger.assertEvent(3, ERROR, ILLEGAL, "Illegal call to Meter.incBy(increment): Non positive argument. id=Test#");
+        meter.incTo(-1);
+        logger.assertEvent(4, ERROR, ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non positive argument. id=Test#");
+
+        meter.incTo(10);
+        meter.incTo(5);
+        logger.assertEvent(5, ERROR, ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non forward iteration. id=Test#");
+        meter.ok();
     }
  }

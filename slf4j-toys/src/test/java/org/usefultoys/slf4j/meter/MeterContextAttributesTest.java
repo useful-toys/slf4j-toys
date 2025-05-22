@@ -32,7 +32,7 @@ import static org.usefultoys.slf4j.meter.Markers.ILLEGAL;
 /**
  * @author Daniel Felix Ferber
  */
-class MeterAttributesTest {
+class MeterContextAttributesTest {
 
     MockLogger logger = (MockLogger) LoggerFactory.getLogger("Test");
 
@@ -62,24 +62,6 @@ class MeterAttributesTest {
         final String description2 = "Test  %d Message";
         final Meter m2 = new Meter(logger).m(description2, 10);
         assertEquals(String.format(description2, 10), m2.getDescription());
-    }
-
-    @Test
-    void testIterationAttributes() {
-        final int iterationCount = 4;
-        final Meter m1 = new Meter(logger).iterations(iterationCount).start();
-        assertEquals(iterationCount, m1.getExpectedIterations());
-        assertEquals(0, m1.getCurrentIteration());
-        m1.inc();
-        assertEquals(iterationCount, m1.getExpectedIterations());
-        assertEquals(1, m1.getCurrentIteration());
-        m1.incBy(2);
-        assertEquals(iterationCount, m1.getExpectedIterations());
-        assertEquals(3, m1.getCurrentIteration());
-        m1.incTo(4);
-        assertEquals(iterationCount, m1.getExpectedIterations());
-        assertEquals(4, m1.getCurrentIteration());
-        m1.ok();
     }
 
     @Test
@@ -365,21 +347,6 @@ class MeterAttributesTest {
 
         meter.ctx("c", 0.0);
         assertFalse(meter2.getContext().containsKey("c"));
-    }
-
-    @Test
-    void testInvalidIteration() {
-        final Meter meter = new Meter(logger);
-
-        // Test m(message) with null
-        meter.iterations(-1);
-        logger.assertEvent(0, ERROR, ILLEGAL, "Illegal call to Meter.iterations(expectedIterations): Non positive argument. id=Test#");
-        meter.start();
-        meter.incBy(-1);
-        logger.assertEvent(3, ERROR, ILLEGAL, "Illegal call to Meter.incBy(increment): Non positive argument. id=Test#");
-        meter.incTo(-1);
-        logger.assertEvent(4, ERROR, ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non positive argument. id=Test#");
-        meter.ok();
     }
 
     @Test
