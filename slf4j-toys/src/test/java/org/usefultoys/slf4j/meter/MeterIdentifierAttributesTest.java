@@ -15,9 +15,13 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Marker;
 import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.SessionConfig;
@@ -148,6 +152,18 @@ public class MeterIdentifierAttributesTest {
         assertEquals(category, m5.getCategory());
         assertEquals("sr", m5.getOperation());
         assertEquals(2L, m5.getPosition());
+
+        // Meter with null operation create a meter with the same category as the parent meter.
+        // Therefore, the position will be incremented.
+        logger.clearEvents();
+        final Meter m6 = m1.sub(null);
+        assertTrue(Session.uuid.endsWith(m6.getSessionUuid()));
+        assertEquals(category, m6.getCategory());
+        assertNull(m6.getOperation());
+        assertEquals(2L, m6.getPosition());
+        logger.assertEvent(0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.sub(name): Null argument. id=TestCategory4#1");
+        logger.clearEvents();
+
     }
     
     @Test
@@ -186,6 +202,17 @@ public class MeterIdentifierAttributesTest {
         assertEquals(category, m5.getCategory());
         assertEquals("rs/sr/sr", m5.getOperation());
         assertEquals(1L, m5.getPosition());
+
+        // Meter with null operation create a meter with the same category as the parent meter.
+        // Therefore, the position will be incremented.
+        logger.clearEvents();
+        final Meter m6 = m4.sub(null);
+        assertTrue(Session.uuid.endsWith(m6.getSessionUuid()));
+        assertEquals(category, m6.getCategory());
+        assertEquals("rs/sr", m6.getOperation());
+        assertEquals(3L, m6.getPosition());
+        logger.assertEvent(0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.sub(name): Null argument. id=TestCategory5/rs/sr#2");
+        logger.clearEvents();
     }
     
     @Test

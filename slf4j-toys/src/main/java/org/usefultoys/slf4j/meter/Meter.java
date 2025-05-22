@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -105,7 +106,7 @@ public class Meter extends MeterData implements Closeable {
      *
      * @param logger Logger that reports messages.
      */
-    public Meter(final Logger logger) {
+    public Meter(final @NonNull Logger logger) {
         this(logger, null);
     }
 
@@ -115,7 +116,7 @@ public class Meter extends MeterData implements Closeable {
      * @param logger    Logger that reports messages.
      * @param operation The operation name or null.
      */
-    public Meter(final Logger logger, final String operation) {
+    public Meter(final @NonNull Logger logger, final String operation) {
         this(logger, operation, null);
     }
 
@@ -126,7 +127,7 @@ public class Meter extends MeterData implements Closeable {
      * @param operation The operation name or null.
      * @param parent    ID of the parent Meter or null.
      */
-    public Meter(final Logger logger, final String operation, final String parent) {
+    public Meter(final @NonNull Logger logger, final String operation, final String parent) {
         super(Session.shortSessionUudi(),
                 extractNextPosition(logger.getName(), operation),
                 logger.getName(), operation, parent);
@@ -185,7 +186,15 @@ public class Meter extends MeterData implements Closeable {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
             messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "sub(name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
         }
-        final Meter m = new Meter(messageLogger, operation == null ? suboperationName : operation + '/' + suboperationName, getFullID());
+        String operation = null;
+        if (this.operation == null) {
+            operation = suboperationName;
+        } else if (suboperationName == null) {
+            operation = this.operation;
+        } else {
+            operation = this.operation + "/" + suboperationName;
+        }
+        final Meter m = new Meter(messageLogger, operation, getFullID());
         if (context != null) {
             m.context = new HashMap<String, String>(context);
         }
