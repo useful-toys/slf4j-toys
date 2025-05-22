@@ -354,6 +354,24 @@ public class MeterAttributesTest {
     }
 
     @Test
+    public void testSubmeterInheritsCtx() {
+        final Meter meter = new Meter(logger);
+        final Meter meter1 = meter.sub("sub");
+        assertNull(meter1.getContext());
+
+        meter.ctx("a", "b");
+        meter.ctx("b", 1);
+
+        final Meter meter2 = meter.sub("sub");
+        assertNotNull(meter2.getContext());
+        assertEquals("b", meter2.getContext().get("a"));
+        assertEquals("1", meter2.getContext().get("b"));
+
+        meter.ctx("c", 0.0);
+        assertFalse(meter2.getContext().containsKey("c"));
+    }
+
+    @Test
     public void testInvalidIteration() {
         Meter meter = new Meter(logger);
 
