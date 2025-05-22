@@ -29,6 +29,17 @@ import org.usefultoys.slf4j.SessionConfig;
 import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.slf4j.impl.MockLoggerEvent.Level.ERROR;
+import static org.slf4j.impl.MockLoggerEvent.Level.DEBUG;
+import static org.slf4j.impl.MockLoggerEvent.Level.INFO;
+import static org.slf4j.impl.MockLoggerEvent.Level.TRACE;
+import static org.usefultoys.slf4j.meter.Markers.*;
+import static org.usefultoys.slf4j.meter.Markers.DATA_FAIL;
+import static org.usefultoys.slf4j.meter.Markers.DATA_OK;
+import static org.usefultoys.slf4j.meter.Markers.DATA_REJECT;
+import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_OK;
+import static org.usefultoys.slf4j.meter.Markers.MSG_FAIL;
+import static org.usefultoys.slf4j.meter.Markers.MSG_REJECT;
 
 /**
  * @author Daniel Felix Ferber
@@ -86,10 +97,10 @@ public class MeterClosableTest {
         assertNull(m.getOkPath());
         assertNull(m.getRejectPath());
         assertNull(m.getFailPath());
-        logger.assertEvent(0, Markers.MSG_START);
-        logger.assertEvent(1, Markers.DATA_START);
-        logger.assertEvent(2, Markers.MSG_OK);
-        logger.assertEvent(3, Markers.DATA_OK);
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK);
+        logger.assertEvent(3, TRACE, DATA_OK);
     }
 
     @Test
@@ -107,16 +118,16 @@ public class MeterClosableTest {
         assertNull(m.getOkPath());
         assertNull(m.getRejectPath());
         assertNull(m.getFailPath());
-        logger.assertEvent(0, Markers.INCONSISTENT_OK);
-        logger.assertEvent(1, Markers.MSG_OK);
-        logger.assertEvent(2, Markers.DATA_OK);
+        logger.assertEvent(0, ERROR, INCONSISTENT_OK);
+        logger.assertEvent(1, INFO, MSG_OK);
+        logger.assertEvent(2, TRACE, DATA_OK);
     }
 
     @Test
-    public void testNoStartWithOkAndPath() {
+    public void testStartWithOkAndPath() {
         final Meter m;
-        try (final Meter m2 = m = new Meter(logger, "testNoStartWithOk")) {
-            assertNotEquals(m, Meter.getCurrentInstance());
+        try (final Meter m2 = m = new Meter(logger, "testStartWithOkAndPath").start()) {
+            assertEquals(m, Meter.getCurrentInstance());
             m2.ok("a");
         }
 
@@ -127,9 +138,10 @@ public class MeterClosableTest {
         assertEquals("a", m.getOkPath());
         assertNull(m.getRejectPath());
         assertNull(m.getFailPath());
-        logger.assertEvent(0, Markers.INCONSISTENT_OK);
-        logger.assertEvent(1, Markers.MSG_OK);
-        logger.assertEvent(2, Markers.DATA_OK);
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK);
+        logger.assertEvent(3, TRACE, DATA_OK);
     }
 
     @Test
@@ -146,9 +158,9 @@ public class MeterClosableTest {
         assertNull(m.getOkPath());
         assertNull(m.getRejectPath());
         assertEquals("try-with-resources", m.getFailPath());
-        logger.assertEvent(0, Markers.INCONSISTENT_CLOSE);
-        logger.assertEvent(1, Markers.MSG_FAIL);
-        logger.assertEvent(2, Markers.DATA_FAIL);
+        logger.assertEvent(0, ERROR, INCONSISTENT_CLOSE);
+        logger.assertEvent(1, ERROR, MSG_FAIL);
+        logger.assertEvent(2, TRACE, DATA_FAIL);
     }
 
     @Test
@@ -165,10 +177,10 @@ public class MeterClosableTest {
         assertNull(m.getOkPath());
         assertNull(m.getRejectPath());
         assertEquals("try-with-resources", m.getFailPath());
-        logger.assertEvent(0, Markers.MSG_START);
-        logger.assertEvent(1, Markers.DATA_START);
-        logger.assertEvent(2, Markers.MSG_FAIL, "try-with-resources");
-        logger.assertEvent(3, Markers.DATA_FAIL);
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL, "try-with-resources");
+        logger.assertEvent(3, TRACE, DATA_FAIL);
     }
 
     @Test
@@ -186,10 +198,10 @@ public class MeterClosableTest {
         assertNull(m.getOkPath());
         assertEquals("a", m.getRejectPath());
         assertNull(m.getFailPath());
-        logger.assertEvent(0, Markers.MSG_START);
-        logger.assertEvent(1, Markers.DATA_START);
-        logger.assertEvent(2, Markers.MSG_REJECT);
-        logger.assertEvent(3, Markers.DATA_REJECT);
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_REJECT);
+        logger.assertEvent(3, TRACE, DATA_REJECT);
     }
 
     @Test
@@ -207,10 +219,10 @@ public class MeterClosableTest {
         assertNull(m.getOkPath());
         assertNull(m.getRejectPath());
         assertEquals("a", m.getFailPath());
-        logger.assertEvent(0, Markers.MSG_START);
-        logger.assertEvent(1, Markers.DATA_START);
-        logger.assertEvent(2, Markers.MSG_FAIL);
-        logger.assertEvent(3, Markers.DATA_FAIL);
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL);
+        logger.assertEvent(3, TRACE, DATA_FAIL);
     }
 
     @Test
@@ -230,9 +242,9 @@ public class MeterClosableTest {
         assertNull(m.getOkPath());
         assertNull(m.getRejectPath());
         assertEquals("try-with-resources", m.getFailPath());
-        logger.assertEvent(0, Markers.MSG_START);
-        logger.assertEvent(1, Markers.DATA_START);
-        logger.assertEvent(2, Markers.MSG_FAIL, "try-with-resources");
-        logger.assertEvent(3, Markers.DATA_FAIL);
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL, "try-with-resources");
+        logger.assertEvent(3, TRACE, DATA_FAIL);
     }
 }
