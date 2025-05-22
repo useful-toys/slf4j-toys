@@ -16,6 +16,8 @@
 package org.usefultoys.slf4j.meter;
 
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,16 +48,27 @@ public class MeterClosableTest {
     }
 
     @BeforeAll
-    public static void configureMeterSettings() {
+    public static void setupMeterSettings() {
         MeterConfig.progressPeriodMilliseconds = 0;
         MeterConfig.printCategory = false;
         MeterConfig.printStatus = true;
     }
 
+    @AfterAll
+    public static void tearDownMeterSettings() {
+        MeterConfig.reset();
+    }
+
     @BeforeEach
-    public void clearEvents() {
+    void setupLogger() {
         logger.clearEvents();
-        MeterConfig.printCategory = false;
+        logger.setEnabled(true);
+    }
+
+    @AfterEach
+    void clearLogger() {
+        logger.clearEvents();
+        logger.setEnabled(true);
     }
 
     @Test
@@ -70,6 +83,9 @@ public class MeterClosableTest {
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertFalse(m.isSlow());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailPath());
         assertEquals(4, logger.getEventCount());
         final MockLoggerEvent startEvent = logger.getEvent(0);
         final MockLoggerEvent startDataEvent = logger.getEvent(1);
@@ -93,6 +109,33 @@ public class MeterClosableTest {
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertFalse(m.isSlow());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailPath());
+        assertEquals(3, logger.getEventCount());
+        final MockLoggerEvent startErrorEvent = logger.getEvent(0);
+        final MockLoggerEvent stopEvent = logger.getEvent(1);
+        final MockLoggerEvent stopDataEvent = logger.getEvent(2);
+        assertEquals(Markers.INCONSISTENT_OK, startErrorEvent.getMarker());
+        assertEquals(Markers.MSG_OK, stopEvent.getMarker());
+        assertEquals(Markers.DATA_OK, stopDataEvent.getMarker());
+    }
+
+    @Test
+    public void testNoStartWithOkAndPath() {
+        final Meter m;
+        try (final Meter m2 = m = new Meter(logger, "testNoStartWithOk")) {
+            assertNotEquals(m, Meter.getCurrentInstance());
+            m2.ok("a");
+        }
+
+        assertTrue(m.isOK());
+        assertFalse(m.isReject());
+        assertFalse(m.isFail());
+        assertFalse(m.isSlow());
+        assertEquals("a", m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertNull(m.getFailPath());
         assertEquals(3, logger.getEventCount());
         final MockLoggerEvent startErrorEvent = logger.getEvent(0);
         final MockLoggerEvent stopEvent = logger.getEvent(1);
@@ -113,6 +156,10 @@ public class MeterClosableTest {
         assertFalse(m.isReject());
         assertTrue(m.isFail());
         assertFalse(m.isSlow());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        // The Meter with try catch pattern cannot know if an exception happened or not.
+        // Therefore, it assumes failure unless ok() is explicitly called.
         assertEquals("try-with-resources", m.getFailPath());
         assertEquals(3, logger.getEventCount());
         final MockLoggerEvent startErrorEvent = logger.getEvent(0);
@@ -135,6 +182,8 @@ public class MeterClosableTest {
         assertFalse(m.isReject());
         assertTrue(m.isFail());
         assertFalse(m.isSlow());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
         assertEquals("try-with-resources", m.getFailPath());
         assertEquals(4, logger.getEventCount());
         final MockLoggerEvent startEvent = logger.getEvent(0);
@@ -160,6 +209,9 @@ public class MeterClosableTest {
         assertTrue(m.isReject());
         assertFalse(m.isFail());
         assertFalse(m.isSlow());
+        assertNull(m.getOkPath());
+        assertEquals("a", m.getRejectPath());
+        assertNull(m.getFailPath());
         assertEquals(4, logger.getEventCount());
         final MockLoggerEvent startEvent = logger.getEvent(0);
         final MockLoggerEvent startDataEvent = logger.getEvent(1);
@@ -183,6 +235,9 @@ public class MeterClosableTest {
         assertFalse(m.isReject());
         assertTrue(m.isFail());
         assertFalse(m.isSlow());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        assertEquals("a", m.getFailPath());
         assertEquals(4, logger.getEventCount());
         final MockLoggerEvent startEvent = logger.getEvent(0);
         final MockLoggerEvent startDataEvent = logger.getEvent(1);
@@ -208,6 +263,10 @@ public class MeterClosableTest {
         assertFalse(m.isReject());
         assertTrue(m.isFail());
         assertFalse(m.isSlow());
+        assertNull(m.getOkPath());
+        assertNull(m.getRejectPath());
+        // The Meter with try catch pattern cannot get the exception itself, but reports "try-with-resources" failure.
+        assertEquals("try-with-resources", m.getFailPath());
         assertEquals(4, logger.getEventCount());
         final MockLoggerEvent startEvent = logger.getEvent(0);
         final MockLoggerEvent startDataEvent = logger.getEvent(1);
@@ -219,5 +278,4 @@ public class MeterClosableTest {
         assertEquals(Markers.DATA_FAIL, stopDataEvent.getMarker());
         assertTrue(stopEvent.getFormattedMessage().contains("try-with-resources"));
     }
-
 }
