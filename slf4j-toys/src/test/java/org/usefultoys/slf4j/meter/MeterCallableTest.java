@@ -15,10 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -51,16 +48,27 @@ public class MeterCallableTest {
     }
 
     @BeforeAll
-    public static void configureMeterSettings() {
+    public static void setupMeterSettings() {
         MeterConfig.progressPeriodMilliseconds = 0;
         MeterConfig.printCategory = false;
         MeterConfig.printStatus = true;
     }
 
+    @AfterAll
+    public static void tearDownMeterSettings() {
+        MeterConfig.reset();
+    }
+
     @BeforeEach
-    public void clearEvents() {
+    void setupLogger() {
         logger.clearEvents();
-        MeterConfig.printCategory = false;
+        logger.setEnabled(true);
+    }
+
+    @AfterEach
+    void clearLogger() {
+        logger.clearEvents();
+        logger.setEnabled(true);
     }
 
     @Test
