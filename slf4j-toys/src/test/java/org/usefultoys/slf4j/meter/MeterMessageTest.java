@@ -659,7 +659,7 @@ public class MeterMessageTest {
         final String flow = "ytrewq";
         try {
             /* Run stuff that may delay. */
-            m.path((Object) flow);
+            m.path(flow);
             Thread.sleep(220);
             m.ok();
         } catch (final Exception e) {

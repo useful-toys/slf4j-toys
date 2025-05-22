@@ -373,7 +373,7 @@ public class MeterAttributesTest {
 
     @Test
     public void testInvalidIteration() {
-        Meter meter = new Meter(logger);
+        final Meter meter = new Meter(logger);
 
         // Test m(message) with null
         meter.iterations(-1);
@@ -388,10 +388,10 @@ public class MeterAttributesTest {
 
     @Test
     public void testMWithNullLogsError() {
-        Meter meter = new Meter(logger);
+        final Meter meter = new Meter(logger);
 
         // Test m(message) with null
-        meter.m((String) null);
+        meter.m(null);
         logger.assertEvent(0, ERROR, ILLEGAL, "Illegal call to Meter.m(message): Null argument. id=Test#");
         logger.clearEvents();
 
@@ -409,10 +409,10 @@ public class MeterAttributesTest {
 
     @Test
     public void testCtxWithNullLogsError() {
-        Meter meter = new Meter(logger);
+        final Meter meter = new Meter(logger);
 
         // Test ctx(name) with null
-        meter.ctx((String) null);
+        meter.ctx(null);
         logger.assertEvent(0, ERROR, ILLEGAL, "Illegal call to Meter.ctx(name): Null argument. id=Test#");
         logger.clearEvents();
 

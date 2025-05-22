@@ -285,7 +285,7 @@ public class MeterCallableTest {
             });
         } catch (final Exception e) {
             assertEquals("someException", e.getMessage());
-            assertEquals(IllegalArgumentException.class, e.getClass());
+            assertSame(IllegalArgumentException.class, e.getClass());
         }
         assertFalse(m.isOK());
         assertFalse(m.isReject());
@@ -314,7 +314,7 @@ public class MeterCallableTest {
             });
         } catch (final Exception e) {
             assertEquals("someException", e.getMessage());
-            assertEquals(IOException.class, e.getClass());
+            assertSame(IOException.class, e.getClass());
         }
         assertFalse(m.isOK());
         assertFalse(m.isReject());

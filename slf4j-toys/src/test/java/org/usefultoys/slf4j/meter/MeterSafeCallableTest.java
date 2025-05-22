@@ -296,7 +296,7 @@ public class MeterSafeCallableTest {
                 }
             });
         } catch (final RuntimeException e) {
-            assertEquals(IllegalArgumentException.class, e.getClass());
+            assertSame(IllegalArgumentException.class, e.getClass());
             assertEquals("someException", e.getMessage());
         }
         assertFalse(m.isOK());
@@ -330,8 +330,8 @@ public class MeterSafeCallableTest {
             });
         } catch (final RuntimeException e) {
             assertEquals("Meter.safeCall wrapped exception.", e.getMessage());
-            assertEquals(RuntimeException.class, e.getClass());
-            assertEquals(IOException.class, e.getCause().getClass());
+            assertSame(RuntimeException.class, e.getClass());
+            assertSame(IOException.class, e.getCause().getClass());
             assertEquals("someException", e.getCause().getMessage());
         }
         assertFalse(m.isOK());
