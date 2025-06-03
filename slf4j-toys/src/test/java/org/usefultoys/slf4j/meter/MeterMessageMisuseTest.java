@@ -39,7 +39,6 @@ public class MeterMessageMisuseTest {
     final String title = "Example of meter misuse.";
     final String meterName = "name";
     final MockLogger logger = (MockLogger) LoggerFactory.getLogger(meterName);
-    static final String stackTraceEvidence = MeterMessageMisuseTest.class.getName();
 
     @BeforeAll
     static void validate() {
