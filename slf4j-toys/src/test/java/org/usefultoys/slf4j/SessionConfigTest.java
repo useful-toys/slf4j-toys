@@ -33,34 +33,17 @@ class SessionConfigTest {
     }
 
     @BeforeEach
-    void resetWatcherConfigBeforeEach() {
+    void setUp() {
         // Reinitialize WatcherConfig to ensure clean configuration before each test
         SessionConfig.reset();
-    }
-
-    @AfterAll
-    static void resetWatcherConfigAfterAll() {
-        // Reinitialize WatcherConfig to ensure clean configuration for further tests
-        SessionConfig.reset();
-    }
-
-
-    @BeforeEach
-    void setUp() {
-        System.clearProperty(SessionConfig.PROP_PRINT_UUID_SIZE);
-        System.clearProperty(SessionConfig.PROP_PRINT_CHARSET);
-
-        // Reinitialize SessionConfig to ensure clean state for each test
-        SessionConfig.init();
+        SystemConfig.reset();
     }
 
     @AfterAll
     static void tearDown() {
-        System.clearProperty(SessionConfig.PROP_PRINT_UUID_SIZE);
-        System.clearProperty(SessionConfig.PROP_PRINT_CHARSET);
-
-        // Reinitialize SessionConfig to ensure clean state for each test
-        SessionConfig.init();
+        // Reinitialize WatcherConfig to ensure clean configuration for further tests
+        SessionConfig.reset();
+        SystemConfig.reset();
     }
 
     @Test

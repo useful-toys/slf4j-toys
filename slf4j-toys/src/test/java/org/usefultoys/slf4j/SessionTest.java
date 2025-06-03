@@ -16,7 +16,9 @@
 
 package org.usefultoys.slf4j;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
@@ -28,6 +30,20 @@ class SessionTest {
     @BeforeAll
     static void validate() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeEach
+    void setUp() {
+        // Reinitialize WatcherConfig to ensure clean configuration before each test
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        // Reinitialize WatcherConfig to ensure clean configuration for further tests
+        SessionConfig.reset();
+        SystemConfig.reset();
     }
 
     @Test

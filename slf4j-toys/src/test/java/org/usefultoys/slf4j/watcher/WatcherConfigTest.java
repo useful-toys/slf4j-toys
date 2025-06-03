@@ -35,7 +35,7 @@ class WatcherConfigTest {
     }
 
     @BeforeEach
-    void resetWatcherConfigBeforeEach() {
+    void setUp() {
         // Reinitialize each configuration to ensure a clean configuration before each test
         WatcherConfig.reset();
         SessionConfig.reset();
@@ -43,8 +43,8 @@ class WatcherConfigTest {
     }
 
     @AfterAll
-    static void resetWatcherConfigAfterAll() {
-        // Reinitialize each configuration to ensure a clean configuration before each test
+    static void tearDown() {
+        // Reinitialize SystemConfig to ensure clean state for further tests
         WatcherConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();

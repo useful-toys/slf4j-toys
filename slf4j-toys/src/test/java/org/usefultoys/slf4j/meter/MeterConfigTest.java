@@ -35,7 +35,7 @@ class MeterConfigTest {
     }
 
     @BeforeEach
-    void resetWatcherConfigBeforeEach() {
+    void setUp() {
         // Reinitialize each configuration to ensure a clean configuration before each test
         MeterConfig.reset();
         SessionConfig.reset();
@@ -43,8 +43,8 @@ class MeterConfigTest {
     }
 
     @AfterAll
-    static void resetWatcherConfigAfterAll() {
-        // Reinitialize each configuration to ensure a clean configuration before each test
+    static void tearDown() {
+        // Reinitialize SystemConfig to ensure clean state for further tests
         MeterConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();

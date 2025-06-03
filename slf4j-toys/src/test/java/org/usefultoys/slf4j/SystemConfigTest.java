@@ -16,10 +16,7 @@
 
 package org.usefultoys.slf4j;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.nio.charset.Charset;
 
@@ -35,21 +32,14 @@ class SystemConfigTest {
     @BeforeEach
     void setUp() {
         // Reinitialize SystemConfig to ensure clean state for each test
-        System.clearProperty(SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN);
-        System.clearProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN);
-        System.clearProperty(SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN);
-        System.clearProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN);
-        System.clearProperty(SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN);
+        SystemConfig.reset();
 
     }
 
-    @AfterEach
-    void tearDown() {
-        System.clearProperty(SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN);
-        System.clearProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN);
-        System.clearProperty(SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN);
-        System.clearProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN);
-        System.clearProperty(SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN);
+    @AfterAll
+    static void tearDown() {
+        // Reinitialize SystemConfig to ensure clean state for further tests
+        SystemConfig.reset();
     }
 
     @Test
