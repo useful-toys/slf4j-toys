@@ -16,12 +16,16 @@
 package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
+import org.usefultoys.slf4j.SessionConfig;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.nio.charset.Charset;
 
 /**
  * Unit tests for the MeterFactory class.
@@ -32,6 +36,11 @@ class MeterFactoryTest {
     private static final String TEST_CATEGORY = "test.category";
     private static final String TEST_OPERATION = "testOperation";
     private static final String TEST_SUBOPERATION = "testSubOperation";
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     @BeforeEach
     void setUp() {
