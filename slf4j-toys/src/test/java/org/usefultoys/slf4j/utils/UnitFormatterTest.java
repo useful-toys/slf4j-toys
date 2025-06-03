@@ -34,16 +34,16 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  */
 class UnitFormatterTest {
 
-
     private static final int[] FACTORS = {1000, 1000, 1000};
     private static final String[] UNITS = {"A", "B", "C"};
+
+
+    private static Locale originalLocale;
 
     @BeforeAll
     static void validate() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
-
-    private static Locale originalLocale;
 
     @BeforeAll
     public static void setUpLocale() {
