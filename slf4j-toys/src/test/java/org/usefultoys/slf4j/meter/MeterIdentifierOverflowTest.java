@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Daniel
  */
 class MeterIdentifierOverflowTest {
-    final String meterName = "name";
+    final String meterName = "MeterIdentifierOverflowTest";
     final MockLogger logger = (MockLogger) LoggerFactory.getLogger(meterName);
 
     @BeforeAll
