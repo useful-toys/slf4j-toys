@@ -55,7 +55,7 @@ class WatcherSingletonTest {
         SystemConfig.reset();
     }
 
-    private MockLogger mockLogger = (MockLogger) LoggerFactory.getLogger(WatcherConfig.name);;
+    private final MockLogger mockLogger = (MockLogger) LoggerFactory.getLogger(WatcherConfig.name);
 
     @BeforeEach
     void setupLogger() {
@@ -101,7 +101,7 @@ class WatcherSingletonTest {
                 mockLogger.getEventCount() > 0
         );
 
-        assertTrue(mockLogger.getEventCount() == 1);
+        assertEquals(1, mockLogger.getEventCount());
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
 
         assertDoesNotThrow(() -> WatcherSingleton.stopDefaultWatcherExecutor());
@@ -139,7 +139,7 @@ class WatcherSingletonTest {
                 mockLogger.getEventCount() > 0
         );
 
-        assertTrue(mockLogger.getEventCount() == 1);
+        assertEquals(1, mockLogger.getEventCount());
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
 
         assertDoesNotThrow(() -> WatcherSingleton.stopDefaultWatcherTimer());

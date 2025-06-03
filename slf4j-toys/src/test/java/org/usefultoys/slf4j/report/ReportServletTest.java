@@ -76,7 +76,7 @@ class ReportServletTest {
         final PrintWriter writer = new PrintWriter(responseWriter);
         when(response.getWriter()).thenReturn(writer);
 
-        reportLogger = (MockLogger) (MockLogger) LoggerFactory.getLogger(ReporterConfig.name);
+        reportLogger = (MockLogger) LoggerFactory.getLogger(ReporterConfig.name);
         reportLogger.clearEvents();
         servletLogger = (MockLogger) LoggerFactory.getLogger(ReportServlet.class);
         servletLogger.clearEvents();

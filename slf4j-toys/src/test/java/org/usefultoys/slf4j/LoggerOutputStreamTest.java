@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +33,7 @@ class LoggerOutputStreamTest {
     }
 
     static class TestLoggerOutputStream extends LoggerOutputStream {
-        private StringBuilder loggedData = new StringBuilder();
+        private final StringBuilder loggedData = new StringBuilder();
 
         @Override
         protected void writeToLogger() {
@@ -47,7 +48,7 @@ class LoggerOutputStreamTest {
     @Test
     void testWriteAndExtractString() throws IOException {
         final TestLoggerOutputStream stream = new TestLoggerOutputStream();
-        stream.write("Hello, World!".getBytes());
+        stream.write("Hello, World!".getBytes(StandardCharsets.UTF_8));
         assertEquals("Hello, World!", stream.extractString());
         assertEquals("", stream.getLoggedData());
     }
@@ -55,7 +56,7 @@ class LoggerOutputStreamTest {
     @Test
     void testFlushDoesNotLog() throws IOException {
         final TestLoggerOutputStream stream = new TestLoggerOutputStream();
-        stream.write("Hello, World!".getBytes());
+        stream.write("Hello, World!".getBytes(StandardCharsets.UTF_8));
         stream.flush();
         assertEquals("Hello, World!", stream.extractString());
         assertEquals("", stream.getLoggedData());
@@ -64,7 +65,7 @@ class LoggerOutputStreamTest {
     @Test
     void testCloseLogsData() throws IOException {
         final TestLoggerOutputStream stream = new TestLoggerOutputStream();
-        stream.write("Hello, World!".getBytes());
+        stream.write("Hello, World!".getBytes(StandardCharsets.UTF_8));
         stream.close();
         assertEquals("Hello, World!", stream.extractString());
         assertEquals("Hello, World!", stream.getLoggedData());
@@ -73,7 +74,7 @@ class LoggerOutputStreamTest {
     @Test
     void testWriteWithOffset() throws IOException {
         final TestLoggerOutputStream stream = new TestLoggerOutputStream();
-        final byte[] data = "Hello, World!".getBytes();
+        final byte[] data = "Hello, World!".getBytes(StandardCharsets.UTF_8);
         stream.write(data, 7, 6); // Write "World!"
         stream.close();
         assertEquals("World!", stream.extractString());
@@ -83,7 +84,7 @@ class LoggerOutputStreamTest {
     @Test
     void testWrite() throws IOException {
         final TestLoggerOutputStream stream = new TestLoggerOutputStream();
-        stream.write("Hello, World!".getBytes());
+        stream.write("Hello, World!".getBytes(StandardCharsets.UTF_8));
         stream.close();
         assertEquals("Hello, World!", stream.extractString());
         assertEquals("Hello, World!", stream.getLoggedData());
@@ -101,7 +102,7 @@ class LoggerOutputStreamTest {
     @Test
     void testToString() throws IOException {
         final TestLoggerOutputStream stream = new TestLoggerOutputStream();
-        stream.write("Hello, World!".getBytes());
+        stream.write("Hello, World!".getBytes(StandardCharsets.UTF_8));
         assertEquals("Hello, World!", stream.toString ());
     }
 }

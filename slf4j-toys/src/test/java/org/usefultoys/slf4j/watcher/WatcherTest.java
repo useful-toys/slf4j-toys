@@ -84,15 +84,15 @@ class WatcherTest {
         final long position = watcher.getPosition();
         final long time = watcher.getLastCurrentTime();
         watcher.run();
-        assertTrue(watcher.getPosition() == position + 1);
+        assertEquals(watcher.getPosition(), position + 1);
         assertTrue(watcher.getLastCurrentTime() > time);
         assertTrue(watcher.getRuntime_usedMemory() > 0);
 
         // Readable and encoded messages are written to the separated logs
-        assertTrue(mockLogger.getEventCount() == 0);
-        assertTrue(messageLogger.getEventCount() == 1);
+        assertEquals(0, mockLogger.getEventCount());
+        assertEquals(1, messageLogger.getEventCount());
         assertTrue(messageLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
-        assertTrue(dataLogger.getEventCount() == 1);
+        assertEquals(1, dataLogger.getEventCount());
         final String json5 = dataLogger.getEvent(0).getMessage();
         assertEquals(json5, watcher.json5Message());
     }
@@ -110,14 +110,14 @@ class WatcherTest {
         final long position = watcher.getPosition();
         final long time = watcher.getLastCurrentTime();
         watcher.run();
-        assertTrue(watcher.getPosition() == position + 1);
+        assertEquals(watcher.getPosition(), position + 1);
         assertTrue(watcher.getLastCurrentTime() > time);
         assertTrue(watcher.getRuntime_usedMemory() > 0);
 
         // Readable and encoded messages are written to the same log
-        assertTrue(messageLogger.getEventCount() == 0);
-        assertTrue(dataLogger.getEventCount() == 0);
-        assertTrue(mockLogger.getEventCount() == 2);
+        assertEquals(0, messageLogger.getEventCount());
+        assertEquals(0, dataLogger.getEventCount());
+        assertEquals(2, mockLogger.getEventCount());
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
         final String json5 = mockLogger.getEvent(1).getMessage();
         assertEquals(json5, watcher.json5Message());
@@ -136,14 +136,14 @@ class WatcherTest {
         final long position = watcher.getPosition();
         final long time = watcher.getLastCurrentTime();
         watcher.run();
-        assertTrue(watcher.getPosition() == position + 1);
+        assertEquals(watcher.getPosition(), position + 1);
         assertTrue(watcher.getLastCurrentTime() > time);
         assertTrue(watcher.getRuntime_usedMemory() > 0);
 
         // Only readable message is written to log
-        assertTrue(messageLogger.getEventCount() == 0);
-        assertTrue(dataLogger.getEventCount() == 0);
-        assertTrue(mockLogger.getEventCount() == 1);
+        assertEquals(0, messageLogger.getEventCount());
+        assertEquals(0, dataLogger.getEventCount());
+        assertEquals(1, mockLogger.getEventCount());
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
     }
 
@@ -164,14 +164,14 @@ class WatcherTest {
         final long position = watcher.getPosition();
         final long time = watcher.getLastCurrentTime();
         watcher.run();
-        assertTrue(watcher.getPosition() == position + 1);
+        assertEquals(watcher.getPosition(), position + 1);
         assertTrue(watcher.getLastCurrentTime() > time);
         assertTrue(watcher.getRuntime_usedMemory() > 0);
 
         // Only readable message is written to log
-        assertTrue(messageLogger.getEventCount() == 0);
-        assertTrue(dataLogger.getEventCount() == 0);
-        assertTrue(mockLogger.getEventCount() == 1);
+        assertEquals(0, messageLogger.getEventCount());
+        assertEquals(0, dataLogger.getEventCount());
+        assertEquals(1, mockLogger.getEventCount());
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
     }
 
@@ -192,14 +192,14 @@ class WatcherTest {
         final long position = watcher.getPosition();
         final long time = watcher.getLastCurrentTime();
         watcher.run();
-        assertTrue(watcher.getPosition() == position + 1);
+        assertEquals(watcher.getPosition(), position + 1);
         assertTrue(watcher.getLastCurrentTime() > time);
         // As nothing is logged, the memory usage won't be collected and should be 0
-        assertTrue(watcher.getRuntime_usedMemory() == 0);
+        assertEquals(0, watcher.getRuntime_usedMemory());
 
         // No messages a written to log
-        assertTrue(messageLogger.getEventCount() == 0);
-        assertTrue(dataLogger.getEventCount() == 0);
-        assertTrue(mockLogger.getEventCount() == 0);
+        assertEquals(0, messageLogger.getEventCount());
+        assertEquals(0, dataLogger.getEventCount());
+        assertEquals(0, mockLogger.getEventCount());
     }
 }

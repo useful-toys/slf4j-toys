@@ -32,7 +32,7 @@ import java.util.Map;
  * instantiated directly in test code.
  * <p>
  * To use this in tests, ensure the service provider configuration is in place:
- * <code>META-INF/services/org.slf4j.ILoggerFactory</code> should contain:
+ * {@code META-INF/services/org.slf4j.ILoggerFactory} should contain:
  * <pre>
  * org.usefultoys.slf4j.report.MockLoggerFactory
  * </pre>

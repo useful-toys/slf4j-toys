@@ -23,6 +23,7 @@ import org.slf4j.impl.MockLoggerEvent;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +33,7 @@ class LoggerFactoryTest {
     void testGetLoggerByName() {
         final Logger logger = LoggerFactory.getLogger("testLogger");
         assertNotNull(logger);
-        assertTrue(logger instanceof MockLogger);
+        assertInstanceOf(MockLogger.class, logger);
         assertEquals("testLogger", logger.getName());
     }
 
@@ -40,7 +41,7 @@ class LoggerFactoryTest {
     void testGetLoggerByClass() {
         final Logger logger = LoggerFactory.getLogger(LoggerFactoryTest.class);
         assertNotNull(logger);
-        assertTrue(logger instanceof MockLogger);
+        assertInstanceOf(MockLogger.class, logger);
         assertEquals(LoggerFactoryTest.class.getName(), logger.getName());
     }
 
@@ -48,7 +49,7 @@ class LoggerFactoryTest {
     void testGetLoggerByClassAndName() {
         final Logger logger = LoggerFactory.getLogger(LoggerFactoryTest.class, "feature");
         assertNotNull(logger);
-        assertTrue(logger instanceof MockLogger);
+        assertInstanceOf(MockLogger.class, logger);
         assertEquals(LoggerFactoryTest.class.getName() + ".feature", logger.getName());
     }
 
@@ -57,7 +58,7 @@ class LoggerFactoryTest {
         final Logger parentLogger = LoggerFactory.getLogger("parentLogger");
         final Logger childLogger = LoggerFactory.getLogger(parentLogger, "child");
         assertNotNull(childLogger);
-        assertTrue(childLogger instanceof MockLogger);
+        assertInstanceOf(MockLogger.class, childLogger);
         assertEquals("parentLogger.child", childLogger.getName());
     }
 
@@ -155,7 +156,7 @@ class LoggerFactoryTest {
 
         final PrintStream traceStream = LoggerFactory.getTracePrintStream(logger);
         assertNotNull(traceStream);
-        assertTrue(traceStream instanceof NullPrintStream);
+        assertInstanceOf(NullPrintStream.class, traceStream);
     }
 
     @Test
@@ -167,7 +168,7 @@ class LoggerFactoryTest {
 
         final PrintStream debugStream = LoggerFactory.getDebugPrintStream(logger);
         assertNotNull(debugStream);
-        assertTrue(debugStream instanceof NullPrintStream);
+        assertInstanceOf(NullPrintStream.class, debugStream);
     }
 
     @Test
@@ -179,7 +180,7 @@ class LoggerFactoryTest {
 
         final PrintStream infoStream = LoggerFactory.getInfoPrintStream(logger);
         assertNotNull(infoStream);
-        assertTrue(infoStream instanceof NullPrintStream);
+        assertInstanceOf(NullPrintStream.class, infoStream);
     }
 
     @Test
@@ -191,7 +192,7 @@ class LoggerFactoryTest {
 
         final PrintStream warnStream = LoggerFactory.getWarnPrintStream(logger);
         assertNotNull(warnStream);
-        assertTrue(warnStream instanceof NullPrintStream);
+        assertInstanceOf(NullPrintStream.class, warnStream);
     }
 
     @Test
@@ -202,7 +203,7 @@ class LoggerFactoryTest {
 
         final PrintStream errorStream = LoggerFactory.getErrorPrintStream(logger);
         assertNotNull(errorStream);
-        assertTrue(errorStream instanceof NullPrintStream);
+        assertInstanceOf(NullPrintStream.class, errorStream);
     }
 
     @Test
@@ -214,7 +215,7 @@ class LoggerFactoryTest {
 
         final OutputStream traceStream = LoggerFactory.getTraceOutputStream(logger);
         assertNotNull(traceStream);
-        traceStream.write("Trace message".getBytes());
+        traceStream.write("Trace message".getBytes(StandardCharsets.UTF_8));
         traceStream.close();
 
         assertEquals(1, mockLogger.getEventCount());
@@ -231,7 +232,7 @@ class LoggerFactoryTest {
 
         final OutputStream debugStream = LoggerFactory.getDebugOutputStream(logger);
         assertNotNull(debugStream);
-        debugStream.write("Debug message".getBytes());
+        debugStream.write("Debug message".getBytes(StandardCharsets.UTF_8));
         debugStream.close();
 
         assertEquals(1, mockLogger.getEventCount());
@@ -248,7 +249,7 @@ class LoggerFactoryTest {
 
         final OutputStream infoStream = LoggerFactory.getInfoOutputStream(logger);
         assertNotNull(infoStream);
-        infoStream.write("Info message".getBytes());
+        infoStream.write("Info message".getBytes(StandardCharsets.UTF_8));
         infoStream.close();
 
         assertEquals(1, mockLogger.getEventCount());
@@ -265,7 +266,7 @@ class LoggerFactoryTest {
 
         final OutputStream warnStream = LoggerFactory.getWarnOutputStream(logger);
         assertNotNull(warnStream);
-        warnStream.write("Warn message".getBytes());
+        warnStream.write("Warn message".getBytes(StandardCharsets.UTF_8));
         warnStream.close();
 
         assertEquals(1, mockLogger.getEventCount());
@@ -282,7 +283,7 @@ class LoggerFactoryTest {
 
         final OutputStream errorStream = LoggerFactory.getErrorOutputStream(logger);
         assertNotNull(errorStream);
-        errorStream.write("Error message".getBytes());
+        errorStream.write("Error message".getBytes(StandardCharsets.UTF_8));
         errorStream.close();
 
         assertEquals(1, mockLogger.getEventCount());
@@ -298,7 +299,7 @@ class LoggerFactoryTest {
 
         final OutputStream traceStream = LoggerFactory.getTraceOutputStream(logger);
         assertNotNull(traceStream);
-        assertTrue(traceStream instanceof NullOutputStream);
+        assertInstanceOf(NullOutputStream.class, traceStream);
     }
 
     @Test
@@ -310,7 +311,7 @@ class LoggerFactoryTest {
 
         final OutputStream debugStream = LoggerFactory.getDebugOutputStream(logger);
         assertNotNull(debugStream);
-        assertTrue(debugStream instanceof NullOutputStream);
+        assertInstanceOf(NullOutputStream.class, debugStream);
     }
 
     @Test
@@ -322,7 +323,7 @@ class LoggerFactoryTest {
 
         final OutputStream infoStream = LoggerFactory.getInfoOutputStream(logger);
         assertNotNull(infoStream);
-        assertTrue(infoStream instanceof NullOutputStream);
+        assertInstanceOf(NullOutputStream.class, infoStream);
     }
 
     @Test
@@ -334,7 +335,7 @@ class LoggerFactoryTest {
 
         final OutputStream warnStream = LoggerFactory.getWarnOutputStream(logger);
         assertNotNull(warnStream);
-        assertTrue(warnStream instanceof NullOutputStream);
+        assertInstanceOf(NullOutputStream.class, warnStream);
     }
 
     @Test
@@ -346,6 +347,6 @@ class LoggerFactoryTest {
 
         final OutputStream errorStream = LoggerFactory.getErrorOutputStream(logger);
         assertNotNull(errorStream);
-        assertTrue(errorStream instanceof NullOutputStream);
+        assertInstanceOf(NullOutputStream.class, errorStream);
     }
 }

@@ -34,7 +34,6 @@ class EventDataTest {
         boolean resetCalled = false;
 
         public TestEventData() {
-            super();
         }
 
         public TestEventData(final String sessionUuid) {
@@ -107,7 +106,7 @@ class EventDataTest {
     void testReadableMessage() {
         final TestEventData event = new TestEventData("abc", 5L);
         final String message = event.readableMessage();
-        assertTrue(message.equals("a"));
+        assertEquals("a", message);
     }
 
     @Test

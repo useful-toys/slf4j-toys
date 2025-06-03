@@ -24,6 +24,7 @@ import org.slf4j.impl.MockLoggerEvent.Level;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -431,7 +432,7 @@ public class MockLogger implements Logger {
      */
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void print(final MockLoggerEvent event) {
-        boolean isStderr = event.getLevel() == Level.ERROR || event.getLevel() == Level.WARN;
+        final boolean isStderr = event.getLevel() == Level.ERROR || event.getLevel() == Level.WARN;
         if (isStderr && !stderrEnabled) {
             return;
         } else if (!stdoutEnabled) {
@@ -454,7 +455,7 @@ public class MockLogger implements Logger {
         }
         final ByteArrayOutputStream s = new ByteArrayOutputStream();
         event.getThrowable().printStackTrace(new PrintStream(s));
-        final String st = new String(s.toByteArray());
+        final String st = s.toString(StandardCharsets.UTF_8);
         return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage() + "\n" + st;
     }
 

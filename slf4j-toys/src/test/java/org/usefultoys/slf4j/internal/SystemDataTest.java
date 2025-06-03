@@ -126,7 +126,7 @@ class SystemDataTest {
     void testReadableMessage() {
         final TestSystemData event = new TestSystemData("abc", 5L);
         final String message = event.readableMessage();
-        assertTrue(message.equals("a"));
+        assertEquals("a", message);
     }
 
     @Test
@@ -138,7 +138,8 @@ class SystemDataTest {
         assertNotEquals(0L, event.getRuntime_totalMemory());
     }
 
-    @Test() @Disabled
+    @Test
+    @Disabled
     void testCollectPlatformStatus() {
         SystemConfig.usePlatformManagedBean = true;
         final TestSystemData event = new TestSystemData("abc", 5L);

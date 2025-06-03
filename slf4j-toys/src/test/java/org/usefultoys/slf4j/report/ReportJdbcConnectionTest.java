@@ -84,7 +84,7 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        final MockLogger mockLogger = (MockLogger) logger;
+        final MockLogger mockLogger = logger;
         final String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
 
         assertTrue(fullLog.contains("Closed!"));
@@ -124,7 +124,7 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        final MockLogger mockLogger = (MockLogger) logger;
+        final MockLogger mockLogger = logger;
         final String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
 
         assertTrue(fullLog.contains("JDBC connection"));
@@ -157,7 +157,7 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        final MockLogger mockLogger = (MockLogger) logger;
+        final MockLogger mockLogger = logger;
         final String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
 
         assertTrue(fullLog.contains("JDBC connection"));
@@ -190,7 +190,7 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        final MockLogger mockLogger = (MockLogger) logger;
+        final MockLogger mockLogger = logger;
         final String fullLog = mockLogger.getEvent(0).getFormattedMessage();
 
         assertTrue(fullLog.contains("type map: uuid->UUID; jsonb->String; "));
@@ -219,7 +219,7 @@ class ReportJdbcConnectionTest {
         reporter.run();
 
         // Assert
-        final MockLogger mockLogger = (MockLogger) logger;
+        final MockLogger mockLogger = logger;
         final String fullLog = mockLogger.getEvent(0).getFormattedMessage();
 
         assertTrue(fullLog.contains("type map: n/a"));

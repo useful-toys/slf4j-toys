@@ -29,8 +29,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class WatcherServletTest {
@@ -56,8 +55,8 @@ class WatcherServletTest {
         SystemConfig.reset();
     }
 
-    private MockLogger mockLogger = (MockLogger) LoggerFactory.getLogger(WatcherServlet.class);
-    private MockLogger watcherLogger = (MockLogger) LoggerFactory.getLogger(WatcherConfig.name);
+    private final MockLogger mockLogger = (MockLogger) LoggerFactory.getLogger(WatcherServlet.class);
+    private final MockLogger watcherLogger = (MockLogger) LoggerFactory.getLogger(WatcherConfig.name);
 
     @BeforeEach
     void setupLogger() {
@@ -92,10 +91,10 @@ class WatcherServletTest {
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertEquals("System status logged successfully.", responseWriter.toString().trim());
 
-        assertTrue(mockLogger.getEventCount() == 1);
+        assertEquals(1, mockLogger.getEventCount());
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("WatcherServlet accessed"));
 
-        assertTrue(watcherLogger.getEventCount() == 1);
+        assertEquals(1, watcherLogger.getEventCount());
         assertTrue(watcherLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
     }
 
@@ -134,7 +133,7 @@ class WatcherServletTest {
         assertEquals("Failed to log system status.", responseWriter.toString().trim());
         
         assertEquals(1, mockLogger.getEventCount());
-        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertSame(mockLogger.getEvent(0).getThrowable(), testException);
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
     }
 
@@ -157,7 +156,7 @@ class WatcherServletTest {
         verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         
         assertEquals(1, mockLogger.getEventCount());
-        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertSame(mockLogger.getEvent(0).getThrowable(), testException);
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
     }
 
@@ -196,7 +195,7 @@ class WatcherServletTest {
         assertEquals("Failed to log system status.", responseWriter.toString().trim());
 
         assertEquals(1, mockLogger.getEventCount());
-        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertSame(mockLogger.getEvent(0).getThrowable(), testException);
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
     }
 
@@ -219,7 +218,7 @@ class WatcherServletTest {
         assertEquals("Failed to log system status.", responseWriter.toString().trim());
 
         assertEquals(1, mockLogger.getEventCount());
-        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertSame(mockLogger.getEvent(0).getThrowable(), testException);
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
     }
 
@@ -242,7 +241,7 @@ class WatcherServletTest {
         verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
         assertEquals(1, mockLogger.getEventCount());
-        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertSame(mockLogger.getEvent(0).getThrowable(), testException);
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
     }
 
@@ -265,7 +264,7 @@ class WatcherServletTest {
         assertEquals("Failed to log system status.", responseWriter.toString().trim());
 
         assertEquals(1, mockLogger.getEventCount());
-        assertTrue(mockLogger.getEvent(0).getThrowable() == testException);
+        assertSame(mockLogger.getEvent(0).getThrowable(), testException);
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
     }
 
