@@ -203,13 +203,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().path(path).path(path2).ok();
 
         assertEquals(4, logger.getEventCount());
-        final MockLoggerEvent startEvent = logger.getEvent(0);
-        final MockLoggerEvent startDataEvent = logger.getEvent(1);
-        final MockLoggerEvent stopEvent = logger.getEvent(2);
-        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
-        assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
-        assertFalse(startEvent.getFormattedMessage().contains("[" + path2 + "]"));
-        assertTrue(stopEvent.getFormattedMessage().contains("[" + path2 + "]"));
+        logger.assertEvent(0, DEBUG, MSG_START, MESSAGE_START_PREFIX);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK, MESSAGE_OK_PREFIX, "[" + path2 + "]");
+        logger.assertEvent(3, TRACE, DATA_OK, path2);
     }
 
     @Test
@@ -219,13 +216,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().path(path).ok(path2);
 
         assertEquals(4, logger.getEventCount());
-        final MockLoggerEvent startEvent = logger.getEvent(0);
-        final MockLoggerEvent startDataEvent = logger.getEvent(1);
-        final MockLoggerEvent stopEvent = logger.getEvent(2);
-        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
-        assertFalse(startEvent.getFormattedMessage().contains("[" + path + "]"));
-        assertFalse(startEvent.getFormattedMessage().contains("[" + path2 + "]"));
-        assertTrue(stopEvent.getFormattedMessage().contains("[" + path2 + "]"));
+        logger.assertEvent(0, DEBUG, MSG_START, MESSAGE_START_PREFIX);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK, MESSAGE_OK_PREFIX, "[" + path2 + "]");
+        logger.assertEvent(3, TRACE, DATA_OK, path2);
     }
 
     @Test
@@ -250,7 +244,7 @@ public class MeterMessageTest {
         logger.assertEvent(0, DEBUG, MSG_START, MESSAGE_START_PREFIX);
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, INFO, MSG_REJECT, MESSAGE_REJECT_PREFIX, reject);
-        logger.assertEvent(3, TRACE, DATA_REJECT);
+        logger.assertEvent(3, TRACE, DATA_REJECT, reject);
     }
 
     @Test
