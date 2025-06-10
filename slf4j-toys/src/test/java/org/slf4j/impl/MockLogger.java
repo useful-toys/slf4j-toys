@@ -537,13 +537,31 @@ public class MockLogger implements Logger {
      * @param eventIndex       the index of the event to check
      * @param expectedLevel    the expected log level of the event
      * @param expectedMarker   the expected marker of the event
-     * @param exepectedMessage a substring that should be present in the event's message
+     * @param messagePart a substring that should be present in the event's message
      */
-    public void assertEvent(final int eventIndex, final Level expectedLevel, final Marker expectedMarker, final String exepectedMessage) {
+    public void assertEvent(final int eventIndex, final Level expectedLevel, final Marker expectedMarker, final String messagePart) {
         final MockLoggerEvent event = loggerEvents.get(eventIndex);
         Assertions.assertTrue(eventIndex < loggerEvents.size(), "Not enough logger messages");
         Assertions.assertSame(expectedLevel, event.getLevel(), "Logger expectedLevel does not match");
-        Assertions.assertTrue(event.getFormattedMessage().contains(exepectedMessage), "Message does not contain expected string");
+        Assertions.assertTrue(event.getFormattedMessage().contains(messagePart), "Message does not contain expected string");
+        Assertions.assertSame(expectedMarker, event.getMarker(), "Logger expectedMarker does not match");
+    }
+
+    /**
+     * Asserts that the logger has recorded an event at the specified index with the expected level, marker, and message.
+     *
+     * @param eventIndex       the index of the event to check
+     * @param expectedLevel    the expected log level of the event
+     * @param expectedMarker   the expected marker of the event
+     * @param messageParts     an array of substrings that should be present in the event's message
+     */
+    public void assertEvent(final int eventIndex, final Level expectedLevel, final Marker expectedMarker, final String... messageParts) {
+        final MockLoggerEvent event = loggerEvents.get(eventIndex);
+        Assertions.assertTrue(eventIndex < loggerEvents.size(), "Not enough logger messages");
+        Assertions.assertSame(expectedLevel, event.getLevel(), "Logger expectedLevel does not match");
+        for (String messagePart : messageParts) {
+            Assertions.assertTrue(event.getFormattedMessage().contains(messagePart), "Message does not contain expected string: " + messagePart);
+        }
         Assertions.assertSame(expectedMarker, event.getMarker(), "Logger expectedMarker does not match");
     }
 
