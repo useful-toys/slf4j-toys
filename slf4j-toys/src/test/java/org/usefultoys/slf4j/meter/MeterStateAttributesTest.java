@@ -27,7 +27,6 @@ import java.nio.charset.Charset;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *
  * @author Daniel Felix Ferber
  */
 public class MeterStateAttributesTest {
@@ -66,7 +65,7 @@ public class MeterStateAttributesTest {
 
         assertTrue(m.isStarted());
         assertFalse(m.isStopped());
-       assertFalse(m.isOK());
+        assertFalse(m.isOK());
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertNull(m.getOkPath());
@@ -87,14 +86,14 @@ public class MeterStateAttributesTest {
         assertNull(m.getFailMessage());
         assertNull(m.getFailPath());
     }
-    
+
     @Test
     public void testTimeAttributesOkWithFlow() {
         final Meter m = new Meter(logger);
 
         assertFalse(m.isStarted());
         assertFalse(m.isStopped());
-       assertFalse(m.isOK());
+        assertFalse(m.isOK());
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertNull(m.getOkPath());
@@ -106,7 +105,7 @@ public class MeterStateAttributesTest {
 
         assertTrue(m.isStarted());
         assertFalse(m.isStopped());
-       assertFalse(m.isOK());
+        assertFalse(m.isOK());
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertNull(m.getOkPath());
@@ -126,14 +125,14 @@ public class MeterStateAttributesTest {
         assertNull(m.getFailMessage());
         assertNull(m.getFailPath());
     }
-  
+
     @Test
     public void testTimeAttributesFlow() {
         final Meter m = new Meter(logger);
 
         assertFalse(m.isStarted());
         assertFalse(m.isStopped());
-       assertFalse(m.isOK());
+        assertFalse(m.isOK());
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertNull(m.getOkPath());
@@ -177,7 +176,7 @@ public class MeterStateAttributesTest {
         assertNull(m.getFailMessage());
         assertNull(m.getFailPath());
     }
-      
+
     @Test
     public void testTimeAttributesFlow2() {
         final Meter m = new Meter(logger);
@@ -196,7 +195,7 @@ public class MeterStateAttributesTest {
 
         assertTrue(m.isStarted());
         assertFalse(m.isStopped());
-       assertFalse(m.isOK());
+        assertFalse(m.isOK());
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertNull(m.getOkPath());
@@ -228,7 +227,7 @@ public class MeterStateAttributesTest {
         assertNull(m.getFailMessage());
         assertNull(m.getFailPath());
 
-    	m.ok();
+        m.ok();
 
         assertTrue(m.isStarted());
         assertTrue(m.isStopped());
@@ -240,14 +239,14 @@ public class MeterStateAttributesTest {
         assertNull(m.getFailMessage());
         assertNull(m.getFailPath());
     }
-      
+
     @Test
     public void testTimeAttributesReject() {
         final Meter m = new Meter(logger);
 
         assertFalse(m.isStarted());
         assertFalse(m.isStopped());
-       assertFalse(m.isOK());
+        assertFalse(m.isOK());
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertNull(m.getOkPath());
@@ -259,7 +258,7 @@ public class MeterStateAttributesTest {
 
         assertTrue(m.isStarted());
         assertFalse(m.isStopped());
-      assertFalse(m.isOK());
+        assertFalse(m.isOK());
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertNull(m.getOkPath());
@@ -298,7 +297,7 @@ public class MeterStateAttributesTest {
 
         assertTrue(m.isStarted());
         assertFalse(m.isStopped());
-       assertFalse(m.isOK());
+        assertFalse(m.isOK());
         assertFalse(m.isReject());
         assertFalse(m.isFail());
         assertNull(m.getOkPath());
@@ -318,4 +317,4 @@ public class MeterStateAttributesTest {
         assertEquals("ISE", m.getFailMessage());
         assertEquals("java.lang.IllegalStateException", m.getFailPath());
     }
- }
+}
