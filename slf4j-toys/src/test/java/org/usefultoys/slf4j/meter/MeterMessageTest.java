@@ -253,22 +253,10 @@ public class MeterMessageTest {
         final Meter m = new Meter(logger).start().fail(new Exception(exceptionStr));
 
         assertEquals(4, logger.getEventCount());
-        final MockLoggerEvent startEvent = logger.getEvent(0);
-        final MockLoggerEvent startDataEvent = logger.getEvent(1);
-        final MockLoggerEvent stopEvent = logger.getEvent(2);
-        final MockLoggerEvent stopDataEvent = logger.getEvent(3);
-        assertEquals(MSG_START, startEvent.getMarker());
-        assertEquals(MSG_FAIL, stopEvent.getMarker());
-        assertEquals(DATA_START, startDataEvent.getMarker());
-        assertEquals(DATA_FAIL, stopDataEvent.getMarker());
-        assertEquals(DEBUG, startEvent.getLevel());
-        assertEquals(ERROR, stopEvent.getLevel());
-        assertEquals(TRACE, startDataEvent.getLevel());
-        assertEquals(TRACE, stopDataEvent.getLevel());
-        assertTrue(startEvent.getFormattedMessage().contains(MESSAGE_START_PREFIX));
-        assertTrue(stopEvent.getFormattedMessage().contains(MESSAGE_FAIL_PREFIX));
-        assertTrue(stopEvent.getFormattedMessage().contains(Exception.class.getName()));
-        assertTrue(stopEvent.getFormattedMessage().contains(exceptionStr));
+        logger.assertEvent(0, DEBUG, MSG_START, MESSAGE_START_PREFIX);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL, MESSAGE_FAIL_PREFIX, Exception.class.getName(), exceptionStr);
+        logger.assertEvent(3, TRACE, DATA_FAIL);
     }
 
     @Test
