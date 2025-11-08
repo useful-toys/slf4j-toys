@@ -1,14 +1,63 @@
 # SLF4J TOYS
 
-*slf4j-toys* is a Java library that complements SLF4J with additional useful logging practices.
+*slf4j-toys* is a Java library that complements SLF4J with tools to promote clear, consistent, and structured logging practices, enabling simple but effective observability without complex or expensive tools.
 
-*slf4j-toys* enables simple but effective observability, without relying on complex or expensive tools.
+## The Problem with Standard Logging
 
-## Goals
+Standard logging practices using `logger.info()` or `logger.error()` often fail to answer a critical question: **"Did the operation succeed?"**
 
-*   A **LoggerFactory** that provides additional useful factory SLF4J Logger methods.
-*   A **Meter** that works like a log message builder that promotes consistent messages all across the application.
-*   A **Watcher** that produces periodic memory and CPU status reports for simple monitoring.
+A log message like `logger.info("Finished processing user 'alice'")` is ambiguous. Did it succeed? Did it fail in an expected way? Was it slow? Answering these questions requires developers to follow a strict, custom logging pattern, which is difficult to establish and maintain across a team. This leads to inconsistent logs that are hard to parse and monitor.
+
+## How slf4j-toys Solves It
+
+*slf4j-toys* fills this gap by providing tools that create clear, structured, and machine-readable logs.
+
+### A `Meter` for Semantic Logging
+The core component is the **`Meter`**, a log message builder designed to clearly communicate the outcome of an operation. Instead of relying on ambiguous log levels, the `Meter` provides an API to record the result with clear semantics:
+*   **`m.ok()`**: The operation succeeded and achieved its primary goal.
+*   **`m.ok(path)`**: The operation succeeded, but through an alternative path (e.g., "Update" instead of "Insert"). This allows you to distinguish between different successful outcomes.
+*   **`m.reject()`**: The operation terminated as expected but did not achieve its goal (a predicted business-level failure, not a technical one).
+*   **`m.fail()`**: The operation failed due to an unexpected technical error.
+
+#### Beyond Status: Measurement and Classification
+The `Meter` also provides powerful features for analysis:
+*   **Automatic Measurement**: It automatically measures execution time and can flag operations that exceed a defined threshold, helping to spot performance issues.
+*   **Operation Counting**: For each unique operation (e.g., `dao/saveUser`), the `Meter` maintains a counter (`position`). This allows you to know that a specific log entry is for the 1st, 2nd, or 100th execution of that operation.
+*   **Unique Identification**: Every operation is given a unique identifier. This combination of a stable identifier and an incrementing counter enables you to easily classify, aggregate, and perform statistical analysis on your logs using simple tools, without needing a complex monitoring platform.
+
+### Other Tools
+*   A **`LoggerFactory`** that provides useful factory methods for creating hierarchical loggers and integrating stream-based output.
+*   A **`Watcher`** that produces periodic memory and CPU status reports for simple, passive monitoring.
+*   A **`Reporter`** that generates detailed diagnostic reports about the host environment on demand.
+
+## Usage Example
+
+This structured approach promotes clean and organized log files where the outcome of each operation is explicit:
+```
+[main] 25/11/2015 14:35:14 INFO dao - OK [Insert]: dao/saveUser; 0.1s; 1.5MB; login=alice; 
+[main] 25/11/2015 14:36:35 INFO dao - OK [Update]: dao/saveUser; 0.1s; 1.5MB; login=bob; 
+[main] 25/11/2015 14:37:27 INFO dao - REJECT [Concurrent]: dao/saveUser; 0.1s; 1.5MB; login=bob; 
+[main] 25/11/2015 14:38:52 INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0.1s; 1.5MB
+```
+
+This is achieved with a clear and concise API:
+```java
+final Meter m = MeterFactory.getMeter(LOGGER, "saveUser").start();
+try {
+    // Check if record exists in database   
+    boolean exist = ...;
+    if (exist) {
+        m.ok("Insert"); // Success via the "Insert" path
+    } else {
+        m.ok("Update"); // Success via the alternative "Update" path
+    }
+} catch (OutOfQuotaException e) {
+    m.reject(e); // An expected business failure
+} catch (SQLException e) {
+    m.fail(e); // An unexpected technical failure
+    throw new IllegalStateException(e);
+}
+```
 
 ## Installation
 
@@ -34,56 +83,18 @@ dependencies {
 
 *   **Java 8** or newer.
 
-## Usage Example
-
-*slf4j-toys* promotes clean and organized log files, like this:
-```
-[main] 25/11/2015 14:35:14 INFO dao - OK [Insert]: dao/saveUser; 0,1s; 1,5MB; login=alice; 
-[main] 25/11/2015 14:36:35 INFO dao - OK [Update]: dao/saveUser; 0,1s; 1,5MB; login=bob; 
-[main] 25/11/2015 14:37:27 INFO dao - REJECT [Concurrent]: dao/saveUser; 0,1s; 1,5MB; login=bob; 
-[main] 25/11/2015 14:38:52 INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0,1s; 1,5MB
-```
-
-This can be achieved with the `Meter` API:
-```java
-final Meter m = MeterFactory.getMeter(LOGGER, "saveUser").start();
-try {
-    // Check if record exists in database   
-    boolean exist = ...;
-    if (exist) {
-        // Insert record into database
-        m.ok("Insert");
-    } else {
-        // Update record in database
-        m.ok("Update");
-    }
-} catch (OutOfQuotaException e) {
-    m.reject(e);
-} catch (SQLException e) {
-    m.fail(e);
-    throw new IllegalStateException(e);
-}
-```
-
-It can also produce reports about your host environment:
-```
-INFO report - Memory:
- - maximum allowed: 1,9GB
- - currently allocated: 129,0MB (1,8GB more available)
- - currently used: 4,1MB (124,9MB free)
-```
-
 ## Design Considerations
 
 * No dependencies other than SLF4J itself.
 * Small footprint.
-* Take advantage of the SLF4J API capabilities and Logback features. 
+* Takes advantage of the SLF4J API capabilities and Logback features.
 
 ## Further Information
 
  * [Using the `LoggerFactory` for additional useful Logger use cases](docs/LoggerFactory-usage.md)
- * [Using the `Watcher` to monitor your application healt and resource usage](docs/Watcher-usage.md)
+ * [Using the `Watcher` to monitor your application healt and resource usage](docs.md)
  * [Using the `Reporter` to generate reports about your host environment](docs/Reporter-usage.md)
+ * [Using the `Logback Extensions` for semantig and colorful log messagens](docs/Logback-extensions.md)
 
 ## Similar Projects
 
