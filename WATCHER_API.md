@@ -1,4 +1,8 @@
-# Watcher API
+# Watcher API Documentation
+
+The `Watcher` is a component in *slf4j-toys* designed for passive monitoring of a Java application's health. It periodically collects system metrics and logs them through SLF4J, providing a simple yet effective way to observe an application's runtime behavior without complex monitoring tools.
+
+## Core Concepts
 
 The `Watcher` is a `Runnable` task that, when executed, performs the following actions:
 1.  **Collects Metrics**: It gathers data from various `java.lang.management.*MXBean` interfaces.
@@ -13,22 +17,30 @@ There are several ways to use the `Watcher`, depending on your application's arc
 
 For simple, standalone applications, the `WatcherSingleton` is the most convenient method. It manages a shared, scheduled `Watcher` instance with minimal setup.
 
+The singleton provides two mechanisms for scheduling:
+*   **Executor-based (Recommended)**: Uses a `java.util.concurrent.ScheduledExecutorService`. This is the modern and preferred approach due to better error handling and thread management.
+*   **Timer-based**: Uses the legacy `java.util.Timer`.
+
+**Using the Executor (Recommended):**
 ```java
+import org.usefultoys.slf4j.watcher.WatcherSingleton;
+
 // At application startup
-WatcherSingleton.startDefaultWatcher();
+WatcherSingleton.startDefaultWatcherExecutor();
 
 // At application shutdown
-WatcherSingleton.stopDefaultWatcher();
+WatcherSingleton.stopDefaultWatcherExecutor();
 ```
 
-The singleton can use either a `java.util.Timer` or a `java.util.concurrent.ScheduledExecutorService` to run the task. The `Executor` is generally preferred in modern applications due to better error handling and thread management. You can specify which to use when starting the watcher:
-
+**Using the Timer (Legacy):**
 ```java
-// Preferred method, using a modern Executor
-WatcherSingleton.startDefaultWatcher(true); // true for Executor, false for Timer
+import org.usefultoys.slf4j.watcher.WatcherSingleton;
 
-// The default is Timer for backward compatibility
-WatcherSingleton.startDefaultWatcher(); // Uses Timer
+// At application startup
+WatcherSingleton.startDefaultWatcherTimer();
+
+// At application shutdown
+WatcherSingleton.stopDefaultWatcherTimer();
 ```
 
 > **Note**: While `WatcherSingleton` is excellent for simple cases, it is **not recommended for container-managed environments** like Java EE or Spring. In those cases, it's better to let the container manage the lifecycle of scheduled tasks.
@@ -156,28 +168,23 @@ You should protect this servlet using the security mechanisms of your framework 
 
 ## Collected Data
 
-The `Watcher` collects a wide range of metrics, which can be enabled or disabled via configuration.
-
-### Default Metrics
-By default, the `Watcher` only collects basic runtime memory information.
+By default, the `Watcher` collects basic runtime memory information, which includes used, total, and max memory.
 
 *   **Log Example**: `INFO myApp.health - Memory: 4.1MB 129.0MB 1.9GB`
-*   **Format**: `Memory: [used] [total] [max]`
 
-### Extended Metrics (via `SystemConfig`)
-By enabling properties in `SystemConfig`, you can collect much more detailed data.
+It is possible to enable a much wider range of metrics, including CPU load, garbage collection, and detailed memory pool stats. These are disabled by default to minimize overhead but can be activated via `SystemConfig` properties.
 
-| Metric | `MXBean` Source | `SystemConfig` Property | Description |
-| :--- | :--- | :--- | :--- |
-| **System Load** | `OperatingSystemMXBean` | `usePlatformManagedBean` | CPU load of the whole system. |
-| **Heap Memory** | `MemoryMXBean` | `useMemoryManagedBean` | Detailed Heap memory usage (used, committed, max). |
-| **Non-Heap Memory** | `MemoryMXBean` | `useMemoryManagedBean` | Detailed Non-Heap memory usage. |
-| **Pending Finalization**| `MemoryMXBean` | `useMemoryManagedBean` | Number of objects waiting for finalization. |
-| **Class Loading** | `ClassLoadingMXBean` | `useClassLoadingManagedBean`| Number of loaded, unloaded, and total classes. |
-| **JIT Compilation** | `CompilationMXBean` | `useCompilationManagedBean`| Total time spent in JIT compilation. |
-| **Garbage Collection**| `GarbageCollectorMXBean`| `useGarbageCollectionManagedBean`| Total collection count and time across all GCs. |
+For a full list of available metrics and how to enable them, please see the **`SystemConfig` Properties** section under **Configuration**.
 
-The `TRACE` level log contains all enabled metrics in a compact, key-value format.
+### Correlation and Ordering
+
+In addition to performance metrics, every `Watcher` log event contains two important fields for tracking and analysis, which are visible in the `TRACE` level data logs:
+
+*   **`sessionUuid`**: A unique identifier generated once per application instance. This is essential in distributed environments (like microservices or clustered applications) where logs from multiple instances are aggregated. You can use this UUID to filter logs and analyze the behavior of a specific application instance.
+
+*   **`position`**: A simple counter (`long`) that starts at 1 and increments for each `Watcher` event within a given session. This allows you to reliably order log messages chronologically, even if log collection systems receive them out of order.
+
+These fields are crucial for making sense of logs in a complex, multi-instance environment.
 
 ## Configuration
 
@@ -193,20 +200,20 @@ These properties control the `WatcherSingleton` and logger naming.
 | `slf4jtoys.watcher.period` | `600000` (10 min)| Interval between subsequent runs. Supports units. |
 | `slf4jtoys.watcher.data.enabled`| `false` | Set to `true` to enable the `TRACE` level data logs. |
 | `slf4jtoys.watcher.message.prefix`| `""` (empty) | A prefix added to the logger name for `INFO` messages. |
-| `slf4jtoys.watcher.message.suffix`| `""` (empty) | A suffix added to the logger name for `INFO` messages. |
+| `slf4jtoys.watcher.message.suffix`| `""` (empty) | A suffix added to the logger name for `INFO` messages.
 | `slf4jtoys.watcher.data.prefix` | `""` (empty) | A prefix added to the logger name for `TRACE` messages. |
 | `slf4jtoys.watcher.data.suffix` | `""` (empty) | A suffix added to the logger name for `TRACE` messages. |
 
 ### `SystemConfig` Properties
-These boolean properties control which metrics are collected. They are `false` by default to minimize overhead. Set them to `true` to enable collection.
+These boolean properties control which metrics are collected from the JVM's `MXBean`s. They are `false` by default to minimize overhead. Set them to `true` to enable collection.
 
 | Property | Default | Description |
 | :--- | :--- | :--- |
-| `slf4jtoys.usePlatformManagedBean` | `false` | Enables collection of system CPU load. |
-| `slf4jtoys.useMemoryManagedBean` | `false` | Enables detailed Heap/Non-Heap memory metrics. |
-| `slf4jtoys.useClassLoadingManagedBean`| `false` | Enables class loading metrics. |
-| `slf4jtoys.useCompilationManagedBean` | `false` | Enables JIT compilation time metrics. |
-| `slf4jtoys.useGarbageCollectionManagedBean`| `false` | Enables garbage collection metrics. |
+| `slf4jtoys.usePlatformManagedBean` | `false` | Enables collection of system CPU load from `OperatingSystemMXBean`. |
+| `slf4jtoys.useMemoryManagedBean` | `false` | Enables detailed Heap/Non-Heap memory metrics from `MemoryMXBean`. |
+| `slf4jtoys.useClassLoadingManagedBean`| `false` | Enables class loading metrics from `ClassLoadingMXBean`. |
+| `slf4jtoys.useCompilationManagedBean` | `false` | Enables JIT compilation time metrics from `CompilationMXBean`. |
+| `slf4jtoys.useGarbageCollectionManagedBean`| `false` | Enables garbage collection metrics from `GarbageCollectorMXBean`. |
 
 ### Example Configuration
 
