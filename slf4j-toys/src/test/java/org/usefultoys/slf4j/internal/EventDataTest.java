@@ -31,7 +31,8 @@ class EventDataTest {
     }
 
     static class TestEventData extends EventData {
-        boolean resetCalled = false;
+        boolean resetImplCalled = false;
+        boolean writeJson5ImplCalled = false;
 
         public TestEventData() {
         }
@@ -50,13 +51,19 @@ class EventDataTest {
 
         @Override
         protected StringBuilder readableStringBuilder(final StringBuilder sb) {
-            sb.append("a");
+            sb.append("readable");
             return sb;
         }
 
         @Override
         protected void resetImpl() {
-            resetCalled = true;
+            resetImplCalled = true;
+        }
+
+        @Override
+        protected void writeJson5Impl(final StringBuilder sb) {
+            writeJson5ImplCalled = true;
+            sb.append(",custom:value");
         }
     }
 
@@ -65,7 +72,7 @@ class EventDataTest {
         final TestEventData event = new TestEventData();
         assertNull(event.getSessionUuid());
         assertEquals(0L, event.getPosition());
-        assertEquals(0L, event.getLastCurrentTime()); // time should be 0 before nextPosition
+        assertEquals(0L, event.getLastCurrentTime());
     }
 
     @Test
@@ -93,35 +100,114 @@ class EventDataTest {
     }
 
     @Test
-    void testResetClearsFields() {
-        final TestEventData event = new TestEventData("abc", 5L,10L);
+    void testCollectCurrentTime() {
+        final TestEventData event = new TestEventData();
+        long startTime = System.nanoTime();
+        event.collectCurrentTime();
+        long endTime = System.nanoTime();
+        assertTrue(event.getLastCurrentTime() >= startTime);
+        assertTrue(event.getLastCurrentTime() <= endTime);
+    }
+
+    @Test
+    void testResetClearsFieldsAndCallsResetImpl() {
+        final TestEventData event = new TestEventData("abc", 5L, 10L);
         event.reset();
         assertNull(event.getSessionUuid());
         assertEquals(0L, event.getPosition());
         assertEquals(0L, event.getLastCurrentTime());
-        assertTrue(event.resetCalled);
+        assertTrue(event.resetImplCalled);
     }
 
     @Test
     void testReadableMessage() {
         final TestEventData event = new TestEventData("abc", 5L);
         final String message = event.readableMessage();
-        assertEquals("a", message);
+        assertEquals("readable", message);
     }
 
     @Test
-    void testWriteJson5Message() {
+    void testJson5MessageAndWriteJson5Impl() {
         final TestEventData event = new TestEventData("abc", 5L, 10L);
         final String json = event.json5Message();
-        assertEquals("{_:abc,$:5,t:10}", json);
+        // Expecting custom:value from writeJson5Impl
+        assertTrue(json.startsWith("{"));
+        assertTrue(json.contains(EventData.SESSION_UUID + ":abc"));
+        assertTrue(json.contains(EventData.EVENT_POSITION + ":5"));
+        assertTrue(json.contains(EventData.EVENT_TIME + ":10"));
+        assertTrue(json.contains(",custom:value"));
+        assertTrue(json.endsWith("}"));
+        assertTrue(event.writeJson5ImplCalled);
     }
 
     @Test
-    void testReadJson5Message() {
+    void testEncodedMessageDelegatesToJson5Message() {
+        final TestEventData event = new TestEventData("testSession", 1L, 2L);
+        final String encoded = event.encodedMessage();
+        final String json5 = event.json5Message(); // Call directly to compare
+        assertEquals(json5, encoded);
+    }
+
+    @Test
+    void testReadJson5MessageAllFields() {
         final TestEventData event = new TestEventData();
         event.readJson5("{_:abc,$:5,t:10}");
         assertEquals("abc", event.getSessionUuid());
         assertEquals(5L, event.getPosition());
         assertEquals(10L, event.getLastCurrentTime());
+    }
+
+    @Test
+    void testReadJson5MessageMissingSessionUuid() {
+        final TestEventData event = new TestEventData("initial", 1L, 2L); // Set initial values
+        event.readJson5("{$:5,t:10}"); // Missing sessionUuid
+        assertEquals("initial", event.getSessionUuid()); // Should retain initial value
+        assertEquals(5L, event.getPosition());
+        assertEquals(10L, event.getLastCurrentTime());
+    }
+
+    @Test
+    void testReadJson5MessageMissingPosition() {
+        final TestEventData event = new TestEventData("initial", 1L, 2L);
+        event.readJson5("{_:abc,t:10}"); // Missing position
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(1L, event.getPosition()); // Should retain initial value
+        assertEquals(10L, event.getLastCurrentTime());
+    }
+
+    @Test
+    void testReadJson5MessageMissingTime() {
+        final TestEventData event = new TestEventData("initial", 1L, 2L);
+        event.readJson5("{_:abc,$:5}"); // Missing time
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(5L, event.getPosition());
+        assertEquals(2L, event.getLastCurrentTime()); // Should retain initial value
+    }
+
+    @Test
+    void testReadJson5MessageFieldsOutOfOrder() {
+        final TestEventData event = new TestEventData();
+        event.readJson5("{t:10,_:abc,$:5}"); // Fields out of order
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(5L, event.getPosition());
+        assertEquals(10L, event.getLastCurrentTime());
+    }
+
+    @Test
+    void testReadJson5MessageEmptyString() {
+        final TestEventData event = new TestEventData("initial", 1L, 2L);
+        event.readJson5(""); // Empty string
+        assertEquals("initial", event.getSessionUuid());
+        assertEquals(1L, event.getPosition());
+        assertEquals(2L, event.getLastCurrentTime());
+    }
+
+    @Test
+    void testReadJson5MessagePartialString() {
+        final TestEventData event = new TestEventData("initial", 1L, 2L);
+        event.readJson5("{_:abc"); // Partial string
+        assertEquals("abc", event.getSessionUuid());
+        assertEquals(1L, event.getPosition());
+        assertEquals(2L, event.getLastCurrentTime());
     }
 }
