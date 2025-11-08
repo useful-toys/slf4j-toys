@@ -83,7 +83,7 @@ INFO report - Memory:
 
  * [Using the `LoggerFactory` for additional useful Logger use cases](docs/LoggerFactory-usage.md)
  * [Using the `Watcher` to monitor your application healt and resource usage](docs/Watcher-usage.md)
- * 
+ * [Using the `Reporter` to generate reports about your host environment](docs/Reporter-usage.md)
 
 ## Similar Projects
 
