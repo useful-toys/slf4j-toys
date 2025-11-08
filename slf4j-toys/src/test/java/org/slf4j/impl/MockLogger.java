@@ -24,7 +24,6 @@ import org.slf4j.impl.MockLoggerEvent.Level;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -451,7 +450,7 @@ public class MockLogger implements Logger {
         }
         final ByteArrayOutputStream s = new ByteArrayOutputStream();
         event.getThrowable().printStackTrace(new PrintStream(s));
-        final String st = s.toString(StandardCharsets.UTF_8);
+        final String st = s.toString();
         return event.getLevel() + " " + event.getLoggerName() + ": " + event.getFormattedMessage() + "\n" + st;
     }
 
