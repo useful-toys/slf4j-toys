@@ -7,14 +7,42 @@ through SLF4J, the `Watcher` provides an easy way to observe an application's ru
 
 ## Core Concepts
 
-The `Watcher` is a `Runnable` task that, when executed, **collects Metrics** and prints a human-readable summary
-(`INFO` level) and a machine-parseable data string (`TRACE` level) sendt to a configured SLF4J logger.
+The `Watcher` is a `Runnable` task that, when executed, **collects Metrics** and prints a **human-readable summary**
+(`INFO` level and `MSG_WATCHER` slf4j marker) and a **machine-parseable data** string (`TRACE` level and `DATA_WATCHER`
+slf4j marker) sent to a configured SLF4J logger.
+
+## Collected Data
+
+By default, the `Watcher` collects basic runtime memory information, which includes used, total, and max memory.
+
+* **Log Example**: `INFO myApp.health - Memory: 4.1MB 129.0MB 1.9GB`
+
+It is possible to enable a much wider range of metrics, including CPU load, garbage collection, and detailed memory pool
+stats. These are disabled by default to minimize overhead but can be activated via `SystemConfig` properties.
+
+For a full list of available metrics and how to enable them, please see the **`SystemConfig` Properties** section under
+**Configuration**.
+
+### Correlation and Ordering
+
+In addition to performance metrics, every `Watcher` log event may contain two important fields for tracking and
+analysis:
+
+* **`sessionUuid`**: A unique identifier generated once per JDK instance. This is essential in distributed
+  environments (like microservices or clustered applications) where logs from multiple instances are aggregated. You can
+  use this UUID to filter logs and analyze the behavior of a specific JDK instance.
+
+* **`position`**: A simple counter (`long`) that starts at 1 and increments for each `Watcher` event within a given
+  session. This allows you to reliably order log messages chronologically, even if log collection systems receive them
+  out of order.
+
+These fields are crucial for making sense of logs in a complex, multi-instance environment.
 
 ## Usage Patterns
 
 There are several ways to use the `Watcher`, depending on your application's architecture.
 
-### 1. `WatcherSingleton`: The Quick and Simple Approach
+### Use case 1: `WatcherSingleton`: The Quick and Simple Approach
 
 For simple, standalone applications, the `WatcherSingleton` is the most convenient method. It manages a shared,
 scheduled `Watcher` instance with minimal setup.
@@ -57,7 +85,7 @@ stopDefaultWatcherTimer();
 environments** like Java EE or Spring. In those cases, it's better to let the container manage the lifecycle of
 > scheduled tasks.
 
-### 2. Manual Instantiation
+### Use case 2: Manual Instantiation
 
 For full control, you can instantiate and manage the `Watcher` yourself. This is the foundation for framework
 integration.
@@ -72,12 +100,12 @@ myWatcher.
 run();
 ```
 
-## Integration with Modern Frameworks
+### Use case 3: Integration with Modern Frameworks
 
 In enterprise and microservice environments, task scheduling should be handled by the framework to ensure proper
 lifecycle management, thread pooling, and context propagation.
 
-### Java EE / Jakarta EE
+#### Java EE / Jakarta EE
 
 In a Java EE or Jakarta EE environment (like WildFly, Open Liberty, or Payara), the best practice is to use an EJB
 Timer. Create a startup singleton bean that injects and runs the `Watcher` on a schedule.
@@ -110,7 +138,7 @@ public class AppHealthMonitor {
 }
 ```
 
-### Spring Boot
+#### Spring Boot
 
 In a Spring Boot application, the recommended approach is to use the built-in scheduling capabilities. Define a
 `@Component` and use the `@Scheduled` annotation on a method that runs the `Watcher`.
@@ -157,7 +185,7 @@ You can make the rate configurable in your `application.properties` file:
 monitoring.health.check.rate=300000 # 5 minutes
 ```
 
-## On-Demand Monitoring with `WatcherServlet`
+### Use case 4: On-Demand Monitoring with `WatcherServlet`
 
 For web applications, `slf4j-toys` provides the `WatcherServlet`, a simple way to trigger a health check on-demand via
 an HTTP GET request. This is useful for:
@@ -169,7 +197,7 @@ an HTTP GET request. This is useful for:
 When the servlet's URL is accessed, it simply runs the default `Watcher` instance, causing the current system status to
 be printed to the logs.
 
-### How to Configure
+#### How to Configure
 
 You can register the servlet in your application's `web.xml` deployment descriptor.
 
@@ -185,7 +213,7 @@ You can register the servlet in your application's `web.xml` deployment descript
 </servlet-mapping>
 ```
 
-### :warning: Security Warning
+#### :Warning: Security Warning
 
 **It is critical to protect this endpoint.** Exposing an application's internal status to the public can be a security
 risk. Ensure that only authorized users or systems can access this URL.
@@ -196,57 +224,35 @@ You should protect this servlet using the security mechanisms of your framework 
 * Restricting access to specific IP addresses.
 * Placing it behind a firewall or API gateway that handles authentication and authorization.
 
-## Collected Data
-
-By default, the `Watcher` collects basic runtime memory information, which includes used, total, and max memory.
-
-* **Log Example**: `INFO myApp.health - Memory: 4.1MB 129.0MB 1.9GB`
-
-It is possible to enable a much wider range of metrics, including CPU load, garbage collection, and detailed memory pool
-stats. These are disabled by default to minimize overhead but can be activated via `SystemConfig` properties.
-
-For a full list of available metrics and how to enable them, please see the **`SystemConfig` Properties** section under
-**Configuration**.
-
-### Correlation and Ordering
-
-In addition to performance metrics, every `Watcher` log event contains two important fields for tracking and analysis,
-which are visible in the `TRACE` level data logs:
-
-* **`sessionUuid`**: A unique identifier generated once per application instance. This is essential in distributed
-  environments (like microservices or clustered applications) where logs from multiple instances are aggregated. You can
-  use this UUID to filter logs and analyze the behavior of a specific application instance.
-
-* **`position`**: A simple counter (`long`) that starts at 1 and increments for each `Watcher` event within a given
-  session. This allows you to reliably order log messages chronologically, even if log collection systems receive them
-  out of order.
-
-These fields are crucial for making sense of logs in a complex, multi-instance environment.
-
 ## Configuration
 
 The `Watcher`'s behavior is highly configurable via Java System Properties. These should be set at application startup (
 e.g., using the `-D` flag).
+Alternatively, you can use global (statick) attributes in the `WatcherConfig` and `SystemConfig`
+classes to configure the `Watcher` programmatically as soon as your application starts.
 
 ### `WatcherConfig` Properties
 
 These properties control the `WatcherSingleton` and logger naming.
 
-| Property                           | Default Value     | Description                                                              |
-|:-----------------------------------|:------------------|:-------------------------------------------------------------------------|
-| `slf4jtoys.watcher.name`           | `watcher`         | The base logger name for the default watcher.                            |
-| `slf4jtoys.watcher.delay`          | `60000` (1 min)   | Initial delay before the first run. Supports units: `ms`, `s`, `m`, `h`. |
-| `slf4jtoys.watcher.period`         | `600000` (10 min) | Interval between subsequent runs. Supports units.                        |
-| `slf4jtoys.watcher.data.enabled`   | `false`           | Set to `true` to enable the `TRACE` level data logs.                     |
-| `slf4jtoys.watcher.message.prefix` | `""` (empty)      | A prefix added to the logger name for `INFO` messages.                   |
-| `slf4jtoys.watcher.message.suffix` | `""` (empty)      | A suffix added to the logger name for `INFO` messages.                   
-| `slf4jtoys.watcher.data.prefix`    | `""` (empty)      | A prefix added to the logger name for `TRACE` messages.                  |
-| `slf4jtoys.watcher.data.suffix`    | `""` (empty)      | A suffix added to the logger name for `TRACE` messages.                  |
+| Property                           | Default Value     | Description                                                                         |
+|:-----------------------------------|:------------------|:------------------------------------------------------------------------------------|
+| `slf4jtoys.watcher.name`           | `watcher`         | The base logger name for the default watcher used by `WatcherSingleton`             |
+| `slf4jtoys.watcher.delay`          | `60000` (1 min)   | Initial delay before the first run. Supports units: `ms`, `s`, `m`, `h`.            |
+| `slf4jtoys.watcher.period`         | `600000` (10 min) | Interval between subsequent runs. Supports units.                                   |
+| `slf4jtoys.watcher.data.enabled`   | `false`           | Set to `true` to enable the `TRACE` level data logs with machine-parseable data.    |
+| `slf4jtoys.watcher.message.prefix` | `""` (empty)      | A prefix added to the logger name for `INFO` messages human-readable summary.       |
+| `slf4jtoys.watcher.message.suffix` | `""` (empty)      | A suffix added to the logger name for `INFO` messages human-readable summary.       
+| `slf4jtoys.watcher.data.prefix`    | `""` (empty)      | A prefix added to the logger name for `TRACE` messages with machine-parseable data. |
+| `slf4jtoys.watcher.data.suffix`    | `""` (empty)      | A suffix added to the logger name for `TRACE` messages with machine-parseable data. |
+
+You may set message or data prefix and suffix in order to apply specific logger configution to the human-readable
+summary and machine-parseable data logs, handling the case where you want to send them to different loggers.
 
 ### `SystemConfig` Properties
 
 These boolean properties control which metrics are collected from the JVM's `MXBean`s. They are `false` by default to
-minimize overhead. Set them to `true` to enable collection.
+minimize overhead. Set them to `true` to enable collection. Not all metrics are available on all platforms.
 
 | Property                                    | Default | Description                                                         |
 |:--------------------------------------------|:--------|:--------------------------------------------------------------------|
@@ -258,7 +264,8 @@ minimize overhead. Set them to `true` to enable collection.
 
 ### Example Configuration
 
-To run the default watcher every 5 minutes, collecting CPU and detailed memory metrics, and sending data logs to a
+To run the default watcher every 5 minutes, collecting CPU and detailed memory metrics, and sending machine-parseable
+data logs to a
 separate logger, you would start your application with these flags:
 
 ```bash
@@ -273,11 +280,15 @@ java -Dslf4jtoys.watcher.period=5m \
 This configuration would result in:
 
 * **INFO logs** going to `watcher`.
-* **TRACE logs** going to `data.watcher`.
+* **TRACE logs** going to `data.watcher` (to be handled by a dedicated logback appender writing to a specific file).
 
 ## Logging Behavior
 
-The `Watcher` provides strong control over how and where its logs are written.
+The `Watcher` uses slf4j logging standards to provide strong control over how and where its logs are written.
+Human-readable (`INFO`) and machine-parseable (`TRACE`) logs are produced by the `Watcher` and sent to a configured
+logger. Additionally, human-readable logs are marked with a special `slf4j` marker (`MSG_WATCHER`) and machine-parseable
+logs are marked with another special `slf4j` marker (`MSG_WATCHER_DATA`). This allows you to use SLF4J markers
+to allow advanced filtering in logging frameworks like Logback.
 
 ### Logger Naming
 
@@ -295,15 +306,15 @@ data (`TRACE`) messages to different loggers. This is configured via system prop
 Every log message produced by the `Watcher` includes an SLF4J `Marker`. This enables advanced filtering in logging
 frameworks like Logback.
 
-* **`WATCHER`**: This marker is attached to the human-readable `INFO` messages.
-* **`WATCHER_DATA`**: This marker is attached to the machine-parseable `TRACE` messages.
+* **`MSG_WATCHER`**: This marker is attached to the human-readable `INFO` messages.
+* **`DATA_WATCHER`**: This marker is attached to the machine-parseable `TRACE` messages.
 
 ### Advanced Logback Configuration Examples
 
 Here are two methods to separate the machine-parseable data logs (`TRACE` level) into a dedicated file, which is useful
 for automated processing.
 
-**Method 1: Filtering by Marker**
+#### Method 1: Filtering by Marker
 
 This approach uses Logback's `MarkerFilter` to identify data logs. It works regardless of the logger's name and is very
 precise.
@@ -344,7 +355,7 @@ Then, configure your `logback.xml`:
 </configuration>
 ```
 
-**Method 2: Filtering by Logger Name Prefix**
+#### Method 2: Filtering by Logger Name Prefix
 
 This approach uses the `WatcherConfig` properties to add a specific prefix to the data logger's name. You then configure
 Logback to capture all logs under that name.
