@@ -75,12 +75,15 @@ INFO report - Memory:
 
 ## Design Considerations
 
-*   No dependencies other than SLF4J itself.
-*   Small footprint.
+* No dependencies other than SLF4J itself.
+* Small footprint.
+* Take advantage of the SLF4J API capabilities and Logback features. 
 
 ## Further Information
 
-Take a look at our [Wiki](https://github.com/useful-toys/slf4j-toys/wiki) or the [API Javadoc](http://useful-toys.github.io/slf4j-toys/javadoc/).
+ * [Using the `LoggerFactory` for additional useful Logger use cases](docs/LoggerFactory-usage.md)
+ * [Using the `Watcher` to monitor your application healt and resource usage](docs/Watcher-usage.md)
+ * 
 
 ## Similar Projects
 
