@@ -50,6 +50,14 @@ try {
 }
 ```
 
+### Log Levels and Message Visibility
+
+Each moment of the operation's lifecycle is recorded by a log message: `start`, `progress`, `ok`, `fail`, `reject`. The visibility of these messages depends on the underlying SLF4J Logger's configured level. Not all messages will always be reported.
+
+*   **DEBUG**: If the Logger's level is `DEBUG`, all messages will be reported: `start`, `progress`, `ok`, `reject`, and `fail`.
+*   **INFO**: If the Logger's level is `INFO`, the `start` message will be omitted. Only `progress`, `ok`, `reject`, or `fail` messages will be generated. Typically, `INFO` level is desired as it provides a clear overview of operation outcomes (success or failure) without the initial `start` noise.
+*   **WARN** or **ERROR**: If the Logger's level is `WARN` or `ERROR`, then only the `fail` message will be reported.
+
 ### 2. Unique Identification and Counting
 
 Each `Meter` instance is uniquely identified and tracked, enabling powerful correlation and statistical analysis:
@@ -93,8 +101,7 @@ flag slow operations.
 
 ### 5. Contextual Data: `ctx()`
 
-You can attach arbitrary key-value pairs to a `Meter` using the `ctx()` methods. This enriches your log messages with
-relevant business or technical context.
+You can attach arbitrary key-value pairs to a `Meter` using the `ctx()` methods. This enriches your log messages with relevant business or technical context.
 
 **Example:**
 
@@ -102,8 +109,15 @@ relevant business or technical context.
 m.ctx("userId",userId).ctx("orderId",orderId);
 ```
 
-Just take care not to include sensitive data in the context, data that could be used to identify a specific user,
-or memomry intensive data that will result in a large log messages.
+The `Meter` is designed to avoid generating redundant information in the log, especially with contextual data. The following behaviors apply:
+
+*   If context (`ctx`) is added before calling `start()`, the `start` message will include this context.
+*   If additional context is added during execution, subsequent messages like `progress`, `fail`, `reject`, or `ok` will print only the *newly added* context, without repeating information already logged.
+*   If the `start` message is not generated (e.g., because the Meter's Logger is configured at a level `>= INFO`), then all accumulated context will be printed with the first generated message (`progress`, `fail`, `reject`, or `ok`).
+
+It is generally recommended to add relevant operation parameters to the context before calling `start()`. Relevant results should be added to the context before calling `ok()` or `reject()`. You can also add more relevant information collected during the operation's execution to the context, such as values used to justify a decision.
+
+**Important:** Take care not to include sensitive data in the context (data that could identify a specific user) or memory-intensive data that could result in excessively large log messages.
 
 ### 6. Iterations and Progress: `iterations()`, `inc()`, `progress()`
 
@@ -129,6 +143,33 @@ try(Meter m = MeterFactory.getMeter(LOGGER, "criticalTask").start()){
         m.ok(); // If this line is reached, it's OK
 } // If an exception occurs before m.ok(), it will automatically be m.fail()
 ```
+
+### 8. Simplified Execution with Functional Interfaces (`Callable`, `Runnable`, etc.)
+
+The `Meter` provides convenient methods to wrap the execution of `Callable`, `Runnable`, `Supplier`, `Consumer`, and `Function` interfaces. These methods automatically handle the `start()`, `ok()`, `reject()`, and `fail()` calls, significantly reducing boilerplate code and ensuring consistent logging for common execution patterns.
+
+These methods are particularly useful for wrapping small, self-contained units of work, ensuring that their execution is always properly metered and logged without manual `try-catch-finally` blocks for each operation.
+
+### 9. Sub-operations with `sub()`
+
+The `sub()` method allows you to create a new `Meter` instance that represents a sub-operation of an already running `Meter`. This is particularly useful for breaking down a larger, complex operation into smaller, more manageable, and individually trackable steps. The sub-operation inherits context from its parent and contributes to the overall timing and status of the parent operation.
+
+Using `sub()` enables you to:
+*   **Represent a hierarchy of operations**: Clearly see which smaller tasks contribute to a larger business process.
+*   **Gain granular visibility**: Track the performance and outcome of individual steps within a composite operation.
+*   **Maintain correlation**: All sub-operations are implicitly linked to their parent, making it easy to trace the entire flow.
+
+### 10. API Usage Validation and Developer Feedback
+
+The `Meter` API incorporates several internal heuristics to ensure it's used correctly and to help developers identify potential misuse. These validations are designed to promote consistent and reliable logging practices. When a usage pattern deviates from the expected API contract, the `Meter` will generate error messages in the log, providing immediate feedback to the developer.
+
+Key validation heuristics include:
+
+*   **Lifecycle Order Enforcement**: The `Meter` validates that `start()` is called before other lifecycle-dependent methods such as `ok()`, `fail()`, `reject()`, or `progress()`. Calling these methods out of sequence will result in a logged error.
+*   **Operation Finalization**: The `Meter` tracks whether every started operation is eventually finalized with an `ok()`, `fail()`, or `reject()` call. If a `Meter` instance is garbage-collected without being explicitly finalized, a warning or error message will be logged, indicating a potential leak or unhandled operation outcome. This is especially important when not using the `try-with-resources` pattern.
+*   **Invalid Parameters**: The API also performs checks for invalid parameters passed to its methods (e.g., null arguments where not permitted, or out-of-range values).
+
+These logged error messages are crucial for developers to quickly identify and correct issues in their code related to `Meter` usage, ensuring the integrity and completeness of the application's semantic logs.
 
 ## Usage Examples
 
@@ -199,6 +240,105 @@ public class BatchProcessor {
             m.fail(e);
         }
     }
+}
+```
+
+### Example 3: Simplified Execution with Functional Interfaces
+
+#### `Meter.run(Runnable runnable)`
+
+Executes a `Runnable` and automatically marks the operation as `ok()` upon successful completion or `fail()` if an exception occurs.
+
+```java
+MeterFactory.getMeter(LOGGER, "simpleTask").run(() -> {
+    // Your task logic here
+    System.out.println("Executing a simple runnable task.");
+});
+```
+
+#### `Meter.call(Callable<T> callable)`
+
+Executes a `Callable` and automatically marks the operation as `ok()` upon successful completion or `fail()` if an exception occurs. The result of the `Callable` is returned.
+
+```java
+String result = MeterFactory.getMeter(LOGGER, "dataFetch")
+    .ctx("query", "SELECT * FROM users")
+    .call(() -> {
+        // Simulate fetching data
+        Thread.sleep(100);
+        return "Fetched User Data";
+    });
+System.out.println("Callable result: " + result);
+```
+
+#### `Meter.supply(Supplier<T> supplier)`
+
+Similar to `call`, but for `Supplier` functional interface. Executes a `Supplier` and automatically marks the operation as `ok()` upon successful completion or `fail()` if an exception occurs. The result of the `Supplier` is returned.
+
+```java
+Integer count = MeterFactory.getMeter(LOGGER, "countItems")
+    .supply(() -> {
+        // Simulate counting items
+        return 123;
+    });
+System.out.println("Supplier result: " + count);
+```
+
+#### `Meter.accept(Consumer<T> consumer, T arg)`
+
+Executes a `Consumer` with a given argument and automatically marks the operation as `ok()` upon successful completion or `fail()` if an exception occurs.
+
+```java
+MeterFactory.getMeter(LOGGER, "processItem")
+    .accept(item -> {
+        // Process the item
+        System.out.println("Processing item: " + item);
+    }, "item-123");
+```
+
+#### `Meter.apply(Function<T, R> function, T arg)`
+
+Executes a `Function` with a given argument and automatically marks the operation as `ok()` upon successful completion or `fail()` if an exception occurs. The result of the `Function` is returned.
+
+```java
+String processed = MeterFactory.getMeter(LOGGER, "transformData")
+    .apply(data -> data.toUpperCase(), "hello world");
+System.out.println("Function result: " + processed);
+```
+
+### Example 4: Sub-operations with `sub()`
+
+The `sub()` method allows you to create a new `Meter` instance that represents a sub-operation of an already running `Meter`. This is particularly useful for breaking down a larger, complex operation into smaller, more manageable, and individually trackable steps. The sub-operation inherits context from its parent and contributes to the overall timing and status of the parent operation.
+
+Using `sub()` enables you to:
+*   **Represent a hierarchy of operations**: Clearly see which smaller tasks contribute to a larger business process.
+*   **Gain granular visibility**: Track the performance and outcome of individual steps within a composite operation.
+*   **Maintain correlation**: All sub-operations are implicitly linked to their parent, making it easy to trace the entire flow.
+
+```java
+final Meter parentMeter = MeterFactory.getMeter(LOGGER, "processLargeOrder").start();
+try {
+    // Step 1: Validate order
+    parentMeter.sub("validateOrder").run(() -> {
+        // ... validation logic ...
+        System.out.println("Order validated.");
+    });
+
+    // Step 2: Persist order
+    parentMeter.sub("persistOrder").run(() -> {
+        // ... database persistence logic ...
+        System.out.println("Order persisted.");
+    });
+
+    // Step 3: Send confirmation email
+    parentMeter.sub("sendConfirmation").run(() -> {
+        // ... email sending logic ...
+        System.out.println("Confirmation email sent.");
+    });
+
+    parentMeter.ok(); // Parent operation successful
+} catch (Exception e) {
+    parentMeter.fail(e); // Parent operation failed due to an exception in any sub-step
 }
 ```
 
