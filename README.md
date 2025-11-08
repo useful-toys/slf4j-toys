@@ -19,6 +19,9 @@ The core component is the **`Meter`**, a log message builder designed to clearly
 *   **`m.reject()`**: The operation terminated as expected but did not achieve its goal (a predicted business-level failure, not a technical one).
 *   **`m.fail()`**: The operation failed due to an unexpected technical error.
 
+
+[Using the `Meter` for semantic logging](docs/Meter-usage.md)
+
 #### Beyond Status: Measurement and Classification
 The `Meter` also provides powerful features for analysis:
 *   **Automatic Measurement**: It automatically measures execution time and can flag operations that exceed a defined threshold, helping to spot performance issues.
@@ -91,6 +94,7 @@ dependencies {
 
 ## Further Information
 
+ * [Using the `Meter` for semantic logging](docs/Meter-usage.md)
  * [Using the `LoggerFactory` for additional useful Logger use cases](docs/LoggerFactory-usage.md)
  * [Using the `Watcher` to monitor your application healt and resource usage](docs.md)
  * [Using the `Reporter` to generate reports about your host environment](docs/Reporter-usage.md)
