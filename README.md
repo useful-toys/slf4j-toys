@@ -2,8 +2,7 @@
 
 *slf4j-toys* is a Java library that complements SLF4J with tools to promote clear, consistent, and structured logging practices, enabling simple but effective observability without complex or expensive tools.
 
-[![Build Status](https://github.com/useful-toys/slf4j-toys/actions/workflows/build.yml/badge.svg)](https://github.com/useful-toys/slf4j-toys/actions/workflows/build.yml) [![Codecov](https://codecov.io/gh/useful-toys/slf4j-toys/branch/master/graph/badge.svg)](https://codecov.io/gh/useful-toys/slf4j-toys) [![Qodana](https://github.com/useful-toys/slf4j-toys/actions/workflows/qodana_code_quality.yml/badge.svg)](https://github.com/useful-toys/slf4j-toys/actions/workflows/qodana_code_quality.yml)
-
+[![Build Status](https://github.com/useful-toys/slf4j-toys/actions/workflows/build.yml/badge.svg)](https://github.com/useful-toys/slf4j-toys/actions/workflows/build.yml) [![Codecov](https://codecov.io/gh/useful-toys/slf4j-toys/branch/master/graph/badge.svg)](https://codecov.io/gh/useful-toys/slf4j-toys) [![Qodana](https://github.com/useful-toys/slf4j-toys/actions/workflows/qodana_code_quality.yml/badge.svg)](https://github.com/useful-toys/slf4j-toys/actions/workflows/qodana_code_quality.yml)[![CodeQL](https://github.com/useful-toys/slf4j-toys/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/useful-toys/slf4j-toys/actions/workflows/github-code-scanning/codeql)
 ## The Problem with Standard Logging
 
 Standard logging practices using `logger.info()` or `logger.error()` often fail to answer a critical question: **"Did the operation succeed?"**
