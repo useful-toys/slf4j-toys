@@ -2,24 +2,26 @@
 
 *slf4j-toys* is a Java library that complements SLF4J with additional useful logging practices.
 
+*slf4j-toys* enables simple but effective observability, without relying on complex or expensive tools.
+
 ## Goals
 
- * A **LoggerFactory** that provides additional usefuly factory SLF4J Logger methods
- * A **Meter** that works like a log message builder that promotes consistent messages all across the application.
- * A **Watcher** that produces periodically memory and cpu status, for simple 
+*   A **LoggerFactory** that provides additional useful factory SLF4J Logger methods.
+*   A **Meter** that works like a log message builder that promotes consistent messages all across the application.
+*   A **Watcher** that produces periodic memory and CPU status reports for simple monitoring.
 
-*slf4j-toys* enables simple but effective observability, without relying on complex or expensive tool.
+## Installation
 
-## Download
+*slf4j-toys* is available from the [Maven Central repository](https://search.maven.org/artifact/org.usefultoys/slf4j-toys/1.9.0/jar).
 
-Gradle:
+**Gradle:**
 ```gradle
 dependencies {
     implementation("org.usefultoys:slf4j-toys:1.9.0")
 }
 ```
 
-Maven:
+**Maven:**
 ```xml
 <dependency>
     <groupId>org.usefultoys</groupId>
@@ -30,20 +32,11 @@ Maven:
 
 ## Requirements
 
-### Minimum Java version
-- *slf4j-toys* 1.9.0 and newer: Java 8
-- *slf4j-toys* 1.8.0 and older: Java 7
+*   **Java 8** or newer.
 
-> [!IMPORTANT]\
-> *slf4j-toys* will not work on Java 9 or above. This issue will be fixed.
+## Usage Example
 
-## Design consideration
- * No dependencies other than SLF4J itself
- * Small footprint
-
-
-
-SLF4J-TOYS promotes clean and organized log files, like:
+*slf4j-toys* promotes clean and organized log files, like this:
 ```
 [main] 25/11/2015 14:35:14 INFO dao - OK [Insert]: dao/saveUser; 0,1s; 1,5MB; login=alice; 
 [main] 25/11/2015 14:36:35 INFO dao - OK [Update]: dao/saveUser; 0,1s; 1,5MB; login=bob; 
@@ -51,11 +44,7 @@ SLF4J-TOYS promotes clean and organized log files, like:
 [main] 25/11/2015 14:38:52 INFO dao - FAIL [OutOfQuota]: dao/saveUser; 0,1s; 1,5MB
 ```
 
-
-
-
-
-
+This can be achieved with the `Meter` API:
 ```java
 final Meter m = MeterFactory.getMeter(LOGGER, "saveUser").start();
 try {
@@ -76,7 +65,7 @@ try {
 }
 ```
 
-And produces reports about your host environment, like:
+It can also produce reports about your host environment:
 ```
 INFO report - Memory:
  - maximum allowed: 1,9GB
@@ -84,33 +73,16 @@ INFO report - Memory:
  - currently used: 4,1MB (124,9MB free)
 ```
 
-It further encourages simple logger names as:
-```
-persistence.user
-persistence.product
-```
+## Design Considerations
 
-**Installing and using**
+*   No dependencies other than SLF4J itself.
+*   Small footprint.
 
-SLF4J-TOYS is avaiable at [Maven Central repository](http://search.maven.org/#artifactdetails|org.usefultoys|slf4j-toys|1.5.0|jar):
-```
-<dependency>
-    <groupId>org.usefultoys</groupId>
-    <artifactId>slf4j-toys</artifactId>
-    <version>1.5.0</version>
-</dependency>
-```
+## Further Information
 
-SLF4J-TOYS is also avaiable as [single JAR](https://github.com/useful-toys/slf4j-toys/releases/download/1.5.0/slf4j-toys-1.5.0.jar).
+Take a look at our [Wiki](https://github.com/useful-toys/slf4j-toys/wiki) or the [API Javadoc](http://useful-toys.github.io/slf4j-toys/javadoc/).
 
+## Similar Projects
 
-
-**Further information**
-
-Take a look at our [WIKI](https://github.com/useful-toys/slf4j-toys/wiki) or the [API Javadoc](http://useful-toys.github.io/slf4j-toys/javadoc/).
-
-**Similar projects**
-
- * [Perf4J](http://perf4j.codehaus.org/) Appearantly discotinued project.
- * [Spped4J](http://perf4j.codehaus.org/) A continuation and enhancement of Perf4J.
-
+*   [Perf4J](https://github.com/perf4j/perf4j): A performance logging library for Java.
+*   [Speed4J](https://github.com/jalkanen/speed4j): A continuation and enhancement of Perf4J. See [comparison between slf4j-toys and Speed4J](docs/slf4j-toys-vs-speed4j.md).
