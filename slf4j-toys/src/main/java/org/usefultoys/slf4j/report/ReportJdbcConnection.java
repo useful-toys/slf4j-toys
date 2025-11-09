@@ -126,6 +126,7 @@ public class ReportJdbcConnection implements Runnable {
                 ps.printf("timeout=%dms; ", connection.getNetworkTimeout());
             } catch (final NoSuchMethodError ignore) {
                 // only since 1.7
+                ps.print("n/a; "); // Added this line
             }
             ps.print("transaction=");
             switch (connection.getTransactionIsolation()) {
@@ -164,7 +165,7 @@ public class ReportJdbcConnection implements Runnable {
                         ps.printf("%s=?; ", name);
                         continue;
                     }
-                    ps.printf("%s=%s", name, entry.getValue());
+                    ps.printf("%s=%s; ", name, entry.getValue());
                 }
                 ps.println();
             }

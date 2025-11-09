@@ -16,213 +16,339 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
-import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.SystemConfig;
 
-import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class ReportJdbcConnectionTest {
-    private MockLogger logger;
-    private Connection connection;
-    private ReportJdbcConnection reporter;
 
-    @BeforeAll
-    static void validate() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
+    private MockLogger mockLogger;
+    private Connection mockConnection;
+    private DatabaseMetaData mockMetaData;
 
     @BeforeEach
-    void resetWatcherConfigBeforeEach() {
-        // Reinitialize each configuration to ensure a clean configuration before each test
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
+    void setUp() throws SQLException {
+        final Logger logger = LoggerFactory.getLogger("test.report.jdbc");
+        mockLogger = (MockLogger) logger;
+        mockLogger.clearEvents();
 
-    @AfterAll
-    static void resetWatcherConfigAfterAll() {
-        // Reinitialize each configuration to ensure a clean configuration before each test
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
+        mockConnection = mock(Connection.class);
+        mockMetaData = mock(DatabaseMetaData.class);
 
-    @BeforeEach
-    void setUp() {
-        logger = (MockLogger) LoggerFactory.getLogger("test.jdbc");
-        logger.clearEvents();
+        // Default mocks for common calls to avoid NullPointerException in basic tests
+        when(mockConnection.isClosed()).thenReturn(false);
+        when(mockConnection.getCatalog()).thenReturn("test_catalog");
+        when(mockConnection.getSchema()).thenReturn("test_schema");
+        when(mockConnection.getMetaData()).thenReturn(mockMetaData);
+        when(mockConnection.isReadOnly()).thenReturn(false);
+        when(mockConnection.getAutoCommit()).thenReturn(true);
+        when(mockConnection.getHoldability()).thenReturn(ResultSet.HOLD_CURSORS_OVER_COMMIT);
+        when(mockConnection.getNetworkTimeout()).thenReturn(1000);
+        when(mockConnection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_READ_COMMITTED);
+        when(mockConnection.getClientInfo()).thenReturn(new Properties());
+        when(mockConnection.getTypeMap()).thenReturn(new HashMap<>());
 
-        connection = mock(Connection.class);
-        reporter = new ReportJdbcConnection(logger, connection);
-    }
-
-    @Test
-    void shouldLogClosedJdbcConnectionInfo() throws SQLException {
-
-        // Arrange
-        when(connection.isClosed()).thenReturn(true);
-
-        // Act
-        reporter.run();
-
-        // Assert
-        final MockLogger mockLogger = logger;
-        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
-
-        assertTrue(fullLog.contains("Closed!"));
+        when(mockMetaData.getURL()).thenReturn("jdbc:test://localhost/testdb");
+        when(mockMetaData.getUserName()).thenReturn("testuser");
+        when(mockMetaData.getDatabaseProductName()).thenReturn("TestDB");
+        when(mockMetaData.getDatabaseProductVersion()).thenReturn("1.0");
+        when(mockMetaData.getDriverName()).thenReturn("TestDriver");
+        when(mockMetaData.getDriverVersion()).thenReturn("1.0");
+        when(mockMetaData.getJDBCMajorVersion()).thenReturn(4);
+        when(mockMetaData.getJDBCMinorVersion()).thenReturn(2);
+        when(mockMetaData.getMaxConnections()).thenReturn(100);
+        when(mockMetaData.getSQLStateType()).thenReturn(DatabaseMetaData.sqlStateSQL99);
     }
 
     @Test
-    void shouldLogJdbcConnectionInfo() throws SQLException {
+    void testReportClosedConnection() throws SQLException {
+        when(mockConnection.isClosed()).thenReturn(true);
 
-        // Arrange
-        final DatabaseMetaData metaData = mock(DatabaseMetaData.class);
-        final Properties clientInfo = new Properties();
-        clientInfo.setProperty("appName", "testApp");
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
 
-        when(connection.isClosed()).thenReturn(false);
-        when(connection.getCatalog()).thenReturn("catalog1");
-        when(connection.getSchema()).thenReturn("public");
-        when(connection.getMetaData()).thenReturn(metaData);
-        when(connection.isReadOnly()).thenReturn(false);
-        when(connection.getAutoCommit()).thenReturn(true);
-        when(connection.getHoldability()).thenReturn(ResultSet.HOLD_CURSORS_OVER_COMMIT);
-        when(connection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_SERIALIZABLE);
-        when(connection.getClientInfo()).thenReturn(clientInfo);
-        when(connection.getTypeMap()).thenReturn(null);
-
-        when(metaData.getURL()).thenReturn("jdbc:test://localhost/db");
-        when(metaData.getUserName()).thenReturn("db_user");
-        when(metaData.getDatabaseProductName()).thenReturn("TestDB");
-        when(metaData.getDatabaseProductVersion()).thenReturn("1.0");
-        when(metaData.getDriverName()).thenReturn("TestDriver");
-        when(metaData.getDriverVersion()).thenReturn("1.2.3");
-        when(metaData.getJDBCMajorVersion()).thenReturn(4);
-        when(metaData.getJDBCMinorVersion()).thenReturn(2);
-        when(metaData.getMaxConnections()).thenReturn(100);
-        when(metaData.getSQLStateType()).thenReturn(DatabaseMetaData.sqlStateSQL99);
-
-        // Act
-        reporter.run();
-
-        // Assert
-        final MockLogger mockLogger = logger;
-        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
-
-        assertTrue(fullLog.contains("JDBC connection"));
-        assertTrue(fullLog.contains("catalog: catalog1"));
-        assertTrue(fullLog.contains("schema: public"));
-        assertTrue(fullLog.contains("URL: jdbc:test://localhost/db"));
-        assertTrue(fullLog.contains("user name: db_user"));
-        assertTrue(fullLog.contains("properties: auto-commit; holdability=hold-cursors-over-commit; timeout=0ms; transaction=serializable;"));
-        assertTrue(fullLog.contains("database: TestDB"));
-        assertTrue(fullLog.contains("driver: TestDriver (1.2.3); jdbc-version=4.2; max-connections=100; sql-state-type=SQL99;"));
-        assertTrue(fullLog.contains("transaction=serializable"));
-        assertTrue(fullLog.contains("client info: appName=testApp"));
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("JDBC connection"));
+        assertTrue(logs.contains(" - Closed! "));
+        verify(mockConnection).isClosed(); // Ensure isClosed was called
+        verify(mockConnection, never()).getCatalog(); // Ensure no further calls
     }
 
     @Test
-    void shouldLogJdbcConnectionInfoOtherAttributes() throws SQLException {
-        // Arrange
-        when(connection.isClosed()).thenReturn(false);
-        when(connection.getCatalog()).thenReturn(null);
-        when(connection.getSchema()).thenReturn(null);
-        when(connection.getMetaData()).thenReturn(null);
-        when(connection.isReadOnly()).thenReturn(true);
-        when(connection.getAutoCommit()).thenReturn(false);
-        when(connection.getHoldability()).thenReturn(ResultSet.CLOSE_CURSORS_AT_COMMIT);
-        when(connection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_REPEATABLE_READ);
-        when(connection.getClientInfo()).thenReturn(null);
-        when(connection.getTypeMap()).thenReturn(null);
+    void testReportOpenConnectionBasicProperties() throws SQLException {
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
 
-        // Act
-        reporter.run();
-
-        // Assert
-        final MockLogger mockLogger = logger;
-        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();  // we assume all output is printed in one event
-
-        assertTrue(fullLog.contains("JDBC connection"));
-        assertTrue(fullLog.contains("properties: read-only; holdability=close-cursors-at-commit; timeout=0ms; transaction=repeatable-read;"));
-        assertTrue(fullLog.contains("client info: n/a"));
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("JDBC connection"));
+        assertTrue(logs.contains(" - catalog: test_catalog"));
+        assertTrue(logs.contains(" - schema: test_schema"));
+        assertTrue(logs.contains("    URL: jdbc:test://localhost/testdb"));
+        assertTrue(logs.contains("    user name: testuser"));
+        assertTrue(logs.contains(" - properties: auto-commit; holdability=hold-cursors-over-commit; timeout=1000ms; transaction=read-committed;"));
+        assertTrue(logs.contains(" - client info: n/a")); // Default empty properties
+        assertTrue(logs.contains(" - database: TestDB (1.0)"));
+        assertTrue(logs.contains(" - driver: TestDriver (1.0); jdbc-version=4.2; max-connections=100; sql-state-type=SQL99;"));
     }
 
     @Test
-    void shouldLogTypeMapWhenEnabled() throws SQLException {
-        // Arrange
-        reporter.printTypeMap(true);
+    void testReportConnectionWithNullCatalogAndSchema() throws SQLException {
+        when(mockConnection.getCatalog()).thenReturn(null);
+        when(mockConnection.getSchema()).thenReturn(null);
 
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
 
-        when(connection.isClosed()).thenReturn(false);
-        when(connection.getCatalog()).thenReturn(null);
-        when(connection.getMetaData()).thenReturn(null);
-        when(connection.getSchema()).thenReturn(null);
-        when(connection.isReadOnly()).thenReturn(false);
-        when(connection.getAutoCommit()).thenReturn(true);
-        when(connection.getHoldability()).thenReturn(ResultSet.CLOSE_CURSORS_AT_COMMIT);
-        when(connection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_NONE);
-        when(connection.getClientInfo()).thenReturn(null);
-
-        final Map<String, Class<?>> typeMap = new LinkedHashMap<>();
-        typeMap.put("uuid", java.util.UUID.class);
-        typeMap.put("jsonb", java.lang.String.class);
-        when(connection.getTypeMap()).thenReturn(typeMap);
-
-        // Act
-        reporter.run();
-
-        // Assert
-        final MockLogger mockLogger = logger;
-        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();
-
-        assertTrue(fullLog.contains("type map: uuid->UUID; jsonb->String; "));
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("JDBC connection"));
+        assertTrue(logs.contains(" - properties:")); // Check for properties section
+        // Ensure catalog and schema are not printed
+        assertTrue(!logs.contains(" - catalog:"));
+        assertTrue(!logs.contains(" - schema:"));
     }
 
     @Test
-    void shouldLogEmptyTypeMap() throws SQLException {
-        // Arrange
-        reporter.printTypeMap(true);
+    void testReportConnectionWithReadOnlyAndNoAutoCommit() throws SQLException {
+        when(mockConnection.isReadOnly()).thenReturn(true);
+        when(mockConnection.getAutoCommit()).thenReturn(false);
 
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
 
-        when(connection.isClosed()).thenReturn(false);
-        when(connection.getCatalog()).thenReturn(null);
-        when(connection.getMetaData()).thenReturn(null);
-        when(connection.getSchema()).thenReturn(null);
-        when(connection.isReadOnly()).thenReturn(false);
-        when(connection.getAutoCommit()).thenReturn(true);
-        when(connection.getHoldability()).thenReturn(ResultSet.CLOSE_CURSORS_AT_COMMIT);
-        when(connection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_READ_COMMITTED);
-        when(connection.getClientInfo()).thenReturn(null);
-
-        final Map<String, Class<?>> typeMap = new LinkedHashMap<>();
-        when(connection.getTypeMap()).thenReturn(typeMap);
-
-        // Act
-        reporter.run();
-
-        // Assert
-        final MockLogger mockLogger = logger;
-        final String fullLog = mockLogger.getEvent(0).getFormattedMessage();
-
-        assertTrue(fullLog.contains("type map: n/a"));
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("read-only; "));
+        assertTrue(!logs.contains("auto-commit; "));
     }
 
+    @Test
+    void testReportConnectionWithHoldabilityCloseCursors() throws SQLException {
+        when(mockConnection.getHoldability()).thenReturn(ResultSet.CLOSE_CURSORS_AT_COMMIT);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("holdability=close-cursors-at-commit; "));
+    }
+
+    @Test
+    void testReportConnectionWithHoldabilityUnknown() throws SQLException {
+        when(mockConnection.getHoldability()).thenReturn(999); // Unknown value
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("holdability=unknown; "));
+    }
+
+    @Test
+    void testReportConnectionWithTransactionIsolationSerializable() throws SQLException {
+        when(mockConnection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_SERIALIZABLE);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("transaction=serializable; "));
+    }
+
+    @Test
+    void testReportConnectionWithTransactionIsolationNone() throws SQLException {
+        when(mockConnection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_NONE);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("transaction=none; "));
+    }
+
+    @Test
+    void testReportConnectionWithTransactionIsolationUnknown() throws SQLException {
+        when(mockConnection.getTransactionIsolation()).thenReturn(999); // Unknown value
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("transaction=unknown; "));
+    }
+
+    @Test
+    void testReportConnectionWithClientInfo() throws SQLException {
+        Properties clientInfo = new Properties();
+        clientInfo.setProperty("ApplicationName", "MyApp");
+        clientInfo.setProperty("ClientUser", "testuser");
+        clientInfo.setProperty("Password", "secret"); // Should be masked
+        when(mockConnection.getClientInfo()).thenReturn(clientInfo);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains(" - client info: "));
+        assertTrue(logs.contains("ApplicationName=MyApp; "));
+        assertTrue(logs.contains("ClientUser=testuser; "));
+        assertTrue(logs.contains("Password=?; "));
+    }
+
+    @Test
+    void testReportConnectionWithNullClientInfo() throws SQLException {
+        when(mockConnection.getClientInfo()).thenReturn(null);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains(" - client info: n/a"));
+    }
+
+    @Test
+    void testReportConnectionWithMetaDataNull() throws SQLException {
+        when(mockConnection.getMetaData()).thenReturn(null);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        // Ensure metadata related fields are not printed
+        assertTrue(!logs.contains("URL:"));
+        assertTrue(!logs.contains("user name:"));
+        assertTrue(!logs.contains(" - database:"));
+        assertTrue(!logs.contains(" - driver:"));
+    }
+
+    @Test
+    void testReportConnectionWithSQLStateTypeXOpen() throws SQLException {
+        when(mockMetaData.getSQLStateType()).thenReturn(DatabaseMetaData.sqlStateXOpen);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("sql-state-type=X-Open; "));
+    }
+
+    @Test
+    void testReportConnectionWithSQLStateTypeUnknown() throws SQLException {
+        when(mockMetaData.getSQLStateType()).thenReturn(999); // Unknown value
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("sql-state-type=unknown; "));
+    }
+
+    @Test
+    void testReportConnectionWithTypeMapEnabledAndPopulated() throws SQLException {
+        Map<String, Class<?>> typeMap = new HashMap<>();
+        typeMap.put("my_udt", String.class);
+        typeMap.put("another_udt", Integer.class);
+        when(mockConnection.getTypeMap()).thenReturn(typeMap);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection)
+                .printTypeMap(true);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains(" - type map: my_udt->String; another_udt->Integer;"));
+    }
+
+    @Test
+    void testReportConnectionWithTypeMapEnabledAndEmpty() throws SQLException {
+        when(mockConnection.getTypeMap()).thenReturn(Collections.emptyMap());
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection)
+                .printTypeMap(true);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains(" - type map: n/a"));
+    }
+
+    @Test
+    void testReportConnectionWithTypeMapEnabledAndNull() throws SQLException {
+        when(mockConnection.getTypeMap()).thenReturn(null);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection)
+                .printTypeMap(true);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains(" - type map: n/a"));
+    }
+
+    @Test
+    void testReportConnectionWithTypeMapDisabled() throws SQLException {
+        Map<String, Class<?>> typeMap = new HashMap<>();
+        typeMap.put("my_udt", String.class);
+        when(mockConnection.getTypeMap()).thenReturn(typeMap);
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection)
+                .printTypeMap(false); // Explicitly disabled
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(!logs.contains(" - type map:")); // Ensure type map is not printed
+    }
+
+    @Test
+    void testReportConnectionSQLExceptionHandling() throws SQLException {
+        when(mockConnection.getCatalog()).thenThrow(new SQLException("Mock SQL Exception"));
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("Cannot read connection property: Mock SQL Exception"));
+    }
+
+    @Test
+    void testReportConnectionSchemaNoSuchMethodError() throws SQLException {
+        // Simulate older JDK where getSchema() might not exist
+        when(mockConnection.getSchema()).thenThrow(new NoSuchMethodError("Mock NoSuchMethodError"));
+
+        final ReportJdbcConnection report = new ReportJdbcConnection(mockLogger, mockConnection);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(!logs.contains(" - schema:")); // Schema should not be printed
+        assertTrue(!logs.contains("Cannot read connection property:")); // Should not catch NoSuchMethodError as SQLException
+    }
 }
