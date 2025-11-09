@@ -25,6 +25,7 @@ import org.slf4j.impl.MockLoggerEvent.Level;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -471,6 +472,10 @@ public class MockLogger implements Logger {
      */
     public MockLoggerEvent getEvent(final int eventIndex) {
         return loggerEvents.get(eventIndex);
+    }
+
+    public List<MockLoggerEvent> getLoggerEvents() {
+        return Collections.unmodifiableList(loggerEvents);
     }
 
     /**
