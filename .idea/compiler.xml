@@ -7,13 +7,17 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="slf4j-toys (1)" />
         <module name="slf4j-toys-logback-example" />
         <module name="slf4j-toys-web-example" />
         <module name="slf4j-toys-log4j-example" />
-        <module name="slf4j-toys-examples" />
-        <module name="slf4j-toys" />
         <module name="slf4j-toys-jul-example" />
+        <module name="slf4j-toys-logback-tests" />
+        <module name="slf4j-toys-examples" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="slf4j-toys" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

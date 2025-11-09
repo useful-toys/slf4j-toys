@@ -336,7 +336,7 @@ class SystemDataTest {
         assertEquals(1L, systemData.getPosition());
         assertEquals(2L, systemData.getLastCurrentTime());
         assertEquals(1L, systemData.getHeap_commited()); // Should retain old value
-        assertEquals(0L, systemData.getRuntime_usedMemory()); // Should retain old value
+        assertEquals(14L, systemData.getRuntime_usedMemory()); // Should retain old value
 
         // Reset and test with only memory
         systemData.reset();

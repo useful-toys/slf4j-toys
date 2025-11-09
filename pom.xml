@@ -76,6 +76,7 @@
 
     <modules>
         <module>slf4j-toys</module>
+        <module>slf4j-toys-logback-tests</module>
         <module>examples</module>
         <module>example_jul</module>
         <module>example_log4j</module>
