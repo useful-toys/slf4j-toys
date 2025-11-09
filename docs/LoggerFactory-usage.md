@@ -1,4 +1,4 @@
-# LoggerFactory API Documentation
+LoggerFactory Extensions
 
 The `org.usefultoys.slf4j.LoggerFactory` is a utility class in *slf4j-toys* that serves as an enhanced alternative to the standard `org.slf4j.LoggerFactory`. It provides convenient methods for two primary purposes:
 1.  Creating loggers with a consistent, hierarchical naming structure.
@@ -33,7 +33,7 @@ public class UserService {
 }
 ```
 
-### Use Case 2: Get Logger for a Specific Feature or Sub-component
+# Use Case 2: Get Logger for a Specific Feature or Sub-component
 
 Sometimes, you want to create a "child" logger nested under a class logger to control the logging for a specific feature more granularly.
 
@@ -77,84 +77,3 @@ public class DatabaseHelper {
 ```
 
 ## 2. Redirecting Streams to SLF4J
-
-The primary motivation for this feature is to allow the creation of large, structured or complex log messages as a single, cohesive log entry. Instead of generating many small log messages, you can use a stream to build a detailed, multi-line message.
-
-This is ideal for logging structured data, such as tables with aligned columns or comma-separated values (CSV). The resulting single log entry is easy to read and can be copied and pasted directly into other tools, like a spreadsheet, for more detailed analysis.
-
-Using a `PrintStream` is particularly convenient as it allows the use of familiar and powerful methods like `print`, `println`, and especially `printf` for string formatting with alignment and various data types.
-
-The factory provides `get[Level]PrintStream()` and `get[Level]OutputStream()` methods for all standard log levels.
-
-### Use Case 1: Logging Tabular Data
-
-Imagine you want to log a summary of processed records in a table format.
-
-**Example:**
-```java
-import org.usefultoys.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import java.io.PrintStream;
-import java.util.List;
-
-public class ReportGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(ReportGenerator.class);
-
-    public void generateProcessingReport(List<Record> records) {
-        try (PrintStream infoStream = LoggerFactory.getInfoPrintStream(logger)) {
-            infoStream.println("Processing Report:");
-            infoStream.println("---------------------------------");
-            infoStream.printf("%-10s | %-8s | %s%n", "ID", "STATUS", "MESSAGE");
-            infoStream.println("---------------------------------");
-            for (Record record : records) {
-                infoStream.printf("%-10s | %-8s | %s%n", record.getId(), record.getStatus(), record.getMessage());
-            }
-            infoStream.println("---------------------------------");
-        }
-        // The try-with-resources block ensures the stream is closed,
-        // and the entire buffered content is logged as one message.
-    }
-}
-```
-This produces a clean, single log entry that is much easier to read than multiple `logger.info()` calls.
-
-### Use Case 2: Integrating with Stream-Based Libraries
-
-This functionality is also perfect for integrating with legacy code or third-party libraries that are designed to write to a `PrintStream`. Instead of letting them write to the console (`System.out`), you can capture their output directly into your application's logs.
-
-**Example:**
-Imagine you are using a third-party library that provides a debugging utility to dump the state of a complex object to a stream.
-
-```java
-// A hypothetical third-party library class
-class ThirdPartyJsonDebugger {
-    public void debug(PrintStream ps) {
-        ps.println("{");
-        ps.println("  \"status\": \"active\",");
-        ps.println("  \"values\": [1, 2, 3]");
-        ps.println("}");
-    }
-}
-
-// Your application code
-import org.usefultoys.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-public class MyService {
-    private static final Logger logger = LoggerFactory.getLogger(MyService.class);
-    private final ThirdPartyJsonDebugger jsonDebugger = new ThirdPartyJsonDebugger();
-
-    public void doSomething() {
-        logger.debug("About to perform a complex operation. Dumping object state for debugging:");
-
-        // Get a PrintStream that writes to our logger at DEBUG level
-        try (PrintStream debugStream = LoggerFactory.getDebugPrintStream(logger)) {
-            // Pass the stream to the third-party library
-            jsonDebugger.debug(debugStream);
-        }
-        // The entire JSON debug output is now in your logs as a single DEBUG message,
-        // associated with the 'MyService' logger.
-    }
-}
-```
-This approach seamlessly integrates external, stream-based tools into your structured logging workflow, ensuring all diagnostic information is captured in one place.

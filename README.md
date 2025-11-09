@@ -1,25 +1,32 @@
 # SLF4J TOYS
 
-*slf4j-toys* is a Java library that complements SLF4J with tools to promote clear, consistent, and structured logging practices, enabling simple but effective observability without complex or expensive tools.
+*slf4j-toys* is a Java library that complements SLF4J with tools to promote **semantical logging**.
 
 [![Build Status](https://github.com/useful-toys/slf4j-toys/actions/workflows/build.yml/badge.svg)](https://github.com/useful-toys/slf4j-toys/actions/workflows/build.yml) [![Codecov](https://codecov.io/gh/useful-toys/slf4j-toys/branch/master/graph/badge.svg)](https://codecov.io/gh/useful-toys/slf4j-toys) [![Qodana](https://github.com/useful-toys/slf4j-toys/actions/workflows/qodana_code_quality.yml/badge.svg)](https://github.com/useful-toys/slf4j-toys/actions/workflows/qodana_code_quality.yml)[![CodeQL](https://github.com/useful-toys/slf4j-toys/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/useful-toys/slf4j-toys/actions/workflows/github-code-scanning/codeql)
+
+Instead of relying on ambiguous log levels and cofusing log messages, the `Meter` defines a clear **life cycle** for operations,
+with well defined output, with clear semantics. Log files will be clean and organized, allowing easy monitoring and failure investigation.
+The log will nearly be self-explanatory and tell the story of your application.
+Additionally, log files will be parsable, allowing automatic analysis and data mining.
+
 ## The Problem with Standard Logging
 
 Standard logging practices using `logger.info()` or `logger.error()` often fail to answer a critical question: **"Did the operation succeed?"**
 
 A log message like `logger.info("Finished processing user 'alice'")` is ambiguous. Did it succeed? Did it fail in an expected way? Was it slow? Answering these questions requires developers to follow a strict, custom logging pattern, which is difficult to establish and maintain across a team. This leads to inconsistent logs that are hard to parse and monitor.
 
-## How slf4j-toys Solves It
+## How slf4j-toys Solves It with Semantic Loggig
 
-*slf4j-toys* fills this gap by providing tools that create clear, structured, and machine-readable logs.
+*slf4j-toys* fills this gap by providing a clear **Life Cycle** for every operation, provinding tools that create clear, structured, and machine-readable logs messages.
 
-### A `Meter` for Semantic Logging
-The core component is the **`Meter`**, a log message builder designed to clearly communicate the outcome of an operation. Instead of relying on ambiguous log levels, the `Meter` provides an API to record the result with clear semantics:
-*   **`m.ok()`**: The operation succeeded and achieved its primary goal.
-*   **`m.ok(path)`**: The operation succeeded, but through an alternative path (e.g., "Update" instead of "Insert"). This allows you to distinguish between different successful outcomes.
-*   **`m.reject()`**: The operation terminated as expected but did not achieve its goal (a predicted business-level failure, not a technical one).
-*   **`m.fail()`**: The operation failed due to an unexpected technical error.
+* **START**: The operation has just started.
+* **OK**: The operation succeeded and achieved its primary goal.
+* **OK (path)**: The operation succeeded achieved its primary goal, but through an alternative path (e.g., "update" instead of "insert", "cache hit" instead of "query"). This allows you to distinguish between different successful outcomes.
+* **REJECT**: The operation did not succeed, terminated as expected but did not achieve its goal, as some businesses condition war not met (e.g., out of quota, cannot insert as user already exists, etc.).
+* **FAIL**: The operation failed due to an unexpected technical error.
 
+Messages will have a clear state within the life cycle and provide additional information about the operation.
+Messages will be clear, consistent, and structured, enabling simple but effective observability without complex or expensive tools.
 
 [Using the `Meter` for semantic logging](docs/Meter-usage.md)
 
@@ -96,7 +103,6 @@ dependencies {
 ## Further Information
 
  * [Using the `Meter` for semantic logging](docs/Meter-usage.md)
- * [Using the `LoggerFactory` for additional useful Logger use cases](docs/LoggerFactory-usage.md)
  * [Using the `Watcher` to monitor your application healt and resource usage](docs.md)
  * [Using the `Reporter` to generate reports about your host environment](docs/Reporter-usage.md)
  * [Using the `Logback Extensions` for semantig and colorful log messagens](docs/Logback-extensions.md)
