@@ -24,7 +24,7 @@
     <artifactId>slf4j-toys-logback-tests</artifactId>
     <version>1.9.0</version>
     <name>slf4j-toys-logback-tests</name>
-    <packaging>pom</packaging> <!-- Módulo usado apenas para testes; não deve produzir jar -->
+    <packaging>jar</packaging> <!-- Módulo usado apenas para testes; não deve produzir jar -->
 
     <parent>
         <groupId>org.usefultoys</groupId>
@@ -91,21 +91,6 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <!-- Removed explicit maven-install-plugin and maven-deploy-plugin entries; using properties to skip install/deploy -->
         </plugins>

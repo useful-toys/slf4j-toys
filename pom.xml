@@ -203,5 +203,34 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>report-aggregate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregate</outputDirectory>
+                            <includes>
+                                <include>org.usefultoys:slf4j-toys</include>
+                                <include>org.usefultoys:slf4j-toys-logback-tests</include>
+                            </includes>
+                            <excludes>
+                                <exclude>org.usefultoys:slf4j-toys-examples</exclude>
+                                <exclude>org.usefultoys:example_jul</exclude>
+                                <exclude>org.usefultoys:example_log4j</exclude>
+                                <exclude>org.usefultoys:example_logback</exclude>
+                                <exclude>org.usefultoys:example_web</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>

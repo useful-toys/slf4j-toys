@@ -12,7 +12,6 @@
         <module name="slf4j-toys-web-example" />
         <module name="slf4j-toys-log4j-example" />
         <module name="slf4j-toys-jul-example" />
-        <module name="slf4j-toys-logback-tests" />
         <module name="slf4j-toys-examples" />
       </profile>
     </annotationProcessing>
