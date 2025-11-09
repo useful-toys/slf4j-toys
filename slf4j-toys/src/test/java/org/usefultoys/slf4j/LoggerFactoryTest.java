@@ -157,6 +157,8 @@ class LoggerFactoryTest {
         final PrintStream traceStream = LoggerFactory.getTracePrintStream(logger);
         assertNotNull(traceStream);
         assertInstanceOf(NullPrintStream.class, traceStream);
+        // Ensure no events are logged
+        assertEquals(0, mockLogger.getEventCount());
     }
 
     @Test
@@ -169,6 +171,7 @@ class LoggerFactoryTest {
         final PrintStream debugStream = LoggerFactory.getDebugPrintStream(logger);
         assertNotNull(debugStream);
         assertInstanceOf(NullPrintStream.class, debugStream);
+        assertEquals(0, mockLogger.getEventCount());
     }
 
     @Test
@@ -181,6 +184,7 @@ class LoggerFactoryTest {
         final PrintStream infoStream = LoggerFactory.getInfoPrintStream(logger);
         assertNotNull(infoStream);
         assertInstanceOf(NullPrintStream.class, infoStream);
+        assertEquals(0, mockLogger.getEventCount());
     }
 
     @Test
@@ -193,6 +197,7 @@ class LoggerFactoryTest {
         final PrintStream warnStream = LoggerFactory.getWarnPrintStream(logger);
         assertNotNull(warnStream);
         assertInstanceOf(NullPrintStream.class, warnStream);
+        assertEquals(0, mockLogger.getEventCount());
     }
 
     @Test
@@ -200,10 +205,26 @@ class LoggerFactoryTest {
         final Logger logger = LoggerFactory.getLogger("errorLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
+        mockLogger.clearEvents();
 
         final PrintStream errorStream = LoggerFactory.getErrorPrintStream(logger);
         assertNotNull(errorStream);
         assertInstanceOf(NullPrintStream.class, errorStream);
+        assertEquals(0, mockLogger.getEventCount());
+    }
+
+    @Test
+    void testNullPrintStreamBehavior() {
+        final NullPrintStream nullPrintStream = new NullPrintStream();
+        assertDoesNotThrow(() -> {
+            nullPrintStream.print("test");
+            nullPrintStream.println("test");
+            nullPrintStream.write(1);
+            nullPrintStream.write("test".getBytes(StandardCharsets.UTF_8));
+            nullPrintStream.write("test".getBytes(StandardCharsets.UTF_8), 0, 2);
+            nullPrintStream.flush();
+            nullPrintStream.close();
+        });
     }
 
     @Test
@@ -300,6 +321,8 @@ class LoggerFactoryTest {
         final OutputStream traceStream = LoggerFactory.getTraceOutputStream(logger);
         assertNotNull(traceStream);
         assertInstanceOf(NullOutputStream.class, traceStream);
+        // Ensure no events are logged
+        assertEquals(0, mockLogger.getEventCount());
     }
 
     @Test
@@ -312,6 +335,7 @@ class LoggerFactoryTest {
         final OutputStream debugStream = LoggerFactory.getDebugOutputStream(logger);
         assertNotNull(debugStream);
         assertInstanceOf(NullOutputStream.class, debugStream);
+        assertEquals(0, mockLogger.getEventCount());
     }
 
     @Test
@@ -324,6 +348,7 @@ class LoggerFactoryTest {
         final OutputStream infoStream = LoggerFactory.getInfoOutputStream(logger);
         assertNotNull(infoStream);
         assertInstanceOf(NullOutputStream.class, infoStream);
+        assertEquals(0, mockLogger.getEventCount());
     }
 
     @Test
@@ -336,17 +361,31 @@ class LoggerFactoryTest {
         final OutputStream warnStream = LoggerFactory.getWarnOutputStream(logger);
         assertNotNull(warnStream);
         assertInstanceOf(NullOutputStream.class, warnStream);
+        assertEquals(0, mockLogger.getEventCount());
     }
 
     @Test
     void testGetErrorOutputStreamWithLoggerDisabled() throws Exception {
         final Logger logger = LoggerFactory.getLogger("errorLogger");
         final MockLogger mockLogger = (MockLogger) logger;
-        mockLogger.setEnabled(false);
+        mockLogger.setErrorEnabled(false); // Disable error
         mockLogger.clearEvents();
 
         final OutputStream errorStream = LoggerFactory.getErrorOutputStream(logger);
         assertNotNull(errorStream);
         assertInstanceOf(NullOutputStream.class, errorStream);
+        assertEquals(0, mockLogger.getEventCount());
+    }
+
+    @Test
+    void testNullOutputStreamBehavior() {
+        final NullOutputStream nullOutputStream = new NullOutputStream();
+        assertDoesNotThrow(() -> {
+            nullOutputStream.write(1);
+            nullOutputStream.write("test".getBytes(StandardCharsets.UTF_8));
+            nullOutputStream.write("test".getBytes(StandardCharsets.UTF_8), 0, 2);
+            nullOutputStream.flush();
+            nullOutputStream.close();
+        });
     }
 }
