@@ -33,10 +33,6 @@
     </parent>
 
     <!-- Evita que este módulo seja instalado ou deployado como artefato -->
-    <properties>
-        <maven.install.skip>true</maven.install.skip>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -77,22 +73,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <!-- Em packaging=pom é necessário ligar o plugin explicitamente ao ciclo de vida -->
-                <executions>
-                    <execution>
-                        <id>run-tests</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
-            <!-- Removed explicit maven-install-plugin and maven-deploy-plugin entries; using properties to skip install/deploy -->
         </plugins>
     </build>
 </project>
