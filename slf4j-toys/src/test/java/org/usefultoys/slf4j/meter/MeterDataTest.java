@@ -536,5 +536,51 @@ public class MeterDataTest {
     void testFullID(final MeterData value, final String expected) {
         assertEquals(expected, value.getFullID());
     }
-}
 
+    @Test
+    void testCalculationMethods() {
+        // Not started
+        MeterData meter = new MockMeterData("uuid", 1, "cat", "op", null, null, 100, 0, 0, 200, 0, 0, 0, null, null, null, null, null);
+        assertEquals(0, meter.getExecutionTime());
+        assertEquals(100, meter.getWaitingTime());
+        assertEquals(0.0, meter.getIterationsPerSecond());
+        assertFalse(meter.isSlow());
+
+        // Started, not stopped
+        meter = new MockMeterData("uuid", 1, "cat", "op", null, null, 100, 200, 0, 300, 0, 0, 0, null, null, null, null, null);
+        assertEquals(100, meter.getExecutionTime());
+        assertEquals(100, meter.getWaitingTime());
+        assertEquals(0.0, meter.getIterationsPerSecond());
+        assertFalse(meter.isSlow());
+
+        // Started with iterations, not stopped
+        meter = new MockMeterData("uuid", 1, "cat", "op", null, null, 100, 200, 0, 1200, 0, 10, 0, null, null, null, null, null);
+        assertEquals(1000, meter.getExecutionTime());
+        assertEquals(100, meter.getWaitingTime());
+        assertEquals(10000000, meter.getIterationsPerSecond());
+        assertFalse(meter.isSlow());
+
+        // Stopped
+        meter = new MockMeterData("uuid", 1, "cat", "op", null, null, 100, 200, 1200, 1300, 0, 10, 0, null, null, null, null, null);
+        assertEquals(1000, meter.getExecutionTime());
+        assertEquals(100, meter.getWaitingTime());
+        assertEquals(10000000, meter.getIterationsPerSecond());
+        assertFalse(meter.isSlow());
+
+        // Slow
+        meter = new MockMeterData("uuid", 1, "cat", "op", null, null, 100, 200, 1200, 1300, 500, 10, 0, null, null, null, null, null);
+        assertTrue(meter.isSlow());
+    }
+
+    @Test
+    void testEqualsAndHashCode() {
+        MeterData data1 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+        MeterData data2 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+        MeterData data3 = new MeterData("uuid2", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat2", "op2", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+
+        assertEquals(data1, data2);
+        assertNotEquals(data1, data3);
+        assertEquals(data1.hashCode(), data2.hashCode());
+        assertNotEquals(data1.hashCode(), data3.hashCode());
+    }
+}
