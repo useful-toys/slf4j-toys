@@ -1,0 +1,64 @@
+<!--
+  ~ Copyright 2025 Daniel Felix Ferber
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!-- No novo módulo: coverage-report-aggregator/pom.xml -->
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>coverage-report-aggregator</artifactId>
+    <packaging>pom</packaging> <!-- Crucial: este módulo não gera JAR, apenas agrega -->
+    <name>coverage-report-aggregator</name>
+
+    <parent>
+        <groupId>org.usefultoys</groupId>
+        <artifactId>slf4j-toys-root</artifactId>
+        <version>1.9.0</version>
+    </parent>
+
+
+
+    <dependencies>
+        <!-- Adicione dependências para TODOS os módulos que você quer cobrir -->
+        <dependency>
+            <groupId>org.usefultoys</groupId>
+            <artifactId>slf4j-toys</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.usefultoys</groupId>
+            <artifactId>slf4j-toys-logback-tests</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>report-aggregate</id>
+                        <!-- Vincule a uma fase que ocorre depois dos testes (ex: verify ou install) -->
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
