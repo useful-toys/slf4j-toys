@@ -68,7 +68,7 @@
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
         <junit5.version>5.11.2</junit5.version>
         <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
-        <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
         <mockito.version>4.11.0</mockito.version>
         <lombok.version>1.18.34</lombok.version>
         <awaitility.version>4.2.0</awaitility.version>
@@ -195,6 +195,21 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>test</phase> <!-- Garante que o relatório seja gerado após a fase de teste -->
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
