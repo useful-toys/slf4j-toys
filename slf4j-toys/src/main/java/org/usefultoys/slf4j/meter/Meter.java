@@ -36,8 +36,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.usefultoys.slf4j.meter.MeterConfig.*;
 
 /**
- * The `Meter` is a core component of `slf4j-toys` designed to track the **lifecycle** of application operations. It
- * collects system status and reports it to the logger at key points: operation start, progress, and termination
+ * The `Meter` is a core component of `slf4j-toys` designed to track the **lifecycle** of application operations.
+ * It collects system status and reports it to the logger at key points: operation start, progress, and termination
  * (success, rejection, or failure).
  * <p>
  * Each `Meter` instance allows you to:
@@ -48,7 +48,7 @@ import static org.usefultoys.slf4j.meter.MeterConfig.*;
  *     <li>Call {@link #fail(Object)} to log unexpected technical failure (ERROR level).</li>
  *     <li>Call {@link #progress()} to log intermediate progress and system status (INFO level, periodically).</li>
  * </ul>
- * All lifecycle events also generate a machine-parsable trace message.
+ * All **lifecycle** events also generate a **machine-parsable data message** at TRACE level.
  *
  * @author Daniel Felix Ferber
  * @see MeterData
@@ -83,11 +83,11 @@ public class Meter extends MeterData implements Closeable {
     /** Generic error message for null arguments. */
     private static final String ERROR_MSG_NULL_ARGUMENT = "Null argument";
     /** Generic error message for non-positive arguments. */
-    private static final String ERROR_MSG_NON_POSITIVE_ARGUMENT = "Non positive argument";
+    private static final String ERROR_MSG_NON_POSITIVE_ARGUMENT = "Non-positive argument";
     /** Generic error message for illegal string format. */
     private static final String ERROR_MSG_ILLEGAL_STRING_FORMAT = "Illegal string format";
     /** Error message for non-forward iteration (e.g., incTo with a smaller value). */
-    private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non forward iteration";
+    private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non-forward iteration";
     /** The fully qualified name of this class, used for stack trace manipulation. */
     private static final String MY_CLASS_NAME = Meter.class.getName();
     /** Placeholder string for null values in context. */
@@ -695,8 +695,8 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Notifies the `Meter` that the operation has started. This method logs a summary (DEBUG level) and a
-     * machine-parsable event (TRACE level) with the current system status.
+     * Notifies the `Meter` that the operation has started. This method logs a **human-readable summary** (DEBUG level)
+     * and a **machine-parsable data message** (TRACE level) with the current system status.
      *
      * @return Reference to this `Meter` instance, for method chaining.
      */
@@ -861,9 +861,9 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Notifies the `Meter` that the operation has completed successfully. This method logs a summary (INFO level) and a
-     * machine-parsable event (TRACE level) with the current system status. If a time limit was set and exceeded, a WARN
-     * level message is logged instead.
+     * Notifies the `Meter` that the operation has completed successfully. This method logs a **human-readable summary**
+     * (INFO level) and a **machine-parsable data message** (TRACE level) with the current system status. If a time
+     * limit was set and exceeded, a WARN level message is logged instead.
      *
      * @return Reference to this `Meter` instance, for method chaining.
      */
@@ -927,6 +927,15 @@ public class Meter extends MeterData implements Closeable {
         return ref == null || ref.get() != this;
     }
 
+    /**
+     * Notifies the `Meter` that the operation has completed successfully, specifying an execution path.
+     * This method logs a **human-readable summary** (INFO level) and a **machine-parsable data message** (TRACE level)
+     * with the current system status. If a time limit was set and exceeded, a WARN level message is logged instead.
+     *
+     * @param pathId An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that identifies
+     *               the successful execution path.
+     * @return Reference to this `Meter` instance, for method chaining.
+     */
     public Meter ok(final Object pathId) {
         try {
             final long newStopTime = collectCurrentTime();
@@ -991,7 +1000,8 @@ public class Meter extends MeterData implements Closeable {
 
     /**
      * Notifies the `Meter` that the operation has completed with a rejection (expected unsuccessful outcome). This
-     * method logs a summary (INFO level) and a machine-parsable event (TRACE level) with the current system status.
+     * method logs a **human-readable summary** (INFO level) and a **machine-parsable data message** (TRACE level) with
+     * the current system status.
      *
      * @param cause An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that describes the
      *              cause of the rejection.
@@ -1054,7 +1064,8 @@ public class Meter extends MeterData implements Closeable {
 
     /**
      * Notifies the `Meter` that the operation has failed due to an unexpected technical error. This method logs a
-     * summary (ERROR level) and a machine-parsable event (TRACE level) with the current system status.
+     * **human-readable summary** (ERROR level) and a **machine-parsable data message** (TRACE level) with the current
+     * system status.
      *
      * @param cause An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that describes the
      *              cause of the failure. If it's a {@link Throwable}, its class name is used for `failPath` and its
@@ -1162,6 +1173,13 @@ public class Meter extends MeterData implements Closeable {
             }
             stacktrace = Arrays.copyOfRange(stacktrace, framesToDiscard, stacktrace.length);
             setStackTrace(stacktrace);
+        }
+
+        /**
+         * Constructs a `MeterThrowable` with a default message.
+         */
+        MeterThrowable() {
+            super("Illegal Meter usage.");
         }
 
         /**
@@ -1395,9 +1413,7 @@ public class Meter extends MeterData implements Closeable {
 
             return result;
         } catch (final Exception e) {
-            final int length = exceptionsToReject.length;
-            for(int i = 0; i < length; ++i) {
-                final Class<? extends Exception> ee = exceptionsToReject[i];
+            for (final Class<? extends Exception> ee : exceptionsToReject) {
                 if (ee.isAssignableFrom(e.getClass())) {
                     reject(e);
                     throw e;
