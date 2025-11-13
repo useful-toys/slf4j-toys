@@ -19,7 +19,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 /**
- * Utility class that provides methods to format numbers by rounding them to a unit, 
+ * Utility class that provides methods to format numbers by rounding them to a unit,
  * thereby reducing their string representation.
  *
  * <p>This class supports formatting for time durations, memory sizes, and iteration-related values.
@@ -40,6 +40,15 @@ public final class UnitFormatter {
     private final String[] ITERATIONS_UNITS = {"", "k", "M"};
     private final int[] ITERATIONS_FACTORS = {1000, 1000, 1000};
 
+    /**
+     * Formats a long integer value into a human-readable string with appropriate units.
+     * This method is used internally by the public formatting methods.
+     *
+     * @param value The long integer value to format.
+     * @param units An array of unit strings (e.g., "B", "kB", "MB").
+     * @param factors An array of factors for unit conversion (e.g., 1000, 1000, 1000).
+     * @return A formatted string representing the value with units.
+     */
     @SuppressWarnings("AssignmentToMethodParameter")
     String longUnit(long value, @NonNull final String[] units, @NonNull final int[] factors) {
         int index = 0;
@@ -59,8 +68,20 @@ public final class UnitFormatter {
         return String.format("%.1f%s", doubleValue, units[index]);
     }
 
+    /**
+     * A small epsilon value used for floating-point comparisons to account for precision issues.
+     */
     final double Epsylon = 0.001;
 
+    /**
+     * Formats a double-precision floating-point value into a human-readable string with appropriate units.
+     * This method is used internally by the public formatting methods.
+     *
+     * @param value The double value to format.
+     * @param units An array of unit strings (e.g., "/s", "k/s", "M/s").
+     * @param factors An array of factors for unit conversion (e.g., 1000, 1000, 1000).
+     * @return A formatted string representing the value with units.
+     */
     @SuppressWarnings("AssignmentToMethodParameter")
     String doubleUnit(double value, @NonNull final String[] units, @NonNull final int[] factors) {
         if (value == 0.0) {

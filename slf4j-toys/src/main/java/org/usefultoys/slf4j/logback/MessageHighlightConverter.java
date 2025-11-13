@@ -21,15 +21,34 @@ import org.slf4j.Marker;
 import org.usefultoys.slf4j.meter.Markers;
 
 /**
- * Highlights meter messages and
+ * A Logback converter that applies ANSI foreground colors to log messages based on their SLF4J {@link Marker}.
+ * This converter is used to visually distinguish different types of messages, particularly those generated
+ * by `slf4j-toys` components like {@link org.usefultoys.slf4j.meter.Meter} and {@link org.usefultoys.slf4j.watcher.Watcher}.
+ * <p>
+ * It assigns specific colors to messages indicating operation lifecycle status (START, OK, REJECT, FAIL, PROGRESS),
+ * data messages, and inconsistency/bug markers.
+ *
+ * @author Daniel Felix Ferber
+ * @see AnsiColors
+ * @see Markers
  */
 public class MessageHighlightConverter extends ForegroundCompositeConverterBase<ILoggingEvent> {
 
+    /** ANSI color code for messages that should have more visibility (e.g., Meter lifecycle events). */
     public static final String MORE_VISIBILITY = AnsiColors.BRIGHT_WHITE;
+    /** ANSI color code for default message visibility. */
     public static final String DEFAULT_VISIBILITY = AnsiColors.WHITE;
+    /** ANSI color code for messages that should have less visibility (e.g., machine-parsable data). */
     public static final String LESS_VISIBILITY = AnsiColors.BRIGHT_BLACK;
+    /** ANSI color code for error-related messages. */
     public static final String ERROR_VISIBILITY = AnsiColors.RED;
 
+    /**
+     * Determines the ANSI foreground color code based on the logging event's {@link Marker}.
+     *
+     * @param event The logging event.
+     * @return The ANSI foreground color code as a string.
+     */
     @Override
     protected String getForegroundColorCode(final ILoggingEvent event) {
         final Marker marker = event.getMarker();

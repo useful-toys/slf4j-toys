@@ -27,9 +27,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Augments the {@link EventData} with status collected from the virtual machine.
+ * Extends {@link EventData} to include status metrics collected from the Java Virtual Machine (JVM)
+ * and the underlying operating system. This class provides detailed insights into runtime
+ * performance and resource usage.
  *
  * @author Daniel Felix Ferber
+ * @see EventData
+ * @see SystemConfig
  */
 @SuppressWarnings("Since15")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,15 +41,50 @@ public abstract class SystemData extends EventData {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructs a SystemData instance with a specified session UUID.
+     *
+     * @param uuid The unique identifier for the JVM session.
+     */
     protected SystemData(final String uuid) {
         super(uuid);
     }
 
+    /**
+     * Constructs a SystemData instance with a specified session UUID and timestamp.
+     *
+     * @param uuid The unique identifier for the JVM session.
+     * @param timestamp The timestamp (in nanoseconds) when the data was collected.
+     */
     protected SystemData(final String uuid, final long timestamp) {
         super(uuid, timestamp);
     }
 
-    // for tests only
+    /**
+     * Constructs a SystemData instance with detailed system metrics.
+     * This constructor is primarily intended for testing purposes.
+     *
+     * @param sessionUuid The unique identifier for the JVM session.
+     * @param position The time-ordered sequential position of the event.
+     * @param lastCurrentTime The timestamp (in nanoseconds) when the data was collected.
+     * @param heap_commited The committed heap memory in bytes.
+     * @param heap_max The maximum heap memory in bytes.
+     * @param heap_used The used heap memory in bytes.
+     * @param nonHeap_commited The committed non-heap memory in bytes.
+     * @param nonHeap_max The maximum non-heap memory in bytes.
+     * @param nonHeap_used The used non-heap memory in bytes.
+     * @param objectPendingFinalizationCount The number of objects pending finalization.
+     * @param classLoading_loaded The number of classes currently loaded.
+     * @param classLoading_total The total number of classes loaded since JVM start.
+     * @param classLoading_unloaded The total number of classes unloaded since JVM start.
+     * @param compilationTime The total time spent in compilation.
+     * @param garbageCollector_count The total number of garbage collections.
+     * @param garbageCollector_time The total time spent in garbage collection.
+     * @param runtime_usedMemory The used memory reported by {@link Runtime}.
+     * @param runtime_maxMemory The maximum memory reported by {@link Runtime}.
+     * @param runtime_totalMemory The total memory reported by {@link Runtime}.
+     * @param systemLoad The system CPU load average.
+     */
     protected SystemData(final String sessionUuid, final long position, final long lastCurrentTime,
                          final long heap_commited, final long heap_max, final long heap_used,
                          final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
@@ -74,38 +113,55 @@ public abstract class SystemData extends EventData {
         this.systemLoad = systemLoad;
     }
 
+    /** The committed heap memory in bytes. */
     @Getter
     protected long heap_commited = 0;
+    /** The maximum heap memory in bytes. */
     @Getter
     protected long heap_max = 0;
+    /** The used heap memory in bytes. */
     @Getter
     protected long heap_used = 0;
+    /** The committed non-heap memory in bytes. */
     @Getter
     protected long nonHeap_commited = 0;
+    /** The maximum non-heap memory in bytes. */
     @Getter
     protected long nonHeap_max = 0;
+    /** The used non-heap memory in bytes. */
     @Getter
     protected long nonHeap_used = 0;
+    /** The number of objects pending finalization. */
     @Getter
     protected long objectPendingFinalizationCount = 0;
+    /** The number of classes currently loaded. */
     @Getter
     protected long classLoading_loaded = 0;
+    /** The total number of classes loaded since JVM start. */
     @Getter
     protected long classLoading_total = 0;
+    /** The total number of classes unloaded since JVM start. */
     @Getter
     protected long classLoading_unloaded = 0;
+    /** The total time spent in compilation by the JIT compiler. */
     @Getter
     protected long compilationTime = 0;
+    /** The total number of garbage collections. */
     @Getter
     protected long garbageCollector_count = 0;
+    /** The total time spent in garbage collection. */
     @Getter
     protected long garbageCollector_time = 0;
+    /** The used memory reported by {@link Runtime}. */
     @Getter
     protected long runtime_usedMemory = 0;
+    /** The maximum memory reported by {@link Runtime}. */
     @Getter
     protected long runtime_maxMemory = 0;
+    /** The total memory reported by {@link Runtime}. */
     @Getter
     protected long runtime_totalMemory = 0;
+    /** The system CPU load average. */
     @Getter
     protected double systemLoad = 0.0;
 
@@ -131,6 +187,9 @@ public abstract class SystemData extends EventData {
         systemLoad = 0;
     }
 
+    /**
+     * Collects memory usage statistics from the JVM's {@link Runtime} object.
+     */
     protected void collectRuntimeStatus() {
         final Runtime runtime = Runtime.getRuntime();
         runtime_totalMemory = runtime.totalMemory();
@@ -138,6 +197,11 @@ public abstract class SystemData extends EventData {
         runtime_maxMemory = runtime.maxMemory();
     }
 
+    /**
+     * Collects operating system-level metrics, specifically the system CPU load.
+     * It attempts to use {@code com.sun.management.OperatingSystemMXBean} for more precise
+     * CPU load, falling back to {@link OperatingSystemMXBean#getSystemLoadAverage()} if necessary.
+     */
     protected void collectPlatformStatus() {
         if (!SystemConfig.usePlatformManagedBean) {
             return;
@@ -165,6 +229,10 @@ public abstract class SystemData extends EventData {
         }
     }
 
+    /**
+     * Collects various JVM metrics using Java Management Extensions (JMX) MXBeans,
+     * based on the configuration in {@link SystemConfig}.
+     */
     protected void collectManagedBeanStatus() {
         if (SystemConfig.useMemoryManagedBean) {
             final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
@@ -203,13 +271,21 @@ public abstract class SystemData extends EventData {
         }
     }
 
+    /** JSON5 key for memory usage (used, total, max) from {@link Runtime}. */
     public static final String PROP_MEMORY = "m";
+    /** JSON5 key for heap memory usage (used, committed, max) from {@link MemoryMXBean}. */
     public static final String PROP_HEAP = "h";
+    /** JSON5 key for non-heap memory usage (used, committed, max) from {@link MemoryMXBean}. */
     public static final String PROP_NON_HEAP = "nh";
+    /** JSON5 key for the number of objects pending finalization. */
     public static final String PROP_FINALIZATION_COUNT = "fc";
+    /** JSON5 key for class loading statistics (total, loaded, unloaded). */
     public static final String PROP_CLASS_LOADING = "cl";
+    /** JSON5 key for total compilation time. */
     public static final String PROP_COMPILATION_TIME = "ct";
+    /** JSON5 key for garbage collection statistics (count, time). */
     public static final String PROP_GARBAGE_COLLECTOR = "gc";
+    /** JSON5 key for system CPU load average. */
     public static final String PROP_SYSTEM_LOAD = "sl";
 
     @Override
@@ -256,7 +332,9 @@ public abstract class SystemData extends EventData {
         }
     }
 
+    /** Regular expression component for matching a 3-tuple value in JSON5 (e.g., `:[v1,v2,v3]`). */
     private static final String REGEX_3_TUPLE = "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]";
+    /** Regular expression component for matching a 2-tuple value in JSON5 (e.g., `:[v1,v2]`). */
     private static final String REGEX_2_TUPLE = "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+)\\]";
     private static final Pattern patternMemory = Pattern.compile(REGEX_START+PROP_MEMORY + REGEX_3_TUPLE);
     private static final Pattern patternHeap = Pattern.compile(REGEX_START+PROP_HEAP + REGEX_3_TUPLE);

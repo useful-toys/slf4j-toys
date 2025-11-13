@@ -36,11 +36,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.usefultoys.slf4j.meter.MeterConfig.*;
 
 /**
- * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call {@link #start()} to produce a 1-line summary
- * about operation start and current system status as debug message and an encoded event as trace message. Call {@link #ok()} to produce a 1-line summary about
- * operation successful end and current system status as information message and an encoded event as trace message. Call {@link #fail(Object)} to produce a
- * 1-line summary about operation failure and current system status as error message and an encoded event as trace message. Call {@link #progress()} to produce
- * a 1-line summary about operation progress and current system status as information message and an encoded event as trace message.
+ * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call
+ * {@link #start()} to produce a 1-line summary about operation start and current system status as debug message and an
+ * encoded event as trace message. Call {@link #ok()} to produce a 1-line summary about operation successful end and
+ * current system status as information message and an encoded event as trace message. Call {@link #fail(Object)} to
+ * produce a 1-line summary about operation failure and current system status as error message and an encoded event as
+ * trace message. Call {@link #progress()} to produce a 1-line summary about operation progress and current system
+ * status as information message and an encoded event as trace message.
  *
  * @author Daniel Felix Ferber
  */
@@ -128,7 +130,7 @@ public class Meter extends MeterData implements Closeable {
      * @param parent    ID of the parent Meter or null.
      */
     public Meter(final @NonNull Logger logger, final String operation, final String parent) {
-        super(Session.shortSessionUudi(),
+        super(Session.shortSessionUuid(),
                 extractNextPosition(logger.getName(), operation),
                 logger.getName(), operation, parent);
         createTime = collectCurrentTime();
@@ -1154,6 +1156,14 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
+
+    /**
+     * Executes the given runnable task within the Meter's lifecycle control.
+     * If the task throws a runtime exception, the method handles it, performs a failure operation,
+     * and rethrows the exception.
+     *
+     * @param runnable the runnable task to be executed
+     */
     public void run(final Runnable runnable) {
         if (startTime == 0) start();
         try {

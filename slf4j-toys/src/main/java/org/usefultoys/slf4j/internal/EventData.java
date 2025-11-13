@@ -25,7 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Abstract class representing events collected by slf4j-toys.
+ * Abstract base class for events collected by `slf4j-toys`.
+ * It provides common attributes and methods for event identification, timestamping,
+ * and serialization to human-readable and machine-parsable formats.
  *
  * @author Daniel Felix Ferber
  */
@@ -34,44 +36,68 @@ public abstract class EventData implements Serializable {
 
     private static final long serialVersionUID = 1L;
     /**
-     * Session UUID of JVM where this event data was collected.
+     * The unique identifier for the JVM session where this event data was collected.
+     * This allows correlation of logs from the same JVM instance.
      */
     @Getter
     protected String sessionUuid = null;
     /**
-     * Time ordered position for multiple occurrences of the same event.
+     * A time-ordered sequential position for multiple occurrences of the same event within a session.
      */
     @Getter
     protected long position = 0;
     /**
-     * Timestamp when the event data was collected.
+     * The timestamp (in nanoseconds) when the event data was collected.
      */
     @Getter
     protected long lastCurrentTime = 0;
 
+    /**
+     * Constructs an EventData instance with a specified session UUID.
+     *
+     * @param sessionUuid The unique identifier for the JVM session.
+     */
     protected EventData(final String sessionUuid) {
         this.sessionUuid = sessionUuid;
     }
 
+    /**
+     * Constructs an EventData instance with a specified session UUID and position.
+     *
+     * @param sessionUuid The unique identifier for the JVM session.
+     * @param position The time-ordered sequential position of the event.
+     */
     protected EventData(final String sessionUuid, final long position) {
         this.sessionUuid = sessionUuid;
         this.position = position;
     }
 
-    // For tests
+    /**
+     * Constructs an EventData instance with a specified session UUID, position, and timestamp.
+     * This constructor is primarily intended for testing purposes.
+     *
+     * @param sessionUuid The unique identifier for the JVM session.
+     * @param position The time-ordered sequential position of the event.
+     * @param lastCurrentTime The timestamp (in nanoseconds) when the data was collected.
+     */
     protected EventData(final String sessionUuid, final long position, final long lastCurrentTime) {
         this.sessionUuid = sessionUuid;
         this.position = position;
         this.lastCurrentTime = lastCurrentTime;
     }
 
+    /**
+     * Updates the {@code lastCurrentTime} with the current system's high-resolution time.
+     *
+     * @return The updated {@code lastCurrentTime} in nanoseconds.
+     */
     protected long collectCurrentTime() {
         return lastCurrentTime = System.nanoTime();
     }
 
     /**
-     * Reverts all event attributes to their constructor initial value. Useful
-     * to reuse the event instance and avoid creation of new objects.
+     * Reverts all event attributes to their initial values, as if newly constructed.
+     * This is useful for reusing event instances to avoid object creation overhead.
      */
     public final void reset() {
         sessionUuid = null;
@@ -81,37 +107,50 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * Subclasses shall provide an implementation that resets its specific
-     * properties to their constructor initial value. This method is called once
-     * and shall compare all specific properties.
+     * Subclasses must implement this method to reset their specific properties
+     * to their initial values. This method is called by {@link #reset()}.
      */
     protected void resetImpl() {
         // no-op
     }
 
+    /**
+     * JSON5 key for the session UUID.
+     */
     public static final String SESSION_UUID = "_";
+    /**
+     * JSON5 key for the event's sequential position.
+     */
     public static final String EVENT_POSITION = "$";
+    /**
+     * JSON5 key for the event's timestamp.
+     */
     public static final String EVENT_TIME = "t";
 
     /**
-     * Writes a concise, human readable string representation of the event into
-     * the supplied StringBuilder.
+     * Appends a concise, human-readable string representation of the event to the provided {@link StringBuilder}.
+     * Subclasses must implement this method to define their specific human-readable output.
      *
-     * @param builder The StringBuilder that receives the string representation
-     * @return The StringBuilder passed as argument to allow chained
-     * StringBuilder method calls.
+     * @param builder The StringBuilder that receives the string representation.
+     * @return The StringBuilder passed as argument, allowing chained method calls.
      */
     protected abstract StringBuilder readableStringBuilder(StringBuilder builder);
 
+    /**
+     * Generates a human-readable string representation of the event.
+     *
+     * @return A string containing the human-readable message.
+     */
     public final String readableMessage() {
         return readableStringBuilder(new StringBuilder(200)).toString();
     }
 
     /**
-     * Writes a JSON encoded representation of the event into the supplied StringBuilder.
+     * Writes a JSON5-encoded representation of the event to the supplied {@link StringBuilder}.
+     * This method includes common event data (session UUID, position, timestamp).
      *
-     * @param sb            The StringBuilder that receives the encoded representation.
-     * @return The StringBuilder passed as argument to allow chained StringBuilder method calls.
+     * @param sb The StringBuilder that receives the encoded representation.
+     * @return The StringBuilder passed as argument, allowing chained method calls.
      */
     protected final StringBuilder writeJson5(final StringBuilder sb) {
         sb.append("{");
@@ -121,22 +160,47 @@ public abstract class EventData implements Serializable {
         return sb;
     }
 
+    /**
+     * Subclasses must implement this method to append their specific properties
+     * to the JSON5-encoded string. This method is called by {@link #writeJson5(StringBuilder)}.
+     *
+     * @param sb The StringBuilder to which the JSON5 properties are appended.
+     */
     protected void writeJson5Impl(final StringBuilder sb) {
         // no-op
     }
 
+    /**
+     * Generates a JSON5-encoded string representation of the event.
+     *
+     * @return A string containing the JSON5-encoded message.
+     */
     public final String json5Message() {
         return writeJson5(new StringBuilder(200)).toString();
     }
+
+    /**
+     * Regular expression component for matching the start of a JSON5 object or a new field.
+     */
     protected static final String REGEX_START = "[{,]";
+    /**
+     * Regular expression component for matching a string value in JSON5 (e.g., `: 'value'`).
+     */
     protected static final String REGEX_STRING_VALUE = "\\s*:\\s*'([^']*)'";
+    /**
+     * Regular expression component for matching a word (non-string) value in JSON5 (e.g., `: value`).
+     */
     protected static final String REGEX_WORD_VALUE = "\\s*:\\s*([^,}\\s]+)";
 
     private static final Pattern patternSession = Pattern.compile(REGEX_START+SESSION_UUID+REGEX_WORD_VALUE);
     private static final Pattern patternPosition = Pattern.compile(REGEX_START+"\\"+EVENT_POSITION+REGEX_WORD_VALUE);
     private static final Pattern patternTime = Pattern.compile(REGEX_START+EVENT_TIME+REGEX_WORD_VALUE);
 
-
+    /**
+     * Reads and parses event data from a JSON5-encoded string, populating the object's fields.
+     *
+     * @param json5 The JSON5-encoded string containing event data.
+     */
     public void readJson5(final String json5) {
         final Matcher matcherSession = patternSession.matcher(json5);
         if (matcherSession.find()) {
@@ -154,6 +218,12 @@ public abstract class EventData implements Serializable {
         }
     }
 
+    /**
+     * Returns the machine-parsable, JSON5-encoded representation of the event.
+     * This is an alias for {@link #json5Message()}.
+     *
+     * @return A string containing the JSON5-encoded message.
+     */
     public final String encodedMessage() {
         return json5Message();
     }
