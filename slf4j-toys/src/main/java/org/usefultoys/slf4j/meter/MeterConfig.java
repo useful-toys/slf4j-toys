@@ -19,35 +19,47 @@ import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.utils.ConfigParser;
 
 /**
- * Centralized configuration holder for controlling the behavior of the {@link Meter} and {@link MeterData}.
+ * Centralized configuration for controlling the behavior of the {@link Meter} and {@link MeterData}.
  * <p>
- * This class exposes a set of flags and properties that determine the behavior of meters, such as progress reporting,
- * logging categories, and encoded data handling. These properties can be configured at application startup or modified
- * dynamically at runtime.
+ * This class exposes a set of flags and properties that determine the behavior of meters, such as
+ * progress reporting, logging categories, and encoded data handling. These properties can be
+ * configured at application startup or modified dynamically at runtime.
  * <p>
- * These properties should ideally be defined <em>before</em> invoking any method from this library, to ensure
- * consistent behavior. Some properties can be modified dynamically at runtime, although care should be taken in
- * concurrent environments.
+ * These properties should ideally be defined *before* invoking any method from this library to ensure
+ * consistent behavior. Some properties can be modified dynamically at runtime, although care should be taken
+ * in concurrent environments.
  * <p>
-* <strong>Performance note:</strong> Some properties, such as progress reporting intervals, may impact performance
+ * **Performance Note:** Some properties, such as progress reporting intervals, may impact performance
  * if configured with very low values.
  * <p>
- * This class is a utility holder and should not be instantiated.
-* <p>
+ * This is a utility class and should not be instantiated.
+ *
  * @author Daniel Felix Ferber
+ * @see Meter
+ * @see MeterData
  */
 @UtilityClass
 public class MeterConfig {
-    
+
+    /** System property key for the message logger name suffix. */
     public final String PROP_MESSAGE_SUFFIX = "slf4jtoys.meter.message.suffix";
+    /** System property key for the message logger name prefix. */
     public final String PROP_MESSAGE_PREFIX = "slf4jtoys.meter.message.prefix";
+    /** System property key for the data logger name suffix. */
     public final String PROP_DATA_SUFFIX = "slf4jtoys.meter.data.suffix";
+    /** System property key for the data logger name prefix. */
     public final String PROP_DATA_PREFIX = "slf4jtoys.meter.data.prefix";
+    /** System property key for enabling/disabling memory printing in readable messages. */
     public final String PROP_PRINT_MEMORY = "slf4jtoys.meter.print.memory";
+    /** System property key for enabling/disabling category printing in readable messages. */
     public final String PROP_PRINT_CATEGORY = "slf4jtoys.meter.print.category";
+    /** System property key for enabling/disabling CPU load printing in readable messages. */
     public final String PROP_PRINT_LOAD = "slf4jtoys.meter.print.load";
+    /** System property key for the progress reporting period. */
     public final String PROP_PROGRESS_PERIOD = "slf4jtoys.meter.progress.period";
+    /** System property key for enabling/disabling position printing in readable messages. */
     public final String PROP_PRINT_POSITION = "slf4jtoys.meter.print.position";
+    /** System property key for enabling/disabling status printing in readable messages. */
     public final String PROP_PRINT_STATUS = "slf4jtoys.meter.print.status";
 
     static {
@@ -55,107 +67,101 @@ public class MeterConfig {
     }
 
     /**
-     * Time to wait before reporting the next progress status, in milliseconds.
+     * The minimum time interval (in milliseconds) between consecutive progress status reports.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.progress.period}, defaulting to {@code 2000} (2 seconds).
      * The value can be suffixed with {@code ms}, {@code s}, {@code m}, or {@code h}.
-     * <p>
-     * You may assign a new value at runtime.
+     * Can be assigned a new value at runtime.
      */
     public long progressPeriodMilliseconds;
 
     /**
-     * Whether the meter includes the category in readable messages.
+     * Whether the {@link Meter} includes the category in its human-readable messages.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.print.category}, defaulting to {@code false}.
-     * <p>
-     * You may assign a new value at runtime.
+     * Can be assigned a new value at runtime.
      */
     public boolean printCategory;
 
     /**
-     * Whether the meter includes the status in readable messages.
+     * Whether the {@link Meter} includes the operation's status (e.g., OK, FAIL) in its human-readable messages.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.print.status}, defaulting to {@code true}.
-     * <p>
-     * You may assign a new value at runtime.
+     * Can be assigned a new value at runtime.
      */
     public boolean printStatus;
 
     /**
-     * Whether the meter includes the position (event counter) in readable messages.
+     * Whether the {@link Meter} includes the operation's position (event counter) in its human-readable messages.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.print.position}, defaulting to {@code false}.
-     * <p>
-     * You may assign a new value at runtime.
+     * Can be assigned a new value at runtime.
      */
     public boolean printPosition;
 
     /**
-     * Whether the meter includes the CPU load in readable messages.
+     * Whether the {@link Meter} includes the system CPU load in its human-readable messages.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.print.load}, defaulting to {@code false}.
-     * <p>
-     * You may assign a new value at runtime.
+     * Can be assigned a new value at runtime.
      */
     public boolean printLoad;
 
     /**
-     * Whether the meter includes the memory load in readable messages.
+     * Whether the {@link Meter} includes memory usage information in its human-readable messages.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.print.memory}, defaulting to {@code false}.
-     * <p>
-     * You may assign a new value at runtime.
+     * Can be assigned a new value at runtime.
      */
     public boolean printMemory;
 
     /**
-     * Prefix added to the logger name used for encoded data messages.
+     * A prefix added to the logger name used for machine-parsable data messages.
      * <p>
-     * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows directing
-     * encoded data to a different logger.
+     * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows
+     * directing encoded data to a different logger.
      * <p>
-     * Example: with prefix {@code data.}, a logger {@code a.b.c.MyClass} becomes {@code data.a.b.c.MyClass} for encoded
-     * data.
+     * Example: With prefix {@code "data."}, a logger {@code "a.b.c.MyClass"} becomes {@code "data.a.b.c.MyClass"}
+     * for encoded data.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.data.prefix}, defaulting to an empty string.
      */
     public String dataPrefix;
 
     /**
-     * Suffix added to the logger name used for encoded data messages.
+     * A suffix added to the logger name used for machine-parsable data messages.
      * <p>
-     * By default, encoded and human-readable messages are written to the same logger. Setting a suffix allows directing
-     * encoded data to a different logger.
+     * By default, encoded and human-readable messages are written to the same logger. Setting a suffix allows
+     * directing encoded data to a different logger.
      * <p>
-     * Example: with suffix {@code .data}, a logger {@code a.b.c.MyClass} becomes {@code a.b.c.MyClass.data} for encoded
-     * data.
+     * Example: With suffix {@code ".data"}, a logger {@code "a.b.c.MyClass"} becomes {@code "a.b.c.MyClass.data"}
+     * for encoded data.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.data.suffix}, defaulting to an empty string.
      */
     public String dataSuffix;
 
     /**
-     * Prefix added to the logger name used for human-readable messages.
+     * A prefix added to the logger name used for human-readable messages.
      * <p>
-     * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows directing
-     * readable messages to a different logger.
+     * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows
+     * directing readable messages to a different logger.
      * <p>
-     * Example: with prefix {@code message.}, a logger {@code a.b.c.MyClass} becomes {@code message.a.b.c.MyClass} for
-     * readable messages.
+     * Example: With prefix {@code "message."}, a logger {@code "a.b.c.MyClass"} becomes {@code "message.a.b.c.MyClass"}
+     * for readable messages.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.message.prefix}, defaulting to an empty string.
      */
     public String messagePrefix;
 
     /**
-     * Suffix added to the logger name used for human-readable messages.
+     * A suffix added to the logger name used for human-readable messages.
      * <p>
-     * By default, encoded and human-readable messages are written to the same logger. Setting a suffix allows directing
-     * readable messages to a different logger.
+     * By default, encoded and human-readable messages are written to the same logger. Setting a suffix allows
+     * directing readable messages to a different logger.
      * <p>
-     * Example: with suffix {@code .message}, a logger {@code a.b.c.MyClass} becomes {@code a.b.c.MyClass.message} for
-     * readable messages.
+     * Example: With suffix {@code ".message"}, a logger {@code "a.b.c.MyClass"} becomes {@code "a.b.c.MyClass.message"}
+     * for readable messages.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.message.suffix}, defaulting to an empty string.
      */
@@ -163,8 +169,7 @@ public class MeterConfig {
 
     /**
      * Initializes the configuration attributes by reading the corresponding system properties.
-     * This method should be called before accessing any configuration attributes to ensure
-     * they are properly initialized.
+     * This method should be called at application startup to ensure they are properly initialized.
      */
     public void init() {
         progressPeriodMilliseconds = ConfigParser.getMillisecondsProperty(PROP_PROGRESS_PERIOD, 2000L);
@@ -178,9 +183,9 @@ public class MeterConfig {
         messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
         messageSuffix = ConfigParser.getProperty(PROP_MESSAGE_SUFFIX, "");
     }
-    
+
     /**
-     * Resets the configuration properties to their default values.
+     * Resets all configuration properties to their default values.
      * This method is useful for testing purposes or when reinitializing the configuration.
      */
     void reset() {
@@ -196,4 +201,4 @@ public class MeterConfig {
         System.clearProperty(PROP_MESSAGE_SUFFIX);
         init();
     }
-  }
+}

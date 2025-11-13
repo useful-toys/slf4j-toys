@@ -27,8 +27,13 @@ import java.io.PrintStream;
 import static org.usefultoys.slf4j.report.ReporterConfig.getPropertySafely;
 
 /**
- * Reports basic information about the Java Virtual Machine (JVM), including vendor, version, and installation
- * directory.
+ * A report module that provides basic information about the Java Virtual Machine (JVM).
+ * It includes details such as the JVM vendor, version, and installation directory.
+ * This report is essential for diagnosing issues related to the Java runtime environment.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportVM
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -36,6 +41,10 @@ public class ReportVM implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing JVM information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
@@ -44,5 +53,6 @@ public class ReportVM implements Runnable {
         ps.printf(" - vendor: %s%n", getPropertySafely("java.vendor"));
         ps.printf(" - version: %s%n", getPropertySafely("java.version"));
         ps.printf(" - installation directory: %s%n", getPropertySafely("java.home"));
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

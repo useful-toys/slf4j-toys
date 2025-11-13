@@ -26,48 +26,48 @@ import java.util.Enumeration;
 import java.util.concurrent.Executor;
 
 /**
- * Produces diagnostic reports about system resources and the current runtime environment.
+ * Generates and logs diagnostic reports about system resources and the current runtime environment.
  * <p>
- * Reports are logged as information-level messages using SLF4J. The set of reports to be generated is controlled by
- * {@link ReporterConfig}, including which sections are enabled and the default logger name (unless overridden).
- *
- * <p>This is useful for troubleshooting or recording system configuration at application startup or runtime.
+ * Reports are logged as human-readable information-level messages using SLF4J. The specific set of reports
+ * to be generated is controlled by {@link ReporterConfig}, which defines which sections are enabled
+ * and the default logger name (unless explicitly overridden).
+ * <p>
+ * This class is useful for troubleshooting, auditing, or recording system configuration at application startup
+ * or at any point during runtime.
  *
  * @author Daniel Felix Ferber
+ * @see ReporterConfig
  */
 @SuppressWarnings("NonConstantLogger")
 public class Reporter implements Serializable {
 
     /**
-     * Logger that prints reports as information messages.
+     * The SLF4J logger instance used to print reports as information messages.
      */
     private final @NonNull Logger logger;
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * An {@link Executor} that runs tasks synchronously on the current thread. Useful for environments where
-     * multithreading is restricted or undesired.
+     * An {@link Executor} implementation that runs tasks synchronously on the current thread.
+     * This is useful for environments where multithreading is restricted or undesired, or for simple applications.
      */
-    public static final Executor sameThreadExecutor = new Executor() {
-        @Override
-        public void execute(final Runnable command) {
-            command.run();
-        }
-    };
+    public static final Executor sameThreadExecutor = command -> command.run();
 
     /**
-     * Runs the default report on the current thread using {@link #sameThreadExecutor}.
+     * Runs all reports enabled in {@link ReporterConfig} synchronously on the current thread.
      * <p>
-     * Intended for simple applications or environments where blocking the current thread is acceptable. May not be
-     * suitable for JavaEE or reactive environments that restrict long-running tasks on request threads.
+     * This method uses {@link #sameThreadExecutor}. It is intended for simple applications or environments
+     * where blocking the current thread is acceptable. It may not be suitable for JavaEE or reactive environments
+     * that restrict long-running tasks on request threads.
      */
     public static void runDefaultReport() {
         new Reporter().logDefaultReports(sameThreadExecutor);
     }
 
     /**
-     * Creates a new {@code Reporter} using the logger defined by {@link ReporterConfig#name}.
+     * Creates a new {@code Reporter} instance.
+     * The reports will be logged using the logger named by {@link ReporterConfig#name}.
      */
     public Reporter() {
         logger = LoggerFactory.getLogger(ReporterConfig.name);
@@ -76,18 +76,21 @@ public class Reporter implements Serializable {
     /**
      * Creates a new {@code Reporter} instance that logs messages to the specified {@link Logger}.
      *
-     * @param logger the SLF4J logger to use for reporting
+     * @param logger The SLF4J logger to use for reporting.
      */
     public Reporter(final Logger logger) {
         this.logger = logger;
     }
 
     /**
-     * Runs only the reports that are enabled in {@link ReporterConfig} and logs them as information-level messages.
+     * Executes all reports that are enabled in {@link ReporterConfig} and logs their output
+     * as human-readable information-level messages.
+     * <p>
+     * Each enabled report is executed via the provided {@link Executor}. This allows for
+     * asynchronous or parallel execution of reports, which can be beneficial for
+     * time-consuming reports like network interface scanning.
      *
-     * <p>Each enabled report is executed via the provided {@link Executor}.
-     *
-     * @param executor the executor used to run each report
+     * @param executor The executor used to run each report module.
      */
     public void logDefaultReports(final @NonNull Executor executor) {
         if (ReporterConfig.reportPhysicalSystem) {
@@ -131,7 +134,7 @@ public class Reporter implements Serializable {
                     executor.execute(new ReportNetworkInterface(logger, nif));
                 }
             } catch (final SocketException e) {
-                logger.warn("Cannot report interfaces", e);
+                logger.warn("Cannot report network interfaces: {}", e.getMessage());
             }
         }
         if (ReporterConfig.reportSSLContext) {

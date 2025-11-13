@@ -27,7 +27,13 @@ import java.io.File;
 import java.io.PrintStream;
 
 /**
- * Reports information about the file system roots, including total, free, and usable space.
+ * A report module that provides information about the file system roots accessible to the JVM.
+ * It reports the total, free, and usable space for each file system root.
+ * This report is useful for diagnosing disk space issues or understanding storage configurations.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportFileSystem
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -35,6 +41,10 @@ public class ReportFileSystem implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing file system information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
@@ -51,5 +61,6 @@ public class ReportFileSystem implements Runnable {
             ps.printf(" - total space: %s%n", UnitFormatter.bytes(root.getTotalSpace()));
             ps.printf(" - currently free space: %s (%s usable)%n", UnitFormatter.bytes(root.getFreeSpace()), UnitFormatter.bytes(root.getUsableSpace()));
         }
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

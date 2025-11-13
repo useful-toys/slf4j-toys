@@ -28,7 +28,13 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
- * Reports the current date and time, default time zone configuration, and lists all available time zone IDs.
+ * A report module that provides information about the system's calendar and time zone settings.
+ * It reports the current date and time, the default time zone configuration, and lists all available time zone IDs.
+ * This report is useful for diagnosing environment-specific time-related issues.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportCalendar
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -36,26 +42,28 @@ public class ReportCalendar implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing calendar and time zone information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Calendar");
-        ps.printf(" - current date/time: %s", DateFormat.getDateTimeInstance().format(new Date()));
+        ps.printf(" - current date/time: %s%n", DateFormat.getDateTimeInstance().format(new Date()));
         final TimeZone tz = TimeZone.getDefault();
-        ps.printf(" - default timezone: %s", tz.getDisplayName());
-        ps.printf(" (%s)", tz.getID());
+        ps.printf(" - default timezone: %s (%s)%n", tz.getDisplayName(), tz.getID());
         ps.printf("; DST=%dmin", tz.getDSTSavings() / 60000);
         //noinspection ErrorNotRethrown
         try {
-            ps.printf("; observesDT=%s", tz.observesDaylightTime());
+            ps.printf("; observesDST=%s", tz.observesDaylightTime());
         } catch (final NoSuchMethodError ignored) {
             // Ignore property that exists only from Java 1.7 on.
         }
-        ps.printf("; useDT=%s", tz.useDaylightTime());
-        ps.printf("; inDT=%s", tz.inDaylightTime(new Date()));
-        ps.printf("; offset=%dmin", tz.getRawOffset() / 60000);
-        ps.println();
+        ps.printf("; useDST=%s", tz.useDaylightTime());
+        ps.printf("; inDST=%s", tz.inDaylightTime(new Date()));
+        ps.printf("; offset=%dmin%n", tz.getRawOffset() / 60000);
         ps.print(" - available IDs: ");
         int i = 1;
         for (final String id : TimeZone.getAvailableIDs()) {
@@ -64,5 +72,6 @@ public class ReportCalendar implements Runnable {
             }
             ps.printf("%s; ", id);
         }
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

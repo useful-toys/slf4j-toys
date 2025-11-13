@@ -31,8 +31,14 @@ import java.net.NetworkInterface;
 import java.util.Enumeration;
 
 /**
- * Reports details of a specific network interface, including name, MTU, status flags (e.g., loopback, multicast),
- * hardware address, and associated IP addresses.
+ * A report module that provides detailed information about a specific {@link NetworkInterface}.
+ * It includes details such as the interface name, MTU, status flags (e.g., loopback, multicast),
+ * hardware address, and associated IP addresses (IPv4 and IPv6).
+ * This report is essential for troubleshooting network connectivity issues.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportNetworkInterface
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -41,6 +47,10 @@ public class ReportNetworkInterface implements Runnable {
     private final @NonNull Logger logger;
     private final @NonNull NetworkInterface nif;
 
+    /**
+     * Executes the report for the specific network interface, writing information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
@@ -83,8 +93,15 @@ public class ReportNetworkInterface implements Runnable {
         } catch (final IOException e) {
             ps.printf("   Cannot read property: %s%n", e.getLocalizedMessage());
         }
+        ps.println(); // Ensure a newline at the end of the report
     }
 
+    /**
+     * Reports details of a specific {@link InetAddress} associated with a network interface.
+     *
+     * @param ps The PrintStream to write the report to.
+     * @param inetAddress The InetAddress to report.
+     */
     private static void reportNetworkAddress(final PrintStream ps, final InetAddress inetAddress) {
         try {
             if (inetAddress instanceof Inet4Address) {

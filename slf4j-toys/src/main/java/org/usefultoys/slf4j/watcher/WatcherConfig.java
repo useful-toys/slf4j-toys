@@ -39,13 +39,21 @@ public class WatcherConfig {
     }
 
     // System property keys
+    /** System property key for the Watcher's name. */
     public final String PROP_NAME = "slf4jtoys.watcher.name";
+    /** System property key for the initial delay of the Watcher. */
     public final String PROP_DELAY = "slf4jtoys.watcher.delay";
+    /** System property key for the period of the Watcher. */
     public final String PROP_PERIOD = "slf4jtoys.watcher.period";
+    /** System property key for the data logger name prefix. */
     public final String PROP_DATA_PREFIX = "slf4jtoys.watcher.data.prefix";
+    /** System property key for the data logger name suffix. */
     public final String PROP_DATA_SUFFIX = "slf4jtoys.watcher.data.suffix";
+    /** System property key for enabling/disabling data logging. */
     public final String PROP_DATA_ENABLED = "slf4jtoys.watcher.data.enabled";
+    /** System property key for the message logger name prefix. */
     public final String PROP_MESSAGE_PREFIX = "slf4jtoys.watcher.message.prefix";
+    /** System property key for the message logger name suffix. */
     public final String PROP_MESSAGE_SUFFIX = "slf4jtoys.watcher.message.suffix";
 
     /**

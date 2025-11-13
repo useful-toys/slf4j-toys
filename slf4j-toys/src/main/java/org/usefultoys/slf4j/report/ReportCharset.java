@@ -26,8 +26,12 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 
 /**
- * Reports the default system locale and lists all available locales with their respective language, country, script,
- * and variant.
+ * A report module that provides information about the system's default character set and lists all available character sets.
+ * This report is useful for diagnosing encoding-related issues in the application's environment.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportCharset
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -35,6 +39,10 @@ public class ReportCharset implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing character set information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
@@ -43,8 +51,7 @@ public class ReportCharset implements Runnable {
         ps.println("Charset");
         ps.printf(" - default charset: %s", charset.displayName());
         ps.printf("; name=%s", charset.name());
-        ps.printf("; canEncode=%s", charset.canEncode());
-        ps.println();
+        ps.printf("; canEncode=%s%n", charset.canEncode());
         ps.print(" - available charsets: ");
         int i = 1;
         for (final Charset l : Charset.availableCharsets().values()) {
@@ -53,5 +60,6 @@ public class ReportCharset implements Runnable {
             }
             ps.printf("%s; ", l.displayName());
         }
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

@@ -25,7 +25,12 @@ import org.usefultoys.slf4j.LoggerFactory;
 import java.io.PrintStream;
 
 /**
- * Reports basic information about the physical system, such as the number of available processors.
+ * A report module that provides basic information about the physical system, such as the number of available processors.
+ * This report is useful for understanding the hardware capabilities of the environment.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportPhysicalSystem
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -33,6 +38,10 @@ public class ReportPhysicalSystem implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing physical system information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         final Runtime runtime = Runtime.getRuntime();
@@ -40,5 +49,6 @@ public class ReportPhysicalSystem implements Runnable {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Physical system");
         ps.printf(" - processors: %d%n", runtime.availableProcessors());
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

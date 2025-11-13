@@ -21,10 +21,10 @@ import java.util.concurrent.Executor;
 /**
  * A {@link javax.servlet.ServletContextListener} that triggers diagnostic reports when the web application starts.
  * <p>
- * The reports to be logged are determined by system properties and executed through a simple {@link Executor}. This is useful for logging
- * environment/configuration details at application startup time.
+ * The reports to be logged are determined by {@link ReporterConfig} and executed through a simple {@link Executor}.
+ * This is useful for logging environment and configuration details at application startup time.
  * <p>
- * To use it, register this listener in {@code web.xml}.
+ * To use it, register this listener in your {@code web.xml} deployment descriptor:
  *
  * <pre>{@code
  * <listener>
@@ -33,13 +33,15 @@ import java.util.concurrent.Executor;
  * }</pre>
  *
  * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig
  */
 public class ReportContextListener implements javax.servlet.ServletContextListener {
 
     /**
-     * Invoked when the web application is shutting down. No action is taken.
+     * Invoked when the web application is shutting down. This implementation takes no action.
      *
-     * @param event the servlet context event
+     * @param event The servlet context event.
      */
     @Override
     public void contextDestroyed(final ServletContextEvent event) {
@@ -47,9 +49,10 @@ public class ReportContextListener implements javax.servlet.ServletContextListen
     }
 
     /**
-     * Invoked when the web application is starting up. Triggers the {@link Reporter} to log the default reports using a simple synchronous executor.
+     * Invoked when the web application is starting up.
+     * Triggers the {@link Reporter} to log the default reports using a synchronous executor.
      *
-     * @param event the servlet context event
+     * @param event The servlet context event.
      */
     @Override
     public void contextInitialized(final ServletContextEvent event) {

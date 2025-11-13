@@ -13,11 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.usefultoys.slf4j.report;
 
 import lombok.Cleanup;
@@ -31,24 +26,28 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
 /**
- * Reports details about a JDBC {@link Connection}, such as catalog, schema, metadata, properties,
- * transaction settings, client info, and optionally the type map.
+ * A report module that provides detailed information about a JDBC {@link Connection}.
+ * It reports properties such as catalog, schema, metadata, transaction settings, client info,
+ * and optionally the type map.
  * <p>
- * This class logs information using a SLF4J {@link Logger}, formatting it to resemble a structured diagnostic output.
- * It is useful for debugging or documenting the JDBC environment at runtime.
+ * This class logs information using an SLF44J {@link Logger}, formatting it to resemble
+ * a structured diagnostic output. It is useful for debugging or documenting the JDBC
+ * environment at runtime.
  * <p>
  * Typical usage:
  * <pre>{@code
- * JdbcConnectionReporter reporter = new JdbcConnectionReporter(logger)
+ * ReportJdbcConnection reporter = new ReportJdbcConnection(logger, connection)
  *     .printTypeMap(true);
- * reporter.run(connection);
+ * reporter.run();
  * }</pre>
  *
- * @author Daniel
+ * @author Daniel Felix Ferber
+ * @see Reporter
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -57,14 +56,17 @@ public class ReportJdbcConnection implements Runnable {
     private final @NonNull Logger logger;
     private final @NonNull Connection connection;
 
-    /** Whether to print the JDBC type map. */
+    /**
+     * Flag indicating whether the JDBC type map should be included in the report.
+     * Defaults to {@code false}.
+     */
     private boolean printTypeMap = false;
 
     /**
-     * Defines whether the JDBC type map should be printed.
+     * Configures whether the JDBC type map should be printed in the report.
      *
-     * @param printTypeMap {@code true} to print the type map; {@code false} to skip it
-     * @return this instance, for method chaining
+     * @param printTypeMap {@code true} to include the type map; {@code false} to exclude it.
+     * @return This {@code ReportJdbcConnection} instance, for method chaining.
      */
     public ReportJdbcConnection printTypeMap(final boolean printTypeMap) {
         this.printTypeMap = printTypeMap;
@@ -72,10 +74,10 @@ public class ReportJdbcConnection implements Runnable {
     }
 
     /**
-     * Executes the report for the specified JDBC {@link Connection}.
-     *
-     * <p>This method logs the output using {@link LoggerFactory#getInfoPrintStream(Logger)}.
-     * If the connection is closed, it logs a message and exits early.
+     * Executes the report for the associated JDBC {@link Connection}.
+     * <p>
+     * This method logs the output using {@link LoggerFactory#getInfoPrintStream(Logger)}.
+     * If the connection is closed, it logs a message indicating its state and exits early.
      */
     @Override
     public void run() {
@@ -131,7 +133,7 @@ public class ReportJdbcConnection implements Runnable {
             ps.print("transaction=");
             switch (connection.getTransactionIsolation()) {
                 case Connection.TRANSACTION_READ_UNCOMMITTED:
-                    ps.print("read-uncommited; ");
+                    ps.print("read-uncommitted; ");
                     break;
                 case Connection.TRANSACTION_READ_COMMITTED:
                     ps.print("read-committed; ");
@@ -161,7 +163,7 @@ public class ReportJdbcConnection implements Runnable {
                         ps.printf("%n      ");
                     }
                     final String name = (String) entry.getKey();
-                    if (name.toLowerCase().contains("password")) {
+                    if (name.toLowerCase(Locale.ROOT).contains("password")) { // Use Locale.ROOT for case-insensitive comparison
                         ps.printf("%s=?; ", name);
                         continue;
                     }
@@ -206,5 +208,6 @@ public class ReportJdbcConnection implements Runnable {
         } catch (final SQLException e) {
             ps.printf("   Cannot read connection property: %s%n", e.getLocalizedMessage());
         }
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

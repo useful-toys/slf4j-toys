@@ -31,8 +31,13 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Reports details of SSL contexts supported by the JVM, including cipher suites, protocols, and supported SSL
- * parameters for each context.
+ * A report module that provides detailed information about SSL contexts supported by the JVM.
+ * It includes details on cipher suites, protocols, and supported SSL parameters for various contexts.
+ * This report is crucial for diagnosing SSL/TLS configuration issues.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportSSLContext
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -40,10 +45,20 @@ public class ReportSSLContext implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * An array of common SSL context names to be reported.
+     */
     final String[] contextNames = {
             "Default", "SSL", "SSLv2", "SSLv3", "TLS", "TLSv1", "TLSv1.1", "TLSv1.2"
     };
 
+    /**
+     * Helper method to print a list of strings to the PrintStream, formatting it with newlines and indentation.
+     *
+     * @param ps The PrintStream to write to.
+     * @param list The array of strings to print.
+     * @param newLineSpace The indentation string to use after each newline.
+     */
     private static void printList(final PrintStream ps, final String[] list, final String newLineSpace) {
         int i = 1;
         for (final String s : list) {
@@ -57,6 +72,10 @@ public class ReportSSLContext implements Runnable {
         ps.println();
     }
 
+    /**
+     * Executes the report, writing SSL context information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         for (final String contextName : contextNames) {
@@ -103,8 +122,9 @@ public class ReportSSLContext implements Runnable {
                 ps.print("      Cipher Suites: ");
                 printList(ps, p.getCipherSuites(), "          ");
             } catch (final Exception e) {
-                ps.printf("Falha ao detalhar SSLContext: %s%n", e.getMessage());
+                ps.printf("Failed to detail SSLContext: %s%n", e.getMessage()); // Changed error message to English
             }
+            ps.println(); // Ensure a newline at the end of each context report
         }
     }
 }

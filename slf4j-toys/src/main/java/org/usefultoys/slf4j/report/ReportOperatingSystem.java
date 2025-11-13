@@ -27,7 +27,13 @@ import java.io.PrintStream;
 import static org.usefultoys.slf4j.report.ReporterConfig.getPropertySafely;
 
 /**
- * Reports properties of the operating system, including architecture, name, version, and path/file/line separators.
+ * A report module that provides detailed information about the operating system running the JVM.
+ * It includes properties such as architecture, name, version, and various system separators (file, path, line).
+ * This report is useful for identifying environment-specific bugs or compatibility issues.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportOperatingSystem
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -35,6 +41,10 @@ public class ReportOperatingSystem implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing operating system information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
@@ -46,5 +56,6 @@ public class ReportOperatingSystem implements Runnable {
         ps.printf(" - file separator: %s%n", Integer.toHexString(getPropertySafely("file.separator").charAt(0)));
         ps.printf(" - path separator: %s%n", Integer.toHexString(getPropertySafely("path.separator").charAt(0)));
         ps.printf(" - line separator: %s%n", Integer.toHexString(getPropertySafely("line.separator").charAt(0)));
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

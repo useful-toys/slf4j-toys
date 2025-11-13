@@ -27,7 +27,13 @@ import java.io.PrintStream;
 import static org.usefultoys.slf4j.report.ReporterConfig.getPropertySafely;
 
 /**
- * Reports environment variables available to the current process.
+ * A report module that provides information about the current user running the application.
+ * It includes the user's name and home directory.
+ * This report is useful for auditing or understanding the execution context.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportUser
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -35,6 +41,10 @@ public class ReportUser implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing user information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
@@ -42,5 +52,6 @@ public class ReportUser implements Runnable {
         ps.println("User:");
         ps.printf(" - name: %s%n", getPropertySafely("user.name"));
         ps.printf(" - home: %s%n", getPropertySafely("user.home"));
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

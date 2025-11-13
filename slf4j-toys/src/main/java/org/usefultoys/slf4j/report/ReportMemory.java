@@ -26,8 +26,13 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
 import java.io.PrintStream;
 
 /**
- * Reports memory usage of the JVM, including maximum available memory, currently allocated memory, and currently used
- * memory.
+ * A report module that provides information about the Java Virtual Machine's (JVM) memory usage.
+ * It reports the maximum available memory, currently allocated memory, and currently used memory.
+ * This report is crucial for identifying memory leaks or tuning memory allocation.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportMemory
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -35,6 +40,10 @@ public class ReportMemory implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing memory usage information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
@@ -47,5 +56,6 @@ public class ReportMemory implements Runnable {
         ps.printf(" - maximum allowed: %s%n", maxMemory == Long.MAX_VALUE ? "no limit" : UnitFormatter.bytes(maxMemory));
         ps.printf(" - currently allocated: %s (%s more available)%n", UnitFormatter.bytes(totalMemory), UnitFormatter.bytes(maxMemory - totalMemory));
         ps.printf(" - currently used: %s (%s free)%n", UnitFormatter.bytes(totalMemory - freeMemory), UnitFormatter.bytes(freeMemory));
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

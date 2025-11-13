@@ -32,7 +32,7 @@ import java.nio.charset.Charset;
  * For consistent behavior, these properties should be set before any methods from this library are called.
  * While some properties can be modified at runtime, caution is advised in concurrent environments.
  * <p>
- * <strong>Security Note:</strong> These parameters can influence log output. Avoid using untrusted input
+ * **Security Note:** These parameters can influence log output. Avoid using untrusted input
  * when modifying runtime values to prevent unintended information disclosure or log format manipulation.
  * <p>
  * This is a utility class and is not meant to be instantiated.
@@ -47,7 +47,9 @@ public class SessionConfig {
     }
 
     // System property keys
+    /** System property key for the number of UUID characters to print. */
     public final String PROP_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
+    /** System property key for the character encoding used for logging. */
     public final String PROP_PRINT_CHARSET = "slf4jtoys.session.print.charset";
 
     /**

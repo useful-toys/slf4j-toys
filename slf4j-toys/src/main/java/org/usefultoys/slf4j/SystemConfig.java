@@ -40,10 +40,15 @@ public class SystemConfig {
     }
 
     // System property keys
+    /** System property key for enabling/disabling memory MXBean usage. */
     public final String PROP_USE_MEMORY_MANAGED_BEAN = "slf4jtoys.useMemoryManagedBean";
+    /** System property key for enabling/disabling class loading MXBean usage. */
     public final String PROP_USE_CLASS_LOADING_MANAGED_BEAN = "slf4jtoys.useClassLoadingManagedBean";
+    /** System property key for enabling/disabling compilation MXBean usage. */
     public final String PROP_USE_COMPILATION_MANAGED_BEAN = "slf4jtoys.useCompilationManagedBean";
+    /** System property key for enabling/disabling garbage collection MXBean usage. */
     public final String PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN = "slf4jtoys.useGarbageCollectionManagedBean";
+    /** System property key for enabling/disabling platform MXBean usage. */
     public final String PROP_USE_PLATFORM_MANAGED_BEAN = "slf4jtoys.usePlatformManagedBean";
 
     /**

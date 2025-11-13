@@ -28,7 +28,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Reports all Java system properties in sorted order.
+ * A report module that lists all Java system properties in sorted order.
+ * <p>
+ * This report can be useful for debugging application behavior that depends on system properties.
+ * However, it may contain sensitive information, so caution is advised when logging this report.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportProperties
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -36,6 +43,10 @@ public class ReportSystemProperties implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing system properties to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
@@ -51,5 +62,6 @@ public class ReportSystemProperties implements Runnable {
         for (final Map.Entry<Object, Object> entry : sortedProperties.entrySet()) {
             ps.printf(" - %s: %s%n", entry.getKey(), entry.getValue());
         }
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

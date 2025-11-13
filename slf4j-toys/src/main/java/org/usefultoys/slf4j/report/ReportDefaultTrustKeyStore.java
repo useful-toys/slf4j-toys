@@ -32,7 +32,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 /**
- * Reports the trusted certificate authorities from the default JVM trust store.
+ * A report module that lists the trusted certificate authorities (CAs) from the default JVM trust store.
+ * This report is useful for diagnosing SSL/TLS connection issues and verifying the trust chain.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportDefaultTrustKeyStore
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -40,6 +45,10 @@ public class ReportDefaultTrustKeyStore implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing trusted keystore information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
@@ -68,5 +77,6 @@ public class ReportDefaultTrustKeyStore implements Runnable {
         } catch (final KeyStoreException | NoSuchAlgorithmException e) {
             ps.printf("Cannot read TrustManager: %s%n", e.getMessage());
         }
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

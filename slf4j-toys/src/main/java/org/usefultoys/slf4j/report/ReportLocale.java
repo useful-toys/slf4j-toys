@@ -26,8 +26,13 @@ import java.io.PrintStream;
 import java.util.Locale;
 
 /**
- * Reports the default system locale and lists all available locales
- * with their respective language, country, script, and variant.
+ * A report module that provides information about the system's default locale and lists all available locales.
+ * It details the language, country, script, and variant for each locale.
+ * This report is useful for diagnosing internationalization (i18n) and localization (l10n) issues.
+ *
+ * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig#reportLocale
  */
 @SuppressWarnings("NonConstantLogger")
 @RequiredArgsConstructor
@@ -35,14 +40,18 @@ public class ReportLocale implements Runnable {
 
     private final @NonNull Logger logger;
 
+    /**
+     * Executes the report, writing locale information to the configured logger.
+     * The output is formatted as human-readable INFO messages.
+     */
     @Override
     public void run() {
         @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         final Locale loc = Locale.getDefault();
         ps.println("Locale");
-        ps.printf(" - default locale: %s", loc.getDisplayName());
-        ps.printf("; language=%s (%s)", loc.getDisplayLanguage(), loc.getLanguage());
+        ps.printf(" - default locale: %s%n", loc.getDisplayName());
+        ps.printf("   ; language=%s (%s)", loc.getDisplayLanguage(), loc.getLanguage());
         ps.printf("; country=%s (%s)", loc.getDisplayCountry(), loc.getCountry());
         //noinspection ErrorNotRethrown
         try {
@@ -50,8 +59,7 @@ public class ReportLocale implements Runnable {
         } catch (final NoSuchMethodError ignored) {
             // Ignore property that exists only from Java 1.7 on.
         }
-        ps.printf("; variant=%s (%s)", loc.getDisplayVariant(), loc.getVariant());
-        ps.println();
+        ps.printf("; variant=%s (%s)%n", loc.getDisplayVariant(), loc.getVariant());
         ps.print(" - available locales: ");
         int i = 1;
         for (final Locale l : Locale.getAvailableLocales()) {
@@ -60,5 +68,6 @@ public class ReportLocale implements Runnable {
             }
             ps.printf("%s; ", l.getDisplayName());
         }
+        ps.println(); // Ensure a newline at the end of the report
     }
 }

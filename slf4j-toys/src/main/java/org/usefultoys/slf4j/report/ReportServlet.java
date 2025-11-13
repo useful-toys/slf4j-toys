@@ -28,12 +28,12 @@ import java.util.Enumeration;
 import java.util.Locale;
 
 /**
- * A servlet that logs system reports based on the URL path provided in the HTTP request.
+ * A servlet that triggers and logs system reports based on the URL path provided in the HTTP request.
  * <p>
- * This servlet handles HTTP GET requests and triggers the appropriate {@link Reporter} module based on the path suffix. The corresponding system report is
- * logged using the SLF4J logger.
+ * This servlet handles HTTP GET requests and executes the appropriate {@link Reporter} module
+ * based on the path suffix. The corresponding system report is logged using an SLF4J logger.
  * <p>
- * The following path suffixes are supported:
+ * The following path suffixes are supported, each triggering a specific report module:
  * <ul>
  *   <li>{@code /VM} — Logs Java Virtual Machine information.</li>
  *   <li>{@code /FileSystem} — Logs information about available and used disk space.</li>
@@ -45,23 +45,36 @@ import java.util.Locale;
  *   <li>{@code /Locale} — Logs current and available locale settings.</li>
  *   <li>{@code /Charset} — Logs current and available character sets.</li>
  *   <li>{@code /NetworkInterface} — Logs information for each available network interface.</li>
+ *   <li>{@code /SSLContext} — Logs details about SSL contexts.</li>
+ *   <li>{@code /DefaultTrustKeyStore} — Logs information about the default trusted keystore.</li>
+ *   <li>{@code /Environment} — Logs environment variables.</li>
+ *   <li>{@code /Properties} — Logs system properties.</li>
  * </ul>
  * <p>
  * If the path does not match any known suffix, no action is taken and the request is silently ignored.
  * <p>
- * <strong>Security considerations</strong>
- *  <p>This servlet accesses and logs potentially sensitive system information. Therefore, the following security measures are strongly recommended:
- *  <ul>
- *    <li><strong>Restrict access</strong> to the servlet endpoint using authentication or IP whitelisting.</li>
- *    <li><strong>Avoid exposing this servlet</strong> in production environments or public networks without proper protection.</li>
- *    <li>Ensure that <strong>reporting environment variables or system properties</strong> is disabled unless explicitly needed, to avoid leaking secrets like passwords, API keys, or tokens.</li>
- *    <li>Use a <strong>read-only, non-sensitive logger configuration</strong> to avoid side effects.</li>
- *    <li><strong>Use a secure logging strategy</strong> — logged reports may contain sensitive data and should not be publicly accessible or retained longer than necessary.</li>
- *    <li><strong>Be aware of log injection and log disclosure risks</strong>: an attacker could trigger this servlet and indirectly cause logs to capture sensitive or excessive system information. Limit logging verbosity and protect log files appropriately.</li>
- *   <li><strong>Protect against denial-of-service (DoS) attacks</strong>: repeated requests to expensive endpoints such as {@code /NetworkInterface} can overload the system or exhaust resources. Consider adding rate limiting or caching to mitigate abuse.</li>
- *  </ul>
+ * **Security Considerations:**
+ * <p>This servlet accesses and logs potentially sensitive system information. Therefore, the following
+ * security measures are strongly recommended:
+ * <ul>
+ *   <li>**Restrict access** to the servlet endpoint using authentication or IP whitelisting.</li>
+ *   <li>**Avoid exposing this servlet** in production environments or public networks without proper protection.</li>
+ *   <li>Ensure that **reporting environment variables or system properties** is disabled unless explicitly needed,
+ *       to avoid leaking secrets like passwords, API keys, or tokens.</li>
+ *   <li>Use a **read-only, non-sensitive logger configuration** to avoid side effects.</li>
+ *   <li>**Use a secure logging strategy** — logged reports may contain sensitive data and should not be
+ *       publicly accessible or retained longer than necessary.</li>
+ *   <li>**Be aware of log injection and log disclosure risks**: an attacker could trigger this servlet and
+ *       indirectly cause logs to capture sensitive or excessive system information. Limit logging verbosity
+ *       and protect log files appropriately.</li>
+ *   <li>**Protect against denial-of-service (DoS) attacks**: repeated requests to expensive endpoints such as
+ *       {@code /NetworkInterface} can overload the system or exhaust resources. Consider adding rate limiting
+ *       or caching to mitigate abuse.</li>
+ * </ul>
  *
  * @author Daniel Felix Ferber
+ * @see Reporter
+ * @see ReporterConfig
  */
 @SuppressWarnings("ClassWithMultipleLoggers")
 @Slf4j
@@ -69,6 +82,13 @@ public class ReportServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Handles HTTP GET requests by triggering the appropriate report module based on the URL path.
+     * The report is logged, and a response indicating success or failure is sent.
+     *
+     * @param request The HTTP request object.
+     * @param response The HTTP response object.
+     */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
         String pathinfo = request.getPathInfo();
@@ -117,12 +137,16 @@ public class ReportServlet extends HttpServlet {
                     new ReportNetworkInterface(logger, nif).run();
                 }
             } catch (final SocketException e) {
-                log.warn("Cannot report network interface", e);
+                log.warn("Cannot report network interface: {}", e.getMessage());
             }
         } else if ("sslcontext".equalsIgnoreCase(pathinfo)) {
             new ReportSSLContext(logger).run();
         } else if ("defaulttrustkeystore".equalsIgnoreCase(pathinfo)) {
             new ReportDefaultTrustKeyStore(logger).run();
+        } else if ("environment".equalsIgnoreCase(pathinfo)) { // Added missing report
+            new ReportSystemEnvironment(logger).run();
+        } else if ("properties".equalsIgnoreCase(pathinfo)) { // Added missing report
+            new ReportSystemProperties(logger).run();
         } else {
             log.warn("Unrecognized report path: {}", pathinfo);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
