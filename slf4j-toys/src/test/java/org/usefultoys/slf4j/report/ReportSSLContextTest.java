@@ -124,7 +124,7 @@ class ReportSSLContextTest {
             boolean found = false;
             for (int i = 0; i < mockLogger.getEventCount(); i++) {
                 if (mockLogger.getEvent(i).getFormattedMessage().contains("SSL Context SSLv2") &&
-                    mockLogger.getEvent(i).getFormattedMessage().contains("Falha ao detalhar SSLContext: SSLv2 not available")) {
+                    mockLogger.getEvent(i).getFormattedMessage().contains("Failed to detail SSLContext: SSLv2 not available")) {
                     found = true;
                     break;
                 }
