@@ -36,98 +36,125 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.usefultoys.slf4j.meter.MeterConfig.*;
 
 /**
- * At beginning, termination of operations and on iterations, collects system status and reports it to logger. Call
- * {@link #start()} to produce a 1-line summary about operation start and current system status as debug message and an
- * encoded event as trace message. Call {@link #ok()} to produce a 1-line summary about operation successful end and
- * current system status as information message and an encoded event as trace message. Call {@link #fail(Object)} to
- * produce a 1-line summary about operation failure and current system status as error message and an encoded event as
- * trace message. Call {@link #progress()} to produce a 1-line summary about operation progress and current system
- * status as information message and an encoded event as trace message.
+ * The `Meter` is a core component of `slf4j-toys` designed to track the **lifecycle** of application operations. It
+ * collects system status and reports it to the logger at key points: operation start, progress, and termination
+ * (success, rejection, or failure).
+ * <p>
+ * Each `Meter` instance allows you to:
+ * <ul>
+ *     <li>Call {@link #start()} to log the operation's beginning and current system status (DEBUG level).</li>
+ *     <li>Call {@link #ok()} to log successful completion (INFO level).</li>
+ *     <li>Call {@link #reject(Object)} to log expected termination due to business rules (INFO level).</li>
+ *     <li>Call {@link #fail(Object)} to log unexpected technical failure (ERROR level).</li>
+ *     <li>Call {@link #progress()} to log intermediate progress and system status (INFO level, periodically).</li>
+ * </ul>
+ * All lifecycle events also generate a machine-parsable trace message.
  *
  * @author Daniel Felix Ferber
+ * @see MeterData
+ * @see MeterConfig
+ * @see Markers
  */
 @SuppressWarnings({"OverlyBroadCatchBlock", "FinalizeDeclaration"})
 public class Meter extends MeterData implements Closeable {
 
     private static final long serialVersionUID = 1L;
 
+    /** Error message for when Meter cannot create an exception of a specific type. */
     private static final String ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION = "Meter cannot create exception of type {}.";
+    /** Error message for when Meter's start() method is called multiple times. */
     private static final String ERROR_MSG_METER_ALREADY_STARTED = "Meter already started. id={}";
+    /** Error message for when Meter's termination method (ok, reject, fail) is called multiple times. */
     private static final String ERROR_MSG_METER_ALREADY_STOPPED = "Meter already stopped. id={}";
+    /** Error message for when Meter's termination method is called before start(). */
     private static final String ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED = "Meter stopped but not started. id={}";
+    /** Error message for when Meter is garbage-collected without being stopped. */
     private static final String ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED = "Meter started and never stopped. id={}";
+    /** Error message for when Meter's iteration increment method is called before start(). */
     private static final String ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED = "Meter incremented but not started. id={}";
+    /** Error message for when Meter's progress() method is called before start(). */
     private static final String ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED = "Meter progress but not started. id={}";
-
+    /** Error message for when an internal Meter method throws an unexpected exception. */
     private static final String ERROR_MSG_METHOD_THREW_EXCEPTION = "Meter.{}(...) method threw exception. id={}";
+    /** Error message for illegal arguments passed to Meter methods. */
     private static final String ERROR_MSG_ILLEGAL_ARGUMENT = "Illegal call to Meter.{}: {}. id={}";
+    /** Error message for Meter lifecycle methods called out of expected order. */
     private static final String ERROR_MSG_METER_OUT_OF_ORDER = "Meter out of order. id={}";
-
+    /** Generic error message for null arguments. */
     private static final String ERROR_MSG_NULL_ARGUMENT = "Null argument";
+    /** Generic error message for non-positive arguments. */
     private static final String ERROR_MSG_NON_POSITIVE_ARGUMENT = "Non positive argument";
+    /** Generic error message for illegal string format. */
     private static final String ERROR_MSG_ILLEGAL_STRING_FORMAT = "Illegal string format";
+    /** Error message for non-forward iteration (e.g., incTo with a smaller value). */
     private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non forward iteration";
+    /** The fully qualified name of this class, used for stack trace manipulation. */
     private static final String MY_CLASS_NAME = Meter.class.getName();
+    /** Placeholder string for null values in context. */
     private static final String NULL_VALUE = "<null>";
+    /** Placeholder string for unknown logger names. */
     private static final String UNKNOWN_LOGGER_NAME = "???";
+    /** Default failure path for operations terminated by `try-with-resources`. */
     private static final String FAIL_PATH_TRY_WITH_RESOURCES = "try-with-resources";
+    /** Context key for storing the result of functional interface calls. */
     public static final String CONTEXT_RESULT = "result";
 
-    /** Logger that prints readable messages. */
+    /** Logger for human-readable messages. */
     private final transient Logger messageLogger;
-    /** Logger that prints enconded data. */
+    /** Logger for machine-parsable data. */
     private final transient Logger dataLogger;
 
     /**
-     * Tracks many times each operation has been executed.
+     * Tracks how many times each unique operation (category/operation name pair) has been executed.
      */
-    static final ConcurrentMap<String, AtomicLong> EVENT_COUNTER = new ConcurrentHashMap<String, AtomicLong>();
+    static final ConcurrentMap<String, AtomicLong> EVENT_COUNTER = new ConcurrentHashMap<>();
     /**
-     * Timestamp when progress was reported for last time. Zero if progress was not reported yet. Used to skip progress messages and to avoid flooding the log
-     * if progress is reported too fast.
+     * Timestamp (in nanoseconds) when progress was last reported. Zero if progress has not been reported yet. Used to
+     * control the frequency of progress messages and avoid flooding the log.
      */
     private transient long lastProgressTime = 0;
     /**
-     * Iteration when progress was reported for last time. Zero if progress was not reported yet. Used to skip progress messages and to avoid flooding the log
-     * if progress is reported too fast.
+     * Iteration count when progress was last reported. Zero if progress has not been reported yet. Used to control the
+     * frequency of progress messages.
      */
     private transient long lastProgressIteration = 0;
 
     /**
-     * Tracks the instance of the current meters withing each thread.
+     * Tracks the `Meter` instance most recently started on the current thread.
      */
-    private static final ThreadLocal<WeakReference<Meter>> localThreadInstance = new ThreadLocal<WeakReference<Meter>>();
+    private static final ThreadLocal<WeakReference<Meter>> localThreadInstance = new ThreadLocal<>();
     /**
-     * Tracks the instance of Meter that was current before this meter became the current Meter. These references are a linked list of Meters that describe a
-     * stack of Meters.
+     * Stores a weak reference to the `Meter` instance that was current before this `Meter` became the current one.
+     * These references form a linked list representing a stack of `Meter` instances.
      */
     private WeakReference<Meter> previousInstance;
 
     /**
-     * Creates a new meter for the category given by the logger's name.
+     * Creates a new `Meter` for an operation belonging to the category derived from the logger's name.
      *
-     * @param logger Logger that reports messages.
+     * @param logger The SLF4J logger that will report messages.
      */
     public Meter(final @NonNull Logger logger) {
         this(logger, null);
     }
 
     /**
-     * Creates a new Meter for the operation beloging to the category given by the logger's name.
+     * Creates a new `Meter` for a specific operation within the category derived from the logger's name.
      *
-     * @param logger    Logger that reports messages.
-     * @param operation The operation name or null.
+     * @param logger    The SLF4J logger that will report messages.
+     * @param operation The name of the operation, or {@code null} if the category itself describes the operation.
      */
     public Meter(final @NonNull Logger logger, final String operation) {
         this(logger, operation, null);
     }
 
     /**
-     * Creates a new Meter for the operation beloging to the category given by the logger's name, as child for an existing Meter.
+     * Creates a new `Meter` for an operation, optionally as a child of an existing `Meter`. The category is derived
+     * from the logger's name.
      *
-     * @param logger    Logger that reports messages.
-     * @param operation The operation name or null.
-     * @param parent    ID of the parent Meter or null.
+     * @param logger    The SLF4J logger that will report messages.
+     * @param operation The name of the operation, or {@code null}.
+     * @param parent    The full ID of the parent `Meter`, or {@code null} if this is a top-level operation.
      */
     public Meter(final @NonNull Logger logger, final String operation, final String parent) {
         super(Session.shortSessionUuid(),
@@ -138,6 +165,14 @@ public class Meter extends MeterData implements Closeable {
         dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
     }
 
+    /**
+     * Extracts and increments the next sequential position for a given operation. This ensures a unique, time-ordered
+     * ID for each operation execution.
+     *
+     * @param eventCategory The category of the event.
+     * @param operationName The name of the operation.
+     * @return The next sequential position for the operation.
+     */
     private static long extractNextPosition(final String eventCategory, final String operationName) {
         final String key = operationName == null ? eventCategory : eventCategory + "/" + operationName;
         EVENT_COUNTER.putIfAbsent(key, new AtomicLong(0));
@@ -147,7 +182,10 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * @return The Meter most recently started on the current thread.
+     * Returns the `Meter` instance most recently started on the current thread. This is useful for accessing the
+     * current operation's context.
+     *
+     * @return The current `Meter` instance, or a dummy `Meter` if none is active on the current thread.
      */
     public static Meter getCurrentInstance() {
         final WeakReference<Meter> ref = localThreadInstance.get();
@@ -158,6 +196,12 @@ public class Meter extends MeterData implements Closeable {
         return current;
     }
 
+    /**
+     * Collects the current waiting time of the operation.
+     *
+     * @return The time elapsed (in nanoseconds) since the Meter was created until it started, or until now if not yet
+     * started.
+     */
     public long collectCurrentWaitingTime() {
         if (startTime == 0) {
             return collectCurrentTime() - createTime;
@@ -165,6 +209,11 @@ public class Meter extends MeterData implements Closeable {
         return startTime - createTime;
     }
 
+    /**
+     * Collects the current execution time of the operation.
+     *
+     * @return The time elapsed (in nanoseconds) since the operation started until now, or 0 if not yet started.
+     */
     public long collectCurrentExecutionTime() {
         if (startTime == 0) {
             return 0;
@@ -177,11 +226,11 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Creates a new Meter for an operation that belongs to the opeartion of this Meter. Useful if a large operation may be subdivided into smaller operations
-     * and reported individually. The new Meter uses the same category of this Meter.
+     * Creates a new `Meter` instance representing a sub-operation of this `Meter`. The new `Meter` inherits the
+     * category of this `Meter` and its context.
      *
-     * @param suboperationName Additional identification appended to this logger name.
-     * @return The new Meter
+     * @param suboperationName The name of the sub-operation.
+     * @return A new `Meter` instance for the sub-operation.
      */
     public Meter sub(final String suboperationName) {
         if (suboperationName == null) {
@@ -198,7 +247,7 @@ public class Meter extends MeterData implements Closeable {
         }
         final Meter m = new Meter(messageLogger, operation, getFullID());
         if (context != null) {
-            m.context = new HashMap<String, String>(context);
+            m.context = new HashMap<>(context);
         }
         return m;
     }
@@ -206,10 +255,10 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Configures the Meter with a human readable message that explains the operations's purpose.
+     * Configures the `Meter` with a human-readable message that explains the operation's purpose.
      *
-     * @param message fixed message
-     * @return reference to the meter itself.
+     * @param message The descriptive message.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter m(final String message) {
         if (message == null) {
@@ -221,11 +270,12 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Configures the Meter with a human readable message that explains the operations's purpose.
+     * Configures the `Meter` with a human-readable message that explains the operation's purpose, using a format
+     * string.
      *
-     * @param format message format ({@link String#format(java.lang.String, java.lang.Object...)})
-     * @param args   message arguments
-     * @return reference to the meter itself.
+     * @param format The message format string (e.g., `String.format(java.lang.String, java.lang.Object...)`).
+     * @param args   The arguments for the format string.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter m(final String format, final Object... args) {
         if (format == null) {
@@ -244,10 +294,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Configures the Meter with an threshold for reasonable, typical execution time for the operation.
+     * Configures the `Meter` with a time limit (threshold) for the operation's execution. If the operation exceeds this
+     * limit, it will be flagged as "slow".
      *
-     * @param timeLimit time threshold
-     * @return reference to the meter itself.
+     * @param timeLimit The time limit in milliseconds. Must be a positive value.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter limitMilliseconds(final long timeLimit) {
         if (timeLimit <= 0) {
@@ -255,17 +306,17 @@ public class Meter extends MeterData implements Closeable {
             messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "limitMilliseconds(timeLimit)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
             return this;
         }
-        this.timeLimit = timeLimit * 1000 * 1000;
+        this.timeLimit = timeLimit * 1000 * 1000; // Convert milliseconds to nanoseconds
         return this;
     }
 
     /**
-     * Configures the Meter for an operation made up of iterations or steps. Such Meter is allows to call {@link #progress() } an arbitrarily number of Such
-     * Meter should call {@link #inc()}, {@link #incBy(long)} or {@link #incTo(long)} to advance the current iteration. times between {@link #start() } and
-     * {@link #ok()}/{@link #reject(Object)}/{@link #fail(Object) } method calls.
+     * Configures the `Meter` for an operation composed of multiple iterations or steps. This enables progress tracking
+     * using {@link #inc()}, {@link #incBy(long)}, {@link #incTo(long)}, and {@link #progress()}.
      *
-     * @param expectedIterations Number of expected iterations or steps that make up the task
-     * @return reference to the meter itself.
+     * @param expectedIterations The total number of expected iterations or steps for the task. Must be a positive
+     *                           value.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter iterations(final long expectedIterations) {
         if (expectedIterations <= 0) {
@@ -280,10 +331,10 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Adds an entry to the context map. The entry has no value and is interpreted as a marker.
+     * Adds a key-only entry to the context map. This is interpreted as a marker or flag.
      *
-     * @param name key of the entry to add.
-     * @return reference to the meter itself.
+     * @param name The key of the entry to add. Must not be {@code null}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name) {
         if (name == null) {
@@ -292,18 +343,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, null);
         return this;
     }
 
     /**
-     * Adds an entry to the context map if conditions is true. The entry has no value and is interpreted as a marker.
+     * Conditionally adds a key-only entry to the context map if the condition is {@code true}.
      *
-     * @param condition the condition
-     * @param trueName  key of the entry to add if conditions is true
-     * @return reference to the meter itself.
+     * @param condition The condition to evaluate.
+     * @param trueName  The key of the entry to add if {@code condition} is {@code true}. Must not be {@code null}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final boolean condition, final String trueName) {
         if (!condition) {
@@ -315,19 +366,19 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(trueName, null);
         return this;
     }
 
     /**
-     * Adds an entry to the context map if conditions is true or false. The entry has no value and is interpreted as a marker.
+     * Conditionally adds a key-only entry to the context map based on a boolean condition.
      *
-     * @param condition the condition
-     * @param trueName  key of the entry to add if conditions is true
-     * @param falseName key of the entry to add if conditions is true
-     * @return reference to the meter itself.
+     * @param condition The condition to evaluate.
+     * @param trueName  The key of the entry to add if {@code condition} is {@code true}. Must not be {@code null}.
+     * @param falseName The key of the entry to add if {@code condition} is {@code false}. Must not be {@code null}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final boolean condition, final String trueName, final String falseName) {
         if (condition) {
@@ -337,7 +388,7 @@ public class Meter extends MeterData implements Closeable {
                 return this;
             }
             if (context == null) {
-                context = new LinkedHashMap<String, String>();
+                context = new LinkedHashMap<>();
             }
             context.put(trueName, null);
         } else {
@@ -347,7 +398,7 @@ public class Meter extends MeterData implements Closeable {
                 return this;
             }
             if (context == null) {
-                context = new LinkedHashMap<String, String>();
+                context = new LinkedHashMap<>();
             }
             context.put(falseName, null);
         }
@@ -355,11 +406,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with an integer value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The integer value.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final int value) {
         if (name == null) {
@@ -368,18 +419,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, Integer.toString(value));
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with a long value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The long value.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final long value) {
         if (name == null) {
@@ -388,18 +439,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, Long.toString(value));
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with a boolean value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The boolean value.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final boolean value) {
         if (name == null) {
@@ -408,18 +459,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, Boolean.toString(value));
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with a float value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The float value.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final float value) {
         if (name == null) {
@@ -428,18 +479,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, Float.toString(value));
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with a double value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The double value.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final double value) {
         if (name == null) {
@@ -448,18 +499,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, Double.toString(value));
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with an {@link Integer} object value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The {@link Integer} object value. {@code null} values are represented by {@code "<null>"}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final Integer value) {
         if (name == null) {
@@ -468,18 +519,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with a {@link Long} object value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The {@link Long} object value. {@code null} values are represented by {@code "<null>"}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final Long value) {
         if (name == null) {
@@ -488,18 +539,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with a {@link Boolean} object value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The {@link Boolean} object value. {@code null} values are represented by {@code "<null>"}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final Boolean value) {
         if (name == null) {
@@ -508,18 +559,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with a {@link Float} object value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The {@link Float} object value. {@code null} values are represented by {@code "<null>"}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final Float value) {
         if (name == null) {
@@ -528,18 +579,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with a {@link Double} object value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The {@link Double} object value. {@code null} values are represented by {@code "<null>"}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final Double value) {
         if (name == null) {
@@ -548,18 +599,19 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, value == null ? NULL_VALUE : value.toString());
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map, using the {@code toString()} representation of an object as value.
      *
-     * @param name   key of the entry to add.
-     * @param object object which string representation is used for the value of the entry to add
-     * @return reference to the meter itself.
+     * @param name   The key of the entry to add. Must not be {@code null}.
+     * @param object The object whose string representation will be used as the value. {@code null} objects are
+     *               represented by {@code "<null>"}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final Object object) {
         if (name == null) {
@@ -568,18 +620,18 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, object == null ? NULL_VALUE : object.toString());
         return this;
     }
 
     /**
-     * Adds an entry to the context map.
+     * Adds a key-value entry to the context map with a string value.
      *
-     * @param name  key of the entry to add.
-     * @param value value of the entry to add.
-     * @return reference to the meter itself.
+     * @param name  The key of the entry to add. Must not be {@code null}.
+     * @param value The string value. {@code null} values are represented by {@code "<null>"}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final String value) {
         if (name == null) {
@@ -588,19 +640,20 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         context.put(name, value == null ? NULL_VALUE : value);
         return this;
     }
 
     /**
-     * Adds an entry to the context map. The entry value is made up of a formatted message with arguments.
+     * Adds a key-value entry to the context map, where the value is a formatted message.
      *
-     * @param name   key of the entry to add.
-     * @param format message format ({@link String#format(java.lang.String, java.lang.Object...) })
-     * @param args   message arguments
-     * @return reference to the meter itself.
+     * @param name   The key of the entry to add. Must not be {@code null}.
+     * @param format The message format string (e.g., `String.format(java.lang.String, java.lang.Object...)`). Must not
+     *               be {@code null}.
+     * @param args   The arguments for the format string.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ctx(final String name, final String format, final Object... args) {
         if (name == null || format == null) {
@@ -609,7 +662,7 @@ public class Meter extends MeterData implements Closeable {
             return this;
         }
         if (context == null) {
-            context = new LinkedHashMap<String, String>();
+            context = new LinkedHashMap<>();
         }
         try {
             ctx(name, String.format(format, args));
@@ -623,8 +676,8 @@ public class Meter extends MeterData implements Closeable {
     /**
      * Removes an entry from the context map.
      *
-     * @param name key of the entry to remove.
-     * @return reference to the meter itself.
+     * @param name The key of the entry to remove. Must not be {@code null}.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter unctx(final String name) {
         if (name == null) {
@@ -642,10 +695,10 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Notifies the meter in order to claim immediate execution start of the task represented by the meter. Sends a message to logger using debug level. Sends a
-     * message with system status and partial context to log using trace level.
+     * Notifies the `Meter` that the operation has started. This method logs a summary (DEBUG level) and a
+     * machine-parsable event (TRACE level) with the current system status.
      *
-     * @return reference to the meter itself.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter start() {
         try {
@@ -654,7 +707,7 @@ public class Meter extends MeterData implements Closeable {
                 messageLogger.error(Markers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, getFullID(), new IllegalMeterUsage(2));
             } else {
                 previousInstance = localThreadInstance.get();
-                localThreadInstance.set(new WeakReference<Meter>(this));
+                localThreadInstance.set(new WeakReference<>(this));
             }
 
             lastProgressTime = startTime = collectCurrentTime();
@@ -681,9 +734,9 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Notifies the meter that one more iteration or step completed that make up the task successfully.
+     * Notifies the `Meter` that one more iteration or step of the task has completed successfully.
      *
-     * @return reference to the meter itself.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter inc() {
         if (startTime == 0) {
@@ -695,10 +748,10 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Notifies the meter that more of iterations or steps that make up the task completed successfully.
+     * Notifies the `Meter` that a specified number of iterations or steps have completed successfully.
      *
-     * @param increment the number of iterations or steps
-     * @return reference to the meter itself.
+     * @param increment The number of iterations or steps to add to the current count. Must be positive.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter incBy(final long increment) {
         if (startTime == 0) {
@@ -715,10 +768,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Notifies the meter that a number of iterations or steps that make up the task already completed successfully.
+     * Notifies the `Meter` that the operation has reached a specific iteration count.
      *
-     * @param currentIteration the number of iterations or steps
-     * @return reference to the meter itself.
+     * @param currentIteration The new total number of iterations or steps completed. Must be greater than the previous
+     *                         count.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter incTo(final long currentIteration) {
         if (startTime == 0) {
@@ -739,11 +793,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Allow informing about successful completion of iterations or steps making up the task represented by the meter. Only applicable for meters that called
-     * {@link #iterations(long i)} before calling {@link #start() }. Sends a message to logger using info level, only periodically and if progress was observed,
-     * to minimize performance degradation.
+     * Reports the current progress of the operation. This is only applicable for `Meter` instances configured with
+     * {@link #iterations(long)}. A progress message is logged (INFO level) only periodically and if progress has
+     * actually advanced, to minimize performance degradation.
      *
-     * @return reference to the meter itself.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter progress() {
         try {
@@ -782,6 +836,14 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Sets the success path identifier for the operation. This is typically used with {@link #ok()} to distinguish
+     * between different successful outcomes.
+     *
+     * @param pathId An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that identifies
+     *               the successful execution path.
+     * @return Reference to this `Meter` instance, for method chaining.
+     */
     public Meter path(final Object pathId) {
         if (pathId instanceof String) {
             okPath = (String) pathId;
@@ -799,11 +861,11 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Confirms the meter in order to claim successful completion of the task represented by the meter. Sends a message to logger using info level. If a time
-     * limit was given and execution exceeded this limit, sends a message using warn level instead. Sends a message with system status and partial context to
-     * log using trace level.
+     * Notifies the `Meter` that the operation has completed successfully. This method logs a summary (INFO level) and a
+     * machine-parsable event (TRACE level) with the current system status. If a time limit was set and exceeded, a WARN
+     * level message is logged instead.
      *
-     * @return reference to the meter itself.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ok() {
         try {
@@ -825,7 +887,7 @@ public class Meter extends MeterData implements Closeable {
             rejectPath = null;
             localThreadInstance.set(previousInstance);
 
-            if (messageLogger.isWarnEnabled()) {
+            if (messageLogger.isWarnEnabled()) { // Check warn enabled to cover info as well
                 collectRuntimeStatus();
                 collectPlatformStatus();
 
@@ -855,19 +917,16 @@ public class Meter extends MeterData implements Closeable {
         return this;
     }
 
+    /**
+     * Checks if this `Meter` instance is the current `Meter` associated with the current thread.
+     *
+     * @return {@code true} if this `Meter` is not the current instance, {@code false} otherwise.
+     */
     private boolean checkCurrentInstance() {
         final WeakReference<Meter> ref = localThreadInstance.get();
         return ref == null || ref.get() != this;
     }
 
-    /**
-     * Confirms the meter in order to claim successful completion of the task represented by the meter. Sends a message to logger using info level. If a time
-     * limit was given and execution exceeded this limit, sends a message using warn level instead. Sends a message with system status and partial context to
-     * log using trace level.
-     *
-     * @param pathId A token, enum or exception that describes the successful pathId.
-     * @return reference to the meter itself.
-     */
     public Meter ok(final Object pathId) {
         try {
             final long newStopTime = collectCurrentTime();
@@ -931,12 +990,12 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
-     * Confirms the meter in order to claim unsuccessful completion of the task represented by the meter. Sends a message to logger using info level. If a time
-     * limit was given and execution exceeded this limit, sends a message using warn level instead. Sends a message with system status and partial context to
-     * log using trace level.
+     * Notifies the `Meter` that the operation has completed with a rejection (expected unsuccessful outcome). This
+     * method logs a summary (INFO level) and a machine-parsable event (TRACE level) with the current system status.
      *
-     * @param cause A token, enum or exception that describes the cause of rejection.
-     * @return reference to the meter itself.
+     * @param cause An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that describes the
+     *              cause of the rejection.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter reject(final Object cause) {
         try {
@@ -994,11 +1053,13 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Refuses the meter in order to claim incomplete or inconsistent execution of the task represented by the meter. Sends a message with the the exception to
-     * logger using warn level. Sends a message with system status, statistics and complete context to log using trace level.
+     * Notifies the `Meter` that the operation has failed due to an unexpected technical error. This method logs a
+     * summary (ERROR level) and a machine-parsable event (TRACE level) with the current system status.
      *
-     * @param cause Exception that represents the failure. May be null if no exception applies.
-     * @return reference to the meter itself.
+     * @param cause An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that describes the
+     *              cause of the failure. If it's a {@link Throwable}, its class name is used for `failPath` and its
+     *              message for `failMessage`.
+     * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter fail(final Object cause) {
         try {
@@ -1052,8 +1113,11 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Checks if meters the meter has been forgotten to be confirmed or refused. Useful to track those meters that do not follow the start(), ok()/fail() idiom
-     * for all execution flows. Meters created to represent unknown instance in {@link #checkCurrentInstance()} are not considered for check.
+     * Overrides the default `finalize()` method to detect `Meter` instances that were started but never explicitly
+     * stopped. If an unstopped `Meter` is garbage-collected, an error message is logged to indicate inconsistent API
+     * usage.
+     *
+     * @throws Throwable if an error occurs during finalization.
      */
     @Override
     protected void finalize() throws Throwable {
@@ -1064,15 +1128,30 @@ public class Meter extends MeterData implements Closeable {
         super.finalize();
     }
 
+    /**
+     * Base class for custom throwables used internally by `Meter` for reporting illegal usage or internal bugs. It
+     * manipulates the stack trace to point to the actual caller method, making debugging easier.
+     */
     @SuppressWarnings("ExtendsThrowable")
     public static class MeterThrowable extends Throwable {
 
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Constructs a `MeterThrowable` by discarding a specified number of frames from the stack trace.
+         *
+         * @param framesToDiscard The number of stack frames to remove from the beginning.
+         */
         MeterThrowable(final int framesToDiscard) {
             this(framesToDiscard + 1, null);
         }
 
+        /**
+         * Constructs a `MeterThrowable` with a cause, discarding a specified number of frames from the stack trace.
+         *
+         * @param framesToDiscard The number of stack frames to remove from the beginning.
+         * @param e               The underlying cause of this throwable.
+         */
         @SuppressWarnings({"AssignmentToMethodParameter", "OverridableMethodCallDuringObjectConstruction"})
         MeterThrowable(int framesToDiscard, final Throwable e) {
             super(e);
@@ -1085,24 +1164,41 @@ public class Meter extends MeterData implements Closeable {
             setStackTrace(stacktrace);
         }
 
-        MeterThrowable() {
-            super("Illegal Meter usage.");
-        }
-
+        /**
+         * Overrides `fillInStackTrace()` to prevent it from capturing the stack trace again, as it's already
+         * manipulated in the constructor.
+         *
+         * @return This `Throwable` instance.
+         */
         @Override
         public synchronized Throwable fillInStackTrace() {
             return this;
         }
     }
 
+    /**
+     * A specific `MeterThrowable` subclass indicating illegal usage of the `Meter` API.
+     */
     public static class IllegalMeterUsage extends MeterThrowable {
 
         private static final long serialVersionUID = 1L;
 
+        /**
+         * Constructs an `IllegalMeterUsage` by discarding a specified number of frames from the stack trace.
+         *
+         * @param framesToDiscard The number of stack frames to remove from the beginning.
+         */
         IllegalMeterUsage(final int framesToDiscard) {
             super(framesToDiscard);
         }
 
+        /**
+         * Constructs an `IllegalMeterUsage` with a cause, discarding a specified number of frames from the stack
+         * trace.
+         *
+         * @param framesToDiscard The number of stack frames to remove from the beginning.
+         * @param e               The underlying cause of this throwable.
+         */
         IllegalMeterUsage(final int framesToDiscard, final Throwable e) {
             super(framesToDiscard, e);
         }
@@ -1111,7 +1207,10 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Compliance with {@link Closeable}. Assumes failure and refuses the meter if the meter has not yet been marked as confirmed.
+     * Implements the {@link Closeable} interface. If the `Meter` has not been explicitly stopped (via `ok()`,
+     * `reject()`, or `fail()`), this method automatically marks the operation as {@code FAIL} with the path
+     * {@code "try-with-resources"}. This ensures that no operation goes untracked when used in a `try-with-resources`
+     * block.
      */
     @Override
     public void close() {
@@ -1158,11 +1257,11 @@ public class Meter extends MeterData implements Closeable {
     // ========================================================================
 
     /**
-     * Executes the given runnable task within the Meter's lifecycle control.
-     * If the task throws a runtime exception, the method handles it, performs a failure operation,
-     * and rethrows the exception.
+     * Executes the given {@link Runnable} task within the `Meter`'s lifecycle control. The operation is automatically
+     * started before execution and marked as {@code OK} upon successful completion. If the task throws a
+     * {@link RuntimeException}, the operation is marked as {@code FAIL}, and the exception is rethrown.
      *
-     * @param runnable the runnable task to be executed
+     * @param runnable The {@link Runnable} task to be executed.
      */
     public void run(final Runnable runnable) {
         if (startTime == 0) start();
@@ -1175,6 +1274,16 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    /**
+     * Executes the given {@link Runnable} task within the `Meter`'s lifecycle control. The operation is automatically
+     * started before execution and marked as {@code OK} upon successful completion. If the task throws an exception
+     * that matches one of {@code exceptionsToReject}, the operation is marked as {@code REJECT}. Otherwise, it's marked
+     * as {@code FAIL}. The exception is always rethrown.
+     *
+     * @param runnable           The {@link Runnable} task to be executed.
+     * @param exceptionsToReject A list of exception classes that should result in a {@code REJECT} status.
+     * @throws Exception The original exception thrown by the runnable.
+     */
     @SneakyThrows
     public void runOrReject(final Runnable runnable, final Class<? extends Exception>... exceptionsToReject) {
         if (startTime == 0L) {
@@ -1199,6 +1308,17 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    /**
+     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control. The operation is automatically
+     * started before execution and marked as {@code OK} upon successful completion. The result of the {@link Callable}
+     * is stored in the context under {@link #CONTEXT_RESULT} and returned. If the task throws an {@link Exception}, the
+     * operation is marked as {@code FAIL}, and the exception is rethrown.
+     *
+     * @param callable The {@link Callable} task to be executed.
+     * @param <T>      The type of the result returned by the callable.
+     * @return The result of the callable task.
+     * @throws Exception The original exception thrown by the callable.
+     */
     public <T> T call(final Callable<T> callable) throws Exception {
         if (startTime == 0) start();
         try {
@@ -1212,6 +1332,18 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    /**
+     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control. The operation is automatically
+     * started before execution and marked as {@code OK} upon successful completion. The result of the {@link Callable}
+     * is stored in the context under {@code "result"} and returned. If the task throws a {@link RuntimeException}, the
+     * operation is marked as {@code FAIL}. If it throws any other {@link Exception}, the operation is marked as
+     * {@code REJECT}. The exception is always rethrown.
+     *
+     * @param callable The {@link Callable} task to be executed.
+     * @param <T>      The type of the result returned by the callable.
+     * @return The result of the callable task.
+     * @throws Exception The original exception thrown by the callable.
+     */
     @SneakyThrows
     public <T> T callOrRejectChecked(final Callable<T> callable) {
         if (startTime == 0L) {
@@ -1235,6 +1367,19 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    /**
+     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control. The operation is automatically
+     * started before execution and marked as {@code OK} upon successful completion. The result of the {@link Callable}
+     * is stored in the context under {@code "result"} and returned. If the task throws an exception that matches one of
+     * {@code exceptionsToReject}, the operation is marked as {@code REJECT}. Otherwise, it's marked as {@code FAIL}.
+     * The exception is always rethrown.
+     *
+     * @param callable           The {@link Callable} task to be executed.
+     * @param exceptionsToReject A list of exception classes that should result in a {@code REJECT} status.
+     * @param <T>                The type of the result returned by the callable.
+     * @return The result of the callable task.
+     * @throws Exception The original exception thrown by the callable.
+     */
     @SneakyThrows
     public <T> T callOrReject(final Callable<T> callable, final Class<? extends Exception>... exceptionsToReject) {
         if (startTime == 0L) {
@@ -1264,6 +1409,18 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    /**
+     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control, ensuring that checked exceptions
+     * are wrapped into a {@link RuntimeException}. The operation is automatically started before execution and marked
+     * as {@code OK} upon successful completion. The result of the {@link Callable} is stored in the context under
+     * {@link #CONTEXT_RESULT} and returned. If the task throws a {@link RuntimeException}, it's rethrown. If it throws
+     * any other {@link Exception}, it's wrapped in a new {@link RuntimeException} and rethrown.
+     *
+     * @param callable The {@link Callable} task to be executed.
+     * @param <T>      The type of the result returned by the callable.
+     * @return The result of the callable task.
+     * @throws RuntimeException If the callable throws any exception, it will be wrapped in a RuntimeException.
+     */
     public <T> T safeCall(final Callable<T> callable) {
         if (startTime == 0) start();
         try {
@@ -1280,8 +1437,27 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    /**
+     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control, wrapping any non-runtime
+     * {@link Exception} into a specified {@link RuntimeException} subclass. The operation is automatically started
+     * before execution and marked as {@code OK} upon successful completion. The result of the {@link Callable} is
+     * stored in the context under {@link #CONTEXT_RESULT} and returned. If the task throws a {@link RuntimeException},
+     * it's rethrown. If it throws any other {@link Exception}, it's wrapped into an instance of `exceptionClass` and
+     * rethrown.
+     *
+     * @param exceptionClass The {@link Class} of the {@link RuntimeException} to wrap checked exceptions into. This
+     *                       class must have a constructor that accepts a `String` message and a `Throwable` cause.
+     * @param callable       The {@link Callable} task to be executed.
+     * @param <E>            The type of the {@link RuntimeException} to wrap checked exceptions into.
+     * @param <T>            The type of the result returned by the callable.
+     * @return The result of the callable task.
+     * @throws E                If the callable throws any non-runtime exception, it will be wrapped in an instance of
+     *                          `exceptionClass`.
+     * @throws RuntimeException If the callable throws a RuntimeException, or if `exceptionClass` cannot be
+     *                          instantiated.
+     */
     public <E extends RuntimeException, T> T safeCall(final Class<E> exceptionClass, final Callable<T> callable) {
-        if (stopTime == 0) start();
+        if (stopTime == 0) start(); // TODO: should be changed from stopTime == 0 to startTime == 0 for consistency?
         try {
             final T result = callable.call();
             ctx(CONTEXT_RESULT, result);
@@ -1296,6 +1472,17 @@ public class Meter extends MeterData implements Closeable {
         }
     }
 
+    /**
+     * Converts a given {@link Exception} into a specified {@link RuntimeException} subclass. This method attempts to
+     * create an instance of `exceptionClass` using a constructor that accepts a `String` message and a `Throwable`
+     * cause. If such a constructor is not found or instantiation fails, a generic {@link RuntimeException} is
+     * returned.
+     *
+     * @param exceptionClass The {@link Class} of the {@link RuntimeException} to create.
+     * @param e              The {@link Exception} to be wrapped.
+     * @param <T>            The type of the {@link RuntimeException} subclass.
+     * @return An instance of `exceptionClass` wrapping `e`, or a generic {@link RuntimeException}.
+     */
     private <T extends RuntimeException> RuntimeException convertException(final Class<T> exceptionClass, final Exception e) {
         final String message = "Failed: " + (description != null ? description : category);
         try {
