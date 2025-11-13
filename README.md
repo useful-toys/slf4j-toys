@@ -9,6 +9,15 @@ with well defined output, with clear semantics. Log files will be clean and orga
 The log will nearly be self-explanatory and tell the story of your application.
 Additionally, log files will be parsable, allowing automatic analysis and data mining.
 
+## Expected Benefits
+
+By adopting `slf4j-toys` and its suggested practices, you can expect:
+
+*   **Reduced coding effort** with conventions for consistent logging.
+*   **Clean and organized log files** that allow for easy monitoring and failure investigation.
+*   **Parsable messages** that allow for automatic investigation, such as statistics and data mining.
+*   **Detailed information** about your host environment with configuration and system reports.
+
 ## The Problem with Standard Logging
 
 Standard logging practices using `logger.info()` or `logger.error()` often fail to answer a critical question: **"Did the operation succeed?"**
