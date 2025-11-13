@@ -24,10 +24,9 @@ import java.util.UUID;
 
 
 /**
- * Holds session-level attributes related to the current JVM instance, such as those used by {@link Meter} and
- * {@link Watcher}.
+ * Holds session-level attributes for the current JVM instance, used by components like {@link Meter} and {@link Watcher}.
  * <p>
- * This class is not meant to be instantiated.
+ * This is a utility class and is not meant to be instantiated.
  *
  * @author Daniel Felix Ferber
  */
@@ -35,16 +34,22 @@ import java.util.UUID;
 public class Session {
 
     /**
-     * Unique identifier for this SLF4J-Toys session.
+     * A unique identifier for the `slf4j-toys` instance.
      * <p>
-     * This UUID is added to all trace messages and can be used to distinguish log entries originating from different
-     * JVM instances, especially when log files are aggregated.
+     * This UUID is included in all **machine-parsable data messages** and can be used to correlate logs from the same JVM instance,
+     * especially when log files are aggregated.
      * <p>
-     * The value is assigned once at application startup and remains constant during runtime.
+     * The value is assigned once at application startup and remains constant.
      */
     public final String uuid = UUID.randomUUID().toString().replace("-", "");
 
-    public @NotNull String shortSessionUudi() {
+    /**
+     * Returns a shortened version of the session UUID, as configured by {@link SessionConfig#uuidSize}.
+     *
+     * @return A shortened UUID string.
+     * @see SessionConfig#UUID_LENGTH
+     */
+    public @NotNull String shortSessionUuid() {
         return Session.uuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize);
     }
 }

@@ -89,7 +89,7 @@ class WatcherServletTest {
         // Assert
         verify(response).setContentType("text/plain");
         verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertEquals("System status logged successfully.", responseWriter.toString().trim());
+        assertEquals("Runtime state logged successfully.", responseWriter.toString().trim());
 
         assertEquals(1, mockLogger.getEventCount());
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("WatcherServlet accessed"));
@@ -130,11 +130,11 @@ class WatcherServletTest {
         // Assert
         verify(response).setContentType("text/plain");
         verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        assertEquals("Failed to log system status.", responseWriter.toString().trim());
+        assertEquals("Failed to log runtime state.", responseWriter.toString().trim());
         
         assertEquals(1, mockLogger.getEventCount());
         assertSame(mockLogger.getEvent(0).getThrowable(), testException);
-        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log runtime state"));
     }
 
     @Test
@@ -157,7 +157,7 @@ class WatcherServletTest {
         
         assertEquals(1, mockLogger.getEventCount());
         assertSame(mockLogger.getEvent(0).getThrowable(), testException);
-        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log runtime state"));
     }
 
     /**
@@ -192,11 +192,11 @@ class WatcherServletTest {
         // Assert
         verify(response).setContentType("text/plain");
         verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        assertEquals("Failed to log system status.", responseWriter.toString().trim());
+        assertEquals("Failed to log runtime state.", responseWriter.toString().trim());
 
         assertEquals(1, mockLogger.getEventCount());
         assertSame(mockLogger.getEvent(0).getThrowable(), testException);
-        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log runtime state"));
     }
 
     @Test
@@ -215,11 +215,11 @@ class WatcherServletTest {
         // Assert
         verify(response).setContentType("text/plain");
         verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        assertEquals("Failed to log system status.", responseWriter.toString().trim());
+        assertEquals("Failed to log runtime state.", responseWriter.toString().trim());
 
         assertEquals(1, mockLogger.getEventCount());
         assertSame(mockLogger.getEvent(0).getThrowable(), testException);
-        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log runtime state"));
     }
 
     @Test
@@ -242,7 +242,7 @@ class WatcherServletTest {
 
         assertEquals(1, mockLogger.getEventCount());
         assertSame(mockLogger.getEvent(0).getThrowable(), testException);
-        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log runtime state"));
     }
 
     @Test
@@ -261,11 +261,11 @@ class WatcherServletTest {
         // Assert
         verify(response).setContentType("text/plain");
         verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        assertEquals("Failed to log system status.", responseWriter.toString().trim());
+        assertEquals("Failed to log runtime state.", responseWriter.toString().trim());
 
         assertEquals(1, mockLogger.getEventCount());
         assertSame(mockLogger.getEvent(0).getThrowable(), testException);
-        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log system status"));
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log runtime state"));
     }
 
 }

@@ -23,46 +23,51 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * A simple servlet that responds to GET requests by invoking the default watcher to report the system status.
- * This servlet can be bound to a specific URL and triggered periodically, for example, by a CRON job.
+ * A simple servlet that reports the runtime state in response to GET requests.
+ * This servlet can be mapped to a URL and triggered periodically, for example, by a cron job.
  *
- * <p>Usage: Bind this servlet to a URL in your web application configuration, and ensure the URL is called
- * periodically to log the current system status.
+ * <p>Usage: Map this servlet to a URL in your web application's configuration.
+ * When the URL is accessed, the servlet will log the current runtime state.
  *
  * @author Daniel Felix Ferber
+ * @see WatcherSingleton
  */
 public class WatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 675380685122096016L;
 
     /**
-     * Handles GET requests by invoking the default watcher to log the current system status.
-     * Responds with a success or error message depending on the operation result.
+     * Handles GET requests by invoking the default watcher to log the current runtime state.
+     * It responds with a success or error message depending on the outcome.
      *
-     * @param request  The HTTP request object.
-     * @param response The HTTP response object.
+     * @param request  The HTTP request.
+     * @param response The HTTP response.
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
         final Logger logger = LoggerFactory.getLogger(WatcherServlet.class);
         try {
             runWatcher();
-            logger.info("WatcherServlet accessed. Logging current system status.");
+            logger.info("WatcherServlet accessed. Logging current runtime state.");
             response.setContentType("text/plain");
-            response.getWriter().write("System status logged successfully.");
+            response.getWriter().write("Runtime state logged successfully.");
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (final Exception e) {
-            logger.error("Failed to log system status.", e);
+            logger.error("Failed to log runtime state.", e);
             response.setContentType("text/plain");
             try {
-                response.getWriter().write("Failed to log system status.");
+                response.getWriter().write("Failed to log runtime state.");
             } catch (final Exception ignored) {
-                // Ignorar falhas ao escrever na resposta
+                // Ignore failures when writing to the response
             }
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * Invokes the default {@link Watcher} to collect and report the current runtime state.
+     * This method can be overridden by subclasses to customize how the watcher is run.
+     */
     protected void runWatcher() {
         WatcherSingleton.DEFAULT_WATCHER.run();
     }

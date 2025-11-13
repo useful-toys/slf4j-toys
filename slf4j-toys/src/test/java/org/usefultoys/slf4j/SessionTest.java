@@ -65,7 +65,7 @@ class SessionTest {
 
     @Test
     void testShortSessionUudi() {
-        assertNotNull(Session.shortSessionUudi(), "shortSessionUudi() should not return null");
-        assertTrue(Session.uuid.endsWith(Session.shortSessionUudi()));
+        assertNotNull(Session.shortSessionUuid(), "shortSessionUuid() should not return null");
+        assertTrue(Session.uuid.endsWith(Session.shortSessionUuid()));
     }
 }

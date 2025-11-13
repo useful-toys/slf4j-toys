@@ -23,27 +23,42 @@ import java.util.concurrent.ScheduledExecutorService;
 import static org.usefultoys.slf4j.watcher.WatcherConfig.*;
 
 /**
- * Collects system status and reports it to logger. Call {@link #logCurrentStatus()} to produce a readable message as INFO and an encoded data as TRACE. It
- * conveniently implements {@link Runnable} for compliance with {@link ScheduledExecutorService}.
+ * Collects and reports information about the state of the Java runtime.
+ * <p>
+ * On each execution, this class gathers metrics about the JVM's runtime, the
+ * underlying platform, and registered JMX MBeans.
+ * <p>
+ * A call to {@link #run()} generates two log messages:
+ * <ul>
+ * <li>A **human-readable summary** at the {@code INFO} level.</li>
+ * <li>A **machine-parsable data message** at the {@code TRACE} level for automated analysis.</li>
+ * </ul>
+ * As a {@link Runnable}, this class can be easily integrated with scheduling
+ * services like {@link ScheduledExecutorService}.
  *
  * @author Daniel Felix Ferber
+ * @see WatcherConfig
+ * @see WatcherData
  */
 public class Watcher extends WatcherData implements Runnable {
 
     private static final long serialVersionUID = 1L;
 
-    /** Logger that prints readable messages. */
+    /** Logger for human-readable messages. */
     private final Logger messageLogger;
-    /** Logger that prints enconded data. */
+    /** Logger for machine-parsable data. */
     private final Logger dataLogger;
 
     /**
-     * Constructor. Events produced by this watcher will use the given logger.
+     * Creates a new Watcher.
+     * <p>
+     * The loggers for reporting the runtime state are derived from the {@code name}
+     * parameter, using prefixes and suffixes defined in {@link WatcherConfig}.
      *
-     * @param name Logger that reports messages.
+     * @param name A logical identifier for this Watcher, used to create the logger names.
      */
     public Watcher(final String name) {
-        super(Session.shortSessionUudi());
+        super(Session.shortSessionUuid());
         this.messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + name + messageSuffix);
         if (dataEnabled) {
             this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + name + dataSuffix);
@@ -53,7 +68,16 @@ public class Watcher extends WatcherData implements Runnable {
     }
 
     /**
-     * Logs about the current system status.
+     * Collects the current runtime state and reports it to the configured loggers.
+     * This method serves as the entry point for execution, typically called by a
+     * {@link ScheduledExecutorService}.
+     * <p>
+     * The process is as follows:
+     * <ol>
+     * <li>Collects runtime, platform, and MBean metrics.</li>
+     * <li>Logs a human-readable summary at the {@code INFO} level.</li>
+     * <li>Logs a machine-parsable data message at the {@code TRACE} level.</li>
+     * </ol>
      */
     @Override
     public void run() {

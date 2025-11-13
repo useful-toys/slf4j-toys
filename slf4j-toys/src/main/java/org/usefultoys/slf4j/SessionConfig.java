@@ -16,38 +16,34 @@
 package org.usefultoys.slf4j;
 
 import lombok.experimental.UtilityClass;
-
 import org.usefultoys.slf4j.meter.Meter;
-import org.usefultoys.slf4j.meter.MeterData;
 import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.slf4j.watcher.Watcher;
-import org.usefultoys.slf4j.watcher.WatcherData;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 /**
- * Centralized configuration holder for controlling the behavior of {@link Watcher}, {@link WatcherData}, {@link Meter},
- * and {@link MeterData}.
+ * Centralized configuration for session-related components like {@link Watcher}, {@link Meter},
+ * and their data counterparts.
  * <p>
- * This class exposes configurable properties that influence how the session-related logging behaves at runtime. It
- * supports reading initial values from system properties during application startup, allowing applications to
- * externalize configuration.
+ * This class holds properties that control logging behavior. It reads initial values from
+ * system properties at startup, allowing for externalized configuration.
  * <p>
- * These properties should ideally be defined <em>before</em> invoking any method from this library, to ensure
- * consistent behavior. Some properties can be modified dynamically at runtime, although care should be taken in
- * concurrent environments.
+ * For consistent behavior, these properties should be set before any methods from this library are called.
+ * While some properties can be modified at runtime, caution is advised in concurrent environments.
  * <p>
- * <strong>Security note:</strong> These configuration parameters may influence logging output. Avoid using untrusted
- * input when modifying runtime values,
- * as it could cause unintended exposure or log format manipulation.
+ * <strong>Security Note:</strong> These parameters can influence log output. Avoid using untrusted input
+ * when modifying runtime values to prevent unintended information disclosure or log format manipulation.
  * <p>
- * This class is a utility holder and should not be instantiated.
+ * This is a utility class and is not meant to be instantiated.
+ *
+ * @author Daniel Felix Ferber
+ * @see Session
  */
 @UtilityClass
 public class SessionConfig {
-    static { 
-        init(); 
+    static {
+        init();
     }
 
     // System property keys
@@ -60,30 +56,30 @@ public class SessionConfig {
     public final int UUID_LENGTH = 32;
 
     /**
-     * Number of UUID digits to print in messages from {@link Watcher} and {@link Meter}.
+     * The number of UUID characters to include in **machine-parsable data messages** from {@link Watcher} and {@link Meter}.
      * <p>
-     * The full UUID (32 hex digits) uniquely identifies the application instance. In most cases, a shorter prefix
-     * (e.g., 5 digits) is sufficient to distinguish between instances or nodes.
+     * The full UUID (32 hex characters) uniquely identifies the application instance. In most cases, a shorter
+     * prefix (e.g., 5 characters) is sufficient to distinguish between instances.
      * <ul>
-     *   <li>If set to <code>0</code>, the UUID will not be printed.</li>
+     *   <li>If set to {@code 0}, the UUID will not be included.</li>
      *   <li>If set to a value greater than {@link #UUID_LENGTH}, it will be truncated.</li>
      * </ul>
      * <p>
-     * Default value: <code>5</code><br>
-     * Can be initialized via system property {@code slf4jtoys.session.print.uuid.size}.
+     * The value is read from the system property {@code slf4jtoys.session.print.uuid.size}, defaulting to {@code 5}.
      */
     public int uuidSize = 5;
 
     /**
-     * Character encoding used when printing logs or performing string operations related to session behavior.
+     * The character encoding used for logging and string operations.
      * <p>
-     * Defaults to {@link StandardCharsets#UTF_8}. May be changed at runtime.
+     * The value is read from the system property {@code slf4jtoys.session.print.charset}, defaulting to the
+     * JVM's default charset.
      */
     public String charset = Charset.defaultCharset().name();
 
     /**
-     * Initializes the configurable properties of the SessionConfig class.
-     * This method should be called during application startup to ensure consistent behavior.
+     * Initializes the configuration properties. This method should be called at application startup to ensure
+     * consistent behavior.
      */
     public void init() {
         uuidSize = ConfigParser.getProperty(PROP_PRINT_UUID_SIZE, 5);
@@ -92,7 +88,7 @@ public class SessionConfig {
 
     /**
      * Resets the configuration properties to their default values.
-     * This method is useful for testing purposes or when reinitializing the configuration.
+     * This method is useful for testing or re-initializing the configuration.
      */
     public void reset() {
         System.clearProperty(PROP_PRINT_UUID_SIZE);

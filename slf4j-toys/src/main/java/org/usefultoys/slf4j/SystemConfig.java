@@ -16,73 +16,76 @@
 package org.usefultoys.slf4j;
 
 import lombok.experimental.UtilityClass;
-
 import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.ConfigParser;
 
 /**
- * Centralized configuration holder for controlling how {@link SystemData} gathers runtime metrics from the Java
- * platform.
+ * Centralized configuration for controlling how {@link SystemData} gathers runtime metrics from the Java platform.
  * <p>
- * This class determines whether various {@code java.lang.management.*MXBean} interfaces are queried to collect data.
- * These interfaces may not be available in all JVM implementations or may be restricted by the security manager. * <p>
- * These properties should ideally be defined <em>before</em> invoking any method from this library, to ensure
- * consistent behavior. Some properties can be modified dynamically at runtime, although care should be taken in
- * concurrent environments.
+ * This class enables or disables the querying of various {@code java.lang.management.*MXBean} interfaces for data collection.
+ * These interfaces may not be available in all JVM implementations or may be restricted by a security manager.
  * <p>
- * This class is a utility holder and should not be instantiated.
+ * For consistent behavior, these properties should be set before any methods from this library are called.
+ * While some properties can be modified at runtime, caution is advised in concurrent environments.
+ * <p>
+ * This is a utility class and is not meant to be instantiated.
  *
  * @author Daniel Felix Ferber
+ * @see SystemData
  */
 @UtilityClass
 public class SystemConfig {
     static {
         init();
     }
-        
+
     // System property keys
-     public final String PROP_USE_MEMORY_MANAGED_BEAN = "slf4jtoys.useMemoryManagedBean";
-     public final String PROP_USE_CLASS_LOADING_MANAGED_BEAN = "slf4jtoys.useClassLoadingManagedBean";
-     public final String PROP_USE_COMPILATION_MANAGED_BEAN = "slf4jtoys.useCompilationManagedBean";
-     public final String PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN = "slf4jtoys.useGarbageCollectionManagedBean";
-     public final String PROP_USE_PLATFORM_MANAGED_BEAN = "slf4jtoys.usePlatformManagedBean";
- 
+    public final String PROP_USE_MEMORY_MANAGED_BEAN = "slf4jtoys.useMemoryManagedBean";
+    public final String PROP_USE_CLASS_LOADING_MANAGED_BEAN = "slf4jtoys.useClassLoadingManagedBean";
+    public final String PROP_USE_COMPILATION_MANAGED_BEAN = "slf4jtoys.useCompilationManagedBean";
+    public final String PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN = "slf4jtoys.useGarbageCollectionManagedBean";
+    public final String PROP_USE_PLATFORM_MANAGED_BEAN = "slf4jtoys.usePlatformManagedBean";
+
     /**
-     * Whether memory usage metrics are retrieved from the {@link java.lang.management.MemoryMXBean}.
+     * Determines whether memory usage metrics are retrieved from the {@link java.lang.management.MemoryMXBean}.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.useMemoryManagedBean}. Defaults to {@code false}. May be
-     * changed at runtime.
+     * The value is read from the system property {@code slf4jtoys.useMemoryManagedBean}, defaulting to {@code false}.
+     * It can be changed at runtime.
      */
     public boolean useMemoryManagedBean;
     /**
-     * Whether class loading metrics are retrieved from the {@link java.lang.management.ClassLoadingMXBean}.
+     * Determines whether class loading metrics are retrieved from the {@link java.lang.management.ClassLoadingMXBean}.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.useClassLoadingManagedBean}. Defaults to {@code false}. May be
-     * changed at runtime.
+     * The value is read from the system property {@code slf4jtoys.useClassLoadingManagedBean}, defaulting to {@code false}.
+     * It can be changed at runtime.
      */
     public boolean useClassLoadingManagedBean;
     /**
-     * Whether JIT compiler metrics are retrieved from the {@link java.lang.management.CompilationMXBean}.
+     * Determines whether JIT compiler metrics are retrieved from the {@link java.lang.management.CompilationMXBean}.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.useCompilationManagedBean}. Defaults to {@code false}. May be
-     * changed at runtime.
+     * The value is read from the system property {@code slf4jtoys.useCompilationManagedBean}, defaulting to {@code false}.
+     * It can be changed at runtime.
      */
     public boolean useCompilationManagedBean;
     /**
-     * Whether garbage collection metrics are retrieved from the {@link java.lang.management.GarbageCollectorMXBean}s.
+     * Determines whether garbage collection metrics are retrieved from the {@link java.lang.management.GarbageCollectorMXBean}s.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.useGarbageCollectionManagedBean}. Defaults to {@code false}.
-     * May be changed at runtime.
+     * The value is read from the system property {@code slf4jtoys.useGarbageCollectionManagedBean}, defaulting to {@code false}.
+     * It can be changed at runtime.
      */
     public boolean useGarbageCollectionManagedBean;
     /**
-     * Whether operating system metrics are retrieved from the {@link java.lang.management.OperatingSystemMXBean}.
+     * Determines whether operating system metrics are retrieved from the {@link java.lang.management.OperatingSystemMXBean}.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.usePlatformManagedBean}. Defaults to {@code false}. May be
-     * changed at runtime.
+     * The value is read from the system property {@code slf4jtoys.usePlatformManagedBean}, defaulting to {@code false}.
+     * It can be changed at runtime.
      */
     public boolean usePlatformManagedBean;
 
+    /**
+     * Initializes the configuration properties. This method should be called at application startup to ensure
+     * consistent behavior.
+     */
     public void init() {
         useMemoryManagedBean = ConfigParser.getProperty(PROP_USE_MEMORY_MANAGED_BEAN, false);
         useClassLoadingManagedBean = ConfigParser.getProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN, false);
@@ -93,7 +96,7 @@ public class SystemConfig {
 
     /**
      * Resets the configuration properties to their default values.
-     * This method is useful for testing purposes or when reinitializing the configuration.
+     * This method is useful for testing or re-initializing the configuration.
      */
     public void reset() {
         System.clearProperty(PROP_USE_MEMORY_MANAGED_BEAN);

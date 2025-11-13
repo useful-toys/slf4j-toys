@@ -19,20 +19,52 @@ import org.usefultoys.slf4j.internal.SystemData;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
- * Augments the {@link SystemData} to semantics required by Watcher. Further, {@link Watcher} events are deserialized
- * back to {@link WatcherData}.
+ * Extends {@link SystemData} with semantics specific to the {@link Watcher}.
+ * This class is used for both collecting and reporting runtime metrics, and for deserializing
+ * {@link Watcher} events.
  *
  * @author Daniel Felix Ferber
+ * @see Watcher
+ * @see SystemData
  */
 public class WatcherData extends SystemData {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructs a new WatcherData instance with the given session UUID.
+     *
+     * @param uuid The unique identifier for the current session.
+     */
     protected WatcherData(final String uuid) {
         super(uuid);
     }
 
-    // for tests only
+    /**
+     * Constructs a new WatcherData instance with detailed system metrics.
+     * This constructor is primarily intended for testing purposes.
+     *
+     * @param sessionUuid The unique identifier for the current session.
+     * @param position The sequential position of this Watcher event.
+     * @param lastCurrentTime The timestamp when the data was collected.
+     * @param heap_commited The committed heap memory in bytes.
+     * @param heap_max The maximum heap memory in bytes.
+     * @param heap_used The used heap memory in bytes.
+     * @param nonHeap_commited The committed non-heap memory in bytes.
+     * @param nonHeap_max The maximum non-heap memory in bytes.
+     * @param nonHeap_used The used non-heap memory in bytes.
+     * @param objectPendingFinalizationCount The number of objects pending finalization.
+     * @param classLoading_loaded The number of classes currently loaded.
+     * @param classLoading_total The total number of classes loaded since JVM start.
+     * @param classLoading_unloaded The total number of classes unloaded since JVM start.
+     * @param compilationTime The total time spent in compilation.
+     * @param garbageCollector_count The total number of garbage collections.
+     * @param garbageCollector_time The total time spent in garbage collection.
+     * @param runtime_usedMemory The used memory reported by Runtime.
+     * @param runtime_maxMemory The maximum memory reported by Runtime.
+     * @param runtime_totalMemory The total memory reported by Runtime.
+     * @param systemLoad The system CPU load.
+     */
     protected WatcherData(final String sessionUuid, final long position, final long lastCurrentTime,
                        final long heap_commited, final long heap_max, final long heap_used,
                        final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
@@ -46,6 +78,14 @@ public class WatcherData extends SystemData {
                 garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory, runtime_totalMemory, systemLoad);
     }
 
+    /**
+     * Appends a human-readable summary of the WatcherData to the provided StringBuilder.
+     * This method customizes the output from {@link SystemData#readableStringBuilder(StringBuilder)}
+     * to include memory usage, system load, and the session UUID.
+     *
+     * @param builder The StringBuilder to which the readable message will be appended.
+     * @return The StringBuilder with the appended readable message.
+     */
     @Override
     public StringBuilder readableStringBuilder(final StringBuilder builder) {
         boolean hasPrevious = false;
