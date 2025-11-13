@@ -14,5 +14,11 @@
  * limitations under the License.
  */
 
-public class Ignora {
+/**
+ * This class exists just because maven surefire plugin requires source code to enable test report generation.
+ * Otherwise, if no source code is present, surefire plugin skips test report generation.
+ * This is a workaround for a peculiar behavior of the surefire plugin.
+ */
+public class Ignore {
+    // No implementation.
 }
