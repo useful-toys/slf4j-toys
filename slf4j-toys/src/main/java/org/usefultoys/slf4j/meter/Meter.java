@@ -999,6 +999,32 @@ public class Meter extends MeterData implements Closeable {
     }
 
     /**
+     * Notifies the `Meter` that the operation has completed successfully. This is an alias for {@link #ok()}.
+     * This method logs a **human-readable summary**
+     * (INFO level) and a **machine-parsable data message** (TRACE level) with the current system status. If a time
+     * limit was set and exceeded, a WARN level message is logged instead.
+     *
+     * @return Reference to this `Meter` instance, for method chaining.
+     */
+    public Meter success() {
+        return ok();
+    }
+
+    /**
+     * Notifies the `Meter` that the operation has completed successfully, specifying an execution path. This is an
+     * alias for {@link #ok(Object)}.
+     * This method logs a **human-readable summary** (INFO level) and a **machine-parsable data message** (TRACE level)
+     * with the current system status. If a time limit was set and exceeded, a WARN level message is logged instead.
+     *
+     * @param pathId An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that identifies
+     *               the successful execution path.
+     * @return Reference to this `Meter` instance, for method chaining.
+     */
+    public Meter success(final Object pathId) {
+        return ok(pathId);
+    }
+
+    /**
      * Notifies the `Meter` that the operation has completed with a rejection (expected unsuccessful outcome). This
      * method logs a **human-readable summary** (INFO level) and a **machine-parsable data message** (TRACE level) with
      * the current system status.
