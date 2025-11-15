@@ -29,6 +29,23 @@ import javax.servlet.http.HttpServletResponse;
  * <p>Usage: Map this servlet to a URL in your web application's configuration.
  * When the URL is accessed, the servlet will log the current runtime state.
  *
+ * <p><b>SECURITY WARNING:</b>
+ * Exposing this servlet in a production environment without proper security measures
+ * can lead to information disclosure and potential Denial of Service (DoS) attacks.
+ * <ul>
+ *     <li><b>Information Disclosure:</b> The Watcher logs detailed system metrics. If these logs
+ *     are accessible, sensitive information about your application's environment might be exposed.</li>
+ *     <li><b>Denial of Service (DoS):</b> Frequent access to this servlet, especially if the Watcher
+ *     operation is resource-intensive, could consume excessive CPU or I/O resources, leading to
+ *     performance degradation or service unavailability.</li>
+ * </ul>
+ * <p><b>Recommendations:</b>
+ * <ul>
+ *     <li>Implement authentication and authorization mechanisms to restrict access to this servlet.</li>
+ *     <li>Ensure it is only accessible from trusted networks or IP addresses.</li>
+ *     <li>Consider rate-limiting or throttling access to prevent abuse.</li>
+ * </ul>
+ *
  * @author Daniel Felix Ferber
  * @see WatcherSingleton
  */
