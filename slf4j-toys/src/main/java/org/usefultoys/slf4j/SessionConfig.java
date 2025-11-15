@@ -84,7 +84,7 @@ public class SessionConfig {
      * consistent behavior.
      */
     public void init() {
-        uuidSize = ConfigParser.getProperty(PROP_PRINT_UUID_SIZE, 5);
+        uuidSize = ConfigParser.getRangeProperty(PROP_PRINT_UUID_SIZE, 5, 0, UUID_LENGTH);
         charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, Charset.defaultCharset().name());
     }
 

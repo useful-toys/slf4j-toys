@@ -20,8 +20,8 @@ import lombok.experimental.UtilityClass;
 /**
  * Collection of utility methods to read system properties, with support for default values and typed conversion.
  * <p>
- * These methods provide safe access to system properties as {@code String}, {@code boolean}, {@code int}, and {@code long}, 
- * and include additional logic for parsing time-based values with unit suffixes (e.g., "10s", "5min").
+ * These methods provide safe access to system properties as {@code String}, {@code boolean}, {@code int}, and
+ * {@code long}, and include additional logic for parsing time-based values with unit suffixes (e.g., "10s", "5min").
  * <p>
  * This class is not meant to be instantiated.
  *
@@ -43,7 +43,8 @@ public class ConfigParser {
     }
 
     /**
-     * Retrieves the value of a system property as a boolean. If the property is not set, the default value is returned.
+     * Retrieves the value of a system property as a boolean. If the property is not set, the default value is
+     * returned.
      * <p>
      * The property value is parsed using {@link Boolean#parseBoolean(String)}.
      *
@@ -60,8 +61,8 @@ public class ConfigParser {
     }
 
     /**
-     * Retrieves the value of a system property as an integer. If the property is not set or cannot be parsed as an integer, 
-     * the default value is returned.
+     * Retrieves the value of a system property as an integer. If the property is not set or cannot be parsed as an
+     * integer, the default value is returned.
      *
      * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set or invalid
@@ -80,8 +81,39 @@ public class ConfigParser {
     }
 
     /**
-     * Retrieves the value of a system property as a long integer. If the property is not set or cannot be parsed as a long, 
-     * the default value is returned.
+     * Retrieves the value of a system property as an integer. If the property is not set or cannot be parsed as an
+     * integer, the default value is returned. If the integer value is outside the specified range, the default value
+     * is returned.
+     *
+     * @param name         the name of the system property
+     * @param defaultValue the default value to return if the property is not set or invalid
+     * @param minValue     the minimum value that is allowed
+     * @param maxValue     the maximum value that is allowed
+     * @return the property value as an integer, or the default value if the property is not set or invalid
+     */
+    public int getRangeProperty(final String name, final int defaultValue,
+                                final int minValue, final int maxValue) {
+        final String value = System.getProperty(name);
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            final int intValue = Integer.parseInt(value);
+            if (intValue < minValue) {
+                return defaultValue;
+            }
+            if (intValue > maxValue) {
+                return defaultValue;
+            }
+            return intValue;
+        } catch (final NumberFormatException ignored) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Retrieves the value of a system property as a long integer. If the property is not set or cannot be parsed as a
+     * long, the default value is returned.
      *
      * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set or invalid

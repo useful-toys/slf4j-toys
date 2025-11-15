@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SessionConfigTest {
 
@@ -65,6 +65,37 @@ class SessionConfigTest {
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "10");
         SessionConfig.init(); // Reinitialize to apply new system properties
         assertEquals(10, SessionConfig.uuidSize, "uuidSize should reflect the system property value");
+    }
+
+    @Test
+    void testUuidSizePropertyWithinBounds() {
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "0");
+        SessionConfig.init();
+        assertEquals(0, SessionConfig.uuidSize, "uuidSize should be 0");
+
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "32");
+        SessionConfig.init();
+        assertEquals(32, SessionConfig.uuidSize, "uuidSize should be 32");
+    }
+
+    @Test
+    void testUuidSizePropertyOutOfBounds() {
+        // Below lower bound
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "-1");
+        SessionConfig.init();
+        assertEquals(5, SessionConfig.uuidSize, "uuidSize should fall back to default for values below range");
+
+        // Above upper bound
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "33");
+        SessionConfig.init();
+        assertEquals(5, SessionConfig.uuidSize, "uuidSize should fall back to default for values above range");
+    }
+
+    @Test
+    void testUuidSizePropertyInvalid() {
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "invalid");
+        SessionConfig.init();
+        assertEquals(5, SessionConfig.uuidSize, "uuidSize should fall back to default for invalid values");
     }
 
     @Test

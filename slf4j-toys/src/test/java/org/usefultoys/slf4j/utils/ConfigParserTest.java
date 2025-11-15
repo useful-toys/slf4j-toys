@@ -61,6 +61,36 @@ class ConfigParserTest {
     }
 
     @Test
+    void testGetRangeProperty() {
+        // Value within range
+        System.setProperty("test.property", "10");
+        assertEquals(10, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
+
+        // Value at lower bound
+        System.setProperty("test.property", "5");
+        assertEquals(5, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
+
+        // Value at upper bound
+        System.setProperty("test.property", "15");
+        assertEquals(15, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
+
+        // Value below range
+        System.setProperty("test.property", "4");
+        assertEquals(0, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
+
+        // Value above range
+        System.setProperty("test.property", "16");
+        assertEquals(0, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
+
+        // Non-existent property
+        assertEquals(0, ConfigParser.getRangeProperty("nonexistent.property", 0, 5, 15));
+
+        // Invalid value
+        System.setProperty("test.property", "invalid");
+        assertEquals(0, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
+    }
+
+    @Test
     void testGetPropertyLong() {
         System.setProperty("test.property", "123456789");
         assertEquals(123456789L, ConfigParser.getProperty("test.property", 0L));
