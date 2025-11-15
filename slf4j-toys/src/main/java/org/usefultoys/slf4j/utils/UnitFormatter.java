@@ -71,7 +71,7 @@ public final class UnitFormatter {
     /**
      * A small epsilon value used for floating-point comparisons to account for precision issues.
      */
-    final double Epsylon = 0.001;
+    final double Epsilon = 0.001;
 
     /**
      * Formats a double-precision floating-point value into a human-readable string with appropriate units.
@@ -91,7 +91,7 @@ public final class UnitFormatter {
         int index = 0;
         final int length = factors.length;
 
-        while (index < length && (value + Epsylon) >= (factors[index] + factors[index] / 10.0)) {
+        while (index < length && (value + Epsilon) >= (factors[index] + factors[index] / 10.0)) {
             value /= factors[index];
             index++;
         }
