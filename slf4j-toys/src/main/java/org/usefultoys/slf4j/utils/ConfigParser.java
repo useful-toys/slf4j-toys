@@ -39,7 +39,7 @@ public class ConfigParser {
      */
     public String getProperty(final String name, final String defaultValue) {
         final String value = System.getProperty(name);
-        return value == null ? defaultValue : value;
+        return value == null ? defaultValue : value.trim();
     }
 
     /**
@@ -57,7 +57,7 @@ public class ConfigParser {
         if (value == null) {
             return defaultValue;
         }
-        return Boolean.parseBoolean(value);
+        return Boolean.parseBoolean(value.trim());
     }
 
     /**
@@ -74,7 +74,7 @@ public class ConfigParser {
             return defaultValue;
         }
         try {
-            return Integer.parseInt(value);
+            return Integer.parseInt(value.trim());
         } catch (final NumberFormatException ignored) {
             return defaultValue;
         }
@@ -98,7 +98,7 @@ public class ConfigParser {
             return defaultValue;
         }
         try {
-            final int intValue = Integer.parseInt(value);
+            final int intValue = Integer.parseInt(value.trim());
             if (intValue < minValue) {
                 return defaultValue;
             }
@@ -125,7 +125,7 @@ public class ConfigParser {
             return defaultValue;
         }
         try {
-            return Long.parseLong(value);
+            return Long.parseLong(value.trim());
         } catch (final NumberFormatException ignored) {
             return defaultValue;
         }
@@ -148,10 +148,15 @@ public class ConfigParser {
      * @return the parsed duration in milliseconds, or the default value if the property is not set or invalid
      */
     public long getMillisecondsProperty(final String name, final long defaultValue) {
-        final String value = System.getProperty(name);
-        if (value == null) {
+        final String rawValue = System.getProperty(name);
+        if (rawValue == null) {
             return defaultValue;
         }
+        final String value = rawValue.trim().toLowerCase();
+        if (value.isEmpty()) {
+            return defaultValue;
+        }
+
         try {
             int multiplicador = 1;
             int suffixLength = 0;
@@ -160,17 +165,23 @@ public class ConfigParser {
             } else if (value.endsWith("s")) {
                 suffixLength = 1;
                 multiplicador = 1000;
-            } else if (value.endsWith("m")) {
-                suffixLength = 1;
-                multiplicador = 60 * 1000;
             } else if (value.endsWith("min")) {
                 suffixLength = 3;
+                multiplicador = 60 * 1000;
+            } else if (value.endsWith("m")) {
+                suffixLength = 1;
                 multiplicador = 60 * 1000;
             } else if (value.endsWith("h")) {
                 suffixLength = 1;
                 multiplicador = 60 * 60 * 1000;
             }
-            return Long.parseLong(value.substring(0, value.length() - suffixLength)) * multiplicador;
+
+            String numberPart = value.substring(0, value.length() - suffixLength);
+            if (numberPart.isEmpty()) {
+                return defaultValue;
+            }
+
+            return Long.parseLong(numberPart) * multiplicador;
 
         } catch (final NumberFormatException ignored) {
             return defaultValue;

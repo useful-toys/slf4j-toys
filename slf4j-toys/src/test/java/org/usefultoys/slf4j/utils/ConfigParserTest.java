@@ -19,6 +19,9 @@ package org.usefultoys.slf4j.utils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.usefultoys.slf4j.SessionConfig;
 
 import java.nio.charset.Charset;
@@ -30,94 +33,112 @@ class ConfigParserTest {
     @BeforeAll
     static void validate() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+        System.clearProperty("test.property");
+        System.clearProperty("nonexistent.property");
     }
 
     @AfterEach
     void clearSystemProperties() {
         System.clearProperty("test.property");
+        System.clearProperty("nonexistent.property");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"value", " value", "value ", " value "})
+    void testGetPropertyString(String value) {
+        System.setProperty("test.property", value);
+        assertEquals("value", ConfigParser.getProperty("test.property", "default"));
     }
 
     @Test
-    void testGetPropertyString() {
-        System.setProperty("test.property", "value");
-        assertEquals("value", ConfigParser.getProperty("test.property", "default"));
+    void testGetPropertyStringNotFound() {
         assertEquals("default", ConfigParser.getProperty("nonexistent.property", "default"));
     }
 
-    @Test
-    void testGetPropertyBoolean() {
-        System.setProperty("test.property", "true");
+    @ParameterizedTest
+    @ValueSource(strings = {"true", " true", "true ", " true "})
+    void testGetPropertyBoolean(String value) {
+        System.setProperty("test.property", value);
         assertTrue(ConfigParser.getProperty("test.property", false));
+    }
+
+    @Test
+    void testGetPropertyBooleanNotFound() {
         assertFalse(ConfigParser.getProperty("nonexistent.property", false));
     }
 
-    @Test
-    void testGetPropertyInt() {
-        System.setProperty("test.property", "42");
+    @ParameterizedTest
+    @ValueSource(strings = {"42", " 42", "42 ", " 42 "})
+    void testGetPropertyInt(String value) {
+        System.setProperty("test.property", value);
         assertEquals(42, ConfigParser.getProperty("test.property", 0));
-        assertEquals(0, ConfigParser.getProperty("nonexistent.property", 0));
+    }
+
+    @Test
+    void testGetPropertyIntInvalid() {
         System.setProperty("test.property", "invalid");
         assertEquals(0, ConfigParser.getProperty("test.property", 0));
+        assertEquals(0, ConfigParser.getProperty("nonexistent.property", 0));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"10", " 10", "10 ", " 10 "})
+    void testGetRangeProperty(String value) {
+        System.setProperty("test.property", value);
+        assertEquals(10, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
     }
 
     @Test
-    void testGetRangeProperty() {
-        // Value within range
-        System.setProperty("test.property", "10");
-        assertEquals(10, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
-
-        // Value at lower bound
-        System.setProperty("test.property", "5");
-        assertEquals(5, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
-
-        // Value at upper bound
-        System.setProperty("test.property", "15");
-        assertEquals(15, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
-
-        // Value below range
+    void testGetRangePropertyOutOfBounds() {
         System.setProperty("test.property", "4");
         assertEquals(0, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
-
-        // Value above range
         System.setProperty("test.property", "16");
         assertEquals(0, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
+    }
 
-        // Non-existent property
-        assertEquals(0, ConfigParser.getRangeProperty("nonexistent.property", 0, 5, 15));
-
-        // Invalid value
+    @Test
+    void testGetRangePropertyInvalid() {
         System.setProperty("test.property", "invalid");
         assertEquals(0, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
+        assertEquals(0, ConfigParser.getRangeProperty("nonexistent.property", 0, 5, 15));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"123456789", " 123456789", "123456789 ", " 123456789 "})
+    void testGetPropertyLong(String value) {
+        System.setProperty("test.property", value);
+        assertEquals(123456789L, ConfigParser.getProperty("test.property", 0L));
     }
 
     @Test
-    void testGetPropertyLong() {
-        System.setProperty("test.property", "123456789");
-        assertEquals(123456789L, ConfigParser.getProperty("test.property", 0L));
+    void testGetPropertyLongInvalid() {
         System.setProperty("test.property", "invalid");
         assertEquals(0L, ConfigParser.getProperty("test.property", 0L));
-    }
-
-    @Test
-    void testGetPropertyLongNotFound() {
         assertEquals(0L, ConfigParser.getProperty("nonexistent.property", 0L));
     }
 
-    @Test
-    void testGetMillisecondsProperty() {
-        System.setProperty("test.property", "10");
-        assertEquals(10L, ConfigParser.getMillisecondsProperty("test.property", 0L));
-        System.setProperty("test.property", "10ms");
-        assertEquals(10L, ConfigParser.getMillisecondsProperty("test.property", 0L));
-        System.setProperty("test.property", "10s");
-        assertEquals(10000L, ConfigParser.getMillisecondsProperty("test.property", 0L));
-        System.setProperty("test.property", "5min");
-        assertEquals(300000L, ConfigParser.getMillisecondsProperty("test.property", 0L));
-        System.setProperty("test.property", "5m");
-        assertEquals(300000L, ConfigParser.getMillisecondsProperty("test.property", 0L));
-        System.setProperty("test.property", "1h");
-        assertEquals(3600000L, ConfigParser.getMillisecondsProperty("test.property", 0L));
-        System.setProperty("test.property", "invalid");
+    @ParameterizedTest
+    @CsvSource({
+            "10, 10",
+            "10ms, 10",
+            "10s, 10000",
+            " 10s , 10000",
+            "5min, 300000",
+            "5m, 300000",
+            "1h, 3600000",
+            "5MIN, 300000",
+            "1H, 3600000",
+            "-10s, -10000"
+    })
+    void testGetMillisecondsProperty(String input, long expected) {
+        System.setProperty("test.property", input);
+        assertEquals(expected, ConfigParser.getMillisecondsProperty("test.property", 0L));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"invalid", "s", "1.5s", ""})
+    void testGetMillisecondsPropertyInvalid(String value) {
+        System.setProperty("test.property", value);
         assertEquals(0L, ConfigParser.getMillisecondsProperty("test.property", 0L));
     }
 
