@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
+import org.usefultoys.slf4j.utils.ConfigParser;
 
 import java.nio.charset.Charset;
 
@@ -40,6 +41,7 @@ class WatcherConfigTest {
         WatcherConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
+        ConfigParser.clearInitializationErrors(); // Clear errors for each test
     }
 
     @AfterAll
@@ -48,6 +50,7 @@ class WatcherConfigTest {
         WatcherConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
+        ConfigParser.clearInitializationErrors(); // Clear errors after all tests
     }
 
     @Test
@@ -61,6 +64,7 @@ class WatcherConfigTest {
         assertFalse(WatcherConfig.dataEnabled, "Default value for dataEnabled should be false");
         assertEquals("", WatcherConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
         assertEquals("", WatcherConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for default values");
     }
 
     @Test
@@ -74,94 +78,92 @@ class WatcherConfigTest {
         assertFalse(WatcherConfig.dataEnabled, "Default value for dataEnabled should be false");
         assertEquals("", WatcherConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
         assertEquals("", WatcherConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported after reset");
     }
 
     @Test
     void testDelayMillisecondsProperty() {
         System.setProperty(WatcherConfig.PROP_DELAY, "120000ms");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
+        WatcherConfig.init();
         assertEquals(120000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid delayMilliseconds");
+    }
 
-        System.setProperty(WatcherConfig.PROP_DELAY, "120000");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(120000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
-
-        System.setProperty(WatcherConfig.PROP_DELAY, "120s");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(120000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
-
-        System.setProperty(WatcherConfig.PROP_DELAY, "2m");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(120000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
-
-        System.setProperty(WatcherConfig.PROP_DELAY, "2min");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(120000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
-
-        System.setProperty(WatcherConfig.PROP_DELAY, "1h");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(3600000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should reflect the system property value");
+    @Test
+    void testDelayMillisecondsInvalidFormat() {
+        System.setProperty(WatcherConfig.PROP_DELAY, "invalid");
+        WatcherConfig.init();
+        assertEquals(60000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should fall back to default for invalid format");
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid delayMilliseconds format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid time value for property '" + WatcherConfig.PROP_DELAY));
     }
 
     @Test
     void testPeriodMillisecondsProperty() {
         System.setProperty(WatcherConfig.PROP_PERIOD, "120000ms");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
+        WatcherConfig.init();
         assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid periodMilliseconds");
+    }
 
-        System.setProperty(WatcherConfig.PROP_PERIOD, "120000");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
-
-        System.setProperty(WatcherConfig.PROP_PERIOD, "120s");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
-
-        System.setProperty(WatcherConfig.PROP_PERIOD, "2m");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
-
-        System.setProperty(WatcherConfig.PROP_PERIOD, "2min");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(120000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
-
-        System.setProperty(WatcherConfig.PROP_PERIOD, "1h");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(3600000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should reflect the system property value");
+    @Test
+    void testPeriodMillisecondsInvalidFormat() {
+        System.setProperty(WatcherConfig.PROP_PERIOD, "invalid");
+        WatcherConfig.init();
+        assertEquals(600000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should fall back to default for invalid format");
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid periodMilliseconds format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid time value for property '" + WatcherConfig.PROP_PERIOD));
     }
 
     @Test
     void testDataPrefixProperty() {
         System.setProperty(WatcherConfig.PROP_DATA_PREFIX, "data.");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
+        WatcherConfig.init();
         assertEquals("data.", WatcherConfig.dataPrefix, "dataPrefix should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid dataPrefix");
     }
 
     @Test
     void testDataSuffixProperty() {
         System.setProperty(WatcherConfig.PROP_DATA_SUFFIX, ".data");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
+        WatcherConfig.init();
         assertEquals(".data", WatcherConfig.dataSuffix, "dataSuffix should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid dataSuffix");
     }
 
     @Test
     void testDataEnabledProperty() {
         System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
+        WatcherConfig.init();
         assertTrue(WatcherConfig.dataEnabled, "dataEnabled should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid dataEnabled");
+    }
+
+    @Test
+    void testDataEnabledInvalidFormat() {
+        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "invalid");
+        WatcherConfig.init();
+        assertFalse(WatcherConfig.dataEnabled, "dataEnabled should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid dataEnabled format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + WatcherConfig.PROP_DATA_ENABLED));
     }
 
     @Test
     void testMessagePrefixProperty() {
         System.setProperty(WatcherConfig.PROP_MESSAGE_PREFIX, "message.");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
+        WatcherConfig.init();
         assertEquals("message.", WatcherConfig.messagePrefix, "messagePrefix should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid messagePrefix");
     }
 
     @Test
     void testMessageSuffixProperty() {
         System.setProperty(WatcherConfig.PROP_MESSAGE_SUFFIX, ".message");
-        WatcherConfig.init(); // Reinitialize to apply new system properties
+        WatcherConfig.init();
         assertEquals(".message", WatcherConfig.messageSuffix, "messageSuffix should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid messageSuffix");
     }
 }

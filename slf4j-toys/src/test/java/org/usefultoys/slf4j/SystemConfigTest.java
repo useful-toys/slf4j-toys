@@ -16,7 +16,11 @@
 
 package org.usefultoys.slf4j;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.usefultoys.slf4j.utils.ConfigParser;
 
 import java.nio.charset.Charset;
 
@@ -33,13 +37,14 @@ class SystemConfigTest {
     void setUp() {
         // Reinitialize SystemConfig to ensure clean state for each test
         SystemConfig.reset();
-
+        ConfigParser.clearInitializationErrors(); // Clear errors for each test
     }
 
     @AfterAll
     static void tearDown() {
         // Reinitialize SystemConfig to ensure clean state for further tests
         SystemConfig.reset();
+        ConfigParser.clearInitializationErrors(); // Clear errors after all tests
     }
 
     @Test
@@ -51,6 +56,7 @@ class SystemConfigTest {
         assertFalse(SystemConfig.useCompilationManagedBean, "Default value for useCompilationManagedBean should be false");
         assertFalse(SystemConfig.useGarbageCollectionManagedBean, "Default value for useGarbageCollectionManagedBean should be false");
         assertFalse(SystemConfig.usePlatformManagedBean, "Default value for usePlatformManagedBean should be false");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for default values");
     }
 
     @Test
@@ -62,6 +68,7 @@ class SystemConfigTest {
         assertFalse(SystemConfig.useCompilationManagedBean, "Default value for useCompilationManagedBean should be false");
         assertFalse(SystemConfig.useGarbageCollectionManagedBean, "Default value for useGarbageCollectionManagedBean should be false");
         assertFalse(SystemConfig.usePlatformManagedBean, "Default value for usePlatformManagedBean should be false");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported after reset");
     }
 
     @Test
@@ -69,6 +76,17 @@ class SystemConfigTest {
         System.setProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
         assertTrue(SystemConfig.useClassLoadingManagedBean, "useClassLoadingManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testUseClassLoadingManagedBeanInvalidFormat() {
+        System.setProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN, "invalid");
+        SystemConfig.init();
+        assertFalse(SystemConfig.useClassLoadingManagedBean, "useClassLoadingManagedBean should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN));
     }
 
     @Test
@@ -76,6 +94,17 @@ class SystemConfigTest {
         System.setProperty(SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
         assertTrue(SystemConfig.useMemoryManagedBean, "useMemoryManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testUseMemoryManagedBeanInvalidFormat() {
+        System.setProperty(SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN, "invalid");
+        SystemConfig.init();
+        assertFalse(SystemConfig.useMemoryManagedBean, "useMemoryManagedBean should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN));
     }
 
     @Test
@@ -83,6 +112,17 @@ class SystemConfigTest {
         System.setProperty(SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
         assertTrue(SystemConfig.useCompilationManagedBean, "useCompilationManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testUseCompilationManagedBeanInvalidFormat() {
+        System.setProperty(SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN, "invalid");
+        SystemConfig.init();
+        assertFalse(SystemConfig.useCompilationManagedBean, "useCompilationManagedBean should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN));
     }
 
     @Test
@@ -90,6 +130,17 @@ class SystemConfigTest {
         System.setProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
         assertTrue(SystemConfig.useGarbageCollectionManagedBean, "useGarbageCollectionManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testUseGarbageCollectionManagedBeanInvalidFormat() {
+        System.setProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, "invalid");
+        SystemConfig.init();
+        assertFalse(SystemConfig.useGarbageCollectionManagedBean, "useGarbageCollectionManagedBean should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN));
     }
 
     @Test
@@ -97,5 +148,16 @@ class SystemConfigTest {
         System.setProperty(SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
         assertTrue(SystemConfig.usePlatformManagedBean, "usePlatformManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testUsePlatformManagedBeanInvalidFormat() {
+        System.setProperty(SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN, "invalid");
+        SystemConfig.init();
+        assertFalse(SystemConfig.usePlatformManagedBean, "usePlatformManagedBean should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN));
     }
 }

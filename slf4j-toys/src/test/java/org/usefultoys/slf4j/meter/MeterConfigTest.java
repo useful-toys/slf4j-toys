@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
+import org.usefultoys.slf4j.utils.ConfigParser;
 
 import java.nio.charset.Charset;
 
@@ -40,6 +41,7 @@ class MeterConfigTest {
         MeterConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
+        ConfigParser.clearInitializationErrors(); // Clear errors for each test
     }
 
     @AfterAll
@@ -48,6 +50,7 @@ class MeterConfigTest {
         MeterConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
+        ConfigParser.clearInitializationErrors(); // Clear errors after all tests
     }
 
     @Test
@@ -62,6 +65,7 @@ class MeterConfigTest {
         assertEquals("", MeterConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
         assertEquals("", MeterConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
         assertEquals("", MeterConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for default values");
     }
 
     @Test
@@ -77,76 +81,147 @@ class MeterConfigTest {
         assertEquals("", MeterConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
         assertEquals("", MeterConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
         assertEquals("", MeterConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported after reset");
     }
 
 
     @Test
     void testProgressPeriodMillisecondsProperty() {
-        System.setProperty("slf4jtoys.meter.progress.period", "5000");
+        System.setProperty(MeterConfig.PROP_PROGRESS_PERIOD, "5000");
         MeterConfig.init();
         assertEquals(5000L, MeterConfig.progressPeriodMilliseconds, "progressPeriodMilliseconds should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid progressPeriodMilliseconds");
+    }
+
+    @Test
+    void testProgressPeriodMillisecondsInvalidFormat() {
+        System.setProperty(MeterConfig.PROP_PROGRESS_PERIOD, "invalid");
+        MeterConfig.init();
+        assertEquals(2000L, MeterConfig.progressPeriodMilliseconds, "progressPeriodMilliseconds should fall back to default for invalid format");
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid progressPeriodMilliseconds format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid time value for property '" + MeterConfig.PROP_PROGRESS_PERIOD));
     }
 
     @Test
     void testPrintCategoryProperty() {
-        System.setProperty("slf4jtoys.meter.print.category", "true");
+        System.setProperty(MeterConfig.PROP_PRINT_CATEGORY, "true");
         MeterConfig.init();
         assertTrue(MeterConfig.printCategory, "printCategory should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printCategory");
+    }
+
+    @Test
+    void testPrintCategoryInvalidFormat() {
+        System.setProperty(MeterConfig.PROP_PRINT_CATEGORY, "invalid");
+        MeterConfig.init();
+        assertFalse(MeterConfig.printCategory, "printCategory should fall back to default for invalid format");
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printCategory format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_CATEGORY));
     }
 
     @Test
     void testPrintStatusProperty() {
-        System.setProperty("slf4jtoys.meter.print.status", "false");
+        System.setProperty(MeterConfig.PROP_PRINT_STATUS, "false");
         MeterConfig.init();
         assertFalse(MeterConfig.printStatus, "printStatus should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printStatus");
+    }
+
+    @Test
+    void testPrintStatusInvalidFormat() {
+        System.setProperty(MeterConfig.PROP_PRINT_STATUS, "invalid");
+        MeterConfig.init();
+        assertTrue(MeterConfig.printStatus, "printStatus should fall back to default for invalid format"); // Default is true
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printStatus format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_STATUS));
     }
 
     @Test
     void testPrintPositionProperty() {
-        System.setProperty("slf4jtoys.meter.print.position", "true");
+        System.setProperty(MeterConfig.PROP_PRINT_POSITION, "true");
         MeterConfig.init();
         assertTrue(MeterConfig.printPosition, "printPosition should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printPosition");
+    }
+
+    @Test
+    void testPrintPositionInvalidFormat() {
+        System.setProperty(MeterConfig.PROP_PRINT_POSITION, "invalid");
+        MeterConfig.init();
+        assertFalse(MeterConfig.printPosition, "printPosition should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printPosition format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_POSITION));
     }
 
     @Test
     void testPrintLoadProperty() {
-        System.setProperty("slf4jtoys.meter.print.load", "true");
+        System.setProperty(MeterConfig.PROP_PRINT_LOAD, "true");
         MeterConfig.init();
         assertTrue(MeterConfig.printLoad, "printLoad should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printLoad");
+    }
+
+    @Test
+    void testPrintLoadInvalidFormat() {
+        System.setProperty(MeterConfig.PROP_PRINT_LOAD, "invalid");
+        MeterConfig.init();
+        assertFalse(MeterConfig.printLoad, "printLoad should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printLoad format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_LOAD));
     }
 
     @Test
     void testPrintMemoryProperty() {
-        System.setProperty("slf4jtoys.meter.print.memory", "true");
+        System.setProperty(MeterConfig.PROP_PRINT_MEMORY, "true");
         MeterConfig.init();
         assertTrue(MeterConfig.printMemory, "printMemory should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printMemory");
+    }
+
+    @Test
+    void testPrintMemoryInvalidFormat() {
+        System.setProperty(MeterConfig.PROP_PRINT_MEMORY, "invalid");
+        MeterConfig.init();
+        assertFalse(MeterConfig.printMemory, "printMemory should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printMemory format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_MEMORY));
     }
 
     @Test
     void testDataPrefixProperty() {
-        System.setProperty("slf4jtoys.meter.data.prefix", "data.");
+        System.setProperty(MeterConfig.PROP_DATA_PREFIX, "data.");
         MeterConfig.init();
         assertEquals("data.", MeterConfig.dataPrefix, "dataPrefix should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid dataPrefix");
     }
 
     @Test
     void testDataSuffixProperty() {
-        System.setProperty("slf4jtoys.meter.data.suffix", ".data");
+        System.setProperty(MeterConfig.PROP_DATA_SUFFIX, ".data");
         MeterConfig.init();
         assertEquals(".data", MeterConfig.dataSuffix, "dataSuffix should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid dataSuffix");
     }
 
     @Test
     void testMessagePrefixProperty() {
-        System.setProperty("slf4jtoys.meter.message.prefix", "message.");
+        System.setProperty(MeterConfig.PROP_MESSAGE_PREFIX, "message.");
         MeterConfig.init();
         assertEquals("message.", MeterConfig.messagePrefix, "messagePrefix should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid messagePrefix");
     }
 
     @Test
     void testMessageSuffixProperty() {
-        System.setProperty("slf4jtoys.meter.message.suffix", ".message");
+        System.setProperty(MeterConfig.PROP_MESSAGE_SUFFIX, ".message");
         MeterConfig.init();
         assertEquals(".message", MeterConfig.messageSuffix, "messageSuffix should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid messageSuffix");
     }
 }
