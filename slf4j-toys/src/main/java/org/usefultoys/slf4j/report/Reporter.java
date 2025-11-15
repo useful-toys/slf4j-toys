@@ -152,5 +152,11 @@ public class Reporter implements Serializable {
         if (ReporterConfig.reportGarbageCollector) {
             executor.execute(new ReportGarbageCollector(logger));
         }
+        if (ReporterConfig.reportSecurityProviders) {
+            executor.execute(new ReportSecurityProviders(logger));
+        }
+        if (ReporterConfig.reportContainerInfo) {
+            executor.execute(new ReportContainerInfo(logger));
+        }
     }
 }

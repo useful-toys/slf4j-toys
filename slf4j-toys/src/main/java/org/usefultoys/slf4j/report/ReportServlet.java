@@ -52,6 +52,8 @@ import java.util.Locale;
  *   <li>{@code /JvmArguments} — Logs JVM input arguments.</li>
  *   <li>{@code /Classpath} — Logs classpath entries.</li>
  *   <li>{@code /GarbageCollector} — Logs garbage collector information.</li>
+ *   <li>{@code /SecurityProviders} — Logs security providers information.</li>
+ *   <li>{@code /ContainerInfo} — Logs container information.</li>
  * </ul>
  * <p>
  * If the path does not match any known suffix, no action is taken and the request is silently ignored.
@@ -156,6 +158,10 @@ public class ReportServlet extends HttpServlet {
             new ReportClasspath(logger).run();
         } else if ("garbagecollector".equalsIgnoreCase(pathinfo)) {
             new ReportGarbageCollector(logger).run();
+        } else if ("securityproviders".equalsIgnoreCase(pathinfo)) {
+            new ReportSecurityProviders(logger).run();
+        } else if ("containerinfo".equalsIgnoreCase(pathinfo)) {
+            new ReportContainerInfo(logger).run();
         } else {
             log.warn("Unrecognized report path: {}", pathinfo);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);

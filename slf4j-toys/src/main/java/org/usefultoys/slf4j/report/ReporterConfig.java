@@ -79,6 +79,10 @@ public class ReporterConfig {
     public final String PROP_CLASSPATH = "slf4jtoys.report.classpath";
     /** System property key for enabling/disabling the garbage collector report. */
     public final String PROP_GARBAGE_COLLECTOR = "slf4jtoys.report.garbageCollector";
+    /** System property key for enabling/disabling the security providers report. */
+    public final String PROP_SECURITY_PROVIDERS = "slf4jtoys.report.securityProviders";
+    /** System property key for enabling/disabling the container info report. */
+    public final String PROP_CONTAINER_INFO = "slf4jtoys.report.containerInfo";
     /** System property key for setting the default logger name for reports. */
     public final String PROP_NAME = "slf4jtoys.report.name";
     /** System property key for the regular expression defining forbidden property names. */
@@ -223,6 +227,22 @@ public class ReporterConfig {
     public boolean reportGarbageCollector;
 
     /**
+     * Whether the default report includes security providers information.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.report.securityProviders}. Defaults to {@code false}.
+     * Can be changed at runtime.
+     */
+    public boolean reportSecurityProviders;
+
+    /**
+     * Whether the default report includes container information.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.report.containerInfo}. Defaults to {@code false}.
+     * Can be changed at runtime.
+     */
+    public boolean reportContainerInfo;
+
+    /**
      * Defines the default name used for the logger that prints reports.
      * <p>
      * Controlled by the system property {@code slf4jtoys.report.name}. Defaults to {@code "report"}.
@@ -264,6 +284,8 @@ public class ReporterConfig {
         reportJvmArguments = ConfigParser.getProperty(PROP_JVM_ARGUMENTS, false);
         reportClasspath = ConfigParser.getProperty(PROP_CLASSPATH, false);
         reportGarbageCollector = ConfigParser.getProperty(PROP_GARBAGE_COLLECTOR, false);
+        reportSecurityProviders = ConfigParser.getProperty(PROP_SECURITY_PROVIDERS, false);
+        reportContainerInfo = ConfigParser.getProperty(PROP_CONTAINER_INFO, false);
         name = ConfigParser.getProperty(PROP_NAME, "report");
         forbiddenPropertyNamesRegex = ConfigParser.getProperty(PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*password.*|.*secret.*|.*key.*|.*token.*");
     }
@@ -304,6 +326,8 @@ public class ReporterConfig {
         System.clearProperty(ReporterConfig.PROP_JVM_ARGUMENTS);
         System.clearProperty(ReporterConfig.PROP_CLASSPATH);
         System.clearProperty(ReporterConfig.PROP_GARBAGE_COLLECTOR);
+        System.clearProperty(ReporterConfig.PROP_SECURITY_PROVIDERS);
+        System.clearProperty(ReporterConfig.PROP_CONTAINER_INFO);
         System.clearProperty(ReporterConfig.PROP_NAME);
         System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
         init();

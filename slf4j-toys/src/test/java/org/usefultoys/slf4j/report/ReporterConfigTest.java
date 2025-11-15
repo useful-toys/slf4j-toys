@@ -56,20 +56,22 @@ class ReporterConfigTest {
         assertTrue(ReporterConfig.reportVM, "Default value for reportVM should be true");
         assertFalse(ReporterConfig.reportFileSystem, "Default value for reportFileSystem should be false");
         assertTrue(ReporterConfig.reportMemory, "Default value for reportMemory should be true");
-        assertTrue(ReporterConfig.reportUser, "Default value for reportUser should be true");
-        assertTrue(ReporterConfig.reportProperties, "Default value for reportProperties should be true");
+        assertFalse(ReporterConfig.reportUser, "Default value for reportUser should be false");
+        assertFalse(ReporterConfig.reportProperties, "Default value for reportProperties should be false");
         assertFalse(ReporterConfig.reportEnvironment, "Default value for reportEnvironment should be false");
         assertTrue(ReporterConfig.reportPhysicalSystem, "Default value for reportPhysicalSystem should be true");
         assertTrue(ReporterConfig.reportOperatingSystem, "Default value for reportOperatingSystem should be true");
-        assertTrue(ReporterConfig.reportCalendar, "Default value for reportCalendar should be true");
-        assertTrue(ReporterConfig.reportLocale, "Default value for reportLocale should be true");
-        assertTrue(ReporterConfig.reportCharset, "Default value for reportCharset should be true");
+        assertFalse(ReporterConfig.reportCalendar, "Default value for reportCalendar should be false");
+        assertFalse(ReporterConfig.reportLocale, "Default value for reportLocale should be false");
+        assertFalse(ReporterConfig.reportCharset, "Default value for reportCharset should be false");
         assertFalse(ReporterConfig.reportNetworkInterface, "Default value for reportNetworkInterface should be false");
         assertFalse(ReporterConfig.reportSSLContext, "Default value for reportSSLContext should be false");
         assertFalse(ReporterConfig.reportDefaultTrustKeyStore, "Default value for reportDefaultTrustKeyStore should be false");
         assertFalse(ReporterConfig.reportJvmArguments, "Default value for reportJvmArguments should be false");
         assertFalse(ReporterConfig.reportClasspath, "Default value for reportClasspath should be false");
         assertFalse(ReporterConfig.reportGarbageCollector, "Default value for reportGarbageCollector should be false");
+        assertFalse(ReporterConfig.reportSecurityProviders, "Default value for reportSecurityProviders should be false");
+        assertFalse(ReporterConfig.reportContainerInfo, "Default value for reportContainerInfo should be false");
         assertEquals("report", ReporterConfig.name, "Default value for name should be 'report'");
         assertEquals("(?i).*password.*|.*secret.*|.*key.*|.*token.*", ReporterConfig.forbiddenPropertyNamesRegex, "Default value for forbiddenPropertyNamesRegex should be the security regex");
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for default values");
@@ -83,6 +85,8 @@ class ReporterConfigTest {
         System.setProperty(ReporterConfig.PROP_JVM_ARGUMENTS, "true");
         System.setProperty(ReporterConfig.PROP_CLASSPATH, "true");
         System.setProperty(ReporterConfig.PROP_GARBAGE_COLLECTOR, "true");
+        System.setProperty(ReporterConfig.PROP_SECURITY_PROVIDERS, "true");
+        System.setProperty(ReporterConfig.PROP_CONTAINER_INFO, "true");
         System.setProperty(ReporterConfig.PROP_NAME, "custom");
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, ".*custom.*");
         ReporterConfig.init();
@@ -91,6 +95,8 @@ class ReporterConfigTest {
         assertTrue(ReporterConfig.reportJvmArguments);
         assertTrue(ReporterConfig.reportClasspath);
         assertTrue(ReporterConfig.reportGarbageCollector);
+        assertTrue(ReporterConfig.reportSecurityProviders);
+        assertTrue(ReporterConfig.reportContainerInfo);
         assertEquals("custom", ReporterConfig.name);
         assertEquals(".*custom.*", ReporterConfig.forbiddenPropertyNamesRegex);
 
@@ -101,6 +107,8 @@ class ReporterConfigTest {
         assertFalse(ReporterConfig.reportJvmArguments);
         assertFalse(ReporterConfig.reportClasspath);
         assertFalse(ReporterConfig.reportGarbageCollector);
+        assertFalse(ReporterConfig.reportSecurityProviders);
+        assertFalse(ReporterConfig.reportContainerInfo);
         assertEquals("report", ReporterConfig.name);
         assertEquals("(?i).*password.*|.*secret.*|.*key.*|.*token.*", ReporterConfig.forbiddenPropertyNamesRegex);
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported after reset");
@@ -171,7 +179,7 @@ class ReporterConfigTest {
     void testReportUserInvalidFormat() {
         System.setProperty(ReporterConfig.PROP_USER, "invalid");
         ReporterConfig.init();
-        assertTrue(ReporterConfig.reportUser, "reportUser should fall back to default for invalid format"); // Default is true
+        assertFalse(ReporterConfig.reportUser, "reportUser should fall back to default for invalid format"); // Default is false
         assertFalse(ConfigParser.isInitializationOK());
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_USER));
@@ -189,7 +197,7 @@ class ReporterConfigTest {
     void testReportPropertiesInvalidFormat() {
         System.setProperty(ReporterConfig.PROP_PROPERTIES, "invalid");
         ReporterConfig.init();
-        assertTrue(ReporterConfig.reportProperties, "reportProperties should fall back to default for invalid format"); // Default is true
+        assertFalse(ReporterConfig.reportProperties, "reportProperties should fall back to default for invalid format"); // Default is false
         assertFalse(ConfigParser.isInitializationOK());
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_PROPERTIES));
@@ -261,7 +269,7 @@ class ReporterConfigTest {
     void testReportCalendarInvalidFormat() {
         System.setProperty(ReporterConfig.PROP_CALENDAR, "invalid");
         ReporterConfig.init();
-        assertTrue(ReporterConfig.reportCalendar, "reportCalendar should fall back to default for invalid format"); // Default is true
+        assertFalse(ReporterConfig.reportCalendar, "reportCalendar should fall back to default for invalid format"); // Default is false
         assertFalse(ConfigParser.isInitializationOK());
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CALENDAR));
@@ -279,7 +287,7 @@ class ReporterConfigTest {
     void testReportLocaleInvalidFormat() {
         System.setProperty(ReporterConfig.PROP_LOCALE, "invalid");
         ReporterConfig.init();
-        assertTrue(ReporterConfig.reportLocale, "reportLocale should fall back to default for invalid format"); // Default is true
+        assertFalse(ReporterConfig.reportLocale, "reportLocale should fall back to default for invalid format"); // Default is false
         assertFalse(ConfigParser.isInitializationOK());
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_LOCALE));
@@ -297,7 +305,7 @@ class ReporterConfigTest {
     void testReportCharsetInvalidFormat() {
         System.setProperty(ReporterConfig.PROP_CHARSET, "invalid");
         ReporterConfig.init();
-        assertTrue(ReporterConfig.reportCharset, "reportCharset should fall back to default for invalid format"); // Default is true
+        assertFalse(ReporterConfig.reportCharset, "reportCharset should fall back to default for invalid format"); // Default is false
         assertFalse(ConfigParser.isInitializationOK());
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CHARSET));
@@ -406,6 +414,42 @@ class ReporterConfigTest {
         assertFalse(ConfigParser.isInitializationOK());
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_GARBAGE_COLLECTOR));
+    }
+
+    @Test
+    void testReportSecurityProvidersProperty() {
+        System.setProperty(ReporterConfig.PROP_SECURITY_PROVIDERS, "true");
+        ReporterConfig.init();
+        assertTrue(ReporterConfig.reportSecurityProviders, "reportSecurityProviders should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testReportSecurityProvidersInvalidFormat() {
+        System.setProperty(ReporterConfig.PROP_SECURITY_PROVIDERS, "invalid");
+        ReporterConfig.init();
+        assertFalse(ReporterConfig.reportSecurityProviders, "reportSecurityProviders should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_SECURITY_PROVIDERS));
+    }
+
+    @Test
+    void testReportContainerInfoProperty() {
+        System.setProperty(ReporterConfig.PROP_CONTAINER_INFO, "true");
+        ReporterConfig.init();
+        assertTrue(ReporterConfig.reportContainerInfo, "reportContainerInfo should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testReportContainerInfoInvalidFormat() {
+        System.setProperty(ReporterConfig.PROP_CONTAINER_INFO, "invalid");
+        ReporterConfig.init();
+        assertFalse(ReporterConfig.reportContainerInfo, "reportContainerInfo should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CONTAINER_INFO));
     }
 
     @Test
