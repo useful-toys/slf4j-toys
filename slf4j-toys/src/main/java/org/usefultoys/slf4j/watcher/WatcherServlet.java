@@ -69,6 +69,6 @@ public class WatcherServlet extends HttpServlet {
      * This method can be overridden by subclasses to customize how the watcher is run.
      */
     protected void runWatcher() {
-        WatcherSingleton.DEFAULT_WATCHER.run();
+        WatcherSingleton.getDefaultWatcher().run(); // Use the getter
     }
 }

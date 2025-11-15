@@ -48,11 +48,23 @@ import java.util.concurrent.TimeUnit;
 public final class WatcherSingleton {
 
     /**
-     * The default watcher instance. It is created at application startup and named using the system property
+     * The default watcher instance. It is created lazily upon first access and named using the system property
      * {@code slf4jtoys.watcher.name}, which defaults to "watcher".
      */
-    @SuppressWarnings("NonFinalStaticVariableUsedInClassInitialization")
-    public final Watcher DEFAULT_WATCHER = new Watcher(WatcherConfig.name);
+    private static Watcher DEFAULT_WATCHER_INSTANCE;
+
+    /**
+     * Returns the default {@link Watcher} instance, creating it if it hasn't been initialized yet.
+     * This method ensures that {@link WatcherConfig} is initialized before the Watcher instance is created.
+     *
+     * @return The default Watcher instance.
+     */
+    public static synchronized Watcher getDefaultWatcher() {
+        if (DEFAULT_WATCHER_INSTANCE == null) {
+            DEFAULT_WATCHER_INSTANCE = new Watcher(WatcherConfig.name);
+        }
+        return DEFAULT_WATCHER_INSTANCE;
+    }
 
     /** Executor service for running the default watcher periodically. */
     ScheduledExecutorService defaultWatcherExecutor = null;
@@ -73,7 +85,7 @@ public final class WatcherSingleton {
         }
         if (scheduledDefaultWatcher == null) {
             scheduledDefaultWatcher = defaultWatcherExecutor.scheduleAtFixedRate(
-                    DEFAULT_WATCHER,
+                    getDefaultWatcher(), // Use the getter
                     WatcherConfig.delayMilliseconds,
                     WatcherConfig.periodMilliseconds,
                     TimeUnit.MILLISECONDS
@@ -108,7 +120,7 @@ public final class WatcherSingleton {
             defaultWatcherTask = new TimerTask() {
                 @Override
                 public void run() {
-                    DEFAULT_WATCHER.run();
+                    getDefaultWatcher().run(); // Use the getter
                 }
             };
             defaultWatcherTimer.schedule(
