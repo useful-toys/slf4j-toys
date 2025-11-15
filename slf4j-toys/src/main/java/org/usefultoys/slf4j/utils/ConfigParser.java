@@ -17,6 +17,10 @@ package org.usefultoys.slf4j.utils;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Collection of utility methods to read system properties, with support for default values and typed conversion.
  * <p>
@@ -29,6 +33,28 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class ConfigParser {
+
+    /**
+     * A list of errors that occurred during property parsing. Applications can inspect this list
+     * after initialization to check for configuration issues.
+     */
+    public final List<String> initializationErrors = Collections.synchronizedList(new ArrayList<>());
+
+    /**
+     * Checks if any errors occurred during property parsing.
+     *
+     * @return {@code true} if no errors were recorded, {@code false} otherwise.
+     */
+    public boolean isInitializationOK() {
+        return initializationErrors.isEmpty();
+    }
+
+    /**
+     * Clears all recorded initialization errors. This is useful for testing or re-initialization.
+     */
+    public void clearInitializationErrors() {
+        initializationErrors.clear();
+    }
 
     /**
      * Retrieves the value of a system property as a string. If the property is not set, the default value is returned.
@@ -62,7 +88,7 @@ public class ConfigParser {
 
     /**
      * Retrieves the value of a system property as an integer. If the property is not set or cannot be parsed as an
-     * integer, the default value is returned.
+     * integer, the default value is returned and an error is recorded.
      *
      * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set or invalid
@@ -75,15 +101,15 @@ public class ConfigParser {
         }
         try {
             return Integer.parseInt(value.trim());
-        } catch (final NumberFormatException ignored) {
+        } catch (final NumberFormatException e) {
+            initializationErrors.add("Invalid integer value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
 
     /**
-     * Retrieves the value of a system property as an integer. If the property is not set or cannot be parsed as an
-     * integer, the default value is returned. If the integer value is outside the specified range, the default value
-     * is returned.
+     * Retrieves the value of a system property as an integer within a given range. If the property is not set,
+     * cannot be parsed, or is outside the range, the default value is returned and an error is recorded.
      *
      * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set or invalid
@@ -99,21 +125,20 @@ public class ConfigParser {
         }
         try {
             final int intValue = Integer.parseInt(value.trim());
-            if (intValue < minValue) {
-                return defaultValue;
-            }
-            if (intValue > maxValue) {
+            if (intValue < minValue || intValue > maxValue) {
+                initializationErrors.add("Value for property '" + name + "' is out of range [" + minValue + "," + maxValue + "]: '" + value + "'. Using default value '" + defaultValue + "'.");
                 return defaultValue;
             }
             return intValue;
-        } catch (final NumberFormatException ignored) {
+        } catch (final NumberFormatException e) {
+            initializationErrors.add("Invalid integer value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
 
     /**
      * Retrieves the value of a system property as a long integer. If the property is not set or cannot be parsed as a
-     * long, the default value is returned.
+     * long, the default value is returned and an error is recorded.
      *
      * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set or invalid
@@ -126,22 +151,15 @@ public class ConfigParser {
         }
         try {
             return Long.parseLong(value.trim());
-        } catch (final NumberFormatException ignored) {
+        } catch (final NumberFormatException e) {
+            initializationErrors.add("Invalid long value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
 
     /**
-     * Retrieves the value of a system property as a duration in milliseconds.
-     * <p>
-     * Supports suffixes for time units:
-     * <ul>
-     *     <li>{@code ms} for milliseconds</li>
-     *     <li>{@code s} for seconds</li>
-     *     <li>{@code m} or {@code min} for minutes</li>
-     *     <li>{@code h} for hours</li>
-     * </ul>
-     * If the property is not set or cannot be parsed, the default value is returned.
+     * Retrieves the value of a system property as a duration in milliseconds. If the property is not set or cannot be
+     * parsed, the default value is returned and an error is recorded.
      *
      * @param name         the name of the system property
      * @param defaultValue the default value (in milliseconds) to return if the property is not set or invalid
@@ -176,14 +194,16 @@ public class ConfigParser {
                 multiplicador = 60 * 60 * 1000;
             }
 
-            String numberPart = value.substring(0, value.length() - suffixLength);
+            String numberPart = value.substring(0, value.length() - suffixLength).trim();
             if (numberPart.isEmpty()) {
+                initializationErrors.add("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
                 return defaultValue;
             }
 
             return Long.parseLong(numberPart) * multiplicador;
 
-        } catch (final NumberFormatException ignored) {
+        } catch (final NumberFormatException e) {
+            initializationErrors.add("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
