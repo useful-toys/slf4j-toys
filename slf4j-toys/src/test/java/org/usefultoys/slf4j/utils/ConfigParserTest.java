@@ -31,14 +31,12 @@ class ConfigParserTest {
     void setUp() {
         ConfigParser.clearInitializationErrors();
         System.clearProperty("test.property");
-        System.clearProperty("nonexistent.property");
     }
 
     @AfterEach
     void tearDown() {
         ConfigParser.clearInitializationErrors();
         System.clearProperty("test.property");
-        System.clearProperty("nonexistent.property");
     }
 
     @ParameterizedTest
@@ -78,12 +76,18 @@ class ConfigParserTest {
     }
 
     @Test
-    void testGetPropertyIntInvalid() {
+    void testGetPropertyIntInvalidFormat() {
         System.setProperty("test.property", "invalid");
         assertEquals(0, ConfigParser.getProperty("test.property", 0));
         assertFalse(ConfigParser.isInitializationOK());
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid integer value"));
+    }
+
+    @Test
+    void testGetPropertyIntNotFound() {
+        assertEquals(0, ConfigParser.getProperty("nonexistent.property", 0));
+        assertTrue(ConfigParser.isInitializationOK());
     }
 
     @ParameterizedTest
@@ -110,11 +114,17 @@ class ConfigParserTest {
     }
 
     @Test
-    void testGetRangePropertyInvalid() {
+    void testGetRangePropertyInvalidFormat() {
         System.setProperty("test.property", "invalid");
         assertEquals(0, ConfigParser.getRangeProperty("test.property", 0, 5, 15));
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid integer value"));
+    }
+
+    @Test
+    void testGetRangePropertyNotFound() {
+        assertEquals(0, ConfigParser.getRangeProperty("nonexistent.property", 0, 5, 15));
+        assertTrue(ConfigParser.isInitializationOK());
     }
 
     @ParameterizedTest
@@ -126,11 +136,17 @@ class ConfigParserTest {
     }
 
     @Test
-    void testGetPropertyLongInvalid() {
+    void testGetPropertyLongInvalidFormat() {
         System.setProperty("test.property", "invalid");
         assertEquals(0L, ConfigParser.getProperty("test.property", 0L));
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid long value"));
+    }
+
+    @Test
+    void testGetPropertyLongNotFound() {
+        assertEquals(0L, ConfigParser.getProperty("nonexistent.property", 0L));
+        assertTrue(ConfigParser.isInitializationOK());
     }
 
     @ParameterizedTest
@@ -153,17 +169,19 @@ class ConfigParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"invalid", "s", "1.5s", ""})
-    void testGetMillisecondsPropertyInvalid(String value) {
+    @ValueSource(strings = {"invalid", "s", "1.5s"})
+    void testGetMillisecondsPropertyInvalidFormat(String value) {
         System.setProperty("test.property", value);
         assertEquals(0L, ConfigParser.getMillisecondsProperty("test.property", 0L));
-        // Empty string is a special case that does not log an error
-        if (!value.isEmpty()) {
-            assertEquals(1, ConfigParser.initializationErrors.size());
-            assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid time value"));
-        } else {
-            assertTrue(ConfigParser.isInitializationOK());
-        }
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid time value"));
+    }
+
+    @Test
+    void testGetMillisecondsPropertyEmpty() {
+        System.setProperty("test.property", "");
+        assertEquals(0L, ConfigParser.getMillisecondsProperty("test.property", 0L));
+        assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
