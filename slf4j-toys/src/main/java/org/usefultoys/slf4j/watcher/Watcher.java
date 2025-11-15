@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.watcher;
 
 import org.slf4j.Logger;
+import org.usefultoys.slf4j.NullLogger;
 import org.usefultoys.slf4j.Session;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -63,7 +64,7 @@ public class Watcher extends WatcherData implements Runnable {
         if (dataEnabled) {
             this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + name + dataSuffix);
         } else {
-            this.dataLogger = null;
+            this.dataLogger = NullLogger.INSTANCE; // Use NullLogger instead of null
         }
     }
 
@@ -83,7 +84,8 @@ public class Watcher extends WatcherData implements Runnable {
     public void run() {
         collectCurrentTime();
         position++;
-        if (messageLogger.isInfoEnabled() || (dataLogger != null && dataLogger.isTraceEnabled())) {
+        // Removed dataLogger != null check
+        if (messageLogger.isInfoEnabled() || dataLogger.isTraceEnabled()) {
             collectRuntimeStatus();
             collectPlatformStatus();
             collectManagedBeanStatus();
@@ -91,7 +93,8 @@ public class Watcher extends WatcherData implements Runnable {
         if (messageLogger.isInfoEnabled()) {
             messageLogger.info(Markers.MSG_WATCHER, readableMessage());
         }
-        if (dataLogger != null && dataLogger.isTraceEnabled()) {
+        // Removed dataLogger != null check
+        if (dataLogger.isTraceEnabled()) {
             dataLogger.trace(Markers.DATA_WATCHER, encodedMessage());
         }
     }
