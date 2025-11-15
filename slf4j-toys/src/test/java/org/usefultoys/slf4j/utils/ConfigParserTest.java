@@ -54,11 +54,27 @@ class ConfigParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"true", " true", "true ", " true "})
-    void testGetPropertyBoolean(String value) {
-        System.setProperty("test.property", value);
-        assertTrue(ConfigParser.getProperty("test.property", false));
+    @CsvSource({
+            "true, true",
+            "TRUE, true",
+            " true , true",
+            "false, false",
+            "FALSE, false",
+            " false , false"
+    })
+    void testGetPropertyBooleanValid(String input, boolean expected) {
+        System.setProperty("test.property", input);
+        assertEquals(expected, ConfigParser.getProperty("test.property", !expected));
         assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testGetPropertyBooleanInvalidFormat() {
+        System.setProperty("test.property", "abc");
+        assertTrue(ConfigParser.getProperty("test.property", true));
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value"));
     }
 
     @Test

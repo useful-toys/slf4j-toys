@@ -70,20 +70,27 @@ public class ConfigParser {
 
     /**
      * Retrieves the value of a system property as a boolean. If the property is not set, the default value is
-     * returned.
-     * <p>
-     * The property value is parsed using {@link Boolean#parseBoolean(String)}.
+     * returned. If the value is not "true" or "false" (case-insensitive), an error is recorded and the default
+     * value is returned.
      *
      * @param name         the name of the system property
-     * @param defaultValue the default value to return if the property is not set
-     * @return the property value as a boolean, or the default value if the property is not set
+     * @param defaultValue the default value to return if the property is not set or invalid
+     * @return the property value as a boolean, or the default value if the property is not set or invalid
      */
     public boolean getProperty(final String name, final boolean defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
         }
-        return Boolean.parseBoolean(value.trim());
+        final String trimmedValue = value.trim();
+        if (trimmedValue.equalsIgnoreCase("true")) {
+            return true;
+        }
+        if (trimmedValue.equalsIgnoreCase("false")) {
+            return false;
+        }
+        initializationErrors.add("Invalid boolean value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
+        return defaultValue;
     }
 
     /**
