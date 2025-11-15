@@ -49,7 +49,7 @@ public final class WithCustomTimer {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                WatcherSingleton.DEFAULT_WATCHER.run();
+                WatcherSingleton.getDefaultWatcher().run();
             }
         }, 1000, 1000);
 

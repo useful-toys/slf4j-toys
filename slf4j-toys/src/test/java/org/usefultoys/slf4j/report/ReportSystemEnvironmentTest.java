@@ -37,7 +37,6 @@ class ReportSystemEnvironmentTest {
 
     private static final String TEST_LOGGER_NAME = "test.logger";
     private MockLogger mockLogger;
-    private Map<String, String> originalEnv; // To store original environment variables
 
     @BeforeEach
     void setUp() {
@@ -54,31 +53,10 @@ class ReportSystemEnvironmentTest {
         ReporterConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
-
-        // Backup original environment variables
-        originalEnv = new HashMap<>(System.getenv());
     }
 
     @AfterEach
     void tearDown() {
-        // Restore original environment variables
-        try {
-            Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
-            java.lang.reflect.Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
-            theEnvironmentField.setAccessible(true);
-            Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
-            env.clear();
-            env.putAll(originalEnv);
-
-            java.lang.reflect.Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
-            theCaseInsensitiveEnvironmentField.setAccessible(true);
-            Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
-            cienv.clear();
-            cienv.putAll(originalEnv);
-        } catch (Exception e) {
-            System.err.println("Warning: Could not restore environment variables via reflection. Test might not be fully isolated. " + e.getMessage());
-        }
-
         // Clear test properties
         System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
 
@@ -88,25 +66,6 @@ class ReportSystemEnvironmentTest {
         SystemConfig.reset();
     }
 
-    // Helper method to simulate environment variables for testing purposes
-    // This is a workaround as System.getenv() is immutable after startup
-    private void setEnv(String key, String value) {
-        try {
-            Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
-            java.lang.reflect.Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
-            theEnvironmentField.setAccessible(true);
-            Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
-            env.put(key, value);
-
-            java.lang.reflect.Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
-            theCaseInsensitiveEnvironmentField.setAccessible(true);
-            Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
-            cienv.put(key, value);
-        } catch (Exception e) {
-            System.err.println("Warning: Could not set environment variable via reflection. Test might not be fully isolated. " + e.getMessage());
-        }
-    }
-
     // Helper method to get all formatted log messages from the MockLogger
     private String getLogOutput() {
         return mockLogger.getLoggerEvents().stream()
@@ -114,13 +73,24 @@ class ReportSystemEnvironmentTest {
                 .collect(Collectors.joining("\n"));
     }
 
+    // Helper method to create a ReportSystemEnvironment instance with a mocked environment
+    private ReportSystemEnvironment createReportSystemEnvironment(Map<String, String> envMap) {
+        return new ReportSystemEnvironment(mockLogger) {
+            @Override
+            protected Map<String, String> getEnvironmentVariables() {
+                return envMap;
+            }
+        };
+    }
+
     @Test
     void testSensitiveEnvironmentVariablesAreCensoredWithDefaultRegex() {
-        setEnv("TEST_PASSWORD", "mysecretpassword");
-        setEnv("TEST_SECRET", "anothersecret");
-        setEnv("TEST_NORMAL", "normalvalue");
+        Map<String, String> testEnv = new HashMap<>();
+        testEnv.put("TEST_PASSWORD", "mysecretpassword");
+        testEnv.put("TEST_SECRET", "anothersecret");
+        testEnv.put("TEST_NORMAL", "normalvalue");
 
-        new ReportSystemEnvironment(mockLogger).run();
+        createReportSystemEnvironment(testEnv).run();
 
         String logOutput = getLogOutput();
 
@@ -135,10 +105,11 @@ class ReportSystemEnvironmentTest {
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*CUSTOM.*");
         ReporterConfig.init(); // Reinitialize to apply custom regex
 
-        setEnv("TEST_CUSTOM_KEY", "customvalue");
-        setEnv("TEST_NORMAL", "normalvalue");
+        Map<String, String> testEnv = new HashMap<>();
+        testEnv.put("TEST_CUSTOM_KEY", "customvalue");
+        testEnv.put("TEST_NORMAL", "normalvalue");
 
-        new ReportSystemEnvironment(mockLogger).run();
+        createReportSystemEnvironment(testEnv).run();
 
         String logOutput = getLogOutput();
 
@@ -152,10 +123,11 @@ class ReportSystemEnvironmentTest {
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "");
         ReporterConfig.init(); // Reinitialize to apply empty regex
 
-        setEnv("TEST_PASSWORD", "mysecretpassword");
-        setEnv("TEST_SECRET", "anothersecret");
+        Map<String, String> testEnv = new HashMap<>();
+        testEnv.put("TEST_PASSWORD", "mysecretpassword");
+        testEnv.put("TEST_SECRET", "anothersecret");
 
-        new ReportSystemEnvironment(mockLogger).run();
+        createReportSystemEnvironment(testEnv).run();
 
         String logOutput = getLogOutput();
 
@@ -169,10 +141,11 @@ class ReportSystemEnvironmentTest {
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, ".*NONEXISTENT.*");
         ReporterConfig.init(); // Reinitialize to apply non-matching regex
 
-        setEnv("TEST_PASSWORD", "mysecretpassword");
-        setEnv("TEST_SECRET", "anothersecret");
+        Map<String, String> testEnv = new HashMap<>();
+        testEnv.put("TEST_PASSWORD", "mysecretpassword");
+        testEnv.put("TEST_SECRET", "anothersecret");
 
-        new ReportSystemEnvironment(mockLogger).run();
+        createReportSystemEnvironment(testEnv).run();
 
         String logOutput = getLogOutput();
 

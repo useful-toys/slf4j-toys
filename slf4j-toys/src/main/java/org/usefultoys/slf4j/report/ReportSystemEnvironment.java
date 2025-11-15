@@ -45,6 +45,16 @@ public class ReportSystemEnvironment implements Runnable {
     private final @NonNull Logger logger;
 
     /**
+     * Retrieves the environment variables. This method can be overridden in tests to provide
+     * a custom map of environment variables without modifying the actual system environment.
+     *
+     * @return A map of environment variable names to their values.
+     */
+    protected Map<String, String> getEnvironmentVariables() {
+        return System.getenv();
+    }
+
+    /**
      * Executes the report, writing environment variables to the configured logger.
      * The output is formatted as human-readable INFO messages.
      */
@@ -54,7 +64,7 @@ public class ReportSystemEnvironment implements Runnable {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         final SortedMap<String, String> sortedProperties;
         try {
-            sortedProperties = new TreeMap<>(System.getenv());
+            sortedProperties = new TreeMap<>(getEnvironmentVariables()); // Use the protected method
         } catch (final SecurityException ignored) {
             ps.println("System Environment: access denied");
             return;
