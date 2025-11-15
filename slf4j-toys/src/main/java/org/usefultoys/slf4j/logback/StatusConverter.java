@@ -20,6 +20,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.slf4j.Marker;
 import org.usefultoys.slf4j.meter.Markers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A Logback converter that extracts and formats a concise status string based on the
  * SLF4J {@link Marker} associated with a logging event.
@@ -31,39 +34,46 @@ import org.usefultoys.slf4j.meter.Markers;
  * @author Daniel Felix Ferber
  * @see Markers
  */
-public class StatusConverter extends ClassicConverter  {
+public class StatusConverter extends ClassicConverter {
+    private static final Map<Marker, String> STATUS_MAP = new HashMap<>();
+
+    static {
+        STATUS_MAP.put(Markers.MSG_START, "START");
+        STATUS_MAP.put(Markers.MSG_PROGRESS, "PROGR");
+        STATUS_MAP.put(Markers.MSG_OK, "OK");
+        STATUS_MAP.put(Markers.MSG_SLOW_OK, "SLOW");
+        STATUS_MAP.put(Markers.MSG_REJECT, "REJECT");
+        STATUS_MAP.put(Markers.MSG_FAIL, "FAIL");
+        STATUS_MAP.put(Markers.DATA_START, "");
+        STATUS_MAP.put(Markers.DATA_PROGRESS, "");
+        STATUS_MAP.put(Markers.DATA_OK, "");
+        STATUS_MAP.put(Markers.DATA_SLOW_OK, "");
+        STATUS_MAP.put(Markers.DATA_REJECT, "");
+        STATUS_MAP.put(Markers.DATA_FAIL, "");
+        STATUS_MAP.put(Markers.BUG, "BUG");
+        STATUS_MAP.put(Markers.ILLEGAL, "ILLEGAL");
+        STATUS_MAP.put(Markers.INCONSISTENT_START, "INCONSISTENT");
+        STATUS_MAP.put(Markers.INCONSISTENT_INCREMENT, "INCONSISTENT");
+        STATUS_MAP.put(Markers.INCONSISTENT_PROGRESS, "INCONSISTENT");
+        STATUS_MAP.put(Markers.INCONSISTENT_EXCEPTION, "INCONSISTENT");
+        STATUS_MAP.put(Markers.INCONSISTENT_REJECT, "INCONSISTENT");
+        STATUS_MAP.put(Markers.INCONSISTENT_OK, "INCONSISTENT");
+        STATUS_MAP.put(Markers.INCONSISTENT_FAIL, "INCONSISTENT");
+        STATUS_MAP.put(Markers.INCONSISTENT_FINALIZED, "INCONSISTENT");
+        STATUS_MAP.put(org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER, "WATCHER");
+        STATUS_MAP.put(org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER, "");
+    }
+
     /**
      * Converts a logging event's {@link Marker} into a status string.
      *
      * @param event The logging event.
      * @return A string representing the status, or an empty string for data markers.
      */
+    @Override
     public String convert(final ILoggingEvent event) {
         final Marker marker = event.getMarker();
-        if (marker == Markers.MSG_START) return "START";
-        if (marker == Markers.MSG_PROGRESS) return "PROGR";
-        if (marker == Markers.MSG_OK) return "OK";
-        if (marker == Markers.MSG_SLOW_OK) return "SLOW";
-        if (marker == Markers.MSG_REJECT) return "REJECT";
-        if (marker == Markers.MSG_FAIL) return "FAIL";
-        if (marker == Markers.DATA_START) return "";
-        if (marker == Markers.DATA_PROGRESS) return "";
-        if (marker == Markers.DATA_OK) return "";
-        if (marker == Markers.DATA_SLOW_OK) return "";
-        if (marker == Markers.DATA_REJECT) return "";
-        if (marker == Markers.DATA_FAIL) return "";
-        if (marker == Markers.BUG) return "BUG";
-        if (marker == Markers.ILLEGAL) return "ILLEGAL";
-        if (marker == Markers.INCONSISTENT_START) return "INCONSISTENT";
-        if (marker == Markers.INCONSISTENT_INCREMENT) return "INCONSISTENT";
-        if (marker == Markers.INCONSISTENT_PROGRESS) return "INCONSISTENT";
-        if (marker == Markers.INCONSISTENT_EXCEPTION) return "INCONSISTENT";
-        if (marker == Markers.INCONSISTENT_REJECT) return "INCONSISTENT";
-        if (marker == Markers.INCONSISTENT_OK) return "INCONSISTENT";
-        if (marker == Markers.INCONSISTENT_FAIL) return "INCONSISTENT";
-        if (marker == Markers.INCONSISTENT_FINALIZED) return "INCONSISTENT";
-        if (marker == org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER) return "WATCHER";
-        if (marker == org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER) return "";
-        return event.getLevel().toString();
+        final String statusString = STATUS_MAP.get(marker);
+        return statusString != null ? statusString : event.getLevel().toString();
     }
 }

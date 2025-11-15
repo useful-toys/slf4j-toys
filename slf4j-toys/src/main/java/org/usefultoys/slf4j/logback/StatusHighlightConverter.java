@@ -21,6 +21,9 @@ import ch.qos.logback.core.pattern.color.ForegroundCompositeConverterBase;
 import org.slf4j.Marker;
 import org.usefultoys.slf4j.meter.Markers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A Logback converter that applies ANSI foreground colors to log messages based on their SLF4J {@link Marker}
  * or logging {@link Level}. This converter is used to visually highlight the status of operations
@@ -59,6 +62,35 @@ public class StatusHighlightConverter extends ForegroundCompositeConverterBase<I
     /** ANSI color code for starting or in-progress operations. */
     public static final String START_VISIBILITY = AnsiColors.CYAN;
 
+    private static final Map<Marker, String> MARKER_MAP = new HashMap<>();
+
+    static {
+        MARKER_MAP.put(Markers.MSG_START, START_VISIBILITY);
+        MARKER_MAP.put(Markers.MSG_PROGRESS, START_VISIBILITY);
+        MARKER_MAP.put(Markers.MSG_OK, SUCCESS_VISIBILITY);
+        MARKER_MAP.put(Markers.MSG_SLOW_OK, WARN_VISIBILITY);
+        MARKER_MAP.put(Markers.MSG_REJECT, REJECT_VISIBILITY);
+        MARKER_MAP.put(Markers.MSG_FAIL, ERROR_VISIBILITY);
+        MARKER_MAP.put(Markers.DATA_START, LESS_VISIBILITY);
+        MARKER_MAP.put(Markers.DATA_PROGRESS, LESS_VISIBILITY);
+        MARKER_MAP.put(Markers.DATA_OK, LESS_VISIBILITY);
+        MARKER_MAP.put(Markers.DATA_SLOW_OK, LESS_VISIBILITY);
+        MARKER_MAP.put(Markers.DATA_REJECT, LESS_VISIBILITY);
+        MARKER_MAP.put(Markers.DATA_FAIL, LESS_VISIBILITY);
+        MARKER_MAP.put(org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER, LESS_VISIBILITY);
+        MARKER_MAP.put(Markers.BUG, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(Markers.ILLEGAL, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(Markers.INCONSISTENT_START, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(Markers.INCONSISTENT_INCREMENT, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(Markers.INCONSISTENT_PROGRESS, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(Markers.INCONSISTENT_EXCEPTION, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(Markers.INCONSISTENT_REJECT, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(Markers.INCONSISTENT_OK, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(Markers.INCONSISTENT_FAIL, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(Markers.INCONSISTENT_FINALIZED, INCONSISTENCY_VISIBILITY);
+        MARKER_MAP.put(org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER, WATCHER_VISIBILITY);
+    }
+
     /**
      * Determines the ANSI foreground color code based on the logging event's {@link Marker} or {@link Level}.
      *
@@ -68,30 +100,10 @@ public class StatusHighlightConverter extends ForegroundCompositeConverterBase<I
     @Override
     protected String getForegroundColorCode(final ILoggingEvent event) {
         final Marker marker = event.getMarker();
-        if (marker == Markers.MSG_START) return START_VISIBILITY;
-        if (marker == Markers.MSG_PROGRESS) return START_VISIBILITY;
-        if (marker == Markers.MSG_OK) return SUCCESS_VISIBILITY;
-        if (marker == Markers.MSG_SLOW_OK) return WARN_VISIBILITY;
-        if (marker == Markers.MSG_REJECT) return REJECT_VISIBILITY;
-        if (marker == Markers.MSG_FAIL) return ERROR_VISIBILITY;
-        if (marker == Markers.DATA_START
-                || marker == Markers.DATA_PROGRESS
-                || marker == Markers.DATA_OK
-                || marker == Markers.DATA_SLOW_OK
-                || marker == Markers.DATA_REJECT
-                || marker == Markers.DATA_FAIL
-                || marker == org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER) return LESS_VISIBILITY;
-        if (marker == Markers.BUG
-                || marker == Markers.ILLEGAL
-                || marker == Markers.INCONSISTENT_START
-                || marker == Markers.INCONSISTENT_INCREMENT
-                || marker == Markers.INCONSISTENT_PROGRESS
-                || marker == Markers.INCONSISTENT_EXCEPTION
-                || marker == Markers.INCONSISTENT_REJECT
-                || marker == Markers.INCONSISTENT_OK
-                || marker == Markers.INCONSISTENT_FAIL
-                || marker == Markers.INCONSISTENT_FINALIZED) return INCONSISTENCY_VISIBILITY;
-        if (marker == org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER) return WATCHER_VISIBILITY;
+        final String markerString = MARKER_MAP.get(marker);
+        if (markerString != null) {
+            return markerString;
+        }
 
         final Level level = event.getLevel();
         switch (level.toInt()) {
@@ -109,5 +121,4 @@ public class StatusHighlightConverter extends ForegroundCompositeConverterBase<I
                 return DEFAULT_VISIBILITY;
         }
     }
-
 }
