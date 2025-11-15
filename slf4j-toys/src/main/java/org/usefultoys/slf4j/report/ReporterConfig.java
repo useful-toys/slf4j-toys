@@ -73,6 +73,12 @@ public class ReporterConfig {
     public final String PROP_SSL_CONTEXT = "slf4jtoys.report.SSLContext";
     /** System property key for enabling/disabling the default trust keystore report. */
     public final String PROP_DEFAULT_TRUST_KEYSTORE = "slf4jtoys.report.defaultTrustKeyStore";
+    /** System property key for enabling/disabling the JVM arguments report. */
+    public final String PROP_JVM_ARGUMENTS = "slf4jtoys.report.jvmArguments";
+    /** System property key for enabling/disabling the classpath report. */
+    public final String PROP_CLASSPATH = "slf4jtoys.report.classpath";
+    /** System property key for enabling/disabling the garbage collector report. */
+    public final String PROP_GARBAGE_COLLECTOR = "slf4jtoys.report.garbageCollector";
     /** System property key for setting the default logger name for reports. */
     public final String PROP_NAME = "slf4jtoys.report.name";
     /** System property key for the regular expression defining forbidden property names. */
@@ -193,6 +199,30 @@ public class ReporterConfig {
     public boolean reportDefaultTrustKeyStore;
 
     /**
+     * Whether the default report includes JVM arguments.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.report.jvmArguments}. Defaults to {@code false}.
+     * Can be changed at runtime.
+     */
+    public boolean reportJvmArguments;
+
+    /**
+     * Whether the default report includes classpath information.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.report.classpath}. Defaults to {@code false}.
+     * Can be changed at runtime.
+     */
+    public boolean reportClasspath;
+
+    /**
+     * Whether the default report includes garbage collector information.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.report.garbageCollector}. Defaults to {@code false}.
+     * Can be changed at runtime.
+     */
+    public boolean reportGarbageCollector;
+
+    /**
      * Defines the default name used for the logger that prints reports.
      * <p>
      * Controlled by the system property {@code slf4jtoys.report.name}. Defaults to {@code "report"}.
@@ -220,17 +250,20 @@ public class ReporterConfig {
         reportVM = ConfigParser.getProperty(PROP_VM, true);
         reportFileSystem = ConfigParser.getProperty(PROP_FILE_SYSTEM, false);
         reportMemory = ConfigParser.getProperty(PROP_MEMORY, true);
-        reportUser = ConfigParser.getProperty(PROP_USER, true);
-        reportProperties = ConfigParser.getProperty(PROP_PROPERTIES, true);
+        reportUser = ConfigParser.getProperty(PROP_USER, false);
+        reportProperties = ConfigParser.getProperty(PROP_PROPERTIES, false);
         reportEnvironment = ConfigParser.getProperty(PROP_ENVIRONMENT, false);
         reportPhysicalSystem = ConfigParser.getProperty(PROP_PHYSICAL_SYSTEM, true);
         reportOperatingSystem = ConfigParser.getProperty(PROP_OPERATING_SYSTEM, true);
-        reportCalendar = ConfigParser.getProperty(PROP_CALENDAR, true);
-        reportLocale = ConfigParser.getProperty(PROP_LOCALE, true);
-        reportCharset = ConfigParser.getProperty(PROP_CHARSET, true);
+        reportCalendar = ConfigParser.getProperty(PROP_CALENDAR, false);
+        reportLocale = ConfigParser.getProperty(PROP_LOCALE, false);
+        reportCharset = ConfigParser.getProperty(PROP_CHARSET, false);
         reportNetworkInterface = ConfigParser.getProperty(PROP_NETWORK_INTERFACE, false);
         reportSSLContext = ConfigParser.getProperty(PROP_SSL_CONTEXT, false);
         reportDefaultTrustKeyStore = ConfigParser.getProperty(PROP_DEFAULT_TRUST_KEYSTORE, false);
+        reportJvmArguments = ConfigParser.getProperty(PROP_JVM_ARGUMENTS, false);
+        reportClasspath = ConfigParser.getProperty(PROP_CLASSPATH, false);
+        reportGarbageCollector = ConfigParser.getProperty(PROP_GARBAGE_COLLECTOR, false);
         name = ConfigParser.getProperty(PROP_NAME, "report");
         forbiddenPropertyNamesRegex = ConfigParser.getProperty(PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*password.*|.*secret.*|.*key.*|.*token.*");
     }
@@ -268,6 +301,9 @@ public class ReporterConfig {
         System.clearProperty(ReporterConfig.PROP_NETWORK_INTERFACE);
         System.clearProperty(ReporterConfig.PROP_SSL_CONTEXT);
         System.clearProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE);
+        System.clearProperty(ReporterConfig.PROP_JVM_ARGUMENTS);
+        System.clearProperty(ReporterConfig.PROP_CLASSPATH);
+        System.clearProperty(ReporterConfig.PROP_GARBAGE_COLLECTOR);
         System.clearProperty(ReporterConfig.PROP_NAME);
         System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
         init();

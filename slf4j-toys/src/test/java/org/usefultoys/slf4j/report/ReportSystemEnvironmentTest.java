@@ -17,6 +17,7 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -27,13 +28,20 @@ import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.utils.ConfigParser;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReportSystemEnvironmentTest {
+
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     private static final String TEST_LOGGER_NAME = "test.logger";
     private MockLogger mockLogger;

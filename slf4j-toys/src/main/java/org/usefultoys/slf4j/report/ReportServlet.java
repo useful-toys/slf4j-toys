@@ -49,6 +49,9 @@ import java.util.Locale;
  *   <li>{@code /DefaultTrustKeyStore} — Logs information about the default trusted keystore.</li>
  *   <li>{@code /Environment} — Logs environment variables.</li>
  *   <li>{@code /Properties} — Logs system properties.</li>
+ *   <li>{@code /JvmArguments} — Logs JVM input arguments.</li>
+ *   <li>{@code /Classpath} — Logs classpath entries.</li>
+ *   <li>{@code /GarbageCollector} — Logs garbage collector information.</li>
  * </ul>
  * <p>
  * If the path does not match any known suffix, no action is taken and the request is silently ignored.
@@ -143,10 +146,16 @@ public class ReportServlet extends HttpServlet {
             new ReportSSLContext(logger).run();
         } else if ("defaulttrustkeystore".equalsIgnoreCase(pathinfo)) {
             new ReportDefaultTrustKeyStore(logger).run();
-        } else if ("environment".equalsIgnoreCase(pathinfo)) { // Added missing report
+        } else if ("environment".equalsIgnoreCase(pathinfo)) {
             new ReportSystemEnvironment(logger).run();
-        } else if ("properties".equalsIgnoreCase(pathinfo)) { // Added missing report
+        } else if ("properties".equalsIgnoreCase(pathinfo)) {
             new ReportSystemProperties(logger).run();
+        } else if ("jvmarguments".equalsIgnoreCase(pathinfo)) {
+            new ReportJvmArguments(logger).run();
+        } else if ("classpath".equalsIgnoreCase(pathinfo)) {
+            new ReportClasspath(logger).run();
+        } else if ("garbagecollector".equalsIgnoreCase(pathinfo)) {
+            new ReportGarbageCollector(logger).run();
         } else {
             log.warn("Unrecognized report path: {}", pathinfo);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);

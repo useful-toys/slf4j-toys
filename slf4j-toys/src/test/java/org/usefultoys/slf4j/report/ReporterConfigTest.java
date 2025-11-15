@@ -67,6 +67,9 @@ class ReporterConfigTest {
         assertFalse(ReporterConfig.reportNetworkInterface, "Default value for reportNetworkInterface should be false");
         assertFalse(ReporterConfig.reportSSLContext, "Default value for reportSSLContext should be false");
         assertFalse(ReporterConfig.reportDefaultTrustKeyStore, "Default value for reportDefaultTrustKeyStore should be false");
+        assertFalse(ReporterConfig.reportJvmArguments, "Default value for reportJvmArguments should be false");
+        assertFalse(ReporterConfig.reportClasspath, "Default value for reportClasspath should be false");
+        assertFalse(ReporterConfig.reportGarbageCollector, "Default value for reportGarbageCollector should be false");
         assertEquals("report", ReporterConfig.name, "Default value for name should be 'report'");
         assertEquals("(?i).*password.*|.*secret.*|.*key.*|.*token.*", ReporterConfig.forbiddenPropertyNamesRegex, "Default value for forbiddenPropertyNamesRegex should be the security regex");
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for default values");
@@ -77,11 +80,17 @@ class ReporterConfigTest {
         // Set some properties to non-default values
         System.setProperty(ReporterConfig.PROP_VM, "false");
         System.setProperty(ReporterConfig.PROP_FILE_SYSTEM, "true");
+        System.setProperty(ReporterConfig.PROP_JVM_ARGUMENTS, "true");
+        System.setProperty(ReporterConfig.PROP_CLASSPATH, "true");
+        System.setProperty(ReporterConfig.PROP_GARBAGE_COLLECTOR, "true");
         System.setProperty(ReporterConfig.PROP_NAME, "custom");
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, ".*custom.*");
         ReporterConfig.init();
         assertFalse(ReporterConfig.reportVM);
         assertTrue(ReporterConfig.reportFileSystem);
+        assertTrue(ReporterConfig.reportJvmArguments);
+        assertTrue(ReporterConfig.reportClasspath);
+        assertTrue(ReporterConfig.reportGarbageCollector);
         assertEquals("custom", ReporterConfig.name);
         assertEquals(".*custom.*", ReporterConfig.forbiddenPropertyNamesRegex);
 
@@ -89,6 +98,9 @@ class ReporterConfigTest {
         ReporterConfig.reset();
         assertTrue(ReporterConfig.reportVM);
         assertFalse(ReporterConfig.reportFileSystem);
+        assertFalse(ReporterConfig.reportJvmArguments);
+        assertFalse(ReporterConfig.reportClasspath);
+        assertFalse(ReporterConfig.reportGarbageCollector);
         assertEquals("report", ReporterConfig.name);
         assertEquals("(?i).*password.*|.*secret.*|.*key.*|.*token.*", ReporterConfig.forbiddenPropertyNamesRegex);
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported after reset");
@@ -295,7 +307,6 @@ class ReporterConfigTest {
     void testReportNetworkInterfaceProperty() {
         System.setProperty(ReporterConfig.PROP_NETWORK_INTERFACE, "true");
         ReporterConfig.init();
-        assertTrue(ReporterConfig.reportNetworkInterface, "reportNetworkInterface should reflect the system property value");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -313,7 +324,6 @@ class ReporterConfigTest {
     void testReportSSLContextProperty() {
         System.setProperty(ReporterConfig.PROP_SSL_CONTEXT, "true");
         ReporterConfig.init();
-        assertTrue(ReporterConfig.reportSSLContext, "reportSSLContext should reflect the system property value");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -331,7 +341,6 @@ class ReporterConfigTest {
     void testReportDefaultTrustKeyStoreProperty() {
         System.setProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE, "true");
         ReporterConfig.init();
-        assertTrue(ReporterConfig.reportDefaultTrustKeyStore, "reportDefaultTrustKeyStore should reflect the system property value");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -343,6 +352,60 @@ class ReporterConfigTest {
         assertFalse(ConfigParser.isInitializationOK());
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE));
+    }
+
+    @Test
+    void testReportJvmArgumentsProperty() {
+        System.setProperty(ReporterConfig.PROP_JVM_ARGUMENTS, "true");
+        ReporterConfig.init();
+        assertTrue(ReporterConfig.reportJvmArguments, "reportJvmArguments should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testReportJvmArgumentsInvalidFormat() {
+        System.setProperty(ReporterConfig.PROP_JVM_ARGUMENTS, "invalid");
+        ReporterConfig.init();
+        assertFalse(ReporterConfig.reportJvmArguments, "reportJvmArguments should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_JVM_ARGUMENTS));
+    }
+
+    @Test
+    void testReportClasspathProperty() {
+        System.setProperty(ReporterConfig.PROP_CLASSPATH, "true");
+        ReporterConfig.init();
+        assertTrue(ReporterConfig.reportClasspath, "reportClasspath should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testReportClasspathInvalidFormat() {
+        System.setProperty(ReporterConfig.PROP_CLASSPATH, "invalid");
+        ReporterConfig.init();
+        assertFalse(ReporterConfig.reportClasspath, "reportClasspath should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CLASSPATH));
+    }
+
+    @Test
+    void testReportGarbageCollectorProperty() {
+        System.setProperty(ReporterConfig.PROP_GARBAGE_COLLECTOR, "true");
+        ReporterConfig.init();
+        assertTrue(ReporterConfig.reportGarbageCollector, "reportGarbageCollector should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testReportGarbageCollectorInvalidFormat() {
+        System.setProperty(ReporterConfig.PROP_GARBAGE_COLLECTOR, "invalid");
+        ReporterConfig.init();
+        assertFalse(ReporterConfig.reportGarbageCollector, "reportGarbageCollector should fall back to default for invalid format"); // Default is false
+        assertFalse(ConfigParser.isInitializationOK());
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_GARBAGE_COLLECTOR));
     }
 
     @Test

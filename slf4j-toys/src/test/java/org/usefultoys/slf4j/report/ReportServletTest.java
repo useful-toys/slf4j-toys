@@ -16,258 +16,273 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
-import org.mockito.MockedStatic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.SystemConfig;
+import org.usefultoys.slf4j.utils.ConfigParser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Collections;
-import java.util.Enumeration;
+import java.nio.charset.Charset;
+import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class ReportServletTest {
 
+    @BeforeAll
+    static void validate() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    private static final String TEST_REPORTER_NAME = "test.report";
     private ReportServlet servlet;
-    private HttpServletRequest mockRequest;
-    private HttpServletResponse mockResponse;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
     private StringWriter responseWriter;
-    private MockLogger mockLogger;
+    private MockLogger reportMockLogger; // Logger used by the reports themselves
+    private MockLogger servletMockLogger; // Logger used by the servlet (Slf4j annotation)
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws IOException {
+        ConfigParser.clearInitializationErrors();
+        ReporterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+
+        // Configure ReporterConfig to use a known logger name for reports
+        System.setProperty(ReporterConfig.PROP_NAME, TEST_REPORTER_NAME);
+        ReporterConfig.init();
+
+        // Initialize MockLoggers
+        Logger reportLogger = LoggerFactory.getLogger(TEST_REPORTER_NAME);
+        reportMockLogger = (MockLogger) reportLogger;
+        reportMockLogger.clearEvents();
+        reportMockLogger.setInfoEnabled(true); // Ensure INFO level is enabled
+
+        Logger servletLogger = LoggerFactory.getLogger(ReportServlet.class);
+        servletMockLogger = (MockLogger) servletLogger;
+        servletMockLogger.clearEvents();
+        servletMockLogger.setWarnEnabled(true); // Ensure WARN level is enabled for servlet's internal logging
+
         servlet = new ReportServlet();
-        mockRequest = mock(HttpServletRequest.class);
-        mockResponse = mock(HttpServletResponse.class);
+        request = mock(HttpServletRequest.class);
+        response = mock(HttpServletResponse.class);
         responseWriter = new StringWriter();
-        when(mockResponse.getWriter()).thenReturn(new PrintWriter(responseWriter));
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+    }
 
-        // Correctly get the logger instance used by ReportServlet (which uses @Slf4j)
-        final Logger logger = LoggerFactory.getLogger(ReportServlet.class);
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
+    @AfterEach
+    void tearDown() {
+        System.clearProperty(ReporterConfig.PROP_NAME);
+        ReporterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+        ConfigParser.clearInitializationErrors();
+    }
+
+    private void assertReportLogged(String expectedContentPart) {
+        assertTrue(reportMockLogger.getEventCount() > 0, "Report logger should have events");
+        String logOutput = reportMockLogger.getLoggerEvents().stream()
+                .map(MockLoggerEvent::getFormattedMessage)
+                .collect(Collectors.joining("\n"));
+        assertTrue(logOutput.contains(expectedContentPart), "Report log output should contain: " + expectedContentPart);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
     @Test
-    void testDoGet_NullPathInfo() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn(null);
+    void testNoPathInfoReturnsNotFound() throws IOException {
+        when(request.getPathInfo()).thenReturn(null);
 
-        servlet.doGet(mockRequest, mockResponse);
+        servlet.doGet(request, response);
 
-        verify(mockResponse).setStatus(HttpServletResponse.SC_NOT_FOUND);
-        verify(mockResponse).setContentType("text/plain");
+        verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
+        verify(response).setContentType("text/plain");
         assertTrue(responseWriter.toString().contains("No report path provided."));
-        assertTrue(mockLogger.getEventCount() > 0);
-        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("No report path provided."));
+        assertEquals(1, servletMockLogger.getEventCount());
+        servletMockLogger.assertEvent(0, MockLoggerEvent.Level.WARN, "No report path provided.");
+        assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
-    void testDoGet_UnrecognizedPathInfo() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/unknown");
+    void testUnknownPathInfoReturnsNotFound() throws IOException {
+        when(request.getPathInfo()).thenReturn("/unknown");
 
-        servlet.doGet(mockRequest, mockResponse);
+        servlet.doGet(request, response);
 
-        verify(mockResponse).setStatus(HttpServletResponse.SC_NOT_FOUND);
-        verify(mockResponse).setContentType("text/plain");
+        verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
+        verify(response).setContentType("text/plain");
         assertTrue(responseWriter.toString().contains("Unknown report path: unknown"));
-        assertTrue(mockLogger.getEventCount() > 0);
-        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Unrecognized report path: unknown"));
+        assertEquals(1, servletMockLogger.getEventCount());
+        servletMockLogger.assertEvent(0, MockLoggerEvent.Level.WARN, "Unrecognized report path: unknown");
+        assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
-    void testDoGet_ReportVM() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/VM");
-
-        try (MockedConstruction<ReportVM> mocked = mockConstruction(ReportVM.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testVMReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/VM");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: vm"));
+        assertReportLogged("Java Virtual Machine");
     }
 
     @Test
-    void testDoGet_ReportFileSystem() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/FileSystem");
-
-        try (MockedConstruction<ReportFileSystem> mocked = mockConstruction(ReportFileSystem.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testFileSystemReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/FileSystem");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: filesystem"));
+        assertReportLogged("File system root:");
     }
 
     @Test
-    void testDoGet_ReportMemory() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/Memory");
-
-        try (MockedConstruction<ReportMemory> mocked = mockConstruction(ReportMemory.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testMemoryReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/Memory");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: memory"));
+        assertReportLogged("Memory:");
     }
 
     @Test
-    void testDoGet_ReportUser() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/User");
-
-        try (MockedConstruction<ReportUser> mocked = mockConstruction(ReportUser.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testUserReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/User");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: user"));
+        assertReportLogged("User:");
     }
 
     @Test
-    void testDoGet_ReportPhysicalSystem() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/PhysicalSystem");
-
-        try (MockedConstruction<ReportPhysicalSystem> mocked = mockConstruction(ReportPhysicalSystem.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testPhysicalSystemReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/PhysicalSystem");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: physicalsystem"));
+        assertReportLogged("Physical system");
     }
 
     @Test
-    void testDoGet_ReportOperatingSystem() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/OperatingSystem");
-
-        try (MockedConstruction<ReportOperatingSystem> mocked = mockConstruction(ReportOperatingSystem.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testOperatingSystemReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/OperatingSystem");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: operatingsystem"));
+        assertReportLogged("Operating System");
     }
 
     @Test
-    void testDoGet_ReportCalendar() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/Calendar");
-
-        try (MockedConstruction<ReportCalendar> mocked = mockConstruction(ReportCalendar.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testCalendarReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/Calendar");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: calendar"));
+        assertReportLogged("Calendar");
     }
 
     @Test
-    void testDoGet_ReportLocale() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/Locale");
-
-        try (MockedConstruction<ReportLocale> mocked = mockConstruction(ReportLocale.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testLocaleReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/Locale");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: locale"));
+        assertReportLogged("Locale");
     }
 
     @Test
-    void testDoGet_ReportCharset() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/Charset");
-
-        try (MockedConstruction<ReportCharset> mocked = mockConstruction(ReportCharset.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testCharsetReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/Charset");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: charset"));
+        assertReportLogged("Charset");
     }
 
     @Test
-    void testDoGet_ReportSSLContext() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/SSLContext");
+    void testNetworkInterfaceReport() throws IOException {
+        // Note: Mocking NetworkInterface.getNetworkInterfaces() is complex.
+        // This test primarily checks if the servlet attempts to run the report.
+        when(request.getPathInfo()).thenReturn("/NetworkInterface");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: networkinterface"));
+        // Cannot easily assert specific content without mocking NetworkInterface
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+    }
 
-        try (MockedConstruction<ReportSSLContext> mocked = mockConstruction(ReportSSLContext.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    @Test
+    void testSSLContextReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/SSLContext");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: sslcontext"));
+        assertReportLogged("SSL Context");
     }
 
     @Test
-    void testDoGet_ReportDefaultTrustKeyStore() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/DefaultTrustKeyStore");
-
-        try (MockedConstruction<ReportDefaultTrustKeyStore> mocked = mockConstruction(ReportDefaultTrustKeyStore.class)) {
-            servlet.doGet(mockRequest, mockResponse);
-            verify(mocked.constructed().get(0)).run();
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    void testDefaultTrustKeyStoreReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/DefaultTrustKeyStore");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: defaulttrustkeystore"));
+        assertReportLogged("Trust Keystore");
     }
 
     @Test
-    void testDoGet_ReportNetworkInterface_SocketException() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/NetworkInterface");
-
-        try (MockedStatic<NetworkInterface> mockedStatic = mockStatic(NetworkInterface.class)) {
-            mockedStatic.when(NetworkInterface::getNetworkInterfaces).thenThrow(new SocketException("Mock SocketException"));
-
-            servlet.doGet(mockRequest, mockResponse);
-
-            assertTrue(mockLogger.getEventCount() > 0);
-            // Check if any log event contains the expected message
-            boolean found = mockLogger.getLoggerEvents().stream()
-                    .anyMatch(event -> event.getFormattedMessage().contains("Cannot report network interface"));
-            assertTrue(found, "Expected log message 'Cannot report network interface' not found.");
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
-        assertTrue(responseWriter.toString().contains("Report logged for: networkinterface"));
+    void testEnvironmentReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/Environment");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: environment"));
+        assertReportLogged("System Environment:");
     }
 
     @Test
-    void testDoGet_ReportNetworkInterface_MultipleInterfaces() throws Exception {
-        when(mockRequest.getPathInfo()).thenReturn("/NetworkInterface");
+    void testPropertiesReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/Properties");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: properties"));
+        assertReportLogged("System Properties:");
+    }
 
-        NetworkInterface mockNif1 = mock(NetworkInterface.class);
-        NetworkInterface mockNif2 = mock(NetworkInterface.class);
-        Enumeration<NetworkInterface> mockEnumeration = Collections.enumeration(java.util.Arrays.asList(mockNif1, mockNif2));
+    @Test
+    void testJvmArgumentsReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/JvmArguments");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: jvmarguments"));
+        assertReportLogged("JVM Arguments:");
+    }
 
-        try (MockedStatic<NetworkInterface> mockedStatic = mockStatic(NetworkInterface.class)) {
-            mockedStatic.when(NetworkInterface::getNetworkInterfaces).thenReturn(mockEnumeration);
+    @Test
+    void testClasspathReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/Classpath");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: classpath"));
+        assertReportLogged("Classpath:");
+    }
 
-            try (MockedConstruction<ReportNetworkInterface> mocked = mockConstruction(ReportNetworkInterface.class)) {
-                servlet.doGet(mockRequest, mockResponse);
-
-                // Verify that ReportNetworkInterface was constructed twice and run() called on each
-                verify(mocked.constructed().get(0)).run();
-                verify(mocked.constructed().get(1)).run();
-            }
-        }
-
-        verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
-        assertTrue(responseWriter.toString().contains("Report logged for: networkinterface"));
+    @Test
+    void testGarbageCollectorReport() throws IOException {
+        when(request.getPathInfo()).thenReturn("/GarbageCollector");
+        servlet.doGet(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: garbagecollector"));
+        assertReportLogged("Garbage Collectors:");
     }
 }

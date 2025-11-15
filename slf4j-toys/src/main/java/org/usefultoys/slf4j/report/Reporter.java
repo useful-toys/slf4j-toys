@@ -143,5 +143,14 @@ public class Reporter implements Serializable {
         if (ReporterConfig.reportDefaultTrustKeyStore) {
             executor.execute(new ReportDefaultTrustKeyStore(logger));
         }
+        if (ReporterConfig.reportJvmArguments) {
+            executor.execute(new ReportJvmArguments(logger));
+        }
+        if (ReporterConfig.reportClasspath) {
+            executor.execute(new ReportClasspath(logger));
+        }
+        if (ReporterConfig.reportGarbageCollector) {
+            executor.execute(new ReportGarbageCollector(logger));
+        }
     }
 }
