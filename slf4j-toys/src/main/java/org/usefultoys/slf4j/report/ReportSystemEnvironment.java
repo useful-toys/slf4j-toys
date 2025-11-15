@@ -26,6 +26,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 /**
  * A report module that lists all environment variables available to the current Java process.
@@ -59,8 +60,17 @@ public class ReportSystemEnvironment implements Runnable {
             return;
         }
         ps.println("System Environment:");
+
+        final Pattern forbiddenPattern = Pattern.compile(ReporterConfig.forbiddenPropertyNamesRegex);
+
         for (final Map.Entry<String, String> entry : sortedProperties.entrySet()) {
-            ps.printf(" - %s: %s%n", entry.getKey(), entry.getValue());
+            final String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (forbiddenPattern.matcher(key).matches()) {
+                value = "********"; // Censor sensitive values
+            }
+            ps.printf(" - %s: %s%n", key, value);
         }
         ps.println(); // Ensure a newline at the end of the report
     }

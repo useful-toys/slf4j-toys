@@ -75,6 +75,9 @@ public class ReporterConfig {
     public final String PROP_DEFAULT_TRUST_KEYSTORE = "slf4jtoys.report.defaultTrustKeyStore";
     /** System property key for setting the default logger name for reports. */
     public final String PROP_NAME = "slf4jtoys.report.name";
+    /** System property key for the regular expression defining forbidden property names. */
+    public final String PROP_FORBIDDEN_PROPERTY_NAMES_REGEX = "slf4jtoys.report.forbiddenPropertyNamesRegex";
+
 
     /**
      * Whether the default report includes Java Virtual Machine (JVM) information.
@@ -198,6 +201,18 @@ public class ReporterConfig {
     public String name;
 
     /**
+     * A regular expression used to identify sensitive property names (system properties or environment variables)
+     * whose values should be censored in reports.
+     * <p>
+     * Controlled by the system property {@code slf4jtoys.report.forbiddenPropertyNamesRegex}.
+     * Defaults to {@code "(?i).*password.*|.*secret.*|.*key.*|.*token.*"}.
+     * The {@code (?i)} flag makes the regex case-insensitive.
+     * Can be changed at runtime.
+     */
+    public String forbiddenPropertyNamesRegex;
+
+
+    /**
      * Initializes the configuration attributes by reading the corresponding system properties.
      * This method should be called at application startup to ensure they are properly initialized.
      */
@@ -217,6 +232,7 @@ public class ReporterConfig {
         reportSSLContext = ConfigParser.getProperty(PROP_SSL_CONTEXT, false);
         reportDefaultTrustKeyStore = ConfigParser.getProperty(PROP_DEFAULT_TRUST_KEYSTORE, false);
         name = ConfigParser.getProperty(PROP_NAME, "report");
+        forbiddenPropertyNamesRegex = ConfigParser.getProperty(PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*password.*|.*secret.*|.*key.*|.*token.*");
     }
 
     /**
@@ -253,6 +269,7 @@ public class ReporterConfig {
         System.clearProperty(ReporterConfig.PROP_SSL_CONTEXT);
         System.clearProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE);
         System.clearProperty(ReporterConfig.PROP_NAME);
+        System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
         init();
     }
 }

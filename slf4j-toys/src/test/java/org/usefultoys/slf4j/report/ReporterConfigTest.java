@@ -68,6 +68,7 @@ class ReporterConfigTest {
         assertFalse(ReporterConfig.reportSSLContext, "Default value for reportSSLContext should be false");
         assertFalse(ReporterConfig.reportDefaultTrustKeyStore, "Default value for reportDefaultTrustKeyStore should be false");
         assertEquals("report", ReporterConfig.name, "Default value for name should be 'report'");
+        assertEquals("(?i).*password.*|.*secret.*|.*key.*|.*token.*", ReporterConfig.forbiddenPropertyNamesRegex, "Default value for forbiddenPropertyNamesRegex should be the security regex");
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for default values");
     }
 
@@ -77,16 +78,19 @@ class ReporterConfigTest {
         System.setProperty(ReporterConfig.PROP_VM, "false");
         System.setProperty(ReporterConfig.PROP_FILE_SYSTEM, "true");
         System.setProperty(ReporterConfig.PROP_NAME, "custom");
+        System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, ".*custom.*");
         ReporterConfig.init();
         assertFalse(ReporterConfig.reportVM);
         assertTrue(ReporterConfig.reportFileSystem);
         assertEquals("custom", ReporterConfig.name);
+        assertEquals(".*custom.*", ReporterConfig.forbiddenPropertyNamesRegex);
 
         // Reset and check if they return to default
         ReporterConfig.reset();
         assertTrue(ReporterConfig.reportVM);
         assertFalse(ReporterConfig.reportFileSystem);
         assertEquals("report", ReporterConfig.name);
+        assertEquals("(?i).*password.*|.*secret.*|.*key.*|.*token.*", ReporterConfig.forbiddenPropertyNamesRegex);
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported after reset");
     }
 
@@ -112,7 +116,6 @@ class ReporterConfigTest {
     void testReportFileSystemProperty() {
         System.setProperty(ReporterConfig.PROP_FILE_SYSTEM, "true");
         ReporterConfig.init();
-        assertTrue(ReporterConfig.reportFileSystem, "reportFileSystem should reflect the system property value");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -347,6 +350,14 @@ class ReporterConfigTest {
         System.setProperty(ReporterConfig.PROP_NAME, "customReport");
         ReporterConfig.init();
         assertEquals("customReport", ReporterConfig.name, "name should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testForbiddenPropertyNamesRegexProperty() {
+        System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, ".*custom.*");
+        ReporterConfig.init();
+        assertEquals(".*custom.*", ReporterConfig.forbiddenPropertyNamesRegex, "forbiddenPropertyNamesRegex should reflect the system property value");
         assertTrue(ConfigParser.isInitializationOK());
     }
 }

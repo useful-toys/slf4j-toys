@@ -16,66 +16,129 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
+import org.usefultoys.slf4j.utils.ConfigParser;
 
-import java.nio.charset.Charset;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReportSystemPropertiesTest {
 
+    private static final String TEST_LOGGER_NAME = "test.logger";
     private MockLogger mockLogger;
-
-    @BeforeAll
-    static void validate() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    @BeforeEach
-    void resetWatcherConfigBeforeEach() {
-        // Reinitialize each configuration to ensure a clean configuration before each test
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
-
-    @AfterAll
-    static void resetWatcherConfigAfterAll() {
-        // Reinitialize each configuration to ensure a clean configuration before each test
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
 
     @BeforeEach
     void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.sysprops");
-        mockLogger = (MockLogger) logger;
+        // Clear any previous errors from ConfigParser
+        ConfigParser.clearInitializationErrors();
+
+        // Initialize MockLogger
+        // LoggerFactory.getLogger should return a MockLogger in the test environment due to slf4j-simple binding
+        Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
+        mockLogger = (MockLogger) testLogger;
         mockLogger.clearEvents();
+
+        // Reset all relevant configs to ensure a clean state for ConfigParser.initializationErrors
+        // ReporterConfig.reset() calls init() internally
+        ReporterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    @AfterEach
+    void tearDown() {
+        // Clear test properties
+        System.clearProperty("test.password");
+        System.clearProperty("test.secret");
+        System.clearProperty("test.normal");
+        System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
+
+        // Reset all relevant configs again for good measure
+        ReporterConfig.reset();
+        SessionConfig.reset();
+        SystemConfig.reset();
+    }
+
+    // Helper method to get all formatted log messages from the MockLogger
+    private String getLogOutput() {
+        return mockLogger.getLoggerEvents().stream()
+                .map(MockLoggerEvent::getFormattedMessage)
+                .collect(Collectors.joining("\n"));
     }
 
     @Test
-    void shouldLogSystemProperties() {
-        // Arrange
-        final ReportSystemProperties report = new ReportSystemProperties(mockLogger);
+    void testSensitivePropertiesAreCensoredWithDefaultRegex() {
+        System.setProperty("test.password", "mysecretpassword");
+        System.setProperty("test.secret", "anothersecret");
+        System.setProperty("test.normal", "normalvalue");
 
-        // Act
-        report.run();
+        new ReportSystemProperties(mockLogger).run();
 
-        // Assert
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("System Properties:"));
-        assertTrue(logs.contains("java.version")); // valor pode variar, mas chave é conhecida
-        assertTrue(logs.contains(System.getProperty("java.version"))); // valor conhecido no ambiente atual
+        String logOutput = getLogOutput();
+
+        assertTrue(logOutput.contains("test.password: ********"), "Log output should censor test.password");
+        assertTrue(logOutput.contains("test.secret: ********"), "Log output should censor test.secret");
+        assertTrue(logOutput.contains("test.normal: normalvalue"), "Log output should contain test.normal value");
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+    }
+
+    @Test
+    void testSensitivePropertiesAreCensoredWithCustomRegex() {
+        System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*custom.*");
+        ReporterConfig.init(); // Reinitialize to apply custom regex
+
+        System.setProperty("test.custom.key", "customvalue");
+        System.setProperty("test.normal", "normalvalue");
+
+        new ReportSystemProperties(mockLogger).run();
+
+        String logOutput = getLogOutput();
+
+        assertTrue(logOutput.contains("test.custom.key: ********"), "Log output should censor test.custom.key with custom regex");
+        assertTrue(logOutput.contains("test.normal: normalvalue"), "Log output should contain test.normal value");
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+    }
+
+    @Test
+    void testNoCensoringWhenRegexIsEmpty() {
+        System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "");
+        ReporterConfig.init(); // Reinitialize to apply empty regex
+
+        System.setProperty("test.password", "mysecretpassword");
+        System.setProperty("test.secret", "anothersecret");
+
+        new ReportSystemProperties(mockLogger).run();
+
+        String logOutput = getLogOutput();
+
+        assertTrue(logOutput.contains("test.password: mysecretpassword"), "Log output should NOT censor test.password when regex is empty");
+        assertTrue(logOutput.contains("test.secret: anothersecret"), "Log output should NOT censor test.secret when regex is empty");
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+    }
+
+    @Test
+    void testNoCensoringWhenRegexDoesNotMatch() {
+        System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, ".*nonexistent.*");
+        ReporterConfig.init(); // Reinitialize to apply non-matching regex
+
+        System.setProperty("test.password", "mysecretpassword");
+        System.setProperty("test.secret", "anothersecret");
+
+        new ReportSystemProperties(mockLogger).run();
+
+        String logOutput = getLogOutput();
+
+        assertTrue(logOutput.contains("test.password: mysecretpassword"), "Log output should NOT censor test.password when regex does not match");
+        assertTrue(logOutput.contains("test.secret: anothersecret"), "Log output should NOT censor test.secret when regex does not match");
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 }
