@@ -120,7 +120,7 @@ public abstract class EventData implements Serializable {
 
     /**
      * Subclasses must implement this method to append their specific properties
-     * to the JSON5-encoded string. This method is called by {@link #json5Message(StringBuilder)}.
+     * to the JSON5-encoded string. This method is called by {@link #json5Message()}.
      *
      * @param sb The StringBuilder to which the JSON5 properties are appended.
      */

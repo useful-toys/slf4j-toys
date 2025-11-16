@@ -70,22 +70,13 @@ public class SystemMetricsCollector {
         collectManagedBeanStatus(data);
     }
 
-    /**
-     * Protected method to allow test subclasses to override where the Runtime instance comes from.
-     *
-     * @return The {@link Runtime} instance.
-     */
-    protected Runtime getRuntime() {
-        return Runtime.getRuntime();
-    }
-
-    /**
+     /**
      * Collects memory usage statistics from the JVM's {@link Runtime} object.
      *
      * @param data The {@link SystemData} object to be populated.
      */
     public void collectRuntimeStatus(final SystemData data) {
-        final Runtime runtime = getRuntime();
+        final Runtime runtime = Runtime.getRuntime();
         data.runtime_totalMemory = runtime.totalMemory();
         data.runtime_usedMemory = data.runtime_totalMemory - runtime.freeMemory();
         data.runtime_maxMemory = runtime.maxMemory();

@@ -218,9 +218,9 @@ public abstract class SystemData extends EventData {
 
     /** JSON5 key for memory usage (used, total, max) from {@link Runtime}. */
     public static final String PROP_MEMORY = "m";
-    /** JSON5 key for heap memory usage (used, committed, max) from {@link MemoryMXBean}. */
+    /** JSON5 key for heap memory usage (used, committed, max). */
     public static final String PROP_HEAP = "h";
-    /** JSON5 key for non-heap memory usage (used, committed, max) from {@link MemoryMXBean}. */
+    /** JSON5 key for non-heap memory usage (used, committed, max). */
     public static final String PROP_NON_HEAP = "nh";
     /** JSON5 key for the number of objects pending finalization. */
     public static final String PROP_FINALIZATION_COUNT = "fc";
