@@ -41,6 +41,39 @@ public class ReportMemory implements Runnable {
     private final @NonNull Logger logger;
 
     /**
+     * Interface for providing memory information to the report.
+     * <p>
+     * This interface can be overridden in tests to simulate different memory scenarios.
+     * The default implementation uses the JVM's {@link Runtime} class.
+     */
+    protected interface MemoryInfoProvider {
+        /**
+         * @return the maximum amount of memory that the JVM will attempt to use (in bytes)
+         */
+        long maxMemory();
+        /**
+         * @return the total amount of memory currently allocated to the JVM (in bytes)
+         */
+        long totalMemory();
+        /**
+         * @return the amount of free memory in the JVM (in bytes)
+         */
+        long freeMemory();
+    }
+
+    /**
+     * Returns the provider for memory information used by this report.
+     * <p>
+     * The default implementation returns a provider based on the JVM's {@link Runtime}.
+     * This method can be overridden in subclasses for testing or custom memory sources.
+     *
+     * @return a MemoryInfoProvider instance
+     */
+    protected MemoryInfoProvider getMemoryInfoProvider() {
+        return new RuntimeMemoryInfoProvider();
+    }
+
+    /**
      * Executes the report, writing memory usage information to the configured logger.
      * The output is formatted as human-readable INFO messages.
      */
@@ -48,11 +81,11 @@ public class ReportMemory implements Runnable {
     public void run() {
         @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
-        final Runtime runtime = Runtime.getRuntime();
+        final MemoryInfoProvider memoryInfoProvider = getMemoryInfoProvider();
+        final long maxMemory = memoryInfoProvider.maxMemory();
+        final long totalMemory = memoryInfoProvider.totalMemory();
+        final long freeMemory = memoryInfoProvider.freeMemory();
         ps.println("Memory:");
-        final long maxMemory = runtime.maxMemory();
-        final long totalMemory = runtime.totalMemory();
-        final long freeMemory = runtime.freeMemory();
         ps.printf(" - maximum allowed: %s%n",
                 maxMemory == Long.MAX_VALUE ? "no limit" : UnitFormatter.bytes(maxMemory));
         ps.printf(" - currently allocated: %s (%s more available)%n",
@@ -62,5 +95,31 @@ public class ReportMemory implements Runnable {
                 UnitFormatter.bytes(totalMemory - freeMemory),
                 UnitFormatter.bytes(freeMemory));
         ps.println(); // Ensure a newline at the end of the report
+    }
+
+    /**
+     * Default implementation of MemoryInfoProvider using the JVM's {@link Runtime}.
+     */
+    private static class RuntimeMemoryInfoProvider implements MemoryInfoProvider {
+        private final Runtime runtime = Runtime.getRuntime();
+
+        /**
+         * Returns the maximum amount of memory that the JVM will attempt to use (in bytes).
+         * @return the maximum memory in bytes
+         */
+        @Override
+        public long maxMemory() { return runtime.maxMemory(); }
+        /**
+         * Returns the total amount of memory currently allocated to the JVM (in bytes).
+         * @return the total allocated memory in bytes
+         */
+        @Override
+        public long totalMemory() { return runtime.totalMemory(); }
+        /**
+         * Returns the amount of free memory in the JVM (in bytes).
+         * @return the free memory in bytes
+         */
+        @Override
+        public long freeMemory() { return runtime.freeMemory(); }
     }
 }
