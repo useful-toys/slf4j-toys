@@ -21,15 +21,12 @@ import lombok.NoArgsConstructor;
 import org.usefultoys.slf4j.internal.SystemData;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * Extends {@link SystemData} with specific attributes for an operation measured by a {@link Meter}.
- * This class holds data related to the operation's lifecycle, performance, and outcome.
+ * Extends {@link SystemData} with specific attributes for an operation measured by a {@link Meter}. This class holds
+ * data related to the operation's lifecycle, performance, and outcome.
  *
  * @author Daniel Felix Ferber
  * @see Meter
@@ -43,11 +40,11 @@ public class MeterData extends SystemData {
     /**
      * Constructs a MeterData instance for a new operation.
      *
-     * @param uuid The session UUID.
-     * @param position The sequential position of the operation.
-     * @param category The category name of the operation.
+     * @param uuid      The session UUID.
+     * @param position  The sequential position of the operation.
+     * @param category  The category name of the operation.
      * @param operation The name of the operation.
-     * @param parent The full ID of the parent operation, if this is a sub-operation.
+     * @param parent    The full ID of the parent operation, if this is a sub-operation.
      */
     protected MeterData(final String uuid, final long position, final String category, final String operation, final String parent) {
         super(uuid, position);
@@ -60,41 +57,41 @@ public class MeterData extends SystemData {
     /**
      * Constructs a MeterData instance with all fields, primarily for testing or deserialization.
      *
-     * @param sessionUuid The session UUID.
-     * @param position The sequential position of the operation.
-     * @param time The timestamp when the data was collected.
-     * @param heap_commited The committed heap memory in bytes.
-     * @param heap_max The maximum heap memory in bytes.
-     * @param heap_used The used heap memory in bytes.
-     * @param nonHeap_commited The committed non-heap memory in bytes.
-     * @param nonHeap_max The maximum non-heap memory in bytes.
-     * @param nonHeap_used The used non-heap memory in bytes.
+     * @param sessionUuid                    The session UUID.
+     * @param position                       The sequential position of the operation.
+     * @param time                           The timestamp when the data was collected.
+     * @param heap_commited                  The committed heap memory in bytes.
+     * @param heap_max                       The maximum heap memory in bytes.
+     * @param heap_used                      The used heap memory in bytes.
+     * @param nonHeap_commited               The committed non-heap memory in bytes.
+     * @param nonHeap_max                    The maximum non-heap memory in bytes.
+     * @param nonHeap_used                   The used non-heap memory in bytes.
      * @param objectPendingFinalizationCount The number of objects pending finalization.
-     * @param classLoading_loaded The number of classes currently loaded.
-     * @param classLoading_total The total number of classes loaded since JVM start.
-     * @param classLoading_unloaded The total number of classes unloaded since JVM start.
-     * @param compilationTime The total time spent in compilation.
-     * @param garbageCollector_count The total number of garbage collections.
-     * @param garbageCollector_time The total time spent in garbage collection.
-     * @param runtime_usedMemory The used memory reported by Runtime.
-     * @param runtime_maxMemory The maximum memory reported by Runtime.
-     * @param runtime_totalMemory The total memory reported by Runtime.
-     * @param systemLoad The system CPU load.
-     * @param category The category name of the operation.
-     * @param operation The name of the operation.
-     * @param parent The full ID of the parent operation.
-     * @param description A human-readable description of the operation.
-     * @param createTime Timestamp when the operation was created.
-     * @param startTime Timestamp when the operation started execution.
-     * @param stopTime Timestamp when the operation finished execution.
-     * @param timeLimit The time limit for the operation in nanoseconds.
-     * @param currentIteration The current iteration count.
-     * @param expectedIterations The total expected iterations.
-     * @param okPath The path taken for a successful execution.
-     * @param rejectPath The reason for rejection.
-     * @param failPath The reason for failure (e.g., exception class name).
-     * @param failMessage An optional message detailing the failure.
-     * @param context Additional key-value context data.
+     * @param classLoading_loaded            The number of classes currently loaded.
+     * @param classLoading_total             The total number of classes loaded since JVM start.
+     * @param classLoading_unloaded          The total number of classes unloaded since JVM start.
+     * @param compilationTime                The total time spent in compilation.
+     * @param garbageCollector_count         The total number of garbage collections.
+     * @param garbageCollector_time          The total time spent in garbage collection.
+     * @param runtime_usedMemory             The used memory reported by Runtime.
+     * @param runtime_maxMemory              The maximum memory reported by Runtime.
+     * @param runtime_totalMemory            The total memory reported by Runtime.
+     * @param systemLoad                     The system CPU load.
+     * @param category                       The category name of the operation.
+     * @param operation                      The name of the operation.
+     * @param parent                         The full ID of the parent operation.
+     * @param description                    A human-readable description of the operation.
+     * @param createTime                     Timestamp when the operation was created.
+     * @param startTime                      Timestamp when the operation started execution.
+     * @param stopTime                       Timestamp when the operation finished execution.
+     * @param timeLimit                      The time limit for the operation in nanoseconds.
+     * @param currentIteration               The current iteration count.
+     * @param expectedIterations             The total expected iterations.
+     * @param okPath                         The path taken for a successful execution.
+     * @param rejectPath                     The reason for rejection.
+     * @param failPath                       The reason for failure (e.g., exception class name).
+     * @param failMessage                    An optional message detailing the failure.
+     * @param context                        Additional key-value context data.
      */
     @SuppressWarnings("ConstructorWithTooManyParameters")
     protected MeterData(final String sessionUuid, final long position, final long time, final long heap_commited, final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded, final long compilationTime, final long garbageCollector_count, final long garbageCollector_time, final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory, final double systemLoad, final String category, final String operation, final String parent, final String description, final long createTime, final long startTime, final long stopTime, final long timeLimit, final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage, final Map<String, String> context) {
@@ -147,12 +144,14 @@ public class MeterData extends SystemData {
     @Getter
     protected long startTime = 0;
     /**
-     * The timestamp (in nanoseconds) when the operation finished execution (success, rejection, or failure). Zero if the operation has not yet finished.
+     * The timestamp (in nanoseconds) when the operation finished execution (success, rejection, or failure). Zero if
+     * the operation has not yet finished.
      */
     @Getter
     protected long stopTime = 0;
     /**
-     * The time limit (in nanoseconds) considered reasonable for successful execution of the operation. Zero if no time limit is defined.
+     * The time limit (in nanoseconds) considered reasonable for successful execution of the operation. Zero if no time
+     * limit is defined.
      */
     @Getter
     protected long timeLimit = 0;
@@ -162,31 +161,32 @@ public class MeterData extends SystemData {
     @Getter
     protected long currentIteration = 0;
     /**
-     * The total number of iterations expected for the operation. Zero if iterations are not applicable or not specified.
+     * The total number of iterations expected for the operation. Zero if iterations are not applicable or not
+     * specified.
      */
     @Getter
     protected long expectedIterations = 0;
     /**
-     * For successful execution, a string identifying the execution path. Mutually exclusive with {@link #rejectPath} and {@link #failPath}.
-     * Set only when the operation finishes successfully and a path was provided.
+     * For successful execution, a string identifying the execution path. Mutually exclusive with {@link #rejectPath}
+     * and {@link #failPath}. Set only when the operation finishes successfully and a path was provided.
      */
     @Getter
     protected String okPath = null;
     /**
-     * For rejected execution, a string identifying the rejection cause. Mutually exclusive with {@link #okPath} and {@link #failPath}.
-     * Set only when the operation finishes with a rejection.
+     * For rejected execution, a string identifying the rejection cause. Mutually exclusive with {@link #okPath} and
+     * {@link #failPath}. Set only when the operation finishes with a rejection.
      */
     @Getter
     protected String rejectPath = null;
     /**
-     * For failed execution, a string identifying the failure cause (e.g., the class name of the exception). Mutually exclusive with {@link #okPath} and {@link #rejectPath}.
-     * Set only when the operation finishes with a failure.
+     * For failed execution, a string identifying the failure cause (e.g., the class name of the exception). Mutually
+     * exclusive with {@link #okPath} and {@link #rejectPath}. Set only when the operation finishes with a failure.
      */
     @Getter
     protected String failPath = null;
     /**
-     * For failed execution, an optional message detailing the cause of the failure. Typically, the message from the exception.
-     * Only set in conjunction with {@link #failPath}.
+     * For failed execution, an optional message detailing the cause of the failure. Typically, the message from the
+     * exception. Only set in conjunction with {@link #failPath}.
      */
     @Getter
     protected String failMessage = null;
@@ -294,7 +294,8 @@ public class MeterData extends SystemData {
     /**
      * Returns the execution time of the operation.
      *
-     * @return The duration from {@code startTime} to {@code stopTime} (if stopped) or to {@code lastCurrentTime} (if ongoing), in nanoseconds.
+     * @return The duration from {@code startTime} to {@code stopTime} (if stopped) or to {@code lastCurrentTime} (if
+     * ongoing), in nanoseconds.
      */
     public long getExecutionTime() {
         if (startTime == 0) {
@@ -308,7 +309,8 @@ public class MeterData extends SystemData {
     /**
      * Returns the waiting time before the operation started.
      *
-     * @return The duration from {@code createTime} to {@code startTime} (if started) or to {@code lastCurrentTime} (if not yet started), in nanoseconds.
+     * @return The duration from {@code createTime} to {@code startTime} (if started) or to {@code lastCurrentTime} (if
+     * not yet started), in nanoseconds.
      */
     public long getWaitingTime() {
         if (startTime == 0) {
@@ -320,7 +322,8 @@ public class MeterData extends SystemData {
     /**
      * Checks if the operation is considered slow based on its {@code timeLimit}.
      *
-     * @return {@code true} if a {@code timeLimit} is set, the operation has started, and its execution time exceeds the limit.
+     * @return {@code true} if a {@code timeLimit} is set, the operation has started, and its execution time exceeds the
+     * limit.
      */
     public boolean isSlow() {
         return timeLimit != 0 && startTime != 0 && getExecutionTime() > timeLimit;
@@ -357,153 +360,22 @@ public class MeterData extends SystemData {
         return builder.toString();
     }
 
-    /** JSON5 key for the operation's description. */
-    private static final String PROP_DESCRIPTION = "d";
-    /** JSON5 key for the success path ID. */
-    private static final String PROP_PATH_ID = "p";
-    /** JSON5 key for the rejection path ID. */
-    private static final String PROP_REJECT_ID = "r";
-    /** JSON5 key for the failure path ID. */
-    private static final String PROP_FAIL_ID = "f";
-    /** JSON5 key for the failure message. */
-    private static final String PROP_FAIL_MESSAGE = "fm";
-    /** JSON5 key for the creation timestamp. */
-    private static final String PROP_CREATE_TIME = "t0";
-    /** JSON5 key for the start timestamp. */
-    private static final String PROP_START_TIME = "t1";
-    /** JSON5 key for the stop timestamp. */
-    private static final String PROP_STOP_TIME = "t2";
-    /** JSON5 key for the current iteration count. */
-    private static final String PROP_ITERATION = "i";
-    /** JSON5 key for the expected iteration count. */
-    private static final String PROP_EXPECTED_ITERATION = "ei";
-    /** JSON5 key for the time limit. */
-    private static final String PROP_LIMIT_TIME = "tl";
-    /** JSON5 key for the context map. */
-    private static final String PROP_CONTEXT = "ctx";
-    /** JSON5 key for the event category. */
-    private static final String EVENT_CATEGORY = "c";
-    /** JSON5 key for the event name (operation). */
-    private static final String EVENT_NAME = "n";
-    /** JSON5 key for the parent event ID. */
-    private static final String EVENT_PARENT = "ep";
-
-    private static final Pattern patternDescription = Pattern.compile(REGEX_START +PROP_DESCRIPTION + REGEX_STRING_VALUE);
-    private static final Pattern patternPathId = Pattern.compile(REGEX_START +PROP_PATH_ID + REGEX_WORD_VALUE);
-    private static final Pattern patternRejectId = Pattern.compile(REGEX_START +PROP_REJECT_ID + REGEX_WORD_VALUE);
-    private static final Pattern patternFailId = Pattern.compile(REGEX_START +PROP_FAIL_ID + REGEX_WORD_VALUE);
-    private static final Pattern patternFailMessage = Pattern.compile(REGEX_START +PROP_FAIL_MESSAGE + REGEX_STRING_VALUE);
-    private static final Pattern patternCreateTime = Pattern.compile(REGEX_START +PROP_CREATE_TIME + REGEX_WORD_VALUE);
-    private static final Pattern patternStartTime = Pattern.compile(REGEX_START +PROP_START_TIME + REGEX_WORD_VALUE);
-    private static final Pattern patternStopTime = Pattern.compile(REGEX_START +PROP_STOP_TIME + REGEX_WORD_VALUE);
-    private static final Pattern patternIteration = Pattern.compile(REGEX_START +PROP_ITERATION + REGEX_WORD_VALUE);
-    private static final Pattern patternExpectedIteration = Pattern.compile(REGEX_START +PROP_EXPECTED_ITERATION + REGEX_WORD_VALUE);
-    private static final Pattern patternLimitTime = Pattern.compile(REGEX_START +PROP_LIMIT_TIME + REGEX_WORD_VALUE);
-    private static final Pattern patternEventCategory = Pattern.compile(REGEX_START +EVENT_CATEGORY + REGEX_WORD_VALUE);
-    private static final Pattern patternEventName = Pattern.compile(REGEX_START +EVENT_NAME + REGEX_WORD_VALUE);
-    private static final Pattern patternEventParent = Pattern.compile(REGEX_START +EVENT_PARENT + REGEX_WORD_VALUE);
-    private static final Pattern patternContext = Pattern.compile(REGEX_START +PROP_CONTEXT + "\\s*:\\s*\\{([^}]*)\\}");
-
-    /**
-     * Reads and parses MeterData from a JSON5-encoded string, populating the object's fields.
+     /**
+     * Returns the machine-parsable, JSON5-encoded representation of the event.
      *
-     * @param json5 The JSON5-encoded string containing MeterData.
+     * @return A string containing the JSON5-encoded message.
      */
-    @SuppressWarnings("CallToSuspiciousStringMethod")
-    public void readJson5(final String json5) {
-        super.readJson5(json5);
-
-        final Matcher matcherDescription = patternDescription.matcher(json5);
-        if (matcherDescription.find()) {
-            description = matcherDescription.group(1);
-        }
-
-        final Matcher matcherPathId = patternPathId.matcher(json5);
-        if (matcherPathId.find()) {
-            okPath = matcherPathId.group(1);
-        }
-
-        final Matcher matcherRejectId = patternRejectId.matcher(json5);
-        if (matcherRejectId.find()) {
-            rejectPath = matcherRejectId.group(1);
-        }
-
-        final Matcher matcherFailId = patternFailId.matcher(json5);
-        if (matcherFailId.find()) {
-            failPath = matcherFailId.group(1);
-        }
-
-        final Matcher matcherFailMessage = patternFailMessage.matcher(json5);
-        if (matcherFailMessage.find()) {
-            failMessage = matcherFailMessage.group(1);
-        }
-
-        final Matcher matcherCreateTime = patternCreateTime.matcher(json5);
-        if (matcherCreateTime.find()) {
-            createTime = Long.parseLong(matcherCreateTime.group(1));
-        }
-
-        final Matcher matcherStartTime = patternStartTime.matcher(json5);
-        if (matcherStartTime.find()) {
-            startTime = Long.parseLong(matcherStartTime.group(1));
-        }
-
-        final Matcher matcherStopTime = patternStopTime.matcher(json5);
-        if (matcherStopTime.find()) {
-            stopTime = Long.parseLong(matcherStopTime.group(1));
-        }
-
-        final Matcher matcherIteration = patternIteration.matcher(json5);
-        if (matcherIteration.find()) {
-            currentIteration = Long.parseLong(matcherIteration.group(1));
-        }
-
-        final Matcher matcherExpectedIteration = patternExpectedIteration.matcher(json5);
-        if (matcherExpectedIteration.find()) {
-            expectedIterations = Long.parseLong(matcherExpectedIteration.group(1));
-        }
-
-        final Matcher matcherLimitTime = patternLimitTime.matcher(json5);
-        if (matcherLimitTime.find()) {
-            timeLimit = Long.parseLong(matcherLimitTime.group(1));
-        }
-
-        final Matcher matcherEventCategory = patternEventCategory.matcher(json5);
-        if (matcherEventCategory.find()) {
-            category = matcherEventCategory.group(1);
-        }
-
-        final Matcher matcherEventName = patternEventName.matcher(json5);
-        if (matcherEventName.find()) {
-            operation = matcherEventName.group(1);
-        }
-
-        final Matcher matcherEventParent = patternEventParent.matcher(json5);
-        if (matcherEventParent.find()) {
-            parent = matcherEventParent.group(1);
-        }
-
-        final Matcher matcherContext = patternContext.matcher(json5);
-        if (matcherContext.find()) {
-            final String contextString = matcherContext.group(1);
-            if (contextString != null && !contextString.isEmpty()) {
-                final String[] contextEntries = contextString.split(",");
-                context = new HashMap<>(10);
-                for (final String entry : contextEntries) {
-                    final String[] keyValue = entry.split(":");
-                    if (keyValue.length >= 1) {
-                        final String key = keyValue[0].trim();
-                        final String value = (keyValue.length > 1) ? keyValue[1].trim() : null;
-                        context.put(key, value);
-                    }
-                }
-            }
-        }
+    public final String json5Message() {
+        final StringBuilder sb = new StringBuilder(200);
+        sb.append("{");
+        writeJson5(sb);
+        sb.append("}");
+        return sb.toString();
     }
 
     /**
-     * Compares this MeterData object to the specified object. The comparison is based on
-     * {@code category}, {@code operation}, {@code position}, and {@code sessionUuid}.
+     * Compares this MeterData object to the specified object. The comparison is based on {@code category},
+     * {@code operation}, {@code position}, and {@code sessionUuid}.
      *
      * @param o The object to compare against.
      * @return {@code true} if the objects are equal, {@code false} otherwise.
@@ -539,80 +411,15 @@ public class MeterData extends SystemData {
         return result;
     }
 
-    /**
-     * Appends the MeterData-specific properties to the JSON5-encoded string.
-     * This method is called by {@link #json5Message()}.
-     *
-     * @param sb The StringBuilder to which the JSON5 properties are appended.
-     */
-    @SuppressWarnings("MagicCharacter")
     @Override
-    public void writeJson5Impl(final StringBuilder sb) {
-        super.writeJson5Impl(sb);
-        if (description != null) {
-            sb.append(String.format(",%s:'%s'", PROP_DESCRIPTION, description));
-        }
-        if (rejectPath != null) {
-            sb.append(String.format(",%s:%s",PROP_REJECT_ID, rejectPath));
-        }
-        if (okPath != null) {
-            sb.append(String.format(",%s:%s",PROP_PATH_ID, okPath));
-        }
-        if (failPath != null) {
-            sb.append(String.format(",%s:%s",PROP_FAIL_ID, failPath));
-        }
-        if (failMessage != null) {
-            sb.append(String.format(",%s:'%s'", PROP_FAIL_MESSAGE, failMessage));
-        }
-        if (category != null) {
-            sb.append(String.format(",%s:%s",EVENT_CATEGORY, category));
-        }
-        if (operation != null) {
-            sb.append(String.format(",%s:%s",EVENT_NAME, operation));
-        }
-        if (parent != null) {
-            sb.append(String.format(",%s:%s",EVENT_PARENT, parent));
-        }
+    protected void writeJson5(final StringBuilder sb) {
+        super.writeJson5(sb);
+        MeterDataJson5.write(this, sb);
+    }
 
-        /* Create, start, stop time. */
-        if (createTime != 0) {
-            sb.append(String.format(",%s:%d",PROP_CREATE_TIME, createTime));
-        }
-        if (startTime != 0) {
-            sb.append(String.format(",%s:%d",PROP_START_TIME, startTime));
-        }
-        if (stopTime != 0) {
-            sb.append(String.format(",%s:%d",PROP_STOP_TIME, stopTime));
-        }
-        if (currentIteration != 0) {
-            sb.append(String.format(",%s:%d",PROP_ITERATION, currentIteration));
-        }
-        if (expectedIterations != 0) {
-            sb.append(String.format(",%s:%d",PROP_EXPECTED_ITERATION, expectedIterations));
-        }
-        if (timeLimit != 0) {
-            sb.append(String.format(",%s:%d",PROP_LIMIT_TIME, timeLimit));
-        }
-
-        /* Context */
-        if (context != null && !context.isEmpty()) {
-            sb.append(',');
-            sb.append(PROP_CONTEXT);
-            sb.append(":{");
-            boolean separatorNeeded = false;
-            for (final Map.Entry<String, String> entry : context.entrySet()) {
-                if (separatorNeeded) {
-                    sb.append(',');
-                } else {
-                    separatorNeeded = true;
-                }
-                sb.append(entry.getKey());
-                sb.append(':');
-                if (entry.getValue() != null) {
-                    sb.append(entry.getValue());
-                }
-            }
-            sb.append('}');
-        }
+    @Override
+    public void readJson5(final String json5) {
+        super.readJson5(json5);
+        MeterDataJson5.read(this, json5);
     }
 }

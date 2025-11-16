@@ -87,4 +87,18 @@ public class WatcherData extends SystemData {
         WatcherDataFormatter.readableStringBuilder(this, builder);
         return builder.toString();
     }
+
+    /**
+     * Returns the machine-parsable, JSON5-encoded representation of the event.
+     *
+     * @return A string containing the JSON5-encoded message.
+     */
+    public final String json5Message() {
+        final StringBuilder sb = new StringBuilder(200);
+        sb.append("{");
+        writeJson5(sb);
+        sb.append("}");
+        return sb.toString();
+    }
+
 }

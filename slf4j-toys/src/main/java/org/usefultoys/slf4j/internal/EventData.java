@@ -20,14 +20,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Abstract base class for events collected by `slf4j-toys`.
- * It provides common attributes and methods for event identification, timestamping,
- * and serialization to human-readable and machine-parsable formats.
+ * It provides common attributes for event identification and timestamping.
+ * The responsibility for serialization is delegated to a corresponding Json5 serializer class.
  *
  * @author Daniel Felix Ferber
  */
@@ -106,78 +103,23 @@ public abstract class EventData implements Serializable {
     }
 
     /**
-     * JSON5 key for the session UUID.
-     */
-    public static final String SESSION_UUID = "_";
-    /**
-     * JSON5 key for the event's sequential position.
-     */
-    public static final String EVENT_POSITION = "$";
-    /**
-     * JSON5 key for the event's timestamp.
-     */
-    public static final String EVENT_TIME = "t";
-
-    /**
-     * Subclasses must implement this method to append their specific properties
-     * to the JSON5-encoded string. This method is called by {@link #json5Message()}.
+     * Appends the object's properties to the JSON5-encoded string by delegating
+     * to the appropriate Json5 serializer. Subclasses should override this method
+     * to delegate to their own specific serializer.
      *
      * @param sb The StringBuilder to which the JSON5 properties are appended.
      */
-    protected void writeJson5Impl(final StringBuilder sb) {
-        sb.append(String.format(Locale.US, "%s:%s,%s:%d,%s:%d", SESSION_UUID, sessionUuid, EVENT_POSITION, position, EVENT_TIME, lastCurrentTime));
+    protected void writeJson5(final StringBuilder sb) {
+        EventDataJson5.write(this, sb);
     }
 
     /**
-     * Returns the machine-parsable, JSON5-encoded representation of the event.
-     * This is an alias for {@link #json5Message()}.
-     *
-     * @return A string containing the JSON5-encoded message.
-     */
-    public final String json5Message() {
-        final StringBuilder sb = new StringBuilder(200);
-        sb.append("{");
-        writeJson5Impl(sb);
-        sb.append("}");
-        return sb.toString();
-    }
-
-    /**
-     * Regular expression component for matching the start of a JSON5 object or a new field.
-     */
-    protected static final String REGEX_START = "[{,]";
-    /**
-     * Regular expression component for matching a string value in JSON5 (e.g., `: 'value'`).
-     */
-    protected static final String REGEX_STRING_VALUE = "\\s*:\\s*'([^']*)'";
-    /**
-     * Regular expression component for matching a word (non-string) value in JSON5 (e.g., `: value`).
-     */
-    protected static final String REGEX_WORD_VALUE = "\\s*:\\s*([^,}\\s]+)";
-
-    private static final Pattern patternSession = Pattern.compile(REGEX_START+SESSION_UUID+REGEX_WORD_VALUE);
-    private static final Pattern patternPosition = Pattern.compile(REGEX_START+"\\"+EVENT_POSITION+REGEX_WORD_VALUE);
-    private static final Pattern patternTime = Pattern.compile(REGEX_START+EVENT_TIME+REGEX_WORD_VALUE);
-
-    /**
-     * Reads and parses event data from a JSON5-encoded string, populating the object's fields.
+     * Reads and parses event data from a JSON5-encoded string by delegating
+     * to the appropriate Json5 serializer, populating the object's fields.
      *
      * @param json5 The JSON5-encoded string containing event data.
      */
     public void readJson5(final String json5) {
-        final Matcher matcherSession = patternSession.matcher(json5);
-        if (matcherSession.find()) {
-            sessionUuid = matcherSession.group(1);
-        }
-
-        final Matcher matcherPosition = patternPosition.matcher(json5);
-        if (matcherPosition.find()) {
-            position = Long.parseLong(matcherPosition.group(1));
-        }
-
-        final Matcher matcherTime = patternTime.matcher(json5);
-        if (matcherTime.find()) {
-            lastCurrentTime = Long.parseLong(matcherTime.group(1));
-        }
+        EventDataJson5.read(this, json5);
     }
 }
