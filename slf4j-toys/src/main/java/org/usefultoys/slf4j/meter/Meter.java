@@ -717,7 +717,7 @@ public class Meter extends MeterData implements Closeable {
                 collectPlatformStatus();
                 messageLogger.debug(Markers.MSG_START, readableMessage());
                 if (dataLogger.isTraceEnabled()) {
-                    dataLogger.trace(Markers.DATA_START, encodedMessage());
+                    dataLogger.trace(Markers.DATA_START, json5Message());
                 }
                 if (context != null) {
                     context.clear();
@@ -817,7 +817,7 @@ public class Meter extends MeterData implements Closeable {
                     collectPlatformStatus();
                     messageLogger.info(Markers.MSG_PROGRESS, readableMessage());
                     if (dataLogger.isTraceEnabled()) {
-                        final String message2 = encodedMessage();
+                        final String message2 = json5Message();
                         if (startTime != 0 && timeLimit != 0 && (now - startTime) > timeLimit) {
                             dataLogger.trace(Markers.DATA_SLOW_PROGRESS, message2);
                         } else if (dataLogger.isTraceEnabled()) {
@@ -899,7 +899,7 @@ public class Meter extends MeterData implements Closeable {
                     messageLogger.info(Markers.MSG_OK, message1);
                 }
                 if (dataLogger.isTraceEnabled()) {
-                    final String message2 = encodedMessage();
+                    final String message2 = json5Message();
                     if (warnSlowness) {
                         dataLogger.trace(Markers.DATA_SLOW_OK, message2);
                     } else {
@@ -980,7 +980,7 @@ public class Meter extends MeterData implements Closeable {
                     messageLogger.info(Markers.MSG_OK, message1);
                 }
                 if (dataLogger.isTraceEnabled()) {
-                    final String message2 = encodedMessage();
+                    final String message2 = json5Message();
                     if (warnSlowness) {
                         dataLogger.trace(Markers.DATA_SLOW_OK, message2);
                     } else {
@@ -1072,7 +1072,7 @@ public class Meter extends MeterData implements Closeable {
                     messageLogger.info(Markers.MSG_REJECT, message1);
                 }
                 if (dataLogger.isTraceEnabled()) {
-                    final String message2 = encodedMessage();
+                    final String message2 = json5Message();
                     dataLogger.trace(Markers.DATA_REJECT, message2);
                 }
                 if (context != null) {
@@ -1134,7 +1134,7 @@ public class Meter extends MeterData implements Closeable {
                 collectPlatformStatus();
                 messageLogger.error(Markers.MSG_FAIL, readableMessage());
                 if (dataLogger.isTraceEnabled()) {
-                    dataLogger.trace(Markers.DATA_FAIL, encodedMessage());
+                    dataLogger.trace(Markers.DATA_FAIL, json5Message());
                 }
                 if (context != null) {
                     context.clear();
@@ -1286,7 +1286,7 @@ public class Meter extends MeterData implements Closeable {
                 collectPlatformStatus();
                 messageLogger.error(Markers.MSG_FAIL, readableMessage(), failPath);
                 if (dataLogger.isTraceEnabled()) {
-                    dataLogger.trace(Markers.DATA_FAIL, encodedMessage());
+                    dataLogger.trace(Markers.DATA_FAIL, json5Message());
                 }
                 if (context != null) {
                     context.clear();

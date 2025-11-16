@@ -99,19 +99,10 @@ public abstract class EventData implements Serializable {
      * Reverts all event attributes to their initial values, as if newly constructed.
      * This is useful for reusing event instances to avoid object creation overhead.
      */
-    public final void reset() {
+    public void reset() {
         sessionUuid = null;
         position = 0;
         lastCurrentTime = 0;
-        resetImpl();
-    }
-
-    /**
-     * Subclasses must implement this method to reset their specific properties
-     * to their initial values. This method is called by {@link #reset()}.
-     */
-    protected void resetImpl() {
-        // no-op
     }
 
     /**
@@ -128,37 +119,27 @@ public abstract class EventData implements Serializable {
     public static final String EVENT_TIME = "t";
 
     /**
-     * Writes a JSON5-encoded representation of the event to the supplied {@link StringBuilder}.
-     * This method includes common event data (session UUID, position, timestamp).
-     *
-     * @param sb The StringBuilder that receives the encoded representation.
-     * @return The StringBuilder passed as argument, allowing chained method calls.
-     */
-    protected final StringBuilder writeJson5(final StringBuilder sb) {
-        sb.append("{");
-        sb.append(String.format(Locale.US, "%s:%s,%s:%d,%s:%d", SESSION_UUID, sessionUuid, EVENT_POSITION, position, EVENT_TIME, lastCurrentTime));
-        writeJson5Impl(sb);
-        sb.append("}");
-        return sb;
-    }
-
-    /**
      * Subclasses must implement this method to append their specific properties
-     * to the JSON5-encoded string. This method is called by {@link #writeJson5(StringBuilder)}.
+     * to the JSON5-encoded string. This method is called by {@link #json5Message(StringBuilder)}.
      *
      * @param sb The StringBuilder to which the JSON5 properties are appended.
      */
     protected void writeJson5Impl(final StringBuilder sb) {
-        // no-op
+        sb.append(String.format(Locale.US, "%s:%s,%s:%d,%s:%d", SESSION_UUID, sessionUuid, EVENT_POSITION, position, EVENT_TIME, lastCurrentTime));
     }
 
     /**
-     * Generates a JSON5-encoded string representation of the event.
+     * Returns the machine-parsable, JSON5-encoded representation of the event.
+     * This is an alias for {@link #json5Message()}.
      *
      * @return A string containing the JSON5-encoded message.
      */
     public final String json5Message() {
-        return writeJson5(new StringBuilder(200)).toString();
+        final StringBuilder sb = new StringBuilder(200);
+        sb.append("{");
+        writeJson5Impl(sb);
+        sb.append("}");
+        return sb.toString();
     }
 
     /**
@@ -198,15 +179,5 @@ public abstract class EventData implements Serializable {
         if (matcherTime.find()) {
             lastCurrentTime = Long.parseLong(matcherTime.group(1));
         }
-    }
-
-    /**
-     * Returns the machine-parsable, JSON5-encoded representation of the event.
-     * This is an alias for {@link #json5Message()}.
-     *
-     * @return A string containing the JSON5-encoded message.
-     */
-    public final String encodedMessage() {
-        return json5Message();
     }
 }

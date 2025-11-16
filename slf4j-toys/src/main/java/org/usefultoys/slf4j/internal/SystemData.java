@@ -20,8 +20,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.usefultoys.slf4j.SystemConfig;
 
-import java.lang.management.*;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,11 +27,13 @@ import java.util.regex.Pattern;
 /**
  * Extends {@link EventData} to include status metrics collected from the Java Virtual Machine (JVM)
  * and the underlying operating system. This class provides detailed insights into runtime
- * performance and resource usage.
+ * performance and resource usage. It acts as a data transfer object (DTO) for system metrics,
+ * with data collection handled by {@link SystemMetricsCollector}.
  *
  * @author Daniel Felix Ferber
  * @see EventData
  * @see SystemConfig
+ * @see SystemMetricsCollector
  */
 @SuppressWarnings("Since15")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -115,59 +115,59 @@ public abstract class SystemData extends EventData {
 
     /** The committed heap memory in bytes. */
     @Getter
-    protected long heap_commited = 0;
+    long heap_commited = 0;
     /** The maximum heap memory in bytes. */
     @Getter
-    protected long heap_max = 0;
+    long heap_max = 0;
     /** The used heap memory in bytes. */
     @Getter
-    protected long heap_used = 0;
+    long heap_used = 0;
     /** The committed non-heap memory in bytes. */
     @Getter
-    protected long nonHeap_commited = 0;
+    long nonHeap_commited = 0;
     /** The maximum non-heap memory in bytes. */
     @Getter
-    protected long nonHeap_max = 0;
+    long nonHeap_max = 0;
     /** The used non-heap memory in bytes. */
     @Getter
-    protected long nonHeap_used = 0;
+    long nonHeap_used = 0;
     /** The number of objects pending finalization. */
     @Getter
-    protected long objectPendingFinalizationCount = 0;
+    long objectPendingFinalizationCount = 0;
     /** The number of classes currently loaded. */
     @Getter
-    protected long classLoading_loaded = 0;
+    long classLoading_loaded = 0;
     /** The total number of classes loaded since JVM start. */
     @Getter
-    protected long classLoading_total = 0;
+    long classLoading_total = 0;
     /** The total number of classes unloaded since JVM start. */
     @Getter
-    protected long classLoading_unloaded = 0;
+    long classLoading_unloaded = 0;
     /** The total time spent in compilation by the JIT compiler. */
     @Getter
-    protected long compilationTime = 0;
+    long compilationTime = 0;
     /** The total number of garbage collections. */
     @Getter
-    protected long garbageCollector_count = 0;
+    long garbageCollector_count = 0;
     /** The total time spent in garbage collection. */
     @Getter
-    protected long garbageCollector_time = 0;
+    long garbageCollector_time = 0;
     /** The used memory reported by {@link Runtime}. */
     @Getter
-    protected long runtime_usedMemory = 0;
+    long runtime_usedMemory = 0;
     /** The maximum memory reported by {@link Runtime}. */
     @Getter
-    protected long runtime_maxMemory = 0;
+    long runtime_maxMemory = 0;
     /** The total memory reported by {@link Runtime}. */
     @Getter
-    protected long runtime_totalMemory = 0;
+    long runtime_totalMemory = 0;
     /** The system CPU load average. */
     @Getter
-    protected double systemLoad = 0.0;
+    double systemLoad = 0.0;
 
     @Override
-    protected void resetImpl() {
-        super.resetImpl();
+    public void reset() {
+        super.reset();
         heap_commited = 0;
         heap_max = 0;
         heap_used = 0;
@@ -188,87 +188,34 @@ public abstract class SystemData extends EventData {
     }
 
     /**
-     * Collects memory usage statistics from the JVM's {@link Runtime} object.
+     * Collects all enabled system metrics by delegating to {@link SystemMetricsCollector}.
+     */
+    protected void collect() {
+        SystemMetricsCollector.collect(this);
+    }
+
+    /**
+     * Collects memory usage statistics by delegating to {@link SystemMetricsCollector}.
+     * Use {@link #collect()} instead.
      */
     protected void collectRuntimeStatus() {
-        final Runtime runtime = Runtime.getRuntime();
-        runtime_totalMemory = runtime.totalMemory();
-        runtime_usedMemory = runtime_totalMemory - runtime.freeMemory();
-        runtime_maxMemory = runtime.maxMemory();
+        SystemMetricsCollector.collectRuntimeStatus(this);
     }
 
     /**
-     * Collects operating system-level metrics, specifically the system CPU load.
-     * It attempts to use {@code com.sun.management.OperatingSystemMXBean} for more precise
-     * CPU load, falling back to {@link OperatingSystemMXBean#getSystemLoadAverage()} if necessary.
+     * Collects operating system-level metrics by delegating to {@link SystemMetricsCollector}.
+     * Use {@link #collect()} instead.
      */
     protected void collectPlatformStatus() {
-        if (!SystemConfig.usePlatformManagedBean) {
-            return;
-        }
-
-        final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-
-        if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
-            final com.sun.management.OperatingSystemMXBean sunOsBean =
-                    (com.sun.management.OperatingSystemMXBean) osBean;
-            final double cpuLoad = sunOsBean.getSystemCpuLoad();
-            if (cpuLoad >= 0) {
-                // may report negative values on some platforms, specifically Windows
-                systemLoad = cpuLoad;
-                return;
-            }
-        }
-
-        // Fallback:
-        final double loadAverage = osBean.getSystemLoadAverage();
-        final int availableProcessors = osBean.getAvailableProcessors();
-        if (loadAverage >= 0 && availableProcessors > 0) {
-            // may report negative values on some platforms, specifically Windows
-            systemLoad = loadAverage / availableProcessors;
-        }
+        SystemMetricsCollector.collectPlatformStatus(this);
     }
 
     /**
-     * Collects various JVM metrics using Java Management Extensions (JMX) MXBeans,
-     * based on the configuration in {@link SystemConfig}.
+     * Collects various JVM metrics by delegating to {@link SystemMetricsCollector}.
+     * Use {@link #collect()} instead.
      */
     protected void collectManagedBeanStatus() {
-        if (SystemConfig.useMemoryManagedBean) {
-            final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
-            final MemoryUsage heapUsage = memory.getHeapMemoryUsage();
-            heap_commited = heapUsage.getCommitted();
-            heap_max = heapUsage.getMax();
-            heap_used = heapUsage.getUsed();
-
-            final MemoryUsage nonHeapUsage = memory.getHeapMemoryUsage();
-            nonHeap_commited = nonHeapUsage.getCommitted();
-            nonHeap_max = nonHeapUsage.getMax();
-            nonHeap_used = nonHeapUsage.getUsed();
-            objectPendingFinalizationCount = memory.getObjectPendingFinalizationCount();
-        }
-
-        if (SystemConfig.useClassLoadingManagedBean) {
-            final ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
-            classLoading_loaded = classLoading.getLoadedClassCount();
-            classLoading_total = classLoading.getTotalLoadedClassCount();
-            classLoading_unloaded = classLoading.getUnloadedClassCount();
-        }
-
-        if (SystemConfig.useCompilationManagedBean) {
-            final CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
-            compilationTime = compilation.getTotalCompilationTime();
-        }
-
-        if (SystemConfig.useGarbageCollectionManagedBean) {
-            final List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
-            garbageCollector_count = 0;
-            garbageCollector_time = 0;
-            for (final GarbageCollectorMXBean garbageCollector : garbageCollectors) {
-                garbageCollector_count += garbageCollector.getCollectionCount();
-                garbageCollector_time += garbageCollector.getCollectionTime();
-            }
-        }
+        SystemMetricsCollector.collectManagedBeanStatus(this);
     }
 
     /** JSON5 key for memory usage (used, total, max) from {@link Runtime}. */

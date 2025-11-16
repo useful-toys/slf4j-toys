@@ -327,8 +327,8 @@ public class MeterData extends SystemData {
     }
 
     @Override
-    protected void resetImpl() {
-        super.resetImpl();
+    public void reset() {
+        super.reset();
         category = null;
         operation = null;
         parent = null;
@@ -344,11 +344,6 @@ public class MeterData extends SystemData {
         failMessage = null;
         timeLimit = 0;
         context = null;
-    }
-
-    @Override
-    protected void collectRuntimeStatus() {
-        super.collectRuntimeStatus();
     }
 
     /**
@@ -546,7 +541,7 @@ public class MeterData extends SystemData {
 
     /**
      * Appends the MeterData-specific properties to the JSON5-encoded string.
-     * This method is called by {@link #writeJson5(StringBuilder)}.
+     * This method is called by {@link #json5Message()}.
      *
      * @param sb The StringBuilder to which the JSON5 properties are appended.
      */

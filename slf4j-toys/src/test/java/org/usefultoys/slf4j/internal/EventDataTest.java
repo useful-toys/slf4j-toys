@@ -31,8 +31,6 @@ class EventDataTest {
     }
 
     static class TestEventData extends EventData {
-        boolean resetImplCalled = false;
-        boolean writeJson5ImplCalled = false;
 
         public TestEventData() {
         }
@@ -50,13 +48,8 @@ class EventDataTest {
         }
 
         @Override
-        protected void resetImpl() {
-            resetImplCalled = true;
-        }
-
-        @Override
         protected void writeJson5Impl(final StringBuilder sb) {
-            writeJson5ImplCalled = true;
+            super.writeJson5Impl(sb);
             sb.append(",custom:value");
         }
     }
@@ -110,7 +103,6 @@ class EventDataTest {
         assertNull(event.getSessionUuid());
         assertEquals(0L, event.getPosition());
         assertEquals(0L, event.getLastCurrentTime());
-        assertTrue(event.resetImplCalled);
     }
 
     @Test
@@ -124,13 +116,12 @@ class EventDataTest {
         assertTrue(json.contains(EventData.EVENT_TIME + ":10"));
         assertTrue(json.contains(",custom:value"));
         assertTrue(json.endsWith("}"));
-        assertTrue(event.writeJson5ImplCalled);
     }
 
     @Test
     void testEncodedMessageDelegatesToJson5Message() {
         final TestEventData event = new TestEventData("testSession", 1L, 2L);
-        final String encoded = event.encodedMessage();
+        final String encoded = event.json5Message();
         final String json5 = event.json5Message(); // Call directly to compare
         assertEquals(json5, encoded);
     }

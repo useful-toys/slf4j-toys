@@ -95,7 +95,7 @@ public class Watcher extends WatcherData implements Runnable {
         }
         // Removed dataLogger != null check
         if (dataLogger.isTraceEnabled()) {
-            dataLogger.trace(Markers.DATA_WATCHER, encodedMessage());
+            dataLogger.trace(Markers.DATA_WATCHER, json5Message());
         }
     }
 }
