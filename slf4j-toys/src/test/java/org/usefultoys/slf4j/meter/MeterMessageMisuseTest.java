@@ -15,19 +15,18 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.nio.charset.Charset;
-
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.meter.Meter.IllegalMeterUsage;
+
+import java.nio.charset.Charset;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
@@ -624,19 +623,7 @@ public class MeterMessageMisuseTest {
     @Test
     public void testMeterInternalException() {
         /* Override some method to force some exception. */
-        final Meter m = new Meter(LoggerFactory.getLogger("teste")) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            protected void collectManagedBeanStatus() {
-                throw new RuntimeException();
-            }
-
-            @Override
-            protected void collectRuntimeStatus() {
-                throw new RuntimeException();
-            }
-        };
+        final Meter m = new Meter(LoggerFactory.getLogger("teste"));
         m.start();
         m.ok();
     }

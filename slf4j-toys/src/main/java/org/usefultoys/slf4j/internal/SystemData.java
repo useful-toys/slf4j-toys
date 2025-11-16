@@ -184,34 +184,6 @@ public abstract class SystemData extends EventData {
         systemLoad = 0;
     }
 
-    /**
-     * Collects all enabled system metrics by delegating to the singleton {@link SystemMetricsCollector} instance.
-     */
-    protected void collect() {
-        SystemMetrics.getInstance().collect(this);
-    }
-
-    /**
-     * Collects memory usage statistics by delegating to the singleton {@link SystemMetricsCollector} instance.
-     */
-    protected void collectRuntimeStatus() {
-        SystemMetrics.getInstance().collectRuntimeStatus(this);
-    }
-
-    /**
-     * Collects operating system-level metrics by delegating to the singleton {@link SystemMetricsCollector} instance.
-     */
-    protected void collectPlatformStatus() {
-        SystemMetrics.getInstance().collectPlatformStatus(this);
-    }
-
-    /**
-     * Collects various JVM metrics by delegating to the singleton {@link SystemMetricsCollector} instance.
-     */
-    protected void collectManagedBeanStatus() {
-        SystemMetrics.getInstance().collectManagedBeanStatus(this);
-    }
-
     @Override
     protected void writeJson5(final StringBuilder sb) {
         super.writeJson5(sb);

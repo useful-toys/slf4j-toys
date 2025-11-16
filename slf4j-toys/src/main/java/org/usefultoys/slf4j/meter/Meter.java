@@ -20,6 +20,7 @@ import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
+import org.usefultoys.slf4j.internal.SystemMetrics;
 
 import java.io.Closeable;
 import java.lang.ref.WeakReference;
@@ -713,8 +714,8 @@ public class Meter extends MeterData implements Closeable {
             lastProgressTime = startTime = collectCurrentTime();
 
             if (messageLogger.isDebugEnabled()) {
-                collectRuntimeStatus();
-                collectPlatformStatus();
+                SystemMetrics.getInstance().collectRuntimeStatus(this);
+                SystemMetrics.getInstance().collectPlatformStatus(this);
                 messageLogger.debug(Markers.MSG_START, readableMessage());
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_START, json5Message());
@@ -813,8 +814,8 @@ public class Meter extends MeterData implements Closeable {
                 lastProgressTime = now;
 
                 if (messageLogger.isInfoEnabled()) {
-                    collectRuntimeStatus();
-                    collectPlatformStatus();
+                    SystemMetrics.getInstance().collectRuntimeStatus(this);
+                    SystemMetrics.getInstance().collectPlatformStatus(this);
                     messageLogger.info(Markers.MSG_PROGRESS, readableMessage());
                     if (dataLogger.isTraceEnabled()) {
                         final String message2 = json5Message();
@@ -888,8 +889,8 @@ public class Meter extends MeterData implements Closeable {
             localThreadInstance.set(previousInstance);
 
             if (messageLogger.isWarnEnabled()) { // Check warn enabled to cover info as well
-                collectRuntimeStatus();
-                collectPlatformStatus();
+                SystemMetrics.getInstance().collectRuntimeStatus(this);
+                SystemMetrics.getInstance().collectPlatformStatus(this);
 
                 final boolean warnSlowness = startTime != 0 && timeLimit != 0 && stopTime - startTime > timeLimit;
                 final String message1 = readableMessage();
@@ -969,8 +970,8 @@ public class Meter extends MeterData implements Closeable {
             }
 
             if (messageLogger.isWarnEnabled()) {
-                collectRuntimeStatus();
-                collectPlatformStatus();
+                SystemMetrics.getInstance().collectRuntimeStatus(this);
+                SystemMetrics.getInstance().collectPlatformStatus(this);
 
                 final boolean warnSlowness = startTime != 0 && timeLimit != 0 && stopTime - startTime > timeLimit;
                 final String message1 = readableMessage();
@@ -1065,8 +1066,8 @@ public class Meter extends MeterData implements Closeable {
             }
 
             if (messageLogger.isInfoEnabled()) {
-                collectRuntimeStatus();
-                collectPlatformStatus();
+                SystemMetrics.getInstance().collectRuntimeStatus(this);
+                SystemMetrics.getInstance().collectPlatformStatus(this);
                 if (messageLogger.isInfoEnabled()) {
                     final String message1 = readableMessage();
                     messageLogger.info(Markers.MSG_REJECT, message1);
@@ -1130,8 +1131,8 @@ public class Meter extends MeterData implements Closeable {
             }
 
             if (messageLogger.isErrorEnabled()) {
-                collectRuntimeStatus();
-                collectPlatformStatus();
+                SystemMetrics.getInstance().collectRuntimeStatus(this);
+                SystemMetrics.getInstance().collectPlatformStatus(this);
                 messageLogger.error(Markers.MSG_FAIL, readableMessage());
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_FAIL, json5Message());
@@ -1282,8 +1283,8 @@ public class Meter extends MeterData implements Closeable {
             failPath = FAIL_PATH_TRY_WITH_RESOURCES;
 
             if (messageLogger.isErrorEnabled()) {
-                collectRuntimeStatus();
-                collectPlatformStatus();
+                SystemMetrics.getInstance().collectRuntimeStatus(this);
+                SystemMetrics.getInstance().collectPlatformStatus(this);
                 messageLogger.error(Markers.MSG_FAIL, readableMessage(), failPath);
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_FAIL, json5Message());
