@@ -128,24 +128,6 @@ public abstract class EventData implements Serializable {
     public static final String EVENT_TIME = "t";
 
     /**
-     * Appends a concise, human-readable string representation of the event to the provided {@link StringBuilder}.
-     * Subclasses must implement this method to define their specific human-readable output.
-     *
-     * @param builder The StringBuilder that receives the string representation.
-     * @return The StringBuilder passed as argument, allowing chained method calls.
-     */
-    protected abstract StringBuilder readableStringBuilder(StringBuilder builder);
-
-    /**
-     * Generates a human-readable string representation of the event.
-     *
-     * @return A string containing the human-readable message.
-     */
-    public final String readableMessage() {
-        return readableStringBuilder(new StringBuilder(200)).toString();
-    }
-
-    /**
      * Writes a JSON5-encoded representation of the event to the supplied {@link StringBuilder}.
      * This method includes common event data (session UUID, position, timestamp).
      *

@@ -351,10 +351,15 @@ public class MeterData extends SystemData {
         super.collectRuntimeStatus();
     }
 
-    @Override
-    public StringBuilder readableStringBuilder(final StringBuilder builder) {
+    /**
+     * Generates a human-readable string representation.
+     *
+     * @return A string containing the human-readable message.
+     */
+    public final String readableMessage() {
+        final StringBuilder builder = new StringBuilder(200);
         MeterDataFormatter.readableStringBuilder(this, builder);
-        return builder;
+        return builder.toString();
     }
 
     /** JSON5 key for the operation's description. */

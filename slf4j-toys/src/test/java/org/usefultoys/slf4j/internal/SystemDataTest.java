@@ -51,12 +51,6 @@ class SystemDataTest {
                     compilationTime, garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory,
                     runtime_totalMemory, systemLoad);
         }
-
-        @Override
-        protected StringBuilder readableStringBuilder(final StringBuilder sb) {
-            sb.append("readable");
-            return sb;
-        }
     }
 
     @BeforeAll
@@ -125,13 +119,6 @@ class SystemDataTest {
         assertEquals(0L, event.getRuntime_maxMemory());
         assertEquals(0L, event.getRuntime_totalMemory());
         assertEquals(0.0, event.getSystemLoad());
-    }
-
-    @Test
-    void testReadableMessage() {
-        final TestSystemData event = new TestSystemData("abc", 5L);
-        final String message = event.readableMessage();
-        assertEquals("readable", message);
     }
 
     @Test

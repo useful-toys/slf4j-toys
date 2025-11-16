@@ -78,16 +78,13 @@ public class WatcherData extends SystemData {
     }
 
     /**
-     * Appends a human-readable summary of the WatcherData to the provided StringBuilder.
-     * This method customizes the output from {@link SystemData#readableStringBuilder(StringBuilder)}
-     * to include memory usage, system load, and the session UUID.
+     * Generates a human-readable string representation.
      *
-     * @param builder The StringBuilder to which the readable message will be appended.
-     * @return The StringBuilder with the appended readable message.
+     * @return A string containing the human-readable message.
      */
-    @Override
-    public StringBuilder readableStringBuilder(final StringBuilder builder) {
+    public final String readableMessage() {
+        final StringBuilder builder = new StringBuilder(200);
         WatcherDataFormatter.readableStringBuilder(this, builder);
-        return builder;
+        return builder.toString();
     }
 }

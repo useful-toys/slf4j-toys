@@ -50,12 +50,6 @@ class EventDataTest {
         }
 
         @Override
-        protected StringBuilder readableStringBuilder(final StringBuilder sb) {
-            sb.append("readable");
-            return sb;
-        }
-
-        @Override
         protected void resetImpl() {
             resetImplCalled = true;
         }
@@ -117,13 +111,6 @@ class EventDataTest {
         assertEquals(0L, event.getPosition());
         assertEquals(0L, event.getLastCurrentTime());
         assertTrue(event.resetImplCalled);
-    }
-
-    @Test
-    void testReadableMessage() {
-        final TestEventData event = new TestEventData("abc", 5L);
-        final String message = event.readableMessage();
-        assertEquals("readable", message);
     }
 
     @Test

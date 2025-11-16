@@ -116,8 +116,6 @@ public class MeterDataReadableTest {
     @ParameterizedTest
     @MethodSource("provideReadableTestCases")
     void testReadable(final String expected, final MeterData data) {
-        final StringBuilder sb = new StringBuilder();
-        data.readableStringBuilder(sb);
-        assertEquals(expected, sb.toString());
+        assertEquals(expected, data.readableMessage());
     }
 }

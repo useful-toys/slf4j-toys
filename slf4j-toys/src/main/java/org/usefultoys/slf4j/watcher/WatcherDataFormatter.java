@@ -32,14 +32,14 @@ class WatcherDataFormatter {
      * @param data    The WatcherData object to format.
      * @param builder The StringBuilder to which the readable message will be appended.
      */
-    public static void readableStringBuilder(final WatcherData data, final StringBuilder builder) {
+    void readableStringBuilder(final WatcherData data, final StringBuilder builder) {
         boolean hasPrevious = false;
         if (data.getRuntime_usedMemory() > 0 || data.getRuntime_maxMemory() > 0 || data.getRuntime_totalMemory() > 0) {
             builder.append("Memory: ");
             builder.append(UnitFormatter.bytes(data.getRuntime_usedMemory()));
-            builder.append(' ');
+            builder.append(" ");
             builder.append(UnitFormatter.bytes(data.getRuntime_totalMemory()));
-            builder.append(' ');
+            builder.append(" ");
             builder.append(UnitFormatter.bytes(data.getRuntime_maxMemory()));
             hasPrevious = true;
         }
