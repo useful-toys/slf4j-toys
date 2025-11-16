@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A test-friendly implementation of the SLF4J {@link Logger} interface.
@@ -577,5 +578,11 @@ public class MockLogger implements Logger {
         final MockLoggerEvent event = loggerEvents.get(eventIndex);
         Assertions.assertSame(expectedLevel, event.getLevel(), String.format("Logger expectedLevel does not match; expected: %s, actual: %s", expectedLevel, event.getLevel()));
         Assertions.assertSame(expectedMarker, event.getMarker(), String.format("Logger expectedMarker does not match; expected: %s, actual: %s", expectedMarker, event.getMarker()));
+    }
+
+    public String toText() {
+        return getLoggerEvents().stream()
+                .map(MockLoggerEvent::getFormattedMessage)
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 }
