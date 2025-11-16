@@ -28,12 +28,13 @@ import java.util.regex.Pattern;
  * Extends {@link EventData} to include status metrics collected from the Java Virtual Machine (JVM)
  * and the underlying operating system. This class provides detailed insights into runtime
  * performance and resource usage. It acts as a data transfer object (DTO) for system metrics,
- * with data collection handled by {@link SystemMetricsCollector}.
+ * with data collection delegated to the singleton instance of {@link SystemMetricsCollector}.
  *
  * @author Daniel Felix Ferber
  * @see EventData
  * @see SystemConfig
  * @see SystemMetricsCollector
+ * @see SystemMetrics
  */
 @SuppressWarnings("Since15")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -188,34 +189,31 @@ public abstract class SystemData extends EventData {
     }
 
     /**
-     * Collects all enabled system metrics by delegating to {@link SystemMetricsCollector}.
+     * Collects all enabled system metrics by delegating to the singleton {@link SystemMetricsCollector} instance.
      */
     protected void collect() {
-        SystemMetricsCollector.collect(this);
+        SystemMetrics.getInstance().collect(this);
     }
 
     /**
-     * Collects memory usage statistics by delegating to {@link SystemMetricsCollector}.
-     * Use {@link #collect()} instead.
+     * Collects memory usage statistics by delegating to the singleton {@link SystemMetricsCollector} instance.
      */
     protected void collectRuntimeStatus() {
-        SystemMetricsCollector.collectRuntimeStatus(this);
+        SystemMetrics.getInstance().collectRuntimeStatus(this);
     }
 
     /**
-     * Collects operating system-level metrics by delegating to {@link SystemMetricsCollector}.
-     * Use {@link #collect()} instead.
+     * Collects operating system-level metrics by delegating to the singleton {@link SystemMetricsCollector} instance.
      */
     protected void collectPlatformStatus() {
-        SystemMetricsCollector.collectPlatformStatus(this);
+        SystemMetrics.getInstance().collectPlatformStatus(this);
     }
 
     /**
-     * Collects various JVM metrics by delegating to {@link SystemMetricsCollector}.
-     * Use {@link #collect()} instead.
+     * Collects various JVM metrics by delegating to the singleton {@link SystemMetricsCollector} instance.
      */
     protected void collectManagedBeanStatus() {
-        SystemMetricsCollector.collectManagedBeanStatus(this);
+        SystemMetrics.getInstance().collectManagedBeanStatus(this);
     }
 
     /** JSON5 key for memory usage (used, total, max) from {@link Runtime}. */

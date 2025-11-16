@@ -15,34 +15,68 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.SystemConfig;
 
 import java.lang.management.*;
 import java.util.List;
 
 /**
- * A utility class responsible for collecting status metrics from the Java Virtual Machine (JVM)
- * and the underlying operating system. This class centralizes the logic for gathering performance
- * and resource usage data, which can then be used to populate {@link SystemData} objects.
+ * A class responsible for collecting status metrics from the Java Virtual Machine (JVM)
+ * and the underlying operating system. An instance of this class is configured with the
+ * necessary MXBeans and can then be used to populate {@link SystemData} objects.
+ * This design allows for dependency injection, making the class easily testable.
  *
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("Since15")
-@UtilityClass
-class SystemMetricsCollector {
+public class SystemMetricsCollector {
+
+    private final OperatingSystemMXBean osBean;
+    private final MemoryMXBean memoryBean;
+    private final ClassLoadingMXBean classLoadingBean;
+    private final CompilationMXBean compilationBean;
+    private final List<GarbageCollectorMXBean> garbageCollectorBeans;
+
+    /**
+     * Constructs a new collector with the provided MXBean dependencies.
+     *
+     * @param osBean                The {@link OperatingSystemMXBean} to collect OS metrics from.
+     * @param memoryBean            The {@link MemoryMXBean} to collect memory metrics from.
+     * @param classLoadingBean      The {@link ClassLoadingMXBean} to collect class loading metrics from.
+     * @param compilationBean       The {@link CompilationMXBean} to collect compilation metrics from.
+     * @param garbageCollectorBeans A list of {@link GarbageCollectorMXBean}s to collect GC metrics from.
+     */
+    public SystemMetricsCollector(
+            final OperatingSystemMXBean osBean,
+            final MemoryMXBean memoryBean,
+            final ClassLoadingMXBean classLoadingBean,
+            final CompilationMXBean compilationBean,
+            final List<GarbageCollectorMXBean> garbageCollectorBeans) {
+        this.osBean = osBean;
+        this.memoryBean = memoryBean;
+        this.classLoadingBean = classLoadingBean;
+        this.compilationBean = compilationBean;
+        this.garbageCollectorBeans = garbageCollectorBeans;
+    }
 
     /**
      * Collects all enabled system metrics and populates the provided {@link SystemData} object.
-     * This method orchestrates the collection of various metrics based on the settings in
-     * {@link SystemConfig}.
      *
      * @param data The {@link SystemData} object to be populated with metrics.
      */
-    void collect(final SystemData data) {
+    public void collect(final SystemData data) {
         collectRuntimeStatus(data);
         collectPlatformStatus(data);
         collectManagedBeanStatus(data);
+    }
+
+    /**
+     * Protected method to allow test subclasses to override where the Runtime instance comes from.
+     *
+     * @return The {@link Runtime} instance.
+     */
+    protected Runtime getRuntime() {
+        return Runtime.getRuntime();
     }
 
     /**
@@ -50,8 +84,8 @@ class SystemMetricsCollector {
      *
      * @param data The {@link SystemData} object to be populated.
      */
-    void collectRuntimeStatus(final SystemData data) {
-        final Runtime runtime = Runtime.getRuntime();
+    public void collectRuntimeStatus(final SystemData data) {
+        final Runtime runtime = getRuntime();
         data.runtime_totalMemory = runtime.totalMemory();
         data.runtime_usedMemory = data.runtime_totalMemory - runtime.freeMemory();
         data.runtime_maxMemory = runtime.maxMemory();
@@ -59,76 +93,64 @@ class SystemMetricsCollector {
 
     /**
      * Collects operating system-level metrics, specifically the system CPU load.
-     * It attempts to use {@code com.sun.management.OperatingSystemMXBean} for more precise
-     * CPU load, falling back to {@link OperatingSystemMXBean#getSystemLoadAverage()} if necessary.
      *
      * @param data The {@link SystemData} object to be populated.
      */
-    void collectPlatformStatus(final SystemData data) {
-        if (!SystemConfig.usePlatformManagedBean) {
+    public void collectPlatformStatus(final SystemData data) {
+        if (!SystemConfig.usePlatformManagedBean || this.osBean == null) {
             return;
         }
 
-        final OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-
-        if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
+        if (this.osBean instanceof com.sun.management.OperatingSystemMXBean) {
             final com.sun.management.OperatingSystemMXBean sunOsBean =
-                    (com.sun.management.OperatingSystemMXBean) osBean;
+                    (com.sun.management.OperatingSystemMXBean) this.osBean;
             final double cpuLoad = sunOsBean.getSystemCpuLoad();
             if (cpuLoad >= 0) {
-                // may report negative values on some platforms, specifically Windows
                 data.systemLoad = cpuLoad;
                 return;
             }
         }
 
-        // Fallback:
-        final double loadAverage = osBean.getSystemLoadAverage();
-        final int availableProcessors = osBean.getAvailableProcessors();
+        final double loadAverage = this.osBean.getSystemLoadAverage();
+        final int availableProcessors = this.osBean.getAvailableProcessors();
         if (loadAverage >= 0 && availableProcessors > 0) {
-            // may report negative values on some platforms, specifically Windows
             data.systemLoad = loadAverage / availableProcessors;
         }
     }
 
     /**
-     * Collects various JVM metrics using Java Management Extensions (JMX) MXBeans,
-     * based on the configuration in {@link SystemConfig}.
+     * Collects various JVM metrics using Java Management Extensions (JMX) MXBeans.
      *
      * @param data The {@link SystemData} object to be populated.
      */
-    void collectManagedBeanStatus(final SystemData data) {
-        if (SystemConfig.useMemoryManagedBean) {
-            final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
-            final MemoryUsage heapUsage = memory.getHeapMemoryUsage();
+    public void collectManagedBeanStatus(final SystemData data) {
+        if (SystemConfig.useMemoryManagedBean && this.memoryBean != null) {
+            final MemoryUsage heapUsage = this.memoryBean.getHeapMemoryUsage();
             data.heap_commited = heapUsage.getCommitted();
             data.heap_max = heapUsage.getMax();
             data.heap_used = heapUsage.getUsed();
 
-            final MemoryUsage nonHeapUsage = memory.getNonHeapMemoryUsage();
+            final MemoryUsage nonHeapUsage = this.memoryBean.getNonHeapMemoryUsage();
             data.nonHeap_commited = nonHeapUsage.getCommitted();
             data.nonHeap_max = nonHeapUsage.getMax();
             data.nonHeap_used = nonHeapUsage.getUsed();
-            data.objectPendingFinalizationCount = memory.getObjectPendingFinalizationCount();
+            data.objectPendingFinalizationCount = this.memoryBean.getObjectPendingFinalizationCount();
         }
 
-        if (SystemConfig.useClassLoadingManagedBean) {
-            final ClassLoadingMXBean classLoading = ManagementFactory.getClassLoadingMXBean();
-            data.classLoading_loaded = classLoading.getLoadedClassCount();
-            data.classLoading_total = classLoading.getTotalLoadedClassCount();
-            data.classLoading_unloaded = classLoading.getUnloadedClassCount();
+        if (SystemConfig.useClassLoadingManagedBean && this.classLoadingBean != null) {
+            data.classLoading_loaded = this.classLoadingBean.getLoadedClassCount();
+            data.classLoading_total = this.classLoadingBean.getTotalLoadedClassCount();
+            data.classLoading_unloaded = this.classLoadingBean.getUnloadedClassCount();
         }
 
-        if (SystemConfig.useCompilationManagedBean) {
-            final CompilationMXBean compilation = ManagementFactory.getCompilationMXBean();
-            data.compilationTime = compilation.getTotalCompilationTime();
+        if (SystemConfig.useCompilationManagedBean && this.compilationBean != null) {
+            data.compilationTime = this.compilationBean.getTotalCompilationTime();
         }
 
-        if (SystemConfig.useGarbageCollectionManagedBean) {
-            final List<GarbageCollectorMXBean> garbageCollectors = ManagementFactory.getGarbageCollectorMXBeans();
+        if (SystemConfig.useGarbageCollectionManagedBean && this.garbageCollectorBeans != null) {
             long count = 0;
             long time = 0;
-            for (final GarbageCollectorMXBean garbageCollector : garbageCollectors) {
+            for (final GarbageCollectorMXBean garbageCollector : this.garbageCollectorBeans) {
                 count += garbageCollector.getCollectionCount();
                 time += garbageCollector.getCollectionTime();
             }
