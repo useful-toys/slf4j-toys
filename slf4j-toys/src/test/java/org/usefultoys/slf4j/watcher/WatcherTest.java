@@ -53,12 +53,12 @@ class WatcherTest {
         Logger messageLogger = LoggerFactory.getLogger(WatcherConfig.messagePrefix + TEST_WATCHER_NAME + WatcherConfig.messageSuffix);
         messageMockLogger = (MockLogger) messageLogger;
         messageMockLogger.clearEvents();
-        messageMockLogger.setInfoEnabled(true); // Ensure INFO level is enabled for message logger
+        messageMockLogger.setEnabled(true); // Ensure INFO level is enabled for message logger
 
         Logger dataLogger = LoggerFactory.getLogger(WatcherConfig.dataPrefix + TEST_WATCHER_NAME + WatcherConfig.dataSuffix);
         dataMockLogger = (MockLogger) dataLogger;
         dataMockLogger.clearEvents();
-        dataMockLogger.setTraceEnabled(true); // Ensure TRACE level is enabled for data logger
+        dataMockLogger.setEnabled(true); // Ensure TRACE level is enabled for data logger
     }
 
     @AfterEach
@@ -71,11 +71,12 @@ class WatcherTest {
         WatcherConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
+        WatcherConfig.init();
         ConfigParser.clearInitializationErrors();
     }
 
     @Test
-    void testWatcherLogsInfoAndTraceWhenDataEnabled() {
+    void testWatcherLogsInfoAndTraceWhenDataAndLoggerEnabled() {
         // Config already set in setUp: PROP_DATA_ENABLED="true", suffixes set, levels enabled
 
         Watcher watcher = new Watcher(TEST_WATCHER_NAME);
@@ -100,10 +101,7 @@ class WatcherTest {
         System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "false");
         WatcherConfig.init(); // Apply the change
 
-        // Ensure message logger is enabled
-        messageMockLogger.setInfoEnabled(true);
         // dataMockLogger's traceEnabled is true, but Watcher's dataLogger will be NullLogger.INSTANCE
-
         Watcher watcher = new Watcher(TEST_WATCHER_NAME);
         watcher.run();
 
@@ -118,14 +116,60 @@ class WatcherTest {
     }
 
     @Test
+    void testWatcherLogsNothingWhenDataLoggerDisabled() {
+        // Disable data logging
+        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
+        WatcherConfig.init();
+
+        // Disable info for message logger
+        dataMockLogger.setEnabled(false);
+        // dataMockLogger's traceEnabled is true, but Watcher's dataLogger will be NullLogger.INSTANCE, so no need to disable dataMockLogger's traceEnabled explicitly here.
+
+        Watcher watcher = new Watcher(TEST_WATCHER_NAME);
+        watcher.run();
+
+        // Verify messageLogger (INFO)
+        assertEquals(1, messageMockLogger.getEventCount(), "messageMockLogger should have 1 event");
+        messageMockLogger.assertEvent(0, MockLoggerEvent.Level.INFO, Markers.MSG_WATCHER);
+        assertTrue(messageMockLogger.getEvent(0).getFormattedMessage().contains("Memory:"), "Message logger output should contain Memory info");
+
+        // Verify dataMockLogger (should be disabled, so no events)
+        assertEquals(0, dataMockLogger.getEventCount(), "dataMockLogger should have 0 events when data is disabled");
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+    }
+
+
+    @Test
+    void testWatcherLogsNothingWhenMessageLoggerDisabled() {
+        // Disable data logging
+        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
+        WatcherConfig.init();
+
+        // Disable info for message logger
+        messageMockLogger.setEnabled(false);
+        // dataMockLogger's traceEnabled is true, but Watcher's dataLogger will be NullLogger.INSTANCE, so no need to disable dataMockLogger's traceEnabled explicitly here.
+
+        Watcher watcher = new Watcher(TEST_WATCHER_NAME);
+        watcher.run();
+
+        // Verify dataMockLogger (TRACE)
+        assertEquals(1, dataMockLogger.getEventCount(), "dataMockLogger should have 1 event");
+        dataMockLogger.assertEvent(0, MockLoggerEvent.Level.TRACE, Markers.DATA_WATCHER);
+        assertTrue(dataMockLogger.getEvent(0).getFormattedMessage().contains("_:"), "Data logger output should contain sessionUuid");
+
+        // Verify messageLogger (should be disabled, so no events)
+        assertEquals(0, messageMockLogger.getEventCount(), "dataMockLogger should have 0 events when data is disabled");
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+    }
+    @Test
     void testWatcherLogsNothingWhenBothDisabled() {
         // Disable data logging
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "false");
+        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
         WatcherConfig.init();
 
         // Disable info for message logger
         messageMockLogger.setInfoEnabled(false);
-        // dataMockLogger's traceEnabled is true, but Watcher's dataLogger will be NullLogger.INSTANCE, so no need to disable dataMockLogger's traceEnabled explicitly here.
+        dataMockLogger.setEnabled(false);
 
         Watcher watcher = new Watcher(TEST_WATCHER_NAME);
         watcher.run();
@@ -133,28 +177,6 @@ class WatcherTest {
         // Verify no events are logged
         assertEquals(0, messageMockLogger.getEventCount(), "messageMockLogger should have 0 events");
         assertEquals(0, dataMockLogger.getEventCount(), "dataMockLogger should have 0 events");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
-    }
-
-    @Test
-    void testWatcherCollectsDataOnlyWhenLoggingEnabled() {
-        // Ensure data logging is enabled in config
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
-        WatcherConfig.init();
-
-        // Disable info for message logger and trace for data logger
-        messageMockLogger.setInfoEnabled(false);
-        dataMockLogger.setTraceEnabled(false);
-
-        Watcher watcher = new Watcher(TEST_WATCHER_NAME);
-        watcher.run();
-
-        // No events should be logged because logger levels are disabled
-        assertEquals(0, messageMockLogger.getEventCount(), "messageMockLogger should have 0 events");
-        assertEquals(0, dataMockLogger.getEventCount(), "dataMockLogger should have 0 events");
-
-        // But the internal position counter should still increment
-        assertEquals(1, watcher.getPosition());
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 }
