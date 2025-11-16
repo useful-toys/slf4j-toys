@@ -19,12 +19,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.usefultoys.slf4j.internal.SystemData;
-import org.usefultoys.slf4j.utils.UnitFormatter;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -353,184 +351,9 @@ public class MeterData extends SystemData {
         super.collectRuntimeStatus();
     }
 
-    /**
-     * Helper method to append a separator to a StringBuilder if there was previous content.
-     *
-     * @param sb The StringBuilder.
-     * @param hasPrevious A boolean indicating if there was previous content.
-     * @return Always {@code true} to indicate that content has been added (or a separator would be added next).
-     */
-    private static boolean separator(final StringBuilder sb, final boolean hasPrevious) {
-        if (hasPrevious) {
-            sb.append("; ");
-        }
-        return true;
-    }
-
-    /**
-     * Appends a human-readable string representation of the MeterData to the provided {@link StringBuilder}.
-     * This method formats the operation's status, identification, timing, and context based on {@link MeterConfig}.
-     *
-     * @param builder The StringBuilder that receives the string representation.
-     * @return The StringBuilder passed as argument, allowing chained method calls.
-     */
-    @SuppressWarnings("MagicCharacter")
     @Override
     public StringBuilder readableStringBuilder(final StringBuilder builder) {
-        final long executionTime;
-        if (startTime == 0) {
-            executionTime = 0;
-        } else if (stopTime == 0) {
-            executionTime = lastCurrentTime - startTime;
-        } else {
-            executionTime = stopTime - startTime;
-        }
-        final boolean slow = timeLimit > 0 && executionTime > timeLimit;
-        final boolean progressInfoRequired = executionTime > MeterConfig.progressPeriodMilliseconds;
-
-        if (MeterConfig.printStatus) {
-            if (stopTime != 0) {
-                //noinspection VariableNotUsedInsideIf
-                if (rejectPath != null) {
-                    builder.append("REJECT");
-                } else //noinspection VariableNotUsedInsideIf
-                    if (failPath != null) {
-                    builder.append("FAIL");
-                } else if (slow) {
-                    builder.append("OK (Slow)");
-                } else {
-                    builder.append("OK");
-                }
-            } else if (startTime != 0) {
-                if (currentIteration == 0) {
-                    builder.append("STARTED");
-                } else if (slow) {
-                    builder.append("PROGRESS (Slow)");
-                } else {
-                    builder.append("PROGRESS");
-                }
-            } else {
-                builder.append("SCHEDULED");
-            }
-            builder.append(": ");
-        }
-
-
-        /* Identification. */
-        boolean hasId = false;
-        if (MeterConfig.printCategory) {
-            final int index = category.lastIndexOf('.') + 1;
-            builder.append(category.substring(index));
-            hasId = true;
-        }
-        if (operation != null) {
-            if (MeterConfig.printCategory) {
-                builder.append('/');
-            }
-            builder.append(operation);
-            hasId = true;
-        }
-        if (MeterConfig.printPosition) {
-            builder.append('#');
-            builder.append(position);
-            hasId = true;
-        }
-
-        /* Execution path, if any. */
-        if (okPath != null) {
-            builder.append("[");
-            builder.append(okPath);
-            builder.append(']');
-            hasId = true;
-        }
-        if (rejectPath != null) {
-            builder.append("[");
-            builder.append(rejectPath);
-            builder.append(']');
-            hasId = true;
-        }
-        if (failPath != null) {
-            builder.append("[");
-            builder.append(failPath);
-            if (failMessage != null) {
-                builder.append("; ");
-                builder.append(failMessage);
-            }
-            builder.append(']');
-            hasId = true;
-        }
-        if (hasId) {
-            builder.append(' ');
-        }
-
-        /* Number of iterations. */
-        boolean hasPrevious = false;
-        if (startTime != 0 && currentIteration > 0) {
-            hasPrevious = separator(builder, hasPrevious);
-            builder.append(UnitFormatter.iterations(currentIteration));
-            if (expectedIterations > 0) {
-                builder.append('/');
-                builder.append(UnitFormatter.iterations(expectedIterations));
-            }
-        }
-
-        /* Timing. */
-        if (startTime == 0) {
-            /* Not yet started, report waiting time. */
-            hasPrevious = separator(builder, hasPrevious);
-            builder.append(UnitFormatter.nanoseconds(lastCurrentTime -createTime));
-        } else {
-            if (stopTime != 0 || progressInfoRequired) {
-                /* Started, report elapsed time if waiting for a considerable amount of time. */
-                /* Or stopped, retport total time. */
-                hasPrevious = separator(builder, hasPrevious);
-                builder.append(UnitFormatter.nanoseconds(executionTime));
-            }
-
-            if (currentIteration > 0 && (stopTime != 0 || progressInfoRequired)) {
-                /* Doing iterations, report speed if waiting for a considerable amount of time of if stopped. */
-                hasPrevious = separator(builder, hasPrevious);
-                final double iterationsPerSecond = getIterationsPerSecond();
-                builder.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
-                builder.append(' ');
-                final double nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
-                builder.append(UnitFormatter.nanoseconds(nanoSecondsPerIteration));
-            }
-        }
-
-        /* Meta data. */
-        if (description != null) {
-            hasPrevious = separator(builder, hasPrevious);
-            builder.append('\'');
-            builder.append(description);
-            builder.append('\'');
-        }
-        if (context != null && ! context.isEmpty()) {
-            for (final Entry<String, String> entry : context.entrySet()) {
-                hasPrevious = separator(builder, hasPrevious);
-                builder.append(entry.getKey());
-                if (entry.getValue() != null) {
-                    builder.append("=");
-                    builder.append(entry.getValue());
-                }
-            }
-        }
-
-        /* System Info */
-        if (MeterConfig.printMemory && runtime_usedMemory > 0) {
-            hasPrevious = separator(builder, hasPrevious);
-            builder.append(UnitFormatter.bytes(runtime_usedMemory));
-        }
-        if (MeterConfig.printLoad && systemLoad > 0) {
-            hasPrevious = separator(builder, hasPrevious);
-            builder.append(Math.round(systemLoad * 100));
-            builder.append("%");
-        }
-        if (sessionUuid != null) {
-            hasPrevious = separator(builder, hasPrevious);
-            builder.append(sessionUuid);
-        }
-
+        MeterDataFormatter.readableStringBuilder(this, builder);
         return builder;
     }
 
@@ -777,7 +600,7 @@ public class MeterData extends SystemData {
             sb.append(PROP_CONTEXT);
             sb.append(":{");
             boolean separatorNeeded = false;
-            for (final Entry<String, String> entry : context.entrySet()) {
+            for (final Map.Entry<String, String> entry : context.entrySet()) {
                 if (separatorNeeded) {
                     sb.append(',');
                 } else {
