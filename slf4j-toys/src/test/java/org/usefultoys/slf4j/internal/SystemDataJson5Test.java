@@ -51,9 +51,29 @@ class SystemDataJson5Test {
                         ""
                 ),
                 Arguments.of(
-                        "Partial data scenario",
-                        new TestSystemData(uuid1, 1, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 16, 17, 0.0),
-                        ",m:[15,17,16]"
+                        "Partial data: only garbageCollector_time",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0.0),
+                        String.format(",gc:[0,14]")
+                ),
+                Arguments.of(
+                        "Partial data: only systemLoad",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18.0),
+                        String.format(",sl:18.0")
+                ),
+                Arguments.of(
+                        "Combination: Runtime Memory + System Load",
+                        new TestSystemData(uuid1, 1, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 16, 17, 18.0),
+                        String.format(",m:[15,17,16],sl:18.0")
+                ),
+                Arguments.of(
+                        "Combination: Heap + Class Loading",
+                        new TestSystemData(uuid1, 1, 1000, 2, 3, 4, 0, 0, 0, 0, 9, 10, 11, 0, 0, 0, 0, 0, 0, 0.0),
+                        String.format(",h:[4,2,3],cl:[10,9,11]")
+                ),
+                Arguments.of(
+                        "Combination: Non-Heap + GC",
+                        new TestSystemData(uuid1, 1, 1000, 0, 0, 0, 5, 6, 7, 0, 0, 0, 0, 0, 13, 14, 0, 0, 0, 0.0),
+                        String.format(",nh:[7,5,6],gc:[13,14]")
                 )
         );
     }
