@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.usefultoys.slf4j.internal.EventDataJson5.*;
+
 /**
  * A package-private utility class responsible for serializing and deserializing
  * {@link SystemData} objects to and from a JSON5-like string format.
@@ -39,10 +41,6 @@ class SystemDataJson5 {
     private final String PROP_GARBAGE_COLLECTOR = "gc";
     private final String PROP_SYSTEM_LOAD = "sl";
 
-    private final String REGEX_START = "[{,]";
-    private final String REGEX_WORD_VALUE = "\\s*:\\s*([^,}\\s]+)";
-    private final String REGEX_3_TUPLE = "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]";
-    private final String REGEX_2_TUPLE = "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+)\\]";
 
     private final Pattern patternMemory = Pattern.compile(REGEX_START + PROP_MEMORY + REGEX_3_TUPLE);
     private final Pattern patternHeap = Pattern.compile(REGEX_START + PROP_HEAP + REGEX_3_TUPLE);
@@ -54,8 +52,6 @@ class SystemDataJson5 {
     private final Pattern patternSystemLoad = Pattern.compile(REGEX_START + PROP_SYSTEM_LOAD + REGEX_WORD_VALUE);
 
     void write(final SystemData data, final StringBuilder sb) {
-        EventDataJson5.write(data, sb);
-
         if (data.runtime_usedMemory > 0 || data.runtime_totalMemory > 0 || data.runtime_maxMemory > 0) {
             sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_MEMORY, data.runtime_usedMemory, data.runtime_totalMemory, data.runtime_maxMemory));
         }

@@ -32,12 +32,23 @@ import java.util.regex.Pattern;
 @UtilityClass
 class EventDataJson5 {
 
-    private final String SESSION_UUID = "_";
-    private final String EVENT_POSITION = "$";
-    private final String EVENT_TIME = "t";
+    /**
+     * JSON5 key for the session UUID.
+     */
+    public static final String SESSION_UUID = "_";
+    /**
+     * JSON5 key for the event's sequential position.
+     */
+    public static final String EVENT_POSITION = "$";
+    /**
+     * JSON5 key for the event's timestamp.
+     */
+    public static final String EVENT_TIME = "t";
 
-    private final String REGEX_START = "[{,]";
-    private final String REGEX_WORD_VALUE = "\\s*:\\s*([^,}\\s]+)";
+    public final String REGEX_START = "[{,]\\s*";
+    public final String REGEX_WORD_VALUE = "\\s*:\\s*([^,}\\s]+)";
+    public final String REGEX_3_TUPLE = "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+),([^,}\\s]+)\\]";
+    public final String REGEX_2_TUPLE = "\\s*:\\s*\\[([^,}\\s]+),([^,}\\s]+)\\]";
 
     private final Pattern patternSession = Pattern.compile(REGEX_START + SESSION_UUID + REGEX_WORD_VALUE);
     private final Pattern patternPosition = Pattern.compile(REGEX_START + "\\" + EVENT_POSITION + REGEX_WORD_VALUE);
