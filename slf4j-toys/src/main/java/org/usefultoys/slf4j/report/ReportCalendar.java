@@ -43,6 +43,41 @@ public class ReportCalendar implements Runnable {
     private final @NonNull Logger logger;
 
     /**
+     * Interface for providing Calendar and TimeZone information to the report.
+     * <p>
+     * This interface can be overridden in tests to simulate different date/time and timezone scenarios.
+     * The default implementation uses the standard Java API (`Date` and `TimeZone` classes).
+     */
+    protected interface CalendarInfoProvider {
+        /**
+         * @return the current date and time.
+         */
+        Date getCurrentDate();
+
+        /**
+         * @return the default time zone for this Java virtual machine.
+         */
+        TimeZone getDefaultTimeZone();
+
+        /**
+         * @return an array of all available time zone IDs.
+         */
+        String[] getAvailableTimeZoneIDs();
+    }
+
+    /**
+     * Returns the provider for calendar and timezone information used by this report.
+     * <p>
+     * The default implementation returns a provider based on the standard Java API.
+     * This method can be overridden in subclasses for testing or custom information sources.
+     *
+     * @return a CalendarInfoProvider instance
+     */
+    protected CalendarInfoProvider getCalendarInfoProvider() {
+        return new DefaultCalendarInfoProvider();
+    }
+
+    /**
      * Executes the report, writing calendar and time zone information to the configured logger.
      * The output is formatted as human-readable INFO messages.
      */
@@ -50,9 +85,14 @@ public class ReportCalendar implements Runnable {
     public void run() {
         @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
+        final CalendarInfoProvider provider = getCalendarInfoProvider();
+        final Date currentDate = provider.getCurrentDate();
+        final TimeZone tz = provider.getDefaultTimeZone();
+
         ps.println("Calendar");
-        ps.printf(" - current date/time: %s%n", DateFormat.getDateTimeInstance().format(new Date()));
-        final TimeZone tz = TimeZone.getDefault();
+        final DateFormat dateTimeInstance = DateFormat.getDateTimeInstance();
+        dateTimeInstance.setTimeZone(tz);
+        ps.printf(" - current date/time: %s%n", dateTimeInstance.format(currentDate));
         ps.printf(" - default timezone: %s (%s)%n", tz.getDisplayName(), tz.getID());
         ps.printf("; DST=%dmin", tz.getDSTSavings() / 60000);
         //noinspection ErrorNotRethrown
@@ -62,16 +102,36 @@ public class ReportCalendar implements Runnable {
             // Ignore property that exists only from Java 1.7 on.
         }
         ps.printf("; useDST=%s", tz.useDaylightTime());
-        ps.printf("; inDST=%s", tz.inDaylightTime(new Date()));
+        ps.printf("; inDST=%s", tz.inDaylightTime(currentDate));
         ps.printf("; offset=%dmin%n", tz.getRawOffset() / 60000);
         ps.print(" - available IDs: ");
         int i = 1;
-        for (final String id : TimeZone.getAvailableIDs()) {
+        for (final String id : provider.getAvailableTimeZoneIDs()) {
             if (i++ % 8 == 0) {
                 ps.printf("%n      ");
             }
             ps.printf("%s; ", id);
         }
         ps.println(); // Ensure a newline at the end of the report
+    }
+
+    /**
+     * Default implementation of CalendarInfoProvider using the standard Java API.
+     */
+    private static class DefaultCalendarInfoProvider implements CalendarInfoProvider {
+        @Override
+        public Date getCurrentDate() {
+            return new Date();
+        }
+
+        @Override
+        public TimeZone getDefaultTimeZone() {
+            return TimeZone.getDefault();
+        }
+
+        @Override
+        public String[] getAvailableTimeZoneIDs() {
+            return TimeZone.getAvailableIDs();
+        }
     }
 }
