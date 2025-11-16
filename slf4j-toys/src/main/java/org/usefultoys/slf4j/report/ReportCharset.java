@@ -24,6 +24,7 @@ import org.usefultoys.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * A report module that provides information about the system's default character set and lists all available character sets.
@@ -40,6 +41,36 @@ public class ReportCharset implements Runnable {
     private final @NonNull Logger logger;
 
     /**
+     * Interface for providing Charset information to the report.
+     * <p>
+     * This interface can be overridden in tests to simulate different Charset scenarios.
+     * The default implementation uses {@link Charset} class.
+     */
+    protected interface CharsetInfoProvider {
+        /**
+         * @return the default charset for this Java virtual machine
+         */
+        Charset defaultCharset();
+
+        /**
+         * @return an immutable map of the charsets supported by the current Java virtual machine
+         */
+        Map<String, Charset> availableCharsets();
+    }
+
+    /**
+     * Returns the provider for charset information used by this report.
+     * <p>
+     * The default implementation returns a provider based on {@link Charset}.
+     * This method can be overridden in subclasses for testing or custom charset sources.
+     *
+     * @return a CharsetInfoProvider instance
+     */
+    protected CharsetInfoProvider getCharsetInfoProvider() {
+        return new DefaultCharsetInfoProvider();
+    }
+
+    /**
      * Executes the report, writing character set information to the configured logger.
      * The output is formatted as human-readable INFO messages.
      */
@@ -47,19 +78,35 @@ public class ReportCharset implements Runnable {
     public void run() {
         @Cleanup
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
-        final Charset charset = Charset.defaultCharset();
+        final CharsetInfoProvider charsetInfoProvider = getCharsetInfoProvider();
+        final Charset charset = charsetInfoProvider.defaultCharset();
         ps.println("Charset");
         ps.printf(" - default charset: %s", charset.displayName());
         ps.printf("; name=%s", charset.name());
         ps.printf("; canEncode=%s%n", charset.canEncode());
         ps.print(" - available charsets: ");
         int i = 1;
-        for (final Charset l : Charset.availableCharsets().values()) {
+        for (final Charset l : charsetInfoProvider.availableCharsets().values()) {
             if (i++ % 15 == 0) {
                 ps.printf("%n      ");
             }
             ps.printf("%s; ", l.displayName());
         }
         ps.println(); // Ensure a newline at the end of the report
+    }
+
+    /**
+     * Default implementation of CharsetInfoProvider using the {@link Charset}.
+     */
+    private static class DefaultCharsetInfoProvider implements CharsetInfoProvider {
+        @Override
+        public Charset defaultCharset() {
+            return Charset.defaultCharset();
+        }
+
+        @Override
+        public Map<String, Charset> availableCharsets() {
+            return Charset.availableCharsets();
+        }
     }
 }
