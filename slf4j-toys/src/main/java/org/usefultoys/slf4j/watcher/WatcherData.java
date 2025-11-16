@@ -16,7 +16,6 @@
 package org.usefultoys.slf4j.watcher;
 
 import org.usefultoys.slf4j.internal.SystemData;
-import org.usefultoys.slf4j.utils.UnitFormatter;
 
 /**
  * Extends {@link SystemData} with semantics specific to the {@link Watcher}.
@@ -88,32 +87,7 @@ public class WatcherData extends SystemData {
      */
     @Override
     public StringBuilder readableStringBuilder(final StringBuilder builder) {
-        boolean hasPrevious = false;
-        if (runtime_usedMemory > 0 || runtime_maxMemory > 0 || runtime_totalMemory > 0) {
-            builder.append("Memory: ");
-            builder.append(UnitFormatter.bytes(runtime_usedMemory));
-            builder.append(' ');
-            builder.append(UnitFormatter.bytes(runtime_totalMemory));
-            builder.append(' ');
-            builder.append(UnitFormatter.bytes(runtime_maxMemory));
-            hasPrevious = true;
-        }
-        if (systemLoad > 0) {
-            if (hasPrevious) {
-                builder.append("; ");
-            }
-            builder.append("System load: ");
-            builder.append(Math.round(systemLoad * 100));
-            builder.append("%");
-            hasPrevious = true;
-        }
-        if (sessionUuid != null) {
-            if (hasPrevious) {
-                builder.append("; ");
-            }
-            builder.append("UUID: ");
-            builder.append(sessionUuid);
-        }
+        WatcherDataFormatter.readableStringBuilder(this, builder);
         return builder;
     }
 }
