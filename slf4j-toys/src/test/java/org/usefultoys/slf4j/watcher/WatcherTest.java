@@ -17,8 +17,8 @@ package org.usefultoys.slf4j.watcher;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
@@ -26,14 +26,50 @@ import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.utils.ConfigParser;
 
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WatcherTest {
 
     private static final String TEST_WATCHER_NAME = "myWatcher";
-    private MockLogger messageMockLogger;
-    private MockLogger dataMockLogger;
+
+    // A final class with a constructor to simulate a "record" or "tuple" for test scenarios, compatible with Java 8.
+    private static final class WatcherTestScenario {
+        final String testName;
+        final String messagePrefix;
+        final String messageSuffix;
+        final String dataPrefix;
+        final String dataSuffix;
+        final boolean dataEnabled;
+        final boolean messageLoggerEnabled;
+        final boolean dataLoggerEnabled;
+        final boolean expectMessageLog;
+        final boolean expectDataLog;
+        final String expectedMessageContent;
+        final String expectedDataContent;
+
+        private WatcherTestScenario(String testName, String messagePrefix, String messageSuffix, String dataPrefix, String dataSuffix, boolean dataEnabled, boolean messageLoggerEnabled, boolean dataLoggerEnabled, boolean expectMessageLog, boolean expectDataLog, String expectedMessageContent, String expectedDataContent) {
+            this.testName = testName;
+            this.messagePrefix = messagePrefix;
+            this.messageSuffix = messageSuffix;
+            this.dataPrefix = dataPrefix;
+            this.dataSuffix = dataSuffix;
+            this.dataEnabled = dataEnabled;
+            this.messageLoggerEnabled = messageLoggerEnabled;
+            this.dataLoggerEnabled = dataLoggerEnabled;
+            this.expectMessageLog = expectMessageLog;
+            this.expectDataLog = expectDataLog;
+            this.expectedMessageContent = expectedMessageContent;
+            this.expectedDataContent = expectedDataContent;
+        }
+
+        @Override
+        public String toString() {
+            return testName; // Used by @ParameterizedTest(name = "{0}")
+        }
+    }
 
     @BeforeEach
     void setUp() {
@@ -41,30 +77,13 @@ class WatcherTest {
         WatcherConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
-
-        // Set distinct suffixes for message and data loggers in WatcherConfig
-        // This ensures Watcher's constructor gets distinct MockLogger instances
-        System.setProperty(WatcherConfig.PROP_MESSAGE_SUFFIX, ".msg");
-        System.setProperty(WatcherConfig.PROP_DATA_SUFFIX, ".data");
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true"); // Ensure data logging is enabled by default for setup
-        WatcherConfig.init(); // Apply these properties
-
-        // Get the specific MockLogger instances that Watcher will use
-        Logger messageLogger = LoggerFactory.getLogger(WatcherConfig.messagePrefix + TEST_WATCHER_NAME + WatcherConfig.messageSuffix);
-        messageMockLogger = (MockLogger) messageLogger;
-        messageMockLogger.clearEvents();
-        messageMockLogger.setEnabled(true); // Ensure INFO level is enabled for message logger
-
-        Logger dataLogger = LoggerFactory.getLogger(WatcherConfig.dataPrefix + TEST_WATCHER_NAME + WatcherConfig.dataSuffix);
-        dataMockLogger = (MockLogger) dataLogger;
-        dataMockLogger.clearEvents();
-        dataMockLogger.setEnabled(true); // Ensure TRACE level is enabled for data logger
     }
 
     @AfterEach
     void tearDown() {
-        // Clear properties set in setUp or tests
+        System.clearProperty(WatcherConfig.PROP_MESSAGE_PREFIX);
         System.clearProperty(WatcherConfig.PROP_MESSAGE_SUFFIX);
+        System.clearProperty(WatcherConfig.PROP_DATA_PREFIX);
         System.clearProperty(WatcherConfig.PROP_DATA_SUFFIX);
         System.clearProperty(WatcherConfig.PROP_DATA_ENABLED);
 
@@ -75,108 +94,60 @@ class WatcherTest {
         ConfigParser.clearInitializationErrors();
     }
 
-    @Test
-    void testWatcherLogsInfoAndTraceWhenDataAndLoggerEnabled() {
-        // Config already set in setUp: PROP_DATA_ENABLED="true", suffixes set, levels enabled
-
-        Watcher watcher = new Watcher(TEST_WATCHER_NAME);
-        watcher.run();
-
-        // Verify messageLogger (INFO)
-        assertEquals(1, messageMockLogger.getEventCount(), "messageMockLogger should have 1 event");
-        messageMockLogger.assertEvent(0, MockLoggerEvent.Level.INFO, Markers.MSG_WATCHER);
-        assertTrue(messageMockLogger.getEvent(0).getFormattedMessage().contains("Memory:"), "Message logger output should contain Memory info");
-
-        // Verify dataMockLogger (TRACE)
-        assertEquals(1, dataMockLogger.getEventCount(), "dataMockLogger should have 1 event");
-        dataMockLogger.assertEvent(0, MockLoggerEvent.Level.TRACE, Markers.DATA_WATCHER);
-        assertTrue(dataMockLogger.getEvent(0).getFormattedMessage().contains("_:"), "Data logger output should contain sessionUuid");
-
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+    private static Stream<WatcherTestScenario> watcherScenarios() {
+        return Stream.of(
+            new WatcherTestScenario("Both loggers enabled", "", ".msg", "", ".data", true, true, true, true, true, "Memory:", "_:"),
+            new WatcherTestScenario("Data logger disabled by config", "", ".msg", "", ".data", false, true, true, true, false, "Memory:", null),
+            new WatcherTestScenario("Message logger level disabled", "", ".msg", "", ".data", true, false, true, false, true, null, "_:"),
+            new WatcherTestScenario("Data logger level disabled", "", ".msg", "", ".data", true, true, false, true, false, "Memory:", null),
+            new WatcherTestScenario("Both loggers level disabled", "", ".msg", "", ".data", true, false, false, false, false, null, null),
+            new WatcherTestScenario("Custom prefixes and suffixes", "p-msg-", ".s-msg", "p-data-", ".s-data", true, true, true, true, true, "Memory:", "_:")
+        );
     }
 
-    @Test
-    void testWatcherLogsInfoOnlyWhenDataDisabled() {
-        // Disable data logging for this test
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "false");
-        WatcherConfig.init(); // Apply the change
-
-        // dataMockLogger's traceEnabled is true, but Watcher's dataLogger will be NullLogger.INSTANCE
-        Watcher watcher = new Watcher(TEST_WATCHER_NAME);
-        watcher.run();
-
-        // Verify messageLogger (INFO)
-        assertEquals(1, messageMockLogger.getEventCount(), "messageMockLogger should have 1 event");
-        messageMockLogger.assertEvent(0, MockLoggerEvent.Level.INFO, Markers.MSG_WATCHER);
-        assertTrue(messageMockLogger.getEvent(0).getFormattedMessage().contains("Memory:"), "Message logger output should contain Memory info");
-
-        // Verify dataMockLogger (should be NullLogger, so no events)
-        assertEquals(0, dataMockLogger.getEventCount(), "dataMockLogger should have 0 events when data is disabled");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
-    }
-
-    @Test
-    void testWatcherLogsNothingWhenDataLoggerDisabled() {
-        // Disable data logging
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("watcherScenarios")
+    void testWatcherLoggingScenarios(WatcherTestScenario scenario) {
+        // 1. Set system properties for the current test scenario
+        System.setProperty(WatcherConfig.PROP_MESSAGE_PREFIX, scenario.messagePrefix);
+        System.setProperty(WatcherConfig.PROP_MESSAGE_SUFFIX, scenario.messageSuffix);
+        System.setProperty(WatcherConfig.PROP_DATA_PREFIX, scenario.dataPrefix);
+        System.setProperty(WatcherConfig.PROP_DATA_SUFFIX, scenario.dataSuffix);
+        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, String.valueOf(scenario.dataEnabled));
         WatcherConfig.init();
 
-        // Disable info for message logger
-        dataMockLogger.setEnabled(false);
-        // dataMockLogger's traceEnabled is true, but Watcher's dataLogger will be NullLogger.INSTANCE, so no need to disable dataMockLogger's traceEnabled explicitly here.
+        // 2. Get the mock loggers that the Watcher will use
+        final String messageLoggerName = scenario.messagePrefix + TEST_WATCHER_NAME + scenario.messageSuffix;
+        final MockLogger messageMockLogger = (MockLogger) LoggerFactory.getLogger(messageLoggerName);
+        messageMockLogger.clearEvents();
+        messageMockLogger.setEnabled(scenario.messageLoggerEnabled);
 
+        final String dataLoggerName = scenario.dataPrefix + TEST_WATCHER_NAME + scenario.dataSuffix;
+        final MockLogger dataMockLogger = (MockLogger) LoggerFactory.getLogger(dataLoggerName);
+        dataMockLogger.clearEvents();
+        dataMockLogger.setEnabled(scenario.dataLoggerEnabled);
+
+        // 3. Execute the watcher
         Watcher watcher = new Watcher(TEST_WATCHER_NAME);
         watcher.run();
 
-        // Verify messageLogger (INFO)
-        assertEquals(1, messageMockLogger.getEventCount(), "messageMockLogger should have 1 event");
-        messageMockLogger.assertEvent(0, MockLoggerEvent.Level.INFO, Markers.MSG_WATCHER);
-        assertTrue(messageMockLogger.getEvent(0).getFormattedMessage().contains("Memory:"), "Message logger output should contain Memory info");
+        // 4. Assertions
+        if (scenario.expectMessageLog) {
+            assertEquals(1, messageMockLogger.getEventCount(), "messageMockLogger should have 1 event for test: " + scenario.testName);
+            messageMockLogger.assertEvent(0, MockLoggerEvent.Level.INFO, Markers.MSG_WATCHER);
+            assertTrue(messageMockLogger.getEvent(0).getFormattedMessage().contains(scenario.expectedMessageContent), "Message content mismatch for test: " + scenario.testName);
+        } else {
+            assertEquals(0, messageMockLogger.getEventCount(), "messageMockLogger should have 0 events for test: " + scenario.testName);
+        }
 
-        // Verify dataMockLogger (should be disabled, so no events)
-        assertEquals(0, dataMockLogger.getEventCount(), "dataMockLogger should have 0 events when data is disabled");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
-    }
+        if (scenario.expectDataLog) {
+            assertEquals(1, dataMockLogger.getEventCount(), "dataMockLogger should have 1 event for test: " + scenario.testName);
+            dataMockLogger.assertEvent(0, MockLoggerEvent.Level.TRACE, Markers.DATA_WATCHER);
+            assertTrue(dataMockLogger.getEvent(0).getFormattedMessage().contains(scenario.expectedDataContent), "Data content mismatch for test: " + scenario.testName);
+        } else {
+            assertEquals(0, dataMockLogger.getEventCount(), "dataMockLogger should have 0 events for test: " + scenario.testName);
+        }
 
-
-    @Test
-    void testWatcherLogsNothingWhenMessageLoggerDisabled() {
-        // Disable data logging
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
-        WatcherConfig.init();
-
-        // Disable info for message logger
-        messageMockLogger.setEnabled(false);
-        // dataMockLogger's traceEnabled is true, but Watcher's dataLogger will be NullLogger.INSTANCE, so no need to disable dataMockLogger's traceEnabled explicitly here.
-
-        Watcher watcher = new Watcher(TEST_WATCHER_NAME);
-        watcher.run();
-
-        // Verify dataMockLogger (TRACE)
-        assertEquals(1, dataMockLogger.getEventCount(), "dataMockLogger should have 1 event");
-        dataMockLogger.assertEvent(0, MockLoggerEvent.Level.TRACE, Markers.DATA_WATCHER);
-        assertTrue(dataMockLogger.getEvent(0).getFormattedMessage().contains("_:"), "Data logger output should contain sessionUuid");
-
-        // Verify messageLogger (should be disabled, so no events)
-        assertEquals(0, messageMockLogger.getEventCount(), "dataMockLogger should have 0 events when data is disabled");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
-    }
-    @Test
-    void testWatcherLogsNothingWhenBothDisabled() {
-        // Disable data logging
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
-        WatcherConfig.init();
-
-        // Disable info for message logger
-        messageMockLogger.setInfoEnabled(false);
-        dataMockLogger.setEnabled(false);
-
-        Watcher watcher = new Watcher(TEST_WATCHER_NAME);
-        watcher.run();
-
-        // Verify no events are logged
-        assertEquals(0, messageMockLogger.getEventCount(), "messageMockLogger should have 0 events");
-        assertEquals(0, dataMockLogger.getEventCount(), "dataMockLogger should have 0 events");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected for test: " + scenario.testName + " - " + ConfigParser.initializationErrors);
     }
 }
