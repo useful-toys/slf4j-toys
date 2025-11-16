@@ -83,6 +83,17 @@ public class Reporter implements Serializable {
     }
 
     /**
+     * Retrieves an enumeration of all network interfaces on the local machine.
+     * This method can be overridden in tests to provide a custom enumeration of network interfaces.
+     *
+     * @return An {@link Enumeration} of {@link NetworkInterface} objects.
+     * @throws SocketException If an I/O error occurs.
+     */
+    protected Enumeration<NetworkInterface> getNetworkInterfaces() throws SocketException {
+        return NetworkInterface.getNetworkInterfaces();
+    }
+
+    /**
      * Executes all reports that are enabled in {@link ReporterConfig} and logs their output
      * as human-readable information-level messages.
      * <p>
@@ -128,7 +139,7 @@ public class Reporter implements Serializable {
         }
         if (ReporterConfig.reportNetworkInterface) {
             try {
-                final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                final Enumeration<NetworkInterface> interfaces = getNetworkInterfaces(); // Use the protected method
                 while (interfaces.hasMoreElements()) {
                     final NetworkInterface nif = interfaces.nextElement();
                     executor.execute(new ReportNetworkInterface(logger, nif));

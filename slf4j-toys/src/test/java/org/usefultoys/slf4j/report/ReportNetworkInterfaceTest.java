@@ -329,4 +329,42 @@ class ReportNetworkInterfaceTest {
         assertTrue(logs.contains("multicast;"));
         assertTrue(logs.contains("reachable;"));
     }
+
+    @Test
+    void testReportNetworkAddressWithNullHostNames() throws Exception {
+        Inet4Address mockIpv4 = mock(Inet4Address.class);
+        when(mockIpv4.getHostAddress()).thenReturn("127.0.0.1");
+        when(mockIpv4.getHostName()).thenReturn(null); // Simulate null host name
+        when(mockIpv4.getCanonicalHostName()).thenReturn(null); // Simulate null canonical host name
+        when(mockIpv4.isLoopbackAddress()).thenReturn(true);
+        when(mockIpv4.isSiteLocalAddress()).thenReturn(false);
+        when(mockIpv4.isAnyLocalAddress()).thenReturn(true);
+        when(mockIpv4.isLinkLocalAddress()).thenReturn(false);
+        when(mockIpv4.isMulticastAddress()).thenReturn(false);
+        when(mockIpv4.isReachable(5000)).thenReturn(true);
+
+        NetworkInterface mockNif = mock(NetworkInterface.class);
+        when(mockNif.getName()).thenReturn("lo_null_host");
+        when(mockNif.getDisplayName()).thenReturn("Loopback Null Host");
+        when(mockNif.getMTU()).thenReturn(65536);
+        when(mockNif.isLoopback()).thenReturn(true);
+        when(mockNif.isPointToPoint()).thenReturn(false);
+        when(mockNif.isUp()).thenReturn(true);
+        when(mockNif.isVirtual()).thenReturn(false);
+        when(mockNif.supportsMulticast()).thenReturn(false);
+        when(mockNif.getHardwareAddress()).thenReturn(null);
+        when(mockNif.getInetAddresses()).thenReturn(Collections.enumeration(Collections.singletonList(mockIpv4)));
+
+        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        report.run();
+
+        assertTrue(mockLogger.getEventCount() > 0);
+        final String logs = mockLogger.getEvent(0).getFormattedMessage();
+        assertTrue(logs.contains("NET address (IPV4): 127.0.0.1"));
+        assertTrue(logs.contains("host name: n/a"));
+        assertTrue(logs.contains("canonical host name : n/a"));
+        assertTrue(logs.contains("loopback;"));
+        assertTrue(logs.contains("any-local;"));
+        assertTrue(logs.contains("reachable;"));
+    }
 }
