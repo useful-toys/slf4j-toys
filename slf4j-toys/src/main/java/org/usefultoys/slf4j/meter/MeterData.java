@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 import org.usefultoys.slf4j.internal.SystemData;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -185,6 +186,61 @@ public class MeterData extends SystemData implements MeterAnalysis {
 
     public Map<String, String> getContext() {
         return context == null ? null : Collections.unmodifiableMap(context);
+    }
+
+    /** Placeholder string for null values in context. */
+    private static final String NULL_VALUE = "<null>";
+
+    /**
+     * Adds a key-value entry to the context map, using the {@code toString()} representation of an object as value.
+     *
+     * @param name   The key of the entry to add.
+     * @param object The object whose string representation will be used as the value. {@code null} objects are
+     *               represented by {@code "<null>"}.
+     */
+    public void putContext(final String name, final Object object) {
+        if (context == null) {
+            context = new LinkedHashMap<>();
+        }
+        context.put(name == null ? NULL_VALUE : name,
+                object == null ? NULL_VALUE : object.toString());
+    }
+
+    public void putContext(final String name) {
+        if (context == null) {
+            context = new LinkedHashMap<>();
+        }
+        context.put(name == null ? NULL_VALUE : name,
+                null);
+    }
+
+    /**
+     * Removes a entry from the context map.
+     * @param name
+     */
+    public void removeContext(final String name) {
+        if (context != null) {
+            context.remove(name);
+        }
+    }
+
+    public void clearContext() {
+        if (context != null) {
+            context.clear();
+        }
+    }
+
+    /**
+     * Returns a unique identifier for this MeterData instance, combining category, operation, and position.
+     *
+     * @return A string representing the full ID of the MeterData.
+     */
+    @SuppressWarnings("MagicCharacter")
+    public String getFullID() {
+        if (operation == null) {
+            return category + '#' + getPosition();
+        }
+        return String.format("%s/%s#%d", category, operation, getPosition());
     }
 
     @Override

@@ -30,14 +30,11 @@ public interface MeterAnalysis {
     // These methods must be implemented by the class implementing this interface
     // to provide the raw data for the default methods.
 
-    String getSessionUuid(); // Kept as it's a fundamental identifier
-    long getPosition();
     long getLastCurrentTime();
 
     String getCategory();
     String getOperation();
     String getParent();
-    String getDescription();
     long getCreateTime();
     long getStartTime();
     long getStopTime();
@@ -46,22 +43,8 @@ public interface MeterAnalysis {
     String getOkPath();
     String getRejectPath();
     String getFailPath();
-    String getFailMessage();
 
     // --- Default Methods (Business Logic and Calculations) ---
-
-    /**
-     * Returns a unique identifier for this MeterData instance, combining category, operation, and position.
-     *
-     * @return A string representing the full ID of the MeterData.
-     */
-    @SuppressWarnings("MagicCharacter")
-    default String getFullID() {
-        if (getOperation() == null) {
-            return getCategory() + '#' + getPosition();
-        }
-        return String.format("%s/%s#%d", getCategory(), getOperation(), getPosition());
-    }
 
     /**
      * Checks if the operation has started.

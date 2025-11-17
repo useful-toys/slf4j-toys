@@ -28,7 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
-import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -57,7 +56,7 @@ import static org.usefultoys.slf4j.meter.MeterConfig.*;
  * @see Markers
  */
 @SuppressWarnings({"OverlyBroadCatchBlock", "FinalizeDeclaration"})
-public class Meter extends MeterData implements Closeable {
+public class Meter extends MeterData implements MeterContext<Meter>, Closeable {
 
     private static final long serialVersionUID = 1L;
 
@@ -91,8 +90,6 @@ public class Meter extends MeterData implements Closeable {
     private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non-forward iteration";
     /** The fully qualified name of this class, used for stack trace manipulation. */
     private static final String MY_CLASS_NAME = Meter.class.getName();
-    /** Placeholder string for null values in context. */
-    private static final String NULL_VALUE = "<null>";
     /** Placeholder string for unknown logger names. */
     private static final String UNKNOWN_LOGGER_NAME = "???";
     /** Default failure path for operations terminated by `try-with-resources`. */
@@ -330,369 +327,7 @@ public class Meter extends MeterData implements Closeable {
     }
 
     // ========================================================================
-
-    /**
-     * Adds a key-only entry to the context map. This is interpreted as a marker or flag.
-     *
-     * @param name The key of the entry to add. Must not be {@code null}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, null);
-        return this;
-    }
-
-    /**
-     * Conditionally adds a key-only entry to the context map if the condition is {@code true}.
-     *
-     * @param condition The condition to evaluate.
-     * @param trueName  The key of the entry to add if {@code condition} is {@code true}. Must not be {@code null}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final boolean condition, final String trueName) {
-        if (!condition) {
-            return this;
-        }
-        if (trueName == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition, trueName)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(trueName, null);
-        return this;
-    }
-
-    /**
-     * Conditionally adds a key-only entry to the context map based on a boolean condition.
-     *
-     * @param condition The condition to evaluate.
-     * @param trueName  The key of the entry to add if {@code condition} is {@code true}. Must not be {@code null}.
-     * @param falseName The key of the entry to add if {@code condition} is {@code false}. Must not be {@code null}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final boolean condition, final String trueName, final String falseName) {
-        if (condition) {
-            if (trueName == null) {
-                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition, trueName, falseName)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-                return this;
-            }
-            if (context == null) {
-                context = new LinkedHashMap<>();
-            }
-            context.put(trueName, null);
-        } else {
-            if (falseName == null) {
-                /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(condition, trueName, falseName)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-                return this;
-            }
-            if (context == null) {
-                context = new LinkedHashMap<>();
-            }
-            context.put(falseName, null);
-        }
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with an integer value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The integer value.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final int value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, Integer.toString(value));
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with a long value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The long value.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final long value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, Long.toString(value));
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with a boolean value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The boolean value.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final boolean value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, Boolean.toString(value));
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with a float value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The float value.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final float value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, Float.toString(value));
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with a double value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The double value.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final double value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, Double.toString(value));
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with an {@link Integer} object value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Integer} object value. {@code null} values are represented by {@code "<null>"}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final Integer value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, value == null ? NULL_VALUE : value.toString());
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with a {@link Long} object value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Long} object value. {@code null} values are represented by {@code "<null>"}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final Long value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, value == null ? NULL_VALUE : value.toString());
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with a {@link Boolean} object value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Boolean} object value. {@code null} values are represented by {@code "<null>"}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final Boolean value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, value == null ? NULL_VALUE : value.toString());
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with a {@link Float} object value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Float} object value. {@code null} values are represented by {@code "<null>"}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final Float value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, value == null ? NULL_VALUE : value.toString());
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with a {@link Double} object value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Double} object value. {@code null} values are represented by {@code "<null>"}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final Double value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, value == null ? NULL_VALUE : value.toString());
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map, using the {@code toString()} representation of an object as value.
-     *
-     * @param name   The key of the entry to add. Must not be {@code null}.
-     * @param object The object whose string representation will be used as the value. {@code null} objects are
-     *               represented by {@code "<null>"}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final Object object) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, object == null ? NULL_VALUE : object.toString());
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map with a string value.
-     *
-     * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The string value. {@code null} values are represented by {@code "<null>"}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final String value) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, value)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        context.put(name, value == null ? NULL_VALUE : value);
-        return this;
-    }
-
-    /**
-     * Adds a key-value entry to the context map, where the value is a formatted message.
-     *
-     * @param name   The key of the entry to add. Must not be {@code null}.
-     * @param format The message format string (e.g., `String.format(java.lang.String, java.lang.Object...)`). Must not
-     *               be {@code null}.
-     * @param args   The arguments for the format string.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter ctx(final String name, final String format, final Object... args) {
-        if (name == null || format == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, format, args...)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            context = new LinkedHashMap<>();
-        }
-        try {
-            ctx(name, String.format(format, args));
-        } catch (final IllegalFormatException e) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "ctx(name, format, args...)", ERROR_MSG_ILLEGAL_STRING_FORMAT, getFullID(), new IllegalMeterUsage(2, e));
-        }
-        return this;
-    }
-
-    /**
-     * Removes an entry from the context map.
-     *
-     * @param name The key of the entry to remove. Must not be {@code null}.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter unctx(final String name) {
-        if (name == null) {
-            /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "unctx(name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
-            return this;
-        }
-        if (context == null) {
-            return this;
-        }
-        context.remove(name);
-        return this;
-    }
-
+    // ctx and unctx methods are now provided by MeterContext interface
     // ========================================================================
 
     /**
@@ -1212,7 +847,7 @@ public class Meter extends MeterData implements Closeable {
          * @return This `Throwable` instance.
          */
         @Override
-        public synchronized Throwable fillInStackTrace() {
+            public synchronized Throwable fillInStackTrace() {
             return this;
         }
     }
@@ -1363,7 +998,7 @@ public class Meter extends MeterData implements Closeable {
         if (startTime == 0) start();
         try {
             final T result = callable.call();
-            ctx(CONTEXT_RESULT, result);
+            ctx(CONTEXT_RESULT, (Object) result);
             if (stopTime == 0) ok();
             return result;
         } catch (final Exception e) {
