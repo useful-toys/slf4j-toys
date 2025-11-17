@@ -185,11 +185,11 @@ public class MeterData extends SystemData implements MeterAnalysis {
     Map<String, String> context = null;
 
     public Map<String, String> getContext() {
-        return context == null ? null : Collections.unmodifiableMap(context);
+        return context == null ? Collections.emptyMap() : Collections.unmodifiableMap(context);
     }
 
     /** Placeholder string for null values in context. */
-    private static final String NULL_VALUE = "<null>";
+    static final String NULL_VALUE = "<null>";
 
     /**
      * Adds a key-value entry to the context map, using the {@code toString()} representation of an object as value.

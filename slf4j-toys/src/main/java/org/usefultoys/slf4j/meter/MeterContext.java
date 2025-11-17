@@ -30,7 +30,7 @@ import java.util.IllegalFormatException;
  *
  * @author Daniel Felix Ferber
  */
-public interface MeterContext<T extends Meter> {
+public interface MeterContext<T extends MeterData> {
 
     /**
      * Adds a key-value entry to the context map.
@@ -81,7 +81,7 @@ public interface MeterContext<T extends Meter> {
         if (!condition) {
             return (T) this;
         }
-        putContext(trueName, null);
+        putContext(trueName);
         return (T) this;
     }
 
@@ -95,9 +95,9 @@ public interface MeterContext<T extends Meter> {
      */
     default T ctx(final boolean condition, final String trueName, final String falseName) {
         if (condition) {
-            putContext(trueName, null);
+            putContext(trueName);
         } else {
-            putContext(falseName, null);
+            putContext(falseName);
         }
         return (T) this;
     }
@@ -245,10 +245,14 @@ public interface MeterContext<T extends Meter> {
      * @return Reference to this `MeterContext` instance, for method chaining.
      */
     default T ctx(final String name, final String format, final Object... args) {
+        if (format == null) {
+            putContext(name, "<null format>");
+            return (T) this;
+        }
         try {
-            ctx(name, String.format(format, args));
+            putContext(name, String.format(format, args));
         } catch (final IllegalFormatException e) {
-            ctx(name, e.getLocalizedMessage());
+            putContext(name, e.getLocalizedMessage());
         }
         return (T) this;
     }
