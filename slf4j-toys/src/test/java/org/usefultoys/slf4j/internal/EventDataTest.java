@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.internal;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.usefultoys.slf4j.SessionConfig;
 
@@ -25,161 +26,96 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EventDataTest {
 
+    private static final String FIXED_UUID = "12345"; // Fixed UUID as requested
+
     @BeforeAll
     static void validate() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
-    static class TestEventData extends EventData {
-
-        public TestEventData() {
-        }
-
-        public TestEventData(final String sessionUuid) {
-            super(sessionUuid);
-        }
-
-        public TestEventData(final String sessionUuid, final long position) {
-            super(sessionUuid, position);
-        }
-
-        public TestEventData(final String sessionUuid, final long position, final long time) {
-            super(sessionUuid, position, time);
-        }
-    }
-
     @Test
+    @DisplayName("Constructor should initialize fields correctly with default values")
     void testConstructorAndGetters0() {
-        final TestEventData event = new TestEventData();
-        assertNull(event.getSessionUuid());
-        assertEquals(0L, event.getPosition());
-        assertEquals(0L, event.getLastCurrentTime());
+        final EventData event = new EventData();
+        assertNull(event.getSessionUuid(), "Session UUID should be null by default");
+        assertEquals(0L, event.getPosition(), "Position should be 0 by default");
+        assertEquals(0L, event.getLastCurrentTime(), "Last current time should be 0 by default");
     }
 
     @Test
+    @DisplayName("Constructor should initialize sessionUuid correctly")
     void testConstructorAndGetters1() {
-        final TestEventData event = new TestEventData("abc");
-        assertEquals("abc", event.getSessionUuid());
-        assertEquals(0L, event.getPosition());
-        assertEquals(0L, event.getLastCurrentTime());
+        final EventData event = new EventData("abc");
+        assertEquals("abc", event.getSessionUuid(), "Session UUID should be initialized correctly");
+        assertEquals(0L, event.getPosition(), "Position should be 0 by default when only UUID is provided");
+        assertEquals(0L, event.getLastCurrentTime(), "Last current time should be 0 by default when only UUID is provided");
     }
 
     @Test
+    @DisplayName("Constructor should initialize sessionUuid and position correctly")
     void testConstructorAndGetters2() {
-        final TestEventData event = new TestEventData("abc", 5L);
-        assertEquals("abc", event.getSessionUuid());
-        assertEquals(5L, event.getPosition());
-        assertEquals(0L, event.getLastCurrentTime());
+        final EventData event = new EventData("abc", 5L);
+        assertEquals("abc", event.getSessionUuid(), "Session UUID should be initialized correctly");
+        assertEquals(5L, event.getPosition(), "Position should be initialized correctly");
+        assertEquals(0L, event.getLastCurrentTime(), "Last current time should be 0 by default when UUID and position are provided");
     }
 
     @Test
+    @DisplayName("Constructor should initialize all fields correctly")
     void testConstructorAndGetters3() {
-        final TestEventData event = new TestEventData("abc", 5L, 10L);
-        assertEquals("abc", event.getSessionUuid());
-        assertEquals(5L, event.getPosition());
-        assertEquals(10L, event.getLastCurrentTime());
+        final EventData event = new EventData("abc", 5L, 10L);
+        assertEquals("abc", event.getSessionUuid(), "Session UUID should be initialized correctly");
+        assertEquals(5L, event.getPosition(), "Position should be initialized correctly");
+        assertEquals(10L, event.getLastCurrentTime(), "Last current time should be initialized correctly");
     }
 
     @Test
+    @DisplayName("collectCurrentTime should update lastCurrentTime with current nano time")
     void testCollectCurrentTime() {
-        final TestEventData event = new TestEventData();
+        final EventData event = new EventData();
         long startTime = System.nanoTime();
         event.collectCurrentTime();
         long endTime = System.nanoTime();
-        assertTrue(event.getLastCurrentTime() >= startTime);
-        assertTrue(event.getLastCurrentTime() <= endTime);
+        assertTrue(event.getLastCurrentTime() >= startTime, "Last current time should be greater than or equal to start time");
+        assertTrue(event.getLastCurrentTime() <= endTime, "Last current time should be less than or equal to end time");
     }
 
     @Test
-    void testResetClearsFieldsAndCallsResetImpl() {
-        final TestEventData event = new TestEventData("abc", 5L, 10L);
+    @DisplayName("reset should clear all fields to their default values")
+    void testResetClearsFields() {
+        final EventData event = new EventData("abc", 5L, 10L);
         event.reset();
-        assertNull(event.getSessionUuid());
-        assertEquals(0L, event.getPosition());
-        assertEquals(0L, event.getLastCurrentTime());
+        assertNull(event.getSessionUuid(), "Session UUID should be null after reset");
+        assertEquals(0L, event.getPosition(), "Position should be 0 after reset");
+        assertEquals(0L, event.getLastCurrentTime(), "Last current time should be 0 after reset");
     }
 
-//    @Test
-//    void testJson5MessageAndWriteJson5Impl() {
-//        final TestEventData event = new TestEventData("abc", 5L, 10L);
-//        final String json = event.json5Message();
-//        // Expecting custom:value from writeJson5Impl
-//        assertTrue(json.startsWith("{"));
-//        assertTrue(json.contains(EventData.SESSION_UUID + ":abc"));
-//        assertTrue(json.contains(EventData.EVENT_POSITION + ":5"));
-//        assertTrue(json.contains(EventData.EVENT_TIME + ":10"));
-//        assertTrue(json.contains(",custom:value"));
-//        assertTrue(json.endsWith("}"));
-//    }
-//
-//    @Test
-//    void testEncodedMessageDelegatesToJson5Message() {
-//        final TestEventData event = new TestEventData("testSession", 1L, 2L);
-//        final String encoded = event.json5Message();
-//        final String json5 = event.json5Message(); // Call directly to compare
-//        assertEquals(json5, encoded);
-//    }
-//
-//    @Test
-//    void testReadJson5MessageAllFields() {
-//        final TestEventData event = new TestEventData();
-//        event.readJson5("{_:abc,$:5,t:10}");
-//        assertEquals("abc", event.getSessionUuid());
-//        assertEquals(5L, event.getPosition());
-//        assertEquals(10L, event.getLastCurrentTime());
-//    }
-//
-//    @Test
-//    void testReadJson5MessageMissingSessionUuid() {
-//        final TestEventData event = new TestEventData("initial", 1L, 2L); // Set initial values
-//        event.readJson5("{$:5,t:10}"); // Missing sessionUuid
-//        assertEquals("initial", event.getSessionUuid()); // Should retain initial value
-//        assertEquals(5L, event.getPosition());
-//        assertEquals(10L, event.getLastCurrentTime());
-//    }
-//
-//    @Test
-//    void testReadJson5MessageMissingPosition() {
-//        final TestEventData event = new TestEventData("initial", 1L, 2L);
-//        event.readJson5("{_:abc,t:10}"); // Missing position
-//        assertEquals("abc", event.getSessionUuid());
-//        assertEquals(1L, event.getPosition()); // Should retain initial value
-//        assertEquals(10L, event.getLastCurrentTime());
-//    }
-//
-//    @Test
-//    void testReadJson5MessageMissingTime() {
-//        final TestEventData event = new TestEventData("initial", 1L, 2L);
-//        event.readJson5("{_:abc,$:5}"); // Missing time
-//        assertEquals("abc", event.getSessionUuid());
-//        assertEquals(5L, event.getPosition());
-//        assertEquals(2L, event.getLastCurrentTime()); // Should retain initial value
-//    }
-//
-//    @Test
-//    void testReadJson5MessageFieldsOutOfOrder() {
-//        final TestEventData event = new TestEventData();
-//        event.readJson5("{t:10,_:abc,$:5}"); // Fields out of order
-//        assertEquals("abc", event.getSessionUuid());
-//        assertEquals(5L, event.getPosition());
-//        assertEquals(10L, event.getLastCurrentTime());
-//    }
-//
-//    @Test
-//    void testReadJson5MessageEmptyString() {
-//        final TestEventData event = new TestEventData("initial", 1L, 2L);
-//        event.readJson5(""); // Empty string
-//        assertEquals("initial", event.getSessionUuid());
-//        assertEquals(1L, event.getPosition());
-//        assertEquals(2L, event.getLastCurrentTime());
-//    }
-//
-//    @Test
-//    void testReadJson5MessagePartialString() {
-//        final TestEventData event = new TestEventData("initial", 1L, 2L);
-//        event.readJson5("{_:abc"); // Partial string
-//        assertEquals("abc", event.getSessionUuid());
-//        assertEquals(1L, event.getPosition());
-//        assertEquals(2L, event.getLastCurrentTime());
-//    }
+    @Test
+    @DisplayName("nextPosition should increment position normally")
+    void testNextPosition_incrementNormal() {
+        final EventData event = new EventData("test", 10L);
+        event.nextPosition();
+        assertEquals(11L, event.getPosition(), "Position should increment by 1");
+    }
+
+    @Test
+    @DisplayName("nextPosition should reset position to 0 when Long.MAX_VALUE is reached")
+    void testNextPosition_overflowResetsToZero() {
+        final EventData event = new EventData("test", Long.MAX_VALUE);
+        event.nextPosition();
+        assertEquals(0L, event.getPosition(), "Position should reset to 0 after reaching Long.MAX_VALUE");
+    }
+
+    @Test
+    @DisplayName("read/write json5 should preserve event data")
+    void testReadWriteJson5() {
+        final EventData event = new EventData(FIXED_UUID, 123L, 456L);
+        final StringBuilder sb = new StringBuilder();
+        EventDataJson5.write(event, sb);
+        final EventData event2 = new EventData();
+        EventDataJson5.read(event2, "{" + sb.toString() + "}");
+        assertEquals(event.getSessionUuid(), event2.getSessionUuid(), "Session UUID should be preserved after JSON5 write/read");
+        assertEquals(event.getPosition(), event2.getPosition(), "Position should be preserved after JSON5 write/read");
+        assertEquals(event.getLastCurrentTime(), event2.getLastCurrentTime(), "Last current time should be preserved after JSON5 write/read");
+    }
 }

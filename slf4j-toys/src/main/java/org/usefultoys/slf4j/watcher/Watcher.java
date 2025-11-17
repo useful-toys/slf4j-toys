@@ -87,7 +87,7 @@ public class Watcher extends WatcherData implements Runnable {
     @Override
     public void run() {
         collectCurrentTime();
-        position++;
+        nextPosition();
         // Removed dataLogger != null check
         if (messageLogger.isInfoEnabled() || dataLogger.isTraceEnabled()) {
             SystemMetrics.getInstance().collectRuntimeStatus(this);

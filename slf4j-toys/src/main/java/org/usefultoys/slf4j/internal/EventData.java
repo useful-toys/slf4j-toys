@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * Abstract base class for events collected by `slf4j-toys`.
+ * Base class for events collected by `slf4j-toys`.
  * It provides common attributes for event identification and timestamping.
  * The responsibility for serialization is delegated to a corresponding Json5 serializer class.
  *
@@ -32,22 +32,22 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED) // for tests only
 @Getter
-public abstract class EventData implements Serializable {
+public class EventData implements Serializable {
 
     private static final long serialVersionUID = 1L;
     /**
      * The unique identifier for the JVM session where this event data was collected.
      * This allows correlation of logs from the same JVM instance.
      */
-    protected String sessionUuid = null;
+    String sessionUuid = null; // Changed from protected to package-private
     /**
      * A time-ordered sequential position for multiple occurrences of the same event within a session.
      */
-    protected long position = 0;
+    long position = 0; // Changed from protected to package-private
     /**
      * The timestamp (in nanoseconds) when the event data was collected.
      */
-    protected long lastCurrentTime = 0;
+    long lastCurrentTime = 0; // Changed from protected to package-private
 
     /**
      * Constructs an EventData instance with a specified session UUID.
@@ -76,6 +76,18 @@ public abstract class EventData implements Serializable {
      */
     protected long collectCurrentTime() {
         return lastCurrentTime = System.nanoTime();
+    }
+
+    /**
+     * Increments the event's position. If the position reaches {@code Long.MAX_VALUE},
+     * it wraps around to 0 to prevent overflow.
+     */
+    protected void nextPosition() {
+        if (position == Long.MAX_VALUE) {
+            position = 0;
+        } else {
+            position++;
+        }
     }
 
     /**

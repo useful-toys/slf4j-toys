@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class MeterData extends SystemData {
+public class MeterData extends SystemData implements MeterAnalysis {
 
     private static final long serialVersionUID = 2L;
 
@@ -117,204 +117,74 @@ public class MeterData extends SystemData {
     /**
      * The category name of the operation being measured. By default, this is derived from the logger name.
      */
-    protected String category = null;
+    String category = null;
     /**
      * The name of the operation. May be {@code null} if the category itself sufficiently describes the operation.
      */
-    protected String operation = null;
+    String operation = null;
     /**
      * The full ID of the parent operation if this Meter was created as a sub-operation. {@code null} otherwise.
      */
-    protected String parent = null;
+    String parent = null;
     /**
      * An arbitrary short, human-readable message describing the operation.
      */
-    protected String description = null;
+    String description = null;
     /**
      * The timestamp (in nanoseconds) when the operation was created or scheduled.
      */
-    protected long createTime = 0;
+    long createTime = 0;
     /**
      * The timestamp (in nanoseconds) when the operation started execution. Zero if the operation has not yet started.
      */
-    protected long startTime = 0;
+    long startTime = 0;
     /**
      * The timestamp (in nanoseconds) when the operation finished execution (success, rejection, or failure). Zero if
      * the operation has not yet finished.
      */
-    protected long stopTime = 0;
+    long stopTime = 0;
     /**
      * The time limit (in nanoseconds) considered reasonable for successful execution of the operation. Zero if no time
      * limit is defined.
      */
-    protected long timeLimit = 0;
+    long timeLimit = 0;
     /**
      * The number of iterations completed by the operation. Zero if no iterations have run yet.
      */
-    protected long currentIteration = 0;
+    long currentIteration = 0;
     /**
      * The total number of iterations expected for the operation. Zero if iterations are not applicable or not
      * specified.
      */
-    protected long expectedIterations = 0;
+    long expectedIterations = 0;
     /**
      * For successful execution, a string identifying the execution path. Mutually exclusive with {@link #rejectPath}
      * and {@link #failPath}. Set only when the operation finishes successfully and a path was provided.
      */
-    protected String okPath = null;
+    String okPath = null;
     /**
      * For rejected execution, a string identifying the rejection cause. Mutually exclusive with {@link #okPath} and
      * {@link #failPath}. Set only when the operation finishes with a rejection.
      */
-    protected String rejectPath = null;
+    String rejectPath = null;
     /**
      * For failed execution, a string identifying the failure cause (e.g., the class name of the exception). Mutually
      * exclusive with {@link #okPath} and {@link #rejectPath}. Set only when the operation finishes with a failure.
      */
-    protected String failPath = null;
+    String failPath = null;
     /**
      * For failed execution, an optional message detailing the cause of the failure. Typically, the message from the
      * exception. Only set in conjunction with {@link #failPath}.
      */
-    protected String failMessage = null;
+    String failMessage = null;
 
     /**
      * Additional key-value pairs providing context for the operation.
      */
-    @Getter(value = AccessLevel.PROTECTED)
-    protected Map<String, String> context = null;
+    Map<String, String> context = null;
 
-    /**
-     * Returns a unique identifier for this MeterData instance, combining category, operation, and position.
-     *
-     * @return A string representing the full ID of the MeterData.
-     */
-    @SuppressWarnings("MagicCharacter")
-    public String getFullID() {
-        if (operation == null) {
-            return category + '#' + position;
-        }
-        return String.format("%s/%s#%d", category, operation, position);
-    }
-
-    /**
-     * Checks if the operation has started.
-     *
-     * @return {@code true} if {@code startTime} is not zero, {@code false} otherwise.
-     */
-    public boolean isStarted() {
-        return startTime != 0;
-    }
-
-    /**
-     * Checks if the operation has finished (either successfully, rejected, or failed).
-     *
-     * @return {@code true} if {@code stopTime} is not zero, {@code false} otherwise.
-     */
-    public boolean isStopped() {
-        return stopTime != 0;
-    }
-
-    /**
-     * Checks if the operation completed successfully.
-     *
-     * @return {@code true} if the operation is stopped and neither rejected nor failed.
-     */
-    public boolean isOK() {
-        return (stopTime != 0) && (failPath == null && rejectPath == null);
-    }
-
-    /**
-     * Checks if the operation was rejected.
-     *
-     * @return {@code true} if the operation is stopped and has a rejection path.
-     */
-    public boolean isReject() {
-        return (stopTime != 0) && (rejectPath != null);
-    }
-
-    /**
-     * Checks if the operation failed.
-     *
-     * @return {@code true} if the operation is stopped and has a failure path.
-     */
-    public boolean isFail() {
-        return (stopTime != 0) && (failPath != null);
-    }
-
-    /**
-     * Returns an unmodifiable map of the context data associated with this operation.
-     *
-     * @return An unmodifiable map of context key-value pairs, or {@code null} if no context is set.
-     */
     public Map<String, String> getContext() {
-        if (context == null) {
-            return null;
-        }
-        return Collections.unmodifiableMap(context);
-    }
-
-    /**
-     * Returns the path of the operation's outcome (success, rejection, or failure).
-     *
-     * @return The {@code failPath}, {@code rejectPath}, or {@code okPath}, in that order of precedence.
-     */
-    public String getPath() {
-        if (failPath != null) return failPath;
-        if (rejectPath != null) return rejectPath;
-        return okPath;
-    }
-
-    /**
-     * Calculates the iterations per second for the operation.
-     *
-     * @return The rate of iterations per second, or 0.0 if the operation has not started or has no iterations.
-     */
-    public double getIterationsPerSecond() {
-        if (currentIteration == 0 || startTime == 0) {
-            return 0.0d;
-        } else if (stopTime == 0) {
-            return ((double) currentIteration) / (lastCurrentTime - startTime) * 1000000000;
-        }
-        return ((double) currentIteration) / (stopTime - startTime) * 1000000000;
-    }
-
-    /**
-     * Returns the execution time of the operation.
-     *
-     * @return The duration from {@code startTime} to {@code stopTime} (if stopped) or to {@code lastCurrentTime} (if
-     * ongoing), in nanoseconds.
-     */
-    public long getExecutionTime() {
-        if (startTime == 0) {
-            return 0;
-        } else if (stopTime == 0) {
-            return lastCurrentTime - startTime;
-        }
-        return stopTime - startTime;
-    }
-
-    /**
-     * Returns the waiting time before the operation started.
-     *
-     * @return The duration from {@code createTime} to {@code startTime} (if started) or to {@code lastCurrentTime} (if
-     * not yet started), in nanoseconds.
-     */
-    public long getWaitingTime() {
-        if (startTime == 0) {
-            return lastCurrentTime - createTime;
-        }
-        return startTime - createTime;
-    }
-
-    /**
-     * Checks if the operation is considered slow based on its {@code timeLimit}.
-     *
-     * @return {@code true} if a {@code timeLimit} is set, the operation has started, and its execution time exceeds the
-     * limit.
-     */
-    public boolean isSlow() {
-        return timeLimit != 0 && startTime != 0 && getExecutionTime() > timeLimit;
+        return context == null ? null : Collections.unmodifiableMap(context);
     }
 
     @Override
@@ -378,9 +248,9 @@ public class MeterData extends SystemData {
 
         if (!Objects.equals(category, meterData.category))
             return false;
-        if (!Objects.equals(sessionUuid, meterData.sessionUuid))
+        if (!Objects.equals(getSessionUuid(), meterData.getSessionUuid()))
             return false;
-        if (position != meterData.position) return false;
+        if (getPosition() != meterData.getPosition()) return false;
         return Objects.equals(operation, meterData.operation);
     }
 
@@ -389,8 +259,8 @@ public class MeterData extends SystemData {
     public int hashCode() {
         int result = category != null ? category.hashCode() : 0;
         result = 31 * result + (operation != null ? operation.hashCode() : 0);
-        result = 31 * result + (int) (position ^ (position >>> 32));
-        result = 31 * result + (sessionUuid != null ? sessionUuid.hashCode() : 0);
+        result = 31 * result + (int) (getPosition() ^ (getPosition() >>> 32));
+        result = 31 * result + (getSessionUuid() != null ? getSessionUuid().hashCode() : 0);
         return result;
     }
 

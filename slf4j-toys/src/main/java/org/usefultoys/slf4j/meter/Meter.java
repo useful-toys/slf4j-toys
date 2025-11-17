@@ -807,7 +807,7 @@ public class Meter extends MeterData implements Closeable {
                 messageLogger.error(Markers.INCONSISTENT_PROGRESS, ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
             }
 
-            final long now = lastCurrentTime = collectCurrentTime();
+            final long now = collectCurrentTime();
             final long meterProgressPeriodNanoseconds = MeterConfig.progressPeriodMilliseconds * 1000 * 1000;
             if (currentIteration > lastProgressIteration && (now - lastProgressTime) > meterProgressPeriodNanoseconds) {
                 lastProgressIteration = currentIteration;
@@ -882,7 +882,6 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            lastCurrentTime = newStopTime;
             failPath = null;
             failMessage = null;
             rejectPath = null;
@@ -951,7 +950,6 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            lastCurrentTime = newStopTime;
             failPath = null;
             failMessage = null;
             rejectPath = null;
@@ -1048,7 +1046,6 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            lastCurrentTime = newStopTime;
             failPath = null;
             failMessage = null;
             okPath = null;
@@ -1113,7 +1110,6 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            lastCurrentTime = newStopTime;
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
@@ -1276,7 +1272,6 @@ public class Meter extends MeterData implements Closeable {
             }
 
             stopTime = newStopTime;
-            lastCurrentTime = newStopTime;
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
