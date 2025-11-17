@@ -41,7 +41,6 @@ class SystemDataJson5 {
     private final String PROP_GARBAGE_COLLECTOR = "gc";
     private final String PROP_SYSTEM_LOAD = "sl";
 
-
     private final Pattern patternMemory = Pattern.compile(REGEX_START + PROP_MEMORY + REGEX_3_TUPLE);
     private final Pattern patternHeap = Pattern.compile(REGEX_START + PROP_HEAP + REGEX_3_TUPLE);
     private final Pattern patternNonHeap = Pattern.compile(REGEX_START + PROP_NON_HEAP + REGEX_3_TUPLE);

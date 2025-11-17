@@ -33,6 +33,7 @@ import java.util.Objects;
  * @see SystemData
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class MeterData extends SystemData {
 
     private static final long serialVersionUID = 2L;
@@ -116,84 +117,71 @@ public class MeterData extends SystemData {
     /**
      * The category name of the operation being measured. By default, this is derived from the logger name.
      */
-    @Getter
     protected String category = null;
     /**
      * The name of the operation. May be {@code null} if the category itself sufficiently describes the operation.
      */
-    @Getter
     protected String operation = null;
     /**
      * The full ID of the parent operation if this Meter was created as a sub-operation. {@code null} otherwise.
      */
-    @Getter
     protected String parent = null;
     /**
      * An arbitrary short, human-readable message describing the operation.
      */
-    @Getter
     protected String description = null;
     /**
      * The timestamp (in nanoseconds) when the operation was created or scheduled.
      */
-    @Getter
     protected long createTime = 0;
     /**
      * The timestamp (in nanoseconds) when the operation started execution. Zero if the operation has not yet started.
      */
-    @Getter
     protected long startTime = 0;
     /**
      * The timestamp (in nanoseconds) when the operation finished execution (success, rejection, or failure). Zero if
      * the operation has not yet finished.
      */
-    @Getter
     protected long stopTime = 0;
     /**
      * The time limit (in nanoseconds) considered reasonable for successful execution of the operation. Zero if no time
      * limit is defined.
      */
-    @Getter
     protected long timeLimit = 0;
     /**
      * The number of iterations completed by the operation. Zero if no iterations have run yet.
      */
-    @Getter
     protected long currentIteration = 0;
     /**
      * The total number of iterations expected for the operation. Zero if iterations are not applicable or not
      * specified.
      */
-    @Getter
     protected long expectedIterations = 0;
     /**
      * For successful execution, a string identifying the execution path. Mutually exclusive with {@link #rejectPath}
      * and {@link #failPath}. Set only when the operation finishes successfully and a path was provided.
      */
-    @Getter
     protected String okPath = null;
     /**
      * For rejected execution, a string identifying the rejection cause. Mutually exclusive with {@link #okPath} and
      * {@link #failPath}. Set only when the operation finishes with a rejection.
      */
-    @Getter
     protected String rejectPath = null;
     /**
      * For failed execution, a string identifying the failure cause (e.g., the class name of the exception). Mutually
      * exclusive with {@link #okPath} and {@link #rejectPath}. Set only when the operation finishes with a failure.
      */
-    @Getter
     protected String failPath = null;
     /**
      * For failed execution, an optional message detailing the cause of the failure. Typically, the message from the
      * exception. Only set in conjunction with {@link #failPath}.
      */
-    @Getter
     protected String failMessage = null;
 
     /**
      * Additional key-value pairs providing context for the operation.
      */
+    @Getter(value = AccessLevel.PROTECTED)
     protected Map<String, String> context = null;
 
     /**
@@ -396,11 +384,6 @@ public class MeterData extends SystemData {
         return Objects.equals(operation, meterData.operation);
     }
 
-    /**
-     * Returns a hash code for this MeterData object.
-     *
-     * @return A hash code value for this object.
-     */
     @SuppressWarnings("NonFinalFieldReferencedInHashCode")
     @Override
     public int hashCode() {

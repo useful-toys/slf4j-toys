@@ -34,6 +34,7 @@ import org.usefultoys.slf4j.SystemConfig;
  */
 @SuppressWarnings("Since15")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public abstract class SystemData extends EventData {
 
     private static final long serialVersionUID = 1L;
@@ -111,55 +112,38 @@ public abstract class SystemData extends EventData {
     }
 
     /** The committed heap memory in bytes. */
-    @Getter
     long heap_commited = 0;
     /** The maximum heap memory in bytes. */
-    @Getter
     long heap_max = 0;
     /** The used heap memory in bytes. */
-    @Getter
     long heap_used = 0;
     /** The committed non-heap memory in bytes. */
-    @Getter
     long nonHeap_commited = 0;
     /** The maximum non-heap memory in bytes. */
-    @Getter
     long nonHeap_max = 0;
     /** The used non-heap memory in bytes. */
-    @Getter
     long nonHeap_used = 0;
     /** The number of objects pending finalization. */
-    @Getter
     long objectPendingFinalizationCount = 0;
     /** The number of classes currently loaded. */
-    @Getter
     long classLoading_loaded = 0;
     /** The total number of classes loaded since JVM start. */
-    @Getter
     long classLoading_total = 0;
     /** The total number of classes unloaded since JVM start. */
-    @Getter
     long classLoading_unloaded = 0;
     /** The total time spent in compilation by the JIT compiler. */
-    @Getter
     long compilationTime = 0;
     /** The total number of garbage collections. */
-    @Getter
     long garbageCollector_count = 0;
     /** The total time spent in garbage collection. */
-    @Getter
     long garbageCollector_time = 0;
     /** The used memory reported by {@link Runtime}. */
-    @Getter
     long runtime_usedMemory = 0;
     /** The maximum memory reported by {@link Runtime}. */
-    @Getter
     long runtime_maxMemory = 0;
     /** The total memory reported by {@link Runtime}. */
-    @Getter
     long runtime_totalMemory = 0;
     /** The system CPU load average. */
-    @Getter
     double systemLoad = 0.0;
 
     @Override

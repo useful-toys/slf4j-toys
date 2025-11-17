@@ -42,13 +42,16 @@ import static org.usefultoys.slf4j.watcher.WatcherConfig.*;
  * @see WatcherConfig
  * @see WatcherData
  */
+
 public class Watcher extends WatcherData implements Runnable {
 
     private static final long serialVersionUID = 1L;
 
     /** Logger for human-readable messages. */
+    @SuppressWarnings("NonConstantLogger")
     private final Logger messageLogger;
     /** Logger for machine-parsable data. */
+    @SuppressWarnings("NonConstantLogger")
     private final Logger dataLogger;
 
     /**
@@ -61,11 +64,11 @@ public class Watcher extends WatcherData implements Runnable {
      */
     public Watcher(final String name) {
         super(Session.shortSessionUuid());
-        this.messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + name + messageSuffix);
+        messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + name + messageSuffix);
         if (dataEnabled) {
-            this.dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + name + dataSuffix);
+            dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + name + dataSuffix);
         } else {
-            this.dataLogger = NullLogger.INSTANCE; // Use NullLogger instead of null
+            dataLogger = NullLogger.INSTANCE; // Use NullLogger instead of null
         }
     }
 

@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.internal;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,8 @@ import java.io.Serializable;
  * @author Daniel Felix Ferber
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED) // for tests only
+@Getter
 public abstract class EventData implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -36,17 +39,14 @@ public abstract class EventData implements Serializable {
      * The unique identifier for the JVM session where this event data was collected.
      * This allows correlation of logs from the same JVM instance.
      */
-    @Getter
     protected String sessionUuid = null;
     /**
      * A time-ordered sequential position for multiple occurrences of the same event within a session.
      */
-    @Getter
     protected long position = 0;
     /**
      * The timestamp (in nanoseconds) when the event data was collected.
      */
-    @Getter
     protected long lastCurrentTime = 0;
 
     /**
@@ -67,20 +67,6 @@ public abstract class EventData implements Serializable {
     protected EventData(final String sessionUuid, final long position) {
         this.sessionUuid = sessionUuid;
         this.position = position;
-    }
-
-    /**
-     * Constructs an EventData instance with a specified session UUID, position, and timestamp.
-     * This constructor is primarily intended for testing purposes.
-     *
-     * @param sessionUuid The unique identifier for the JVM session.
-     * @param position The time-ordered sequential position of the event.
-     * @param lastCurrentTime The timestamp (in nanoseconds) when the data was collected.
-     */
-    protected EventData(final String sessionUuid, final long position, final long lastCurrentTime) {
-        this.sessionUuid = sessionUuid;
-        this.position = position;
-        this.lastCurrentTime = lastCurrentTime;
     }
 
     /**
