@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ import static org.usefultoys.slf4j.meter.MeterConfig.*;
  * @see Markers
  */
 @SuppressWarnings({"OverlyBroadCatchBlock", "FinalizeDeclaration"})
-public class Meter extends MeterData implements MeterContext<Meter>, Closeable {
+public class Meter extends MeterData implements MeterContext<Meter>, MeterExecutor<Meter>, Closeable {
 
     private static final long serialVersionUID = 1L;
 
@@ -94,12 +95,12 @@ public class Meter extends MeterData implements MeterContext<Meter>, Closeable {
     private static final String UNKNOWN_LOGGER_NAME = "???";
     /** Default failure path for operations terminated by `try-with-resources`. */
     private static final String FAIL_PATH_TRY_WITH_RESOURCES = "try-with-resources";
-    /** Context key for storing the result of functional interface calls. */
-    public static final String CONTEXT_RESULT = "result";
 
     /** Logger for human-readable messages. */
+    @Getter
     private final transient Logger messageLogger;
     /** Logger for machine-parsable data. */
+    @Getter
     private final transient Logger dataLogger;
 
     /**
@@ -927,243 +928,5 @@ public class Meter extends MeterData implements MeterContext<Meter>, Closeable {
             /* Prevents bugs from disrupting the application. Logs message with exception to provide stacktrace to bug. */
             messageLogger.error(Markers.BUG, ERROR_MSG_METHOD_THREW_EXCEPTION, "close", getFullID(), t);
         }
-    }
-
-    // ========================================================================
-
-    /**
-     * Executes the given {@link Runnable} task within the `Meter`'s lifecycle control. The operation is automatically
-     * started before execution and marked as {@code OK} upon successful completion. If the task throws a
-     * {@link RuntimeException}, the operation is marked as {@code FAIL}, and the exception is rethrown.
-     *
-     * @param runnable The {@link Runnable} task to be executed.
-     */
-    public void run(final Runnable runnable) {
-        if (startTime == 0) start();
-        try {
-            runnable.run();
-            if (stopTime == 0) ok();
-        } catch (final RuntimeException e) {
-            fail(e);
-            throw e;
-        }
-    }
-
-    /**
-     * Executes the given {@link Runnable} task within the `Meter`'s lifecycle control. The operation is automatically
-     * started before execution and marked as {@code OK} upon successful completion. If the task throws an exception
-     * that matches one of {@code exceptionsToReject}, the operation is marked as {@code REJECT}. Otherwise, it's marked
-     * as {@code FAIL}. The exception is always rethrown.
-     *
-     * @param runnable           The {@link Runnable} task to be executed.
-     * @param exceptionsToReject A list of exception classes that should result in a {@code REJECT} status.
-     * @throws Exception The original exception thrown by the runnable.
-     */
-    @SneakyThrows
-    public void runOrReject(final Runnable runnable, final Class<? extends Exception>... exceptionsToReject) {
-        if (startTime == 0L) {
-            start();
-        }
-
-        try {
-            runnable.run();
-            if (stopTime == 0L) {
-                ok();
-            }
-        } catch (final Exception e) {
-            final int length = exceptionsToReject.length;
-            for (final Class<? extends Exception> ee : exceptionsToReject) {
-                if (ee.isAssignableFrom(e.getClass())) {
-                    reject(e);
-                    throw e;
-                }
-            }
-            fail(e);
-            throw e;
-        }
-    }
-
-    /**
-     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control. The operation is automatically
-     * started before execution and marked as {@code OK} upon successful completion. The result of the {@link Callable}
-     * is stored in the context under {@link #CONTEXT_RESULT} and returned. If the task throws an {@link Exception}, the
-     * operation is marked as {@code FAIL}, and the exception is rethrown.
-     *
-     * @param callable The {@link Callable} task to be executed.
-     * @param <T>      The type of the result returned by the callable.
-     * @return The result of the callable task.
-     * @throws Exception The original exception thrown by the callable.
-     */
-    public <T> T call(final Callable<T> callable) throws Exception {
-        if (startTime == 0) start();
-        try {
-            final T result = callable.call();
-            ctx(CONTEXT_RESULT, (Object) result);
-            if (stopTime == 0) ok();
-            return result;
-        } catch (final Exception e) {
-            fail(e);
-            throw e;
-        }
-    }
-
-    /**
-     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control. The operation is automatically
-     * started before execution and marked as {@code OK} upon successful completion. The result of the {@link Callable}
-     * is stored in the context under {@code "result"} and returned. If the task throws a {@link RuntimeException}, the
-     * operation is marked as {@code FAIL}. If it throws any other {@link Exception}, the operation is marked as
-     * {@code REJECT}. The exception is always rethrown.
-     *
-     * @param callable The {@link Callable} task to be executed.
-     * @param <T>      The type of the result returned by the callable.
-     * @return The result of the callable task.
-     * @throws Exception The original exception thrown by the callable.
-     */
-    @SneakyThrows
-    public <T> T callOrRejectChecked(final Callable<T> callable) {
-        if (startTime == 0L) {
-            start();
-        }
-
-        try {
-            final T result = callable.call();
-            ctx("result", result);
-            if (stopTime == 0L) {
-                ok();
-            }
-
-            return result;
-        } catch (final RuntimeException e) {
-            fail(e);
-            throw e;
-        } catch (final Exception e) {
-            reject(e);
-            throw e;
-        }
-    }
-
-    /**
-     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control. The operation is automatically
-     * started before execution and marked as {@code OK} upon successful completion. The result of the {@link Callable}
-     * is stored in the context under {@code "result"} and returned. If the task throws an exception that matches one of
-     * {@code exceptionsToReject}, the operation is marked as {@code REJECT}. Otherwise, it's marked as {@code FAIL}.
-     * The exception is always rethrown.
-     *
-     * @param callable           The {@link Callable} task to be executed.
-     * @param exceptionsToReject A list of exception classes that should result in a {@code REJECT} status.
-     * @param <T>                The type of the result returned by the callable.
-     * @return The result of the callable task.
-     * @throws Exception The original exception thrown by the callable.
-     */
-    @SneakyThrows
-    public <T> T callOrReject(final Callable<T> callable, final Class<? extends Exception>... exceptionsToReject) {
-        if (startTime == 0L) {
-            start();
-        }
-
-        try {
-            final T result = callable.call();
-            ctx("result", result);
-            if (stopTime == 0L) {
-                ok();
-            }
-
-            return result;
-        } catch (final Exception e) {
-            for (final Class<? extends Exception> ee : exceptionsToReject) {
-                if (ee.isAssignableFrom(e.getClass())) {
-                    reject(e);
-                    throw e;
-                }
-            }
-
-            fail(e);
-            throw e;
-        }
-    }
-
-    /**
-     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control, ensuring that checked exceptions
-     * are wrapped into a {@link RuntimeException}. The operation is automatically started before execution and marked
-     * as {@code OK} upon successful completion. The result of the {@link Callable} is stored in the context under
-     * {@link #CONTEXT_RESULT} and returned. If the task throws a {@link RuntimeException}, it's rethrown. If it throws
-     * any other {@link Exception}, it's wrapped in a new {@link RuntimeException} and rethrown.
-     *
-     * @param callable The {@link Callable} task to be executed.
-     * @param <T>      The type of the result returned by the callable.
-     * @return The result of the callable task.
-     * @throws RuntimeException If the callable throws any exception, it will be wrapped in a RuntimeException.
-     */
-    public <T> T safeCall(final Callable<T> callable) {
-        if (startTime == 0) start();
-        try {
-            final T result = callable.call();
-            ctx(CONTEXT_RESULT, result);
-            if (stopTime == 0) ok();
-            return result;
-        } catch (final RuntimeException e) {
-            fail(e);
-            throw e;
-        } catch (final Exception e) {
-            fail(e);
-            throw new RuntimeException("Meter.safeCall wrapped exception.", e);
-        }
-    }
-
-    /**
-     * Executes the given {@link Callable} task within the `Meter`'s lifecycle control, wrapping any non-runtime
-     * {@link Exception} into a specified {@link RuntimeException} subclass. The operation is automatically started
-     * before execution and marked as {@code OK} upon successful completion. The result of the {@link Callable} is
-     * stored in the context under {@link #CONTEXT_RESULT} and returned. If the task throws a {@link RuntimeException},
-     * it's rethrown. If it throws any other {@link Exception}, it's wrapped into an instance of `exceptionClass` and
-     * rethrown.
-     *
-     * @param exceptionClass The {@link Class} of the {@link RuntimeException} to wrap checked exceptions into. This
-     *                       class must have a constructor that accepts a `String` message and a `Throwable` cause.
-     * @param callable       The {@link Callable} task to be executed.
-     * @param <E>            The type of the {@link RuntimeException} to wrap checked exceptions into.
-     * @param <T>            The type of the result returned by the callable.
-     * @return The result of the callable task.
-     * @throws E                If the callable throws any non-runtime exception, it will be wrapped in an instance of
-     *                          `exceptionClass`.
-     * @throws RuntimeException If the callable throws a RuntimeException, or if `exceptionClass` cannot be
-     *                          instantiated.
-     */
-    public <E extends RuntimeException, T> T safeCall(final Class<E> exceptionClass, final Callable<T> callable) {
-        if (stopTime == 0) start(); // TODO: should be changed from stopTime == 0 to startTime == 0 for consistency?
-        try {
-            final T result = callable.call();
-            ctx(CONTEXT_RESULT, result);
-            if (stopTime == 0) ok();
-            return result;
-        } catch (final RuntimeException e) {
-            fail(e);
-            throw e;
-        } catch (final Exception e) {
-            fail(e);
-            throw convertException(exceptionClass, e);
-        }
-    }
-
-    /**
-     * Converts a given {@link Exception} into a specified {@link RuntimeException} subclass. This method attempts to
-     * create an instance of `exceptionClass` using a constructor that accepts a `String` message and a `Throwable`
-     * cause. If such a constructor is not found or instantiation fails, a generic {@link RuntimeException} is
-     * returned.
-     *
-     * @param exceptionClass The {@link Class} of the {@link RuntimeException} to create.
-     * @param e              The {@link Exception} to be wrapped.
-     * @param <T>            The type of the {@link RuntimeException} subclass.
-     * @return An instance of `exceptionClass` wrapping `e`, or a generic {@link RuntimeException}.
-     */
-    private <T extends RuntimeException> RuntimeException convertException(final Class<T> exceptionClass, final Exception e) {
-        final String message = "Failed: " + (description != null ? description : category);
-        try {
-            return exceptionClass.getConstructor(String.class, Throwable.class).newInstance(message, e);
-        } catch (final NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException |
-                       IllegalArgumentException | InvocationTargetException ignored) {
-            messageLogger.error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
-        }
-        return new RuntimeException(e);
     }
 }

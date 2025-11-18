@@ -279,7 +279,7 @@ public class MeterSafeCallableTest {
                 }
             });
         } catch (final RuntimeException e) {
-            assertEquals("Meter.safeCall wrapped exception.", e.getMessage());
+            assertEquals("MeterExecutor.safeCall wrapped exception.", e.getMessage());
             assertSame(RuntimeException.class, e.getClass());
             assertSame(IOException.class, e.getCause().getClass());
             assertEquals("someException", e.getCause().getMessage());
