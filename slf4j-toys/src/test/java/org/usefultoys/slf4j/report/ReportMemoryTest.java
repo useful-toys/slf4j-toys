@@ -19,6 +19,9 @@ package org.usefultoys.slf4j.report;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import java.nio.charset.Charset;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +36,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReportMemoryTest {
 
-    private MockLogger mockLogger;
-
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
+
+    private MockLogger mockLogger;
 
     @BeforeEach
     void resetWatcherConfigBeforeEach() {

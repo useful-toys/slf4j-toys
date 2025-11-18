@@ -29,7 +29,7 @@ class EventDataTest {
     private static final String FIXED_UUID = "12345"; // Fixed UUID as requested
 
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 

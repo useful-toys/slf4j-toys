@@ -30,26 +30,22 @@ import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.usefultoys.slf4j.SessionConfig;
+import java.nio.charset.Charset;
 import static org.mockito.Mockito.*;
 
 class ReportFileSystemTest {
 
-
-    private static Locale originalLocale;
+    @BeforeAll
+    static void validateConsistentCharset() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     private MockLogger mockLogger;
 
     @BeforeAll
     public static void setUpLocale() {
-        // Set the default locale to English for consistent formatting
-        originalLocale = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
-    }
-
-    @AfterAll
-    public static void tearDownLocale() {
-        // Reset the default locale to the system default
-        Locale.setDefault(originalLocale);
     }
 
     @BeforeEach

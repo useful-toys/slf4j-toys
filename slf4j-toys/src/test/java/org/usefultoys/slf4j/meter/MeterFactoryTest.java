@@ -38,9 +38,9 @@ class MeterFactoryTest {
     private static final String TEST_SUBOPERATION = "testSubOperation";
 
     @BeforeAll
-    static void validate() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
+        static void validateConsistentCharset() {
+                assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+        }
 
     @BeforeEach
     void setUp() {
