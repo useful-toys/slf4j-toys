@@ -361,6 +361,39 @@ class MeterExecutorTest {
     }
 
     @Test
+    @DisplayName("runOrReject() with start with excessive start call")
+    @SuppressWarnings("unchecked")
+    void testRunOrRejectWithStartWithExcessiveStart() {
+        final Meter meter = new Meter(logger, "testRunOrRejectExcessiveStart").start();
+        final boolean[] executed = {false};
+        
+        try {
+            meter.runOrReject(() -> {
+                meter.start(); // Excessive call to start() - should generate error log
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                meter.ok();
+            }, IOException.class);
+        } catch (final Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+        
+        assertTrue(executed[0], "Runnable should have been executed");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        logger.assertEvent(3, DEBUG, MSG_START); // Duplicate start message
+        logger.assertEvent(4, TRACE, DATA_START); // Duplicate start data
+        logger.assertEvent(5, INFO, MSG_OK);
+        logger.assertEvent(6, TRACE, DATA_OK);
+    }
+
+    @Test
     @DisplayName("runOrReject() with start with multiple exception classes to reject")
     @SuppressWarnings("unchecked")
     void testRunOrRejectWithStartWithMultipleExceptionClassesToReject() {
@@ -650,6 +683,37 @@ class MeterExecutorTest {
     }
 
     @Test
+    @DisplayName("call() with start with excessive start call")
+    void testCallWithStartWithExcessiveStart() throws Exception {
+        final Meter meter = new Meter(logger, "testCallExcessiveStart").start();
+        final boolean[] executed = {false};
+        
+        final String expectedResult = "Result with excessive start";
+        final String result = meter.call(() -> {
+            meter.start(); // Excessive call to start() - should generate error log
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.ok();
+            return expectedResult;
+        });
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertEquals(expectedResult, result, "Callable result should match expected value");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        logger.assertEvent(3, DEBUG, MSG_START); // Duplicate start message
+        logger.assertEvent(4, TRACE, DATA_START); // Duplicate start data
+        logger.assertEvent(5, INFO, MSG_OK);
+        logger.assertEvent(6, TRACE, DATA_OK);
+    }
+
+    @Test
     @DisplayName("call() no start with exception to fail")
     void testCallNoStartWithExceptionToFail() {
         final Meter meter = new Meter(logger, "testCallException");
@@ -798,6 +862,38 @@ class MeterExecutorTest {
     }
 
     @Test
+    @DisplayName("callOrReject() with start with excessive start call")
+    @SuppressWarnings("unchecked")
+    void testCallOrRejectWithStartWithExcessiveStart() throws Exception {
+        final Meter meter = new Meter(logger, "testCallOrRejectExcessiveStart").start();
+        final boolean[] executed = {false};
+        
+        final String expectedResult = "Excessive start result";
+        final String result = meter.callOrReject(() -> {
+            meter.start(); // Excessive call to start() - should generate error log
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.ok();
+            return expectedResult;
+        });
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertEquals(expectedResult, result, "Result should match expected value");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        logger.assertEvent(3, DEBUG, MSG_START); // Duplicate start message
+        logger.assertEvent(4, TRACE, DATA_START); // Duplicate start data
+        logger.assertEvent(5, INFO, MSG_OK);
+        logger.assertEvent(6, TRACE, DATA_OK);
+    }
+
+    @Test
     @DisplayName("callOrReject() with start with ok and return")
     @SuppressWarnings("unchecked")
     void testCallOrRejectWithStartWithOkAndReturn() throws Exception {
@@ -823,6 +919,37 @@ class MeterExecutorTest {
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, INFO, MSG_OK);
         logger.assertEvent(3, TRACE, DATA_OK);
+    }
+
+    @Test
+    @DisplayName("callOrRejectChecked() with start with excessive start call")
+    void testCallOrRejectCheckedWithStartWithExcessiveStart() throws Exception {
+        final Meter meter = new Meter(logger, "testCallOrRejectCheckedExcessiveStart").start();
+        final boolean[] executed = {false};
+        
+        final String expectedResult = "Checked excessive start result";
+        final String result = meter.callOrRejectChecked(() -> {
+            meter.start(); // Excessive call to start() - should generate error log
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.ok();
+            return expectedResult;
+        });
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertEquals(expectedResult, result, "Result should match expected value");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        logger.assertEvent(3, DEBUG, MSG_START); // Duplicate start message
+        logger.assertEvent(4, TRACE, DATA_START); // Duplicate start data
+        logger.assertEvent(5, INFO, MSG_OK);
+        logger.assertEvent(6, TRACE, DATA_OK);
     }
 
     @Test
@@ -969,6 +1096,37 @@ class MeterExecutorTest {
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, ERROR, MSG_FAIL);
         logger.assertEvent(3, TRACE, DATA_FAIL);
+    }
+
+    @Test
+    @DisplayName("safeCall() with exception class with start with excessive start call")
+    void testSafeCallWithExceptionClassWithStartWithExcessiveStart() {
+        final Meter meter = new Meter(logger, "testSafeCallWithExceptionClassExcessiveStart").start();
+        final boolean[] executed = {false};
+        
+        final String expectedResult = "Safe excessive start result";
+        final String result = meter.safeCall(RuntimeException.class, () -> {
+            meter.start(); // Excessive call to start() - should generate error log
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.ok();
+            return expectedResult;
+        });
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertEquals(expectedResult, result, "Result should match expected value");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        logger.assertEvent(3, DEBUG, MSG_START); // Duplicate start message
+        logger.assertEvent(4, TRACE, DATA_START); // Duplicate start data
+        logger.assertEvent(5, INFO, MSG_OK);
+        logger.assertEvent(6, TRACE, DATA_OK);
     }
 
     @Test
