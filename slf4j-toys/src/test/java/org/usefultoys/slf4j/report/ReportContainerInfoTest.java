@@ -37,24 +37,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReportContainerInfoTest {
-    private static Locale originalLocale;
 
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
     @BeforeAll
     public static void setUpLocale() {
-        // Set the default locale to English for consistent formatting
-        originalLocale = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
-    }
-
-    @AfterAll
-    public static void tearDownLocale() {
-        // Reset the default locale to the system default
-        Locale.setDefault(originalLocale);
     }
 
     private static final String TEST_LOGGER_NAME = "test.logger";

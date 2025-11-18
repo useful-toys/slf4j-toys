@@ -44,7 +44,7 @@ class ReportNetworkInterfaceTest {
     private MockLogger mockLogger;
 
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 

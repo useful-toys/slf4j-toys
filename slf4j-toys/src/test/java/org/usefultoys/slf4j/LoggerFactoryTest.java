@@ -17,6 +17,8 @@
 package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import java.nio.charset.Charset;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
@@ -26,8 +28,16 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+
 
 class LoggerFactoryTest {
+
+    @BeforeAll
+    static void validateConsistentCharset() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     @Test
     void testGetLoggerByName() {

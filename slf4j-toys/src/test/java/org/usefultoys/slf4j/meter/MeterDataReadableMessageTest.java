@@ -36,25 +36,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MeterDataReadableMessageTest {
 
-    private static Locale originalLocale;
+    
 
     
     @BeforeAll
-    public static void validate() {
+    public static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
     @BeforeAll
     public static void setUpLocale() {
         // Set the default locale to English for consistent formatting
-        originalLocale = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
-    }
-
-    @AfterAll
-    public static void tearDownLocale() {
-        // Reset the default locale to the system default
-        Locale.setDefault(originalLocale);
     }
 
     @BeforeEach
@@ -88,7 +81,7 @@ public class MeterDataReadableMessageTest {
     }
 
     private static final Map<String, String> nullContext = null;
-    private static final Map<String, String> voidContext = Collections.EMPTY_MAP;
+    private static final Map<String, String> voidContext = Collections.emptyMap();
     private static final Map<String, String> sampleContext = new HashMap<>();
     static {
         sampleContext.put("a", null);

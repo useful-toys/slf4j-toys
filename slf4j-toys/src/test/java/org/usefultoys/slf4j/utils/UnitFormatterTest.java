@@ -15,7 +15,6 @@
  */
 package org.usefultoys.slf4j.utils;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -37,25 +36,14 @@ class UnitFormatterTest {
     private static final int[] FACTORS = {1000, 1000, 1000};
     private static final String[] UNITS = {"A", "B", "C"};
 
-
-    private static Locale originalLocale;
-
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
     @BeforeAll
     public static void setUpLocale() {
-        // Set the default locale to English for consistent formatting
-        originalLocale = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
-    }
-
-    @AfterAll
-    public static void tearDownLocale() {
-        // Reset the default locale to the system default
-        Locale.setDefault(originalLocale);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideLongUnitTestCases() {

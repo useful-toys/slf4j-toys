@@ -25,10 +25,12 @@ import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
+
 class SessionConfigTest {
 
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
