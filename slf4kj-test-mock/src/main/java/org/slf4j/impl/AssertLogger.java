@@ -529,4 +529,72 @@ public final class AssertLogger {
             String.format("should have expected number of events containing message part '%s'; expected: %d, actual: %d", 
                 messagePart, expectedCount, actualCount));
     }
+
+    // Methods for asserting event sequences
+
+    /**
+     * Asserts that the logger has recorded events in the exact sequence of log levels specified.
+     *
+     * @param logger          the Logger instance to check (must be a MockLogger)
+     * @param expectedLevels  the expected sequence of log levels
+     */
+    public static void assertEventSequence(final Logger logger, final Level... expectedLevels) {
+        final MockLogger mockLogger = toMockLogger(logger);
+        final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
+        
+        Assertions.assertEquals(expectedLevels.length, loggerEvents.size(), 
+            String.format("should have expected number of events for sequence; expected: %d, actual: %d", 
+                expectedLevels.length, loggerEvents.size()));
+        
+        for (int i = 0; i < expectedLevels.length; i++) {
+            final Level actualLevel = loggerEvents.get(i).getLevel();
+            Assertions.assertSame(expectedLevels[i], actualLevel, 
+                String.format("should have expected level at position %d; expected: %s, actual: %s", 
+                    i, expectedLevels[i], actualLevel));
+        }
+    }
+
+    /**
+     * Asserts that the logger has recorded events in the exact sequence of markers specified.
+     *
+     * @param logger           the Logger instance to check (must be a MockLogger)
+     * @param expectedMarkers  the expected sequence of markers
+     */
+    public static void assertEventSequence(final Logger logger, final Marker... expectedMarkers) {
+        final MockLogger mockLogger = toMockLogger(logger);
+        final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
+        
+        Assertions.assertEquals(expectedMarkers.length, loggerEvents.size(), 
+            String.format("should have expected number of events for sequence; expected: %d, actual: %d", 
+                expectedMarkers.length, loggerEvents.size()));
+        
+        for (int i = 0; i < expectedMarkers.length; i++) {
+            final Marker actualMarker = loggerEvents.get(i).getMarker();
+            Assertions.assertEquals(expectedMarkers[i], actualMarker, 
+                String.format("should have expected marker at position %d; expected: %s, actual: %s", 
+                    i, expectedMarkers[i], actualMarker));
+        }
+    }
+
+    /**
+     * Asserts that the logger has recorded events containing message parts in the exact sequence specified.
+     *
+     * @param logger              the Logger instance to check (must be a MockLogger)
+     * @param expectedMessageParts the expected sequence of message parts
+     */
+    public static void assertEventSequence(final Logger logger, final String... expectedMessageParts) {
+        final MockLogger mockLogger = toMockLogger(logger);
+        final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
+        
+        Assertions.assertEquals(expectedMessageParts.length, loggerEvents.size(), 
+            String.format("should have expected number of events for sequence; expected: %d, actual: %d", 
+                expectedMessageParts.length, loggerEvents.size()));
+        
+        for (int i = 0; i < expectedMessageParts.length; i++) {
+            final String actualMessage = loggerEvents.get(i).getFormattedMessage();
+            Assertions.assertTrue(actualMessage.contains(expectedMessageParts[i]), 
+                String.format("should contain expected message part at position %d; expected: %s, actual message: %s", 
+                    i, expectedMessageParts[i], actualMessage));
+        }
+    }
 }

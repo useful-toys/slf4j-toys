@@ -1324,4 +1324,273 @@ class AssertLoggerTest {
             AssertLogger.assertEventCountByLevel(logger, Level.WARN, 1);
         }
     }
+
+    @Nested
+    @DisplayName("assertEventSequence with levels")
+    class AssertEventSequenceWithLevels {
+
+        @Test
+        @DisplayName("should pass when level sequence matches exactly")
+        void shouldPassWhenLevelSequenceMatchesExactly() {
+            final Logger logger = new MockLogger("test");
+            logger.debug("Debug message");
+            logger.info("Info message");
+            logger.warn("Warning message");
+            logger.error("Error message");
+
+            AssertLogger.assertEventSequence(logger, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR);
+        }
+
+        @Test
+        @DisplayName("should pass with single event")
+        void shouldPassWithSingleEvent() {
+            final Logger logger = new MockLogger("test");
+            logger.info("Single message");
+
+            AssertLogger.assertEventSequence(logger, Level.INFO);
+        }
+
+        @Test
+        @DisplayName("should pass with empty sequence when no events")
+        void shouldPassWithEmptySequenceWhenNoEvents() {
+            final Logger logger = new MockLogger("test");
+
+            AssertLogger.assertEventSequence(logger, new Level[0]);
+        }
+
+        @Test
+        @DisplayName("should throw when level sequence does not match")
+        void shouldThrowWhenLevelSequenceDoesNotMatch() {
+            final Logger logger = new MockLogger("test");
+            logger.info("Info message");
+            logger.warn("Warning message");
+
+            final AssertionError error = assertThrows(AssertionError.class, () -> 
+                AssertLogger.assertEventSequence(logger, Level.DEBUG, Level.WARN));
+                
+            final String expected = "should have expected level at position 0";
+            final boolean containsExpected = error.getMessage().contains(expected);
+            org.junit.jupiter.api.Assertions.assertTrue(containsExpected,
+                "should contain expected error message part; expected: " + expected + "; actual: " + error.getMessage());
+        }
+
+        @Test
+        @DisplayName("should throw when event count does not match sequence length")
+        void shouldThrowWhenEventCountDoesNotMatchSequenceLength() {
+            final Logger logger = new MockLogger("test");
+            logger.info("Single message");
+
+            final AssertionError error = assertThrows(AssertionError.class, () -> 
+                AssertLogger.assertEventSequence(logger, Level.INFO, Level.WARN, Level.ERROR));
+                
+            final String expected = "should have expected number of events for sequence";
+            final boolean containsExpected = error.getMessage().contains(expected);
+            org.junit.jupiter.api.Assertions.assertTrue(containsExpected,
+                "should contain expected error message part; expected: " + expected + "; actual: " + error.getMessage());
+        }
+
+        @Test
+        @DisplayName("should work with repeated levels")
+        void shouldWorkWithRepeatedLevels() {
+            final Logger logger = new MockLogger("test");
+            logger.info("Info 1");
+            logger.info("Info 2");
+            logger.error("Error");
+            logger.info("Info 3");
+
+            AssertLogger.assertEventSequence(logger, Level.INFO, Level.INFO, Level.ERROR, Level.INFO);
+        }
+    }
+
+    @Nested
+    @DisplayName("assertEventSequence with markers")
+    class AssertEventSequenceWithMarkers {
+
+        @Test
+        @DisplayName("should pass when marker sequence matches exactly")
+        void shouldPassWhenMarkerSequenceMatchesExactly() {
+            final Logger logger = new MockLogger("test");
+            final Marker marker1 = MarkerFactory.getMarker("SECURITY");
+            final Marker marker2 = MarkerFactory.getMarker("AUDIT");
+            final Marker marker3 = MarkerFactory.getMarker("PERFORMANCE");
+            
+            logger.warn(marker1, "Security message");
+            logger.info(marker2, "Audit message");
+            logger.debug(marker3, "Performance message");
+
+            AssertLogger.assertEventSequence(logger, marker1, marker2, marker3);
+        }
+
+        @Test
+        @DisplayName("should pass with null markers in sequence")
+        void shouldPassWithNullMarkersInSequence() {
+            final Logger logger = new MockLogger("test");
+            final Marker marker = MarkerFactory.getMarker("TEST");
+            
+            logger.info("Message without marker");
+            logger.warn(marker, "Message with marker");
+            logger.error("Another message without marker");
+
+            AssertLogger.assertEventSequence(logger, (Marker) null, marker, (Marker) null);
+        }
+
+        @Test
+        @DisplayName("should throw when marker sequence does not match")
+        void shouldThrowWhenMarkerSequenceDoesNotMatch() {
+            final Logger logger = new MockLogger("test");
+            final Marker marker1 = MarkerFactory.getMarker("SECURITY");
+            final Marker marker2 = MarkerFactory.getMarker("AUDIT");
+            final Marker marker3 = MarkerFactory.getMarker("PERFORMANCE");
+            
+            logger.warn(marker1, "Security message");
+            logger.info(marker2, "Audit message");
+
+            final AssertionError error = assertThrows(AssertionError.class, () -> 
+                AssertLogger.assertEventSequence(logger, marker1, marker3));
+                
+            final String expected = "should have expected marker at position 1";
+            final boolean containsExpected = error.getMessage().contains(expected);
+            org.junit.jupiter.api.Assertions.assertTrue(containsExpected,
+                "should contain expected error message part; expected: " + expected + "; actual: " + error.getMessage());
+        }
+
+        @Test
+        @DisplayName("should work with repeated markers")
+        void shouldWorkWithRepeatedMarkers() {
+            final Logger logger = new MockLogger("test");
+            final Marker marker = MarkerFactory.getMarker("REPEATED");
+            
+            logger.info(marker, "Message 1");
+            logger.warn(marker, "Message 2");
+            logger.error(marker, "Message 3");
+
+            AssertLogger.assertEventSequence(logger, marker, marker, marker);
+        }
+    }
+
+    @Nested
+    @DisplayName("assertEventSequence with message parts")
+    class AssertEventSequenceWithMessageParts {
+
+        @Test
+        @DisplayName("should pass when message sequence matches exactly")
+        void shouldPassWhenMessageSequenceMatchesExactly() {
+            final Logger logger = new MockLogger("test");
+            logger.info("Starting application");
+            logger.debug("Loading configuration");
+            logger.info("Application ready");
+            logger.warn("Low memory warning");
+
+            AssertLogger.assertEventSequence(logger, "Starting", "Loading", "ready", "memory");
+        }
+
+        @Test
+        @DisplayName("should work with partial message matching")
+        void shouldWorkWithPartialMessageMatching() {
+            final Logger logger = new MockLogger("test");
+            logger.info("User john logged in successfully");
+            logger.warn("Invalid password attempt for user alice");
+            logger.error("Database connection failed");
+
+            AssertLogger.assertEventSequence(logger, "john", "alice", "Database");
+        }
+
+        @Test
+        @DisplayName("should throw when message sequence does not match")
+        void shouldThrowWhenMessageSequenceDoesNotMatch() {
+            final Logger logger = new MockLogger("test");
+            logger.info("First message");
+            logger.warn("Second message");
+
+            final AssertionError error = assertThrows(AssertionError.class, () -> 
+                AssertLogger.assertEventSequence(logger, "First", "Third"));
+                
+            final String expected = "should contain expected message part at position 1";
+            final boolean containsExpected = error.getMessage().contains(expected);
+            org.junit.jupiter.api.Assertions.assertTrue(containsExpected,
+                "should contain expected error message part; expected: " + expected + "; actual: " + error.getMessage());
+        }
+
+        @Test
+        @DisplayName("should handle empty message parts")
+        void shouldHandleEmptyMessageParts() {
+            final Logger logger = new MockLogger("test");
+            logger.info("Any message");
+            logger.warn("Another message");
+
+            AssertLogger.assertEventSequence(logger, "", ""); // Empty strings match all messages
+        }
+
+        @Test
+        @DisplayName("should handle special characters in message parts")
+        void shouldHandleSpecialCharactersInMessageParts() {
+            final Logger logger = new MockLogger("test");
+            logger.info("Pattern: [a-z]+");
+            logger.warn("Regex: \\d{3}");
+            logger.error("Special: $^*()");
+
+            AssertLogger.assertEventSequence(logger, "[a-z]", "\\d{3}", "$^*");
+        }
+
+        @Test
+        @DisplayName("should work with case sensitive matching")
+        void shouldWorkWithCaseSensitiveMatching() {
+            final Logger logger = new MockLogger("test");
+            logger.info("Error occurred");
+            logger.warn("error in processing");
+            logger.debug("ERROR: critical issue");
+
+            AssertLogger.assertEventSequence(logger, "Error", "error", "ERROR");
+        }
+    }
+
+    @Nested
+    @DisplayName("event sequence edge cases")
+    class EventSequenceEdgeCases {
+
+        @Test
+        @DisplayName("should handle mixed level sequences with same levels")
+        void shouldHandleMixedLevelSequencesWithSameLevels() {
+            final Logger logger = new MockLogger("test");
+            logger.error("Error 1");
+            logger.error("Error 2");
+            logger.info("Info");
+            logger.error("Error 3");
+
+            AssertLogger.assertEventSequence(logger, Level.ERROR, Level.ERROR, Level.INFO, Level.ERROR);
+        }
+
+        @Test
+        @DisplayName("should work with long sequences")
+        void shouldWorkWithLongSequences() {
+            final Logger logger = new MockLogger("test");
+            final Level[] levels = new Level[100];
+            final String[] messageParts = new String[100];
+            
+            for (int i = 0; i < 100; i++) {
+                final Level level = Level.values()[i % Level.values().length];
+                levels[i] = level;
+                messageParts[i] = "Message " + i;
+                logger.info("Message " + i + " at level " + level);
+            }
+
+            AssertLogger.assertEventSequence(logger, levels);
+            AssertLogger.assertEventSequence(logger, messageParts);
+        }
+
+        @Test
+        @DisplayName("should handle sequences with disabled levels")
+        void shouldHandleSequencesWithDisabledLevels() {
+            final MockLogger logger = new MockLogger("test");
+            logger.setDebugEnabled(false);
+            logger.setTraceEnabled(false);
+            
+            logger.trace("Trace message"); // Won't be logged
+            logger.debug("Debug message"); // Won't be logged
+            logger.info("Info message");
+            logger.warn("Warn message");
+
+            AssertLogger.assertEventSequence(logger, Level.INFO, Level.WARN);
+        }
+    }
 }
