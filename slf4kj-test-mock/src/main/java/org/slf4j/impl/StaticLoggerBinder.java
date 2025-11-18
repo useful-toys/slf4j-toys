@@ -18,11 +18,36 @@ package org.slf4j.impl;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
 
+/**
+ * Static binding for the SLF4J logger factory in the mock logging implementation.
+ * <p>
+ * This class provides the binding between SLF4J's logging facade and the mock logger factory
+ * implementation. It follows the SLF4J binding pattern where a static singleton provides
+ * access to the actual logger factory.
+ * <p>
+ * This class is part of the SLF4J service provider interface and should not be used directly
+ * by application code. SLF4J will automatically discover and use this binding when it's
+ * present on the classpath.
+ *
+ * @author Daniel Felix Ferber
+ */
 public final class StaticLoggerBinder implements LoggerFactoryBinder {
 
+    /**
+     * The requested SLF4J API version that this binding supports.
+     */
     public static final String REQUESTED_API_VERSION = "1.6";
+
+    /**
+     * The singleton instance of this binder.
+     */
     private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 
+    /**
+     * Returns the singleton instance of this binder.
+     *
+     * @return the singleton instance
+     */
     public static StaticLoggerBinder getSingleton() {
         return SINGLETON;
     }

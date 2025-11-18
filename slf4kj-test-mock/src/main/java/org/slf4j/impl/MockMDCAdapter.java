@@ -20,11 +20,24 @@ import java.util.Map;
 import org.slf4j.spi.MDCAdapter;
 
 /**
+ * A mock implementation of {@link MDCAdapter} for testing purposes.
+ * <p>
+ * This adapter provides a thread-local storage for MDC (Mapped Diagnostic Context) data,
+ * allowing each thread to maintain its own set of key-value pairs for logging context.
+ * <p>
+ * The implementation uses {@link ThreadLocal} to ensure thread safety and isolation
+ * of MDC data between different threads during test execution.
+ * <p>
+ * This class is primarily intended for use in unit tests where you need to verify
+ * MDC behavior without depending on a full logging implementation.
  *
  * @author Daniel Felix Ferber
  */
 public class MockMDCAdapter implements MDCAdapter {
 
+    /**
+     * Thread-local storage for MDC data. Each thread gets its own map instance.
+     */
     private final ThreadLocal<Map<String, String>> value = new ThreadLocal<Map<String, String>>() {
         @Override
         protected Map<String, String> initialValue() {

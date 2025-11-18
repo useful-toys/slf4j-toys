@@ -19,12 +19,33 @@ import org.slf4j.IMarkerFactory;
 import org.slf4j.helpers.BasicMarkerFactory;
 import org.slf4j.spi.MarkerFactoryBinder;
 
+/**
+ * Static binding for the SLF4J marker factory in the mock logging implementation.
+ * <p>
+ * This class provides the binding between SLF4J's marker facade and the marker factory
+ * implementation. It uses the standard {@link BasicMarkerFactory} from SLF4J helpers.
+ * <p>
+ * This class is part of the SLF4J service provider interface and should not be used directly
+ * by application code. SLF4J will automatically discover and use this binding when it's
+ * present on the classpath.
+ *
+ * @author Daniel Felix Ferber
+ */
 public final class StaticMarkerBinder implements MarkerFactoryBinder {
 
-    public static final org.slf4j.impl.StaticMarkerBinder SINGLETON = new org.slf4j.impl.StaticMarkerBinder();
+    /**
+     * The singleton instance of this binder.
+     */
+    public static final StaticMarkerBinder SINGLETON = new StaticMarkerBinder();
 
+    /**
+     * The marker factory instance.
+     */
     private final IMarkerFactory markerFactory = new BasicMarkerFactory();
 
+    /**
+     * Private constructor to enforce singleton pattern.
+     */
     private StaticMarkerBinder() { }
 
     @Override

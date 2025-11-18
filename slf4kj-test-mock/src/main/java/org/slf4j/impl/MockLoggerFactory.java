@@ -49,6 +49,14 @@ public class MockLoggerFactory implements ILoggerFactory {
     private final Map<String, Logger> nameToLogger = new HashMap<String, Logger>();
     private static final MockLoggerFactory instance = new MockLoggerFactory();
 
+    /**
+     * Returns the singleton instance of this factory.
+     * <p>
+     * This method is used by SLF4J's internal binding mechanism and should not be called directly
+     * by application code.
+     *
+     * @return the singleton MockLoggerFactory instance
+     */
     public static ILoggerFactory getInstance() {
         return instance;
     }

@@ -61,6 +61,20 @@ public class MockLoggerEvent {
         ERROR, WARN, INFO, DEBUG, TRACE
     }
 
+    /**
+     * Constructs a new MockLoggerEvent with the specified parameters.
+     * <p>
+     * If no throwable is explicitly passed but the last argument is a {@link Throwable},
+     * it is extracted automatically and stored separately.
+     *
+     * @param loggerName the name of the logger
+     * @param level      the log level
+     * @param mdc        the MDC context map
+     * @param marker     the optional marker
+     * @param throwable  the optional throwable
+     * @param message    the message format string
+     * @param arguments  the message arguments
+     */
     public MockLoggerEvent(
             final String loggerName,
             final Level level,
@@ -90,30 +104,65 @@ public class MockLoggerEvent {
         }
     }
 
+    /**
+     * Returns the name of the logger that created this event.
+     *
+     * @return the logger name
+     */
     public String getLoggerName() {
         return loggerName;
     }
 
+    /**
+     * Returns the log level of this event.
+     *
+     * @return the log level
+     */
     public Level getLevel() {
         return level;
     }
 
+    /**
+     * Returns the MDC context map at the time this event was created.
+     *
+     * @return the MDC context map, may be null
+     */
     public Map<String, String> getMdc() {
         return mdc;
     }
 
+    /**
+     * Returns the marker associated with this event.
+     *
+     * @return the marker, may be null
+     */
     public Marker getMarker() {
         return marker;
     }
 
+    /**
+     * Returns the throwable associated with this event.
+     *
+     * @return the throwable, may be null
+     */
     public Throwable getThrowable() {
         return throwable;
     }
 
+    /**
+     * Returns the original message format string.
+     *
+     * @return the message format string
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * Returns the arguments passed to the logging method.
+     *
+     * @return the message arguments, may be null or empty
+     */
     public Object[] getArguments() {
         return arguments;
     }
@@ -123,6 +172,14 @@ public class MockLoggerEvent {
         return "MockLoggerEvent{" + "loggerName=" + loggerName + ", level=" + level + ", marker=" + marker + ", throwable=" + throwable + ", message=" + message + ", arguments=" + Arrays.toString(arguments) + '}';
     }
 
+    /**
+     * Returns the formatted message by applying SLF4J's {@link MessageFormatter} to the message and arguments.
+     * <p>
+     * This method processes the message format string and substitutes placeholders with the provided arguments,
+     * following SLF4J's formatting conventions.
+     *
+     * @return the formatted message string
+     */
     public String getFormattedMessage() {
         return MessageFormatter.arrayFormat(message, arguments).getMessage();
     }
