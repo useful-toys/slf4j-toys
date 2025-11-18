@@ -624,7 +624,7 @@ public class MockLogger implements Logger {
         Assertions.assertSame(expectedLevel, event.getLevel(), String.format("Logger expectedLevel does not match; expected: %s, actual: %s", expectedLevel, event.getLevel()));
         Assertions.assertSame(expectedMarker, event.getMarker(), String.format("Logger expectedMarker does not match; expected: %s, actual: %s", expectedMarker, event.getMarker()));
         for (final String messagePart : messageParts) {
-//            Assertions.assertTrue(event.getFormattedMessage().contains(messagePart), String.format("Message does not contain expected string; expected: %s; message: %s", messagePart, event.getFormattedMessage()));
+            Assertions.assertTrue(event.getFormattedMessage().contains(messagePart), String.format("Message does not contain expected string; expected: %s; message: %s", messagePart, event.getFormattedMessage()));
         }
     }
 

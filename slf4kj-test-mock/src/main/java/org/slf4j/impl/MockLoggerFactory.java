@@ -15,6 +15,8 @@
  */
 package org.slf4j.impl;
 
+import lombok.experimental.FieldDefaults;
+import lombok.AccessLevel;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
@@ -44,10 +46,11 @@ import java.util.Map;
  *
  * @author Daniel Felix Ferber
  */
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MockLoggerFactory implements ILoggerFactory {
 
-    private final Map<String, Logger> nameToLogger = new HashMap<String, Logger>();
-    private static final MockLoggerFactory instance = new MockLoggerFactory();
+    Map<String, Logger> nameToLogger = new HashMap<>();
+    static MockLoggerFactory instance = new MockLoggerFactory();
 
     /**
      * Returns the singleton instance of this factory.

@@ -15,6 +15,8 @@
  */
 package org.slf4j.impl;
 
+import lombok.experimental.FieldDefaults;
+import lombok.AccessLevel;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.spi.MDCAdapter;
@@ -33,17 +35,13 @@ import org.slf4j.spi.MDCAdapter;
  *
  * @author Daniel Felix Ferber
  */
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MockMDCAdapter implements MDCAdapter {
 
     /**
      * Thread-local storage for MDC data. Each thread gets its own map instance.
      */
-    private final ThreadLocal<Map<String, String>> value = new ThreadLocal<Map<String, String>>() {
-        @Override
-        protected Map<String, String> initialValue() {
-            return new HashMap<String, String>();
-        }
-    };
+    ThreadLocal<Map<String, String>> value = ThreadLocal.withInitial(HashMap::new);
 
     @Override
 	public void put(final String key, final String val) {

@@ -15,6 +15,8 @@
  */
 package org.slf4j.impl;
 
+import lombok.experimental.FieldDefaults;
+import lombok.AccessLevel;
 import org.slf4j.IMarkerFactory;
 import org.slf4j.helpers.BasicMarkerFactory;
 import org.slf4j.spi.MarkerFactoryBinder;
@@ -31,6 +33,7 @@ import org.slf4j.spi.MarkerFactoryBinder;
  *
  * @author Daniel Felix Ferber
  */
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class StaticMarkerBinder implements MarkerFactoryBinder {
 
     /**
@@ -41,7 +44,7 @@ public final class StaticMarkerBinder implements MarkerFactoryBinder {
     /**
      * The marker factory instance.
      */
-    private final IMarkerFactory markerFactory = new BasicMarkerFactory();
+    IMarkerFactory markerFactory = new BasicMarkerFactory();
 
     /**
      * Private constructor to enforce singleton pattern.

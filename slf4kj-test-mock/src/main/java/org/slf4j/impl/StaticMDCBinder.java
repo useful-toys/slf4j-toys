@@ -15,6 +15,8 @@
  */
 package org.slf4j.impl;
 
+import lombok.experimental.FieldDefaults;
+import lombok.AccessLevel;
 import org.slf4j.spi.MDCAdapter;
 
 /**
@@ -29,6 +31,7 @@ import org.slf4j.spi.MDCAdapter;
  *
  * @author Daniel Felix Ferber
  */
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class StaticMDCBinder {
 
     /**
@@ -39,7 +42,7 @@ public final class StaticMDCBinder {
     /**
      * The mock MDC adapter instance.
      */
-    private final MockMDCAdapter mockMDCAdapter = new MockMDCAdapter();
+    MockMDCAdapter mockMDCAdapter = new MockMDCAdapter();
 
     /**
      * Private constructor to enforce singleton pattern.

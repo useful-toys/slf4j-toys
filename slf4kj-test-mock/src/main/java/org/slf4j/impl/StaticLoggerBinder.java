@@ -15,6 +15,8 @@
  */
 package org.slf4j.impl;
 
+import lombok.experimental.FieldDefaults;
+import lombok.AccessLevel;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
 
@@ -31,6 +33,7 @@ import org.slf4j.spi.LoggerFactoryBinder;
  *
  * @author Daniel Felix Ferber
  */
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class StaticLoggerBinder implements LoggerFactoryBinder {
 
     /**
@@ -41,7 +44,7 @@ public final class StaticLoggerBinder implements LoggerFactoryBinder {
     /**
      * The singleton instance of this binder.
      */
-    private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
+    static StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 
     /**
      * Returns the singleton instance of this binder.

@@ -18,6 +18,9 @@ package org.slf4j.impl;
 import java.util.Arrays;
 import java.util.Map;
 
+import lombok.Getter;
+import lombok.ToString;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Marker;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -45,6 +48,8 @@ import org.slf4j.helpers.MessageFormatter;
  *
  * @author Daniel Felix Ferber
  */
+@Getter
+@ToString(includeFieldNames = true)
 public class MockLoggerEvent {
 
     private final String loggerName;
@@ -104,73 +109,8 @@ public class MockLoggerEvent {
         }
     }
 
-    /**
-     * Returns the name of the logger that created this event.
-     *
-     * @return the logger name
-     */
-    public String getLoggerName() {
-        return loggerName;
-    }
-
-    /**
-     * Returns the log level of this event.
-     *
-     * @return the log level
-     */
-    public Level getLevel() {
-        return level;
-    }
-
-    /**
-     * Returns the MDC context map at the time this event was created.
-     *
-     * @return the MDC context map, may be null
-     */
-    public Map<String, String> getMdc() {
-        return mdc;
-    }
-
-    /**
-     * Returns the marker associated with this event.
-     *
-     * @return the marker, may be null
-     */
-    public Marker getMarker() {
-        return marker;
-    }
-
-    /**
-     * Returns the throwable associated with this event.
-     *
-     * @return the throwable, may be null
-     */
-    public Throwable getThrowable() {
-        return throwable;
-    }
-
-    /**
-     * Returns the original message format string.
-     *
-     * @return the message format string
-     */
-    public String getMessage() {
-        return message;
-    }
-
-    /**
-     * Returns the arguments passed to the logging method.
-     *
-     * @return the message arguments, may be null or empty
-     */
-    public Object[] getArguments() {
-        return arguments;
-    }
-
-    @Override
-    public String toString() {
-        return "MockLoggerEvent{" + "loggerName=" + loggerName + ", level=" + level + ", marker=" + marker + ", throwable=" + throwable + ", message=" + message + ", arguments=" + Arrays.toString(arguments) + '}';
-    }
+    // Getters são gerados automaticamente pela anotação @Getter do Lombok
+    // toString() é gerado automaticamente pela anotação @ToString do Lombok
 
     /**
      * Returns the formatted message by applying SLF4J's {@link MessageFormatter} to the message and arguments.
