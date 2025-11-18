@@ -16,14 +16,17 @@
 package org.usefultoys.slf4j.internal;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 
 import java.lang.management.*;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -32,6 +35,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class SystemMetricsCollectorTest {
+    @BeforeAll
+    static void validateConsistentCharset() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     @Mock
     private com.sun.management.OperatingSystemMXBean mockSunOsBean;
