@@ -41,6 +41,7 @@ class MockLoggerTest {
     @BeforeEach
     void setUp() {
         logger = new MockLogger(loggerName);
+        logger.setEnabled(true);
     }
 
     @Test
@@ -564,5 +565,237 @@ class MockLoggerTest {
         for (int i = 0; i < 3; i++) {
             assertEquals(complexMarker, logger.getEvent(i).getMarker());
         }
+    }
+
+    @Test
+    @DisplayName("Should not record events when level is disabled via setEnabled(false)")
+    void shouldNotRecordEventsWhenSetEnabledFalse() {
+        // Given
+        logger.setEnabled(false);
+        
+        // When
+        logger.trace("Trace message");
+        logger.debug("Debug message");
+        logger.info("Info message");
+        logger.warn("Warn message");
+        logger.error("Error message");
+        
+        // Then
+        assertEquals(0, logger.getEventCount(), "should not record any events when all levels disabled");
+    }
+
+    @Test
+    @DisplayName("Should record events when level is enabled via setEnabled(true)")
+    void shouldRecordEventsWhenSetEnabledTrue() {
+        // Given
+        logger.setEnabled(false);
+        logger.setEnabled(true);
+        
+        // When
+        logger.trace("Trace message");
+        logger.debug("Debug message");
+        logger.info("Info message");
+        logger.warn("Warn message");
+        logger.error("Error message");
+        
+        // Then
+        assertEquals(5, logger.getEventCount(), "should record all events when all levels enabled");
+    }
+
+    @Test
+    @DisplayName("Should not record TRACE events when trace is disabled")
+    void shouldNotRecordTraceEventsWhenTraceDisabled() {
+        // Given
+        logger.setTraceEnabled(false);
+        
+        // When
+        logger.trace("This should not be recorded");
+        logger.debug("Debug message");
+        logger.info("Info message");
+        
+        // Then
+        assertEquals(2, logger.getEventCount(), "should only record DEBUG and INFO");
+        assertEquals(Level.DEBUG, logger.getEvent(0).getLevel());
+        assertEquals(Level.INFO, logger.getEvent(1).getLevel());
+    }
+
+    @Test
+    @DisplayName("Should not record DEBUG events when debug is disabled")
+    void shouldNotRecordDebugEventsWhenDebugDisabled() {
+        // Given
+        logger.setDebugEnabled(false);
+        
+        // When
+        logger.trace("Trace message");
+        logger.debug("This should not be recorded");
+        logger.info("Info message");
+        
+        // Then
+        assertEquals(2, logger.getEventCount(), "should only record TRACE and INFO");
+        assertEquals(Level.TRACE, logger.getEvent(0).getLevel());
+        assertEquals(Level.INFO, logger.getEvent(1).getLevel());
+    }
+
+    @Test
+    @DisplayName("Should not record INFO events when info is disabled")
+    void shouldNotRecordInfoEventsWhenInfoDisabled() {
+        // Given
+        logger.setInfoEnabled(false);
+        
+        // When
+        logger.debug("Debug message");
+        logger.info("This should not be recorded");
+        logger.warn("Warn message");
+        
+        // Then
+        assertEquals(2, logger.getEventCount(), "should only record DEBUG and WARN");
+        assertEquals(Level.DEBUG, logger.getEvent(0).getLevel());
+        assertEquals(Level.WARN, logger.getEvent(1).getLevel());
+    }
+
+    @Test
+    @DisplayName("Should not record WARN events when warn is disabled")
+    void shouldNotRecordWarnEventsWhenWarnDisabled() {
+        // Given
+        logger.setWarnEnabled(false);
+        
+        // When
+        logger.info("Info message");
+        logger.warn("This should not be recorded");
+        logger.error("Error message");
+        
+        // Then
+        assertEquals(2, logger.getEventCount(), "should only record INFO and ERROR");
+        assertEquals(Level.INFO, logger.getEvent(0).getLevel());
+        assertEquals(Level.ERROR, logger.getEvent(1).getLevel());
+    }
+
+    @Test
+    @DisplayName("Should not record ERROR events when error is disabled")
+    void shouldNotRecordErrorEventsWhenErrorDisabled() {
+        // Given
+        logger.setErrorEnabled(false);
+        
+        // When
+        logger.warn("Warn message");
+        logger.error("This should not be recorded");
+        
+        // Then
+        assertEquals(1, logger.getEventCount(), "should only record WARN");
+        assertEquals(Level.WARN, logger.getEvent(0).getLevel());
+    }
+
+    @Test
+    @DisplayName("Should not record events with markers when level is disabled")
+    void shouldNotRecordEventsWithMarkersWhenLevelDisabled() {
+        // Given
+        logger.setInfoEnabled(false);
+        Marker marker = MarkerFactory.getMarker("TEST");
+        
+        // When
+        logger.info(marker, "This should not be recorded");
+        logger.debug(marker, "Debug with marker");
+        
+        // Then
+        assertEquals(1, logger.getEventCount(), "should only record DEBUG event");
+        assertEquals(Level.DEBUG, logger.getEvent(0).getLevel());
+    }
+
+    @Test
+    @DisplayName("Should not record events with throwables when level is disabled")
+    void shouldNotRecordEventsWithThrowablesWhenLevelDisabled() {
+        // Given
+        logger.setErrorEnabled(false);
+        Exception ex = new RuntimeException("Test exception");
+        
+        // When
+        logger.error("This should not be recorded", ex);
+        logger.warn("Warn with exception", ex);
+        
+        // Then
+        assertEquals(1, logger.getEventCount(), "should only record WARN event");
+        assertEquals(Level.WARN, logger.getEvent(0).getLevel());
+    }
+
+    @Test
+    @DisplayName("Should respect individual level settings in combination")
+    void shouldRespectIndividualLevelSettingsInCombination() {
+        // Given
+        logger.setTraceEnabled(false);
+        logger.setDebugEnabled(true);
+        logger.setInfoEnabled(false);
+        logger.setWarnEnabled(true);
+        logger.setErrorEnabled(false);
+        
+        // When
+        logger.trace("Trace - disabled");
+        logger.debug("Debug - enabled");
+        logger.info("Info - disabled");
+        logger.warn("Warn - enabled");
+        logger.error("Error - disabled");
+        
+        // Then
+        assertEquals(2, logger.getEventCount(), "should only record DEBUG and WARN");
+        assertEquals(Level.DEBUG, logger.getEvent(0).getLevel());
+        assertEquals("Debug - enabled", logger.getEvent(0).getFormattedMessage());
+        assertEquals(Level.WARN, logger.getEvent(1).getLevel());
+        assertEquals("Warn - enabled", logger.getEvent(1).getFormattedMessage());
+    }
+
+    @Test
+    @DisplayName("Should clear events and allow new events to be recorded")
+    void shouldClearEventsAndAllowNewEventsToBeRecorded() {
+        // Given
+        logger.info("First message");
+        logger.warn("Second message");
+        assertEquals(2, logger.getEventCount(), "should have 2 events initially");
+        
+        // When
+        logger.clearEvents();
+        
+        // Then
+        assertEquals(0, logger.getEventCount(), "should have 0 events after clear");
+        
+        // When
+        logger.info("New message after clear");
+        
+        // Then
+        assertEquals(1, logger.getEventCount(), "should record new events after clear");
+        assertEquals("New message after clear", logger.getEvent(0).getFormattedMessage());
+    }
+
+    @Test
+    @DisplayName("Should clear events multiple times")
+    void shouldClearEventsMultipleTimes() {
+        // First cycle
+        logger.info("Message 1");
+        assertEquals(1, logger.getEventCount());
+        logger.clearEvents();
+        assertEquals(0, logger.getEventCount());
+        
+        // Second cycle
+        logger.info("Message 2");
+        logger.info("Message 3");
+        assertEquals(2, logger.getEventCount());
+        logger.clearEvents();
+        assertEquals(0, logger.getEventCount());
+        
+        // Third cycle
+        logger.info("Message 4");
+        assertEquals(1, logger.getEventCount());
+        assertEquals("Message 4", logger.getEvent(0).getFormattedMessage());
+    }
+
+    @Test
+    @DisplayName("Should handle clearEvents on empty event list")
+    void shouldHandleClearEventsOnEmptyEventList() {
+        // Given - no events logged
+        assertEquals(0, logger.getEventCount());
+        
+        // When
+        logger.clearEvents();
+        
+        // Then
+        assertEquals(0, logger.getEventCount(), "should remain 0 after clearing empty list");
     }
 }
