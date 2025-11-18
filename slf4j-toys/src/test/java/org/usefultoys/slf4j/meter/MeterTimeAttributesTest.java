@@ -32,16 +32,18 @@ import org.usefultoys.slf4j.SessionConfig;
  */
 public class MeterTimeAttributesTest {
 
+    
+    @BeforeAll
+    static void validateConsistentCharset() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+    
     MockLogger logger = (MockLogger) LoggerFactory.getLogger("Test");
 
     public MeterTimeAttributesTest() {
         logger.setEnabled(false);
     }
 
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     @BeforeEach
     public void clearEvents() {

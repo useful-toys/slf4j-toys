@@ -15,14 +15,22 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.usefultoys.slf4j.SessionConfig;
+
+import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.usefultoys.slf4j.meter.MeterData.NULL_VALUE;
 
 class MeterContextTest {
+    @BeforeAll
+    static void validateConsistentCharset() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
 
     // Implementação de teste da interface MeterContext
     static class TestMeterContext extends MeterData implements MeterContext {

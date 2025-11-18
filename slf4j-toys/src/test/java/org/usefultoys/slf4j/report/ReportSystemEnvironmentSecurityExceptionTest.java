@@ -28,6 +28,11 @@ package org.usefultoys.slf4j.report;
 
  class ReportSystemEnvironmentSecurityExceptionTest {
 
+    @BeforeAll
+    static void validateConsistentCharset() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
      private SecurityManager originalSecurityManager;
      private MockLogger mockLogger;
      private ByteArrayOutputStream logOutput;
