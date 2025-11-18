@@ -631,4 +631,267 @@ class MeterExecutorTest {
         logger.assertEvent(2, INFO, MSG_OK);
         logger.assertEvent(3, TRACE, DATA_OK);
     }
+
+    @Test
+    @DisplayName("callOrRejectChecked() no start with ok and return")
+    void testCallOrRejectCheckedNoStartWithOkAndReturn() throws Exception {
+        final Meter meter = new Meter(logger, "testCallOrRejectChecked");
+        final boolean[] executed = {false};
+        
+        final String expectedResult = "Checked Success";
+        final String result = meter.callOrRejectChecked(() -> {
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.ok();
+            return expectedResult;
+        });
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertEquals(expectedResult, result, "Result should match expected value");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK);
+        logger.assertEvent(3, TRACE, DATA_OK);
+    }
+
+    @Test
+    @DisplayName("callOrRejectChecked() no start no ok and return")
+    void testCallOrRejectCheckedNoStartNoOkAndReturn() throws Exception {
+        final Meter meter = new Meter(logger, "testCallOrRejectCheckedAutoOk");
+        final boolean[] executed = {false};
+        
+        final String expectedResult = "Auto OK";
+        final String result = meter.callOrRejectChecked(() -> {
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            return expectedResult;
+        });
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertEquals(expectedResult, result, "Result should match expected value");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK, "result=Auto OK");
+        logger.assertEvent(3, TRACE, DATA_OK, "result:Auto OK");
+    }
+
+    @Test
+    @DisplayName("callOrRejectChecked() no start with reject via exception")
+    void testCallOrRejectCheckedNoStartWithRejectViaException() {
+        final Meter meter = new Meter(logger, "testCallOrRejectCheckedReject");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.callOrRejectChecked(() -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IOException("test rejection");
+            });
+            fail("Should have thrown IOException");
+        } catch (final Exception e) {
+            assertEquals(IOException.class, e.getClass(), "Exception class should be IOException");
+            assertEquals("test rejection", e.getMessage(), "Exception message should match");
+        }
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertTrue(meter.isReject(), "Meter should be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("IOException", meter.getRejectPath(), "Reject path should match exception class");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_REJECT);
+        logger.assertEvent(3, TRACE, DATA_REJECT);
+    }
+
+    @Test
+    @DisplayName("callOrRejectChecked() no start with exception to reject")
+    void testCallOrRejectCheckedNoStartWithExceptionToReject() {
+        final Meter meter = new Meter(logger, "testCallOrRejectCheckedException");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.callOrRejectChecked(() -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IOException("test exception");
+            });
+            fail("Should have thrown IOException");
+        } catch (final Exception e) {
+            assertEquals(IOException.class, e.getClass(), "Exception class should be IOException");
+            assertEquals("test exception", e.getMessage(), "Exception message should match");
+        }
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertTrue(meter.isReject(), "Meter should be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("IOException", meter.getRejectPath(), "Reject path should match exception class");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_REJECT);
+        logger.assertEvent(3, TRACE, DATA_REJECT);
+    }
+
+    @Test
+    @DisplayName("callOrRejectChecked() no start with RuntimeException to fail")
+    void testCallOrRejectCheckedNoStartWithRuntimeExceptionToFail() {
+        final Meter meter = new Meter(logger, "testCallOrRejectCheckedRuntimeException");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.callOrRejectChecked(() -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IllegalArgumentException("test runtime exception");
+            });
+            fail("Should have thrown IllegalArgumentException");
+        } catch (final IllegalArgumentException e) {
+            assertEquals("test runtime exception", e.getMessage(), "Exception message should match");
+        }
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertTrue(meter.isFail(), "Meter should be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("java.lang.IllegalArgumentException", meter.getFailPath(), "Fail path should match exception class");
+        assertEquals("test runtime exception", meter.getFailMessage(), "Fail message should match exception message");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL);
+        logger.assertEvent(3, TRACE, DATA_FAIL);
+    }
+
+    @Test
+    @DisplayName("safeCall() with exception class no start with ok and return")
+    void testSafeCallWithExceptionClassNoStartWithOkAndReturn() {
+        final Meter meter = new Meter(logger, "testSafeCallWithExceptionClass");
+        final boolean[] executed = {false};
+        
+        final String expectedResult = "Safe Success";
+        final String result = meter.safeCall(RuntimeException.class, () -> {
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.ok();
+            return expectedResult;
+        });
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertEquals(expectedResult, result, "Result should match expected value");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK);
+        logger.assertEvent(3, TRACE, DATA_OK);
+    }
+
+    @Test
+    @DisplayName("safeCall() with exception class no start no ok and return")
+    void testSafeCallWithExceptionClassNoStartNoOkAndReturn() {
+        final Meter meter = new Meter(logger, "testSafeCallWithExceptionClassAutoOk");
+        final boolean[] executed = {false};
+        
+        final String expectedResult = "Auto Safe Success";
+        final String result = meter.safeCall(RuntimeException.class, () -> {
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            return expectedResult;
+        });
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertEquals(expectedResult, result, "Result should match expected value");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK, "result=Auto Safe Success");
+        logger.assertEvent(3, TRACE, DATA_OK, "result:Auto Safe Success");
+    }
+
+    @Test
+    @DisplayName("safeCall() with exception class no start with exception wrapped")
+    void testSafeCallWithExceptionClassNoStartWithExceptionWrapped() {
+        final Meter meter = new Meter(logger, "testSafeCallWithExceptionClassWrapped");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.safeCall(RuntimeException.class, () -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IOException("test exception");
+            });
+            fail("Should have thrown RuntimeException");
+        } catch (final RuntimeException e) {
+            assertEquals(RuntimeException.class, e.getClass(), "Exception class should be RuntimeException");
+            assertEquals(IOException.class, e.getCause().getClass(), "Cause should be IOException");
+            assertEquals("test exception", e.getCause().getMessage(), "Cause message should match");
+        }
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertTrue(meter.isFail(), "Meter should be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("java.io.IOException", meter.getFailPath(), "Fail path should match original exception class");
+        assertEquals("test exception", meter.getFailMessage(), "Fail message should match original exception message");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL);
+        logger.assertEvent(3, TRACE, DATA_FAIL);
+    }
+
+    @Test
+    @DisplayName("safeCall() with exception class no start with exception to fail")
+    void testSafeCallWithExceptionClassNoStartWithExceptionToFail() {
+        final Meter meter = new Meter(logger, "testSafeCallWithExceptionClassFail");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.safeCall(RuntimeException.class, () -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IllegalArgumentException("test exception");
+            });
+        } catch (final RuntimeException e) {
+            assertSame(IllegalArgumentException.class, e.getClass(), "Exception class should be IllegalArgumentException");
+            assertEquals("test exception", e.getMessage(), "Exception message should match");
+        }
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertTrue(meter.isFail(), "Meter should be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("java.lang.IllegalArgumentException", meter.getFailPath(), "Fail path should match exception class");
+        assertEquals("test exception", meter.getFailMessage(), "Fail message should match exception message");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL);
+        logger.assertEvent(3, TRACE, DATA_FAIL);
+    }
 }
