@@ -20,6 +20,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
@@ -79,20 +80,21 @@ class MeterClosableTest {
     }
 
     @Test
-    void testWithStartWithOk() {
+    @DisplayName("Meter with correct try-with-resources usage, started and successful operation")
+    void meterStartedAndSuccessfulOperation() {
         final Meter m;
-        try (final Meter m2 = m = new Meter(logger, "testWithStartWithOk").start()) {
-            assertEquals(m, Meter.getCurrentInstance());
+        try (final Meter m2 = m = new Meter(logger, "meterStartedAndSuccessfulOperation").start()) {
+            assertEquals(m, Meter.getCurrentInstance(), "Current instance should be the started meter");
             m2.ok();
         }
 
-        assertTrue(m.isOK());
-        assertFalse(m.isReject());
-        assertFalse(m.isFail());
-        assertFalse(m.isSlow());
-        assertNull(m.getOkPath());
-        assertNull(m.getRejectPath());
-        assertNull(m.getFailPath());
+        assertTrue(m.isOK(), "Meter should be in successful state");
+        assertFalse(m.isReject(), "Meter should not be in rejected state");
+        assertFalse(m.isFail(), "Meter should not be in failed state");
+        assertFalse(m.isSlow(), "Meter should not be in slow state");
+        assertNull(m.getOkPath(), "Success path should be null when no path specified");
+        assertNull(m.getRejectPath(), "Reject path should be null");
+        assertNull(m.getFailPath(), "Fail path should be null");
         logger.assertEvent(0, DEBUG, MSG_START);
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, INFO, MSG_OK);
@@ -100,40 +102,42 @@ class MeterClosableTest {
     }
 
     @Test
-    void testNoStartWithOk() {
+    @DisplayName("Meter with incorrect try-with-resources usage, not started but successful operation")
+    void meterNotStartedButSuccessfulOperation() {
         final Meter m;
-        try (final Meter m2 = m = new Meter(logger, "testNoStartWithOk")) {
-            assertNotEquals(m, Meter.getCurrentInstance());
+        try (final Meter m2 = m = new Meter(logger, "meterNotStartedButSuccessfulOperation")) {
+            assertNotEquals(m, Meter.getCurrentInstance(), "Current instance should not be the non-started meter");
             m2.ok();
         }
 
-        assertTrue(m.isOK());
-        assertFalse(m.isReject());
-        assertFalse(m.isFail());
-        assertFalse(m.isSlow());
-        assertNull(m.getOkPath());
-        assertNull(m.getRejectPath());
-        assertNull(m.getFailPath());
+        assertTrue(m.isOK(), "Meter should be in successful state despite not being started");
+        assertFalse(m.isReject(), "Meter should not be in rejected state");
+        assertFalse(m.isFail(), "Meter should not be in failed state");
+        assertFalse(m.isSlow(), "Meter should not be in slow state");
+        assertNull(m.getOkPath(), "Success path should be null when no path specified");
+        assertNull(m.getRejectPath(), "Reject path should be null");
+        assertNull(m.getFailPath(), "Fail path should be null");
         logger.assertEvent(0, ERROR, INCONSISTENT_OK);
         logger.assertEvent(1, INFO, MSG_OK);
         logger.assertEvent(2, TRACE, DATA_OK);
     }
 
     @Test
-    void testStartWithOkAndPath() {
+    @DisplayName("Meter with correct try-with-resources usage, started and successful operation with path")
+    void meterStartedAndSuccessfulOperationWithPath() {
         final Meter m;
-        try (final Meter m2 = m = new Meter(logger, "testStartWithOkAndPath").start()) {
-            assertEquals(m, Meter.getCurrentInstance());
+        try (final Meter m2 = m = new Meter(logger, "meterStartedAndSuccessfulOperationWithPath").start()) {
+            assertEquals(m, Meter.getCurrentInstance(), "Current instance should be the started meter");
             m2.ok("a");
         }
 
-        assertTrue(m.isOK());
-        assertFalse(m.isReject());
-        assertFalse(m.isFail());
-        assertFalse(m.isSlow());
-        assertEquals("a", m.getOkPath());
-        assertNull(m.getRejectPath());
-        assertNull(m.getFailPath());
+        assertTrue(m.isOK(), "Meter should be in successful state");
+        assertFalse(m.isReject(), "Meter should not be in rejected state");
+        assertFalse(m.isFail(), "Meter should not be in failed state");
+        assertFalse(m.isSlow(), "Meter should not be in slow state");
+        assertEquals("a", m.getOkPath(), "Success path should be 'a'");
+        assertNull(m.getRejectPath(), "Reject path should be null");
+        assertNull(m.getFailPath(), "Fail path should be null");
         logger.assertEvent(0, DEBUG, MSG_START);
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, INFO, MSG_OK);
@@ -141,38 +145,40 @@ class MeterClosableTest {
     }
 
     @Test
-    void testNoStartNoOk() {
+    @DisplayName("Meter with incorrect try-with-resources usage, not started and no completion notification")
+    void meterNotStartedAndNoCompletion() {
         final Meter m;
-        try (final Meter m2 = m = new Meter(logger, "testNoStartNoOk")) {
-            assertNotEquals(m, Meter.getCurrentInstance());
+        try (final Meter m2 = m = new Meter(logger, "meterNotStartedAndNoCompletion")) {
+            assertNotEquals(m, Meter.getCurrentInstance(), "Current instance should not be the non-started meter");
         }
 
-        assertFalse(m.isOK());
-        assertFalse(m.isReject());
-        assertTrue(m.isFail());
-        assertFalse(m.isSlow());
-        assertNull(m.getOkPath());
-        assertNull(m.getRejectPath());
-        assertEquals("try-with-resources", m.getFailPath());
+        assertFalse(m.isOK(), "Meter should not be in successful state");
+        assertFalse(m.isReject(), "Meter should not be in rejected state");
+        assertTrue(m.isFail(), "Meter should be in failed state");
+        assertFalse(m.isSlow(), "Meter should not be in slow state");
+        assertNull(m.getOkPath(), "Success path should be null");
+        assertNull(m.getRejectPath(), "Reject path should be null");
+        assertEquals("try-with-resources", m.getFailPath(), "Fail path should be 'try-with-resources'");
         logger.assertEvent(0, ERROR, INCONSISTENT_CLOSE);
         logger.assertEvent(1, ERROR, MSG_FAIL);
         logger.assertEvent(2, TRACE, DATA_FAIL);
     }
 
     @Test
-    void testWithStartNoOk() {
+    @DisplayName("Meter with correct try-with-resources usage, started but no completion notification")
+    void meterStartedButNoCompletion() {
         final Meter m;
-        try (final Meter m2 = m = new Meter(logger, "testWithStartNoOk").start()) {
-            assertEquals(m, Meter.getCurrentInstance());
+        try (final Meter m2 = m = new Meter(logger, "meterStartedButNoCompletion").start()) {
+            assertEquals(m, Meter.getCurrentInstance(), "Current instance should be the started meter");
         }
 
-        assertFalse(m.isOK());
-        assertFalse(m.isReject());
-        assertTrue(m.isFail());
-        assertFalse(m.isSlow());
-        assertNull(m.getOkPath());
-        assertNull(m.getRejectPath());
-        assertEquals("try-with-resources", m.getFailPath());
+        assertFalse(m.isOK(), "Meter should not be in successful state");
+        assertFalse(m.isReject(), "Meter should not be in rejected state");
+        assertTrue(m.isFail(), "Meter should be in failed state");
+        assertFalse(m.isSlow(), "Meter should not be in slow state");
+        assertNull(m.getOkPath(), "Success path should be null");
+        assertNull(m.getRejectPath(), "Reject path should be null");
+        assertEquals("try-with-resources", m.getFailPath(), "Fail path should be 'try-with-resources'");
         logger.assertEvent(0, DEBUG, MSG_START);
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, ERROR, MSG_FAIL, "try-with-resources");
@@ -180,20 +186,21 @@ class MeterClosableTest {
     }
 
     @Test
-    void testWithStartWithReject() {
+    @DisplayName("Meter with correct try-with-resources usage, started and rejected operation")
+    void meterStartedAndRejectedOperation() {
         final Meter m;
-        try (final Meter m2 = m = new Meter(logger, "testWithStartWithReject").start()) {
-            assertEquals(m, Meter.getCurrentInstance());
+        try (final Meter m2 = m = new Meter(logger, "meterStartedAndRejectedOperation").start()) {
+            assertEquals(m, Meter.getCurrentInstance(), "Current instance should be the started meter");
             m2.reject("a");
         }
 
-        assertFalse(m.isOK());
-        assertTrue(m.isReject());
-        assertFalse(m.isFail());
-        assertFalse(m.isSlow());
-        assertNull(m.getOkPath());
-        assertEquals("a", m.getRejectPath());
-        assertNull(m.getFailPath());
+        assertFalse(m.isOK(), "Meter should not be in successful state");
+        assertTrue(m.isReject(), "Meter should be in rejected state");
+        assertFalse(m.isFail(), "Meter should not be in failed state");
+        assertFalse(m.isSlow(), "Meter should not be in slow state");
+        assertNull(m.getOkPath(), "Success path should be null");
+        assertEquals("a", m.getRejectPath(), "Reject path should be 'a'");
+        assertNull(m.getFailPath(), "Fail path should be null");
         logger.assertEvent(0, DEBUG, MSG_START);
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, INFO, MSG_REJECT);
@@ -201,20 +208,21 @@ class MeterClosableTest {
     }
 
     @Test
-    void testWithStartWithFail() {
+    @DisplayName("Meter with correct try-with-resources usage, started and failed operation")
+    void meterStartedAndFailedOperation() {
         final Meter m;
-        try (final Meter m2 = m = new Meter(logger, "testWithStartWithFail").start()) {
-            assertEquals(m, Meter.getCurrentInstance());
+        try (final Meter m2 = m = new Meter(logger, "meterStartedAndFailedOperation").start()) {
+            assertEquals(m, Meter.getCurrentInstance(), "Current instance should be the started meter");
             m2.fail("a");
         }
 
-        assertFalse(m.isOK());
-        assertFalse(m.isReject());
-        assertTrue(m.isFail());
-        assertFalse(m.isSlow());
-        assertNull(m.getOkPath());
-        assertNull(m.getRejectPath());
-        assertEquals("a", m.getFailPath());
+        assertFalse(m.isOK(), "Meter should not be in successful state");
+        assertFalse(m.isReject(), "Meter should not be in rejected state");
+        assertTrue(m.isFail(), "Meter should be in failed state");
+        assertFalse(m.isSlow(), "Meter should not be in slow state");
+        assertNull(m.getOkPath(), "Success path should be null");
+        assertNull(m.getRejectPath(), "Reject path should be null");
+        assertEquals("a", m.getFailPath(), "Fail path should be 'a'");
         logger.assertEvent(0, DEBUG, MSG_START);
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, ERROR, MSG_FAIL);
@@ -222,22 +230,23 @@ class MeterClosableTest {
     }
 
     @Test
-    void testWithStartWithException() {
+    @DisplayName("Meter with correct try-with-resources usage, started but operation throws exception")
+    void meterStartedWithThrownException() {
         Meter m = null;
-        try (final Meter m2 = m = new Meter(logger, "testWithStartWithException").start()) {
-            assertEquals(m, Meter.getCurrentInstance());
+        try (final Meter m2 = m = new Meter(logger, "meterStartedWithThrownException").start()) {
+            assertEquals(m, Meter.getCurrentInstance(), "Current instance should be the started meter");
             throw new RuntimeException("someException");
         } catch (final RuntimeException e) {
             // ignore
         }
 
-        assertFalse(m.isOK());
-        assertFalse(m.isReject());
-        assertTrue(m.isFail());
-        assertFalse(m.isSlow());
-        assertNull(m.getOkPath());
-        assertNull(m.getRejectPath());
-        assertEquals("try-with-resources", m.getFailPath());
+        assertFalse(m.isOK(), "Meter should not be in successful state");
+        assertFalse(m.isReject(), "Meter should not be in rejected state");
+        assertTrue(m.isFail(), "Meter should be in failed state");
+        assertFalse(m.isSlow(), "Meter should not be in slow state");
+        assertNull(m.getOkPath(), "Success path should be null");
+        assertNull(m.getRejectPath(), "Reject path should be null");
+        assertEquals("try-with-resources", m.getFailPath(), "Fail path should be 'try-with-resources'");
         logger.assertEvent(0, DEBUG, MSG_START);
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, ERROR, MSG_FAIL, "try-with-resources");
