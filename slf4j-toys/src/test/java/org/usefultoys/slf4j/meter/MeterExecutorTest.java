@@ -237,6 +237,162 @@ class MeterExecutorTest {
     }
 
     @Test
+    @DisplayName("runOrReject() no start with ok")
+    @SuppressWarnings("unchecked")
+    void testRunOrRejectNoStartWithOk() {
+        final Meter meter = new Meter(logger, "testRunOrReject");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.runOrReject(() -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                meter.ok();
+            }, IOException.class);
+        } catch (final Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+        
+        assertTrue(executed[0], "Runnable should have been executed");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK);
+        logger.assertEvent(3, TRACE, DATA_OK);
+    }
+
+    @Test
+    @DisplayName("runOrReject() no start no ok")
+    @SuppressWarnings("unchecked")
+    void testRunOrRejectNoStartNoOk() {
+        final Meter meter = new Meter(logger, "testRunOrRejectAutoOk");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.runOrReject(() -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+            }, IOException.class);
+        } catch (final Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+        
+        assertTrue(executed[0], "Runnable should have been executed");
+        assertTrue(meter.isOK(), "Meter should be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_OK);
+        logger.assertEvent(3, TRACE, DATA_OK);
+    }
+
+    @Test
+    @DisplayName("runOrReject() no start with IOException to reject")
+    @SuppressWarnings("unchecked")
+    void testRunOrRejectNoStartWithIOExceptionToReject() {
+        final Meter meter = new Meter(logger, "testRunOrRejectReject");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.runOrReject(() -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                // Simulating IOException in a Runnable by wrapping in RuntimeException
+                throw new RuntimeException(new IOException("test reject exception"));
+            }, RuntimeException.class);
+            fail("Should have thrown RuntimeException");
+        } catch (final Exception e) {
+            assertEquals(RuntimeException.class, e.getClass(), "Exception class should be RuntimeException");
+            assertTrue(e.getCause() instanceof IOException, "Cause should be IOException");
+            assertEquals("test reject exception", e.getCause().getMessage(), "Exception message should match");
+        }
+        
+        assertTrue(executed[0], "Runnable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertTrue(meter.isReject(), "Meter should be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("RuntimeException", meter.getRejectPath(), "Reject path should match exception class");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_REJECT);
+        logger.assertEvent(3, TRACE, DATA_REJECT);
+    }
+
+    @Test
+    @DisplayName("runOrReject() no start with exception to fail")
+    @SuppressWarnings("unchecked")
+    void testRunOrRejectNoStartWithExceptionToFail() {
+        final Meter meter = new Meter(logger, "testRunOrRejectFail");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.runOrReject(() -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IllegalArgumentException("test fail exception");
+            }, IOException.class);
+            fail("Should have thrown IllegalArgumentException");
+        } catch (final Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass(), "Exception class should be IllegalArgumentException");
+            assertEquals("test fail exception", e.getMessage(), "Exception message should match");
+        }
+        
+        assertTrue(executed[0], "Runnable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertTrue(meter.isFail(), "Meter should be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("java.lang.IllegalArgumentException", meter.getFailPath(), "Fail path should match exception class");
+        assertEquals("test fail exception", meter.getFailMessage(), "Fail message should match exception message");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL);
+        logger.assertEvent(3, TRACE, DATA_FAIL);
+    }
+
+    @Test
+    @DisplayName("runOrReject() with start with multiple exception classes to reject")
+    @SuppressWarnings("unchecked")
+    void testRunOrRejectWithStartWithMultipleExceptionClassesToReject() {
+        final Meter meter = new Meter(logger, "testRunOrRejectMultiple").start();
+        final boolean[] executed = {false};
+        
+        try {
+            meter.runOrReject(() -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IllegalStateException("test multiple reject");
+            }, IOException.class, IllegalStateException.class, RuntimeException.class);
+            fail("Should have thrown IllegalStateException");
+        } catch (final Exception e) {
+            assertEquals(IllegalStateException.class, e.getClass(), "Exception class should be IllegalStateException");
+            assertEquals("test multiple reject", e.getMessage(), "Exception message should match");
+        }
+        
+        assertTrue(executed[0], "Runnable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertTrue(meter.isReject(), "Meter should be in reject state");
+        assertFalse(meter.isFail(), "Meter should not be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("IllegalStateException", meter.getRejectPath(), "Reject path should match exception class");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, INFO, MSG_REJECT);
+        logger.assertEvent(3, TRACE, DATA_REJECT);
+    }
+
+    @Test
     @DisplayName("safeCall() with start with ok")
     void testSafeCallWithStartWithOk() {
         final Meter meter = new Meter(logger, "testSafeCallWithStartAndOk").start();
@@ -494,7 +650,40 @@ class MeterExecutorTest {
     }
 
     @Test
+    @DisplayName("call() no start with exception to fail")
+    void testCallNoStartWithExceptionToFail() {
+        final Meter meter = new Meter(logger, "testCallException");
+        final boolean[] executed = {false};
+        
+        try {
+            meter.call(() -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IOException("test exception");
+            });
+            fail("Should have thrown IOException");
+        } catch (final Exception e) {
+            assertEquals(IOException.class, e.getClass(), "Exception class should be IOException");
+            assertEquals("test exception", e.getMessage(), "Exception message should match");
+        }
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertTrue(meter.isFail(), "Meter should be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("java.io.IOException", meter.getFailPath(), "Fail path should match exception class");
+        assertEquals("test exception", meter.getFailMessage(), "Fail message should match exception message");
+        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL);
+        logger.assertEvent(3, TRACE, DATA_FAIL);
+    }
+
+    @Test
     @DisplayName("callOrReject() no start with ok and return")
+    @SuppressWarnings("unchecked")
     void testCallOrRejectNoStartWithOkAndReturn() throws Exception {
         final Meter meter = new Meter(logger, "testCallOrReject");
         final boolean[] executed = {false};
@@ -522,6 +711,7 @@ class MeterExecutorTest {
 
     @Test
     @DisplayName("callOrReject() no start no ok and return")
+    @SuppressWarnings("unchecked")
     void testCallOrRejectNoStartNoOkAndReturn() throws Exception {
         final Meter meter = new Meter(logger, "testCallOrRejectAutoOk");
         final boolean[] executed = {false};
@@ -548,6 +738,7 @@ class MeterExecutorTest {
 
     @Test
     @DisplayName("callOrReject() no start with reject via exception")
+    @SuppressWarnings("unchecked")
     void testCallOrRejectNoStartWithRejectViaException() throws Exception {
         final Meter meter = new Meter(logger, "testCallOrRejectWithReject");
         final boolean[] executed = {false};
@@ -577,6 +768,7 @@ class MeterExecutorTest {
 
     @Test
     @DisplayName("callOrReject() no start with exception to fail")
+    @SuppressWarnings("unchecked")
     void testCallOrRejectNoStartWithExceptionToFail() throws Exception {
         final Meter meter = new Meter(logger, "testCallOrRejectException");
         final boolean[] executed = {false};
@@ -607,6 +799,7 @@ class MeterExecutorTest {
 
     @Test
     @DisplayName("callOrReject() with start with ok and return")
+    @SuppressWarnings("unchecked")
     void testCallOrRejectWithStartWithOkAndReturn() throws Exception {
         final Meter meter = new Meter(logger, "testCallOrRejectWithStart").start();
         final boolean[] executed = {false};
@@ -893,5 +1086,56 @@ class MeterExecutorTest {
         logger.assertEvent(1, TRACE, DATA_START);
         logger.assertEvent(2, ERROR, MSG_FAIL);
         logger.assertEvent(3, TRACE, DATA_FAIL);
+    }
+
+    @Test
+    @DisplayName("safeCall() with invalid exception class falls back to RuntimeException")
+    void testSafeCallWithInvalidExceptionClassFallbackToRuntimeException() {
+        final Meter meter = new Meter(logger, "testSafeCallInvalidException");
+        final boolean[] executed = {false};
+        
+        // Creating a custom RuntimeException that doesn't have the expected constructor
+        class CustomRuntimeException extends RuntimeException {
+            // Intentionally no constructor with (String, Throwable) signature
+            // Only has default constructor
+            public CustomRuntimeException() {
+                super("Custom exception without proper constructor");
+            }
+            
+            // Adding a different constructor to make sure it doesn't match
+            public CustomRuntimeException(String message) {
+                super(message);
+            }
+        }
+        
+        try {
+            meter.safeCall(CustomRuntimeException.class, () -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IOException("test checked exception");
+            });
+            fail("Should have thrown RuntimeException");
+        } catch (final RuntimeException e) {
+            // Should fall back to plain RuntimeException when CustomRuntimeException can't be instantiated
+            assertEquals(RuntimeException.class, e.getClass(), "Exception class should be RuntimeException (fallback)");
+            assertEquals(IOException.class, e.getCause().getClass(), "Cause should be IOException");
+            assertEquals("test checked exception", e.getCause().getMessage(), "Cause message should match");
+        }
+        
+        assertTrue(executed[0], "Callable should have been executed");
+        assertFalse(meter.isOK(), "Meter should not be in OK state");
+        assertFalse(meter.isReject(), "Meter should not be in reject state");
+        assertTrue(meter.isFail(), "Meter should be in fail state");
+        assertFalse(meter.isSlow(), "Meter should not be in slow state");
+        assertEquals("java.io.IOException", meter.getFailPath(), "Fail path should match original exception class");
+        assertEquals("test checked exception", meter.getFailMessage(), "Fail message should match original exception message");
+        
+        // Should have 5 log events: 4 normal + 1 error from convertException fallback
+        assertEquals(5, logger.getEventCount(), "Should have exactly 5 log events (4 normal + 1 from convertException)");
+        logger.assertEvent(0, DEBUG, MSG_START);
+        logger.assertEvent(1, TRACE, DATA_START);
+        logger.assertEvent(2, ERROR, MSG_FAIL);
+        logger.assertEvent(3, TRACE, DATA_FAIL);
+        logger.assertEvent(4, ERROR, INCONSISTENT_EXCEPTION); // Error from convertException fallback
     }
 }
