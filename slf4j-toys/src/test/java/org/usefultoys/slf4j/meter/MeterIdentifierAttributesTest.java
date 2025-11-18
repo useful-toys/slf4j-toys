@@ -153,6 +153,7 @@ class MeterIdentifierAttributesTest {
         // Meter with null operation create a meter with the same category as the parent meter.
         // Therefore, the position will be incremented.
         logger.clearEvents();
+        logger.setEnabled(true);
         final Meter m6 = m1.sub(null);
         assertTrue(Session.uuid.endsWith(m6.getSessionUuid()));
         assertEquals(category, m6.getCategory());
@@ -203,6 +204,7 @@ class MeterIdentifierAttributesTest {
         // Meter with null operation create a meter with the same category as the parent meter.
         // Therefore, the position will be incremented.
         logger.clearEvents();
+        logger.setEnabled(true);
         final Meter m6 = m4.sub(null);
         assertTrue(Session.uuid.endsWith(m6.getSessionUuid()));
         assertEquals(category, m6.getCategory());
