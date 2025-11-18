@@ -42,7 +42,7 @@ class MeterExecutorTest {
     static final MockLogger logger = (MockLogger) LoggerFactory.getLogger("test.executor");
 
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 

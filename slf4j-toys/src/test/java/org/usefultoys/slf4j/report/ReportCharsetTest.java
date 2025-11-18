@@ -38,7 +38,7 @@ class ReportCharsetTest {
     private static final Random random = new Random();
 
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 

@@ -40,7 +40,7 @@ class MeterIterationAttributesTest {
     MockLogger logger = (MockLogger) LoggerFactory.getLogger("MeterIterationAttributesTest");
 
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 

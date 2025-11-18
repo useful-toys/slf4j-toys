@@ -19,7 +19,6 @@ package org.usefultoys.slf4j.watcher;
 import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
-import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,12 +29,15 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.usefultoys.slf4j.SessionConfig;
 import static org.mockito.Mockito.*;
+
 
 class WatcherServletTest {
 
     @BeforeAll
-    static void validate() {
+    static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 

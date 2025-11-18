@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MeterDataTest {
 
     @BeforeAll
-    public static void validate() {
+    public static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
