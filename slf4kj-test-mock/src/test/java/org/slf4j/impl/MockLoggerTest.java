@@ -380,4 +380,189 @@ class MockLoggerTest {
         // When/Then
         assertDoesNotThrow(() -> logger.assertEvent(0, Level.INFO, null, "test", "assertion", "validation"));
     }
+
+    @Test
+    @DisplayName("Should log DEBUG messages with marker and various argument formats")
+    void shouldLogDebugMessagesWithMarkerAndVariousArgumentFormats() {
+        // Given
+        final Marker debugMarker = MarkerFactory.getMarker("DEBUG_MARKER");
+        
+        // When
+        logger.debug(debugMarker, "Debug marker with single arg: {}", "value");
+        logger.debug(debugMarker, "Debug marker with two args: {} {}", "arg1", "arg2");
+        logger.debug(debugMarker, "Debug marker with varargs: {} {} {}", "a", "b", "c");
+        logger.debug(debugMarker, "Debug marker with exception", new IllegalArgumentException("test exception"));
+        
+        // Then
+        assertEquals(4, logger.getEventCount());
+        
+        final MockLoggerEvent event0 = logger.getEvent(0);
+        assertEquals(Level.DEBUG, event0.getLevel());
+        assertEquals(debugMarker, event0.getMarker());
+        assertEquals("Debug marker with single arg: value", event0.getFormattedMessage());
+        
+        final MockLoggerEvent event1 = logger.getEvent(1);
+        assertEquals(Level.DEBUG, event1.getLevel());
+        assertEquals(debugMarker, event1.getMarker());
+        assertEquals("Debug marker with two args: arg1 arg2", event1.getFormattedMessage());
+        
+        final MockLoggerEvent event2 = logger.getEvent(2);
+        assertEquals(Level.DEBUG, event2.getLevel());
+        assertEquals(debugMarker, event2.getMarker());
+        assertEquals("Debug marker with varargs: a b c", event2.getFormattedMessage());
+        
+        final MockLoggerEvent event3 = logger.getEvent(3);
+        assertEquals(Level.DEBUG, event3.getLevel());
+        assertEquals(debugMarker, event3.getMarker());
+        assertEquals("Debug marker with exception", event3.getMessage());
+        assertNotNull(event3.getThrowable());
+        assertEquals(IllegalArgumentException.class, event3.getThrowable().getClass());
+        assertEquals("test exception", event3.getThrowable().getMessage());
+    }
+
+    @Test
+    @DisplayName("Should log INFO messages with marker and various argument formats")
+    void shouldLogInfoMessagesWithMarkerAndVariousArgumentFormats() {
+        // Given
+        final Marker infoMarker = MarkerFactory.getMarker("INFO_MARKER");
+        
+        // When
+        logger.info(infoMarker, "Info marker with varargs: {} {} {}", "x", "y", "z");
+        logger.info(infoMarker, "Info marker with exception", new NullPointerException("null value"));
+        
+        // Then
+        assertEquals(2, logger.getEventCount());
+        
+        final MockLoggerEvent event0 = logger.getEvent(0);
+        assertEquals(Level.INFO, event0.getLevel());
+        assertEquals(infoMarker, event0.getMarker());
+        assertEquals("Info marker with varargs: x y z", event0.getFormattedMessage());
+        
+        final MockLoggerEvent event1 = logger.getEvent(1);
+        assertEquals(Level.INFO, event1.getLevel());
+        assertEquals(infoMarker, event1.getMarker());
+        assertEquals("Info marker with exception", event1.getMessage());
+        assertNotNull(event1.getThrowable());
+        assertEquals(NullPointerException.class, event1.getThrowable().getClass());
+        assertEquals("null value", event1.getThrowable().getMessage());
+    }
+
+    @Test
+    @DisplayName("Should log WARN messages with marker and various argument formats")
+    void shouldLogWarnMessagesWithMarkerAndVariousArgumentFormats() {
+        // Given
+        final Marker warnMarker = MarkerFactory.getMarker("WARN_MARKER");
+        
+        // When
+        logger.warn(warnMarker, "Warn marker with single arg: {}", "warning");
+        logger.warn(warnMarker, "Warn marker with two args: {} {}", "first", "second");
+        logger.warn(warnMarker, "Warn marker with varargs: {} {} {}", "1", "2", "3");
+        logger.warn(warnMarker, "Warn marker with exception", new RuntimeException("runtime error"));
+        
+        // Then
+        assertEquals(4, logger.getEventCount());
+        
+        final MockLoggerEvent event0 = logger.getEvent(0);
+        assertEquals(Level.WARN, event0.getLevel());
+        assertEquals(warnMarker, event0.getMarker());
+        assertEquals("Warn marker with single arg: warning", event0.getFormattedMessage());
+        
+        final MockLoggerEvent event1 = logger.getEvent(1);
+        assertEquals(Level.WARN, event1.getLevel());
+        assertEquals(warnMarker, event1.getMarker());
+        assertEquals("Warn marker with two args: first second", event1.getFormattedMessage());
+        
+        final MockLoggerEvent event2 = logger.getEvent(2);
+        assertEquals(Level.WARN, event2.getLevel());
+        assertEquals(warnMarker, event2.getMarker());
+        assertEquals("Warn marker with varargs: 1 2 3", event2.getFormattedMessage());
+        
+        final MockLoggerEvent event3 = logger.getEvent(3);
+        assertEquals(Level.WARN, event3.getLevel());
+        assertEquals(warnMarker, event3.getMarker());
+        assertEquals("Warn marker with exception", event3.getMessage());
+        assertNotNull(event3.getThrowable());
+        assertEquals(RuntimeException.class, event3.getThrowable().getClass());
+        assertEquals("runtime error", event3.getThrowable().getMessage());
+    }
+
+    @Test
+    @DisplayName("Should log ERROR messages with marker and various argument formats")
+    void shouldLogErrorMessagesWithMarkerAndVariousArgumentFormats() {
+        // Given
+        final Marker errorMarker = MarkerFactory.getMarker("ERROR_MARKER");
+        
+        // When
+        logger.error(errorMarker, "Error marker with single arg: {}", "critical");
+        logger.error(errorMarker, "Error marker with two args: {} {}", "error", "occurred");
+        logger.error(errorMarker, "Error marker with varargs: {} {} {}", "fatal", "system", "failure");
+        logger.error(errorMarker, "Error marker with exception", new Exception("system error"));
+        
+        // Then
+        assertEquals(4, logger.getEventCount());
+        
+        final MockLoggerEvent event0 = logger.getEvent(0);
+        assertEquals(Level.ERROR, event0.getLevel());
+        assertEquals(errorMarker, event0.getMarker());
+        assertEquals("Error marker with single arg: critical", event0.getFormattedMessage());
+        
+        final MockLoggerEvent event1 = logger.getEvent(1);
+        assertEquals(Level.ERROR, event1.getLevel());
+        assertEquals(errorMarker, event1.getMarker());
+        assertEquals("Error marker with two args: error occurred", event1.getFormattedMessage());
+        
+        final MockLoggerEvent event2 = logger.getEvent(2);
+        assertEquals(Level.ERROR, event2.getLevel());
+        assertEquals(errorMarker, event2.getMarker());
+        assertEquals("Error marker with varargs: fatal system failure", event2.getFormattedMessage());
+        
+        final MockLoggerEvent event3 = logger.getEvent(3);
+        assertEquals(Level.ERROR, event3.getLevel());
+        assertEquals(errorMarker, event3.getMarker());
+        assertEquals("Error marker with exception", event3.getMessage());
+        assertNotNull(event3.getThrowable());
+        assertEquals(Exception.class, event3.getThrowable().getClass());
+        assertEquals("system error", event3.getThrowable().getMessage());
+    }
+
+    @Test
+    @DisplayName("Should handle all marker-based logging methods with null markers")
+    void shouldHandleAllMarkerBasedLoggingMethodsWithNullMarkers() {
+        // When - Testing with null markers to ensure robustness
+        logger.trace((Marker) null, "Trace with null marker");
+        logger.debug((Marker) null, "Debug with null marker");
+        logger.info((Marker) null, "Info with null marker");
+        logger.warn((Marker) null, "Warn with null marker");
+        logger.error((Marker) null, "Error with null marker");
+        
+        // Then
+        assertEquals(5, logger.getEventCount());
+        for (int i = 0; i < 5; i++) {
+            assertNull(logger.getEvent(i).getMarker());
+        }
+    }
+
+    @Test
+    @DisplayName("Should handle complex message formatting with markers")
+    void shouldHandleComplexMessageFormattingWithMarkers() {
+        // Given
+        final Marker complexMarker = MarkerFactory.getMarker("COMPLEX");
+        
+        // When - Testing edge cases in message formatting
+        logger.info(complexMarker, "Message with {} and {}", null, "non-null");
+        logger.warn(complexMarker, "Message with empty args: {} {}", "", "");
+        logger.error(complexMarker, "Message with special chars: {} {}", "special!@#", "chars$%^");
+        
+        // Then
+        assertEquals(3, logger.getEventCount());
+        
+        assertEquals("Message with null and non-null", logger.getEvent(0).getFormattedMessage());
+        assertEquals("Message with empty args:  ", logger.getEvent(1).getFormattedMessage());
+        assertEquals("Message with special chars: special!@# chars$%^", logger.getEvent(2).getFormattedMessage());
+        
+        // All should have the same marker
+        for (int i = 0; i < 3; i++) {
+            assertEquals(complexMarker, logger.getEvent(i).getMarker());
+        }
+    }
 }
