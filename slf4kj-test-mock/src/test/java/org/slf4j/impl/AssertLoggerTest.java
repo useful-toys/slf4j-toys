@@ -23,6 +23,8 @@ import org.slf4j.MarkerFactory;
 import org.slf4j.Marker;
 import org.slf4j.impl.MockLoggerEvent.Level;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -859,7 +861,7 @@ class AssertLoggerTest {
         void shouldThrowWhenNoEventHasMatchingThrowableTypeAndMessage() {
             final Logger logger = new MockLogger("test");
             logger.error("Error 1", new RuntimeException("Different message"));
-            logger.error("Error 2", new IllegalStateException("Connection failed"));
+            logger.error("Error 2", new IOException("Connection failed")); // Changed to IOException
 
             final AssertionError error = assertThrows(AssertionError.class, () -> 
                 AssertLogger.assertHasEventWithThrowable(logger, RuntimeException.class, "Connection"));
@@ -1218,7 +1220,7 @@ class AssertLoggerTest {
             logger.info("Processing user bob");
 
             AssertLogger.assertEventCountByMessage(logger, "Processing", 3);
-            AssertLogger.assertEventCountByMessage(logger, "user", 4);
+            AssertLogger.assertEventCountByMessage(logger, "user", 3); // Only 3: alice (debug), bob (info), validation (warn)
             AssertLogger.assertEventCountByMessage(logger, "error", 1);
         }
 
@@ -1281,7 +1283,7 @@ class AssertLoggerTest {
             logger.info("Message with spaces");
             logger.warn("Another message");
 
-            AssertLogger.assertEventCountByMessage(logger, " ", 1);
+            AssertLogger.assertEventCountByMessage(logger, " ", 2); // Both messages have spaces
             AssertLogger.assertEventCountByMessage(logger, "", 2); // Empty string matches all
         }
     }
@@ -1568,10 +1570,9 @@ class AssertLoggerTest {
             final String[] messageParts = new String[100];
             
             for (int i = 0; i < 100; i++) {
-                final Level level = Level.values()[i % Level.values().length];
-                levels[i] = level;
+                levels[i] = Level.INFO; // All logged at INFO level
                 messageParts[i] = "Message " + i;
-                logger.info("Message " + i + " at level " + level);
+                logger.info("Message " + i);
             }
 
             AssertLogger.assertEventSequence(logger, levels);

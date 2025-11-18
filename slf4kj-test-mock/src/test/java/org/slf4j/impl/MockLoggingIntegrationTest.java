@@ -191,12 +191,11 @@ class MockLoggingIntegrationTest {
         daoLogger.info("DAO info message");           // Should not be logged
         
         // Then
-        // Note: MockLogger currently doesn't check if levels are enabled before logging
-        // This is a design limitation that could be improved
-        assertEquals(2, serviceLogger.getEventCount()); // Both messages are logged
-        assertEquals(2, daoLogger.getEventCount());     // Both messages are logged
+        // MockLogger now properly checks if levels are enabled before logging
+        assertEquals(1, serviceLogger.getEventCount()); // Only INFO message logged
+        assertEquals(1, daoLogger.getEventCount());     // Only DEBUG message logged
         
-        // But we can verify the configuration is working
+        // Verify the configuration is working
         assertFalse(serviceLogger.isDebugEnabled());
         assertTrue(serviceLogger.isInfoEnabled());
         assertTrue(daoLogger.isDebugEnabled());

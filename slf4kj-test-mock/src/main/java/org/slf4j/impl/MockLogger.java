@@ -460,9 +460,36 @@ public class MockLogger implements Logger {
             final Throwable throwable,
             final String format,
             final Object... args) {
+        // Check if the level is enabled before recording the event
+        if (!isLevelEnabled(level)) {
+            return;
+        }
         final MockLoggerEvent event = new MockLoggerEvent(name, level, null, marker, throwable, format, args);
         loggerEvents.add(event);
         print(event);
+    }
+
+    /**
+     * Checks if a specific log level is enabled.
+     *
+     * @param level the log level to check
+     * @return true if the level is enabled, false otherwise
+     */
+    private boolean isLevelEnabled(final Level level) {
+        switch (level) {
+            case TRACE:
+                return traceEnabled;
+            case DEBUG:
+                return debugEnabled;
+            case INFO:
+                return infoEnabled;
+            case WARN:
+                return warnEnabled;
+            case ERROR:
+                return errorEnabled;
+            default:
+                return true;
+        }
     }
 
     /**
