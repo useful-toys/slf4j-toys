@@ -40,6 +40,11 @@ import static org.mockito.Mockito.*;
 
 class ReportDefaultTrustKeyStoreTest {
 
+    @BeforeAll
+    static void validateConsistentCharset() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+    
     private MockLogger mockLogger;
 
     @BeforeEach

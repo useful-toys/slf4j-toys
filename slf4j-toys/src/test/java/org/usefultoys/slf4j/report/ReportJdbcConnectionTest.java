@@ -36,6 +36,11 @@ import static org.mockito.Mockito.*;
 
 class ReportJdbcConnectionTest {
 
+    @BeforeAll
+    static void validateConsistentCharset() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+    
     private MockLogger mockLogger;
     private Connection mockConnection;
     private DatabaseMetaData mockMetaData;
