@@ -123,12 +123,39 @@ Immutable representation of a single log event.
 
 Utility class providing static assertion methods for testing log events.
 
-**Methods:**
+**Index-Based Event Assertions:**
 - `assertEvent(Logger, int, String)` - Assert message contains text
 - `assertEvent(Logger, int, Level, String)` - Assert level and message
 - `assertEvent(Logger, int, Marker, String)` - Assert marker and message
 - `assertEvent(Logger, int, Level, Marker, String)` - Assert level, marker, and message
 - `assertEvent(Logger, int, Level, Marker, String...)` - Assert with multiple message parts
+
+**Existence-Based Event Assertions:**
+- `assertHasEvent(Logger, String)` - Assert any event contains message part
+- `assertHasEvent(Logger, Level, String)` - Assert any event has level and message
+- `assertHasEvent(Logger, Marker, String)` - Assert any event has marker and message
+- `assertHasEvent(Logger, Level, Marker, String)` - Assert any event has level, marker, and message
+- `assertHasEvent(Logger, Level, Marker, String...)` - Assert any event has level, marker, and all message parts
+
+**Throwable Assertions:**
+- `assertEventWithThrowable(Logger, int, Class)` - Assert event has specific throwable type
+- `assertEventWithThrowable(Logger, int, Class, String)` - Assert event has throwable type and message
+- `assertEventHasThrowable(Logger, int)` - Assert event has any throwable
+- `assertHasEventWithThrowable(Logger, Class)` - Assert any event has specific throwable type
+- `assertHasEventWithThrowable(Logger, Class, String)` - Assert any event has throwable type and message
+- `assertHasEventWithThrowable(Logger)` - Assert any event has any throwable
+
+**Event Counting Assertions:**
+- `assertEventCount(Logger, int)` - Assert total number of events
+- `assertNoEvents(Logger)` - Assert no events were logged
+- `assertEventCountByLevel(Logger, Level, int)` - Assert count of events by level
+- `assertEventCountByMarker(Logger, Marker, int)` - Assert count of events by marker
+- `assertEventCountByMessage(Logger, String, int)` - Assert count of events containing message part
+
+**Event Sequence Assertions:**
+- `assertEventSequence(Logger, Level...)` - Assert exact sequence of log levels
+- `assertEventSequence(Logger, Marker...)` - Assert exact sequence of markers
+- `assertEventSequence(Logger, String...)` - Assert exact sequence of message parts
 
 ## Advanced Usage
 
@@ -243,6 +270,115 @@ void testCompleteLogOutput() {
 }
 ```
 
+### Using Existence-Based Assertions
+
+```java
+@Test
+void testExistenceAssertions() {
+    Logger logger = LoggerFactory.getLogger("test");
+    MockLogger mockLogger = (MockLogger) logger;
+    mockLogger.clearEvents();
+    mockLogger.setEnabled(true);
+    
+    logger.info("User john logged in");
+    logger.warn("Invalid password attempt");
+    logger.error("Database connection failed");
+    
+    // Check if any event contains specific text (order doesn't matter)
+    assertHasEvent(logger, "john");
+    assertHasEvent(logger, Level.ERROR, "Database");
+    assertHasEvent(logger, Level.WARN, "password");
+}
+```
+
+### Testing Exception Handling
+
+```java
+@Test
+void testExceptionAssertions() {
+    Logger logger = LoggerFactory.getLogger("test");
+    MockLogger mockLogger = (MockLogger) logger;
+    mockLogger.clearEvents();
+    mockLogger.setEnabled(true);
+    
+    logger.error("Database error", new SQLException("Connection timeout"));
+    logger.warn("Network issue", new IOException("Connection refused"));
+    
+    // Test specific throwable types
+    assertEventWithThrowable(logger, 0, SQLException.class);
+    assertEventWithThrowable(logger, 1, IOException.class, "refused");
+    
+    // Test existence of any throwable
+    assertHasEventWithThrowable(logger, SQLException.class);
+    assertHasEventWithThrowable(logger); // Any throwable
+}
+```
+
+### Counting Events
+
+```java
+@Test
+void testEventCounting() {
+    Logger logger = LoggerFactory.getLogger("test");
+    MockLogger mockLogger = (MockLogger) logger;
+    mockLogger.clearEvents();
+    mockLogger.setEnabled(true);
+    Marker securityMarker = MarkerFactory.getMarker("SECURITY");
+    
+    logger.info("Application started");
+    logger.warn(securityMarker, "Authentication failed");
+    logger.info("Processing request");
+    logger.error("Critical error occurred");
+    logger.warn(securityMarker, "Unauthorized access");
+    
+    // Count total events
+    assertEventCount(logger, 5);
+    
+    // Count by level
+    assertEventCountByLevel(logger, Level.INFO, 2);
+    assertEventCountByLevel(logger, Level.WARN, 2);
+    assertEventCountByLevel(logger, Level.ERROR, 1);
+    
+    // Count by marker
+    assertEventCountByMarker(logger, securityMarker, 2);
+    
+    // Count by message content
+    assertEventCountByMessage(logger, "error", 1); // Case sensitive
+}
+```
+
+### Validating Event Sequences
+
+```java
+@Test
+void testEventSequences() {
+    Logger logger = LoggerFactory.getLogger("test");
+    MockLogger mockLogger = (MockLogger) logger;
+    mockLogger.clearEvents();
+    mockLogger.setEnabled(true);
+    Marker startMarker = MarkerFactory.getMarker("START");
+    Marker endMarker = MarkerFactory.getMarker("END");
+    
+    logger.info(startMarker, "Process starting");
+    logger.debug("Step 1 completed");
+    logger.debug("Step 2 completed");
+    logger.warn("Warning occurred");
+    logger.info(endMarker, "Process finished");
+    
+    // Verify exact sequence of levels
+    assertEventSequence(logger, 
+        Level.INFO, Level.DEBUG, Level.DEBUG, Level.WARN, Level.INFO);
+    
+    // Verify sequence of markers (null for events without markers)
+    assertEventSequence(logger, 
+        startMarker, null, null, null, endMarker);
+    
+    // Verify sequence of message parts
+    assertEventSequence(logger, 
+        "starting", "Step 1", "Step 2", "Warning", "finished");
+}
+```
+
 ## Integration with Test Frameworks
 
 ### JUnit 5
@@ -336,6 +472,63 @@ void testDifferentLogLevels() {
     assertEvent(logger, 2, Level.INFO, "Info");
     assertEvent(logger, 3, Level.WARN, "Warning");
     assertEvent(logger, 4, Level.ERROR, "Error");
+}
+```
+
+### 5. Choose the Right Assertion Type
+
+**Use index-based assertions** when order matters:
+```java
+// When testing specific sequence of events
+assertEvent(logger, 0, Level.INFO, "Starting");
+assertEvent(logger, 1, Level.DEBUG, "Processing");
+assertEvent(logger, 2, Level.INFO, "Completed");
+```
+
+**Use existence-based assertions** when order doesn't matter:
+```java
+// When testing that events occurred, regardless of order
+assertHasEvent(logger, Level.ERROR, "Database connection failed");
+assertHasEvent(logger, "user authentication");
+```
+
+**Use counting assertions** for volume verification:
+```java
+// When testing logging frequency or filtering
+assertEventCount(logger, 5);
+assertEventCountByLevel(logger, Level.ERROR, 0); // No errors expected
+assertNoEvents(logger); // Nothing should be logged
+```
+
+**Use sequence assertions** for workflow validation:
+```java
+// When testing state machine transitions or process flows
+assertEventSequence(logger, Level.INFO, Level.DEBUG, Level.WARN, Level.INFO);
+```
+
+### 6. Test Exception Logging Properly
+
+```java
+@Test
+void testExceptionHandling() {
+    // Test both the message and the exception
+    logger.error("Operation failed", new SQLException("Connection timeout"));
+    
+    assertEvent(logger, 0, Level.ERROR, "Operation failed");
+    assertEventWithThrowable(logger, 0, SQLException.class, "timeout");
+}
+```
+
+### 7. Validate Event Counts for Performance
+
+```java
+@Test
+void testMinimalLogging() {
+    // Ensure production code doesn't log excessively
+    performOperation();
+    
+    assertEventCountByLevel(logger, Level.DEBUG, 0); // No debug in production
+    assertEventCountByLevel(logger, Level.INFO, 1);  // Single info message expected
 }
 ```
 
