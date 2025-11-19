@@ -1,6 +1,15 @@
 name: Java Build
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'pom.xml'
+      - '**/pom.xml'
+      - '.mvn/**'
+      - '.github/workflows/**'
+      - 'src/main/**'
+      - 'src/test/**'
 
 permissions:
   contents: read
@@ -8,9 +17,7 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
