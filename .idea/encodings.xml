@@ -13,10 +13,14 @@
     <file url="file://$PROJECT_DIR$/example_web/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jul-test-mock/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jul-test-mock/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/slf4j-toys-logback-tests/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/slf4j-toys-logback-tests/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/slf4j-toys/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/slf4j-toys/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slf4kj-test-mock/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slf4kj-test-mock/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>
