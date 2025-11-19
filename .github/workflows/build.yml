@@ -25,9 +25,6 @@ jobs:
       - name: Build com Maven
         run: mvn -B clean verify
 
-      - name: Listar arquivos jacoco gerados
-        run: find . -name "jacoco.xml"
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         env:
