@@ -17,6 +17,7 @@ to help it better understand this project and provide more accurate suggestions.
   - Test descriptions and assertions
 - **Source code files must be encoded in UTF-8**
 
+
 ### Java Version Compatibility
 - **Code must be compatible with Java 8 or higher**
 - Use modern Java features when appropriate (streams, method references, lambda expressions)
