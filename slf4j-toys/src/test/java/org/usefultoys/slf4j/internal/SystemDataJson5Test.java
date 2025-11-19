@@ -23,6 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.slf4j.SessionConfig;
 
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +32,11 @@ class SystemDataJson5Test {
     @BeforeAll
     static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+    }
+
+    @BeforeAll
+    static void setupConsistentLocale() {
+        Locale.setDefault(Locale.ENGLISH);
     }
 
     // Concrete class for testing the abstract SystemData

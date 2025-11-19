@@ -34,7 +34,7 @@ class NullPrintStreamTest {
     }
 
     @BeforeAll
-    public static void setUpLocale() {
+    public static void setupConsistentLocale() {
         Locale.setDefault(Locale.ENGLISH);
     }
 

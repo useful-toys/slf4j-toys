@@ -22,11 +22,17 @@ import org.junit.jupiter.api.Test;
 import org.usefultoys.slf4j.SessionConfig;
 
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.usefultoys.slf4j.meter.MeterData.NULL_VALUE;
 
 class MeterContextTest {
+    @BeforeAll
+    static void setupConsistentLocale() {
+        Locale.setDefault(Locale.ENGLISH);
+    }
+
     @BeforeAll
     static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");

@@ -16,14 +16,18 @@
 package org.usefultoys.slf4j.report;
 
  import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.BeforeAll;
  import org.junit.jupiter.api.BeforeEach;
  import org.junit.jupiter.api.Test;
  import org.slf4j.LoggerFactory;
  import org.slf4j.impl.MockLogger;
+ import org.usefultoys.slf4j.SessionConfig;
 
  import java.io.ByteArrayOutputStream;
+ import java.nio.charset.Charset;
  import java.security.Permission;
 
+ import static org.junit.jupiter.api.Assertions.assertEquals;
  import static org.junit.jupiter.api.Assertions.assertTrue;
 
  class ReportSystemEnvironmentSecurityExceptionTest {

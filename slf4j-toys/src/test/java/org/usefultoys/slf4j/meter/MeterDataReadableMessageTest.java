@@ -45,7 +45,7 @@ public class MeterDataReadableMessageTest {
     }
 
     @BeforeAll
-    public static void setUpLocale() {
+    public static void setupConsistentLocale() {
         // Set the default locale to English for consistent formatting
         Locale.setDefault(Locale.ENGLISH);
     }

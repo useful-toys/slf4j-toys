@@ -23,6 +23,7 @@ import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -52,6 +53,11 @@ class SystemDataTest {
                     compilationTime, garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory,
                     runtime_totalMemory, systemLoad);
         }
+    }
+
+    @BeforeAll
+    static void setupConsistentLocale() {
+        Locale.setDefault(Locale.ENGLISH);
     }
 
     @BeforeAll
