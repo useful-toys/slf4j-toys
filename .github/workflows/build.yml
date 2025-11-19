@@ -23,7 +23,7 @@ jobs:
           cache: maven
 
       - name: Build com Maven
-        run: mvn -B clean verify
+        run: mvn -T 1C -B clean verify
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
