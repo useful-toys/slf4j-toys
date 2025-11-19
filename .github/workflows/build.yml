@@ -13,13 +13,14 @@ jobs:
 
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Instalação do JDK 8
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          java-version: '8'
-          distribution: 'temurin'
+          java-version: 8
+          distribution: temurin
+          cache: maven
 
       - name: Build com Maven
         run: mvn -B clean verify
