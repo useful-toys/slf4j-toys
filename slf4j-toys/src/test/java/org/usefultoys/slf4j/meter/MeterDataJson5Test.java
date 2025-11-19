@@ -24,6 +24,7 @@ import org.usefultoys.slf4j.SessionConfig;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -31,6 +32,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class MeterDataJson5Test {
+    @BeforeAll
+    static void setupConsistentLocale() {
+        Locale.setDefault(Locale.ENGLISH);
+    }
+
     @BeforeAll
     static void validateConsistentCharset() {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
