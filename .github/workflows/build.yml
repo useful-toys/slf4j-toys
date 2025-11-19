@@ -22,8 +22,8 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Build com Maven
-        run: mvn -T 1C -B clean verify
+      - name: Verify with Maven
+        run: mvn -T 1C -B verify
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
