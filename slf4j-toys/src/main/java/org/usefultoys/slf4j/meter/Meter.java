@@ -314,7 +314,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter inc() {
-        if (!MeterValidator.validateInc(this)) {
+        if (!MeterValidator.validateIncPrecondition(this)) {
             return this;
         }
         currentIteration++;
@@ -328,7 +328,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter incBy(final long increment) {
-        if (!MeterValidator.validateIncBy(this, increment)) {
+        if (!MeterValidator.validateIncBy(this, increment) || ! MeterValidator.validateIncPrecondition(this)) {
             return this;
         }
         currentIteration += increment;
@@ -343,7 +343,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter incTo(final long currentIteration) {
-        if (!MeterValidator.validateIncTo(this, currentIteration)) {
+        if (!MeterValidator.validateIncToArguments(this, currentIteration) || ! MeterValidator.validateIncPrecondition(this)) {
             return this;
         }
         this.currentIteration = currentIteration;
