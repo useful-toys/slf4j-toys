@@ -47,11 +47,10 @@ public final class MeterValidator {
     private static final String ERROR_MSG_NON_POSITIVE_ARGUMENT = "Non-positive argument";
     private static final String ERROR_MSG_ILLEGAL_STRING_FORMAT = "Illegal string format";
     private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non-forward iteration";
-    private static final String ERROR_MSG_METHOD_THREW_EXCEPTION = "Meter.{}(...) method threw exception. id={}";
     private static final String ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED = "Meter started and never stopped. id={}";
 
 
-    public static boolean validateStart(Meter meter) {
+    public static boolean validateStart(final Meter meter) {
         if (meter.getStartTime() != 0) {
             meter.getMessageLogger().error(Markers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -59,7 +58,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateStop(Meter meter, Marker marker) {
+    public static boolean validateStop(final Meter meter, final Marker marker) {
         if (meter.getStopTime() != 0) {
             meter.getMessageLogger().error(marker, ERROR_MSG_METER_ALREADY_STOPPED, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -75,7 +74,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateSubCallArguments(Meter meter, String suboperationName) {
+    public static boolean validateSubCallArguments(final Meter meter, final String suboperationName) {
         if (suboperationName == null) {
             meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "sub(name)", ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -83,7 +82,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateMCallArguments(Meter meter, String message) {
+    public static boolean validateMCallArguments(final Meter meter, final String message) {
         if (message == null) {
             meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message)", ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -91,7 +90,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static String validateMCallArguments(Meter meter, String format, Object... args) {
+    public static String validateMCallArguments(final Meter meter, final String format, final Object... args) {
         if (format == null) {
             meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args...)", ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
             return null;
@@ -104,7 +103,7 @@ public final class MeterValidator {
         }
     }
 
-    public static boolean validateLimitMillisecondsCallArguments(Meter meter, long timeLimit) {
+    public static boolean validateLimitMillisecondsCallArguments(final Meter meter, final long timeLimit) {
         if (timeLimit <= 0) {
             meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "limitMilliseconds(timeLimit)", ERROR_MSG_NON_POSITIVE_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -112,7 +111,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateIterationsCallArguments(Meter meter, long expectedIterations) {
+    public static boolean validateIterationsCallArguments(final Meter meter, final long expectedIterations) {
         if (expectedIterations <= 0) {
             meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "iterations(expectedIterations)", ERROR_MSG_NON_POSITIVE_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -120,7 +119,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateInc(Meter meter) {
+    public static boolean validateInc(final Meter meter) {
         if (meter.getStartTime() == 0) {
             meter.getMessageLogger().error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -128,7 +127,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateIncBy(Meter meter, long increment) {
+    public static boolean validateIncBy(final Meter meter, final long increment) {
         if (meter.getStartTime() == 0) {
             meter.getMessageLogger().error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -140,7 +139,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateIncTo(Meter meter, long currentIteration) {
+    public static boolean validateIncTo(final Meter meter, final long currentIteration) {
         if (meter.getStartTime() == 0) {
             meter.getMessageLogger().error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -156,7 +155,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateProgress(Meter meter) {
+    public static boolean validateProgressPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
             meter.getMessageLogger().error(Markers.INCONSISTENT_PROGRESS, ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -164,43 +163,18 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validatePathCallArguments(Meter meter, Object pathId) {
+    public static void validatePathArgument(final Meter meter, final String methodName, final Object pathId) {
         if (pathId == null) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
+            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, methodName,
+                    ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
         }
-        return true;
     }
 
-    public static boolean validateOkCallArguments(Meter meter, Object cause) {
-        if (cause == null) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
-        }
-        return true;
+    public static void logBug(final Meter meter, final String methodName, final Throwable t) {
+        meter.getMessageLogger().error(Markers.BUG, "Meter.{} method threw exception. id={}", methodName, meter.getFullID(), t);
     }
 
-    public static boolean validateRejectCallArguments(Meter meter, Object cause) {
-        if (cause == null) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean validateFailCallArguments(Meter meter, Object cause) {
-        if (cause == null) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_FAIL, ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
-        }
-        return true;
-    }
-
-    public static void logBug(Meter meter, String methodName, Throwable t) {
-        meter.getMessageLogger().error(Markers.BUG, ERROR_MSG_METHOD_THREW_EXCEPTION, methodName, meter.getFullID(), t);
-    }
-
-    public static void validateFinalize(Meter meter) {
+    public static void validateFinalize(final Meter meter) {
         if (meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
             meter.getMessageLogger().error(Markers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED, meter.getFullID(), new CallerStackTraceThrowable());
         }

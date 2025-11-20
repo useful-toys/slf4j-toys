@@ -301,7 +301,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
 
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "start", t);
+            MeterValidator.logBug(this, "start()", t);
         }
         return this;
     }
@@ -359,7 +359,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter progress() {
         try {
-            if (!MeterValidator.validateProgress(this)) {
+            if (!MeterValidator.validateProgressPrecondition(this)) {
                 return this;
             }
 
@@ -387,7 +387,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 }
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "progress", t);
+            MeterValidator.logBug(this, "progress()", t);
         }
         return this;
     }
@@ -401,7 +401,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter path(final Object pathId) {
-        MeterValidator.validatePathCallArguments(this, pathId);
+        MeterValidator.validatePathArgument(this, "path(pathId)", pathId);
         okPath = toPath(pathId, true);
         return this;
     }
@@ -450,7 +450,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 }
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "ok", t);
+            MeterValidator.logBug(this, "ok(...)", t);
         }
         return this;
     }
@@ -480,7 +480,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ok(final Object pathId) {
-        MeterValidator.validateOkCallArguments(this, pathId);
+        MeterValidator.validatePathArgument(this, "ok(pathId)", pathId);
         return commonOk(pathId);
     }
 
@@ -507,7 +507,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter success(final Object pathId) {
-        MeterValidator.validateOkCallArguments(this, pathId);
+        MeterValidator.validatePathArgument(this, "success(pathId)", pathId);
         return commonOk(pathId);
     }
 
@@ -522,7 +522,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter reject(final Object cause) {
         try {
-            MeterValidator.validateRejectCallArguments(this, cause);
+            MeterValidator.validatePathArgument(this, "reject(cause)", cause);
             MeterValidator.validateStop(this, Markers.INCONSISTENT_REJECT);
 
             stopTime = collectCurrentTime();
@@ -548,7 +548,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 }
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "reject", t);
+            MeterValidator.logBug(this, "reject(cause)", t);
         }
         return this;
     }
@@ -567,7 +567,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter fail(final Object cause) {
         try {
-            MeterValidator.validateFailCallArguments(this, cause);
+            MeterValidator.validatePathArgument(this, "fail(cause)", cause);
             MeterValidator.validateStop(this, Markers.INCONSISTENT_FAIL);
 
             stopTime = collectCurrentTime();
@@ -591,7 +591,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 }
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "fail", t);
+            MeterValidator.logBug(this, "fail(cause)", t);
         }
         return this;
     }
@@ -646,7 +646,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 }
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "close", t);
+            MeterValidator.logBug(this, "close()", t);
         }
     }
 }
