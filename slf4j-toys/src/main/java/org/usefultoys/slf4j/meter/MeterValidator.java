@@ -21,14 +21,12 @@ import org.usefultoys.slf4j.CallerStackTraceThrowable;
 import java.util.IllegalFormatException;
 
 /**
- * A utility class responsible for validating the state of a {@link Meter} instance
- * before executing an operation.
+ * A utility class responsible for validating the state of a {@link Meter} instance before executing an operation.
  * <p>
- * This class centralizes all validation logic, ensuring that the {@link Meter} class
- * remains clean and focused on its primary responsibility of managing the operation
-s
- * lifecycle. All methods are static and designed to be non-intrusive, logging warnings
- * for invalid states but never throwing exceptions that could disrupt the application flow.
+ * This class centralizes all validation logic, ensuring that the {@link Meter} class remains clean and focused on its
+ * primary responsibility of managing the operation s lifecycle. All methods are static and designed to be
+ * non-intrusive, logging warnings for invalid states but never throwing exceptions that could disrupt the application
+ * flow.
  */
 public final class MeterValidator {
 
@@ -37,10 +35,7 @@ public final class MeterValidator {
     }
 
     private static final String ERROR_MSG_METER_NOT_STARTED = "Meter not started. id={}";
-    private static final String ERROR_MSG_METER_ALREADY_STARTED = "Meter already started. id={}";
-    private static final String ERROR_MSG_METER_ALREADY_STOPPED = "Meter already stopped. id={}";
     private static final String ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED = "Meter stopped but not started. id={}";
-    private static final String ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED = "Meter incremented but not started. id={}";
     private static final String ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED = "Meter progress but not started. id={}";
     private static final String ERROR_MSG_ILLEGAL_ARGUMENT = "Illegal call to Meter.{}: {}. id={}";
     private static final String ERROR_MSG_METER_OUT_OF_ORDER = "Meter out of order. id={}";
@@ -51,28 +46,22 @@ public final class MeterValidator {
     private static final String ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED = "Meter started and never stopped. id={}";
 
 
-    public static boolean validateStart(final Meter meter) {
+    public static boolean validateStartPrecondition(final Meter meter) {
         if (meter.getStartTime() != 0) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
+            meter.getMessageLogger().error(Markers.INCONSISTENT_START, "Meter already started. id={}", meter.getFullID(), new CallerStackTraceThrowable());
             return false;
         }
         return true;
     }
 
-    public static boolean validateStop(final Meter meter, final Marker marker) {
+    public static void validateStopPrecondition(final Meter meter, final Marker marker) {
         if (meter.getStopTime() != 0) {
-            meter.getMessageLogger().error(marker, ERROR_MSG_METER_ALREADY_STOPPED, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
-        }
-        if (meter.getStartTime() == 0) {
+            meter.getMessageLogger().error(marker, "Meter already stopped. id={}", meter.getFullID(), new CallerStackTraceThrowable());
+        } else if (meter.getStartTime() == 0) {
             meter.getMessageLogger().error(marker, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
-        }
-        if (meter.checkCurrentInstance()) {
+        } else if (meter.checkCurrentInstance()) {
             meter.getMessageLogger().error(marker, ERROR_MSG_METER_OUT_OF_ORDER, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
         }
-        return true;
     }
 
     public static boolean validateSubCallArguments(final Meter meter, final String suboperationName) {
@@ -130,7 +119,7 @@ public final class MeterValidator {
 
     public static boolean validateIncPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
+            meter.getMessageLogger().error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
         }
         return true;
