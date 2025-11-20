@@ -74,15 +74,16 @@ public class EventData implements Serializable {
      *
      * @return The updated {@code lastCurrentTime} in nanoseconds.
      */
-    protected long collectCurrentTime() {
+    protected final long collectCurrentTime() {
         return lastCurrentTime = System.nanoTime();
     }
+
 
     /**
      * Increments the event's position. If the position reaches {@code Long.MAX_VALUE},
      * it wraps around to 0 to prevent overflow.
      */
-    protected void nextPosition() {
+    protected final void nextPosition() {
         if (position == Long.MAX_VALUE) {
             position = 0;
         } else {
