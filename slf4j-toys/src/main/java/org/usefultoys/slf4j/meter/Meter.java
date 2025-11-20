@@ -17,7 +17,6 @@ package org.usefultoys.slf4j.meter;
 
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
@@ -25,11 +24,9 @@ import org.usefultoys.slf4j.internal.SystemMetrics;
 
 import java.io.Closeable;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -193,33 +190,6 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             return new Meter(LoggerFactory.getLogger(UNKNOWN_LOGGER_NAME));
         }
         return current;
-    }
-
-    /**
-     * Collects the current waiting time of the operation.
-     *
-     * @return The time elapsed (in nanoseconds) since the Meter was created until it started, or until now if not yet
-     * started.
-     */
-    public long collectCurrentWaitingTime() {
-        if (startTime == 0) {
-            return collectCurrentTime() - createTime;
-        }
-        return startTime - createTime;
-    }
-
-    /**
-     * Collects the current execution time of the operation.
-     *
-     * @return The time elapsed (in nanoseconds) since the operation started until now, or 0 if not yet started.
-     */
-    public long collectCurrentExecutionTime() {
-        if (startTime == 0) {
-            return 0;
-        } else if (stopTime == 0) {
-            return collectCurrentTime() - startTime;
-        }
-        return stopTime - startTime;
     }
 
     // ========================================================================

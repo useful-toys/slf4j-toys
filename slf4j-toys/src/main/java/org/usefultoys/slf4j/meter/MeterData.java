@@ -243,6 +243,33 @@ public class MeterData extends SystemData implements MeterAnalysis {
         return String.format("%s/%s#%d", category, operation, getPosition());
     }
 
+    /**
+     * Collects the current waiting time of the operation.
+     *
+     * @return The time elapsed (in nanoseconds) since the Meter was created until it started, or until now if not yet
+     * started.
+     */
+    public long collectCurrentWaitingTime() {
+        if (startTime == 0) {
+            return collectCurrentTime() - createTime;
+        }
+        return startTime - createTime;
+    }
+
+    /**
+     * Collects the current execution time of the operation.
+     *
+     * @return The time elapsed (in nanoseconds) since the operation started until now, or 0 if not yet started.
+     */
+    public long collectCurrentExecutionTime() {
+        if (startTime == 0) {
+            return 0;
+        } else if (stopTime == 0) {
+            return collectCurrentTime() - startTime;
+        }
+        return stopTime - startTime;
+    }
+
     @Override
     public void reset() {
         super.reset();
