@@ -18,13 +18,13 @@ package org.usefultoys.slf4j.meter;
 import lombok.Getter;
 import lombok.NonNull;
 import org.slf4j.Logger;
+import org.usefultoys.slf4j.CallerStackTraceThrowable;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.internal.SystemMetrics;
 
 import java.io.Closeable;
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -204,7 +204,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter sub(final String suboperationName) {
         if (suboperationName == null) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "sub(name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "sub(name)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
         }
         String operation = null;
         if (this.operation == null) {
@@ -232,7 +232,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter m(final String message) {
         if (message == null) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
         }
         description = message;
         return this;
@@ -249,7 +249,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter m(final String format, final Object... args) {
         if (format == null) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args...)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args...)", ERROR_MSG_NULL_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
             description = null;
             return this;
         }
@@ -257,7 +257,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             description = String.format(format, args);
         } catch (final IllegalFormatException e) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args...)", ERROR_MSG_ILLEGAL_STRING_FORMAT, getFullID(), new IllegalMeterUsage(2, e));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args...)", ERROR_MSG_ILLEGAL_STRING_FORMAT, getFullID(), new CallerStackTraceThrowable(e));
         }
         return this;
     }
@@ -272,7 +272,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter limitMilliseconds(final long timeLimit) {
         if (timeLimit <= 0) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "limitMilliseconds(timeLimit)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "limitMilliseconds(timeLimit)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
             return this;
         }
         this.timeLimit = timeLimit * 1000 * 1000; // Convert milliseconds to nanoseconds
@@ -290,7 +290,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter iterations(final long expectedIterations) {
         if (expectedIterations <= 0) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "iterations(expectedIterations)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "iterations(expectedIterations)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
             return this;
         }
         this.expectedIterations = expectedIterations;
@@ -311,7 +311,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         try {
             if (startTime != 0) {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                messageLogger.error(Markers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_START, ERROR_MSG_METER_ALREADY_STARTED, getFullID(), new CallerStackTraceThrowable());
             } else {
                 previousInstance = localThreadInstance.get();
                 localThreadInstance.set(new WeakReference<>(this));
@@ -348,7 +348,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter inc() {
         if (startTime == 0) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(4));
+            messageLogger.error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, getFullID(), new CallerStackTraceThrowable());
         }
         currentIteration++;
         return this;
@@ -363,11 +363,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter incBy(final long increment) {
         if (startTime == 0) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(4));
+            messageLogger.error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, getFullID(), new CallerStackTraceThrowable());
         }
         if (increment <= 0) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incBy(increment)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incBy(increment)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
             return this;
         }
         currentIteration += increment;
@@ -384,16 +384,16 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter incTo(final long currentIteration) {
         if (startTime == 0) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(4));
+            messageLogger.error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, getFullID(), new CallerStackTraceThrowable());
         }
         if (currentIteration <= 0) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_POSITIVE_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
             return this;
         }
         if (currentIteration <= this.currentIteration) {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_FORWARD_ITERATION, getFullID(), new IllegalMeterUsage(2));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_FORWARD_ITERATION, getFullID(), new CallerStackTraceThrowable());
         }
         this.currentIteration = currentIteration;
         return this;
@@ -410,7 +410,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         try {
             if (startTime == 0) {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                messageLogger.error(Markers.INCONSISTENT_PROGRESS, ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_PROGRESS, ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED, getFullID(), new CallerStackTraceThrowable());
             }
 
             final long now = collectCurrentTime();
@@ -462,7 +462,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             okPath = pathId.toString();
         } else {
             /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
+            messageLogger.error(Markers.ILLEGAL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
         }
         return this;
     }
@@ -480,11 +480,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
-                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new CallerStackTraceThrowable());
             } else if (startTime == 0) {
-                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new CallerStackTraceThrowable());
             } else if (checkCurrentInstance()) {
-                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new CallerStackTraceThrowable());
             }
 
             stopTime = newStopTime;
@@ -548,11 +548,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
-                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new CallerStackTraceThrowable());
             } else if (startTime == 0) {
-                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new CallerStackTraceThrowable());
             } else if (checkCurrentInstance()) {
-                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new CallerStackTraceThrowable());
             }
 
             stopTime = newStopTime;
@@ -570,7 +570,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 okPath = pathId.toString();
             } else {
                 /* Logs message and exception with stacktrace forged to the inconsistent caller method. */
-                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(4));
+                messageLogger.error(Markers.INCONSISTENT_OK, ERROR_MSG_NULL_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
             }
 
             if (messageLogger.isWarnEnabled()) {
@@ -644,11 +644,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
-                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new CallerStackTraceThrowable());
             } else if (startTime == 0) {
-                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new CallerStackTraceThrowable());
             } else if (checkCurrentInstance()) {
-                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new CallerStackTraceThrowable());
             }
 
             stopTime = newStopTime;
@@ -665,7 +665,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             } else if (cause != null) {
                 rejectPath = cause.toString();
             } else {
-                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
             }
 
             if (messageLogger.isInfoEnabled()) {
@@ -708,11 +708,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
-                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new CallerStackTraceThrowable());
             } else if (startTime == 0) {
-                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new CallerStackTraceThrowable());
             } else if (checkCurrentInstance()) {
-                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new CallerStackTraceThrowable());
             }
 
             stopTime = newStopTime;
@@ -729,7 +729,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             } else if (cause != null) {
                 failPath = cause.toString();
             } else {
-                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_FAIL, ERROR_MSG_NULL_ARGUMENT, getFullID(), new CallerStackTraceThrowable());
             }
 
             if (messageLogger.isErrorEnabled()) {
@@ -763,92 +763,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     protected void finalize() throws Throwable {
         if (stopTime == 0 && ! category.equals(UNKNOWN_LOGGER_NAME)) {
             /* Logs only message. Stacktrace will not contain useful hints. Exception is logged only for visibility of inconsistent meter usage. */
-            messageLogger.error(Markers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED, getFullID(), new IllegalMeterUsage(1));
+            messageLogger.error(Markers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED, getFullID(), new CallerStackTraceThrowable());
         }
         super.finalize();
-    }
-
-    /**
-     * Base class for custom throwables used internally by `Meter` for reporting illegal usage or internal bugs. It
-     * manipulates the stack trace to point to the actual caller method, making debugging easier.
-     */
-    @SuppressWarnings("ExtendsThrowable")
-    public static class MeterThrowable extends Throwable {
-
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Constructs a `MeterThrowable` by discarding a specified number of frames from the stack trace.
-         *
-         * @param framesToDiscard The number of stack frames to remove from the beginning.
-         */
-        MeterThrowable(final int framesToDiscard) {
-            this(framesToDiscard + 1, null);
-        }
-
-        /**
-         * Constructs a `MeterThrowable` with a cause, discarding a specified number of frames from the stack trace.
-         *
-         * @param framesToDiscard The number of stack frames to remove from the beginning.
-         * @param e               The underlying cause of this throwable.
-         */
-        @SuppressWarnings({"AssignmentToMethodParameter", "OverridableMethodCallDuringObjectConstruction"})
-        MeterThrowable(int framesToDiscard, final Throwable e) {
-            super(e);
-            framesToDiscard++;
-            StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-            while (MY_CLASS_NAME.equals(stacktrace[framesToDiscard].getClassName())) {
-                framesToDiscard++;
-            }
-            stacktrace = Arrays.copyOfRange(stacktrace, framesToDiscard, stacktrace.length);
-            setStackTrace(stacktrace);
-        }
-
-        /**
-         * Constructs a `MeterThrowable` with a default message.
-         */
-        MeterThrowable() {
-            super("Illegal Meter usage.");
-        }
-
-        /**
-         * Overrides `fillInStackTrace()` to prevent it from capturing the stack trace again, as it's already
-         * manipulated in the constructor.
-         *
-         * @return This `Throwable` instance.
-         */
-        @Override
-            public synchronized Throwable fillInStackTrace() {
-            return this;
-        }
-    }
-
-    /**
-     * A specific `MeterThrowable` subclass indicating illegal usage of the `Meter` API.
-     */
-    public static class IllegalMeterUsage extends MeterThrowable {
-
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Constructs an `IllegalMeterUsage` by discarding a specified number of frames from the stack trace.
-         *
-         * @param framesToDiscard The number of stack frames to remove from the beginning.
-         */
-        IllegalMeterUsage(final int framesToDiscard) {
-            super(framesToDiscard);
-        }
-
-        /**
-         * Constructs an `IllegalMeterUsage` with a cause, discarding a specified number of frames from the stack
-         * trace.
-         *
-         * @param framesToDiscard The number of stack frames to remove from the beginning.
-         * @param e               The underlying cause of this throwable.
-         */
-        IllegalMeterUsage(final int framesToDiscard, final Throwable e) {
-            super(framesToDiscard, e);
-        }
     }
 
     // ========================================================================
@@ -870,11 +787,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
             /* Sanity check. Logs message and exception with stacktrace forged to the inconsistent caller method. */
             if (stopTime != 0) {
-                messageLogger.error(Markers.INCONSISTENT_CLOSE, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_CLOSE, ERROR_MSG_METER_ALREADY_STOPPED, getFullID(), new CallerStackTraceThrowable());
             } else if (startTime == 0) {
-                messageLogger.error(Markers.INCONSISTENT_CLOSE, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_CLOSE, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, getFullID(), new CallerStackTraceThrowable());
             } else if (checkCurrentInstance()) {
-                messageLogger.error(Markers.INCONSISTENT_CLOSE, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new IllegalMeterUsage(2));
+                messageLogger.error(Markers.INCONSISTENT_CLOSE, ERROR_MSG_METER_OUT_OF_ORDER, getFullID(), new CallerStackTraceThrowable());
             }
 
             stopTime = newStopTime;
