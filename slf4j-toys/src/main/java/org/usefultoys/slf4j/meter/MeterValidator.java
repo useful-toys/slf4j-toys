@@ -39,13 +39,13 @@ public class MeterValidator {
         meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_CALL, methodName, message, meter.getFullID(), new CallerStackTraceThrowable());
     }
 
-    private void logMessage(final Meter meter, final Marker marker, final String message) {
-        meter.getMessageLogger().error(marker, message, meter.getFullID(), new CallerStackTraceThrowable());
+    private void logIllegalPrecondition(final Meter meter, final Marker marker, final String message) {
+        meter.getMessageLogger().error(marker, "{}; id={}", message, meter.getFullID(), new CallerStackTraceThrowable());
     }
 
     public boolean validateStartPrecondition(final Meter meter) {
         if (meter.getStartTime() != 0) {
-            logMessage(meter, Markers.INCONSISTENT_START, "Meter already started. id={}");
+            logIllegalPrecondition(meter, Markers.INCONSISTENT_START, "Meter already started.");
             return false;
         }
         return true;
@@ -53,11 +53,11 @@ public class MeterValidator {
 
     public void validateStopPrecondition(final Meter meter, final Marker marker) {
         if (meter.getStopTime() != 0) {
-            logMessage(meter, marker, "Meter already stopped. id={}");
+            logIllegalPrecondition(meter, marker, "Meter already stopped.");
         } else if (meter.getStartTime() == 0) {
-            logMessage(meter, marker, "Meter stopped but not started. id={}");
+            logIllegalPrecondition(meter, marker, "Meter stopped but not started.");
         } else if (meter.checkCurrentInstance()) {
-            logMessage(meter, marker, "Meter out of order. id={}");
+            logIllegalPrecondition(meter, marker, "Meter out of order.");
         }
     }
 
@@ -114,7 +114,7 @@ public class MeterValidator {
 
     public boolean validateIncPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
-            logMessage(meter, Markers.INCONSISTENT_INCREMENT, "Meter not started. id={}");
+            logIllegalPrecondition(meter, Markers.INCONSISTENT_INCREMENT, "Meter not started");
             return false;
         }
         return true;
@@ -134,7 +134,7 @@ public class MeterValidator {
 
     public boolean validateProgressPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
-            logMessage(meter, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started. id={}");
+            logIllegalPrecondition(meter, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started");
             return false;
         }
         return true;
@@ -152,7 +152,7 @@ public class MeterValidator {
 
     public void validateFinalize(final Meter meter) {
         if (meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
-            logMessage(meter, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped. id={}");
+            logIllegalPrecondition(meter, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped. id={}");
         }
     }
 }
