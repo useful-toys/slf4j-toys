@@ -281,7 +281,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter start() {
         try {
-            if (MeterValidator.validateStart(this)) {
+            if (MeterValidator.validateStartPrecondition(this)) {
                 previousInstance = localThreadInstance.get();
                 localThreadInstance.set(new WeakReference<>(this));
             }
@@ -415,7 +415,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     Meter commonOk(final Object pathId) {
         try {
-            MeterValidator.validateStop(this, Markers.INCONSISTENT_OK);
+            MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_OK);
 
             stopTime = collectCurrentTime();
             failPath = null;
@@ -523,7 +523,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter reject(final Object cause) {
         try {
             MeterValidator.validatePathArgument(this, "reject(cause)", cause);
-            MeterValidator.validateStop(this, Markers.INCONSISTENT_REJECT);
+            MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_REJECT);
 
             stopTime = collectCurrentTime();
             failPath = null;
@@ -568,7 +568,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter fail(final Object cause) {
         try {
             MeterValidator.validatePathArgument(this, "fail(cause)", cause);
-            MeterValidator.validateStop(this, Markers.INCONSISTENT_FAIL);
+            MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_FAIL);
 
             stopTime = collectCurrentTime();
             rejectPath = null;
@@ -626,7 +626,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             if (stopTime != 0) {
                 return;
             }
-            MeterValidator.validateStop(this, Markers.INCONSISTENT_CLOSE);
+            MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_CLOSE);
 
             stopTime = collectCurrentTime();
             rejectPath = null;
