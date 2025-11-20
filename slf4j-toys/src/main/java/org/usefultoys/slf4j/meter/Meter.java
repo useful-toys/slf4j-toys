@@ -234,7 +234,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter m(final String format, final Object... args) {
-        description = MeterValidator.validateMCallArguments(this, format, args);
+        description = MeterValidator.validateAndFormatMCallArguments(this, format, args);
         return this;
     }
 
