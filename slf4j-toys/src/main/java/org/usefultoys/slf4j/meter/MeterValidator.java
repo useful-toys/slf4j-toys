@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.experimental.UtilityClass;
 import org.slf4j.Marker;
 import org.usefultoys.slf4j.CallerStackTraceThrowable;
 
@@ -24,141 +25,134 @@ import java.util.IllegalFormatException;
  * A utility class responsible for validating the state of a {@link Meter} instance before executing an operation.
  * <p>
  * This class centralizes all validation logic, ensuring that the {@link Meter} class remains clean and focused on its
- * primary responsibility of managing the operation s lifecycle. All methods are static and designed to be
+ * primary responsibility of managing the operation s lifecycle. All methods are and designed to be
  * non-intrusive, logging warnings for invalid states but never throwing exceptions that could disrupt the application
  * flow.
  */
-public final class MeterValidator {
+@UtilityClass
+public class MeterValidator {
 
-    private MeterValidator() {
-        // Utility class
+    private final String ERROR_MSG_ILLEGAL_CALL = "Illegal call to Meter.{}: {}. id={}";
+    private final String ERROR_MSG_NULL_ARGUMENT = "Null argument";
+
+    private void logIllegalCall(final Meter meter, final String methodName, final String message) {
+        meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_CALL, methodName, message, meter.getFullID(), new CallerStackTraceThrowable());
     }
 
-    private static final String ERROR_MSG_METER_NOT_STARTED = "Meter not started. id={}";
-    private static final String ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED = "Meter stopped but not started. id={}";
-    private static final String ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED = "Meter progress but not started. id={}";
-    private static final String ERROR_MSG_ILLEGAL_ARGUMENT = "Illegal call to Meter.{}: {}. id={}";
-    private static final String ERROR_MSG_METER_OUT_OF_ORDER = "Meter out of order. id={}";
-    private static final String ERROR_MSG_NULL_ARGUMENT = "Null argument";
-    private static final String ERROR_MSG_NON_POSITIVE_ARGUMENT = "Non-positive argument";
-    private static final String ERROR_MSG_ILLEGAL_STRING_FORMAT = "Illegal string format";
-    private static final String ERROR_MSG_NON_FORWARD_ITERATION = "Non-forward iteration";
-    private static final String ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED = "Meter started and never stopped. id={}";
+    private void logMessage(final Meter meter, final Marker marker, final String message) {
+        meter.getMessageLogger().error(marker, message, meter.getFullID(), new CallerStackTraceThrowable());
+    }
 
-
-    public static boolean validateStartPrecondition(final Meter meter) {
+    public boolean validateStartPrecondition(final Meter meter) {
         if (meter.getStartTime() != 0) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_START, "Meter already started. id={}", meter.getFullID(), new CallerStackTraceThrowable());
+            logMessage(meter, Markers.INCONSISTENT_START, "Meter already started. id={}");
             return false;
         }
         return true;
     }
 
-    public static void validateStopPrecondition(final Meter meter, final Marker marker) {
+    public void validateStopPrecondition(final Meter meter, final Marker marker) {
         if (meter.getStopTime() != 0) {
-            meter.getMessageLogger().error(marker, "Meter already stopped. id={}", meter.getFullID(), new CallerStackTraceThrowable());
+            logMessage(meter, marker, "Meter already stopped. id={}");
         } else if (meter.getStartTime() == 0) {
-            meter.getMessageLogger().error(marker, ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
+            logMessage(meter, marker, "Meter stopped but not started. id={}");
         } else if (meter.checkCurrentInstance()) {
-            meter.getMessageLogger().error(marker, ERROR_MSG_METER_OUT_OF_ORDER, meter.getFullID(), new CallerStackTraceThrowable());
+            logMessage(meter, marker, "Meter out of order. id={}");
         }
     }
 
-    public static boolean validateSubCallArguments(final Meter meter, final String suboperationName) {
+    public void validateSubCallArguments(final Meter meter, final String suboperationName) {
         if (suboperationName == null) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "sub(name)", ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
+            logIllegalCall(meter, "sub(name)", ERROR_MSG_NULL_ARGUMENT);
         }
-        return true;
     }
 
-    public static boolean validateMCallArguments(final Meter meter, final String message) {
+    public boolean validateMCallArguments(final Meter meter, final String message) {
         if (message == null) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message)", ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
+            logIllegalCall(meter, "m(message)", ERROR_MSG_NULL_ARGUMENT);
             return false;
         }
         return true;
     }
 
-    public static String validateMCallArguments(final Meter meter, final String format, final Object... args) {
+    public String validateAndFormatMCallArguments(final Meter meter, final String format, final Object... args) {
         if (format == null) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args...)", ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
+            logIllegalCall(meter, "m(message, args...)", ERROR_MSG_NULL_ARGUMENT);
             return null;
         }
         try {
             return String.format(format, args);
         } catch (final IllegalFormatException e) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "m(message, args...)", ERROR_MSG_ILLEGAL_STRING_FORMAT, meter.getFullID(), new CallerStackTraceThrowable(e));
+            logIllegalCall(meter, "m(message, args...)", "Illegal string format");
             return null;
         }
     }
 
-    public static boolean validateLimitMillisecondsCallArguments(final Meter meter, final long timeLimit) {
+    public boolean validateLimitMillisecondsCallArguments(final Meter meter, final long timeLimit) {
         if (timeLimit <= 0) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "limitMilliseconds(timeLimit)", ERROR_MSG_NON_POSITIVE_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
+            logIllegalCall(meter, "limitMilliseconds(timeLimit)", "Non-positive argument");
             return false;
         }
         return true;
     }
 
-    public static boolean validateIterationsCallArguments(final Meter meter, final long expectedIterations) {
+    public boolean validateIterationsCallArguments(final Meter meter, final long expectedIterations) {
         if (expectedIterations <= 0) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "iterations(expectedIterations)", ERROR_MSG_NON_POSITIVE_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
+            logIllegalCall(meter, "iterations(expectedIterations)", "Non-positive argument");
             return false;
         }
         return true;
     }
 
-    public static boolean validateIncBy(final Meter meter, final long increment) {
+    public boolean validateIncBy(final Meter meter, final long increment) {
         if (increment <= 0) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incBy(increment)", ERROR_MSG_NON_POSITIVE_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
+            logIllegalCall(meter, "incBy(increment)", "Non-positive increment");
             return false;
         }
         return true;
     }
 
-    public static boolean validateIncPrecondition(final Meter meter) {
+    public boolean validateIncPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
+            logMessage(meter, Markers.INCONSISTENT_INCREMENT, "Meter not started. id={}");
             return false;
         }
         return true;
     }
 
-    public static boolean validateIncToArguments(final Meter meter, final long currentIteration) {
+    public boolean validateIncToArguments(final Meter meter, final long currentIteration) {
         if (currentIteration <= 0) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_POSITIVE_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
+            logIllegalCall(meter, "incTo(currentIteration)", "Non-positive argument");
             return false;
         }
         if (currentIteration <= meter.getCurrentIteration()) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_FORWARD_ITERATION, meter.getFullID(), new CallerStackTraceThrowable());
+            logIllegalCall(meter, "incTo(currentIteration)", "Non-forward increment");
             return false;
         }
         return true;
     }
 
-    public static boolean validateProgressPrecondition(final Meter meter) {
+    public boolean validateProgressPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_PROGRESS, ERROR_MSG_METER_PROGRESS_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
+            logMessage(meter, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started. id={}");
             return false;
         }
         return true;
     }
 
-    public static void validatePathArgument(final Meter meter, final String methodName, final Object pathId) {
+    public void validatePathArgument(final Meter meter, final String methodName, final Object pathId) {
         if (pathId == null) {
-            meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, methodName,
-                    ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
+            logIllegalCall(meter, methodName, ERROR_MSG_NULL_ARGUMENT);
         }
     }
 
-    public static void logBug(final Meter meter, final String methodName, final Throwable t) {
+    public void logBug(final Meter meter, final String methodName, final Throwable t) {
         meter.getMessageLogger().error(Markers.BUG, "Meter.{} method threw exception. id={}", methodName, meter.getFullID(), t);
     }
 
-    public static void validateFinalize(final Meter meter) {
+    public void validateFinalize(final Meter meter) {
         if (meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_FINALIZED, ERROR_MSG_METER_STARTED_AND_NEVER_STOPPED, meter.getFullID(), new CallerStackTraceThrowable());
+            logMessage(meter, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped. id={}");
         }
     }
 }
