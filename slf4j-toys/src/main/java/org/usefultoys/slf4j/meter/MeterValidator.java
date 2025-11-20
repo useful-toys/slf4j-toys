@@ -36,6 +36,7 @@ public final class MeterValidator {
         // Utility class
     }
 
+    private static final String ERROR_MSG_METER_NOT_STARTED = "Meter not started. id={}";
     private static final String ERROR_MSG_METER_ALREADY_STARTED = "Meter already started. id={}";
     private static final String ERROR_MSG_METER_ALREADY_STOPPED = "Meter already stopped. id={}";
     private static final String ERROR_MSG_METER_STOPPED_BUT_NOT_STARTED = "Meter stopped but not started. id={}";
@@ -119,19 +120,7 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateInc(final Meter meter) {
-        if (meter.getStartTime() == 0) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
-        }
-        return true;
-    }
-
     public static boolean validateIncBy(final Meter meter, final long increment) {
-        if (meter.getStartTime() == 0) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
-            return false;
-        }
         if (increment <= 0) {
             meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incBy(increment)", ERROR_MSG_NON_POSITIVE_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
@@ -139,11 +128,15 @@ public final class MeterValidator {
         return true;
     }
 
-    public static boolean validateIncTo(final Meter meter, final long currentIteration) {
+    public static boolean validateIncPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
             meter.getMessageLogger().error(Markers.INCONSISTENT_INCREMENT, ERROR_MSG_METER_INCREMENTED_BUT_NOT_STARTED, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
         }
+        return true;
+    }
+
+    public static boolean validateIncToArguments(final Meter meter, final long currentIteration) {
         if (currentIteration <= 0) {
             meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_ARGUMENT, "incTo(currentIteration)", ERROR_MSG_NON_POSITIVE_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
             return false;
