@@ -160,6 +160,29 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         return current;
     }
 
+    /**
+     * Converts an object into a string representation suitable for a path identifier.
+     *
+     * @param o The object to convert.
+     * @param useSimpleClassNameForThrowable If true, uses {@link Class#getSimpleName()} for Throwables; otherwise, uses {@link Class#getName()}.
+     * @return The string representation.
+     */
+    private static String toPath(Object o, boolean useSimpleClassNameForThrowable) {
+        if (o == null) {
+            return null;
+        }
+        if (o instanceof String) {
+            return (String) o;
+        }
+        if (o instanceof Enum) {
+            return ((Enum<?>) o).name();
+        }
+        if (o instanceof Throwable) {
+            return useSimpleClassNameForThrowable ? o.getClass().getSimpleName() : o.getClass().getName();
+        }
+        return o.toString();
+    }
+
     // ========================================================================
 
     /**
@@ -378,18 +401,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter path(final Object pathId) {
-        if (!MeterValidator.validatePathCallArguments(this, pathId)) {
-            return this;
-        }
-        if (pathId instanceof String) {
-            okPath = (String) pathId;
-        } else if (pathId instanceof Enum) {
-            okPath = ((Enum<?>) pathId).name();
-        } else if (pathId instanceof Throwable) {
-            okPath = pathId.getClass().getSimpleName();
-        } else if (pathId != null) {
-            okPath = pathId.toString();
-        }
+        MeterValidator.validatePathCallArguments(this, pathId);
+        okPath = toPath(pathId, true);
         return this;
     }
 
@@ -400,14 +413,17 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      *
      * @return Reference to this `Meter` instance, for method chaining.
      */
-    public Meter ok() {
+    Meter commonOk(final Object pathId) {
         try {
-            if (!MeterValidator.validateStop(this, Markers.INCONSISTENT_OK));
+            MeterValidator.validateStop(this, Markers.INCONSISTENT_OK);
 
             stopTime = collectCurrentTime();
             failPath = null;
             failMessage = null;
             rejectPath = null;
+            if (pathId != null) {
+                okPath = toPath(pathId, true);
+            }
             localThreadInstance.set(previousInstance);
 
             if (messageLogger.isWarnEnabled()) { // Check warn enabled to cover info as well
@@ -449,6 +465,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         return ref == null || ref.get() != this;
     }
 
+    public Meter ok() {
+        commonOk(null);
+        return this;
+    }
+
     /**
      * Notifies the `Meter` that the operation has completed successfully, specifying an execution path.
      * This method logs a **human-readable summary** (INFO level) and a **machine-parsable data message** (TRACE level)
@@ -459,8 +480,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ok(final Object pathId) {
-        path(pathId);
-        return ok();
+        MeterValidator.validateOkCallArguments(this, pathId);
+        return commonOk(pathId);
     }
 
     /**
@@ -472,7 +493,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter success() {
-        return ok();
+        return commonOk(null);
     }
 
     /**
@@ -486,7 +507,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter success(final Object pathId) {
-        return ok(pathId);
+        MeterValidator.validateOkCallArguments(this, pathId);
+        return commonOk(pathId);
     }
 
     /**
@@ -508,15 +530,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failMessage = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
-            if (cause instanceof String) {
-                rejectPath = (String) cause;
-            } else if (cause instanceof Enum) {
-                rejectPath = ((Enum<?>) cause).name();
-            } else if (cause instanceof Throwable) {
-                rejectPath = cause.getClass().getSimpleName();
-            } else if (cause != null){
-                rejectPath = cause.toString();
-            }
+            rejectPath = toPath(cause, true);
 
             if (messageLogger.isInfoEnabled()) {
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
@@ -560,15 +574,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
-            if (cause instanceof String) {
-                failPath = (String) cause;
-            } else if (cause instanceof Enum) {
-                failPath = ((Enum<?>) cause).name();
-            } else if (cause instanceof Throwable) {
-                failPath = cause.getClass().getName();
+            failPath = toPath(cause, false);
+            if (cause instanceof Throwable) {
                 failMessage = ((Throwable)cause).getLocalizedMessage();
-            } else if (cause != null) {
-                failPath = cause.toString();
             }
 
             if (messageLogger.isErrorEnabled()) {

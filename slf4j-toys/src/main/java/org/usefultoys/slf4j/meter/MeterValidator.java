@@ -172,6 +172,14 @@ public final class MeterValidator {
         return true;
     }
 
+    public static boolean validateOkCallArguments(Meter meter, Object cause) {
+        if (cause == null) {
+            meter.getMessageLogger().error(Markers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
+            return false;
+        }
+        return true;
+    }
+
     public static boolean validateRejectCallArguments(Meter meter, Object cause) {
         if (cause == null) {
             meter.getMessageLogger().error(Markers.INCONSISTENT_REJECT, ERROR_MSG_NULL_ARGUMENT, meter.getFullID(), new CallerStackTraceThrowable());
