@@ -131,16 +131,16 @@ class MeterIterationAttributesTest {
 
         // Test m(message) with null
         meter.iterations(-1);
-        logger.assertEvent(0, ERROR, ILLEGAL, "Illegal call to Meter.iterations(expectedIterations): Non-positive argument. id=MeterIterationAttributesTest#");
+        logger.assertEvent(0, ERROR, ILLEGAL, "Illegal call to Meter.iterations(expectedIterations): Non-positive argument; id=MeterIterationAttributesTest#");
         meter.start();
         meter.incBy(-1);
-        logger.assertEvent(3, ERROR, ILLEGAL, "Illegal call to Meter.incBy(increment): Non-positive increment. id=MeterIterationAttributesTest#");
+        logger.assertEvent(3, ERROR, ILLEGAL, "Illegal call to Meter.incBy(increment): Non-positive increment; id=MeterIterationAttributesTest#");
         meter.incTo(-1);
-        logger.assertEvent(4, ERROR, ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-positive argument. id=MeterIterationAttributesTest#");
+        logger.assertEvent(4, ERROR, ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-positive argument; id=MeterIterationAttributesTest#");
 
         meter.incTo(10);
         meter.incTo(5);
-        logger.assertEvent(5, ERROR, ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-forward increment. id=MeterIterationAttributesTest#");
+        logger.assertEvent(5, ERROR, ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-forward increment; id=MeterIterationAttributesTest#");
         meter.ok();
     }
  }
