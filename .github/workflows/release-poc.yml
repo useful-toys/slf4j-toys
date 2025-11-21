@@ -45,7 +45,7 @@ jobs:
           cache: maven
 
       - name: Verify with Maven
-        run: mvn -T 1C -B package
+        run: mvn -T 1C -B package -P release
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
