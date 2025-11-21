@@ -546,4 +546,79 @@ public class MeterThreadLocalTest {
         m1.ok();
         assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should still be no active Meter after ok() after reject()");
     }
+
+    // --- New tests for invalid lifecycle scenarios ---
+
+    @Test
+    @DisplayName("Should clear ThreadLocal stack if a non-active Meter is completed")
+    public void shouldHandleCompletionOfNonActiveMeter() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active");
+
+        final Meter m2 = MeterFactory.getMeter(loggerOther);
+        m2.start();
+        assertEquals(meterOther, Meter.getCurrentInstance().getCategory(), "m2 should be active");
+
+        // m1.ok() is called while m2 is active. This is an inconsistent state.
+        // The framework should detect this and clear the ThreadLocal stack.
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "ThreadLocal should be cleared after inconsistent m1.ok()");
+    }
+
+    @Test
+    @DisplayName("Should not affect ThreadLocal if close() is called on an unstarted Meter")
+    public void shouldHandleCloseOnUnstartedMeter() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        // m1.start() is intentionally not called
+
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "No active Meter before close() on unstarted m1");
+        m1.close(); // Calling close() on an unstarted meter
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "No active Meter after close() on unstarted m1");
+    }
+
+    @Test
+    @DisplayName("Should not affect ThreadLocal if close() is called on an already stopped Meter")
+    public void shouldHandleCloseOnAlreadyStoppedMeter() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active");
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "m1 should be stopped");
+
+        // Call close() on an already stopped meter
+        m1.close();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "No active Meter after close() on already stopped m1");
+    }
+
+    @Test
+    @DisplayName("Should ignore subsequent completion calls after an ignored start()")
+    public void shouldHandleCompletionAfterIgnoredStart() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "m1 should be stopped");
+
+        // This start() call will be ignored as m1 is already stopped
+        m1.start();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "m1.start() should be ignored, no active Meter");
+
+        // Subsequent completion calls should also be ignored and not change ThreadLocal state
+        m1.fail(new IllegalStateException("error"));
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "m1.fail() should be ignored after ignored start()");
+
+        m1.reject("reason");
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "m1.reject() should be ignored after ignored start()");
+
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "m1.ok() should be ignored after ignored start()");
+    }
 }
