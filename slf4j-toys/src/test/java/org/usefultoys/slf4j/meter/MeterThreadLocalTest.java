@@ -262,4 +262,288 @@ public class MeterThreadLocalTest {
         // However, if it were to be started later, it would need to be stopped.
         // For this specific test, we just ensure it's not active.
     }
+
+    /**
+     * Tests a misuse case where a Meter is created but not started,
+     * and another Meter is started and completed.
+     * <p>
+     * Flow:
+     * 1. Initially, no Meter is active.
+     * 2. `m1` is created but `start()` is *not* called. It should not become the active Meter.
+     * 3. `m2` is created and started. It becomes the active Meter.
+     * 4. `m2` completes with `ok()`. It is unstacked, and no Meter is active.
+     * 5. `m1` is completed with `ok()`, which is an error as it was never started.
+     * <p>
+     * Objective: Ensure that `getCurrentInstance()` behaves as expected when `start()` is omitted,
+     * and that completing an unstarted Meter does not cause unexpected state changes.
+     */
+    @Test
+    @DisplayName("Should handle misuse: Meter created but not started, then another started and completed")
+    public void shouldHandleMisuseMeterCreatedButNotStarted() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after m1 creation (not started)");
+        // Forgets to call m1.start(); current meter is not set to m1
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Still no active Meter as m1 was not started");
+
+        final Meter m2 = MeterFactory.getMeter(loggerOther);
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Still no active Meter before m2.start()");
+        m2.start();
+        assertEquals(meterOther, Meter.getCurrentInstance().getCategory(), "m2 should be the active Meter after m2.start()");
+
+        m2.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after m2.ok()");
+
+        m1.ok(); // This reports an error internally but should not change the current Meter state
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Still no active Meter after m1.ok() (which was not started)");
+    }
+
+    /**
+     * Tests a misuse case where an inner Meter is started but not completed,
+     * and an outer Meter is completed, which should report an error.
+     * <p>
+     * Flow:
+     * 1. Initially, no Meter is active.
+     * 2. `m1` is created and started. It becomes the active Meter.
+     * 3. `m2` is created and started. `m1` is pushed, `m2` becomes active.
+     * 4. `m2` is *not* completed (e.g., `ok()`, `fail()`, `reject()`).
+     * 5. `m1` is completed with `ok()`. This is a misuse as `m2` is still active.
+     * <p>
+     * Objective: Ensure that `getCurrentInstance()` reflects the correct active Meter,
+     * and that completing an outer Meter while an inner Meter is still active
+     * results in the expected error handling (e.g., `m1.ok()` reports an error and clears the stack).
+     */
+    @Test
+    @DisplayName("Should handle misuse: Inner Meter not completed, outer Meter completed")
+    public void shouldHandleMisuseInnerMeterNotCompleted() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter before m1.start()");
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be the active Meter after m1.start()");
+
+        final Meter m2 = MeterFactory.getMeter(loggerOther);
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should still be the active Meter before m2.start()");
+        m2.start();
+        assertEquals(meterOther, Meter.getCurrentInstance().getCategory(), "m2 should be the active Meter after m2.start()");
+
+        // Forgets to call m2.ok() or m2.fail() or m2.reject();
+        assertEquals(meterOther, Meter.getCurrentInstance().getCategory(), "m2 should still be the active Meter as it was not completed");
+
+        m1.ok(); // This reports an error internally because m2 is still on the stack, and clears the stack.
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after m1.ok() (misuse, stack cleared)");
+    }
+
+    // --- New tests for repeated and out-of-order calls ---
+
+    @Test
+    @DisplayName("Should handle repeated start() calls gracefully")
+    public void shouldHandleRepeatedStartCalls() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active after first start()");
+
+        // Repeated start call
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should still be active after repeated start()");
+
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after m1.ok()");
+    }
+
+    @Test
+    @DisplayName("Should handle repeated ok() calls gracefully")
+    public void shouldHandleRepeatedOkCalls() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active after start()");
+
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after first ok()");
+
+        // Repeated ok call
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should still be no active Meter after repeated ok()");
+    }
+
+    @Test
+    @DisplayName("Should handle repeated reject() calls gracefully")
+    public void shouldHandleRepeatedRejectCalls() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active after start()");
+
+        m1.reject("reason1");
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after first reject()");
+
+        // Repeated reject call
+        m1.reject("reason2");
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should still be no active Meter after repeated reject()");
+    }
+
+    @Test
+    @DisplayName("Should handle repeated fail() calls gracefully")
+    public void shouldHandleRepeatedFailCalls() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active after start()");
+
+        m1.fail(new IllegalStateException("error1"));
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after first fail()");
+
+        // Repeated fail call
+        m1.fail(new IllegalStateException("error2"));
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should still be no active Meter after repeated fail()");
+    }
+
+    @Test
+    @DisplayName("Should handle ok() call before start() gracefully")
+    public void shouldHandleOkBeforeStart() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        // m1.start() is intentionally not called
+
+        m1.ok(); // Call ok() before start()
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after ok() before start()");
+    }
+
+    @Test
+    @DisplayName("Should handle reject() call before start() gracefully")
+    public void shouldHandleRejectBeforeStart() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        // m1.start() is intentionally not called
+
+        m1.reject("reason"); // Call reject() before start()
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after reject() before start()");
+    }
+
+    @Test
+    @DisplayName("Should handle fail() call before start() gracefully")
+    public void shouldHandleFailBeforeStart() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        // m1.start() is intentionally not called
+
+        m1.fail(new IllegalStateException("error")); // Call fail() before start()
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after fail() before start()");
+    }
+
+    @Test
+    @DisplayName("Should handle start() call after ok() gracefully (does not restart meter)")
+    public void shouldHandleStartAfterOk() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after ok()");
+
+        // Call start() again on a completed meter
+        m1.start();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after start() on a completed meter");
+    }
+
+    @Test
+    @DisplayName("Should handle start() call after reject() gracefully (does not restart meter)")
+    public void shouldHandleStartAfterReject() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        m1.reject("reason");
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after reject()");
+
+        // Call start() again on a completed meter
+        m1.start();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after start() on a completed meter");
+    }
+
+    @Test
+    @DisplayName("Should handle start() call after fail() gracefully (does not restart meter)")
+    public void shouldHandleStartAfterFail() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        m1.fail(new IllegalStateException("error"));
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after fail()");
+
+        // Call start() again on a completed meter
+        m1.start();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after start() on a completed meter");
+    }
+
+    @Test
+    @DisplayName("Should handle ok() call after fail() gracefully (no effect)")
+    public void shouldHandleOkAfterFail() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        m1.fail(new IllegalStateException("error"));
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after fail()");
+
+        // Call ok() after fail()
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should still be no active Meter after ok() after fail()");
+    }
+
+    @Test
+    @DisplayName("Should handle fail() call after ok() gracefully (no effect)")
+    public void shouldHandleFailAfterOk() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after ok()");
+
+        // Call fail() after ok()
+        m1.fail(new IllegalStateException("error"));
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should still be no active Meter after fail() after ok()");
+    }
+
+    @Test
+    @DisplayName("Should handle reject() call after ok() gracefully (no effect)")
+    public void shouldHandleRejectAfterOk() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after ok()");
+
+        // Call reject() after ok()
+        m1.reject("reason");
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should still be no active Meter after reject() after ok()");
+    }
+
+    @Test
+    @DisplayName("Should handle ok() call after reject() gracefully (no effect)")
+    public void shouldHandleOkAfterReject() {
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter initially");
+
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        m1.reject("reason");
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after reject()");
+
+        // Call ok() after reject()
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should still be no active Meter after ok() after reject()");
+    }
 }
