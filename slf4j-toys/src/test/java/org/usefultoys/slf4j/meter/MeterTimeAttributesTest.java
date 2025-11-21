@@ -55,9 +55,8 @@ public class MeterTimeAttributesTest {
     }
 
     /**
-     * Helper method to assert time attributes at different stages.
-     * This method asserts the *stored* time attributes of the Meter.
-     * Dynamic "collected" times are asserted separately due to their nature.
+     * Helper method to assert time attributes at different stages. This method asserts the *stored* time attributes of
+     * the Meter. Dynamic "collected" times are asserted separately due to their nature.
      */
     private void assertStoredTimeAttributes(Meter m, long expectedCreateTime, long expectedStartTime, long expectedStopTime,
                                             long expectedWaitingTime, long expectedExecutionTime, long expectedLastProgressTime,
