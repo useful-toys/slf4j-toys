@@ -36,16 +36,16 @@
             <artifactId>slf4j-toys</artifactId>
             <version>${project.version}</version>
         </dependency>        
-        <dependency>
-            <groupId>org.usefultoys</groupId>
-            <artifactId>slf4j-test-mock</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.usefultoys</groupId>
-            <artifactId>jul-test-mock</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.usefultoys</groupId>-->
+<!--            <artifactId>slf4j-test-mock</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.usefultoys</groupId>-->
+<!--            <artifactId>jul-test-mock</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.usefultoys</groupId>
             <artifactId>slf4j-toys-logback-tests</artifactId>
