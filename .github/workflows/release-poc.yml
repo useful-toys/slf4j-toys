@@ -1,17 +1,17 @@
 name: Release
 
 on:
-  workflow_dispatch:
-  push:
-#    paths:
-#      - 'pom.xml'
-#      - '**/pom.xml'
-#      - '.mvn/**'
-#      - '.github/workflows/**'
-#      - 'src/main/**'
-#      - 'src/test/**'
-    branches:
-      - 'master'
+#  workflow_dispatch:
+#  push:
+##    paths:
+##      - 'pom.xml'
+##      - '**/pom.xml'
+##      - '.mvn/**'
+##      - '.github/workflows/**'
+##      - 'src/main/**'
+##      - 'src/test/**'
+#    branches:
+#      - 'master'
 
 permissions:
   contents: read
