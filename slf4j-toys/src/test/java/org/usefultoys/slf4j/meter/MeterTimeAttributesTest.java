@@ -499,4 +499,41 @@ public class MeterTimeAttributesTest {
         assertEquals(waitingTime, m.collectCurrentWaitingTime(), "collectedWaitingTime should equal waitingTime if stopped");
         assertEquals(executionTime, m.collectCurrentExecutionTime(), "collectedExecutionTime should equal executionTime if stopped");
     }
+
+    @Test
+    @DisplayName("Should correctly update time attributes on repeated start() calls")
+    public void shouldUpdateTimesOnRepeatedStart() throws InterruptedException {
+        final long now0 = System.nanoTime();
+        final Meter m = new Meter(logger);
+        final long createTime = m.getCreateTime();
+
+        // After creation
+        assertStoredTimeAttributes(m, createTime, 0, 0, 0, 0, 0, "After creation");
+
+        final long now1 = System.nanoTime();
+        m.start();
+        final long startTime1 = m.getStartTime();
+        final long waitingTime1 = startTime1 - createTime;
+
+        // After first start()
+        assertStoredTimeAttributes(m, createTime, startTime1, 0, waitingTime1, 0, startTime1, "After first start");
+        assertTrue(startTime1 >= now1, "startTime1 should be after now1");
+        assertTrue(startTime1 <= System.nanoTime(), "startTime1 should be before current nano time");
+
+        Thread.sleep(10); // Small delay
+
+        final long now2 = System.nanoTime();
+        m.start(); // Call start() again
+        final long startTime2 = m.getStartTime();
+        final long waitingTime2 = startTime2 - createTime;
+
+        // After second start()
+        assertStoredTimeAttributes(m, createTime, startTime2, 0, waitingTime2, 0, startTime2, "After second start");
+        assertTrue(startTime2 >= now2, "startTime2 should be after now2");
+        assertTrue(startTime2 > startTime1, "startTime2 should be greater than startTime1");
+        assertTrue(waitingTime2 > waitingTime1, "waitingTime2 should be greater than waitingTime1");
+        assertTrue(startTime2 <= System.nanoTime(), "startTime2 should be before current nano time");
+        assertEquals(waitingTime2, m.collectCurrentWaitingTime(), "collectedWaitingTime should reflect the second start");
+        assertTrue(m.collectCurrentExecutionTime() > 0, "collectedExecutionTime should be positive");
+    }
 }
