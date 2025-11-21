@@ -136,7 +136,7 @@ public class MeterValidatorTest {
     void validateAndFormatMCallArguments_whenIllegalFormat1() {
         // This case should not log an error, as String.format handles it by returning the format string itself
         // if there are too many arguments for the format specifiers.
-        assertEquals("message %s", MeterValidator.validateAndFormatMCallArguments(meter, "message %s", 1, 2));
+        assertEquals("message 1", MeterValidator.validateAndFormatMCallArguments(meter, "message %s", 1, 2));
         assertNoEvents(logger);
     }
 

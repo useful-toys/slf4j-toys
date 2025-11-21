@@ -159,7 +159,7 @@ class MeterIdentifierAttributesTest {
         assertEquals(category, m6.getCategory());
         assertNull(m6.getOperation());
         assertEquals(2L, m6.getPosition());
-        logger.assertEvent(0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.sub(name): Null argument. id=TestCategory4#1");
+        logger.assertEvent(0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.sub(name): Null argument; id=TestCategory4#1");
         logger.clearEvents();
 
     }
@@ -210,7 +210,7 @@ class MeterIdentifierAttributesTest {
         assertEquals(category, m6.getCategory());
         assertEquals("rs/sr", m6.getOperation());
         assertEquals(3L, m6.getPosition());
-        logger.assertEvent(0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.sub(name): Null argument. id=TestCategory5/rs/sr#2");
+        logger.assertEvent(0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.sub(name): Null argument; id=TestCategory5/rs/sr#2");
         logger.clearEvents();
     }
     
