@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.CallerStackTraceThrowable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
@@ -53,7 +54,7 @@ public class MeterValidatorTest {
         when(meter.getStartTime()).thenReturn(1L);
         assertFalse(MeterValidator.validateStartPrecondition(meter));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -70,7 +71,7 @@ public class MeterValidatorTest {
         when(meter.getStopTime()).thenReturn(1L);
         MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -79,7 +80,7 @@ public class MeterValidatorTest {
         when(meter.getStartTime()).thenReturn(0L);
         MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -89,7 +90,7 @@ public class MeterValidatorTest {
         when(meter.checkCurrentInstance()).thenReturn(true);
         MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter out of order; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -102,7 +103,7 @@ public class MeterValidatorTest {
     void validateSubCallArguments_whenNull() {
         MeterValidator.validateSubCallArguments(meter, null);
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.sub(name): Null argument; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -115,7 +116,7 @@ public class MeterValidatorTest {
     void validateMCallArguments_withMessage_whenNull() {
         assertFalse(MeterValidator.validateMCallArguments(meter, null));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.m(message): Null argument; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -128,19 +129,22 @@ public class MeterValidatorTest {
     void validateAndFormatMCallArguments_whenNull() {
         assertNull(MeterValidator.validateAndFormatMCallArguments(meter, null, 1));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.m(message, args...): Null argument; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
     void validateAndFormatMCallArguments_whenIllegalFormat1() {
-        assertEquals("message 1", MeterValidator.validateAndFormatMCallArguments(meter, "message %s", 1, 2));
+        // This case should not log an error, as String.format handles it by returning the format string itself
+        // if there are too many arguments for the format specifiers.
+        assertEquals("message %s", MeterValidator.validateAndFormatMCallArguments(meter, "message %s", 1, 2));
+        assertNoEvents(logger);
     }
 
     @Test
     void validateAndFormatMCallArguments_whenIllegalFormat2() {
         assertNull(MeterValidator.validateAndFormatMCallArguments(meter, "message %d", "s"));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.m(message, args...): Illegal string format; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -153,7 +157,7 @@ public class MeterValidatorTest {
     void validateLimitMillisecondsCallArguments_whenNonPositive() {
         assertFalse(MeterValidator.validateLimitMillisecondsCallArguments(meter, 0L));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.limitMilliseconds(timeLimit): Non-positive argument; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -166,7 +170,7 @@ public class MeterValidatorTest {
     void validateIterationsCallArguments_whenNonPositive() {
         assertFalse(MeterValidator.validateIterationsCallArguments(meter, 0L));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.iterations(expectedIterations): Non-positive argument; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -181,7 +185,7 @@ public class MeterValidatorTest {
         when(meter.getStartTime()).thenReturn(0L);
         assertFalse(MeterValidator.validateIncPrecondition(meter));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -194,7 +198,7 @@ public class MeterValidatorTest {
     void validateIncBy_whenNonPositive() {
         assertFalse(MeterValidator.validateIncBy(meter, 0L));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incBy(increment): Non-positive increment; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -208,7 +212,7 @@ public class MeterValidatorTest {
     void validateIncToArguments_whenNonPositive() {
         assertFalse(MeterValidator.validateIncToArguments(meter, 0L));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-positive argument; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -216,7 +220,7 @@ public class MeterValidatorTest {
         when(meter.getCurrentIteration()).thenReturn(10L);
         assertFalse(MeterValidator.validateIncToArguments(meter, 10L));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-forward increment; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -231,7 +235,7 @@ public class MeterValidatorTest {
         when(meter.getStartTime()).thenReturn(0L);
         assertFalse(MeterValidator.validateProgressPrecondition(meter));
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -244,7 +248,7 @@ public class MeterValidatorTest {
     void validatePathArgument_whenNull() {
         MeterValidator.validatePathArgument(meter, "myMethod", null);
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.myMethod: Null argument; id=test-id");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test
@@ -261,7 +265,7 @@ public class MeterValidatorTest {
         when(meter.getCategory()).thenReturn("test-category");
         MeterValidator.validateFinalize(meter);
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped; id={}");
-        assertEventHasThrowable(logger, 0);
+        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
     }
 
     @Test

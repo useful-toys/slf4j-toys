@@ -32,11 +32,8 @@ import java.util.IllegalFormatException;
 @UtilityClass
 public class MeterValidator {
 
-    private final String ERROR_MSG_ILLEGAL_CALL = "Illegal call to Meter.{}: {}. id={}";
-    private final String ERROR_MSG_NULL_ARGUMENT = "Null argument";
-
     private void logIllegalCall(final Meter meter, final String methodName, final String message) {
-        meter.getMessageLogger().error(Markers.ILLEGAL, ERROR_MSG_ILLEGAL_CALL, methodName, message, meter.getFullID(), new CallerStackTraceThrowable());
+        meter.getMessageLogger().error(Markers.ILLEGAL, "Illegal call to Meter.{}: {}; id={}", methodName, message, meter.getFullID(), new CallerStackTraceThrowable());
     }
 
     private void logIllegalPrecondition(final Meter meter, final Marker marker, final String message) {
@@ -45,7 +42,7 @@ public class MeterValidator {
 
     public boolean validateStartPrecondition(final Meter meter) {
         if (meter.getStartTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INCONSISTENT_START, "Meter already started.");
+            logIllegalPrecondition(meter, Markers.INCONSISTENT_START, "Meter already started");
             return false;
         }
         return true;
@@ -53,23 +50,23 @@ public class MeterValidator {
 
     public void validateStopPrecondition(final Meter meter, final Marker marker) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, marker, "Meter already stopped.");
+            logIllegalPrecondition(meter, marker, "Meter already stopped");
         } else if (meter.getStartTime() == 0) {
-            logIllegalPrecondition(meter, marker, "Meter stopped but not started.");
+            logIllegalPrecondition(meter, marker, "Meter stopped but not started");
         } else if (meter.checkCurrentInstance()) {
-            logIllegalPrecondition(meter, marker, "Meter out of order.");
+            logIllegalPrecondition(meter, marker, "Meter out of order");
         }
     }
 
     public void validateSubCallArguments(final Meter meter, final String suboperationName) {
         if (suboperationName == null) {
-            logIllegalCall(meter, "sub(name)", ERROR_MSG_NULL_ARGUMENT);
+            logIllegalCall(meter, "sub(name)", "Null argument");
         }
     }
 
     public boolean validateMCallArguments(final Meter meter, final String message) {
         if (message == null) {
-            logIllegalCall(meter, "m(message)", ERROR_MSG_NULL_ARGUMENT);
+            logIllegalCall(meter, "m(message)", "Null argument");
             return false;
         }
         return true;
@@ -77,7 +74,7 @@ public class MeterValidator {
 
     public String validateAndFormatMCallArguments(final Meter meter, final String format, final Object... args) {
         if (format == null) {
-            logIllegalCall(meter, "m(message, args...)", ERROR_MSG_NULL_ARGUMENT);
+            logIllegalCall(meter, "m(message, args...)", "Null argument");
             return null;
         }
         try {
@@ -142,17 +139,17 @@ public class MeterValidator {
 
     public void validatePathArgument(final Meter meter, final String methodName, final Object pathId) {
         if (pathId == null) {
-            logIllegalCall(meter, methodName, ERROR_MSG_NULL_ARGUMENT);
+            logIllegalCall(meter, methodName, "Null argument");
         }
     }
 
     public void logBug(final Meter meter, final String methodName, final Throwable t) {
-        meter.getMessageLogger().error(Markers.BUG, "Meter.{} method threw exception. id={}", methodName, meter.getFullID(), t);
+        meter.getMessageLogger().error(Markers.BUG, "Meter.{} method threw exception; id={}", methodName, meter.getFullID(), t);
     }
 
     public void validateFinalize(final Meter meter) {
         if (meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
-            logIllegalPrecondition(meter, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped. id={}");
+            logIllegalPrecondition(meter, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped; id={}");
         }
     }
 }
