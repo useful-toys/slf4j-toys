@@ -3,13 +3,13 @@ name: Verify
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'pom.xml'
-      - '**/pom.xml'
-      - '.mvn/**'
-      - '.github/workflows/**'
-      - 'src/main/**'
-      - 'src/test/**'
+#    paths:
+#      - 'pom.xml'
+#      - '**/pom.xml'
+#      - '.mvn/**'
+#      - '.github/workflows/**'
+#      - 'src/main/**'
+#      - 'src/test/**'
 
 permissions:
   contents: read
@@ -30,7 +30,7 @@ jobs:
           cache: maven
 
       - name: Verify with Maven
-        run: mvn -T 1C -B verify
+        run: mvn -B verify
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
