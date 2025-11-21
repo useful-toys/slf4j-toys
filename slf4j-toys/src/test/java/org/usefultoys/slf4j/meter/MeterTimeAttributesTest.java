@@ -436,4 +436,67 @@ public class MeterTimeAttributesTest {
         assertEquals(waitingTime, m.collectCurrentWaitingTime(), "collectedWaitingTime should equal waitingTime if stopped");
         assertEquals(executionTime, m.collectCurrentExecutionTime(), "collectedExecutionTime should equal executionTime if stopped");
     }
+
+    @Test
+    @DisplayName("Should correctly update time attributes on start, two progress() calls, and ok()")
+    public void shouldUpdateTimesOnTwoProgressAndOk() throws InterruptedException {
+        final long now0 = System.nanoTime();
+        final Meter m = new Meter(logger).iterations(100); // Set iterations for progress
+        final long createTime = m.getCreateTime();
+
+        // After creation, before start()
+        assertStoredTimeAttributes(m, createTime, 0, 0, 0, 0, 0, "After creation");
+        assertTrue(m.collectCurrentWaitingTime() > 0, "collectedWaitingTime should be positive if not started");
+        assertEquals(0, m.collectCurrentExecutionTime(), "collectedExecutionTime should be 0 if not started");
+
+        final long now1 = System.nanoTime();
+        m.start();
+        final long startTime = m.getStartTime();
+        final long waitingTime = startTime - createTime;
+
+        // After start()
+        assertStoredTimeAttributes(m, createTime, startTime, 0, waitingTime, 0, startTime, "After start");
+        assertEquals(waitingTime, m.collectCurrentWaitingTime(), "collectedWaitingTime should equal waitingTime if started");
+        assertTrue(m.collectCurrentExecutionTime() > 0, "collectedExecutionTime should be positive if started but not stopped");
+
+        Thread.sleep(MeterConfig.progressPeriodMilliseconds + 10); // Ensure progress logs
+        final long now2 = System.nanoTime();
+        m.incBy(10).progress();
+        final long lastProgressTime1 = m.getLastProgressTime();
+        final long expectedExecutionTime1 = m.getLastCurrentTime() - m.getStartTime();
+
+        // After first progress()
+        assertStoredTimeAttributes(m, createTime, startTime, 0, waitingTime, expectedExecutionTime1, lastProgressTime1, "After first progress");
+        assertTrue(lastProgressTime1 >= now2, "lastProgressTime after first progress should be after now2");
+        assertTrue(lastProgressTime1 <= System.nanoTime(), "lastProgressTime after first progress should be before current nano time");
+        assertEquals(waitingTime, m.collectCurrentWaitingTime(), "collectedWaitingTime should equal waitingTime after first progress");
+        assertTrue(m.collectCurrentExecutionTime() > 0, "collectedExecutionTime should be positive after first progress but not stopped");
+
+        Thread.sleep(MeterConfig.progressPeriodMilliseconds + 10); // Ensure progress logs
+        final long now3 = System.nanoTime();
+        m.incBy(10).progress();
+        final long lastProgressTime2 = m.getLastProgressTime();
+        final long expectedExecutionTime2 = m.getLastCurrentTime() - m.getStartTime();
+
+        // After second progress()
+        assertStoredTimeAttributes(m, createTime, startTime, 0, waitingTime, expectedExecutionTime2, lastProgressTime2, "After second progress");
+        assertTrue(lastProgressTime2 >= now3, "lastProgressTime after second progress should be after now3");
+        assertTrue(lastProgressTime2 > lastProgressTime1, "lastProgressTime should be updated after second progress");
+        assertTrue(lastProgressTime2 <= System.nanoTime(), "lastProgressTime after second progress should be before current nano time");
+        assertEquals(waitingTime, m.collectCurrentWaitingTime(), "collectedWaitingTime should equal waitingTime after second progress");
+        assertTrue(m.collectCurrentExecutionTime() > 0, "collectedExecutionTime should be positive after second progress but not stopped");
+
+        Thread.sleep(10); // Small delay before final stop
+        final long now4 = System.nanoTime();
+        m.ok();
+        final long stopTime = m.getStopTime();
+        final long executionTime = stopTime - startTime;
+
+        // After ok()
+        assertStoredTimeAttributes(m, createTime, startTime, stopTime, waitingTime, executionTime, lastProgressTime2, "After ok");
+        assertTrue(stopTime >= now4, "stopTime should be after now4");
+        assertTrue(stopTime <= System.nanoTime(), "stopTime should be before current nano time");
+        assertEquals(waitingTime, m.collectCurrentWaitingTime(), "collectedWaitingTime should equal waitingTime if stopped");
+        assertEquals(executionTime, m.collectCurrentExecutionTime(), "collectedExecutionTime should equal executionTime if stopped");
+    }
 }
