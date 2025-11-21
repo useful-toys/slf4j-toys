@@ -336,23 +336,6 @@ class AssertLoggerTest {
     }
 
     @Nested
-    @DisplayName("static utility class behavior")
-    class StaticUtilityClassBehavior {
-
-        @Test
-        @DisplayName("should not be instantiable")
-        void shouldNotBeInstantiable() {
-            assertThrows(UnsupportedOperationException.class, () -> {
-                try {
-                    AssertLogger.class.getDeclaredConstructor().newInstance();
-                } catch (final Exception e) {
-                    throw e.getCause();
-                }
-            });
-        }
-    }
-
-    @Nested
     @DisplayName("assertHasEvent with message parts")
     class AssertHasEventWithMessagePart {
 

@@ -15,6 +15,7 @@
  */
 package org.slf4j.impl;
 
+import lombok.experimental.UtilityClass;
 import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -23,10 +24,10 @@ import org.slf4j.impl.MockLoggerEvent.Level;
 import java.util.List;
 
 /**
- * Utility class providing static assertion methods for testing {@link MockLogger} instances.
+ * Utility class providing assertion methods for testing {@link MockLogger} instances.
  * <p>
  * This class contains methods to verify that logged events match expected criteria such as log level,
- * message content, and markers. All assertion methods are static and take a {@link Logger} instance as their
+ * message content, and markers. All assertion methods are and take a {@link Logger} instance as their
  * first parameter, automatically converting it to {@link MockLogger} for testing purposes.
  * <p>
  * Example usage:
@@ -39,12 +40,8 @@ import java.util.List;
  *
  * @author Daniel Felix Ferber
  */
-public final class AssertLogger {
-
-    private AssertLogger() {
-        // Utility class - prevent instantiation
-    }
-
+@UtilityClass
+public class AssertLogger {
     /**
      * Converts a Logger instance to MockLogger, throwing an assertion error if the conversion is not possible.
      *
@@ -52,7 +49,7 @@ public final class AssertLogger {
      * @return the MockLogger instance
      * @throws AssertionError if the logger is not an instance of MockLogger
      */
-    private static MockLogger toMockLogger(final Logger logger) {
+    private MockLogger toMockLogger(final Logger logger) {
         Assertions.assertTrue(logger instanceof MockLogger, 
             String.format("should be MockLogger instance; actual type: %s", 
                 logger != null ? logger.getClass().getName() : "null"));
@@ -66,7 +63,7 @@ public final class AssertLogger {
      * @param eventIndex       the index of the event to check
      * @param messageParts     an array of substrings that should be present in the event's message
      */
-    public static void assertEvent(final Logger logger, final int eventIndex, final String... messageParts) {
+    public void assertEvent(final Logger logger, final int eventIndex, final String... messageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         Assertions.assertTrue(eventIndex < loggerEvents.size(), 
@@ -85,7 +82,7 @@ public final class AssertLogger {
      * @param eventIndex       the index of the event to check
      * @param expectedMarker   the expected marker of the event
      */
-    public static void assertEvent(final Logger logger, final int eventIndex, final Marker expectedMarker) {
+    public void assertEvent(final Logger logger, final int eventIndex, final Marker expectedMarker) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         Assertions.assertTrue(eventIndex < loggerEvents.size(), 
@@ -103,7 +100,7 @@ public final class AssertLogger {
      * @param expectedLevel    the expected log level of the event
      * @param messageParts     an array of substrings that should be present in the event's message
      */
-    public static void assertEvent(final Logger logger, final int eventIndex, final Level expectedLevel, final String... messageParts) {
+    public void assertEvent(final Logger logger, final int eventIndex, final Level expectedLevel, final String... messageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         Assertions.assertTrue(eventIndex < loggerEvents.size(), 
@@ -125,7 +122,7 @@ public final class AssertLogger {
      * @param expectedMarker   the expected marker of the event
      * @param messageParts     an array of substrings that should be present in the event's message
      */
-    public static void assertEvent(final Logger logger, final int eventIndex, final Marker expectedMarker, final String... messageParts) {
+    public void assertEvent(final Logger logger, final int eventIndex, final Marker expectedMarker, final String... messageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         Assertions.assertTrue(eventIndex < loggerEvents.size(), 
@@ -148,7 +145,7 @@ public final class AssertLogger {
      * @param expectedMarker   the expected marker of the event
      * @param messageParts     an array of substrings that should be present in the event's message
      */
-    public static void assertEvent(final Logger logger, final int eventIndex, final Level expectedLevel, final Marker expectedMarker, final String... messageParts) {
+    public void assertEvent(final Logger logger, final int eventIndex, final Level expectedLevel, final Marker expectedMarker, final String... messageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         Assertions.assertTrue(eventIndex < loggerEvents.size(), 
@@ -172,7 +169,7 @@ public final class AssertLogger {
      * @param expectedLevel    the expected log level of the event
      * @param expectedMarker   the expected marker of the event
      */
-    public static void assertEvent(final Logger logger, final int eventIndex, final Level expectedLevel, final Marker expectedMarker) {
+    public void assertEvent(final Logger logger, final int eventIndex, final Level expectedLevel, final Marker expectedMarker) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         Assertions.assertTrue(eventIndex < loggerEvents.size(), 
@@ -192,7 +189,7 @@ public final class AssertLogger {
      * @param logger           the Logger instance to check (must be a MockLogger)
      * @param messageParts     an array of substrings that should be present in at least one event's message
      */
-    public static void assertHasEvent(final Logger logger, final String... messageParts) {
+    public void assertHasEvent(final Logger logger, final String... messageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final boolean hasEvent = loggerEvents.stream()
@@ -214,7 +211,7 @@ public final class AssertLogger {
      * @param logger           the Logger instance to check (must be a MockLogger)
      * @param expectedMarker   the expected marker
      */
-    public static void assertHasEvent(final Logger logger, final Marker expectedMarker) {
+    public void assertHasEvent(final Logger logger, final Marker expectedMarker) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final boolean hasEvent = loggerEvents.stream()
@@ -230,7 +227,7 @@ public final class AssertLogger {
      * @param expectedLevel    the expected log level
      * @param messageParts     an array of substrings that should be present in the event's message
      */
-    public static void assertHasEvent(final Logger logger, final Level expectedLevel, final String... messageParts) {
+    public void assertHasEvent(final Logger logger, final Level expectedLevel, final String... messageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final boolean hasEvent = loggerEvents.stream()
@@ -257,7 +254,7 @@ public final class AssertLogger {
      * @param expectedMarker   the expected marker
      * @param messageParts     an array of substrings that should be present in the event's message
      */
-    public static void assertHasEvent(final Logger logger, final Marker expectedMarker, final String... messageParts) {
+    public void assertHasEvent(final Logger logger, final Marker expectedMarker, final String... messageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final boolean hasEvent = loggerEvents.stream()
@@ -285,7 +282,7 @@ public final class AssertLogger {
      * @param expectedMarker   the expected marker
      * @param messageParts     an array of substrings that should all be present in the event's message
      */
-    public static void assertHasEvent(final Logger logger, final Level expectedLevel, final Marker expectedMarker, final String... messageParts) {
+    public void assertHasEvent(final Logger logger, final Level expectedLevel, final Marker expectedMarker, final String... messageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final boolean hasEvent = loggerEvents.stream()
@@ -312,7 +309,7 @@ public final class AssertLogger {
      * @param expectedLevel    the expected log level
      * @param expectedMarker   the expected marker
      */
-    public static void assertHasEvent(final Logger logger, final Level expectedLevel, final Marker expectedMarker) {
+    public void assertHasEvent(final Logger logger, final Level expectedLevel, final Marker expectedMarker) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final boolean hasEvent = loggerEvents.stream()
@@ -332,7 +329,7 @@ public final class AssertLogger {
      * @param eventIndex       the index of the event to check
      * @param throwableClass   the expected throwable class
      */
-    public static void assertEventWithThrowable(final Logger logger, final int eventIndex, final Class<? extends Throwable> throwableClass) {
+    public void assertEventWithThrowable(final Logger logger, final int eventIndex, final Class<? extends Throwable> throwableClass) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         Assertions.assertTrue(eventIndex < loggerEvents.size(), 
@@ -353,7 +350,7 @@ public final class AssertLogger {
      * @param throwableClass        the expected throwable class
      * @param throwableMessageParts a list of substrings that should be present in the throwable's message
      */
-    public static void assertEventWithThrowable(final Logger logger, final int eventIndex, final Class<? extends Throwable> throwableClass, final String... throwableMessageParts) {
+    public void assertEventWithThrowable(final Logger logger, final int eventIndex, final Class<? extends Throwable> throwableClass, final String... throwableMessageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         Assertions.assertTrue(eventIndex < loggerEvents.size(), 
@@ -378,7 +375,7 @@ public final class AssertLogger {
      * @param logger           the Logger instance to check (must be a MockLogger)
      * @param eventIndex       the index of the event to check
      */
-    public static void assertEventHasThrowable(final Logger logger, final int eventIndex) {
+    public void assertEventHasThrowable(final Logger logger, final int eventIndex) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         Assertions.assertTrue(eventIndex < loggerEvents.size(), 
@@ -393,7 +390,7 @@ public final class AssertLogger {
      * @param logger           the Logger instance to check (must be a MockLogger)
      * @param throwableClass   the expected throwable class
      */
-    public static void assertHasEventWithThrowable(final Logger logger, final Class<? extends Throwable> throwableClass) {
+    public void assertHasEventWithThrowable(final Logger logger, final Class<? extends Throwable> throwableClass) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final boolean hasEvent = loggerEvents.stream()
@@ -412,7 +409,7 @@ public final class AssertLogger {
      * @param throwableClass        the expected throwable class
      * @param throwableMessageParts a list of substrings that should be present in the throwable's message
      */
-    public static void assertHasEventWithThrowable(final Logger logger, final Class<? extends Throwable> throwableClass, final String... throwableMessageParts) {
+    public void assertHasEventWithThrowable(final Logger logger, final Class<? extends Throwable> throwableClass, final String... throwableMessageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final boolean hasEvent = loggerEvents.stream()
@@ -442,7 +439,7 @@ public final class AssertLogger {
      *
      * @param logger           the Logger instance to check (must be a MockLogger)
      */
-    public static void assertHasEventWithThrowable(final Logger logger) {
+    public void assertHasEventWithThrowable(final Logger logger) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final boolean hasEvent = loggerEvents.stream()
@@ -458,7 +455,7 @@ public final class AssertLogger {
      * @param logger         the Logger instance to check (must be a MockLogger)
      * @param expectedCount  the expected number of events
      */
-    public static void assertEventCount(final Logger logger, final int expectedCount) {
+    public void assertEventCount(final Logger logger, final int expectedCount) {
         final MockLogger mockLogger = toMockLogger(logger);
         final int actualCount = mockLogger.getEventCount();
         Assertions.assertEquals(expectedCount, actualCount, 
@@ -470,7 +467,7 @@ public final class AssertLogger {
      *
      * @param logger         the Logger instance to check (must be a MockLogger)
      */
-    public static void assertNoEvents(final Logger logger) {
+    public void assertNoEvents(final Logger logger) {
         assertEventCount(logger, 0);
     }
 
@@ -481,7 +478,7 @@ public final class AssertLogger {
      * @param level          the log level to count
      * @param expectedCount  the expected number of events with the specified level
      */
-    public static void assertEventCountByLevel(final Logger logger, final Level level, final int expectedCount) {
+    public void assertEventCountByLevel(final Logger logger, final Level level, final int expectedCount) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final long actualCount = loggerEvents.stream()
@@ -499,7 +496,7 @@ public final class AssertLogger {
      * @param marker         the marker to count
      * @param expectedCount  the expected number of events with the specified marker
      */
-    public static void assertEventCountByMarker(final Logger logger, final Marker marker, final int expectedCount) {
+    public void assertEventCountByMarker(final Logger logger, final Marker marker, final int expectedCount) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final long actualCount = loggerEvents.stream()
@@ -517,7 +514,7 @@ public final class AssertLogger {
      * @param messagePart    a substring that should be present in the event's message
      * @param expectedCount  the expected number of events containing the message part
      */
-    public static void assertEventCountByMessage(final Logger logger, final String messagePart, final int expectedCount) {
+    public void assertEventCountByMessage(final Logger logger, final String messagePart, final int expectedCount) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         final long actualCount = loggerEvents.stream()
@@ -536,7 +533,7 @@ public final class AssertLogger {
      * @param logger          the Logger instance to check (must be a MockLogger)
      * @param expectedLevels  the expected sequence of log levels
      */
-    public static void assertEventSequence(final Logger logger, final Level... expectedLevels) {
+    public void assertEventSequence(final Logger logger, final Level... expectedLevels) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         
@@ -558,7 +555,7 @@ public final class AssertLogger {
      * @param logger           the Logger instance to check (must be a MockLogger)
      * @param expectedMarkers  the expected sequence of markers
      */
-    public static void assertEventSequence(final Logger logger, final Marker... expectedMarkers) {
+    public void assertEventSequence(final Logger logger, final Marker... expectedMarkers) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         
@@ -580,7 +577,7 @@ public final class AssertLogger {
      * @param logger              the Logger instance to check (must be a MockLogger)
      * @param expectedMessageParts the expected sequence of message parts
      */
-    public static void assertEventSequence(final Logger logger, final String... expectedMessageParts) {
+    public void assertEventSequence(final Logger logger, final String... expectedMessageParts) {
         final MockLogger mockLogger = toMockLogger(logger);
         final List<MockLoggerEvent> loggerEvents = mockLogger.getLoggerEvents();
         
