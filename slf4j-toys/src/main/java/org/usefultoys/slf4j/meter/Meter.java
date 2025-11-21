@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -79,6 +80,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * Timestamp (in nanoseconds) when progress was last reported. Zero if progress has not been reported yet. Used to
      * control the frequency of progress messages and avoid flooding the log.
      */
+    @Getter(value = AccessLevel.PACKAGE) // for tests
     private transient long lastProgressTime = 0;
     /**
      * Iteration count when progress was last reported. Zero if progress has not been reported yet. Used to control the
