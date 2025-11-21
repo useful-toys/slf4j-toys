@@ -39,7 +39,7 @@ import static org.usefultoys.slf4j.meter.MeterConfig.*;
  * Each `Meter` instance allows you to:
  * <ul>
  *     <li>Call {@link #start()} to log the operation's beginning and current system status (DEBUG level).</li>
- *     <li>Call {@link #ok()} to log successful completion (INFO level).</li>
+ *     <li>Call {@link #ok()} to log successful completion (INFO level, or WARN level if slow).</li>
  *     <li>Call {@link #reject(Object)} to log expected termination due to business rules (INFO level).</li>
  *     <li>Call {@link #fail(Object)} to log unexpected technical failure (ERROR level).</li>
  *     <li>Call {@link #progress()} to log intermediate progress and system status (INFO level, periodically).</li>
@@ -54,6 +54,9 @@ import static org.usefultoys.slf4j.meter.MeterConfig.*;
 @SuppressWarnings({"OverlyBroadCatchBlock", "FinalizeDeclaration"})
 public class Meter extends MeterData implements MeterContext<Meter>, MeterExecutor<Meter>, Closeable {
 
+    /**
+     * The serial version UID for serialization.
+     */
     private static final long serialVersionUID = 1L;
 
     /** Placeholder string for unknown logger names. */
@@ -409,7 +412,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     /**
      * Notifies the `Meter` that the operation has completed successfully. This method logs a **human-readable summary**
      * (INFO level) and a **machine-parsable data message** (TRACE level) with the current system status. If a time
-     * limit was set and exceeded, a WARN level message is logged instead.
+     * limit was set and exceeded, a WARN level message is logged instead, indicating a slow operation.
      *
      * @return Reference to this `Meter` instance, for method chaining.
      */
@@ -473,7 +476,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     /**
      * Notifies the `Meter` that the operation has completed successfully, specifying an execution path.
      * This method logs a **human-readable summary** (INFO level) and a **machine-parsable data message** (TRACE level)
-     * with the current system status. If a time limit was set and exceeded, a WARN level message is logged instead.
+     * with the current system status. If a time limit was set and exceeded, a WARN level message is logged instead, indicating a slow operation.
      *
      * @param pathId An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that identifies
      *               the successful execution path.
@@ -488,7 +491,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * Notifies the `Meter` that the operation has completed successfully. This is an alias for {@link #ok()}.
      * This method logs a **human-readable summary**
      * (INFO level) and a **machine-parsable data message** (TRACE level) with the current system status. If a time
-     * limit was set and exceeded, a WARN level message is logged instead.
+     * limit was set and exceeded, a WARN level message is logged instead, indicating a slow operation.
      *
      * @return Reference to this `Meter` instance, for method chaining.
      */
@@ -500,7 +503,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * Notifies the `Meter` that the operation has completed successfully, specifying an execution path. This is an
      * alias for {@link #ok(Object)}.
      * This method logs a **human-readable summary** (INFO level) and a **machine-parsable data message** (TRACE level)
-     * with the current system status. If a time limit was set and exceeded, a WARN level message is logged instead.
+     * with the current system status. If a time limit was set and exceeded, a WARN level message is logged instead, indicating a slow operation.
      *
      * @param pathId An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that identifies
      *               the successful execution path.
