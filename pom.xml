@@ -79,8 +79,6 @@
     </properties>
 
     <modules>
-        <module>slf4kj-test-mock</module>
-<!--        <module>jul-test-mock</module>-->
         <module>slf4j-toys</module>
         <module>slf4j-toys-logback-tests</module>
         <module>examples</module>
