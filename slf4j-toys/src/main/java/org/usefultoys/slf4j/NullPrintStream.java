@@ -40,7 +40,7 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public void write(@NonNull final byte[] b) {
+    public void write(final byte[] b) {
         // ignore
     }
 
@@ -50,7 +50,7 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public void write(@NonNull final byte[] buf, final int off, final int len) {
+    public void write(final byte[] buf, final int off, final int len) {
         // ignore
     }
 
@@ -75,7 +75,7 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public void print(@NonNull final char[] s) {
+    public void print(final char[] s) {
         // ignore
     }
 
@@ -100,13 +100,13 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public PrintStream printf(@NonNull final String format, final Object... args) {
+    public PrintStream printf(final String format, final Object... args) {
         // ignore
         return this;
     }
 
     @Override
-    public PrintStream printf(final Locale l, @NonNull final String format, final Object... args) {
+    public PrintStream printf(final Locale l, final String format, final Object... args) {
         // ignore
         return this;
     }
@@ -180,13 +180,13 @@ class NullPrintStream extends PrintStream {
     }
 
     @Override
-    public PrintStream format(@NonNull final String format, final Object... args) {
+    public PrintStream format(final String format, final Object... args) {
         // ignore
         return this;
     }
 
     @Override
-    public PrintStream format(final Locale l, @NonNull final String format, final Object... args) {
+    public PrintStream format(final Locale l, final String format, final Object... args) {
         // ignore
         return this;
     }
