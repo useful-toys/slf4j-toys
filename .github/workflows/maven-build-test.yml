@@ -52,7 +52,10 @@ jobs:
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          file: ./target/site/jacoco/jacoco.xml
+          file: |
+           ./coverage-report-aggregator/target/site/jacoco-aggregate/jacoco.xml
+           ./slf4j-toys-logback-tests/target/site/jacoco/jacoco.xml
+           ./slf4j-toys/target/site/jacoco/jacoco.xml
 
   qodana:
     runs-on: ubuntu-latest
