@@ -15,7 +15,7 @@
  */
 package org.usefultoys.slf4j;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 
 import java.io.OutputStream;
 
@@ -43,12 +43,12 @@ class NullOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(@NotNull final byte[] b) {
+    public void write(@NonNull final byte[] b) {
         // ignore
     }
 
     @Override
-    public void write(@NotNull final byte[] b, final int off, final int len) {
+    public void write(@NonNull final byte[] b, final int off, final int len) {
         // ignore
     }
 }

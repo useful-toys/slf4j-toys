@@ -15,8 +15,8 @@
  */
 package org.usefultoys.slf4j;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.NotNull;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.watcher.Watcher;
 
@@ -49,7 +49,7 @@ public class Session {
      * @return A shortened UUID string.
      * @see SessionConfig#UUID_LENGTH
      */
-    public @NotNull String shortSessionUuid() {
+    public @NonNull String shortSessionUuid() {
         return Session.uuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize);
     }
 }

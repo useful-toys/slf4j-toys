@@ -15,7 +15,7 @@
  */
 package org.usefultoys.slf4j;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -70,12 +70,12 @@ abstract class LoggerOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(@NotNull final byte[] b) throws IOException {
+    public void write(@NonNull final byte[] b) throws IOException {
         os.write(b);
     }
 
     @Override
-    public void write(@NotNull final byte[] b, final int off, final int len) {
+    public void write(@NonNull final byte[] b, final int off, final int len) {
         os.write(b, off, len);
     }
 
