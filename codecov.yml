@@ -25,5 +25,5 @@ coverage:
 
 # Allows Codecov to post a comment on the PR with a coverage summary.
 comment:
-  layout: "reach,diff,flags,tree"
+  layout: "header, reach, diff, files, footer"
   behavior: default
