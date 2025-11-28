@@ -1,0 +1,29 @@
+# Codecov configuration file
+
+coverage:
+  # Status checks that will appear in the Pull Request
+  status:
+    # Rules for the project-wide coverage
+    project:
+      default:
+        # The target is 'auto', which means coverage cannot decrease.
+        # If project coverage is 85%, the PR must maintain or increase it to pass.
+        # You can replace 'auto' with a fixed value, like "80%".
+        target: 90%
+        # Allows for a small drop in coverage before failing.
+        # Useful to prevent failures from minor fluctuations.
+        threshold: 0.5%
+
+    # Rules for the coverage of new/modified lines in the PR only
+    patch:
+      default:
+        # Requires that NEW code has at least 90% coverage.
+        # This is a powerful rule to ensure new features are always well-tested.
+        target: 90%
+        # Does not allow any drop from the target.
+        threshold: 0.5%
+
+# Allows Codecov to post a comment on the PR with a coverage summary.
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
