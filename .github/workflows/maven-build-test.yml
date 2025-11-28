@@ -53,6 +53,7 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           file: ./coverage-report-aggregator/target/site/jacoco-aggregate/jacoco.xml
+          debug: true
 
   qodana:
     runs-on: ubuntu-latest
