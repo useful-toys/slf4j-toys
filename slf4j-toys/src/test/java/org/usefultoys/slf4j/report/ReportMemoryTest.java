@@ -16,35 +16,28 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class})
+@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportMemoryTest {
 
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.memory");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.report.memory")
+    private Logger logger;
 
     @Test
     void shouldLogJvmMemoryInformation() {
         // Arrange
-        final ReportMemory report = new ReportMemory(mockLogger);
+        final ReportMemory report = new ReportMemory(logger);
         final Runtime runtime = Runtime.getRuntime();
         final long maxMemory = runtime.maxMemory();
         final long totalMemory = runtime.totalMemory();
@@ -63,16 +56,16 @@ class ReportMemoryTest {
         report.run();
 
         // Assert
-        String logs = mockLogger.toText();
-        assertTrue(logs.contains("Memory:"), "Should contain 'Memory:'");
-        assertTrue(logs.contains("maximum allowed:"), "Should contain 'maximum allowed:'");
-        assertTrue(logs.contains("currently allocated:"), "Should contain 'currently allocated:'");
-        assertTrue(logs.contains("currently used:"), "Should contain 'currently used:'");
-        assertTrue(logs.contains(expectedMaxMemory), "Should contain '" + expectedMaxMemory + "'");
-        assertTrue(logs.contains(expectedTotalMemory), "Should contain '" + expectedTotalMemory + "'");
-        assertTrue(logs.contains(expectedMoreAvailable), "Should contain '" + expectedMoreAvailable + "'");
-        assertTrue(logs.contains(expectedUsedMemory), "Should contain '" + expectedUsedMemory + "'");
-        assertTrue(logs.contains(expectedFreeMemory), "Should contain '" + expectedFreeMemory + "'");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Memory:",
+            "maximum allowed:",
+            "currently allocated:",
+            "currently used:",
+            expectedMaxMemory,
+            expectedTotalMemory,
+            expectedMoreAvailable,
+            expectedUsedMemory,
+            expectedFreeMemory);
     }
 
     @Test
@@ -83,7 +76,7 @@ class ReportMemoryTest {
             @Override public long totalMemory() { return 1024L * 1024 * 512; } // 512MB
             @Override public long freeMemory() { return 1024L * 1024 * 128; } // 128MB
         };
-        ReportMemory report = new ReportMemory(mockLogger) {
+        ReportMemory report = new ReportMemory(logger) {
             @Override
             protected MemoryInfoProvider getMemoryInfoProvider() {
                 return provider;
@@ -92,7 +85,7 @@ class ReportMemoryTest {
         // Act
         report.run();
         // Assert
-        String logs = mockLogger.toText();
+        // Use AssertLogger to validate the INFO report contents
         final long maxMemory = provider.maxMemory();
         final long totalMemory = provider.totalMemory();
         final long freeMemory = provider.freeMemory();
@@ -105,15 +98,16 @@ class ReportMemoryTest {
                 : org.usefultoys.slf4j.utils.UnitFormatter.bytes(maxMemory - totalMemory);
         final String expectedUsedMemory = org.usefultoys.slf4j.utils.UnitFormatter.bytes(totalMemory - freeMemory);
         final String expectedFreeMemory = org.usefultoys.slf4j.utils.UnitFormatter.bytes(freeMemory);
-        assertTrue(logs.contains("Memory:"), "Should contain 'Memory:'");
-        assertTrue(logs.contains("maximum allowed:"), "Should contain 'maximum allowed:'");
-        assertTrue(logs.contains("currently allocated:"), "Should contain 'currently allocated:'");
-        assertTrue(logs.contains("currently used:"), "Should contain 'currently used:'");
-        assertTrue(logs.contains(expectedMaxMemory), "Should contain '" + expectedMaxMemory + "'");
-        assertTrue(logs.contains(expectedTotalMemory), "Should contain '" + expectedTotalMemory + "'");
-        assertTrue(logs.contains(expectedMoreAvailable), "Should contain '" + expectedMoreAvailable + "'");
-        assertTrue(logs.contains(expectedUsedMemory), "Should contain '" + expectedUsedMemory + "'");
-        assertTrue(logs.contains(expectedFreeMemory), "Should contain '" + expectedFreeMemory + "'");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Memory:",
+            "maximum allowed:",
+            "currently allocated:",
+            "currently used:",
+            expectedMaxMemory,
+            expectedTotalMemory,
+            expectedMoreAvailable,
+            expectedUsedMemory,
+            expectedFreeMemory);
     }
 
     @Test
@@ -124,7 +118,7 @@ class ReportMemoryTest {
             @Override public long totalMemory() { return 1024L * 1024 * 512; } // 512MB
             @Override public long freeMemory() { return 1024L * 1024 * 128; } // 128MB
         };
-        ReportMemory report = new ReportMemory(mockLogger) {
+        ReportMemory report = new ReportMemory(logger) {
             @Override
             protected MemoryInfoProvider getMemoryInfoProvider() {
                 return provider;
@@ -133,7 +127,7 @@ class ReportMemoryTest {
         // Act
         report.run();
         // Assert
-        String logs = mockLogger.toText();
+        // Use AssertLogger to validate the INFO report contents
         final long maxMemory = provider.maxMemory();
         final long totalMemory = provider.totalMemory();
         final long freeMemory = provider.freeMemory();
@@ -142,14 +136,15 @@ class ReportMemoryTest {
         final String expectedMoreAvailable = "n/a";
         final String expectedUsedMemory = org.usefultoys.slf4j.utils.UnitFormatter.bytes(totalMemory - freeMemory);
         final String expectedFreeMemory = org.usefultoys.slf4j.utils.UnitFormatter.bytes(freeMemory);
-        assertTrue(logs.contains("Memory:"), "Should contain 'Memory:'");
-        assertTrue(logs.contains("maximum allowed:"), "Should contain 'maximum allowed:'");
-        assertTrue(logs.contains("currently allocated:"), "Should contain 'currently allocated:'");
-        assertTrue(logs.contains("currently used:"), "Should contain 'currently used:'");
-        assertTrue(logs.contains(expectedMaxMemory), "Should contain '" + expectedMaxMemory + "'");
-        assertTrue(logs.contains(expectedTotalMemory), "Should contain '" + expectedTotalMemory + "'");
-        assertTrue(logs.contains(expectedMoreAvailable), "Should contain '" + expectedMoreAvailable + "'");
-        assertTrue(logs.contains(expectedUsedMemory), "Should contain '" + expectedUsedMemory + "'");
-        assertTrue(logs.contains(expectedFreeMemory), "Should contain '" + expectedFreeMemory + "'");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Memory:",
+            "maximum allowed:",
+            "currently allocated:",
+            "currently used:",
+            expectedMaxMemory,
+            expectedTotalMemory,
+            expectedMoreAvailable,
+            expectedUsedMemory,
+            expectedFreeMemory);
     }
 }

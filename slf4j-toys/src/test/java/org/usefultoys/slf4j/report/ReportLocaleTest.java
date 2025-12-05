@@ -16,51 +16,42 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
 
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class})
+@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportLocaleTest {
 
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.locale");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.report.locale")
+    private Logger logger;
 
     @Test
     void shouldLogLocaleInformation() {
         // Arrange
-        final ReportLocale report = new ReportLocale(mockLogger);
+        final ReportLocale report = new ReportLocale(logger);
         final Locale defaultLocale = Locale.getDefault();
 
         // Act
         report.run();
 
         // Assert
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-
-        assertTrue(logs.contains("Locale"));
-        assertTrue(logs.contains("default locale: " + defaultLocale.getDisplayName()));
-        assertTrue(logs.contains("language=" + defaultLocale.getDisplayLanguage()));
-        assertTrue(logs.contains("country=" + defaultLocale.getDisplayCountry()));
-        assertTrue(logs.contains("variant=" + defaultLocale.getDisplayVariant()));
-        assertTrue(logs.contains("available locales:"));
+        assertEvent(logger, 0,
+                "Locale",
+                "default locale: " + defaultLocale.getDisplayName(),
+                "language=" + defaultLocale.getDisplayLanguage(),
+                "country=" + defaultLocale.getDisplayCountry(),
+                "variant=" + defaultLocale.getDisplayVariant(),
+                "available locales:");
     }
 }

@@ -16,13 +16,14 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -33,17 +34,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportFileSystemTest {
 
-    private MockLogger mockLogger;
+    @Slf4jMock("test.report.filesystem")
+    private Logger logger;
 
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.filesystem");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
+    private org.slf4j.impl.MockLogger getMockLogger() {
+        return (org.slf4j.impl.MockLogger) logger;
     }
 
     @Test
@@ -51,13 +50,13 @@ class ReportFileSystemTest {
         try (MockedStatic<File> mockedStatic = mockStatic(File.class)) {
             mockedStatic.when(File::listRoots).thenReturn(new File[0]);
 
-            final ReportFileSystem report = new ReportFileSystem(mockLogger);
+            final ReportFileSystem report = new ReportFileSystem(logger);
             report.run();
 
             // Expect 1 log event because PrintStream is always created and closed,
             // even if nothing is written to it.
-            assertEquals(1, mockLogger.getEventCount());
-            final String logs = mockLogger.getEvent(0).getFormattedMessage();
+            assertEquals(1, getMockLogger().getEventCount());
+            final String logs = getMockLogger().getEvent(0).getFormattedMessage();
             // Assert that the log message does not contain any file system root information
             assertTrue(!logs.contains("File system root:"), "Log should not contain file system root info.");
             assertTrue(logs.trim().isEmpty(), "Log message should be empty or contain only whitespace.");
@@ -75,13 +74,13 @@ class ReportFileSystemTest {
 
             mockedStatic.when(File::listRoots).thenReturn(new File[]{mockRoot});
 
-            final ReportFileSystem report = new ReportFileSystem(mockLogger);
+            final ReportFileSystem report = new ReportFileSystem(logger);
             report.run();
-            assertEquals(1, mockLogger.getEventCount());
-            final String logs = mockLogger.getEvent(0).getFormattedMessage();
-            assertTrue(logs.contains("File system root: /mock_root_a"));
-            assertTrue(logs.contains(" - total space: 1000.0MB")); // Corrected assertion
-            assertTrue(logs.contains(" - currently free space: 500.0MB (250.0MB usable)")); // Corrected assertion
+
+            AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "File system root: /mock_root_a",
+                " - total space: 1000.0MB",
+                " - currently free space: 500.0MB (250.0MB usable)");
         }
     }
 
@@ -102,20 +101,16 @@ class ReportFileSystemTest {
 
             mockedStatic.when(File::listRoots).thenReturn(new File[]{mockRootA, mockRootB});
 
-            final ReportFileSystem report = new ReportFileSystem(mockLogger);
+            final ReportFileSystem report = new ReportFileSystem(logger);
             report.run();
 
-            assertEquals(1, mockLogger.getEventCount());
-
-            final String logs0 = mockLogger.getEvent(0).getFormattedMessage();
-            assertTrue(logs0.contains("File system root: /mock_root_a"));
-            assertTrue(logs0.contains(" - total space: 1000.0MB")); // Corrected assertion
-            assertTrue(logs0.contains(" - currently free space: 500.0MB (250.0MB usable)")); // Corrected assertion
-
-            final String logs1 = logs0;
-            assertTrue(logs1.contains("File system root: /mock_root_b"));
-            assertTrue(logs1.contains(" - total space: 2.0GB")); // Corrected assertion
-            assertTrue(logs1.contains(" - currently free space: 1000.0MB (750.0MB usable)")); // Corrected assertion
+            AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "File system root: /mock_root_a",
+                " - total space: 1000.0MB",
+                " - currently free space: 500.0MB (250.0MB usable)",
+                "File system root: /mock_root_b",
+                " - total space: 2.0GB",
+                " - currently free space: 1000.0MB (750.0MB usable)");
         }
     }
 
@@ -130,14 +125,13 @@ class ReportFileSystemTest {
 
             mockedStatic.when(File::listRoots).thenReturn(new File[]{mockRoot});
 
-            final ReportFileSystem report = new ReportFileSystem(mockLogger);
+            final ReportFileSystem report = new ReportFileSystem(logger);
             report.run();
 
-            assertEquals(1, mockLogger.getEventCount());
-            final String logs = mockLogger.getEvent(0).getFormattedMessage();
-            assertTrue(logs.contains("File system root: /zero_space_root"));
-            assertTrue(logs.contains(" - total space: 0B")); // Corrected assertion
-            assertTrue(logs.contains(" - currently free space: 0B (0B usable)")); // Corrected assertion
+            AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "File system root: /zero_space_root",
+                " - total space: 0B",
+                " - currently free space: 0B (0B usable)");
         }
     }
 }
