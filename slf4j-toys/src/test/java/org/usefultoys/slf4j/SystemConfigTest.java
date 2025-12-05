@@ -19,12 +19,13 @@ package org.usefultoys.slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetSystemConfig;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
-@ExtendWith(ResetSystemConfig.class)
+@ExtendWith({ResetSystemConfig.class, CharsetConsistency.class})
 class SystemConfigTest {
 
     @Test

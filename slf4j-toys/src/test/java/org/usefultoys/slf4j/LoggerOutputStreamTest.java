@@ -16,22 +16,18 @@
 
 package org.usefultoys.slf4j;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.usefultoys.test.CharsetConsistency;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
+@ExtendWith(CharsetConsistency.class)
 class LoggerOutputStreamTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     static class TestLoggerOutputStream extends LoggerOutputStream {
         private final StringBuilder loggedData = new StringBuilder();

@@ -16,20 +16,19 @@
 
 package org.usefultoys.slf4j;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.WithLocale;
 
-import java.nio.charset.Charset;
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
+@WithLocale("en")
+@ExtendWith(CharsetConsistency.class)
 class NullPrintStreamTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     @Test
     void testWriteMethods() {
