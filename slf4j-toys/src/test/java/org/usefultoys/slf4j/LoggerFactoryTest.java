@@ -17,27 +17,22 @@
 package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
-import java.nio.charset.Charset;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.test.CharsetConsistency;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 
+@ExtendWith(CharsetConsistency.class)
 class LoggerFactoryTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     @Test
     void testGetLoggerByName() {

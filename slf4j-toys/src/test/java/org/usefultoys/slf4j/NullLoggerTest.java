@@ -16,23 +16,16 @@
 package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.MarkerFactory;
-import java.nio.charset.Charset;
+import org.usefultoys.test.CharsetConsistency;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import org.usefultoys.slf4j.SessionConfig;
 
 
+@ExtendWith(CharsetConsistency.class)
 class NullLoggerTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     private final NullLogger nullLogger = NullLogger.INSTANCE;
 

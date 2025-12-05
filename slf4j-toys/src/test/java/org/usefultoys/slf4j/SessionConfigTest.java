@@ -18,6 +18,7 @@ package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetSessionConfig;
 
 import java.nio.charset.Charset;
@@ -25,7 +26,7 @@ import java.nio.charset.Charset;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-@ExtendWith(ResetSessionConfig.class)
+@ExtendWith({ResetSessionConfig.class, CharsetConsistency.class})
 class SessionConfigTest {
     @Test
     void testDefaultValues() {

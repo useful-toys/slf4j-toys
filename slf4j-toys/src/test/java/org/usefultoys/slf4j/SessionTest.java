@@ -19,11 +19,12 @@ package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetSessionConfig;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(ResetSessionConfig.class)
+@ExtendWith({ResetSessionConfig.class, CharsetConsistency.class})
 class SessionTest {
 
     @Test

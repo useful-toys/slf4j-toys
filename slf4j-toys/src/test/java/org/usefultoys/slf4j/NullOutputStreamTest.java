@@ -16,37 +16,37 @@
 
 package org.usefultoys.slf4j;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.nio.charset.Charset;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.usefultoys.test.CharsetConsistency;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
+@ExtendWith(CharsetConsistency.class)
 class NullOutputStreamTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     @Test
     void testWriteSingleByte() {
         final NullOutputStream nullOutputStream = new NullOutputStream();
         assertDoesNotThrow(() -> nullOutputStream.write(0));
+        assertDoesNotThrow(nullOutputStream::flush);
+        assertDoesNotThrow(nullOutputStream::close);
     }
 
     @Test
     void testWriteByteArray() {
         final NullOutputStream nullOutputStream = new NullOutputStream();
         assertDoesNotThrow(() -> nullOutputStream.write(new byte[]{1, 2, 3}));
+        assertDoesNotThrow(nullOutputStream::flush);
+        assertDoesNotThrow(nullOutputStream::close);
     }
 
     @Test
     void testWriteByteArrayWithOffsetAndLength() {
         final NullOutputStream nullOutputStream = new NullOutputStream();
         assertDoesNotThrow(() -> nullOutputStream.write(new byte[]{1, 2, 3, 4}, 1, 2));
+        assertDoesNotThrow(nullOutputStream::flush);
+        assertDoesNotThrow(nullOutputStream::close);
     }
 }
