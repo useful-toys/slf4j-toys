@@ -17,9 +17,8 @@
 package org.usefultoys.slf4j;
 
 /**
- * A helper class located in the library's package (`org.usefultoys.slf4j`)
- * for testing purposes. It simulates an internal library method that creates
- * a {@link CallerStackTraceThrowable}.
+ * A helper class located in the library's package (`org.usefultoys.slf4j`) for testing purposes. It simulates an
+ * internal library method that creates a {@link CallerStackTraceThrowable}.
  */
 public final class LibraryHelper {
     private LibraryHelper() {

@@ -48,8 +48,7 @@ class SessionTest {
     void testShortSessionUudi() {
         assertNotNull(Session.shortSessionUuid(), "shortSessionUuid() should not return null");
         assertTrue(Session.uuid.endsWith(Session.shortSessionUuid()));
-        assertEquals(SessionConfig.uuidSize, Session.shortSessionUuid().length(),
-                "shortSessionUuid() should return a string of length " + SessionConfig.uuidSize);
+        assertEquals(SessionConfig.uuidSize, Session.shortSessionUuid().length(), "shortSessionUuid() should return a string of length " + SessionConfig.uuidSize);
     }
 
     @Test
@@ -57,7 +56,6 @@ class SessionTest {
         SessionConfig.uuidSize = 10;
         assertNotNull(Session.shortSessionUuid(), "shortSessionUuid() should not return null");
         assertTrue(Session.uuid.endsWith(Session.shortSessionUuid()));
-        assertEquals(10, Session.shortSessionUuid().length(),
-                "shortSessionUuid() should return a string of length " + SessionConfig.uuidSize);
+        assertEquals(10, Session.shortSessionUuid().length(), "shortSessionUuid() should return a string of length " + SessionConfig.uuidSize);
     }
 }
