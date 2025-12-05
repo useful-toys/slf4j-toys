@@ -19,8 +19,12 @@ package org.usefultoys.slf4j.report;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -31,16 +35,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportContextListenerTest {
-    private MockLogger mockLogger;
+    @Slf4jMock("report")
+    private Logger logger;
     private ReportContextListener listener;
 
+    private MockLogger getMockLogger() {
+        return (MockLogger) logger;
+    }
+
     @BeforeEach
-    void setUp() {
-        mockLogger = (MockLogger) LoggerFactory.getLogger(ReporterConfig.name);
-        mockLogger.clearEvents();
+    void setUpListener() {
+        getMockLogger().clearEvents();
         listener = new ReportContextListener();
     }
 
@@ -67,10 +75,7 @@ class ReportContextListenerTest {
         listener.contextInitialized(event);
 
         // Assert
-        assertTrue(mockLogger.getEventCount() > 0, "Expected at least one log event");
-
-        final boolean vmReported = mockLogger.getEvent(0).getFormattedMessage().contains("Java Virtual Machine");
-        assertTrue(vmReported, "Expected VM report to be logged");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "Java Virtual Machine");
     }
 
     @Test
@@ -82,6 +87,6 @@ class ReportContextListenerTest {
 
         // Assert
         // No side effect expected — especially no logging
-        assertEquals(0, mockLogger.getEventCount(), "Expected no log output on contextDestroyed");
+        assertEquals(0, getMockLogger().getEventCount(), "Expected no log output on contextDestroyed");
     }
 }

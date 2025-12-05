@@ -16,12 +16,14 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -30,19 +32,17 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportCalendarTest {
 
-    private MockLogger mockLogger;
+    @Slf4jMock("test.report.calendar")
+    private Logger logger;
 
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.calendar");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
+    private org.slf4j.impl.MockLogger getMockLogger() {
+        return (org.slf4j.impl.MockLogger) logger;
     }
 
     @Test
@@ -68,7 +68,7 @@ class ReportCalendarTest {
             }
         };
 
-        ReportCalendar report = new ReportCalendar(mockLogger) {
+        ReportCalendar report = new ReportCalendar(logger) {
             @Override
             protected ReportCalendar.CalendarInfoProvider getCalendarInfoProvider() {
                 return provider;
@@ -78,25 +78,21 @@ class ReportCalendarTest {
         // Act
         report.run();
 
-        // Assert
-        String logs = mockLogger.toText();
-        assertTrue(logs.contains("Calendar"), "Should contain 'Calendar'");
-
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
         df.setTimeZone(defaultTimeZone); // Ensure formatter uses the actual default timezone for comparison
         String expectedDateString = df.format(fixedCurrentDate);
-        assertTrue(logs.contains("current date/time: " + expectedDateString), "Should contain current date/time");
-
-        assertTrue(logs.contains("default timezone: " + defaultTimeZone.getDisplayName()), "Should contain default timezone display name");
-        assertTrue(logs.contains(" (" + defaultTimeZone.getID() + ")"), "Should contain default timezone ID");
-        assertTrue(logs.contains("DST=" + (defaultTimeZone.getDSTSavings() / 60000) + "min"), "Should contain DST savings");
-        assertTrue(logs.contains("useDST=" + defaultTimeZone.useDaylightTime()), "Should contain useDST status");
-        assertTrue(logs.contains("inDST=" + defaultTimeZone.inDaylightTime(fixedCurrentDate)), "Should contain inDST status");
-        assertTrue(logs.contains("offset=" + (defaultTimeZone.getRawOffset() / 60000) + "min"), "Should contain raw offset");
-        assertTrue(logs.contains("available IDs:"), "Should contain 'available IDs:'");
-        // We can't assert all available charsets as they vary by JVM, but we can check for a few common ones
-        assertTrue(logs.contains("America/Sao_Paulo;"), "Should contain a common timezone ID");
-        assertTrue(logs.contains("UTC;"), "Should contain UTC timezone ID");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Calendar",
+            " - current date/time: " + expectedDateString,
+            " - default timezone: " + defaultTimeZone.getDisplayName() + " (" + defaultTimeZone.getID() + ")",
+            "; DST=" + (defaultTimeZone.getDSTSavings() / 60000) + "min",
+            "; observesDST=" + defaultTimeZone.observesDaylightTime(),
+            "; useDST=" + defaultTimeZone.useDaylightTime(),
+            "; inDST=" + defaultTimeZone.inDaylightTime(fixedCurrentDate),
+            "; offset=" + (defaultTimeZone.getRawOffset() / 60000) + "min",
+            " - available IDs:",
+            "America/Sao_Paulo; ",
+            "UTC; ");
     }
 
     @Test
@@ -123,7 +119,7 @@ class ReportCalendarTest {
             }
         };
 
-        ReportCalendar report = new ReportCalendar(mockLogger) {
+        ReportCalendar report = new ReportCalendar(logger) {
             @Override
             protected ReportCalendar.CalendarInfoProvider getCalendarInfoProvider() {
                 return provider;
@@ -133,25 +129,22 @@ class ReportCalendarTest {
         // Act
         report.run();
 
-        // Assert
-        String logs = mockLogger.toText();
-        assertTrue(logs.contains("Calendar"), "Should contain 'Calendar'");
-        
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
         df.setTimeZone(customTimeZone); // Ensure formatter uses the custom timezone for comparison
         String expectedDateString = df.format(customDate); // Get the full formatted string
-        assertTrue(logs.contains("current date/time: " + expectedDateString), "Should contain custom date/time");
-
-        assertTrue(logs.contains("default timezone: " + customTimeZone.getDisplayName()), "Should contain custom timezone display name");
-        assertTrue(logs.contains(" (" + customTimeZone.getID() + ")"), "Should contain custom timezone ID");
-        assertTrue(logs.contains("DST=" + (customTimeZone.getDSTSavings() / 60000) + "min"), "Should contain custom DST savings");
-        assertTrue(logs.contains("useDST=" + customTimeZone.useDaylightTime()), "Should contain custom useDST status");
-        assertTrue(logs.contains("inDST=" + customTimeZone.inDaylightTime(customDate)), "Should contain custom inDST status");
-        assertTrue(logs.contains("offset=" + (customTimeZone.getRawOffset() / 60000) + "min"), "Should contain custom raw offset");
-        assertTrue(logs.contains("available IDs:"), "Should contain 'available IDs:'");
-        assertTrue(logs.contains("Europe/Berlin;"), "Should contain custom available ID: Europe/Berlin");
-        assertTrue(logs.contains("America/New_York;"), "Should contain custom available ID: America/New_York");
-        assertTrue(logs.contains("Asia/Tokyo;"), "Should contain custom available ID: Asia/Tokyo");
-        assertTrue(!logs.contains("America/Sao_Paulo;"), "Should NOT contain default ID: America/Sao_Paulo");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Calendar",
+            " - current date/time: " + expectedDateString,
+            " - default timezone: " + customTimeZone.getDisplayName() + " (" + customTimeZone.getID() + ")",
+            "; DST=" + (customTimeZone.getDSTSavings() / 60000) + "min",
+            "; observesDST=" + customTimeZone.observesDaylightTime(),
+            "; useDST=" + customTimeZone.useDaylightTime(),
+            "; inDST=" + customTimeZone.inDaylightTime(customDate),
+            "; offset=" + (customTimeZone.getRawOffset() / 60000) + "min",
+            " - available IDs:",
+            "Europe/Berlin; ",
+            "America/New_York; ",
+            "Asia/Tokyo; ");
+        assertFalse(getMockLogger().toText().contains("America/Sao_Paulo; "), "Should NOT contain default ID: America/Sao_Paulo");
     }
 }

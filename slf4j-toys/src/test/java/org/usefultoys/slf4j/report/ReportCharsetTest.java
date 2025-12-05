@@ -16,12 +16,14 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -29,41 +31,38 @@ import org.usefultoys.test.WithLocale;
 import java.nio.charset.Charset;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportCharsetTest {
 
-    private MockLogger mockLogger;
+    @Slf4jMock("test.report.charset")
+    private Logger logger;
     private static final Random random = new Random();
 
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.charset");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
+    private org.slf4j.impl.MockLogger getMockLogger() {
+        return (org.slf4j.impl.MockLogger) logger;
     }
 
     @Test
     void shouldLogDefaultCharsetInformation() {
         // Arrange
-        final ReportCharset report = new ReportCharset(mockLogger);
+        final ReportCharset report = new ReportCharset(logger);
         final Charset defaultCharset = Charset.defaultCharset();
 
         // Act
         report.run();
 
         // Assert
-        String logs = mockLogger.toText();
-        assertTrue(logs.contains("Charset"), "Should contain 'Charset'");
-        assertTrue(logs.contains("default charset: " + defaultCharset.displayName()), "Should contain default charset display name");
-        assertTrue(logs.contains("name=" + defaultCharset.name()), "Should contain default charset name");
-        assertTrue(logs.contains("canEncode=" + defaultCharset.canEncode()), "Should contain default charset canEncode status");
-        assertTrue(logs.contains("available charsets:"), "Should contain 'available charsets:'");
-        // We can't assert all available charsets as they vary by JVM, but we can check for a few common ones
-        assertTrue(logs.contains(Charset.forName("UTF-8").displayName()), "Should contain UTF-8 display name");
-        assertTrue(logs.contains(Charset.forName("ISO-8859-1").displayName()), "Should contain ISO-8859-1 display name");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Charset",
+            " - default charset: " + defaultCharset.displayName(),
+            "; name=" + defaultCharset.name(),
+            "; canEncode=" + defaultCharset.canEncode(),
+            " - available charsets: ",
+            Charset.forName("UTF-8").displayName() + "; ",
+            Charset.forName("ISO-8859-1").displayName() + "; ");
     }
 
     @Test
@@ -86,7 +85,7 @@ class ReportCharsetTest {
             }
         };
 
-        ReportCharset report = new ReportCharset(mockLogger) {
+        ReportCharset report = new ReportCharset(logger) {
             @Override
             protected ReportCharset.CharsetInfoProvider getCharsetInfoProvider() {
                 return provider;
@@ -97,16 +96,15 @@ class ReportCharsetTest {
         report.run();
 
         // Assert
-        String logs = mockLogger.toText();
-        assertTrue(logs.contains("Charset"), "Should contain 'Charset'");
-        assertTrue(logs.contains("default charset: " + customDefaultCharset.displayName()), "Should contain custom default charset display name");
-        assertTrue(logs.contains("name=" + customDefaultCharset.name()), "Should contain custom default charset name");
-        assertTrue(logs.contains("canEncode=" + customDefaultCharset.canEncode()), "Should contain custom default charset canEncode status");
-        assertTrue(logs.contains("available charsets:"), "Should contain 'available charsets:'");
-        assertTrue(logs.contains(Charset.forName("UTF-16").displayName()), "Should contain custom available UTF-16 display name");
-        assertTrue(logs.contains(Charset.forName("US-ASCII").displayName()), "Should contain custom available US-ASCII display name");
-        // Ensure other charsets are not present if not in custom list
-        assertTrue(!logs.contains(Charset.forName("ISO-8859-1").displayName()), "Should not contain ISO-8859-1 display name");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Charset",
+            " - default charset: " + customDefaultCharset.displayName(),
+            "; name=" + customDefaultCharset.name(),
+            "; canEncode=" + customDefaultCharset.canEncode(),
+            " - available charsets: ",
+            Charset.forName("UTF-16").displayName() + "; ",
+            Charset.forName("US-ASCII").displayName() + "; ");
+        assertFalse(getMockLogger().toText().contains(Charset.forName("ISO-8859-1").displayName()), "Should not contain ISO-8859-1 display name");
     }
 
     @Test
@@ -127,7 +125,7 @@ class ReportCharsetTest {
             }
         };
 
-        ReportCharset report = new ReportCharset(mockLogger) {
+        ReportCharset report = new ReportCharset(logger) {
             @Override
             protected ReportCharset.CharsetInfoProvider getCharsetInfoProvider() {
                 return provider;
@@ -138,14 +136,13 @@ class ReportCharsetTest {
         report.run();
 
         // Assert
-        String logs = mockLogger.toText();
-        assertTrue(logs.contains("Charset"), "Should contain 'Charset'");
-        assertTrue(logs.contains("default charset: " + customDefaultCharset.displayName()), "Should contain custom default charset display name");
-        assertTrue(logs.contains("name=" + customDefaultCharset.name()), "Should contain custom default charset name");
-        assertTrue(logs.contains("canEncode=" + customDefaultCharset.canEncode()), "Should contain custom default charset canEncode status");
-        assertTrue(logs.contains("available charsets: "), "Should contain 'available charsets:'");
-        // Ensure no other charset names are present
-        assertTrue(!logs.contains(Charset.forName("UTF-16").displayName()), "Should not contain UTF-16 display name");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Charset",
+            " - default charset: " + customDefaultCharset.displayName(),
+            "; name=" + customDefaultCharset.name(),
+            "; canEncode=" + customDefaultCharset.canEncode(),
+            " - available charsets: ");
+        assertFalse(getMockLogger().toText().contains(Charset.forName("UTF-16").displayName()), "Should not contain UTF-16 display name");
     }
 
     @Test
@@ -175,7 +172,7 @@ class ReportCharsetTest {
             }
         };
 
-        ReportCharset report = new ReportCharset(mockLogger) {
+        ReportCharset report = new ReportCharset(logger) {
             @Override
             protected ReportCharset.CharsetInfoProvider getCharsetInfoProvider() {
                 return provider;
@@ -186,16 +183,14 @@ class ReportCharsetTest {
         report.run();
 
         // Assert
-        String logs = mockLogger.toText();
-        assertTrue(logs.contains("Charset"), "Should contain 'Charset'");
-        assertTrue(logs.contains("default charset: " + customDefaultCharset.displayName()), "Should contain custom default charset display name");
-        assertTrue(logs.contains("name=" + customDefaultCharset.name()), "Should contain custom default charset name");
-        assertTrue(logs.contains("canEncode=" + customDefaultCharset.canEncode()), "Should contain custom default charset canEncode status");
-        assertTrue(logs.contains("available charsets:"), "Should contain 'available charsets:'");
-
-        for (Charset charset : randomCharsets.values()) {
-            assertTrue(logs.contains(charset.displayName()), "Should contain random charset: " + charset.displayName());
-        }
+        final List<String> expectedFragments = new ArrayList<>(Arrays.asList(
+            "Charset",
+            " - default charset: " + customDefaultCharset.displayName(),
+            "; name=" + customDefaultCharset.name(),
+            "; canEncode=" + customDefaultCharset.canEncode(),
+            " - available charsets: "));
+        randomCharsets.values().forEach(charset -> expectedFragments.add(charset.displayName() + "; "));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, expectedFragments.toArray(new String[0]));
     }
 
     /**
