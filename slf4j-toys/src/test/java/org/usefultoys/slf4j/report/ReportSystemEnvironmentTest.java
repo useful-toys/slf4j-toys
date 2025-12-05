@@ -17,61 +17,43 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.WithLocale;
 
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@WithLocale("en")
 class ReportSystemEnvironmentTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     private static final String TEST_LOGGER_NAME = "test.logger";
     private MockLogger mockLogger;
 
     @BeforeEach
     void setUp() {
-        // Clear any previous errors from ConfigParser
-        ConfigParser.clearInitializationErrors();
-
         // Initialize MockLogger
         Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
         mockLogger = (MockLogger) testLogger;
         mockLogger.clearEvents();
-
-        // Reset all relevant configs to ensure a clean state for ConfigParser.initializationErrors
-        // ReporterConfig.reset() calls init() internally
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
     }
 
     @AfterEach
     void tearDown() {
         // Clear test properties
         System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
-
-        // Reset all relevant configs again for good measure
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
     }
 
     // Helper method to get all formatted log messages from the MockLogger

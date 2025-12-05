@@ -16,46 +16,26 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
-import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.SystemConfig;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.WithLocale;
 
 import javax.servlet.ServletContextEvent;
-import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@WithLocale("en")
 class ReportContextListenerTest {
     private MockLogger mockLogger;
     private ReportContextListener listener;
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    @BeforeEach
-    void resetWatcherConfigBeforeEach() {
-        // Reinitialize each configuration to ensure a clean configuration before each test
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
-
-    @AfterAll
-    static void resetWatcherConfigAfterAll() {
-        // Reinitialize each configuration to ensure a clean configuration before each test
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
 
     @BeforeEach
     void setUp() {

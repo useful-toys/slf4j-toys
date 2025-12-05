@@ -16,25 +16,21 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
-import java.nio.charset.Charset;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.WithLocale;
 
 import java.net.Inet4Address;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -47,39 +43,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class})
+@WithLocale("en")
 class ReporterTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     private static final String TEST_LOGGER_NAME = "test.reporter";
     private MockLogger mockLogger;
     private Reporter reporter;
 
     @BeforeEach
-    void setUp() {
-        ConfigParser.clearInitializationErrors();
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-
+    void setUpLogger() {
         Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
         mockLogger = (MockLogger) testLogger;
         mockLogger.clearEvents();
         mockLogger.setInfoEnabled(true); // Ensure INFO level is enabled for reports
         mockLogger.setWarnEnabled(true); // Ensure WARN level is enabled for error reporting
-
         reporter = new Reporter(mockLogger);
-    }
-
-    @AfterEach
-    void tearDown() {
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-        ConfigParser.clearInitializationErrors();
     }
 
     @Test

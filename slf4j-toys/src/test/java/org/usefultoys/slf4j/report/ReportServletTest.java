@@ -17,35 +17,32 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.WithLocale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@WithLocale("en")
 class ReportServletTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     private static final String TEST_REPORTER_NAME = "test.report";
     private ReportServlet servlet;
@@ -57,11 +54,6 @@ class ReportServletTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        ConfigParser.clearInitializationErrors();
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-
         // Configure ReporterConfig to use a known logger name for reports
         System.setProperty(ReporterConfig.PROP_NAME, TEST_REPORTER_NAME);
         ReporterConfig.init();
@@ -87,10 +79,6 @@ class ReportServletTest {
     @AfterEach
     void tearDown() {
         System.clearProperty(ReporterConfig.PROP_NAME);
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-        ConfigParser.clearInitializationErrors();
     }
 
     private void assertReportLogged(String expectedContentPart) {
