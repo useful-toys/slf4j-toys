@@ -16,12 +16,13 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -34,23 +35,15 @@ import java.net.SocketException;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportNetworkInterfaceTest {
 
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.os");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.report.os")
+    private Logger logger;
 
     @Test
     void testRunWithLoopbackInterface() throws Exception {
@@ -66,17 +59,16 @@ class ReportNetworkInterfaceTest {
         when(mockNif.getHardwareAddress()).thenReturn(null); // No hardware address
         when(mockNif.getInetAddresses()).thenReturn(Collections.emptyEnumeration());
 
-        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
         report.run();
 
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("Network Interface lo:"));
-        assertTrue(logs.contains("display name: Loopback"));
-        assertTrue(logs.contains("mtu=65536;"));
-        assertTrue(logs.contains("loopback;"));
-        assertTrue(logs.contains("UP;"));
-        assertTrue(logs.contains("hardware address: n/a"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "Network Interface lo:",
+                "display name: Loopback",
+                "mtu=65536;",
+                "loopback;",
+                "UP;",
+                "hardware address: n/a");
     }
 
     @Test
@@ -115,30 +107,23 @@ class ReportNetworkInterfaceTest {
         when(mockNif.getHardwareAddress()).thenReturn(new byte[]{0x00, 0x11, 0x22, 0x33, 0x44, 0x55});
         when(mockNif.getInetAddresses()).thenReturn(Collections.enumeration(Arrays.asList(mockIpv4, mockIpv6)));
 
-        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
         report.run();
 
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("Network Interface eth0:"));
-        assertTrue(logs.contains("display name: Ethernet"));
-        assertTrue(logs.contains("mtu=1500;"));
-        assertFalse(logs.contains("loopback;"));
-        assertTrue(logs.contains("UP;"));
-        assertTrue(logs.contains("multicast;"));
-        assertTrue(logs.contains("hardware address: 00 11 22 33 44 55"));
-        assertTrue(logs.contains("NET address (IPV4): 192.168.1.100"));
-        assertTrue(logs.contains("host name: host.local"));
-        assertTrue(logs.contains("canonical host name : host.local"));
-        assertTrue(logs.contains("site-local;"));
-        assertTrue(logs.contains("reachable;"));
-        assertTrue(logs.contains("NET address (IPV6): fe80::1"));
-        assertTrue(logs.contains("link-local;"));
-        // Find the start of the IPv6 address log section
-        int ipv6LogStartIndex = logs.indexOf("NET address (IPV6): fe80::1");
-        // Extract the section of the log that starts from the IPv6 address entry
-        String ipv6LogSection = logs.substring(ipv6LogStartIndex);
-        assertFalse(ipv6LogSection.contains("reachable;"), "IPv6 address should not be reachable in logs"); // For IPv6
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "Network Interface eth0:",
+                "display name: Ethernet",
+                "mtu=1500;",
+                "UP;",
+                "multicast;",
+                "hardware address: 00 11 22 33 44 55",
+                "NET address (IPV4): 192.168.1.100",
+                "host name: host.local",
+                "canonical host name : host.local",
+                "site-local;",
+                "reachable;",
+                "NET address (IPV6): fe80::1",
+                "link-local;");
     }
 
     @Test
@@ -155,13 +140,12 @@ class ReportNetworkInterfaceTest {
         when(mockNif.getHardwareAddress()).thenReturn(null);
         when(mockNif.getInetAddresses()).thenReturn(Collections.emptyEnumeration());
 
-        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
         report.run();
 
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("Network Interface virbr0:"));
-        assertTrue(logs.contains("virtual;"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "Network Interface virbr0:",
+                "virtual;");
     }
 
     @Test
@@ -178,12 +162,11 @@ class ReportNetworkInterfaceTest {
         when(mockNif.getHardwareAddress()).thenReturn(null); // Null hardware address
         when(mockNif.getInetAddresses()).thenReturn(Collections.emptyEnumeration());
 
-        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
         report.run();
 
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("hardware address: n/a"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "hardware address: n/a");
     }
 
     @Test
@@ -194,12 +177,11 @@ class ReportNetworkInterfaceTest {
         when(mockNif.getMTU()).thenThrow(new SocketException("Mock MTU exception")); // Simulate IOException
         when(mockNif.getInetAddresses()).thenReturn(Collections.emptyEnumeration()); // Avoid NPE for addresses
 
-        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
         report.run();
 
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("Cannot read property: Mock MTU exception"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "Cannot read property: Mock MTU exception");
     }
 
     @Test
@@ -227,13 +209,12 @@ class ReportNetworkInterfaceTest {
         when(mockNif.getHardwareAddress()).thenReturn(null);
         when(mockNif.getInetAddresses()).thenReturn(Collections.enumeration(Collections.singletonList(mockIpv4)));
 
-        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
         report.run();
 
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("NET address (IPV4): 127.0.0.1"));
-        assertTrue(logs.contains("Cannot read property: Mock reachable exception"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "NET address (IPV4): 127.0.0.1",
+                "Cannot read property: Mock reachable exception");
     }
 
     @Test
@@ -260,17 +241,16 @@ class ReportNetworkInterfaceTest {
         when(mockNif.supportsMulticast()).thenReturn(true);
         when(mockNif.getHardwareAddress()).thenReturn(new byte[]{(byte) 0xAA, (byte) 0xBB, (byte) 0xCC, (byte) 0xDD, (byte) 0xEE, (byte) 0xFF});
         when(mockNif.getInetAddresses()).thenReturn(Collections.enumeration(Collections.singletonList(mockIpv4)));
-        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
         report.run();
 
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("NET address (IPV4): 10.0.0.1"));
-        assertTrue(logs.contains("host name: internal-host"));
-        assertTrue(logs.contains("canonical host name : internal-host.domain.com"));
-        assertTrue(logs.contains("site-local;"));
-        assertTrue(logs.contains("multicast;"));
-        assertTrue(logs.contains("reachable;"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "NET address (IPV4): 10.0.0.1",
+                "host name: internal-host",
+                "canonical host name : internal-host.domain.com",
+                "site-local;",
+                "multicast;",
+                "reachable;");
     }
 
     @Test
@@ -298,17 +278,16 @@ class ReportNetworkInterfaceTest {
         when(mockNif.getHardwareAddress()).thenReturn(new byte[]{0x11, 0x22, 0x33, 0x44, 0x55, 0x66});
         when(mockNif.getInetAddresses()).thenReturn(Collections.enumeration(Collections.singletonList(mockIpv6)));
 
-        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
         report.run();
 
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("NET address (IPV6): fe80::abcd:1234:5678:90ef"));
-        assertTrue(logs.contains("host name: ipv6-host"));
-        assertTrue(logs.contains("canonical host name : ipv6-host.domain.com"));
-        assertTrue(logs.contains("link-local;"));
-        assertTrue(logs.contains("multicast;"));
-        assertTrue(logs.contains("reachable;"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "NET address (IPV6): fe80::abcd:1234:5678:90ef",
+                "host name: ipv6-host",
+                "canonical host name : ipv6-host.domain.com",
+                "link-local;",
+                "multicast;",
+                "reachable;");
     }
 
     @Test
@@ -336,16 +315,15 @@ class ReportNetworkInterfaceTest {
         when(mockNif.getHardwareAddress()).thenReturn(null);
         when(mockNif.getInetAddresses()).thenReturn(Collections.enumeration(Collections.singletonList(mockIpv4)));
 
-        final ReportNetworkInterface report = new ReportNetworkInterface(mockLogger, mockNif);
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
         report.run();
 
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("NET address (IPV4): 127.0.0.1"));
-        assertTrue(logs.contains("host name: n/a"));
-        assertTrue(logs.contains("canonical host name : n/a"));
-        assertTrue(logs.contains("loopback;"));
-        assertTrue(logs.contains("any-local;"));
-        assertTrue(logs.contains("reachable;"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "NET address (IPV4): 127.0.0.1",
+                "host name: n/a",
+                "canonical host name : n/a",
+                "loopback;",
+                "any-local;",
+                "reachable;");
     }
 }

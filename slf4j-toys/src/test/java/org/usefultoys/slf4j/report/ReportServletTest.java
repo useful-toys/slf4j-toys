@@ -21,10 +21,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -34,40 +35,29 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportServletTest {
 
-    private static final String TEST_REPORTER_NAME = "test.report";
     private ReportServlet servlet;
     private HttpServletRequest request;
     private HttpServletResponse response;
     private StringWriter responseWriter;
-    private MockLogger reportMockLogger; // Logger used by the reports themselves
-    private MockLogger servletMockLogger; // Logger used by the servlet (Slf4j annotation)
+
+    @Slf4jMock("test.report")
+    private Logger reportLogger; // Logger used by the reports themselves
+    @Slf4jMock(type=ReportServlet.class)
+    private Logger servletLogger; // Logger used by the servlet (Slf4j annotation)
 
     @BeforeEach
     void setUp() throws IOException {
         // Configure ReporterConfig to use a known logger name for reports
-        System.setProperty(ReporterConfig.PROP_NAME, TEST_REPORTER_NAME);
+        System.setProperty(ReporterConfig.PROP_NAME, "test.report");
         ReporterConfig.init();
-
-        // Initialize MockLoggers
-        Logger reportLogger = LoggerFactory.getLogger(TEST_REPORTER_NAME);
-        reportMockLogger = (MockLogger) reportLogger;
-        reportMockLogger.clearEvents();
-        reportMockLogger.setInfoEnabled(true); // Ensure INFO level is enabled
-
-        Logger servletLogger = LoggerFactory.getLogger(ReportServlet.class);
-        servletMockLogger = (MockLogger) servletLogger;
-        servletMockLogger.clearEvents();
-        servletMockLogger.setWarnEnabled(true); // Ensure WARN level is enabled for servlet's internal logging
 
         servlet = new ReportServlet();
         request = mock(HttpServletRequest.class);
@@ -81,15 +71,6 @@ class ReportServletTest {
         System.clearProperty(ReporterConfig.PROP_NAME);
     }
 
-    private void assertReportLogged(String expectedContentPart) {
-        assertTrue(reportMockLogger.getEventCount() > 0, "Report logger should have events");
-        String logOutput = reportMockLogger.getLoggerEvents().stream()
-                .map(MockLoggerEvent::getFormattedMessage)
-                .collect(Collectors.joining("\n"));
-        assertTrue(logOutput.contains(expectedContentPart), "Report log output should contain: " + expectedContentPart);
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
-    }
-
     @Test
     void testNoPathInfoReturnsNotFound() throws IOException {
         when(request.getPathInfo()).thenReturn(null);
@@ -99,8 +80,7 @@ class ReportServletTest {
         verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
         verify(response).setContentType("text/plain");
         assertTrue(responseWriter.toString().contains("No report path provided."));
-        assertEquals(1, servletMockLogger.getEventCount());
-        servletMockLogger.assertEvent(0, MockLoggerEvent.Level.WARN, "No report path provided.");
+        AssertLogger.assertEvent(servletLogger, 0, MockLoggerEvent.Level.WARN, "No report path provided.");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -113,8 +93,7 @@ class ReportServletTest {
         verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
         verify(response).setContentType("text/plain");
         assertTrue(responseWriter.toString().contains("Unknown report path: unknown"));
-        assertEquals(1, servletMockLogger.getEventCount());
-        servletMockLogger.assertEvent(0, MockLoggerEvent.Level.WARN, "Unrecognized report path: unknown");
+        AssertLogger.assertEvent(servletLogger, 0, MockLoggerEvent.Level.WARN, "Unrecognized report path: unknown");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -124,7 +103,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: vm"));
-        assertReportLogged("Java Virtual Machine");
+        AssertLogger.assertEvent(reportLogger,0,  MockLoggerEvent.Level.INFO, "Java Virtual Machine");
     }
 
     @Test
@@ -133,7 +112,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: filesystem"));
-        assertReportLogged("File system root:");
+        AssertLogger.assertEvent(reportLogger,0,  MockLoggerEvent.Level.INFO, "File system root:");
     }
 
     @Test
@@ -142,7 +121,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: memory"));
-        assertReportLogged("Memory:");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
     }
 
     @Test
@@ -151,7 +130,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: user"));
-        assertReportLogged("User:");
+        AssertLogger.assertEvent(reportLogger,0,  MockLoggerEvent.Level.INFO, "User:");
     }
 
     @Test
@@ -160,7 +139,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: physicalsystem"));
-        assertReportLogged("Physical system");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Physical system");
     }
 
     @Test
@@ -169,7 +148,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: operatingsystem"));
-        assertReportLogged("Operating System");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Operating System");
     }
 
     @Test
@@ -178,7 +157,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: calendar"));
-        assertReportLogged("Calendar");
+        AssertLogger.assertEvent(reportLogger,0,  MockLoggerEvent.Level.INFO, "Calendar");
     }
 
     @Test
@@ -187,7 +166,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: locale"));
-        assertReportLogged("Locale");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Locale");
     }
 
     @Test
@@ -196,7 +175,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: charset"));
-        assertReportLogged("Charset");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Charset");
     }
 
     @Test
@@ -217,7 +196,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: sslcontext"));
-        assertReportLogged("SSL Context");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "SSL Context");
     }
 
     @Test
@@ -226,7 +205,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: defaulttrustkeystore"));
-        assertReportLogged("Trust Keystore");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Trust Keystore");
     }
 
     @Test
@@ -235,7 +214,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: environment"));
-        assertReportLogged("System Environment:");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "System Environment:");
     }
 
     @Test
@@ -244,7 +223,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: properties"));
-        assertReportLogged("System Properties:");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "System Properties:");
     }
 
     @Test
@@ -253,7 +232,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: jvmarguments"));
-        assertReportLogged("JVM Arguments:");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "JVM Arguments:");
     }
 
     @Test
@@ -262,7 +241,7 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: classpath"));
-        assertReportLogged("Classpath:");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Classpath:");
     }
 
     @Test
@@ -271,6 +250,6 @@ class ReportServletTest {
         servlet.doGet(request, response);
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: garbagecollector"));
-        assertReportLogged("Garbage Collectors:");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Garbage Collectors:");
     }
 }
