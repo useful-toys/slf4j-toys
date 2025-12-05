@@ -16,44 +16,36 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class})
+@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportUserTest {
 
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.user");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.report.user")
+    private Logger logger;
 
     @Test
     void shouldLogUserInformation() {
         // Arrange
-        final ReportUser report = new ReportUser(mockLogger);
+        final ReportUser report = new ReportUser(logger);
 
         // Act
         report.run();
 
         // Assert
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("User:"));
-        assertTrue(logs.contains("name: " + System.getProperty("user.name")));
-        assertTrue(logs.contains("home: " + System.getProperty("user.home")));
+        assertEvent(logger, 0,
+                "User:",
+                "name: " + System.getProperty("user.name"),
+                "home: " + System.getProperty("user.home"));
     }
 }
