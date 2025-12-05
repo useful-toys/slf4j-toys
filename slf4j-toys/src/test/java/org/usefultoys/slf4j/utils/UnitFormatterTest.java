@@ -15,13 +15,12 @@
  */
 package org.usefultoys.slf4j.utils;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.WithLocale;
 
-import java.nio.charset.Charset;
-import java.util.Locale;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,20 +30,12 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  *
  * @author Daniel
  */
+@ExtendWith(CharsetConsistency.class)
+@WithLocale("en")
 class UnitFormatterTest {
 
     private static final int[] FACTORS = {1000, 1000, 1000};
     private static final String[] UNITS = {"A", "B", "C"};
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    @BeforeAll
-    public static void setupConsistentLocale() {
-        Locale.setDefault(Locale.ENGLISH);
-    }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideLongUnitTestCases() {
         return Stream.of(
@@ -117,22 +108,22 @@ class UnitFormatterTest {
             of(1199, "1.2B"),
             of(1200, "1.2B"),
             of(1201, "1.2B"),
-            of(1249, "1.2B"),
-            of(1250, "1.3B"),
-            of(1251, "1.3B"),
-            of(1299, "1.3B"),
-            of(1300, "1.3B"),
-            of(1301, "1.3B"),
-            of(1349, "1.3B"),
-            of(4900, "4.9B"),
-            of(4949, "4.9B"),
-            of(4990, "5.0B"),
-            of(5000, "5.0B"),
-            of(5010, "5.0B"),
-            of(5050, "5.1B"),
-            of(999900, "999.9B"),
-            of(1000000, "1000.0B"),
-            of(1100000, "1.1C")
+            of(1249L, "1.2B"),
+            of(1250L, "1.3B"),
+            of(1251L, "1.3B"),
+            of(1299L, "1.3B"),
+            of(1300L, "1.3B"),
+            of(1301L, "1.3B"),
+            of(1349L, "1.3B"),
+            of(4900L, "4.9B"),
+            of(4949L, "4.9B"),
+            of(4990L, "5.0B"),
+            of(5000L, "5.0B"),
+            of(5010L, "5.0B"),
+            of(5050L, "5.1B"),
+            of(999900L, "999.9B"),
+            of(1000000L, "1000.0B"),
+            of(1100000L, "1.1C")
         );
     }
 
