@@ -16,37 +16,28 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.WithLocale;
 
 import java.io.File;
-import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.usefultoys.slf4j.SessionConfig;
-import java.nio.charset.Charset;
 import static org.mockito.Mockito.*;
 
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@WithLocale("en")
 class ReportFileSystemTest {
 
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
     private MockLogger mockLogger;
-
-    @BeforeAll
-    public static void setUpLocale() {
-        Locale.setDefault(Locale.ENGLISH);
-    }
 
     @BeforeEach
     void setUp() {

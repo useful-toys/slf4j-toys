@@ -16,15 +16,16 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
-import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.WithLocale;
 
-import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -34,17 +35,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@WithLocale("en")
 class ReportJdbcConnectionTest {
 
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-    
     private MockLogger mockLogger;
     private Connection mockConnection;
     private DatabaseMetaData mockMetaData;

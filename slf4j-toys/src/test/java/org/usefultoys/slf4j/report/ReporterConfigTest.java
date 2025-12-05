@@ -16,38 +16,24 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.usefultoys.slf4j.SessionConfig;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.usefultoys.slf4j.utils.ConfigParser;
-
-import java.nio.charset.Charset;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@WithLocale("en")
 class ReporterConfigTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     @BeforeEach
     void setUp() {
-        // Limpa as propriedades do sistema para garantir um estado limpo
-        ReporterConfig.reset();
-        // Limpa os erros de inicialização do ConfigParser
-        ConfigParser.clearInitializationErrors();
         // Reinicializa o ReporterConfig
         ReporterConfig.init();
-    }
-
-    @AfterEach
-    void tearDown() {
-        ReporterConfig.reset();
-        ConfigParser.clearInitializationErrors();
     }
 
     @Test
