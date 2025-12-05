@@ -16,38 +16,16 @@
 
 package org.usefultoys.slf4j;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.usefultoys.slf4j.utils.ConfigParser;
-
-import java.nio.charset.Charset;
+import org.usefultoys.test.ResetSystemConfig;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
-
+@ExtendWith(ResetSystemConfig.class)
 class SystemConfigTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    @BeforeEach
-    void setUp() {
-        // Reinitialize SystemConfig to ensure clean state for each test
-        SystemConfig.reset();
-        ConfigParser.clearInitializationErrors(); // Clear errors for each test
-    }
-
-    @AfterAll
-    static void tearDown() {
-        // Reinitialize SystemConfig to ensure clean state for further tests
-        SystemConfig.reset();
-        ConfigParser.clearInitializationErrors(); // Clear errors after all tests
-    }
 
     @Test
     void testDefaultValues() {
@@ -76,8 +54,16 @@ class SystemConfigTest {
     @Test
     void testUseClassLoadingManagedBean() {
         System.setProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN, "true");
-        SystemConfig.init(); // Reinitialize to apply new system properties
+        SystemConfig.init();
         assertTrue(SystemConfig.useClassLoadingManagedBean, "useClassLoadingManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testUseClassLoadingManagedBeanFalse() {
+        System.setProperty(SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN, "false");
+        SystemConfig.init();
+        assertFalse(SystemConfig.useClassLoadingManagedBean, "useClassLoadingManagedBean should reflect the system property value");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -100,6 +86,14 @@ class SystemConfigTest {
     }
 
     @Test
+    void testUseMemoryManagedBeanFalse() {
+        System.setProperty(SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN, "false");
+        SystemConfig.init(); // Reinitialize to apply new system properties
+        assertFalse(SystemConfig.useMemoryManagedBean, "useMemoryManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
     void testUseMemoryManagedBeanInvalidFormat() {
         System.setProperty(SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN, "invalid");
         SystemConfig.init();
@@ -114,6 +108,14 @@ class SystemConfigTest {
         System.setProperty(SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
         assertTrue(SystemConfig.useCompilationManagedBean, "useCompilationManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testUseCompilationManagedBeanFalse() {
+        System.setProperty(SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN, "false");
+        SystemConfig.init(); // Reinitialize to apply new system properties
+        assertFalse(SystemConfig.useCompilationManagedBean, "useCompilationManagedBean should reflect the system property value");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -136,6 +138,14 @@ class SystemConfigTest {
     }
 
     @Test
+    void testUseGarbageCollectionManagedBeanFalse() {
+        System.setProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, "false");
+        SystemConfig.init(); // Reinitialize to apply new system properties
+        assertFalse(SystemConfig.useGarbageCollectionManagedBean, "useGarbageCollectionManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
     void testUseGarbageCollectionManagedBeanInvalidFormat() {
         System.setProperty(SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, "invalid");
         SystemConfig.init();
@@ -150,6 +160,14 @@ class SystemConfigTest {
         System.setProperty(SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN, "true");
         SystemConfig.init(); // Reinitialize to apply new system properties
         assertTrue(SystemConfig.usePlatformManagedBean, "usePlatformManagedBean should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    void testUsePlatformManagedBeanFalse() {
+        System.setProperty(SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN, "false");
+        SystemConfig.init(); // Reinitialize to apply new system properties
+        assertFalse(SystemConfig.usePlatformManagedBean, "usePlatformManagedBean should reflect the system property value");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
