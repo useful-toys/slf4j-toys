@@ -19,33 +19,28 @@ package org.usefultoys.slf4j.utils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
-import java.nio.charset.Charset;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.ClearConfigParser;
+import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.usefultoys.slf4j.SessionConfig;
-
-
+@ExtendWith({CharsetConsistency.class, ClearConfigParser.class})
+@WithLocale("en")
 class ConfigParserTest {
 
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     @BeforeEach
     void setUp() {
-        ConfigParser.clearInitializationErrors();
         System.clearProperty("test.property");
     }
 
     @AfterEach
     void tearDown() {
-        ConfigParser.clearInitializationErrors();
         System.clearProperty("test.property");
     }
 
