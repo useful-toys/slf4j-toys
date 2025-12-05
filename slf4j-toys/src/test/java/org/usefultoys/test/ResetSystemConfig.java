@@ -19,6 +19,7 @@ package org.usefultoys.test;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.utils.ConfigParser;
 
@@ -27,12 +28,14 @@ public class ResetSystemConfig implements BeforeEachCallback, AfterEachCallback 
     @Override
     public void beforeEach(ExtensionContext context) {
         ConfigParser.clearInitializationErrors();
+        SessionConfig.reset();
         SystemConfig.reset();
     }
 
     @Override
     public void afterEach(ExtensionContext context) {
         ConfigParser.clearInitializationErrors();
+        SessionConfig.reset();
         SystemConfig.reset();
     }
 }
