@@ -16,36 +16,15 @@
 
 package org.usefultoys.slf4j;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-import java.nio.charset.Charset;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.usefultoys.test.ResetSessionConfig;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@ExtendWith(ResetSessionConfig.class)
 class SessionTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    @BeforeEach
-    void setUp() {
-        // Reinitialize WatcherConfig to ensure clean configuration before each test
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        // Reinitialize WatcherConfig to ensure clean configuration for further tests
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
 
     @Test
     void testUuidIsNotNull() {
@@ -68,5 +47,16 @@ class SessionTest {
     void testShortSessionUudi() {
         assertNotNull(Session.shortSessionUuid(), "shortSessionUuid() should not return null");
         assertTrue(Session.uuid.endsWith(Session.shortSessionUuid()));
+        assertEquals(SessionConfig.uuidSize, Session.shortSessionUuid().length(),
+                "shortSessionUuid() should return a string of length " + SessionConfig.uuidSize);
+    }
+
+    @Test
+    void testShortSessionUuidWithNonDefaultSize() {
+        SessionConfig.uuidSize = 10;
+        assertNotNull(Session.shortSessionUuid(), "shortSessionUuid() should not return null");
+        assertTrue(Session.uuid.endsWith(Session.shortSessionUuid()));
+        assertEquals(10, Session.shortSessionUuid().length(),
+                "shortSessionUuid() should return a string of length " + SessionConfig.uuidSize);
     }
 }
