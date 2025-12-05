@@ -100,6 +100,6 @@ class LoggerOutputStreamTest {
     void testToString() throws IOException {
         final TestLoggerOutputStream stream = new TestLoggerOutputStream();
         stream.write("Hello, World!".getBytes(StandardCharsets.UTF_8));
-        assertEquals("Hello, World!", stream.toString ());
+        assertEquals("Hello, World!", stream.toString());
     }
 }
