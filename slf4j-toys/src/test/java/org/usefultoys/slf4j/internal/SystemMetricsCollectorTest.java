@@ -15,33 +15,27 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.ResetSystemConfig;
 
 import java.lang.management.*;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+@ExtendWith({CharsetConsistency.class, ResetSystemConfig.class})
 class SystemMetricsCollectorTest {
-    @BeforeAll
-    static void setupConsistentLocale() {
-        Locale.setDefault(Locale.ENGLISH);
-    }
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
     @Mock
     private com.sun.management.OperatingSystemMXBean mockSunOsBean;
     @Mock
@@ -93,8 +87,6 @@ class SystemMetricsCollectorTest {
     @AfterEach
     void tearDown() throws Exception {
         mockitoCloseable.close();
-        SystemConfig.reset();
-        SystemConfig.init();
     }
 
     @Test

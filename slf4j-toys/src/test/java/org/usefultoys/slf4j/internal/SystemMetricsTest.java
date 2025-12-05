@@ -15,14 +15,9 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.usefultoys.slf4j.SessionConfig;
 
-import java.nio.charset.Charset;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -33,11 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * @author Daniel Felix Ferber
  */
 class SystemMetricsTest {
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
     @Test
     @DisplayName("Should provide a non-null singleton instance")
     void getInstance_providesSingleton() {

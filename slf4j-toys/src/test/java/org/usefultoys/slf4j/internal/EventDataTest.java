@@ -15,23 +15,19 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.usefultoys.slf4j.SessionConfig;
-
-import java.nio.charset.Charset;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@WithLocale("en")
+@ExtendWith(CharsetConsistency.class)
 class EventDataTest {
 
     private static final String FIXED_UUID = "12345"; // Fixed UUID as requested
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     @Test
     @DisplayName("Constructor should initialize fields correctly with default values")

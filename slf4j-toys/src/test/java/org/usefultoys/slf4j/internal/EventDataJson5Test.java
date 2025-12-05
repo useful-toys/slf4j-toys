@@ -15,24 +15,21 @@
  */
 package org.usefultoys.slf4j.internal;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.WithLocale;
 
-import java.nio.charset.Charset;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@WithLocale("en")
+@ExtendWith(CharsetConsistency.class)
 class EventDataJson5Test {
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
     // Concrete class for testing the abstract EventData
     private static class TestEventData extends EventData {
         TestEventData() {
