@@ -22,9 +22,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.Charset;
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 class NullPrintStreamTest {
 
@@ -33,17 +31,15 @@ class NullPrintStreamTest {
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
     }
 
-    @BeforeAll
-    public static void setupConsistentLocale() {
-        Locale.setDefault(Locale.ENGLISH);
-    }
-
     @Test
     void testWriteMethods() {
         final NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.write(new byte[]{1, 2, 3}));
         assertDoesNotThrow(() -> nullPrintStream.write(1));
         assertDoesNotThrow(() -> nullPrintStream.write(new byte[]{1, 2, 3}, 0, 2));
+        assertFalse(nullPrintStream.checkError());
+        assertDoesNotThrow(nullPrintStream::flush);
+        assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
@@ -59,6 +55,9 @@ class NullPrintStreamTest {
         assertDoesNotThrow(() -> nullPrintStream.print(true));
         assertDoesNotThrow(() -> nullPrintStream.print(new Object()));
         assertDoesNotThrow(() -> nullPrintStream.print(new char[]{'a', 'b'}));
+        assertFalse(nullPrintStream.checkError());
+        assertDoesNotThrow(nullPrintStream::flush);
+        assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
@@ -74,6 +73,9 @@ class NullPrintStreamTest {
         assertDoesNotThrow(() -> nullPrintStream.println(true));
         assertDoesNotThrow(() -> nullPrintStream.println(new Object()));
         assertDoesNotThrow(() -> nullPrintStream.println(new char[]{'a', 'b'}));
+        assertFalse(nullPrintStream.checkError());
+        assertDoesNotThrow(nullPrintStream::flush);
+        assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
@@ -82,6 +84,9 @@ class NullPrintStreamTest {
         assertDoesNotThrow(() -> nullPrintStream.append("test"));
         assertDoesNotThrow(() -> nullPrintStream.append('c'));
         assertDoesNotThrow(() -> nullPrintStream.append("test", 0, 2));
+        assertFalse(nullPrintStream.checkError());
+        assertDoesNotThrow(nullPrintStream::flush);
+        assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
@@ -89,6 +94,9 @@ class NullPrintStreamTest {
         final NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.format("test %s", "value"));
         assertDoesNotThrow(() -> nullPrintStream.format(Locale.US, "test %s", "value"));
+        assertFalse(nullPrintStream.checkError());
+        assertDoesNotThrow(nullPrintStream::flush);
+        assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
@@ -96,5 +104,8 @@ class NullPrintStreamTest {
         final NullPrintStream nullPrintStream = new NullPrintStream();
         assertDoesNotThrow(() -> nullPrintStream.printf("test %s", "value"));
         assertDoesNotThrow(() -> nullPrintStream.printf(Locale.US, "test %s", "value"));
+        assertFalse(nullPrintStream.checkError());
+        assertDoesNotThrow(nullPrintStream::flush);
+        assertDoesNotThrow(nullPrintStream::close);
     }
 }
