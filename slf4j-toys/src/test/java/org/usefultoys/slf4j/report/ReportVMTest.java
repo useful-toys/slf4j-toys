@@ -16,43 +16,37 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
+import org.slf4j.Logger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class})
+@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportVMTest {
 
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        mockLogger = (MockLogger) LoggerFactory.getLogger("test.report.vm");
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.report.vm")
+    private Logger logger;
 
     @Test
     void shouldLogJvmInformation() {
         // Arrange
-        final ReportVM report = new ReportVM(mockLogger);
+        final ReportVM report = new ReportVM(logger);
 
         // Act
         report.run();
 
         // Assert
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("Java Virtual Machine"));
-        assertTrue(logs.contains("vendor: " + System.getProperty("java.vendor")));
-        assertTrue(logs.contains("version: " + System.getProperty("java.version")));
-        assertTrue(logs.contains("installation directory: " + System.getProperty("java.home")));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "Java Virtual Machine",
+                "vendor: " + System.getProperty("java.vendor"),
+                "version: " + System.getProperty("java.version"),
+                "installation directory: " + System.getProperty("java.home"));
     }
 }
