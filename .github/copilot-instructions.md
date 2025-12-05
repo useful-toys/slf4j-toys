@@ -45,6 +45,12 @@ to help it better understand this project and provide more accurate suggestions.
 - Group related tests using nested test classes with @Nested when appropriate
 - Use Given-When-Then structure in test comments for clarity
 
+### Configuration Reset in Tests
+If a test uses a configuration class (e.g., `SessionConfig`), the test class must include the `@ExtendWith(ResetConfig.class)` annotation (e.g., `@ExtendWith(ResetSessionConfig.class)`). This eliminates the need for `@BeforeAll` and `@AfterAll` methods that reset the configuration. This applies to all configuration sources, including `SystemConfig`, `MeterConfig`, `WatcherConfig`, and `ReporterConfig`.
+
+### Locale-Sensitive Tests
+Test classes that perform string comparisons involving decimal numbers or dates must be annotated with `@WithLocale("en")`. This ensures that tests run uniformly and predictably across different environments and operating systems by standardizing the locale.
+
 ### Assertion Best Practices
 - **All assertions must include descriptive failure messages**
 - **Assertion messages should use "should" format** (e.g., "should return non-null value", "should throw IllegalArgumentException")
