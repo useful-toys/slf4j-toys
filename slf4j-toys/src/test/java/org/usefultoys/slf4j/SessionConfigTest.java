@@ -16,38 +16,17 @@
 
 package org.usefultoys.slf4j;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.usefultoys.test.ResetSessionConfig;
 
 import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-
+@ExtendWith(ResetSessionConfig.class)
 class SessionConfigTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    @BeforeEach
-    void setUp() {
-        // Reinitialize WatcherConfig to ensure clean configuration before each test
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        // Reinitialize WatcherConfig to ensure clean configuration for further tests
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
-
     @Test
     void testDefaultValues() {
         SessionConfig.init();
@@ -67,6 +46,13 @@ class SessionConfigTest {
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "10");
         SessionConfig.init(); // Reinitialize to apply new system properties
         assertEquals(10, SessionConfig.uuidSize, "uuidSize should reflect the system property value");
+    }
+
+    @Test
+    void testUuidSizePropertyWithNonDefaultValue() {
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "15");
+        SessionConfig.init(); // Reinitialize to apply new system properties
+        assertEquals(15, SessionConfig.uuidSize, "uuidSize should reflect the system property value");
     }
 
     @Test
