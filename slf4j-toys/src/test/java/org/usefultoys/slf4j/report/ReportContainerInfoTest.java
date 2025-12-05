@@ -17,13 +17,14 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
@@ -33,40 +34,29 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportContainerInfoTest {
 
-    private static final String TEST_LOGGER_NAME = "test.logger";
-    private MockLogger mockLogger;
+    private static final String TEST_LOGGER_NAME = "test.report.container";
+    @Slf4jMock(TEST_LOGGER_NAME)
+    private Logger logger;
 
-    @BeforeEach
-    void setUp() {
-        Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
-        mockLogger = (MockLogger) testLogger;
-        mockLogger.clearEvents();
-        mockLogger.setInfoEnabled(true); // Ensure INFO level is enabled
-        mockLogger.setWarnEnabled(true); // Ensure WARN level is enabled for error reporting
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-
-    private String getLogOutput() {
-        return mockLogger.getLoggerEvents().stream()
-                .map(MockLoggerEvent::getFormattedMessage)
-                .collect(Collectors.joining("\n"));
+    private org.slf4j.impl.MockLogger getMockLogger() {
+        return (org.slf4j.impl.MockLogger) logger;
     }
 
     // Helper method to create a ReportContainerInfo instance with mocked environment and file system
     private ReportContainerInfo createReportContainerInfo(Map<String, String> envMap, Map<String, String> fileContentMap) {
-        return new ReportContainerInfo(mockLogger) {
+        final MockLogger mockLogger = getMockLogger();
+        mockLogger.clearEvents();
+        mockLogger.setInfoEnabled(true);
+        mockLogger.setWarnEnabled(true);
+        return new ReportContainerInfo(logger) {
             @Override
             protected Map<String, String> getEnvironmentVariables() {
                 return envMap;
@@ -98,15 +88,15 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains("Container Info:"));
-        assertTrue(logOutput.contains(" - Hostname: my-docker-container"));
-        assertTrue(logOutput.contains(" - Container ID (cgroup): a1b2c3d4e5f67890abcdef1234567890"));
-        assertTrue(logOutput.contains(" - Memory Limit: 1073.7MB"));
-        assertTrue(logOutput.contains(" - CPU Limit: 1.00 cores"));
-        assertTrue(logOutput.contains(" - Docker Container ID (env): a1b2c3d4e5f6"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - Hostname: my-docker-container",
+            " - Container ID (cgroup): a1b2c3d4e5f67890abcdef1234567890",
+            " - Memory Limit: 1073.7MB",
+            " - CPU Limit: 1.00 cores",
+            " - Docker Container ID (env): a1b2c3d4e5f6");
         assertTrue(ConfigParser.isInitializationOK());
-        assertEquals(0, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
     }
 
     @Test
@@ -127,17 +117,17 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains("Container Info:"));
-        assertTrue(logOutput.contains(" - Hostname: my-pod-123"));
-        assertTrue(logOutput.contains(" - Kubernetes Pod Name: my-app-pod-xyz"));
-        assertTrue(logOutput.contains(" - Kubernetes Namespace: production"));
-        assertTrue(logOutput.contains(" - Kubernetes Node Name: worker-node-1"));
-        assertTrue(logOutput.contains(" - Container ID (cgroup): Not available"));
-        assertTrue(logOutput.contains(" - Memory Limit: Not available (not in Linux container or no read access)"));
-        assertTrue(logOutput.contains(" - CPU Limit: Not available (not in Linux container or no read access)"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - Hostname: my-pod-123",
+            " - Kubernetes Pod Name: my-app-pod-xyz",
+            " - Kubernetes Namespace: production",
+            " - Kubernetes Node Name: worker-node-1",
+            " - Container ID (cgroup): Not available",
+            " - Memory Limit: Not available (not in Linux container or no read access)",
+            " - CPU Limit: Not available (not in Linux container or no read access)");
         assertTrue(ConfigParser.isInitializationOK());
-        assertEquals(0, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
     }
 
     @Test
@@ -152,14 +142,14 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains("Container Info:"));
-        assertTrue(logOutput.contains(" - Hostname: unknown"));
-        assertTrue(logOutput.contains(" - Container ID (cgroup): Not available"));
-        assertTrue(logOutput.contains(" - Memory Limit: Not available (not in Linux container or no read access)"));
-        assertTrue(logOutput.contains(" - CPU Limit: Not available (not in Linux container or no read access)"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - Hostname: unknown",
+            " - Container ID (cgroup): Not available",
+            " - Memory Limit: Not available (not in Linux container or no read access)",
+            " - CPU Limit: Not available (not in Linux container or no read access)");
         assertTrue(ConfigParser.isInitializationOK());
-        assertEquals(0, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
     }
 
     @Test
@@ -173,11 +163,14 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - Hostname: test-host"));
-        assertTrue(logOutput.contains(" - Container ID (cgroup): Error reading cgroup file"));
-        assertEquals(1, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "One WARN log expected");
-        assertTrue(mockLogger.getLoggerEvents().stream().anyMatch(e -> e.getFormattedMessage().contains("Failed to read /proc/self/cgroup: Simulated IO Error for /proc/self/cgroup")));
+        final int infoEventIndex = getMockLogger().getEventCount() - 1;
+
+        AssertLogger.assertEvent(logger, infoEventIndex, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - Hostname: test-host",
+            " - Container ID (cgroup): Error reading cgroup file");
+        assertEquals(1, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "One WARN log expected");
+        assertTrue(getMockLogger().getLoggerEvents().stream().anyMatch(e -> e.getFormattedMessage().contains("Failed to read /proc/self/cgroup: Simulated IO Error for /proc/self/cgroup")));
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -190,10 +183,13 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - Memory Limit: Error reading"));
-        assertEquals(1, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "One WARN log expected");
-        assertTrue(mockLogger.getLoggerEvents().stream().anyMatch(e -> e.getFormattedMessage().contains("Failed to read memory limit from cgroup: For input string: \"invalid_number\"")));
+        final int infoEventIndex = getMockLogger().getEventCount() - 1;
+
+        AssertLogger.assertEvent(logger, infoEventIndex, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - Memory Limit: Error reading");
+        assertEquals(1, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "One WARN log expected");
+        assertTrue(getMockLogger().getLoggerEvents().stream().anyMatch(e -> e.getFormattedMessage().contains("Failed to read memory limit from cgroup: For input string: \"invalid_number\"")));
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -207,10 +203,13 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - CPU Limit: Error reading"));
-        assertEquals(1, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "One WARN log expected");
-        assertTrue(mockLogger.getLoggerEvents().stream().anyMatch(e -> e.getFormattedMessage().contains("Failed to read CPU limit from cgroup: For input string: \"invalid_quota\"")));
+        final int infoEventIndex = getMockLogger().getEventCount() - 1;
+
+        AssertLogger.assertEvent(logger, infoEventIndex, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - CPU Limit: Error reading");
+        assertEquals(1, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "One WARN log expected");
+        assertTrue(getMockLogger().getLoggerEvents().stream().anyMatch(e -> e.getFormattedMessage().contains("Failed to read CPU limit from cgroup: For input string: \"invalid_quota\"")));
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -223,9 +222,10 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - Container ID (cgroup): Not found in cgroup (not a Docker container?)"));
-        assertEquals(0, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - Container ID (cgroup): Not found in cgroup (not a Docker container?)");
+        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -238,9 +238,10 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - Memory Limit: No limit set"));
-        assertEquals(0, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - Memory Limit: No limit set");
+        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -254,9 +255,10 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - CPU Limit: No limit set"));
-        assertEquals(0, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - CPU Limit: No limit set");
+        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -270,9 +272,10 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - CPU Limit: No limit set"));
-        assertEquals(0, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - CPU Limit: No limit set");
+        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -286,9 +289,10 @@ class ReportContainerInfoTest {
         ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
         reporter.run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - CPU Limit: No limit set"));
-        assertEquals(0, mockLogger.getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - CPU Limit: No limit set");
+        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
         assertTrue(ConfigParser.isInitializationOK());
     }
 }

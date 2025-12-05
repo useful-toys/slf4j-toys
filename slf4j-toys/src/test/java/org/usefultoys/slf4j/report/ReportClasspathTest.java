@@ -17,15 +17,15 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
@@ -35,29 +35,22 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportClasspathTest {
 
-    private static final String TEST_LOGGER_NAME = "test.logger";
-    private MockLogger mockLogger;
+    private static final String TEST_LOGGER_NAME = "test.report.classpath";
+    @Slf4jMock(TEST_LOGGER_NAME)
+    private Logger logger;
     private MockedStatic<ManagementFactory> mockedManagementFactory;
     private RuntimeMXBean mockRuntimeMXBean;
 
-    @BeforeEach
-    void setUp() {
-        Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
-        mockLogger = (MockLogger) testLogger;
-        mockLogger.clearEvents();
-        mockLogger.setInfoEnabled(true); // Ensure INFO level is enabled
-
-        // Mock ManagementFactory and RuntimeMXBean
+    private void setupRuntimeMXBean() {
         mockedManagementFactory = Mockito.mockStatic(ManagementFactory.class);
         mockRuntimeMXBean = mock(RuntimeMXBean.class);
         mockedManagementFactory.when(ManagementFactory::getRuntimeMXBean).thenReturn(mockRuntimeMXBean);
@@ -65,13 +58,9 @@ class ReportClasspathTest {
 
     @AfterEach
     void tearDown() {
-        mockedManagementFactory.close(); // Close the mock static
-    }
-
-    private String getLogOutput() {
-        return mockLogger.getLoggerEvents().stream()
-                .map(MockLoggerEvent::getFormattedMessage)
-                .collect(Collectors.joining("\n"));
+        if (mockedManagementFactory != null) {
+            mockedManagementFactory.close(); // Close the mock static
+        }
     }
 
     @Test
@@ -81,15 +70,15 @@ class ReportClasspathTest {
         Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put("path.separator", pathSeparator);
 
+        setupRuntimeMXBean();
         when(mockRuntimeMXBean.getClassPath()).thenReturn(classpath);
         when(mockRuntimeMXBean.getSystemProperties()).thenReturn(systemProperties);
 
-        new ReportClasspath(mockLogger).run();
-
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains("Classpath:"));
-        assertTrue(logOutput.contains(" - /path/to/my.jar"));
-        assertTrue(logOutput.contains(" - /path/to/classes"));
+        new ReportClasspath(logger).run();
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Classpath:",
+            " - /path/to/my.jar",
+            " - /path/to/classes");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -100,13 +89,14 @@ class ReportClasspathTest {
         Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put("path.separator", pathSeparator);
 
+        setupRuntimeMXBean();
         when(mockRuntimeMXBean.getClassPath()).thenReturn(classpath);
         when(mockRuntimeMXBean.getSystemProperties()).thenReturn(systemProperties);
 
-        new ReportClasspath(mockLogger).run();
-
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - Classpath is empty."));
+        new ReportClasspath(logger).run();
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Classpath:",
+            " - Classpath is empty.");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -117,13 +107,14 @@ class ReportClasspathTest {
         Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put("path.separator", pathSeparator);
 
+        setupRuntimeMXBean();
         when(mockRuntimeMXBean.getClassPath()).thenReturn(classpath);
         when(mockRuntimeMXBean.getSystemProperties()).thenReturn(systemProperties);
 
-        new ReportClasspath(mockLogger).run();
-
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - Classpath is empty."));
+        new ReportClasspath(logger).run();
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Classpath:",
+            " - Classpath is empty.");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -134,14 +125,15 @@ class ReportClasspathTest {
         Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put("path.separator", pathSeparator);
 
+        setupRuntimeMXBean();
         when(mockRuntimeMXBean.getClassPath()).thenReturn(classpath);
         when(mockRuntimeMXBean.getSystemProperties()).thenReturn(systemProperties);
 
-        new ReportClasspath(mockLogger).run();
-
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - C:\\path\\to\\my.jar"));
-        assertTrue(logOutput.contains(" - C:\\path\\to\\classes"));
+        new ReportClasspath(logger).run();
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Classpath:",
+            " - C:\\path\\to\\my.jar",
+            " - C:\\path\\to\\classes");
         assertTrue(ConfigParser.isInitializationOK());
     }
 }
