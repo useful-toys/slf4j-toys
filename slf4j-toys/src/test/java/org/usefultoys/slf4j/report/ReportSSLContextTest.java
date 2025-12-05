@@ -16,13 +16,14 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -34,22 +35,15 @@ import javax.net.ssl.SSLSocketFactory;
 import java.security.Provider;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportSSLContextTest {
 
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.sslcontext");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.report.sslcontext")
+    private Logger logger;
 
     @Test
     void testRun() throws Exception {
@@ -87,35 +81,33 @@ class ReportSSLContextTest {
             when(mockSupportedParams.getProtocols()).thenReturn(new String[]{"TLSv1.2", "TLSv1.3", "Proto3", "Proto4", "Proto5", "Proto6", "Proto7", "Proto8", "Proto9", "Proto10", "Proto11", "Proto12"});
             when(mockSupportedParams.getCipherSuites()).thenReturn(new String[]{"TLS_DHE_DSS_WITH_AES_128_CBC_SHA", "TLS_AES_128_GCM_SHA256"});
 
-            final ReportSSLContext report = new ReportSSLContext(mockLogger);
+            final ReportSSLContext report = new ReportSSLContext(logger);
             report.run();
 
-            assertEquals(report.contextNames.length, mockLogger.getEventCount());
-            final String logs = mockLogger.getEvent(0).getFormattedMessage();
-
-            assertTrue(logs.contains("SSL Context Default"));
-            assertTrue(logs.contains("   Protocol: TLSv1.2"));
-            assertTrue(logs.contains("   Provider:"));
-            assertTrue(logs.contains("    - Provider.id name: SunJSSE"));
-            assertTrue(logs.contains("   SocketFactory: "));
-            assertTrue(logs.contains("      Default Cipher Suites:TLS_DHE_DSS_WITH_AES_128_CBC_SHA;"));
-            assertTrue(logs.contains("      Supported Cipher Suites: TLS_DHE_DSS_WITH_AES_128_CBC_SHA; TLS_DHE_DSS_WITH_AES_256_CBC_SHA;"));
-            assertTrue(logs.contains("   ServerSocketFactory: "));
-            assertTrue(logs.contains("      Default Cipher Suites:TLS_DHE_DSS_WITH_AES_128_CBC_SHA;"));
-            assertTrue(logs.contains("      Supported Cipher Suites:TLS_DHE_DSS_WITH_AES_128_CBC_SHA; TLS_DHE_DSS_WITH_AES_256_CBC_SHA;"));
-            assertTrue(logs.contains("   Default SSL Parameters:"));
-            assertTrue(logs.contains("      EndpointIdentificationAlgorithm: HTTPS"));
-            assertTrue(logs.contains("      Need Client Auth: false"));
-            assertTrue(logs.contains("      Want Client Auth: true"));
-            assertTrue(logs.contains("      Protocols: TLSv1.2;"));
-            assertTrue(logs.contains("      Cipher Suites: TLS_DHE_DSS_WITH_AES_128_CBC_SHA;"));
-            assertTrue(logs.contains("   Supported SSL Parameters:"));
-            assertTrue(logs.contains("      EndpointIdentificationAlgorithm: HTTPS"));
-            assertTrue(logs.contains("      Need Client Auth: false"));
-            assertTrue(logs.contains("      Want Client Auth: true"));
-            assertTrue(logs.contains("      Protocols: TLSv1.2; TLSv1.3; Proto3; Proto4; Proto5; Proto6; Proto7; Proto8; Proto9;"));
-            assertTrue(logs.contains("          Proto10; Proto11; Proto12;"));
-            assertTrue(logs.contains("      Cipher Suites: TLS_DHE_DSS_WITH_AES_128_CBC_SHA; TLS_AES_128_GCM_SHA256;"));
+            AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "SSL Context Default",
+                "   Protocol: TLSv1.2",
+                "   Provider:",
+                "    - Provider.id name: SunJSSE",
+                "   SocketFactory: ",
+                "      Default Cipher Suites:TLS_DHE_DSS_WITH_AES_128_CBC_SHA;",
+                "      Supported Cipher Suites: TLS_DHE_DSS_WITH_AES_128_CBC_SHA; TLS_DHE_DSS_WITH_AES_256_CBC_SHA;",
+                "   ServerSocketFactory: ",
+                "      Default Cipher Suites:TLS_DHE_DSS_WITH_AES_128_CBC_SHA;",
+                "      Supported Cipher Suites:TLS_DHE_DSS_WITH_AES_128_CBC_SHA; TLS_DHE_DSS_WITH_AES_256_CBC_SHA;",
+                "   Default SSL Parameters:",
+                "      EndpointIdentificationAlgorithm: HTTPS",
+                "      Need Client Auth: false",
+                "      Want Client Auth: true",
+                "      Protocols: TLSv1.2;",
+                "      Cipher Suites: TLS_DHE_DSS_WITH_AES_128_CBC_SHA;",
+                "   Supported SSL Parameters:",
+                "      EndpointIdentificationAlgorithm: HTTPS",
+                "      Need Client Auth: false",
+                "      Want Client Auth: true",
+                "      Protocols: TLSv1.2; TLSv1.3; Proto3; Proto4; Proto5; Proto6; Proto7; Proto8; Proto9;",
+                "          Proto10; Proto11; Proto12;",
+                "      Cipher Suites: TLS_DHE_DSS_WITH_AES_128_CBC_SHA; TLS_AES_128_GCM_SHA256;");
         }
     }
 
@@ -124,18 +116,10 @@ class ReportSSLContextTest {
         try (MockedStatic<SSLContext> mockedStatic = mockStatic(SSLContext.class)) {
             mockedStatic.when(() -> SSLContext.getInstance("SSLv2")).thenThrow(new java.security.NoSuchAlgorithmException("SSLv2 not available"));
 
-            final ReportSSLContext report = new ReportSSLContext(mockLogger);
+            final ReportSSLContext report = new ReportSSLContext(logger);
             report.run();
 
-            boolean found = false;
-            for (int i = 0; i < mockLogger.getEventCount(); i++) {
-                if (mockLogger.getEvent(i).getFormattedMessage().contains("SSL Context SSLv2") &&
-                    mockLogger.getEvent(i).getFormattedMessage().contains("Failed to detail SSLContext: SSLv2 not available")) {
-                    found = true;
-                    break;
-                }
-            }
-            assertTrue(found, "Log message for SSLv2 failure not found.");
+            AssertLogger.assertHasEvent(logger, MockLoggerEvent.Level.INFO, "SSL Context SSLv2", "Failed to detail SSLContext: SSLv2 not available");
         }
     }
 }

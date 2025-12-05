@@ -17,38 +17,29 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportSystemEnvironmentTest {
 
-    private static final String TEST_LOGGER_NAME = "test.logger";
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        // Initialize MockLogger
-        Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
-        mockLogger = (MockLogger) testLogger;
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.logger.env")
+    private Logger logger;
 
     @AfterEach
     void tearDown() {
@@ -56,16 +47,9 @@ class ReportSystemEnvironmentTest {
         System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
     }
 
-    // Helper method to get all formatted log messages from the MockLogger
-    private String getLogOutput() {
-        return mockLogger.getLoggerEvents().stream()
-                .map(MockLoggerEvent::getFormattedMessage)
-                .collect(Collectors.joining("\n"));
-    }
-
     // Helper method to create a ReportSystemEnvironment instance with a mocked environment
     private ReportSystemEnvironment createReportSystemEnvironment(Map<String, String> envMap) {
-        return new ReportSystemEnvironment(mockLogger) {
+        return new ReportSystemEnvironment(logger) {
             @Override
             protected Map<String, String> getEnvironmentVariables() {
                 return envMap;
@@ -82,11 +66,10 @@ class ReportSystemEnvironmentTest {
 
         createReportSystemEnvironment(testEnv).run();
 
-        String logOutput = getLogOutput();
-
-        assertTrue(logOutput.contains("TEST_PASSWORD: ********"), "Log output should censor TEST_PASSWORD");
-        assertTrue(logOutput.contains("TEST_SECRET: ********"), "Log output should censor TEST_SECRET");
-        assertTrue(logOutput.contains("TEST_NORMAL: normalvalue"), "Log output should contain TEST_NORMAL value");
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "TEST_PASSWORD: ********",
+                "TEST_SECRET: ********",
+                "TEST_NORMAL: normalvalue");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -101,10 +84,9 @@ class ReportSystemEnvironmentTest {
 
         createReportSystemEnvironment(testEnv).run();
 
-        String logOutput = getLogOutput();
-
-        assertTrue(logOutput.contains("TEST_CUSTOM_KEY: ********"), "Log output should censor TEST_CUSTOM_KEY with custom regex");
-        assertTrue(logOutput.contains("TEST_NORMAL: normalvalue"), "Log output should contain TEST_NORMAL value");
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "TEST_CUSTOM_KEY: ********",
+                "TEST_NORMAL: normalvalue");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -119,10 +101,9 @@ class ReportSystemEnvironmentTest {
 
         createReportSystemEnvironment(testEnv).run();
 
-        String logOutput = getLogOutput();
-
-        assertTrue(logOutput.contains("TEST_PASSWORD: mysecretpassword"), "Log output should NOT censor TEST_PASSWORD when regex is empty");
-        assertTrue(logOutput.contains("TEST_SECRET: anothersecret"), "Log output should NOT censor TEST_SECRET when regex is empty");
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "TEST_PASSWORD: mysecretpassword",
+                "TEST_SECRET: anothersecret");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -137,10 +118,9 @@ class ReportSystemEnvironmentTest {
 
         createReportSystemEnvironment(testEnv).run();
 
-        String logOutput = getLogOutput();
-
-        assertTrue(logOutput.contains("TEST_PASSWORD: mysecretpassword"), "Log output should NOT censor TEST_PASSWORD when regex does not match");
-        assertTrue(logOutput.contains("TEST_SECRET: anothersecret"), "Log output should NOT censor TEST_SECRET when regex does not match");
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "TEST_PASSWORD: mysecretpassword",
+                "TEST_SECRET: anothersecret");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 }

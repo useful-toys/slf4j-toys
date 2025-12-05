@@ -16,44 +16,37 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportPhysicalSystemTest {
 
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.physical");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.report.physical")
+    private Logger logger;
 
     @Test
     void shouldLogPhysicalSystemInformation() {
         // Arrange
-        final ReportPhysicalSystem report = new ReportPhysicalSystem(mockLogger);
+        final ReportPhysicalSystem report = new ReportPhysicalSystem(logger);
         final int expectedProcessors = Runtime.getRuntime().availableProcessors();
 
         // Act
         report.run();
 
         // Assert
-        assertTrue(mockLogger.getEventCount() > 0);
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("Physical system"));
-        assertTrue(logs.contains("processors: " + expectedProcessors));
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "Physical system",
+                "processors: " + expectedProcessors);
     }
 }

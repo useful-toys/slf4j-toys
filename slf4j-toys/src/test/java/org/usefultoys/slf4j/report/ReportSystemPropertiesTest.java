@@ -17,37 +17,26 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
 
-import java.util.stream.Collectors;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportSystemPropertiesTest {
 
-    private static final String TEST_LOGGER_NAME = "test.logger";
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        // Initialize MockLogger
-        // LoggerFactory.getLogger should return a MockLogger in the test environment due to slf4j-simple binding
-        Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
-        mockLogger = (MockLogger) testLogger;
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.logger.props")
+    private Logger logger;
 
     @AfterEach
     void tearDown() {
@@ -55,14 +44,6 @@ class ReportSystemPropertiesTest {
         System.clearProperty("test.password");
         System.clearProperty("test.secret");
         System.clearProperty("test.normal");
-        System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
-    }
-
-    // Helper method to get all formatted log messages from the MockLogger
-    private String getLogOutput() {
-        return mockLogger.getLoggerEvents().stream()
-                .map(MockLoggerEvent::getFormattedMessage)
-                .collect(Collectors.joining("\n"));
     }
 
     @Test
@@ -71,13 +52,12 @@ class ReportSystemPropertiesTest {
         System.setProperty("test.secret", "anothersecret");
         System.setProperty("test.normal", "normalvalue");
 
-        new ReportSystemProperties(mockLogger).run();
+        new ReportSystemProperties(logger).run();
 
-        String logOutput = getLogOutput();
-
-        assertTrue(logOutput.contains("test.password: ********"), "Log output should censor test.password");
-        assertTrue(logOutput.contains("test.secret: ********"), "Log output should censor test.secret");
-        assertTrue(logOutput.contains("test.normal: normalvalue"), "Log output should contain test.normal value");
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "test.password: ********",
+                "test.secret: ********",
+                "test.normal: normalvalue");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -89,12 +69,11 @@ class ReportSystemPropertiesTest {
         System.setProperty("test.custom.key", "customvalue");
         System.setProperty("test.normal", "normalvalue");
 
-        new ReportSystemProperties(mockLogger).run();
+        new ReportSystemProperties(logger).run();
 
-        String logOutput = getLogOutput();
-
-        assertTrue(logOutput.contains("test.custom.key: ********"), "Log output should censor test.custom.key with custom regex");
-        assertTrue(logOutput.contains("test.normal: normalvalue"), "Log output should contain test.normal value");
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "test.custom.key: ********",
+                "test.normal: normalvalue");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -106,12 +85,11 @@ class ReportSystemPropertiesTest {
         System.setProperty("test.password", "mysecretpassword");
         System.setProperty("test.secret", "anothersecret");
 
-        new ReportSystemProperties(mockLogger).run();
+        new ReportSystemProperties(logger).run();
 
-        String logOutput = getLogOutput();
-
-        assertTrue(logOutput.contains("test.password: mysecretpassword"), "Log output should NOT censor test.password when regex is empty");
-        assertTrue(logOutput.contains("test.secret: anothersecret"), "Log output should NOT censor test.secret when regex is empty");
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "test.password: mysecretpassword",
+                "test.secret: anothersecret");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -123,12 +101,11 @@ class ReportSystemPropertiesTest {
         System.setProperty("test.password", "mysecretpassword");
         System.setProperty("test.secret", "anothersecret");
 
-        new ReportSystemProperties(mockLogger).run();
+        new ReportSystemProperties(logger).run();
 
-        String logOutput = getLogOutput();
-
-        assertTrue(logOutput.contains("test.password: mysecretpassword"), "Log output should NOT censor test.password when regex does not match");
-        assertTrue(logOutput.contains("test.secret: anothersecret"), "Log output should NOT censor test.secret when regex does not match");
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "test.password: mysecretpassword",
+                "test.secret: anothersecret");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 }

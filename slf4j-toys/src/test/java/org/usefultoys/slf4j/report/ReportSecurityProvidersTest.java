@@ -23,10 +23,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -34,27 +35,21 @@ import org.usefultoys.test.WithLocale;
 import java.security.Provider;
 import java.security.Security;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportSecurityProvidersTest {
 
-    private static final String TEST_LOGGER_NAME = "test.logger";
-    private MockLogger mockLogger;
+    @Slf4jMock("test.logger")
+    private Logger logger;
     private MockedStatic<Security> mockedSecurity;
 
     @BeforeEach
     void setUp() {
-        Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
-        mockLogger = (MockLogger) testLogger;
-        mockLogger.clearEvents();
-        mockLogger.setInfoEnabled(true); // Ensure INFO level is enabled
-
         // Mock Security class
         mockedSecurity = Mockito.mockStatic(Security.class);
     }
@@ -62,12 +57,6 @@ class ReportSecurityProvidersTest {
     @AfterEach
     void tearDown() {
         mockedSecurity.close(); // Close the mock static
-    }
-
-    private String getLogOutput() {
-        return mockLogger.getLoggerEvents().stream()
-                .map(MockLoggerEvent::getFormattedMessage)
-                .collect(Collectors.joining("\n"));
     }
 
     @Test
@@ -86,17 +75,19 @@ class ReportSecurityProvidersTest {
 
         when(Security.getProviders()).thenReturn(new Provider[]{provider1, provider2});
 
-        new ReportSecurityProviders(mockLogger).run();
+        new ReportSecurityProviders(logger).run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains("Security Providers:"));
-        assertTrue(logOutput.contains(" - Provider 1: SUN (Version: 1.800000)"));
-        assertTrue(logOutput.contains("   Info: SUN security provider"));
-        assertTrue(logOutput.contains("   Services:"));
-        assertTrue(logOutput.contains("    - Signature.SHA1withDSA: SUN provider"));
-        assertTrue(logOutput.contains(" - Provider 2: BC (Version: 1.680000)"));
-        assertTrue(logOutput.contains("   Info: Bouncy Castle security provider"));
-        assertTrue(logOutput.contains("    - Cipher.AES: BC provider"));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "Security Providers:",
+                " - Provider 1: SUN (Version: 1.800000)",
+                "   Info: SUN security provider",
+                "   Services:",
+                "    - Signature.SHA1withDSA: SUN provider",
+                " - Provider 2: BC (Version: 1.680000)",
+                "   Info: Bouncy Castle security provider",
+                "   Services:",
+                "    - Cipher.AES: BC provider"
+        );
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -104,10 +95,9 @@ class ReportSecurityProvidersTest {
     void testNoSecurityProvidersFound() {
         when(Security.getProviders()).thenReturn(new Provider[]{});
 
-        new ReportSecurityProviders(mockLogger).run();
+        new ReportSecurityProviders(logger).run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - No security providers found."));
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "Security Providers:", " - No security providers found.");
         assertTrue(ConfigParser.isInitializationOK());
     }
 }
