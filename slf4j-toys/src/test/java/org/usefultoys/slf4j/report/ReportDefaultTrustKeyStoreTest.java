@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.slf4j.Logger;
-import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
@@ -38,8 +37,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvent;
 
 @ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
@@ -71,14 +71,12 @@ class ReportDefaultTrustKeyStoreTest {
             final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
-            final String logs = ((MockLogger) logger).getEvent(0).getFormattedMessage();
-
-            assertTrue(logs.contains("Trust Keystore"));
-            assertTrue(logs.contains(" - TrustManager: 0 (class org.mockito.codegen.X509TrustManager$MockitoMock$"));
-            assertTrue(logs.contains("   - Certificate #0"));
-            assertTrue(logs.contains("       Subject: CN=Test Subject"));
-            assertTrue(logs.contains("       Issuer: CN=Test Issuer"));
-            assertTrue(logs.contains("       #: 12345 From: " + notBefore + " Until: " + notAfter));
+            assertHasEvent(logger, "Trust Keystore");
+            assertHasEvent(logger, " - TrustManager: 0 (class org.mockito.codegen.X509TrustManager$MockitoMock$");
+            assertHasEvent(logger, "   - Certificate #0");
+            assertHasEvent(logger, "       Subject: CN=Test Subject");
+            assertHasEvent(logger, "       Issuer: CN=Test Issuer");
+            assertHasEvent(logger, "       #: 12345 From: " + notBefore + " Until: " + notAfter);
         }
     }
 
@@ -92,9 +90,8 @@ class ReportDefaultTrustKeyStoreTest {
             final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
-            final String logs = ((MockLogger) logger).getEvent(0).getFormattedMessage();
-            assertTrue(logs.contains("Trust Keystore"));
-            assertTrue(!logs.contains(" - TrustManager:"));
+            assertHasEvent(logger, "Trust Keystore");
+            assertNoEvent(logger, " - TrustManager:");
         }
     }
 
@@ -108,8 +105,7 @@ class ReportDefaultTrustKeyStoreTest {
             final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
-            final String logs = ((MockLogger) logger).getEvent(0).getFormattedMessage();
-            assertTrue(logs.contains("Cannot read TrustManager: Test KeyStore Exception"));
+            assertHasEvent(logger, "Cannot read TrustManager: Test KeyStore Exception");
         }
     }
 
@@ -121,8 +117,7 @@ class ReportDefaultTrustKeyStoreTest {
             final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
-            final String logs = ((MockLogger) logger).getEvent(0).getFormattedMessage();
-            assertTrue(logs.contains("Cannot read TrustManager: Test Algorithm Exception"));
+            assertHasEvent(logger, "Cannot read TrustManager: Test Algorithm Exception");
         }
     }
 }
