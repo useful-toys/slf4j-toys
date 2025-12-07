@@ -33,9 +33,9 @@ import java.lang.management.RuntimeMXBean;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 
 @ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
@@ -68,13 +68,9 @@ class ReportJvmArgumentsTest {
 
         new ReportJvmArguments(logger).run();
 
-        final org.slf4j.impl.MockLogger mockLogger = (org.slf4j.impl.MockLogger) logger;
-        String logOutput = mockLogger.getLoggerEvents().stream()
-                .map(org.slf4j.impl.MockLoggerEvent::getFormattedMessage)
-                .reduce("", (a, b) -> a + "\n" + b);
-        assertTrue(logOutput.contains("JVM Arguments:"));
-        assertTrue(logOutput.contains(" - -Xmx512m"));
-        assertTrue(logOutput.contains(" - -Djava.awt.headless=true"));
+        assertHasEvent(logger, "JVM Arguments:");
+        assertHasEvent(logger, " - -Xmx512m");
+        assertHasEvent(logger, " - -Djava.awt.headless=true");
     }
 
     @Test
@@ -90,13 +86,9 @@ class ReportJvmArgumentsTest {
 
         new ReportJvmArguments(logger).run();
 
-        final org.slf4j.impl.MockLogger mockLogger = (org.slf4j.impl.MockLogger) logger;
-        String logOutput = mockLogger.getLoggerEvents().stream()
-                .map(org.slf4j.impl.MockLoggerEvent::getFormattedMessage)
-                .reduce("", (a, b) -> a + "\n" + b);
-        assertTrue(logOutput.contains(" - -Dmy.password=********"));
-        assertTrue(logOutput.contains(" - -Ddb.key=********"));
-        assertTrue(logOutput.contains(" - -Dnormal.prop=normalvalue"));
+        assertHasEvent(logger, " - -Dmy.password=********");
+        assertHasEvent(logger, " - -Ddb.key=********");
+        assertHasEvent(logger, " - -Dnormal.prop=normalvalue");
     }
 
     @Test
@@ -113,12 +105,8 @@ class ReportJvmArgumentsTest {
 
         new ReportJvmArguments(logger).run();
 
-        final org.slf4j.impl.MockLogger mockLogger = (org.slf4j.impl.MockLogger) logger;
-        String logOutput = mockLogger.getLoggerEvents().stream()
-                .map(org.slf4j.impl.MockLoggerEvent::getFormattedMessage)
-                .reduce("", (a, b) -> a + "\n" + b);
-        assertTrue(logOutput.contains(" - -Dapp.custom.token=********"));
-        assertTrue(logOutput.contains(" - -Dapp.normal=normalvalue"));
+        assertHasEvent(logger, " - -Dapp.custom.token=********");
+        assertHasEvent(logger, " - -Dapp.normal=normalvalue");
     }
 
     @Test
@@ -128,10 +116,6 @@ class ReportJvmArgumentsTest {
 
         new ReportJvmArguments(logger).run();
 
-        final org.slf4j.impl.MockLogger mockLogger = (org.slf4j.impl.MockLogger) logger;
-        String logOutput = mockLogger.getLoggerEvents().stream()
-                .map(org.slf4j.impl.MockLoggerEvent::getFormattedMessage)
-                .reduce("", (a, b) -> a + "\n" + b);
-        assertTrue(logOutput.contains(" - No JVM arguments found."));
+        assertHasEvent(logger, " - No JVM arguments found.");
     }
 }
