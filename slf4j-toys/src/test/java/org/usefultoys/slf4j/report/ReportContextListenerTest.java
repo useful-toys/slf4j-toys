@@ -20,9 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.impl.MockLogger;
-import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
@@ -31,51 +28,51 @@ import org.usefultoys.test.WithLocale;
 
 import javax.servlet.ServletContextEvent;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvent;
 
 @ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportContextListenerTest {
-    @Slf4jMock("report")
+    @Slf4jMock("test.report.contextlistener")
     private Logger logger;
     private ReportContextListener listener;
 
-    private MockLogger getMockLogger() {
-        return (MockLogger) logger;
-    }
-
     @BeforeEach
     void setUpListener() {
-        getMockLogger().clearEvents();
         listener = new ReportContextListener();
     }
 
     @Test
     void shouldLogReportsOnContextInitialization() {
+        // Configure reporter to use our test logger
+        System.setProperty(ReporterConfig.PROP_NAME, "test.report.contextlistener");
+
         // Enable only one report to simplify the test
-        ReporterConfig.reportVM = true;
-        ReporterConfig.reportMemory = false;
-        ReporterConfig.reportUser = false;
-        ReporterConfig.reportOperatingSystem = false;
-        ReporterConfig.reportPhysicalSystem = false;
-        ReporterConfig.reportEnvironment = false;
-        ReporterConfig.reportProperties = false;
-        ReporterConfig.reportFileSystem = false;
-        ReporterConfig.reportCalendar = false;
-        ReporterConfig.reportLocale = false;
-        ReporterConfig.reportCharset = false;
-        ReporterConfig.reportNetworkInterface = false;
-        ReporterConfig.reportSSLContext = false;
-        ReporterConfig.reportDefaultTrustKeyStore = false;
+        System.setProperty(ReporterConfig.PROP_VM, "true");
+        System.setProperty(ReporterConfig.PROP_MEMORY, "false");
+        System.setProperty(ReporterConfig.PROP_USER, "false");
+        System.setProperty(ReporterConfig.PROP_OPERATING_SYSTEM, "false");
+        System.setProperty(ReporterConfig.PROP_PHYSICAL_SYSTEM, "false");
+        System.setProperty(ReporterConfig.PROP_ENVIRONMENT, "false");
+        System.setProperty(ReporterConfig.PROP_PROPERTIES, "false");
+        System.setProperty(ReporterConfig.PROP_FILE_SYSTEM, "false");
+        System.setProperty(ReporterConfig.PROP_CALENDAR, "false");
+        System.setProperty(ReporterConfig.PROP_LOCALE, "false");
+        System.setProperty(ReporterConfig.PROP_CHARSET, "false");
+        System.setProperty(ReporterConfig.PROP_NETWORK_INTERFACE, "false");
+        System.setProperty(ReporterConfig.PROP_SSL_CONTEXT, "false");
+        System.setProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE, "false");
+        ReporterConfig.init();
+
         final ServletContextEvent event = mock(ServletContextEvent.class);
 
         // Act
         listener.contextInitialized(event);
 
         // Assert
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "Java Virtual Machine");
+        assertHasEvent(logger, "Java Virtual Machine");
     }
 
     @Test
@@ -86,7 +83,8 @@ class ReportContextListenerTest {
         listener.contextDestroyed(event);
 
         // Assert
-        // No side effect expected — especially no logging
-        assertEquals(0, getMockLogger().getEventCount(), "Expected no log output on contextDestroyed");
+        // No side effect expected — especially no logging - verify no events were logged at all
+        assertNoEvent(logger, "Java Virtual Machine");
+        assertNoEvent(logger, "Physical system");
     }
 }
