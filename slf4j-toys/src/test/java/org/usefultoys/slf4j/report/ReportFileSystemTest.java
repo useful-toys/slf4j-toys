@@ -30,8 +30,6 @@ import org.usefultoys.test.WithLocale;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
@@ -41,10 +39,6 @@ class ReportFileSystemTest {
     @Slf4jMock("test.report.filesystem")
     private Logger logger;
 
-    private org.slf4j.impl.MockLogger getMockLogger() {
-        return (org.slf4j.impl.MockLogger) logger;
-    }
-
     @Test
     void testRunWithNoFileSystemRoots() {
         try (MockedStatic<File> mockedStatic = mockStatic(File.class)) {
@@ -53,13 +47,8 @@ class ReportFileSystemTest {
             final ReportFileSystem report = new ReportFileSystem(logger);
             report.run();
 
-            // Expect 1 log event because PrintStream is always created and closed,
-            // even if nothing is written to it.
-            assertEquals(1, getMockLogger().getEventCount());
-            final String logs = getMockLogger().getEvent(0).getFormattedMessage();
             // Assert that the log message does not contain any file system root information
-            assertTrue(!logs.contains("File system root:"), "Log should not contain file system root info.");
-            assertTrue(logs.trim().isEmpty(), "Log message should be empty or contain only whitespace.");
+            AssertLogger.assertNoEvent(logger, "File system root:");
         }
     }
 
