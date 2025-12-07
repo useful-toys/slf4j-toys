@@ -16,13 +16,13 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -38,22 +38,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportDefaultTrustKeyStoreTest {
 
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        final Logger logger = LoggerFactory.getLogger("test.report.truststore");
-        mockLogger = (MockLogger) logger;
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock("test.report.truststore")
+    private Logger logger;
 
     @Test
     void testRun() throws Exception {
@@ -75,11 +68,10 @@ class ReportDefaultTrustKeyStoreTest {
             when(mockCert.getNotBefore()).thenReturn(notBefore);
             when(mockCert.getNotAfter()).thenReturn(notAfter);
 
-            final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(mockLogger);
+            final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
-            assertEquals(1, mockLogger.getEventCount());
-            final String logs = mockLogger.getEvent(0).getFormattedMessage();
+            final String logs = ((MockLogger) logger).getEvent(0).getFormattedMessage();
 
             assertTrue(logs.contains("Trust Keystore"));
             assertTrue(logs.contains(" - TrustManager: 0 (class org.mockito.codegen.X509TrustManager$MockitoMock$"));
@@ -97,11 +89,10 @@ class ReportDefaultTrustKeyStoreTest {
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenReturn(mockTmf);
             when(mockTmf.getTrustManagers()).thenReturn(new TrustManager[0]);
 
-            final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(mockLogger);
+            final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
-            assertEquals(1, mockLogger.getEventCount());
-            final String logs = mockLogger.getEvent(0).getFormattedMessage();
+            final String logs = ((MockLogger) logger).getEvent(0).getFormattedMessage();
             assertTrue(logs.contains("Trust Keystore"));
             assertTrue(!logs.contains(" - TrustManager:"));
         }
@@ -114,11 +105,10 @@ class ReportDefaultTrustKeyStoreTest {
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenReturn(mockTmf);
             doThrow(new KeyStoreException("Test KeyStore Exception")).when(mockTmf).init((KeyStore) null);
 
-            final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(mockLogger);
+            final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
-            assertEquals(1, mockLogger.getEventCount());
-            final String logs = mockLogger.getEvent(0).getFormattedMessage();
+            final String logs = ((MockLogger) logger).getEvent(0).getFormattedMessage();
             assertTrue(logs.contains("Cannot read TrustManager: Test KeyStore Exception"));
         }
     }
@@ -128,11 +118,10 @@ class ReportDefaultTrustKeyStoreTest {
         try (MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenThrow(new NoSuchAlgorithmException("Test Algorithm Exception"));
 
-            final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(mockLogger);
+            final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
-            assertEquals(1, mockLogger.getEventCount());
-            final String logs = mockLogger.getEvent(0).getFormattedMessage();
+            final String logs = ((MockLogger) logger).getEvent(0).getFormattedMessage();
             assertTrue(logs.contains("Cannot read TrustManager: Test Algorithm Exception"));
         }
     }
