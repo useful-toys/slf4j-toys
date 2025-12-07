@@ -23,10 +23,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.MockLogger;
-import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -35,27 +34,23 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportGarbageCollectorTest {
 
-    private static final String TEST_LOGGER_NAME = "test.logger";
-    private MockLogger mockLogger;
+    @Slf4jMock("test.report.garbagecollector")
+    private Logger logger;
+
     private MockedStatic<ManagementFactory> mockedManagementFactory;
 
     @BeforeEach
     void setUp() {
-        Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
-        mockLogger = (MockLogger) testLogger;
-        mockLogger.clearEvents();
-        mockLogger.setInfoEnabled(true); // Ensure INFO level is enabled
-
         // Mock ManagementFactory
         mockedManagementFactory = Mockito.mockStatic(ManagementFactory.class);
     }
@@ -65,11 +60,6 @@ class ReportGarbageCollectorTest {
         mockedManagementFactory.close(); // Close the mock static
     }
 
-    private String getLogOutput() {
-        return mockLogger.getLoggerEvents().stream()
-                .map(MockLoggerEvent::getFormattedMessage)
-                .collect(Collectors.joining("\n"));
-    }
 
     @Test
     void testGarbageCollectorsAreReported() {
@@ -87,18 +77,17 @@ class ReportGarbageCollectorTest {
 
         when(ManagementFactory.getGarbageCollectorMXBeans()).thenReturn(Arrays.asList(gc1, gc2));
 
-        new ReportGarbageCollector(mockLogger).run();
+        new ReportGarbageCollector(logger).run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains("Garbage Collectors:"));
-        assertTrue(logOutput.contains(" - Name: G1 Young Generation"));
-        assertTrue(logOutput.contains("   Collection Count: 100"));
-        assertTrue(logOutput.contains("   Collection Time: 5000 ms"));
-        assertTrue(logOutput.contains("   Memory Pool Names: G1 Eden Space, G1 Survivor Space"));
-        assertTrue(logOutput.contains(" - Name: G1 Old Generation"));
-        assertTrue(logOutput.contains("   Collection Count: 10"));
-        assertTrue(logOutput.contains("   Collection Time: 15000 ms"));
-        assertTrue(logOutput.contains("   Memory Pool Names: G1 Old Gen"));
+        assertHasEvent(logger, "Garbage Collectors:");
+        assertHasEvent(logger, " - Name: G1 Young Generation");
+        assertHasEvent(logger, "   Collection Count: 100");
+        assertHasEvent(logger, "   Collection Time: 5000 ms");
+        assertHasEvent(logger, "   Memory Pool Names: G1 Eden Space, G1 Survivor Space");
+        assertHasEvent(logger, " - Name: G1 Old Generation");
+        assertHasEvent(logger, "   Collection Count: 10");
+        assertHasEvent(logger, "   Collection Time: 15000 ms");
+        assertHasEvent(logger, "   Memory Pool Names: G1 Old Gen");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
@@ -106,10 +95,9 @@ class ReportGarbageCollectorTest {
     void testNoGarbageCollectorsFound() {
         when(ManagementFactory.getGarbageCollectorMXBeans()).thenReturn(Collections.emptyList());
 
-        new ReportGarbageCollector(mockLogger).run();
+        new ReportGarbageCollector(logger).run();
 
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains(" - No garbage collectors found."));
+        assertHasEvent(logger, " - No garbage collectors found.");
         assertTrue(ConfigParser.isInitializationOK());
     }
 }
