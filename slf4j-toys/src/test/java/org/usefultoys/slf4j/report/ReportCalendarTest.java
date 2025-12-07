@@ -19,7 +19,6 @@ package org.usefultoys.slf4j.report;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
@@ -32,18 +31,12 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 @ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportCalendarTest {
 
     @Slf4jMock("test.report.calendar")
     private Logger logger;
-
-    private org.slf4j.impl.MockLogger getMockLogger() {
-        return (org.slf4j.impl.MockLogger) logger;
-    }
 
     @Test
     void shouldLogDefaultCalendarInformation() {
@@ -145,6 +138,6 @@ class ReportCalendarTest {
             "Europe/Berlin; ",
             "America/New_York; ",
             "Asia/Tokyo; ");
-        assertFalse(getMockLogger().toText().contains("America/Sao_Paulo; "), "Should NOT contain default ID: America/Sao_Paulo");
+        AssertLogger.assertEventNot(logger, 0, MockLoggerEvent.Level.INFO, "America/Sao_Paulo; ");
     }
 }
