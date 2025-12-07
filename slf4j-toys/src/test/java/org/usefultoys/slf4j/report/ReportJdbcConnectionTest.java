@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
+import org.slf4j.impl.MockLoggerEvent.Level;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
@@ -35,8 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
+import static org.usefultoys.slf4jtestmock.AssertLogger.*;
 
 @ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
@@ -46,10 +47,6 @@ class ReportJdbcConnectionTest {
     private Logger logger;
     private Connection mockConnection;
     private DatabaseMetaData mockMetaData;
-
-    private org.slf4j.impl.MockLogger getMockLogger() {
-        return (org.slf4j.impl.MockLogger) logger;
-    }
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -89,11 +86,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        final org.slf4j.impl.MockLogger mockLogger = (org.slf4j.impl.MockLogger) logger;
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("JDBC connection"));
-        assertTrue(logs.contains(" - Closed! "));
+        assertEvent(logger, 0, Level.INFO, "JDBC connection", " - Closed! ");
         verify(mockConnection).isClosed(); // Ensure isClosed was called
         verify(mockConnection, never()).getCatalog(); // Ensure no further calls
     }
@@ -103,18 +96,16 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        final org.slf4j.impl.MockLogger mockLogger = (org.slf4j.impl.MockLogger) logger;
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("JDBC connection"));
-        assertTrue(logs.contains(" - catalog: test_catalog"));
-        assertTrue(logs.contains(" - schema: test_schema"));
-        assertTrue(logs.contains("    URL: jdbc:test://localhost/testdb"));
-        assertTrue(logs.contains("    user name: testuser"));
-        assertTrue(logs.contains(" - properties: auto-commit; holdability=hold-cursors-over-commit; timeout=1000ms; transaction=read-committed;"));
-        assertTrue(logs.contains(" - client info: n/a")); // Default empty properties
-        assertTrue(logs.contains(" - database: TestDB (1.0)"));
-        assertTrue(logs.contains(" - driver: TestDriver (1.0); jdbc-version=4.2; max-connections=100; sql-state-type=SQL99;"));
+        assertEvent(logger, 0, Level.INFO,
+            "JDBC connection",
+            " - catalog: test_catalog",
+            " - schema: test_schema",
+            "    URL: jdbc:test://localhost/testdb",
+            "    user name: testuser",
+            " - properties: auto-commit; holdability=hold-cursors-over-commit; timeout=1000ms; transaction=read-committed;",
+            " - client info: n/a",
+            " - database: TestDB (1.0)",
+            " - driver: TestDriver (1.0); jdbc-version=4.2; max-connections=100; sql-state-type=SQL99;");
     }
 
     @Test
@@ -125,13 +116,10 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("JDBC connection"));
-        assertTrue(logs.contains(" - properties:")); // Check for properties section
+        assertEvent(logger, 0, Level.INFO, "JDBC connection", " - properties:");
         // Ensure catalog and schema are not printed
-        assertTrue(!logs.contains(" - catalog:"));
-        assertTrue(!logs.contains(" - schema:"));
+        assertEventNot(logger, 0, Level.INFO, " - catalog:");
+        assertEventNot(logger, 0, Level.INFO, " - schema:");
     }
 
     @Test
@@ -142,10 +130,8 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("read-only; "));
-        assertTrue(!logs.contains("auto-commit; "));
+        assertEvent(logger, 0, Level.INFO, "read-only; ");
+        assertEventNot(logger, 0, Level.INFO, "auto-commit; ");
     }
 
     @Test
@@ -155,9 +141,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("holdability=close-cursors-at-commit; "));
+        assertHasEvent(logger, "holdability=close-cursors-at-commit; ");
     }
 
     @Test
@@ -167,9 +151,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("holdability=unknown; "));
+        assertHasEvent(logger, "holdability=unknown; ");
     }
 
     @Test
@@ -179,9 +161,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("transaction=serializable; "));
+        assertHasEvent(logger, "transaction=serializable; ");
     }
 
     @Test
@@ -191,9 +171,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("transaction=none; "));
+        assertHasEvent(logger, "transaction=none; ");
     }
 
     @Test
@@ -203,9 +181,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("transaction=unknown; "));
+        assertHasEvent(logger, "transaction=unknown; ");
     }
 
     @Test
@@ -219,12 +195,10 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains(" - client info: "));
-        assertTrue(logs.contains("ApplicationName=MyApp; "));
-        assertTrue(logs.contains("ClientUser=testuser; "));
-        assertTrue(logs.contains("Password=?; "));
+        assertHasEvent(logger, " - client info: ");
+        assertHasEvent(logger, "ApplicationName=MyApp; ");
+        assertHasEvent(logger, "ClientUser=testuser; ");
+        assertHasEvent(logger, "Password=?; ");
     }
 
     @Test
@@ -234,9 +208,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains(" - client info: n/a"));
+        assertHasEvent(logger, " - client info: n/a");
     }
 
     @Test
@@ -246,13 +218,11 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
         // Ensure metadata related fields are not printed
-        assertTrue(!logs.contains("URL:"));
-        assertTrue(!logs.contains("user name:"));
-        assertTrue(!logs.contains(" - database:"));
-        assertTrue(!logs.contains(" - driver:"));
+        assertNoEvent(logger, "URL:");
+        assertNoEvent(logger, "user name:");
+        assertNoEvent(logger, " - database:");
+        assertNoEvent(logger, " - driver:");
     }
 
     @Test
@@ -262,9 +232,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("sql-state-type=X-Open; "));
+        assertHasEvent(logger, "sql-state-type=X-Open; ");
     }
 
     @Test
@@ -274,9 +242,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("sql-state-type=unknown; "));
+        assertHasEvent(logger, "sql-state-type=unknown; ");
     }
 
     @Test
@@ -290,9 +256,7 @@ class ReportJdbcConnectionTest {
                 .printTypeMap(true);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains(" - type map: my_udt->String; another_udt->Integer;"));
+        assertHasEvent(logger, " - type map: my_udt->String; another_udt->Integer;");
     }
 
     @Test
@@ -303,9 +267,7 @@ class ReportJdbcConnectionTest {
                 .printTypeMap(true);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains(" - type map: n/a"));
+        assertHasEvent(logger, " - type map: n/a");
     }
 
     @Test
@@ -316,9 +278,7 @@ class ReportJdbcConnectionTest {
                 .printTypeMap(true);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains(" - type map: n/a"));
+        assertHasEvent(logger, " - type map: n/a");
     }
 
     @Test
@@ -331,9 +291,7 @@ class ReportJdbcConnectionTest {
                 .printTypeMap(false); // Explicitly disabled
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(!logs.contains(" - type map:")); // Ensure type map is not printed
+        assertNoEvent(logger, " - type map:"); // Ensure type map is not printed
     }
 
     @Test
@@ -343,9 +301,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("Cannot read connection property: Mock SQL Exception"));
+        assertHasEvent(logger, "Cannot read connection property: Mock SQL Exception");
     }
 
     @Test
@@ -356,9 +312,7 @@ class ReportJdbcConnectionTest {
         final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
         report.run();
 
-        assertTrue(getMockLogger().getEventCount() > 0);
-        final String logs = getMockLogger().getEvent(0).getFormattedMessage();
-        assertTrue(!logs.contains(" - schema:")); // Schema should not be printed
-        assertTrue(!logs.contains("Cannot read connection property:")); // Should not catch NoSuchMethodError as SQLException
+        assertNoEvent(logger, " - schema:"); // Schema should not be printed
+        assertNoEvent(logger, "Cannot read connection property:"); // Should not catch NoSuchMethodError as SQLException
     }
 }
