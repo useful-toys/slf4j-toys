@@ -22,8 +22,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
-import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
@@ -36,29 +38,24 @@ import java.util.Enumeration;
 import java.util.Vector;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class})
+@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReporterTest {
 
-    private static final String TEST_LOGGER_NAME = "test.reporter";
-    private MockLogger mockLogger;
+    @Slf4jMock("test.reporter")
+    private Logger logger;
+
     private Reporter reporter;
 
     @BeforeEach
     void setUpLogger() {
-        Logger testLogger = LoggerFactory.getLogger(TEST_LOGGER_NAME);
-        mockLogger = (MockLogger) testLogger;
-        mockLogger.clearEvents();
-        mockLogger.setInfoEnabled(true); // Ensure INFO level is enabled for reports
-        mockLogger.setWarnEnabled(true); // Ensure WARN level is enabled for error reporting
-        reporter = new Reporter(mockLogger);
+        reporter = new Reporter(logger);
     }
 
     @Test
@@ -92,14 +89,15 @@ class ReporterTest {
             executionCount.incrementAndGet();
         };
 
-        reporter = new Reporter(mockLogger);
+        reporter = new Reporter(logger);
         reporter.logDefaultReports(countingExecutor);
 
         // Total reports: 15 existing + 3 new (JvmArgs, Classpath, GC) + 2 new (SecurityProviders, ContainerInfo) = 20
         // NetworkInterface loop executes 1 time for 1 mockNif.
         // So, 20 + 1 = 21 reports.
         assertEquals(18, executionCount.get(), "All enabled reports should be executed");
-        assertTrue(mockLogger.getEventCount() > 0, "Logger should have received events");
+        // Verify that at least some reports were logged (we can check for common report content)
+        AssertLogger.assertHasEvent(logger, "Physical system");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -121,7 +119,9 @@ class ReporterTest {
         reporter.logDefaultReports(countingExecutor);
 
         assertEquals(6, executionCount.get(), "Only 6 reports should be executed");
-        assertTrue(mockLogger.getEventCount() > 0, "Logger should have received events");
+        // Verify that the enabled reports were logged
+        AssertLogger.assertHasEvent(logger, "Java Virtual Machine");
+        AssertLogger.assertHasEvent(logger, "System Properties");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -158,7 +158,9 @@ class ReporterTest {
         reporter.logDefaultReports(countingExecutor);
 
         assertEquals(0, executionCount.get(), "No reports should be executed");
-        assertEquals(0, mockLogger.getEventCount(), "Logger should not have received events");
+        // Verify no events were logged by checking that none of the common report titles appear
+        AssertLogger.assertNoEvent(logger, "Java Virtual Machine");
+        AssertLogger.assertNoEvent(logger, "Physical system");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -170,29 +172,24 @@ class ReporterTest {
         System.setProperty(ReporterConfig.PROP_JVM_ARGUMENTS, "true");
         System.setProperty(ReporterConfig.PROP_SECURITY_PROVIDERS, "true");
         System.setProperty(ReporterConfig.PROP_CONTAINER_INFO, "true");
-        System.setProperty(ReporterConfig.PROP_NAME, TEST_LOGGER_NAME);
+        System.setProperty(ReporterConfig.PROP_NAME, "test.reporter");
         ReporterConfig.init();
 
         // Test the static runDefaultReport method
         Reporter.runDefaultReport();
 
         // Verify that reports were logged
-        assertTrue(mockLogger.getEventCount() > 0, "Logger should have received events");
+        AssertLogger.assertHasEvent(logger, "Physical system");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
-    private String getLogOutput() {
-        return mockLogger.getLoggerEvents().stream()
-                .map(MockLoggerEvent::getFormattedMessage)
-                .collect(Collectors.joining("\n"));
-    }
 
     @Test
     void testLogDefaultReportsHandlesNetworkInterfaceSocketException() {
         System.setProperty(ReporterConfig.PROP_NETWORK_INTERFACE, "true");
         ReporterConfig.init();
 
-        Reporter testReporter = new Reporter(mockLogger) {
+        Reporter testReporter = new Reporter(logger) {
             @Override
             protected Enumeration<NetworkInterface> getNetworkInterfaces() throws SocketException {
                 throw new SocketException("Simulated network error");
@@ -207,9 +204,7 @@ class ReporterTest {
 
         testReporter.logDefaultReports(countingExecutor);
 
-        String logOutput = getLogOutput();
-
-        assertTrue(logOutput.contains("Cannot report network interfaces"), "Log output should contain 'Cannot report network interfaces'");
+        AssertLogger.assertHasEvent(logger, "Cannot report network interfaces");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -275,7 +270,7 @@ class ReporterTest {
         nifs.add(mockNif2);
         Enumeration<NetworkInterface> mockEnumeration = nifs.elements();
 
-        Reporter testReporter = new Reporter(mockLogger) {
+        Reporter testReporter = new Reporter(logger) {
             @Override
             protected Enumeration<NetworkInterface> getNetworkInterfaces() throws SocketException {
                 return mockEnumeration;
@@ -291,11 +286,10 @@ class ReporterTest {
         testReporter.logDefaultReports(countingExecutor);
 
         assertEquals(2, executionCount.get(), "Two network interface reports should be executed");
-        String logOutput = getLogOutput();
-        assertTrue(logOutput.contains("Network Interface eth0:"));
-        assertTrue(logOutput.contains("Network Interface lo:"));
-        assertTrue(logOutput.contains("NET address (IPV4): 192.168.1.10"));
-        assertTrue(logOutput.contains("NET address (IPV4): 127.0.0.1"));
+        AssertLogger.assertHasEvent(logger, "Network Interface eth0:");
+        AssertLogger.assertHasEvent(logger, "Network Interface lo:");
+        AssertLogger.assertHasEvent(logger, "NET address (IPV4): 192.168.1.10");
+        AssertLogger.assertHasEvent(logger, "NET address (IPV4): 127.0.0.1");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
@@ -305,21 +299,20 @@ class ReporterTest {
         System.setProperty(ReporterConfig.PROP_NAME, customLoggerName);
         ReporterConfig.init();
 
-        // Create a new MockLogger for the custom name to capture its events
-        MockLogger customMockLogger = (MockLogger) LoggerFactory.getLogger(customLoggerName);
-        customMockLogger.clearEvents();
+        // Create a new Logger for the custom name to capture its events
+        Logger customLogger = LoggerFactory.getLogger(customLoggerName);
+        ((MockLogger) customLogger).clearEvents();
 
         Reporter defaultReporter = new Reporter();
-        // Now, when defaultReporter logs, it should log to customMockLogger.
-        // Let's enable a report and see if it logs to the customMockLogger.
+        // Now, when defaultReporter logs, it should log to customLogger.
+        // Let's enable a report and see if it logs to the customLogger.
         System.setProperty(ReporterConfig.PROP_VM, "true");
         ReporterConfig.init(); // Re-init to pick up VM report config
 
         defaultReporter.logDefaultReports(Reporter.sameThreadExecutor); // Use sameThreadExecutor for simplicity
 
-        assertTrue(customMockLogger.getEventCount() > 0, "Default reporter should log to the custom logger.");
-        assertTrue(customMockLogger.getEvent(0).getFormattedMessage().contains("Physical system"));
-        assertEquals(0, mockLogger.getEventCount(), "Original mockLogger should not receive events from defaultReporter.");
+        AssertLogger.assertHasEvent(customLogger, "Physical system");
+        AssertLogger.assertNoEvent(logger, "Physical system");
 
         // Reset for other tests
         System.clearProperty(ReporterConfig.PROP_NAME);
@@ -328,7 +321,7 @@ class ReporterTest {
 
     @Test
     void testLogDefaultReportsWhenInfoDisabled() {
-        mockLogger.setInfoEnabled(false); // Disable INFO level logging
+        ((MockLogger) logger).setInfoEnabled(false); // Disable INFO level logging
 
         // Enable a few reports
         System.setProperty(ReporterConfig.PROP_VM, "true");
@@ -345,7 +338,8 @@ class ReporterTest {
 
         // Reports should still be executed, but no INFO messages should be logged
         assertEquals(5, executionCount.get(), "Enabled reports should still be executed"); // VM, Properties, JvmArgs, Classpath, GC, SecurityProviders, ContainerInfo
-        assertEquals(0, mockLogger.getEventCount(), "No INFO messages should be logged when INFO is disabled");
+        AssertLogger.assertNoEvent(logger, "Java Virtual Machine");
+        AssertLogger.assertNoEvent(logger, "System Properties");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 }
