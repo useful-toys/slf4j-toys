@@ -84,7 +84,6 @@
         <module>example_jul</module>
         <module>example_log4j</module>
         <module>example_logback</module>
-        <module>example_web</module>
         <module>coverage-report-aggregator</module>
     </modules>
 
