@@ -215,8 +215,9 @@ public class MeterData extends SystemData implements MeterAnalysis {
     }
 
     /**
-     * Removes a entry from the context map.
-     * @param name
+     * Removes an entry from the context map.
+     *
+     * @param name The name of the context entry to remove.
      */
     public void removeContext(final String name) {
         if (context != null) {

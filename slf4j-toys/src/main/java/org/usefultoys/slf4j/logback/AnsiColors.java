@@ -25,41 +25,41 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 class AnsiColors {
     /** ANSI escape code for bold text. */
-    public final String BOLD = "1;";
+    public static final String BOLD = "1;";
 
     /** ANSI escape code for black foreground color. */
-    public final String BLACK = "30";
+    public static final String BLACK = "30";
     /** ANSI escape code for red foreground color. */
-    public final String RED = "31";
+    public static final String RED = "31";
     /** ANSI escape code for green foreground color. */
-    public final String GREEN = "32";
+    public static final String GREEN = "32";
     /** ANSI escape code for yellow foreground color. */
-    public final String YELLOW = "33";
+    public static final String YELLOW = "33";
     /** ANSI escape code for blue foreground color. */
-    public final String BLUE = "34";
+    public static final String BLUE = "34";
     /** ANSI escape code for magenta foreground color. */
-    public final String MAGENTA = "35";
+    public static final String MAGENTA = "35";
     /** ANSI escape code for cyan foreground color. */
-    public final String CYAN = "36";
+    public static final String CYAN = "36";
     /** ANSI escape code for white foreground color. */
-    public final String WHITE = "37";
+    public static final String WHITE = "37";
     /** ANSI escape code for default foreground color. */
-    public final String DEFAULT = "39";
+    public static final String DEFAULT = "39";
 
     /** ANSI escape code for bright black (gray) foreground color. */
-    public final String BRIGHT_BLACK = "90";
+    public static final String BRIGHT_BLACK = "90";
     /** ANSI escape code for bright red foreground color. */
-    public final String BRIGHT_RED = "91";
+    public static final String BRIGHT_RED = "91";
     /** ANSI escape code for bright green foreground color. */
-    public final String BRIGHT_GREEN = "92";
+    public static final String BRIGHT_GREEN = "92";
     /** ANSI escape code for bright yellow foreground color. */
-    public final String BRIGHT_YELLOW = "93";
+    public static final String BRIGHT_YELLOW = "93";
     /** ANSI escape code for bright blue foreground color. */
-    public final String BRIGHT_BLUE = "94";
+    public static final String BRIGHT_BLUE = "94";
     /** ANSI escape code for bright magenta foreground color. */
-    public final String BRIGHT_MAGENTA = "95";
+    public static final String BRIGHT_MAGENTA = "95";
     /** ANSI escape code for bright cyan foreground color. */
-    public final String BRIGHT_CYAN = "96";
+    public static final String BRIGHT_CYAN = "96";
     /** ANSI escape code for bright white foreground color. */
-    public final String BRIGHT_WHITE = "97";
+    public static final String BRIGHT_WHITE = "97";
 }

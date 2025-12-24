@@ -57,14 +57,14 @@ public class WatcherConfig {
     public final String PROP_MESSAGE_SUFFIX = "slf4jtoys.watcher.message.suffix";
 
     /**
-     * The logger name used by {@link WatcherSingleton#DEFAULT_WATCHER} to write messages.
+     * The logger name used by the default watcher to write messages.
      * <p>
      * Read from the system property {@code slf4jtoys.watcher.name}, defaulting to {@code "watcher"}.
      */
     public String name;
 
     /**
-     * The initial delay before the first status report by {@link WatcherSingleton#DEFAULT_WATCHER}, in milliseconds.
+     * The initial delay before the first status report by the default watcher, in milliseconds.
      * <p>
      * Read from the system property {@code slf4jtoys.watcher.delay}, defaulting to {@code 60000} (1 minute).
      * The value can be suffixed with {@code ms}, {@code s}, {@code m}, or {@code h}.
@@ -74,7 +74,7 @@ public class WatcherConfig {
     public long delayMilliseconds;
 
     /**
-     * The interval between subsequent status reports by {@link WatcherSingleton#DEFAULT_WATCHER}, in milliseconds.
+     * The interval between subsequent status reports by the default watcher, in milliseconds.
      * <p>
      * Read from the system property {@code slf4jtoys.watcher.period}, defaulting to {@code 600000} (10 minutes).
      * The value can be suffixed with {@code ms}, {@code s}, {@code m}, or {@code h}.
