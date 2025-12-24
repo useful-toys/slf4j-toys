@@ -80,7 +80,6 @@
 
     <modules>
         <module>slf4j-toys</module>
-        <module>slf4j-toys-logback-tests</module>
         <module>coverage-report-aggregator</module>
     </modules>
 
