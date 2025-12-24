@@ -45,6 +45,17 @@ public class ReportSystemProperties implements Runnable {
     private final @NonNull Logger logger;
 
     /**
+     * Retrieves the system properties. This method can be overridden in tests to provide
+     * a custom map of properties without modifying the actual system properties.
+     *
+     * @return A map of system property names to their values.
+     * @throws SecurityException if access to system properties is denied
+     */
+    protected Map<Object, Object> getSystemProperties() {
+        return System.getProperties();
+    }
+
+    /**
      * Executes the report, writing system properties to the configured logger.
      * The output is formatted as human-readable INFO messages.
      */
@@ -54,7 +65,7 @@ public class ReportSystemProperties implements Runnable {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         final SortedMap<Object, Object> sortedProperties;
         try {
-            sortedProperties = new TreeMap<>(System.getProperties());
+            sortedProperties = new TreeMap<>(getSystemProperties());
         } catch (final SecurityException ignored) {
             ps.println("System Properties: access denied");
             return;
