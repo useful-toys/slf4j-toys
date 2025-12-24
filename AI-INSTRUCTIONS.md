@@ -19,9 +19,8 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
 - **Java**: 21 for builds (but code must maintain Java 8+ compatibility)
 - **Maven**: 3.9.8 (via Maven wrapper, enforced)
 
-### Key Modules
-- **slf4j-toys**: Main library with logging utilities and extensions
-- **coverage-report-aggregator**: Aggregates test coverage reports
+### Project Structure
+The project follows a standard Maven single-module structure with source code in the `src/` directory at the root level.
 
 ### Development Environment
 - **Preferred terminal**: PowerShell (Windows) or equivalent shell (Unix/Linux/macOS).
