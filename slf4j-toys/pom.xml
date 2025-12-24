@@ -22,14 +22,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>slf4j-toys</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.0-SNAPSHOT</version>
     <name>slf4j-toys</name>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>org.usefultoys</groupId>
         <artifactId>slf4j-toys-root</artifactId>
-        <version>1.9.0</version>
+        <version>1.9.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>

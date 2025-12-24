@@ -22,14 +22,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>slf4j-toys-logback-tests</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.0-SNAPSHOT</version>
     <name>slf4j-toys-logback-tests</name>
     <packaging>jar</packaging> <!-- Módulo usado apenas para testes; não deve produzir jar -->
 
     <parent>
         <groupId>org.usefultoys</groupId>
         <artifactId>slf4j-toys-root</artifactId>
-        <version>1.9.0</version>
+        <version>1.9.0-SNAPSHOT</version>
     </parent>
 
     <!-- Evita que este módulo seja instalado ou deployado como artefato -->
