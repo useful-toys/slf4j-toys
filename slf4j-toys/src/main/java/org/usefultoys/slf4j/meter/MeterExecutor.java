@@ -77,9 +77,8 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      * Adds a key-value pair to the meter's context.
      * This method should delegate to the underlying context implementation.
      * 
-     * @param key The context key
-     * @param value The context value
-     * @return Reference to this instance, for method chaining.
+     * @param key The context key.
+     * @param value The context value.
      */
     void putContext(String key, Object value);
 
@@ -114,7 +113,6 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      *
      * @param runnable           The {@link Runnable} task to be executed.
      * @param exceptionsToReject A list of exception classes that should result in a {@code REJECT} status.
-     * @throws Exception The original exception thrown by the runnable.
      */
     @SuppressWarnings("unchecked")
     @SneakyThrows
@@ -171,7 +169,6 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      * @param callable The {@link Callable} task to be executed.
      * @param <T>      The type of the result returned by the callable.
      * @return The result of the callable task.
-     * @throws Exception The original exception thrown by the callable.
      */
     @SneakyThrows
     default <T> T callOrRejectChecked(final Callable<T> callable) {
@@ -202,7 +199,6 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      * @param exceptionsToReject A list of exception classes that should result in a {@code REJECT} status.
      * @param <T>                The type of the result returned by the callable.
      * @return The result of the callable task.
-     * @throws Exception The original exception thrown by the callable.
      */
     @SuppressWarnings("unchecked")
     @SneakyThrows
