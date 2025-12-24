@@ -117,7 +117,7 @@ jobs:
           path: slf4j-toys/target/
 
       - name: Run tests with ${{ matrix.slf4j-profile }}
-        run: sh mvnw surefire:test -P ${{ matrix.slf4j-profile }} --batch-mode -Denforcer.skip=true
+        run: sh mvnw test -P ${{ matrix.slf4j-profile }} --batch-mode -Denforcer.skip=true
 
   # Job 3: Final status check to simplify branch protection rules
   status-gateway:
