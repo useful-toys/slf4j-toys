@@ -76,6 +76,7 @@
         <dependency>
             <groupId>org.usefultoys</groupId>
             <artifactId>slf4j-test-mock</artifactId>
+            <!-- TODO: Update to 0.0.3+ when available on Maven Central for better SLF4J 2.0 support -->
             <version>0.0.1</version>
             <scope>test</scope>
         </dependency>
