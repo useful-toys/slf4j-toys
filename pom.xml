@@ -84,8 +84,7 @@
         <mockito.version>5.7.0</mockito.version>
         <lombok.version>1.18.42</lombok.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <!-- TODO: Update to 0.0.3+ when available on Maven Central for better SLF4J 2.0 support -->
-        <slf4j-test-mock.version>0.0.1</slf4j-test-mock.version>
+        <slf4j-test-mock.version>0.0.6</slf4j-test-mock.version>
     </properties>
 
     <modules>

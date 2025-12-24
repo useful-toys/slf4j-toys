@@ -26,7 +26,7 @@ import org.usefultoys.slf4j.CallerStackTraceThrowable;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
-import static org.slf4j.impl.AssertLogger.*;
+import static org.usefultoys.slf4jtestmock.AssertLogger.*;
 
 public class MeterValidatorTest {
 
