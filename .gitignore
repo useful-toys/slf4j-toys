@@ -95,3 +95,5 @@ buildNumber.properties
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 /slf4j-toys/.flattened-pom.xml
+
+jul-test-mock/
