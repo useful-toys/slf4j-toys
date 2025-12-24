@@ -19,6 +19,8 @@ package org.usefultoys.slf4j.report;
  import org.junit.jupiter.api.BeforeAll;
  import org.junit.jupiter.api.BeforeEach;
  import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.api.condition.DisabledForJreRange;
+ import org.junit.jupiter.api.condition.JRE;
  import org.slf4j.LoggerFactory;
  import org.slf4j.impl.MockLogger;
  import org.usefultoys.slf4j.SessionConfig;
@@ -30,6 +32,12 @@ package org.usefultoys.slf4j.report;
  import static org.junit.jupiter.api.Assertions.assertEquals;
  import static org.junit.jupiter.api.Assertions.assertTrue;
 
+ /**
+  * Tests SecurityManager behavior when accessing system environment variables.
+  * SecurityManager was deprecated in Java 17 and removed in Java 21+.
+  * These tests are disabled for Java 21+ as SecurityManager is no longer supported.
+  */
+ @DisabledForJreRange(min = JRE.JAVA_21, disabledReason = "SecurityManager removed in Java 21+")
  class ReportSystemEnvironmentSecurityExceptionTest {
 
     @BeforeAll
