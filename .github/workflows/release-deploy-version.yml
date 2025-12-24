@@ -1,5 +1,15 @@
-# This workflow builds and deploys the project to Maven Central.
-# It is triggered when a release pull request is merged.
+# This workflow validates, builds, and deploys the project to Maven Central.
+# It is triggered on a push event for tags matching 'v*.*.*' (e.g., v1.2.3),
+# or can be triggered manually.
+#
+# Comprehensive validation strategy:
+# 1. Runs full test suite across all supported JDK/SLF4J combinations
+#    (JDK 8, 11, 17, 21 with SLF4J 1.7.x and 2.0.x)
+# 2. Only proceeds to deployment if all tests pass
+# 3. Builds, signs with GPG, and deploys to Maven Central
+# 4. Creates GitHub Release with auto-generated notes
+# 5. Uploads compiled JAR artifacts to release
+
 name: Release and Deploy Version
 
 on:
@@ -9,20 +19,46 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write # to fetch code (actions/checkout) and push tags
+  contents: write
 
 jobs:
+  # Comprehensive test validation across all supported JDK/SLF4J combinations
+  test-compatibility:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [8, 11, 17, 21]
+        slf4j-profile: [slf4j-1.7, slf4j-2.0]
+      fail-fast: true
+    name: Test (JDK ${{ matrix.java-version }}, ${{ matrix.slf4j-profile }})
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Test with JDK ${{ matrix.java-version }} and ${{ matrix.slf4j-profile }}
+        run: sh mvnw clean verify -P ${{ matrix.slf4j-profile }} --batch-mode -Denforcer.skip=true
+
+  # Deploy only after all tests pass
   build-release-deploy:
+    needs: test-compatibility
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Set up JDK 8
+      - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
-          java-version: '8'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
           gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
@@ -30,8 +66,8 @@ jobs:
           server-username: MAVEN_CENTRAL_USERNAME
           server-password: MAVEN_CENTRAL_PASSWORD
 
-      - name: Build and Deploy
-        run: sh mvnw -ntp clean deploy -P release -DskipTests --batch-mode
+      - name: Build and Deploy (with SLF4J 2.0 profile)
+        run: sh mvnw -ntp clean deploy -P release,slf4j-2.0 --batch-mode -DskipTests
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -41,13 +77,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            gh release create ${{ github.ref_name }} \
-              --generate-notes \
-              --title "Version ${{ github.ref_name }}"
+          gh release create ${{ github.ref_name }} \
+            --generate-notes \
+            --title "Version ${{ github.ref_name }}"
+          echo "✓ GitHub Release ${{ github.ref_name }} created successfully"
               
       - name: Upload Release Assets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            gh release upload ${{ github.ref_name }} \
-              ./target/*.jar --clobber
+          gh release upload ${{ github.ref_name }} \
+            slf4j-toys/target/slf4j-toys-*.jar --clobber
+          echo "✓ JAR artifact uploaded to release ${{ github.ref_name }}"
+          echo "✓ Release ${{ github.ref_name }} is now live on Maven Central and GitHub"

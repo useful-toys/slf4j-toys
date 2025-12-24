@@ -1,7 +1,16 @@
-# This workflow prepares a new release.
-# It is triggered manually and allows choosing the semantic version bump (major, minor, or patch).
-# It then updates the pom.xml to the release version, commits, creates a tag,
-# updates the pom.xml to the next snapshot version, commits again, and pushes all changes.
+# This workflow prepares a new release by managing semantic versioning and git tagging.
+#
+# Workflow:
+# 1. Validates prerequisites (branch, remote status, git tag existence)
+# 2. Runs full test suite to ensure code quality
+# 3. Updates pom.xml to release version and commits
+# 4. Creates a git tag for the release version
+# 5. Updates pom.xml to next snapshot version and commits
+# 6. Pushes all commits and tags to remote
+#
+# Triggered manually with semantic version increment choice (major, minor, or patch).
+# Must be run from the 'main' branch. After successful execution,
+# the 'Release and Deploy Version' workflow will be triggered by the git tag push.
 
 name: Create New Version
 
@@ -34,10 +43,32 @@ jobs:
           token: ${{ secrets.BOT_ACCESS_TOKEN }}
           fetch-depth: 0
 
-      - name: Set up JDK 8
+      - name: Validate prerequisites
+        run: |
+          # Check if we are on main branch
+          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          if [ "$CURRENT_BRANCH" != "main" ]; then
+            echo "Error: This workflow must be run from the 'main' branch. Current branch: $CURRENT_BRANCH"
+            exit 1
+          fi
+          echo "✓ Running on main branch"
+          
+          # Fetch latest remote state
+          git fetch origin main
+          
+          # Check if local main is behind origin/main
+          BEHIND=$(git rev-list --left-only --count origin/main...HEAD)
+          if [ "$BEHIND" -gt 0 ]; then
+            echo "Error: Local 'main' branch is $BEHIND commit(s) behind 'origin/main'"
+            echo "Please pull the latest changes and try again"
+            exit 1
+          fi
+          echo "✓ Local main is up-to-date with origin/main"
+
+      - name: Set up JDK 21
         uses: actions/setup-java@v5
         with:
-          java-version: '8'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
 
@@ -46,13 +77,20 @@ jobs:
           git config user.name "${{ secrets.BOT_USER_NAME }}"
           git config user.email "${{ secrets.BOT_USER_NAME }}@users.noreply.github.com"
 
+      - name: Run full test suite before versioning
+        run: sh mvnw clean verify -P slf4j-2.0 --batch-mode
+
       - name: Get current version from latest git tag
         id: current_version
         run: |
           # Get the latest tag name like v1.2.3 and remove the 'v' prefix
-          LATEST_TAG=$(git describe --tags --match "v*.*.*" `git rev-list --tags --max-count=1`)
+          LATEST_TAG=$(git describe --tags --match "v*.*.*" `git rev-list --tags --max-count=1` 2>/dev/null || true)
           echo "Latest tag: $LATEST_TAG"
-          VERSION=${LATEST_TAG#v}
+          if [ -z "$LATEST_TAG" ]; then
+            VERSION=0.0.0
+          else
+            VERSION=${LATEST_TAG#v}
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Determine next release version
