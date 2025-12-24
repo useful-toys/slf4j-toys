@@ -83,14 +83,77 @@
 
     <build>
         <plugins>
+            <!--
+                Multiple Surefire Executions for Classpath Isolation
+                =====================================================
+                
+                Problem:
+                - Unit tests require slf4j-test-mock (MockLogger implementation)
+                - Logback tests require logback-classic (Logback Logger implementation)
+                - SLF4J ServiceLoader can only bind ONE implementation at runtime
+                - Having both on classpath causes: "ClassCastException: ch.qos.logback.classic.Logger 
+                  cannot be cast to org.slf4j.impl.MockLogger"
+                
+                Solution:
+                - Use multiple executions with isolated classpaths
+                - Execution 1: Excludes logback-classic → runs with MockLogger (1441 tests)
+                - Execution 2: Excludes slf4j-test-mock → runs with Logback (84 tests)
+                - Default execution is disabled to prevent conflicts
+                
+                Total: 1525 tests (1441 + 84)
+                
+                Alternative approaches considered and rejected:
+                - Separate module (slf4j-toys-logback-tests): Adds complexity, requires extra POM maintenance
+                - Maven profiles: Cannot isolate classpath within same build
+                - JUnit tags: Cannot remove dependencies from classpath
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <classpathDependencyExcludes>
-                        <classpathDependencyExclude>ch.qos.logback:logback-classic</classpathDependencyExclude>
-                    </classpathDependencyExcludes>
+                    <!-- Disable default execution to prevent classpath conflicts -->
+                    <skip>true</skip>
                 </configuration>
+                <executions>
+                    <!-- Execution 1: Standard unit tests with MockLogger -->
+                    <execution>
+                        <id>unit-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <!-- Exclude Logback-specific tests -->
+                            <excludes>
+                                <exclude>**/logback/**/*Test.java</exclude>
+                            </excludes>
+                            <!-- Remove Logback from classpath to avoid SLF4J binding conflict -->
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>ch.qos.logback:logback-classic</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
+                        </configuration>
+                    </execution>
+                    <!-- Execution 2: Logback-specific tests -->
+                    <execution>
+                        <id>logback-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <!-- Include only Logback-specific tests -->
+                            <includes>
+                                <include>**/logback/**/*Test.java</include>
+                            </includes>
+                            <!-- Remove MockLogger from classpath to use real Logback implementation -->
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>org.usefultoys:slf4j-test-mock</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>

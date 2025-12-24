@@ -87,7 +87,6 @@
 
     <modules>
         <module>slf4j-toys</module>
-        <module>coverage-report-aggregator</module>
     </modules>
 
     <dependencyManagement>
