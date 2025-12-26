@@ -353,8 +353,6 @@
                 <jdk>11</jdk>
             </activation>
             <properties>
-                <!-- Mockito 5.x is compatible with Java 11+ -->
-                <mockito.version>5.7.0</mockito.version>
                 <!-- Skip enforcer for compatibility builds -->
                 <maven.enforcer.skip>true</maven.enforcer.skip>
             </properties>
@@ -367,8 +365,6 @@
                 <jdk>17</jdk>
             </activation>
             <properties>
-                <!-- Mockito 5.x is compatible with Java 11+ -->
-                <mockito.version>5.7.0</mockito.version>
                 <!-- Skip enforcer for compatibility builds -->
                 <maven.enforcer.skip>true</maven.enforcer.skip>
             </properties>
@@ -381,8 +377,6 @@
                 <jdk>21</jdk>
             </activation>
             <properties>
-                <!-- Mockito 5.x is compatible with Java 11+ -->
-                <mockito.version>5.7.0</mockito.version>
                 <!-- Enforcer is enabled for the default build (maven.enforcer.skip=false) -->
             </properties>
         </profile>
