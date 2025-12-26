@@ -81,10 +81,15 @@
         <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
         <junit5.version>5.14.1</junit5.version>
+        <!-- Mockito version defaults to 5.x for Java 11+ (can be overridden by JDK profiles) -->
         <mockito.version>5.7.0</mockito.version>
         <lombok.version>1.18.42</lombok.version>
         <awaitility.version>4.2.0</awaitility.version>
         <slf4j-test-mock.version>0.0.6</slf4j-test-mock.version>
+        <!-- Java version defaults (can be overridden by JDK profiles) -->
+        <java.version>21</java.version>
+        <!-- Enforcer defaults to enabled for JDK 21, skipped for other JDKs -->
+        <maven.enforcer.skip>false</maven.enforcer.skip>
     </properties>
 
     <dependencyManagement>
@@ -313,6 +318,7 @@
                                 <goal>enforce</goal>
                             </goals>
                             <configuration>
+                                <skip>${maven.enforcer.skip}</skip>
                                 <rules>
                                     <requireMavenVersion>
                                         <version>[3.9.8,3.10)</version>
@@ -383,6 +389,72 @@
     </build>
 
     <profiles>
+
+        <!-- ========================================
+             JDK Version Profiles
+             ========================================
+             These profiles auto-activate based on the detected JDK version
+             and adjust dependency versions for compatibility.
+             
+             Key adjustments:
+             - Mockito: Version 5.x requires Java 11+, so Java 8 uses 4.11.0
+             - Enforcer: Only active for JDK 21 (default build), skipped for compatibility builds
+        -->
+        
+        <!-- Java 8 Profile -->
+        <profile>
+            <id>jdk-8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <!-- Mockito 5.x requires Java 11+, so we use 4.11.0 for Java 8 -->
+                <mockito.version>4.11.0</mockito.version>
+                <!-- Skip enforcer for compatibility builds -->
+                <maven.enforcer.skip>true</maven.enforcer.skip>
+            </properties>
+        </profile>
+        
+        <!-- Java 11 Profile -->
+        <profile>
+            <id>jdk-11</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
+            <properties>
+                <!-- Mockito 5.x is compatible with Java 11+ -->
+                <mockito.version>5.7.0</mockito.version>
+                <!-- Skip enforcer for compatibility builds -->
+                <maven.enforcer.skip>true</maven.enforcer.skip>
+            </properties>
+        </profile>
+        
+        <!-- Java 17 Profile -->
+        <profile>
+            <id>jdk-17</id>
+            <activation>
+                <jdk>17</jdk>
+            </activation>
+            <properties>
+                <!-- Mockito 5.x is compatible with Java 11+ -->
+                <mockito.version>5.7.0</mockito.version>
+                <!-- Skip enforcer for compatibility builds -->
+                <maven.enforcer.skip>true</maven.enforcer.skip>
+            </properties>
+        </profile>
+        
+        <!-- Java 21 Profile (default) -->
+        <profile>
+            <id>jdk-21</id>
+            <activation>
+                <jdk>21</jdk>
+            </activation>
+            <properties>
+                <!-- Mockito 5.x is compatible with Java 11+ -->
+                <mockito.version>5.7.0</mockito.version>
+                <!-- Enforcer is enabled for the default build (maven.enforcer.skip=false) -->
+            </properties>
+        </profile>
 
         <!-- SLF4J 1.7 Profile - uses SLF4J 1.7.x API for testing compatibility -->
         <profile>
