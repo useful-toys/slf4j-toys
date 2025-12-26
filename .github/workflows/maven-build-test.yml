@@ -79,8 +79,8 @@ jobs:
         with:
           name: compiled-artifacts
           path: |
-            slf4j-toys/target/classes/
-            slf4j-toys/target/test-classes/
+            target/classes/
+            target/test-classes/
           retention-days: 1
 
   # Job 2: Run tests on all JDK/SLF4J combinations (except JDK 21 + SLF4J 2.0 already tested)
@@ -114,7 +114,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: compiled-artifacts
-          path: slf4j-toys/target/
+          path: target/
 
       - name: Run tests with ${{ matrix.slf4j-profile }}
         run: sh mvnw test -P ${{ matrix.slf4j-profile }} --batch-mode -Denforcer.skip=true
