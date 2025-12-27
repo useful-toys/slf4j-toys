@@ -80,7 +80,6 @@ jobs:
           name: compiled-artifacts
           path: |
             target/classes/
-            target/test-classes/
           retention-days: 1
 
   # Job 2: Run tests on all JDK/SLF4J combinations (except JDK 21 + SLF4J 2.0 already tested)
@@ -91,10 +90,13 @@ jobs:
     strategy:
       matrix:
         java-version: [8, 11, 17, 21]
-        slf4j-profile: [slf4j-1.7, slf4j-2.0]
+        slf4j-profile: [slf4j-1.7-javax, slf4j-2.0-javax, slf4j-2.0]
         exclude:
           # Exclude JDK 21 + SLF4J 2.0 as it was fully tested in build job
           - java-version: 21
+            slf4j-profile: slf4j-2.0
+          # Exclude JDK 8 + SLF4J 2.0 as requires java 11+
+          - java-version: 8
             slf4j-profile: slf4j-2.0
       fail-fast: false
     name: Test (JDK ${{ matrix.java-version }}, ${{ matrix.slf4j-profile }})
