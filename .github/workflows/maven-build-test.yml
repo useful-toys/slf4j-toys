@@ -67,13 +67,17 @@ jobs:
 
       - name: Populate Maven cache
         run: |
+          # Download all plugin dependencies (including surefire-junit-platform)
+          sh mvnw dependency:resolve-plugins --batch-mode
           # Download dependencies for main build profile (SLF4J 2.0 + Jakarta Servlet + Mockito 5)
           sh mvnw dependency:go-offline -P slf4j-2.0,javadoc-validation --batch-mode
           # Download dependencies for SLF4J 1.7 profile (Logback 1.2 + javax.servlet)
           sh mvnw dependency:resolve -P slf4j-1.7-javax --batch-mode
           # Download dependencies for SLF4J 2.0 with javax profile (Logback 1.3 + javax.servlet)
           sh mvnw dependency:resolve -P slf4j-2.0-javax --batch-mode
-          echo "Maven cache populated for all profiles (Mockito 4/5, Logback 1.2/1.3/1.5, javax/jakarta servlet)"
+          # Download dependencies for SLF4J 2.0 with jdk-8 profile (Mockito 4 + javax servlet)
+          sh mvnw dependency:resolve -P slf4j-1.7-javax,jdk-8 --batch-mode
+          echo "Maven cache populated: plugins + all profiles (Mockito 4/5, Logback 1.2/1.3/1.5, javax/jakarta servlet)"
 
       - name: Build and run full test suite with SLF4J 2.0
         run: sh mvnw clean verify -P slf4j-2.0,javadoc-validation --batch-mode

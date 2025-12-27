@@ -28,7 +28,11 @@ jobs:
     strategy:
       matrix:
         java-version: [8, 11, 17, 21]
-        slf4j-profile: [slf4j-1.7, slf4j-2.0]
+        slf4j-profile: [slf4j-1.7-javax, slf4j-2.0-javax, slf4j-2.0]
+        exclude:
+          # Exclude JDK 8 + SLF4J 2.0 as requires java 11+
+          - java-version: 8
+            slf4j-profile: slf4j-2.0
       fail-fast: true
     name: Test (JDK ${{ matrix.java-version }}, ${{ matrix.slf4j-profile }})
 
