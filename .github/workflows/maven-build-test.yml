@@ -131,7 +131,7 @@ jobs:
           echo "Removed Jakarta Servlet classes for ${{ matrix.slf4j-profile }}"
 
       - name: Run tests with ${{ matrix.slf4j-profile }}
-        run: sh mvnw test -P ${{ matrix.slf4j-profile }} --batch-mode -Dmaven.enforcer.skip=true
+        run: sh mvnw test -X -P ${{ matrix.slf4j-profile }} --batch-mode -Dmaven.enforcer.skip=true
 
   # Job 3: Final status check to simplify branch protection rules
   status-gateway:
