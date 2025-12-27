@@ -130,7 +130,7 @@ jobs:
           path: target/
 
       - name: Run tests with ${{ matrix.slf4j-profile }}
-        run: sh mvnw test -Dmaven.main.skip=true -P ${{ matrix.slf4j-profile }} --batch-mode -Dmaven.enforcer.skip=true
+        run: sh mvnw surefire:test@unit-tests surefire:test@logback-tests -P ${{ matrix.slf4j-profile }} --batch-mode -Dmaven.enforcer.skip=true
 
   # Job 3: Final status check to simplify branch protection rules
   status-gateway:

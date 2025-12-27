@@ -413,7 +413,7 @@
             </dependencies>
             <build>
                 <plugins>
-                    <!-- Exclude Jakarta Servlet classes from compilation -->
+                    <!-- Exclude Jakarta Servlet classes from compilation. -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
