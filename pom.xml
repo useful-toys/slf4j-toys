@@ -359,6 +359,23 @@
             </dependencies>
             <build>
                 <plugins>
+                    <!-- Exclude Jakarta Servlet classes from compilation -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/ReportContextListener.java</exclude>
+                                <exclude>**/ReportServlet.java</exclude>
+                                <exclude>**/WatcherServlet.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <testExclude>**/ReportContextListenerTest.java</testExclude>
+                                <testExclude>**/ReportServletTest.java</testExclude>
+                                <testExclude>**/WatcherServletTest.java</testExclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
                     <!-- Exclude Jakarta Servlet tests and dependencies -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -396,6 +413,23 @@
             </dependencies>
             <build>
                 <plugins>
+                    <!-- Exclude Jakarta Servlet classes from compilation -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/ReportContextListener.java</exclude>
+                                <exclude>**/ReportServlet.java</exclude>
+                                <exclude>**/WatcherServlet.java</exclude>
+                            </excludes>
+                            <testExcludes>
+                                <testExclude>**/ReportContextListenerTest.java</testExclude>
+                                <testExclude>**/ReportServletTest.java</testExclude>
+                                <testExclude>**/WatcherServletTest.java</testExclude>
+                            </testExcludes>
+                        </configuration>
+                    </plugin>
                     <!-- Exclude Jakarta Servlet tests and dependencies -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
