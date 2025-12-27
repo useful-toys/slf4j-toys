@@ -21,6 +21,13 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
 - **Repository**: GitHub
 - **CI/CD**: GitHub Actions for validation, build, testing, and deployment to Maven Central and GitHub Releases
 
+### Build Profiles
+**Task-Specific Profiles**:
+- **release**: Generates Javadoc JAR, sources JAR, signs artifacts, and deploys to Maven Central
+  - Activate: `mvnw -P release deploy`
+- **validate-javadoc**: Validates Javadoc formatting and documentation completeness
+  - Activate: `mvnw -P validate-javadoc test`
+
 ## Code Standards
 
 ### Language & Style
@@ -79,15 +86,15 @@ When writing documentation (guides, TDRs, implementation docs, etc.):
   - Example: "I see class X uses pattern Y. Should I document this pattern as an established convention?"
 
 - **Example of what NOT to do**:
-  - ❌ Inventing methods or features that don't exist
-  - ❌ Describing functionality not present in the code
-  - ❌ Making assumptions about design decisions without supporting evidence
+  - Inventing an annotation that doesn't exist
+  - Describing functionality not present in the code
+  - Making assumptions about design decisions without supporting evidence
 
 - **Example of correct approach**:
-  - ✅ Search the codebase for actual implementations
-  - ✅ Read method Javadoc and comments
-  - ✅ Document what you find, not what you imagine should exist
-  - ✅ Ask for clarification if unsure
+  - Search the codebase for actual implementations
+  - Read method Javadoc and comments
+  - Document what you find, not what you imagine should exist
+  - Ask for clarification if unsure
 
 ### API Changes & Documentation
 - **README.md synchronization**: If you modify the public API (new methods, changed signatures, new parameters, behavior changes, new features, or deprecations), **update README.md** with:
