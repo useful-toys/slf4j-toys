@@ -357,6 +357,22 @@
                     <optional>true</optional>
                 </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <!-- Exclude Jakarta Servlet tests -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes combine.children="append">
+                                <exclude>**/ReportContextListenerTest.java</exclude>
+                                <exclude>**/ReportServletTest.java</exclude>
+                                <exclude>**/WatcherServletTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <!-- SLF4J 2.0 with javax (Java 8+) - SLF4J 2.0.16 + Logback 1.3.14 + javax.servlet -->
@@ -374,6 +390,22 @@
                     <optional>true</optional>
                 </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <!-- Exclude Jakarta Servlet tests -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes combine.children="append">
+                                <exclude>**/ReportContextListenerTest.java</exclude>
+                                <exclude>**/ReportServletTest.java</exclude>
+                                <exclude>**/WatcherServletTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <!-- SLF4J 2.0 with jakarta (Java 11+) - SLF4J 2.0.16 + Logback 1.5.23 + jakarta.servlet (Default) -->
