@@ -21,6 +21,12 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
 - **Repository**: GitHub
 - **CI/CD**: GitHub Actions for validation, build, testing, and deployment to Maven Central and GitHub Releases
 
+### Development Environment
+- **JDK**: 21
+- **Terminal**: PowerShell (Windows) or equivalent shell (Unix/Linux/macOS)
+- **IDEs**: IntelliJ IDEA, VS Code, GitHub Codespaces
+- **Version Control**: Git
+
 ### Build Profiles
 **Task-Specific Profiles**:
 - **release**: Generates Javadoc JAR, sources JAR, signs artifacts, and deploys to Maven Central
@@ -103,34 +109,6 @@ When writing documentation (guides, TDRs, implementation docs, etc.):
 - Keep README.md synchronized with actual library capabilities
 
 ## Development Workflow
-
-### Testing
-- **All new features and bug fixes must include corresponding unit tests**
-- **Coverage**: Target >95% code coverage. Cover all logical branches and conditionals
-- **Build tools**: Use `maven-surefire-plugin` for testing and `jacoco-maven-plugin` for coverage
-
-### Test Structure & Organization
-- Group tests semantically using JUnit 5's `@Nested` classes
-- Create a test group for each method or feature of the class under test
-- Use `@DisplayName` with descriptive names for all test classes and methods
-
-### Test Assertions
-- **All assertions must include a descriptive message** starting with "should..."
-- **Assertion messages should use "should" format** (e.g., "should return non-null value", "should throw IllegalArgumentException")
-- Example: `assertEquals(expected, actual, "should return the correct value")`
-- Prefer specific assertions over generic ones (e.g., assertEquals over assertTrue when comparing values)
-- Include context in assertion messages to help debugging failures
-
-### Test Cases
-- Test both positive (success) and negative (expected failure) scenarios
-- Cover all meaningful combinations of parameters, even if redundant for coverage purposes
-- **Priority**: Validate all possible usages and real-world scenarios over just achieving coverage metrics
-- Testing `null` parameters is not required unless `null` is a valid, handled input
-- Test method names should be descriptive and follow the pattern `shouldDoSomethingWhenCondition`
-
-### Dependencies
-- Minimize new Maven dependencies
-- Carefully consider necessity before adding any dependency
 
 ### Code Generation
 - Add `@AIGenerated("ai-name")` annotation to AI-generated classes/methods (e.g., "gemini", "copilot")
