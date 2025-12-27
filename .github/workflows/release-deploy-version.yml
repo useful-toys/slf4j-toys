@@ -44,7 +44,7 @@ jobs:
           cache: 'maven'
 
       - name: Test with JDK ${{ matrix.java-version }} and ${{ matrix.slf4j-profile }}
-        run: sh mvnw clean verify -P ${{ matrix.slf4j-profile }} --batch-mode -Denforcer.skip=true
+        run: sh mvnw clean verify -P ${{ matrix.slf4j-profile }} --batch-mode -Dmaven.enforcer.skip=true
 
   # Deploy only after all tests pass
   build-release-deploy:

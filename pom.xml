@@ -330,6 +330,9 @@
         -->
         <profile>
             <id>jdk-8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
             <properties>
                 <!-- Mockito 5.x requires Java 11+, so we use 4.11.0 for Java 8 -->
                 <mockito.version>4.11.0</mockito.version>
