@@ -90,7 +90,7 @@ public class ReportCalendar implements Runnable {
         final TimeZone tz = provider.getDefaultTimeZone();
 
         ps.println("Calendar");
-        final DateFormat dateTimeInstance = DateFormat.getDateTimeInstance();
+        final DateFormat dateTimeInstance = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
         dateTimeInstance.setTimeZone(tz);
         ps.printf(" - current date/time: %s%n", dateTimeInstance.format(currentDate));
         ps.printf(" - default timezone: %s (%s)%n", tz.getDisplayName(), tz.getID());
