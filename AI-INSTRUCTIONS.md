@@ -133,6 +133,12 @@ When writing documentation (guides, TDRs, implementation docs, etc.):
 - **Protected main**: Main branch is protected and requires successful checks and approvals before accepting merges
 - **AI automation**: AI can execute development process steps (create feature branches, generate commits, create PRs with descriptions), but only when explicitly requested by the user, never automatically
 
+### Git Workflow Details
+- **Linear history**: Prefer a linear commit history without merge commits
+- **Rebase strategy**: Always rebase (prefer rebase over merge for a linear history)
+- **Squash commits**: Can squash commits to organize the branch before submitting a Pull Request
+- **Force push policy**: Never force push to main or any protected branch
+
 ### Workflow Stages
 
 The project uses a three-stage CI/CD pipeline:
