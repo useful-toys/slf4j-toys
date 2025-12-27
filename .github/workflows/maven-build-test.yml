@@ -119,17 +119,6 @@ jobs:
           name: compiled-artifacts
           path: target/
 
-      - name: Remove Jakarta Servlet classes for javax profiles
-        if: contains(matrix.slf4j-profile, 'javax')
-        run: |
-          rm -f target/classes/org/usefultoys/slf4j/report/ReportContextListener.class
-          rm -f target/classes/org/usefultoys/slf4j/report/ReportServlet.class
-          rm -f target/classes/org/usefultoys/slf4j/watcher/WatcherServlet.class
-          rm -f target/test-classes/org/usefultoys/slf4j/report/ReportContextListenerTest.class
-          rm -f target/test-classes/org/usefultoys/slf4j/report/ReportServletTest.class
-          rm -f target/test-classes/org/usefultoys/slf4j/watcher/WatcherServletTest.class
-          echo "Removed Jakarta Servlet classes for ${{ matrix.slf4j-profile }}"
-
       - name: Run tests with ${{ matrix.slf4j-profile }}
         run: sh mvnw test -Dmaven.main.skip=true -P ${{ matrix.slf4j-profile }} --batch-mode -Dmaven.enforcer.skip=true
 
