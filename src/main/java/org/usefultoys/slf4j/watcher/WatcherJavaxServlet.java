@@ -18,38 +18,15 @@ package org.usefultoys.slf4j.watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * A simple servlet that reports the runtime state in response to GET requests.
- * This servlet can be mapped to a URL and triggered periodically, for example, by a cron job.
- *
- * <p>Usage: Map this servlet to a URL in your web application's configuration.
- * When the URL is accessed, the servlet will log the current runtime state.
- *
- * <p><b>SECURITY WARNING:</b>
- * Exposing this servlet in a production environment without proper security measures
- * can lead to information disclosure and potential Denial of Service (DoS) attacks.
- * <ul>
- *     <li><b>Information Disclosure:</b> The Watcher logs detailed system metrics. If these logs
- *     are accessible, sensitive information about your application's environment might be exposed.</li>
- *     <li><b>Denial of Service (DoS):</b> Frequent access to this servlet, especially if the Watcher
- *     operation is resource-intensive, could consume excessive CPU or I/O resources, leading to
- *     performance degradation or service unavailability.</li>
- * </ul>
- * <p><b>Recommendations:</b>
- * <ul>
- *     <li>Implement authentication and authorization mechanisms to restrict access to this servlet.</li>
- *     <li>Ensure it is only accessible from trusted networks or IP addresses.</li>
- *     <li>Consider rate-limiting or throttling access to prevent abuse.</li>
- * </ul>
- *
- * @author Daniel Felix Ferber
- * @see WatcherSingleton
+ * This class is identical to {@link WatcherServlet} but uses the javax.servlet API
+ * instead of the jakarta.servlet API.
  */
-public class WatcherServlet extends HttpServlet {
+public class WatcherJavaxServlet extends HttpServlet {
 
     private static final long serialVersionUID = 675380685122096016L;
 
@@ -62,10 +39,10 @@ public class WatcherServlet extends HttpServlet {
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
-        final Logger logger = LoggerFactory.getLogger(WatcherServlet.class);
+        final Logger logger = LoggerFactory.getLogger(WatcherJavaxServlet.class);
         try {
             runWatcher();
-            logger.info("WatcherServlet accessed. Logging current runtime state.");
+            logger.info("WatcherJavaxServlet accessed. Logging current runtime state.");
             response.setContentType("text/plain");
             response.getWriter().write("Runtime state logged successfully.");
             response.setStatus(HttpServletResponse.SC_OK);

@@ -15,12 +15,14 @@
  */
 package org.usefultoys.slf4j.report;
 
-import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
-
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import java.util.concurrent.Executor;
 
 /**
+ * This class is identical to {@link ReportContextListener} but uses the javax.servlet API
+ * instead of the jakarta.servlet API.
+ * <p>
  * A {@link javax.servlet.ServletContextListener} that triggers diagnostic reports when the web application starts.
  * <p>
  * The reports to be logged are determined by {@link ReporterConfig} and executed through a simple {@link Executor}.
@@ -30,7 +32,7 @@ import java.util.concurrent.Executor;
  *
  * <pre>{@code
  * <listener>
- *     <listener-class>org.usefultoys.slf4j.report.ReportContextListener</listener-class>
+ *     <listener-class>org.usefultoys.slf4j.report.ReportJavaxContextListener</listener-class>
  * </listener>
  * }</pre>
  *
@@ -38,7 +40,7 @@ import java.util.concurrent.Executor;
  * @see Reporter
  * @see ReporterConfig
  */
-public class ReportContextListener implements ServletContextListener {
+public class ReportJavaxContextListener implements ServletContextListener {
 
     /**
      * Invoked when the web application is shutting down. This implementation takes no action.

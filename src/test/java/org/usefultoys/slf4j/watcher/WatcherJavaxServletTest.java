@@ -16,25 +16,32 @@
 
 package org.usefultoys.slf4j.watcher;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
+import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import org.usefultoys.slf4j.SessionConfig;
-import static org.mockito.Mockito.*;
 
-
-class WatcherServletTest {
+class WatcherJavaxServletTest {
 
     @BeforeAll
     static void validateConsistentCharset() {
@@ -57,7 +64,7 @@ class WatcherServletTest {
         SystemConfig.reset();
     }
 
-    private final MockLogger mockLogger = (MockLogger) LoggerFactory.getLogger(WatcherServlet.class);
+    private final MockLogger mockLogger = (MockLogger) LoggerFactory.getLogger(WatcherJavaxServlet.class);
     private final MockLogger watcherLogger = (MockLogger) LoggerFactory.getLogger(WatcherConfig.name);
 
     @BeforeEach
@@ -79,7 +86,7 @@ class WatcherServletTest {
     @Test
     void shouldLogSystemStatusSuccessfully() throws Exception {
         // Arrange
-        final WatcherServlet servlet = new WatcherServlet();
+        final WatcherJavaxServlet servlet = new WatcherJavaxServlet();
         final HttpServletRequest request = mock(HttpServletRequest.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final StringWriter responseWriter = new StringWriter();
@@ -94,24 +101,24 @@ class WatcherServletTest {
         assertEquals("Runtime state logged successfully.", responseWriter.toString().trim());
 
         assertEquals(1, mockLogger.getEventCount());
-        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("WatcherServlet accessed"));
+        assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("WatcherJavaxServlet accessed"));
 
         assertEquals(1, watcherLogger.getEventCount());
         assertTrue(watcherLogger.getEvent(0).getFormattedMessage().contains("Memory:"));
     }
 
     /**
-     * Classe de teste que estende WatcherServlet para simular exceções
+     * Classe de teste que estende WatcherJavaxServlet para simular exceções
      */
-    static class TestExceptionWatcherServlet extends WatcherServlet {
+    static class TestExceptionWatcherJavaxServlet extends WatcherJavaxServlet {
         private final RuntimeException exceptionToThrow;
 
-        public TestExceptionWatcherServlet(final RuntimeException exceptionToThrow) {
+        public TestExceptionWatcherJavaxServlet(final RuntimeException exceptionToThrow) {
             this.exceptionToThrow = exceptionToThrow;
         }
 
         @Override
-        protected void runWatcher()  {
+        protected void runWatcher() {
             throw exceptionToThrow;
         }
     }
@@ -120,7 +127,7 @@ class WatcherServletTest {
     void shouldHandleExceptionInRunWatcher() throws Exception {
         // Arrange
         final RuntimeException testException = new RuntimeException("Teste de falha no watcher");
-        final WatcherServlet servlet = new TestExceptionWatcherServlet(testException);
+        final WatcherJavaxServlet servlet = new TestExceptionWatcherJavaxServlet(testException);
         final HttpServletRequest request = mock(HttpServletRequest.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final StringWriter responseWriter = new StringWriter();
@@ -143,7 +150,7 @@ class WatcherServletTest {
     void shouldHandleIOExceptionWhenWritingToResponse() throws Exception {
         // Arrange
         final RuntimeException testException = new RuntimeException("Teste de falha no watcher");
-        final WatcherServlet servlet = new TestExceptionWatcherServlet(testException);
+        final WatcherJavaxServlet servlet = new TestExceptionWatcherJavaxServlet(testException);
         final HttpServletRequest request = mock(HttpServletRequest.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -163,12 +170,12 @@ class WatcherServletTest {
     }
 
     /**
-     * Classe estendida do WatcherServlet para simular exceções no método runWatcher
+     * Classe estendida do WatcherJavaxServlet para simular exceções no método runWatcher
      */
-    static class ExceptionThrowingWatcherServlet extends WatcherServlet {
+    static class ExceptionThrowingWatcherJavaxServlet extends WatcherJavaxServlet {
         private final RuntimeException exceptionToThrow;
 
-        public ExceptionThrowingWatcherServlet(final RuntimeException exceptionToThrow) {
+        public ExceptionThrowingWatcherJavaxServlet(final RuntimeException exceptionToThrow) {
             this.exceptionToThrow = exceptionToThrow;
         }
 
@@ -182,7 +189,7 @@ class WatcherServletTest {
     void shouldHandleRuntimeExceptionInRunWatcher() throws Exception {
         // Arrange
         final RuntimeException testException = new RuntimeException("Teste de exceção simulada");
-        final WatcherServlet servlet = new ExceptionThrowingWatcherServlet(testException);
+        final WatcherJavaxServlet servlet = new ExceptionThrowingWatcherJavaxServlet(testException);
         final HttpServletRequest request = mock(HttpServletRequest.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final StringWriter responseWriter = new StringWriter();
@@ -205,7 +212,7 @@ class WatcherServletTest {
     void shouldHandleNullPointerExceptionInRunWatcher() throws Exception {
         // Arrange
         final NullPointerException testException = new NullPointerException("Erro de referência nula");
-        final WatcherServlet servlet = new ExceptionThrowingWatcherServlet(testException);
+        final WatcherJavaxServlet servlet = new ExceptionThrowingWatcherJavaxServlet(testException);
         final HttpServletRequest request = mock(HttpServletRequest.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final StringWriter responseWriter = new StringWriter();
@@ -228,7 +235,7 @@ class WatcherServletTest {
     void shouldHandleWriterExceptionInErrorCase() throws Exception {
         // Arrange
         final RuntimeException testException = new RuntimeException("Teste de exceção primária");
-        final WatcherServlet servlet = new ExceptionThrowingWatcherServlet(testException);
+        final WatcherJavaxServlet servlet = new ExceptionThrowingWatcherJavaxServlet(testException);
         final HttpServletRequest request = mock(HttpServletRequest.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -251,7 +258,7 @@ class WatcherServletTest {
     void shouldHandleIllegalStateExceptionInRunWatcher() throws Exception {
         // Arrange
         final IllegalStateException testException = new IllegalStateException("Estado inválido do watcher");
-        final WatcherServlet servlet = new ExceptionThrowingWatcherServlet(testException);
+        final WatcherJavaxServlet servlet = new ExceptionThrowingWatcherJavaxServlet(testException);
         final HttpServletRequest request = mock(HttpServletRequest.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final StringWriter responseWriter = new StringWriter();
@@ -269,4 +276,5 @@ class WatcherServletTest {
         assertSame(mockLogger.getEvent(0).getThrowable(), testException);
         assertTrue(mockLogger.getEvent(0).getFormattedMessage().contains("Failed to log runtime state"));
     }
+
 }

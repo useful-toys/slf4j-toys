@@ -30,8 +30,8 @@ import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -41,16 +41,16 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
-class ReportServletTest {
+class ReportJavaxServletTest {
 
-    private ReportServlet servlet;
+    private ReportJavaxServlet servlet;
     private HttpServletRequest request;
     private HttpServletResponse response;
     private StringWriter responseWriter;
 
     @Slf4jMock("test.report")
     private Logger reportLogger; // Logger used by the reports themselves
-    @Slf4jMock(type=ReportServlet.class)
+    @Slf4jMock(type=ReportJavaxServlet.class)
     private Logger servletLogger; // Logger used by the servlet (Slf4j annotation)
 
     @BeforeEach
@@ -59,7 +59,7 @@ class ReportServletTest {
         System.setProperty(ReporterConfig.PROP_NAME, "test.report");
         ReporterConfig.init();
 
-        servlet = new ReportServlet();
+        servlet = new ReportJavaxServlet();
         request = mock(HttpServletRequest.class);
         response = mock(HttpServletResponse.class);
         responseWriter = new StringWriter();

@@ -19,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -83,7 +83,7 @@ import java.util.Locale;
  */
 @SuppressWarnings("ClassWithMultipleLoggers")
 @Slf4j
-public class ReportServlet extends HttpServlet {
+public class ReportJavaxServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 

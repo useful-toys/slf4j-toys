@@ -13,6 +13,7 @@
         <module name="slf4j-toys-log4j-example" />
         <module name="slf4j-toys" />
         <module name="slf4j-toys-jul-example" />
+        <module name="slf4j-toys-root" />
         <module name="slf4j-toys-examples" />
       </profile>
     </annotationProcessing>
