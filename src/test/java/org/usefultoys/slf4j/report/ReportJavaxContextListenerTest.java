@@ -16,6 +16,7 @@
 
 package org.usefultoys.slf4j.report;
 
+import javax.servlet.ServletContextEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,22 +27,20 @@ import org.usefultoys.test.CharsetConsistency;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.WithLocale;
 
-import jakarta.servlet.ServletContextEvent;
-
 import static org.mockito.Mockito.mock;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvent;
 
 @ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
 @WithLocale("en")
-class ReportContextListenerTest {
+class ReportJavaxContextListenerTest {
     @Slf4jMock("test.report.contextlistener")
     private Logger logger;
-    private ReportContextListener listener;
+    private ReportJavaxContextListener listener;
 
     @BeforeEach
     void setUpListener() {
-        listener = new ReportContextListener();
+        listener = new ReportJavaxContextListener();
     }
 
     @Test
