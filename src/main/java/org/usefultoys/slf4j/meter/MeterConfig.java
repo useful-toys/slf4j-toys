@@ -188,7 +188,7 @@ public class MeterConfig {
      * Resets all configuration properties to their default values.
      * This method is useful for testing purposes or when reinitializing the configuration.
      */
-    void reset() {
+    public void reset() {
         System.clearProperty(PROP_PROGRESS_PERIOD);
         System.clearProperty(PROP_PRINT_CATEGORY);
         System.clearProperty(PROP_PRINT_STATUS);

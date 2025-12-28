@@ -154,7 +154,7 @@ public class WatcherConfig {
      * Resets the configuration properties to their default values.
      * This method is useful for testing or re-initializing the configuration.
      */
-    void reset() {
+    public void reset() {
         System.clearProperty(WatcherConfig.PROP_NAME);
         System.clearProperty(WatcherConfig.PROP_DELAY);
         System.clearProperty(WatcherConfig.PROP_PERIOD);

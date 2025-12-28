@@ -70,7 +70,7 @@ public class ResetMeterConfigExtension implements BeforeEachCallback, AfterEachC
         // Clear any accumulated parsing errors
         ConfigParser.clearInitializationErrors();
         // Reset all three config levels to their default values
-        MeterConfig.init();
+        MeterConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
     }
@@ -88,7 +88,7 @@ public class ResetMeterConfigExtension implements BeforeEachCallback, AfterEachC
         // Clean up any errors or config changes made during the test
         ConfigParser.clearInitializationErrors();
         // Reset all three config levels to their default values
-        MeterConfig.init();
+        MeterConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
     }

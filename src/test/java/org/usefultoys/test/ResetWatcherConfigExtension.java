@@ -68,7 +68,7 @@ public class ResetWatcherConfigExtension implements BeforeEachCallback, AfterEac
         // Clear any accumulated parsing errors
         ConfigParser.clearInitializationErrors();
         // Reset all three config levels to their default values
-        WatcherConfig.init();
+        WatcherConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
     }
@@ -86,7 +86,7 @@ public class ResetWatcherConfigExtension implements BeforeEachCallback, AfterEac
         // Clean up any errors or config changes made during the test
         ConfigParser.clearInitializationErrors();
         // Reset all three config levels to their default values
-        WatcherConfig.init();
+        WatcherConfig.reset();
         SessionConfig.reset();
         SystemConfig.reset();
     }
