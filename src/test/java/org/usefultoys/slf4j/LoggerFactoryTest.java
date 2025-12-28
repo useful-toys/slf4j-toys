@@ -109,9 +109,6 @@ class LoggerFactoryTest {
             traceStream.print("Trace message");
             traceStream.close();
             // Then: should return print stream that logs trace messages
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Trace message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.TRACE, mockLogger.getEvent(0).getLevel(), "should be trace level");
             AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.TRACE, "Trace message");
         }
 
@@ -177,7 +174,7 @@ class LoggerFactoryTest {
             traceStream.close();
             // Then: should return NullPrintStream and not log
             assertInstanceOf(NullPrintStream.class, traceStream, "should return NullPrintStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
 
         @Test
@@ -190,7 +187,7 @@ class LoggerFactoryTest {
             debugStream.close();
             // Then: should return NullPrintStream and not log
             assertInstanceOf(NullPrintStream.class, debugStream, "should return NullPrintStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
 
         @Test
@@ -203,7 +200,7 @@ class LoggerFactoryTest {
             infoStream.close();
             // Then: should return NullPrintStream and not log
             assertInstanceOf(NullPrintStream.class, infoStream, "should return NullPrintStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
 
         @Test
@@ -216,7 +213,7 @@ class LoggerFactoryTest {
             warnStream.close();
             // Then: should return NullPrintStream and not log
             assertInstanceOf(NullPrintStream.class, warnStream, "should return NullPrintStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
 
         @Test
@@ -229,7 +226,7 @@ class LoggerFactoryTest {
             errorStream.close();
             // Then: should return NullPrintStream and not log
             assertInstanceOf(NullPrintStream.class, errorStream, "should return NullPrintStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
     }
 
@@ -327,7 +324,7 @@ class LoggerFactoryTest {
             traceStream.close();
             // Then: should return NullOutputStream and not log
             assertInstanceOf(NullOutputStream.class, traceStream, "should return NullOutputStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
 
         @Test
@@ -340,7 +337,7 @@ class LoggerFactoryTest {
             debugStream.close();
             // Then: should return NullOutputStream and not log
             assertInstanceOf(NullOutputStream.class, debugStream, "should return NullOutputStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
 
         @Test
@@ -353,7 +350,7 @@ class LoggerFactoryTest {
             infoStream.close();
             // Then: should return NullOutputStream and not log
             assertInstanceOf(NullOutputStream.class, infoStream, "should return NullOutputStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
 
         @Test
@@ -366,7 +363,7 @@ class LoggerFactoryTest {
             warnStream.close();
             // Then: should return NullOutputStream and not log
             assertInstanceOf(NullOutputStream.class, warnStream, "should return NullOutputStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
 
         @Test
@@ -379,7 +376,7 @@ class LoggerFactoryTest {
             errorStream.close();
             // Then: should return NullOutputStream and not log
             assertInstanceOf(NullOutputStream.class, errorStream, "should return NullOutputStream");
-            assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+            AssertLogger.assertEventCount(mockLogger, 0);
         }
     }
 
