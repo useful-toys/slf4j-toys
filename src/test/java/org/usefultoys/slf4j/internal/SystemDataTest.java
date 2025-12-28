@@ -15,29 +15,34 @@
  */
 package org.usefultoys.slf4j.internal;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+/**
+ * Unit tests for {@link SystemData}.
+ * <p>
+ * Tests verify that SystemData correctly initializes, manages, and resets system monitoring information
+ * including memory, garbage collection, class loading, and compilation metrics.
+ */
+@DisplayName("SystemData")
+@ValidateCharset
 @WithLocale("en")
-@ExtendWith(CharsetConsistencyExtension.class)
 class SystemDataTest {
 
     static class TestSystemData extends SystemData {
         public TestSystemData() {
-            super();
         }
 
         public TestSystemData(final String sessionUuid, final long position) {
-            super(sessionUuid); // Call EventData constructor
-            this.position = position; // Set position directly as EventData constructor doesn't take it
+            super(sessionUuid);
+            this.position = position;
         }
 
-        // for tests only
         protected TestSystemData(final String sessionUuid, final long position, final long lastCurrentTime,
                               final long heap_commited, final long heap_max, final long heap_used,
                               final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used,
@@ -53,8 +58,13 @@ class SystemDataTest {
     }
 
     @Test
+    @DisplayName("should initialize all fields correctly with full constructor")
     void testConstructorAndGetters() {
+        // Given: SystemData with all parameters
+        // When: object is created
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
+
+        // Then: all fields should be set correctly
         assertEquals("abc", event.getSessionUuid());
         assertEquals(1, event.getPosition());
         assertEquals(2L, event.getLastCurrentTime());
@@ -78,9 +88,15 @@ class SystemDataTest {
     }
 
     @Test
+    @DisplayName("should reset all fields to default values")
     void testResetClearsFields() {
+        // Given: SystemData with values set
         final TestSystemData event = new TestSystemData("abc", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19.0);
+
+        // When: reset is called
         event.reset();
+
+        // Then: all fields should return to default values
         assertNull(event.getSessionUuid());
         assertEquals(0L, event.getPosition());
         assertEquals(0L, event.getLastCurrentTime());
