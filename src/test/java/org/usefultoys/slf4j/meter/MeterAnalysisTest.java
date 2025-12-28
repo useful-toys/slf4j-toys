@@ -70,14 +70,14 @@ class MeterAnalysisTest {
 
         // Construtor completo para facilitar a criação de cenários
         public MeterAnalysisScenario(
-                long lastCurrentTime,
-                String category, String operation, String parent,
-                long createTime, long startTime, long stopTime, long timeLimit,
-                long currentIteration, String okPath, String rejectPath, String failPath,
-                String expectedFullID, boolean expectedIsStarted, boolean expectedIsStopped,
-                boolean expectedIsOK, boolean expectedIsReject, boolean expectedIsFail,
-                String expectedPath, double expectedIterationsPerSecond, long expectedExecutionTime,
-                long expectedWaitingTime, boolean expectedIsSlow) {
+                final long lastCurrentTime,
+                final String category, final String operation, final String parent,
+                final long createTime, final long startTime, final long stopTime, final long timeLimit,
+                final long currentIteration, final String okPath, final String rejectPath, final String failPath,
+                final String expectedFullID, final boolean expectedIsStarted, final boolean expectedIsStopped,
+                final boolean expectedIsOK, final boolean expectedIsReject, final boolean expectedIsFail,
+                final String expectedPath, final double expectedIterationsPerSecond, final long expectedExecutionTime,
+                final long expectedWaitingTime, final boolean expectedIsSlow) {
             this.lastCurrentTime = lastCurrentTime;
             this.category = category;
             this.operation = operation;
@@ -106,6 +106,67 @@ class MeterAnalysisTest {
         @Override
         public String toString() {
             return String.format("Scenario(category='%s', operation='%s')", category, operation);
+        }
+
+        // --- Implementação dos métodos abstratos de MeterAnalysis ---
+        @Override
+        public long getLastCurrentTime() {
+            return lastCurrentTime;
+        }
+
+        @Override
+        public String getCategory() {
+            return category;
+        }
+
+        @Override
+        public String getOperation() {
+            return operation;
+        }
+
+        @Override
+        public String getParent() {
+            return parent;
+        }
+
+        @Override
+        public long getCreateTime() {
+            return createTime;
+        }
+
+        @Override
+        public long getStartTime() {
+            return startTime;
+        }
+
+        @Override
+        public long getStopTime() {
+            return stopTime;
+        }
+
+        @Override
+        public long getTimeLimit() {
+            return timeLimit;
+        }
+
+        @Override
+        public long getCurrentIteration() {
+            return currentIteration;
+        }
+
+        @Override
+        public String getOkPath() {
+            return okPath;
+        }
+
+        @Override
+        public String getRejectPath() {
+            return rejectPath;
+        }
+
+        @Override
+        public String getFailPath() {
+            return failPath;
         }
     }
 
@@ -206,7 +267,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isStarted should correctly indicate if the operation has started")
-    void testIsStarted(MeterAnalysisScenario scenario) {
+    void testIsStarted(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedIsStarted, scenario.isStarted(),
                 "isStarted should match the expected value for scenario: " + scenario);
     }
@@ -214,7 +275,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isStopped should correctly indicate if the operation has stopped")
-    void testIsStopped(MeterAnalysisScenario scenario) {
+    void testIsStopped(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedIsStopped, scenario.isStopped(),
                 "isStopped should match the expected value for scenario: " + scenario);
     }
@@ -222,7 +283,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isOK should correctly indicate if the operation completed successfully")
-    void testIsOK(MeterAnalysisScenario scenario) {
+    void testIsOK(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedIsOK, scenario.isOK(),
                 "isOK should match the expected value for scenario: " + scenario);
     }
@@ -230,7 +291,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isReject should correctly indicate if the operation was rejected")
-    void testIsReject(MeterAnalysisScenario scenario) {
+    void testIsReject(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedIsReject, scenario.isReject(),
                 "isReject should match the expected value for scenario: " + scenario);
     }
@@ -238,7 +299,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isFail should correctly indicate if the operation failed")
-    void testIsFail(MeterAnalysisScenario scenario) {
+    void testIsFail(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedIsFail, scenario.isFail(),
                 "isFail should match the expected value for scenario: " + scenario);
     }
@@ -246,7 +307,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("getPath should return the correct outcome path")
-    void testGetPath(MeterAnalysisScenario scenario) {
+    void testGetPath(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedPath, scenario.getPath(),
                 "Path should match the expected value for scenario: " + scenario);
     }
@@ -254,7 +315,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("getIterationsPerSecond should calculate the correct iterations per second")
-    void testGetIterationsPerSecond(MeterAnalysisScenario scenario) {
+    void testGetIterationsPerSecond(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedIterationsPerSecond, scenario.getIterationsPerSecond(), 0.000000001, // Delta para comparação de doubles
                 "Iterations per second should match the expected value for scenario: " + scenario);
     }
@@ -262,7 +323,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("getExecutionTime should calculate the correct execution time")
-    void testGetExecutionTime(MeterAnalysisScenario scenario) {
+    void testGetExecutionTime(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedExecutionTime, scenario.getExecutionTime(),
                 "Execution time should match the expected value for scenario: " + scenario);
     }
@@ -270,7 +331,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("getWaitingTime should calculate the correct waiting time")
-    void testGetWaitingTime(MeterAnalysisScenario scenario) {
+    void testGetWaitingTime(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedWaitingTime, scenario.getWaitingTime(),
                 "Waiting time should match the expected value for scenario: " + scenario);
     }
@@ -278,7 +339,7 @@ class MeterAnalysisTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isSlow should correctly indicate if the operation is slow")
-    void testIsSlow(MeterAnalysisScenario scenario) {
+    void testIsSlow(final MeterAnalysisScenario scenario) {
         assertEquals(scenario.expectedIsSlow, scenario.isSlow(),
                 "isSlow should match the expected value for scenario: " + scenario);
     }
