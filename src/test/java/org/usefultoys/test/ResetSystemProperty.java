@@ -19,6 +19,7 @@ package org.usefultoys.test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -27,7 +28,9 @@ import java.lang.annotation.Target;
  * Test annotation to automatically clear/reset a specific system property before and after each test.
  * <p>
  * This annotation ensures that system property changes made during a test don't affect other tests.
- * The property is removed before the test runs and restored to its original value after the test completes.
+ * The property is removed before the test runs and cleared after the test completes.
+ * <p>
+ * This annotation is {@link Repeatable}, allowing multiple properties to be reset on the same test class or method.
  * <p>
  * <b>Usage on test method:</b>
  * <pre>{@code
@@ -35,7 +38,7 @@ import java.lang.annotation.Target;
  * @ResetSystemProperty("my.custom.property")
  * void testThatModifiesSystemProperty() {
  *     System.setProperty("my.custom.property", "custom");
- *     // Property is automatically reset after this test
+ *     // Property is automatically cleared after this test
  * }
  * }</pre>
  * <p>
@@ -45,7 +48,7 @@ import java.lang.annotation.Target;
  * class MySystemPropertyTest {
  *     @Test
  *     void testOne() {
- *         // my.custom.property is reset before and after each test
+ *         // my.custom.property is cleared before and after each test
  *     }
  * }
  * }</pre>
@@ -60,7 +63,7 @@ import java.lang.annotation.Target;
  *     void testModifyingMultipleProperties() {
  *         System.setProperty("property1", "value1");
  *         System.setProperty("property2", "value2");
- *         // Both properties are reset after this test
+ *         // Both properties are cleared after this test
  *     }
  * }
  * }</pre>
@@ -72,14 +75,15 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
+@Repeatable(ResetSystemProperties.class)
 @ExtendWith(ResetSystemPropertyExtension.class)
 public @interface ResetSystemProperty {
 
     /**
      * The name of the system property to reset.
      * <p>
-     * The property will be saved before the test, cleared before test execution,
-     * and restored to its original value after the test completes.
+     * The property will be cleared before the test execution
+     * and cleared again after the test completes.
      *
      * @return the system property name to reset
      */

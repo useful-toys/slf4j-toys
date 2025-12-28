@@ -19,7 +19,6 @@ package org.usefultoys.slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.usefultoys.test.ResetSessionConfig;
-import org.usefultoys.test.ResetSystemProperty;
 import org.usefultoys.test.ValidateCharset;
 
 import java.nio.charset.Charset;
@@ -34,8 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @ValidateCharset
 @ResetSessionConfig
-@ResetSystemProperty(SessionConfig.PROP_PRINT_UUID_SIZE)
-@ResetSystemProperty(SessionConfig.PROP_PRINT_CHARSET)
 class SessionConfigTest {
 
     @Test
