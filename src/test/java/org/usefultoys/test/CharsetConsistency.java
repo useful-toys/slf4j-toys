@@ -25,11 +25,46 @@ import java.nio.charset.Charset;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * JUnit 5 extension that validates if the default charset is consistent with {@link SessionConfig#charset}.
+ * JUnit 5 extension that validates charset consistency before running tests.
+ * <p>
+ * This extension ensures that the JVM's default charset matches the charset configured
+ * in {@link SessionConfig}. This validation is critical for tests that involve character
+ * encoding operations, file I/O, or string conversions, as charset mismatches can lead to
+ * subtle bugs that only appear in certain environments.
+ * <p>
+ * The extension runs once before all tests in the class and fails fast if there's a mismatch,
+ * preventing unreliable test results.
+ * <p>
+ * <b>Usage:</b>
+ * <pre>{@code
+ * @ExtendWith(CharsetConsistency.class)
+ * class MyCharsetSensitiveTest {
+ *     @Test
+ *     void testStringEncoding() {
+ *         // Test runs only if default charset matches SessionConfig.charset
+ *     }
+ * }
+ * }</pre>
+ *
+ * @see SessionConfig#charset
+ * @see Charset#defaultCharset()
+ * @author Daniel Felix Ferber
  */
 public class CharsetConsistency implements BeforeAllCallback {
+
+    /**
+     * Validates that the default charset matches {@link SessionConfig#charset}.
+     * <p>
+     * This check runs once before all tests in the class. If the charsets don't match,
+     * the test class fails immediately with a descriptive error message.
+     *
+     * @param context the current extension context
+     * @throws AssertionError if the default charset doesn't match SessionConfig.charset
+     */
     @Override
     public void beforeAll(ExtensionContext context) {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
+        // Fail fast if charset mismatch detected - prevents unreliable test results
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset,
+                "Test requires SessionConfig.charset = default charset");
     }
 }
