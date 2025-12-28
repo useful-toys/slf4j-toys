@@ -116,18 +116,14 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should get debug print stream when logger enabled")
-        void shouldGetDebugPrintStreamWhenLoggerEnabled() {
+        void shouldGetDebugPrintStreamWhenLoggerEnabled(@Slf4jMock(value = "debugLogger", debugEnabled = true) final MockLogger mockLogger) {
             // Given: a logger with debug enabled
-            final Logger logger = LoggerFactory.getLogger("debugLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setDebugEnabled(true);
-            mockLogger.clearEvents();
             // When: getDebugPrintStream is called
-            final PrintStream debugStream = LoggerFactory.getDebugPrintStream(logger);
-            // Then: should return print stream that logs debug messages
-            assertNotNull(debugStream, "should return non-null print stream");
+            final PrintStream debugStream = LoggerFactory.getDebugPrintStream(mockLogger);
             debugStream.print("Debug message");
             debugStream.close();
+            // Then: should return print stream that logs debug messages
+            assertNotNull(debugStream, "should return non-null print stream");
             assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
             assertEquals("Debug message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
             assertEquals(MockLoggerEvent.Level.DEBUG, mockLogger.getEvent(0).getLevel(), "should be debug level");
@@ -135,18 +131,14 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should get info print stream when logger enabled")
-        void shouldGetInfoPrintStreamWhenLoggerEnabled() {
+        void shouldGetInfoPrintStreamWhenLoggerEnabled(@Slf4jMock(value = "infoLogger", infoEnabled = true) final MockLogger mockLogger) {
             // Given: a logger with info enabled
-            final Logger logger = LoggerFactory.getLogger("infoLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setInfoEnabled(true);
-            mockLogger.clearEvents();
             // When: getInfoPrintStream is called
-            final PrintStream infoStream = LoggerFactory.getInfoPrintStream(logger);
-            // Then: should return print stream that logs info messages
-            assertNotNull(infoStream, "should return non-null print stream");
+            final PrintStream infoStream = LoggerFactory.getInfoPrintStream(mockLogger);
             infoStream.print("Info message");
             infoStream.close();
+            // Then: should return print stream that logs info messages
+            assertNotNull(infoStream, "should return non-null print stream");
             assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
             assertEquals("Info message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
             assertEquals(MockLoggerEvent.Level.INFO, mockLogger.getEvent(0).getLevel(), "should be info level");
@@ -154,18 +146,14 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should get warn print stream when logger enabled")
-        void shouldGetWarnPrintStreamWhenLoggerEnabled() {
+        void shouldGetWarnPrintStreamWhenLoggerEnabled(@Slf4jMock(value = "warnLogger", warnEnabled = true) final MockLogger mockLogger) {
             // Given: a logger with warn enabled
-            final Logger logger = LoggerFactory.getLogger("warnLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setWarnEnabled(true);
-            mockLogger.clearEvents();
             // When: getWarnPrintStream is called
-            final PrintStream warnStream = LoggerFactory.getWarnPrintStream(logger);
-            // Then: should return print stream that logs warn messages
-            assertNotNull(warnStream, "should return non-null print stream");
+            final PrintStream warnStream = LoggerFactory.getWarnPrintStream(mockLogger);
             warnStream.print("Warn message");
             warnStream.close();
+            // Then: should return print stream that logs warn messages
+            assertNotNull(warnStream, "should return non-null print stream");
             assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
             assertEquals("Warn message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
             assertEquals(MockLoggerEvent.Level.WARN, mockLogger.getEvent(0).getLevel(), "should be warn level");
@@ -173,18 +161,14 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should get error print stream when logger enabled")
-        void shouldGetErrorPrintStreamWhenLoggerEnabled() {
+        void shouldGetErrorPrintStreamWhenLoggerEnabled(@Slf4jMock(value = "errorLogger", errorEnabled = true) final MockLogger mockLogger) {
             // Given: a logger with error enabled
-            final Logger logger = LoggerFactory.getLogger("errorLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setErrorEnabled(true);
-            mockLogger.clearEvents();
             // When: getErrorPrintStream is called
-            final PrintStream errorStream = LoggerFactory.getErrorPrintStream(logger);
-            // Then: should return print stream that logs error messages
-            assertNotNull(errorStream, "should return non-null print stream");
+            final PrintStream errorStream = LoggerFactory.getErrorPrintStream(mockLogger);
             errorStream.print("Error message");
             errorStream.close();
+            // Then: should return print stream that logs error messages
+            assertNotNull(errorStream, "should return non-null print stream");
             assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
             assertEquals("Error message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
             assertEquals(MockLoggerEvent.Level.ERROR, mockLogger.getEvent(0).getLevel(), "should be error level");
@@ -196,14 +180,10 @@ class LoggerFactoryTest {
     class GetDisabledPrintStream {
         @Test
         @DisplayName("should return NullPrintStream when trace logger disabled")
-        void shouldReturnNullPrintStreamWhenTraceLoggerDisabled() {
+        void shouldReturnNullPrintStreamWhenTraceLoggerDisabled(@Slf4jMock(value = "traceLogger", enabled = false) final MockLogger mockLogger) {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("traceLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getTracePrintStream is called
-            final PrintStream traceStream = LoggerFactory.getTracePrintStream(logger);
+            final PrintStream traceStream = LoggerFactory.getTracePrintStream(mockLogger);
             traceStream.println("Trace message");
             traceStream.close();
             // Then: should return NullPrintStream and not log
@@ -214,14 +194,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should return NullPrintStream when debug logger disabled")
-        void shouldReturnNullPrintStreamWhenDebugLoggerDisabled() {
+        void shouldReturnNullPrintStreamWhenDebugLoggerDisabled(@Slf4jMock(value = "debugLogger", enabled = false) final MockLogger mockLogger) {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("debugLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getDebugPrintStream is called
-            final PrintStream debugStream = LoggerFactory.getDebugPrintStream(logger);
+            final PrintStream debugStream = LoggerFactory.getDebugPrintStream(mockLogger);
             debugStream.println("Debug message");
             debugStream.close();
             // Then: should return NullPrintStream and not log
@@ -232,14 +208,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should return NullPrintStream when info logger disabled")
-        void shouldReturnNullPrintStreamWhenInfoLoggerDisabled() {
+        void shouldReturnNullPrintStreamWhenInfoLoggerDisabled(@Slf4jMock(value = "infoLogger", enabled = false) final MockLogger mockLogger) {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("infoLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getInfoPrintStream is called
-            final PrintStream infoStream = LoggerFactory.getInfoPrintStream(logger);
+            final PrintStream infoStream = LoggerFactory.getInfoPrintStream(mockLogger);
             infoStream.println("Info message");
             infoStream.close();
             // Then: should return NullPrintStream and not log
@@ -250,14 +222,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should return NullPrintStream when warn logger disabled")
-        void shouldReturnNullPrintStreamWhenWarnLoggerDisabled() {
+        void shouldReturnNullPrintStreamWhenWarnLoggerDisabled(@Slf4jMock(value = "warnLogger", enabled = false) final MockLogger mockLogger) {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("warnLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getWarnPrintStream is called
-            final PrintStream warnStream = LoggerFactory.getWarnPrintStream(logger);
+            final PrintStream warnStream = LoggerFactory.getWarnPrintStream(mockLogger);
             warnStream.println("Warn message");
             warnStream.close();
             // Then: should return NullPrintStream and not log
@@ -268,14 +236,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should return NullPrintStream when error logger disabled")
-        void shouldReturnNullPrintStreamWhenErrorLoggerDisabled() {
+        void shouldReturnNullPrintStreamWhenErrorLoggerDisabled(@Slf4jMock(value = "errorLogger", enabled = false) final MockLogger mockLogger) {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("errorLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getErrorPrintStream is called
-            final PrintStream errorStream = LoggerFactory.getErrorPrintStream(logger);
+            final PrintStream errorStream = LoggerFactory.getErrorPrintStream(mockLogger);
             errorStream.println("Error message");
             errorStream.close();
             // Then: should return NullPrintStream and not log
@@ -307,14 +271,10 @@ class LoggerFactoryTest {
     class GetEnabledOutputStream {
         @Test
         @DisplayName("should get trace output stream when logger enabled")
-        void shouldGetTraceOutputStreamWhenLoggerEnabled() throws Exception {
+        void shouldGetTraceOutputStreamWhenLoggerEnabled(@Slf4jMock(value = "traceLogger", traceEnabled = true) final MockLogger mockLogger) throws Exception {
             // Given: a logger with trace enabled
-            final Logger logger = LoggerFactory.getLogger("traceLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setTraceEnabled(true);
-            mockLogger.clearEvents();
             // When: getTraceOutputStream is called
-            final OutputStream traceStream = LoggerFactory.getTraceOutputStream(logger);
+            final OutputStream traceStream = LoggerFactory.getTraceOutputStream(mockLogger);
             traceStream.write("Trace message".getBytes(StandardCharsets.UTF_8));
             traceStream.close();
             // Then: should return output stream that logs trace messages
@@ -326,14 +286,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should get debug output stream when logger enabled")
-        void shouldGetDebugOutputStreamWhenLoggerEnabled() throws Exception {
+        void shouldGetDebugOutputStreamWhenLoggerEnabled(@Slf4jMock(value = "debugLogger", debugEnabled = true) final MockLogger mockLogger) throws Exception {
             // Given: a logger with debug enabled
-            final Logger logger = LoggerFactory.getLogger("debugLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setDebugEnabled(true);
-            mockLogger.clearEvents();
             // When: getDebugOutputStream is called
-            final OutputStream debugStream = LoggerFactory.getDebugOutputStream(logger);
+            final OutputStream debugStream = LoggerFactory.getDebugOutputStream(mockLogger);
             debugStream.write("Debug message".getBytes(StandardCharsets.UTF_8));
             debugStream.close();
             // Then: should return output stream that logs debug messages
@@ -345,14 +301,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should get info output stream when logger enabled")
-        void shouldGetInfoOutputStreamWhenLoggerEnabled() throws Exception {
+        void shouldGetInfoOutputStreamWhenLoggerEnabled(@Slf4jMock(value = "infoLogger", infoEnabled = true) final MockLogger mockLogger) throws Exception {
             // Given: a logger with info enabled
-            final Logger logger = LoggerFactory.getLogger("infoLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setInfoEnabled(true);
-            mockLogger.clearEvents();
             // When: getInfoOutputStream is called
-            final OutputStream infoStream = LoggerFactory.getInfoOutputStream(logger);
+            final OutputStream infoStream = LoggerFactory.getInfoOutputStream(mockLogger);
             infoStream.write("Info message".getBytes(StandardCharsets.UTF_8));
             infoStream.close();
             // Then: should return output stream that logs info messages
@@ -364,14 +316,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should get warn output stream when logger enabled")
-        void shouldGetWarnOutputStreamWhenLoggerEnabled() throws Exception {
+        void shouldGetWarnOutputStreamWhenLoggerEnabled(@Slf4jMock(value = "warnLogger", warnEnabled = true) final MockLogger mockLogger) throws Exception {
             // Given: a logger with warn enabled
-            final Logger logger = LoggerFactory.getLogger("warnLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setWarnEnabled(true);
-            mockLogger.clearEvents();
             // When: getWarnOutputStream is called
-            final OutputStream warnStream = LoggerFactory.getWarnOutputStream(logger);
+            final OutputStream warnStream = LoggerFactory.getWarnOutputStream(mockLogger);
             warnStream.write("Warn message".getBytes(StandardCharsets.UTF_8));
             warnStream.close();
             // Then: should return output stream that logs warn messages
@@ -383,14 +331,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should get error output stream when logger enabled")
-        void shouldGetErrorOutputStreamWhenLoggerEnabled() throws Exception {
+        void shouldGetErrorOutputStreamWhenLoggerEnabled(@Slf4jMock(value = "errorLogger", errorEnabled = true) final MockLogger mockLogger) throws Exception {
             // Given: a logger with error enabled
-            final Logger logger = LoggerFactory.getLogger("errorLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setErrorEnabled(true);
-            mockLogger.clearEvents();
             // When: getErrorOutputStream is called
-            final OutputStream errorStream = LoggerFactory.getErrorOutputStream(logger);
+            final OutputStream errorStream = LoggerFactory.getErrorOutputStream(mockLogger);
             errorStream.write("Error message".getBytes(StandardCharsets.UTF_8));
             errorStream.close();
             // Then: should return output stream that logs error messages
@@ -402,17 +346,14 @@ class LoggerFactoryTest {
     }
 
     @Nested
+    @WithMockLogger
     class GetDisabledOutputStream {
         @Test
         @DisplayName("should return NullOutputStream when trace logger disabled")
-        void shouldReturnNullOutputStreamWhenTraceLoggerDisabled() throws Exception {
+        void shouldReturnNullOutputStreamWhenTraceLoggerDisabled(@Slf4jMock(value = "traceLogger", enabled = false) final MockLogger mockLogger) throws Exception {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("traceLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getTraceOutputStream is called
-            final OutputStream traceStream = LoggerFactory.getTraceOutputStream(logger);
+            final OutputStream traceStream = LoggerFactory.getTraceOutputStream(mockLogger);
             traceStream.write("Trace message".getBytes(StandardCharsets.UTF_8));
             traceStream.close();
             // Then: should return NullOutputStream and not log
@@ -423,14 +364,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should return NullOutputStream when debug logger disabled")
-        void shouldReturnNullOutputStreamWhenDebugLoggerDisabled() throws Exception {
+        void shouldReturnNullOutputStreamWhenDebugLoggerDisabled(@Slf4jMock(value = "debugLogger", enabled = false) final MockLogger mockLogger) throws Exception {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("debugLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getDebugOutputStream is called
-            final OutputStream debugStream = LoggerFactory.getDebugOutputStream(logger);
+            final OutputStream debugStream = LoggerFactory.getDebugOutputStream(mockLogger);
             debugStream.write("Debug message".getBytes(StandardCharsets.UTF_8));
             debugStream.close();
             // Then: should return NullOutputStream and not log
@@ -441,14 +378,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should return NullOutputStream when info logger disabled")
-        void shouldReturnNullOutputStreamWhenInfoLoggerDisabled() throws Exception {
+        void shouldReturnNullOutputStreamWhenInfoLoggerDisabled(@Slf4jMock(value = "infoLogger", enabled = false) final MockLogger mockLogger) throws Exception {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("infoLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getInfoOutputStream is called
-            final OutputStream infoStream = LoggerFactory.getInfoOutputStream(logger);
+            final OutputStream infoStream = LoggerFactory.getInfoOutputStream(mockLogger);
             infoStream.write("Info message".getBytes(StandardCharsets.UTF_8));
             infoStream.close();
             // Then: should return NullOutputStream and not log
@@ -459,14 +392,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should return NullOutputStream when warn logger disabled")
-        void shouldReturnNullOutputStreamWhenWarnLoggerDisabled() throws Exception {
+        void shouldReturnNullOutputStreamWhenWarnLoggerDisabled(@Slf4jMock(value = "warnLogger", enabled = false) final MockLogger mockLogger) throws Exception {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("warnLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getWarnOutputStream is called
-            final OutputStream warnStream = LoggerFactory.getWarnOutputStream(logger);
+            final OutputStream warnStream = LoggerFactory.getWarnOutputStream(mockLogger);
             warnStream.write("Warn message".getBytes(StandardCharsets.UTF_8));
             warnStream.close();
             // Then: should return NullOutputStream and not log
@@ -477,14 +406,10 @@ class LoggerFactoryTest {
 
         @Test
         @DisplayName("should return NullOutputStream when error logger disabled")
-        void shouldReturnNullOutputStreamWhenErrorLoggerDisabled() throws Exception {
+        void shouldReturnNullOutputStreamWhenErrorLoggerDisabled(@Slf4jMock(value = "errorLogger", enabled = false) final MockLogger mockLogger) throws Exception {
             // Given: a disabled logger
-            final Logger logger = LoggerFactory.getLogger("errorLogger");
-            final MockLogger mockLogger = (MockLogger) logger;
-            mockLogger.setEnabled(false);
-            mockLogger.clearEvents();
             // When: getErrorOutputStream is called
-            final OutputStream errorStream = LoggerFactory.getErrorOutputStream(logger);
+            final OutputStream errorStream = LoggerFactory.getErrorOutputStream(mockLogger);
             errorStream.write("Error message".getBytes(StandardCharsets.UTF_8));
             errorStream.close();
             // Then: should return NullOutputStream and not log
