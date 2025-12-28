@@ -18,12 +18,11 @@ package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.AssertLogger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
@@ -42,7 +41,7 @@ import java.util.TimeZone;
 @ValidateCharset
 @ResetReporterConfig
 @WithLocale("en")
-@ExtendWith(MockLoggerExtension.class)
+@WithMockLogger
 class ReportCalendarTest {
 
     @Slf4jMock
