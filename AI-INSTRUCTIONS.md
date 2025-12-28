@@ -189,6 +189,45 @@ class NumberFormattingTest {
 - Prefer specific assertions over generic ones (e.g., assertEquals over assertTrue when comparing values)
 - Include context in assertion messages to help debugging failures
 
+### Test Assertions with MockLogger - Anti-Patterns
+
+**Never make assertions directly on MockLogger attributes or methods.** This is considered an anti-pattern. Instead, **always use `AssertLogger` methods** to validate logging behavior.
+
+**Why this matters:**
+- Direct assertions on MockLogger are tightly coupled to implementation details
+- `AssertLogger` provides semantic, intent-driven assertions that are more maintainable
+- The code becomes more compact and readable
+- Changes to MockLogger internals won't break assertions
+
+**Anti-Pattern Examples (❌ DON'T DO THIS):**
+```java
+// ❌ WRONG: Direct assertions on MockLogger attributes/methods
+assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+assertEquals("Trace message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+assertEquals(MockLoggerEvent.Level.TRACE, mockLogger.getEvent(0).getLevel(), "should be trace level");
+assertEquals(0, mockLogger.getEventCount(), "should not log any events");
+```
+
+**Recommended Patterns (✅ DO THIS):**
+```java
+// ✅ CORRECT: Use AssertLogger semantic assertions
+// For validating logged event: level + message
+AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.TRACE, "Trace message");
+
+// For validating event count
+AssertLogger.assertEventCount(mockLogger, 0);  // Asserts exactly 0 events
+AssertLogger.assertEventCount(mockLogger, 1);  // Asserts exactly 1 event
+```
+
+**When analyzing legacy test code:** If you find direct assertions on MockLogger attributes (like `assertEquals(mockLogger.getEventCount(), ...)` or `mockLogger.getEvent(0).getFormattedMessage()`), **propose replacing them with `AssertLogger` equivalents**. This improves code quality and readability significantly.
+
+**Benefits of this refactoring:**
+- **More concise**: 3 separate assertions become 1 semantic call
+- **More readable**: Intent is clear at a glance
+- **More maintainable**: Changes to MockLogger don't require test updates
+- **Better separation of concerns**: Tests focus on behavior, not implementation
+
+
 ### Test Cases
 - Test both positive (success) and negative (expected failure) scenarios
 - Cover all meaningful combinations of parameters, even if redundant for coverage purposes
@@ -288,8 +327,6 @@ k### MockLogger for Log Output Validation
 
 **Test classes that validate logger output must use `MockLogger` via the `@Slf4jMock` annotation and `MockLoggerExtension`.** This eliminates the need for manual MockLogger management.
 
-**Key Rules:**
-
 1. **Use `@Slf4jMock` annotation** instead of manually instantiating `MockLogger`:
    ```java
    @Slf4jMock  // Omit the name - uses FQN of test class automatically
@@ -303,7 +340,7 @@ k### MockLogger for Log Output Validation
      private Logger logger;
      ```
 
-Lo2. **Use `@WithMockLogger` annotation** on the test class:
+2. **Use `@WithMockLogger` annotation** on the test class:
    - Simplifies `@ExtendWith({MockLoggerExtension.class})`
    - The extension automatically:
      - Initializes the MockLogger instance
@@ -312,6 +349,7 @@ Lo2. **Use `@WithMockLogger` annotation** on the test class:
    - **No manual `clearEvents()` calls needed**
    - **No manual `setEnabled(true)` calls needed**
    - **No manual @AfterEach, @AfterAll, @BeforeEach, @BeforeAll calls needed to handle MockLogger state**
+   - If a logger-output test cannot rely on `MockLoggerExtension` (see legacy scenarios or special setup requirements), add an inline comment explaining why the extension is inapplicable and how the manual handling differs.
 
 3. **Use `AssertLogger` for validations** instead of direct `MockLogger` assertions:
    ```java
