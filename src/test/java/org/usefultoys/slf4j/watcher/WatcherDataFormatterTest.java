@@ -15,32 +15,29 @@
  */
 package org.usefultoys.slf4j.watcher;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.WithLocale;
 
-import java.nio.charset.Charset;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
+/**
+ * Unit tests for {@link WatcherDataFormatter}.
+ * <p>
+ * Tests validate that WatcherDataFormatter correctly formats WatcherData into human-readable strings,
+ * handling memory values, system load, and UUID information with proper locale-specific formatting.
+ */
+@DisplayName("WatcherDataFormatter")
+@ValidateCharset
+@WithLocale("en")
 class WatcherDataFormatterTest {
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    @BeforeAll
-    public static void setUpLocale() {
-        Locale.setDefault(Locale.ENGLISH);
-    }
 
     private static Stream<Arguments> provideWatcherDataForReadableStringBuilder() {
         final String sessionUuid = UUID.randomUUID().toString();
@@ -59,17 +56,23 @@ class WatcherDataFormatterTest {
                 Arguments.of(dataWithTotalMemoryOnly, "Memory: 0B 2.0kB 0B"),
                 Arguments.of(dataWithMaxMemoryOnly, "Memory: 0B 0B 4.1kB"),
                 Arguments.of(dataWithSystemLoad, "System load: 50%"),
-                Arguments.of(dataWithUuid, "UUID: " + sessionUuid),
-                Arguments.of(dataWithAll, "Memory: 1024B 2.0kB 4.1kB; System load: 50%; UUID: " + sessionUuid),
+                Arguments.of(dataWithUuid, String.format("UUID: %s", sessionUuid)),
+                Arguments.of(dataWithAll, String.format("Memory: 1024B 2.0kB 4.1kB; System load: 50%%; UUID: %s", sessionUuid)),
                 Arguments.of(emptyData, "")
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideWatcherDataForReadableStringBuilder")
-    void testReadableStringBuilder(WatcherData data, String expected) {
-        final StringBuilder sb = new StringBuilder();
+    @DisplayName("should format watcher data to readable string")
+    void testReadableStringBuilder(final WatcherData data, final String expected) {
+        // Given: WatcherData with various combinations of memory, system load, and UUID
+        final StringBuilder sb = new StringBuilder(128);
+
+        // When: readableStringBuilder is called
         WatcherDataFormatter.readableStringBuilder(data, sb);
-        assertEquals(expected, sb.toString());
+
+        // Then: should produce the expected formatted string with proper locale-specific formatting
+        assertEquals(expected, sb.toString(), "should format watcher data correctly");
     }
 }
