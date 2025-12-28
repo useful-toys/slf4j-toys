@@ -15,34 +15,36 @@
  */
 package org.usefultoys.slf4j.watcher;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.utils.ConfigParser;
+import org.usefultoys.test.ResetWatcherConfig;
+import org.usefultoys.test.ValidateCharset;
 
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.nio.charset.Charset;
 
-
+/**
+ * Unit tests for {@link Watcher}.
+ * <p>
+ * Tests validate that Watcher correctly logs messages and data based on configuration,
+ * with proper handling of various logger states and prefix/suffix combinations.
+ */
+@ValidateCharset
+@ResetWatcherConfig
 class WatcherTest {
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
     private static final String TEST_WATCHER_NAME = "myWatcher";
 
-    // A final class with a constructor to simulate a "record" or "tuple" for test scenarios, compatible with Java 8.
+    /**
+     * Test scenario class containing all parameters for a watcher test case.
+     * Simulates a record/tuple structure for Java 8 compatibility.
+     */
     private static final class WatcherTestScenario {
         final String testName;
         final String messagePrefix;
@@ -57,7 +59,7 @@ class WatcherTest {
         final String expectedMessageContent;
         final String expectedDataContent;
 
-        private WatcherTestScenario(String testName, String messagePrefix, String messageSuffix, String dataPrefix, String dataSuffix, boolean dataEnabled, boolean messageLoggerEnabled, boolean dataLoggerEnabled, boolean expectMessageLog, boolean expectDataLog, String expectedMessageContent, String expectedDataContent) {
+        private WatcherTestScenario(final String testName, final String messagePrefix, final String messageSuffix, final String dataPrefix, final String dataSuffix, final boolean dataEnabled, final boolean messageLoggerEnabled, final boolean dataLoggerEnabled, final boolean expectMessageLog, final boolean expectDataLog, final String expectedMessageContent, final String expectedDataContent) {
             this.testName = testName;
             this.messagePrefix = messagePrefix;
             this.messageSuffix = messageSuffix;
@@ -78,30 +80,7 @@ class WatcherTest {
         }
     }
 
-    @BeforeEach
-    void setUp() {
-        ConfigParser.clearInitializationErrors();
-        WatcherConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.clearProperty(WatcherConfig.PROP_MESSAGE_PREFIX);
-        System.clearProperty(WatcherConfig.PROP_MESSAGE_SUFFIX);
-        System.clearProperty(WatcherConfig.PROP_DATA_PREFIX);
-        System.clearProperty(WatcherConfig.PROP_DATA_SUFFIX);
-        System.clearProperty(WatcherConfig.PROP_DATA_ENABLED);
-
-        WatcherConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-        WatcherConfig.init();
-        ConfigParser.clearInitializationErrors();
-    }
-
-    private static Stream<WatcherTestScenario> watcherScenarios() {
+    private static Stream<WatcherTestScenario> provideWatcherLoggingScenarios() {
         return Stream.of(
             new WatcherTestScenario("Both loggers enabled", "", ".msg", "", ".data", true, true, true, true, true, "Memory:", "_:"),
             new WatcherTestScenario("Data logger disabled by config", "", ".msg", "", ".data", false, true, true, true, false, "Memory:", null),
@@ -113,8 +92,15 @@ class WatcherTest {
     }
 
     @ParameterizedTest(name = "{0}")
-    @MethodSource("watcherScenarios")
-    void testWatcherLoggingScenarios(WatcherTestScenario scenario) {
+    @MethodSource("provideWatcherLoggingScenarios")
+    @DisplayName("should log watcher messages and data according to configuration")
+    void shouldLogWatcherMessagesAndDataAccordingToConfiguration(final WatcherTestScenario scenario) {
+        /*
+           Note: This test requires creating a dedicated Watcher instance for each scenario.
+           And requires setting up loggers with specific configurations for each scenario.
+           Therefore, we cannot make use of MockLogger JUnit Extensions.
+         */
+        // Given: system properties and loggers configured for test scenario
         // 1. Set system properties for the current test scenario
         System.setProperty(WatcherConfig.PROP_MESSAGE_PREFIX, scenario.messagePrefix);
         System.setProperty(WatcherConfig.PROP_MESSAGE_SUFFIX, scenario.messageSuffix);
@@ -122,6 +108,7 @@ class WatcherTest {
         System.setProperty(WatcherConfig.PROP_DATA_SUFFIX, scenario.dataSuffix);
         System.setProperty(WatcherConfig.PROP_DATA_ENABLED, String.valueOf(scenario.dataEnabled));
         WatcherConfig.init();
+        assertTrue(ConfigParser.isInitializationOK(), "ConfigParser should have no errors for scenario: " + scenario.testName + " - " + ConfigParser.initializationErrors);
 
         // 2. Get the mock loggers that the Watcher will use
         final String messageLoggerName = scenario.messagePrefix + TEST_WATCHER_NAME + scenario.messageSuffix;
@@ -134,27 +121,28 @@ class WatcherTest {
         dataMockLogger.clearEvents();
         dataMockLogger.setEnabled(scenario.dataLoggerEnabled);
 
-        // 3. Execute the watcher
-        Watcher watcher = new Watcher(TEST_WATCHER_NAME);
+        // When: watcher is executed
+        final Watcher watcher = new Watcher(TEST_WATCHER_NAME);
         watcher.run();
 
-        // 4. Assertions
+        // Then: assertions should match expected logging behavior
         if (scenario.expectMessageLog) {
-            assertEquals(1, messageMockLogger.getEventCount(), "messageMockLogger should have 1 event for test: " + scenario.testName);
+            assertEquals(1, messageMockLogger.getEventCount(), "messageMockLogger should have 1 event for scenario: " + scenario.testName);
             messageMockLogger.assertEvent(0, MockLoggerEvent.Level.INFO, Markers.MSG_WATCHER);
-            assertTrue(messageMockLogger.getEvent(0).getFormattedMessage().contains(scenario.expectedMessageContent), "Message content mismatch for test: " + scenario.testName);
+            assertTrue(messageMockLogger.getEvent(0).getFormattedMessage().contains(scenario.expectedMessageContent), "Message content should match for scenario: " + scenario.testName);
         } else {
-            assertEquals(0, messageMockLogger.getEventCount(), "messageMockLogger should have 0 events for test: " + scenario.testName);
+            assertEquals(0, messageMockLogger.getEventCount(), "messageMockLogger should have 0 events for scenario: " + scenario.testName);
         }
 
         if (scenario.expectDataLog) {
-            assertEquals(1, dataMockLogger.getEventCount(), "dataMockLogger should have 1 event for test: " + scenario.testName);
+            assertEquals(1, dataMockLogger.getEventCount(), "dataMockLogger should have 1 event for scenario: " + scenario.testName);
             dataMockLogger.assertEvent(0, MockLoggerEvent.Level.TRACE, Markers.DATA_WATCHER);
-            assertTrue(dataMockLogger.getEvent(0).getFormattedMessage().contains(scenario.expectedDataContent), "Data content mismatch for test: " + scenario.testName);
+            assertTrue(dataMockLogger.getEvent(0).getFormattedMessage().contains(scenario.expectedDataContent), "Data content should match for scenario: " + scenario.testName);
         } else {
-            assertEquals(0, dataMockLogger.getEventCount(), "dataMockLogger should have 0 events for test: " + scenario.testName);
+            assertEquals(0, dataMockLogger.getEventCount(), "dataMockLogger should have 0 events for scenario: " + scenario.testName);
         }
 
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected for test: " + scenario.testName + " - " + ConfigParser.initializationErrors);
+        messageMockLogger.clearEvents();
+        dataMockLogger.clearEvents();
     }
 }
