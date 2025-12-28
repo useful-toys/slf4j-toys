@@ -82,12 +82,78 @@ If a test uses a configuration class (e.g., `SessionConfig`), the test class mus
 - Use `@ResetSessionConfig` for tests modifying `SessionConfig`
 - Use `@ResetReporterConfig` for tests modifying `ReporterConfig` (resets all three levels, including SystemConfig and SessionConfig)
 - Use `@ResetMeterConfig` for tests modifying `MeterConfig` (resets all three levels, including SystemConfig and SessionConfig)
+- Use `@ResetWatcherConfig` for tests modifying `WatcherConfig` (resets all three levels, including SystemConfig and SessionConfig)
 - Use `@ClearParserErrors` for tests involving `ConfigParser` error handling
 
 This eliminates the need for `@BeforeAll` and `@AfterAll` methods that reset the configuration. This applies to all configuration sources, including `SystemConfig`, `MeterConfig`, `WatcherConfig`, and `ReporterConfig`.
 
+### System Property Reset in Tests
+**If a test class uses `System.setProperty()` to set system properties that are NOT part of `SystemConfig`, `SessionConfig`, `ReporterConfig`, `MeterConfig`, or `WatcherConfig`, the test class must declare a `@ResetSystemProperty` annotation for each custom property being set.**
+
+Note: If the test class already uses `@ResetSystemConfig`, `@ResetSessionConfig`, `@ResetReporterConfig`, `@ResetMeterConfig`, or `@ResetWatcherConfig`, then `@ResetSystemProperty` is NOT needed for properties belonging to those configuration classes, as the reset is already covered.
+
+Example with custom property:
+```java
+@ValidateCharset
+@ResetSessionConfig
+@ResetSystemProperty("my.custom.property")  // Only needed for custom properties
+class MyCustomPropertyTest {
+    @Test
+    @DisplayName("should handle custom property")
+    void shouldHandleCustomProperty() {
+        // Given: custom system property set
+        System.setProperty("my.custom.property", "value");
+        // When: code uses the property
+        // Then: property is automatically cleared after test
+        assertEquals("value", System.getProperty("my.custom.property"));
+    }
+}
+```
+
+Example WITHOUT @ResetSystemProperty (covered by @ResetSessionConfig):
+```java
+@ValidateCharset
+@ResetSessionConfig  // This already covers PROP_PRINT_UUID_SIZE reset
+class SessionConfigTest {
+    @Test
+    @DisplayName("should parse uuidSize property correctly")
+    void shouldParseUuidSizePropertyCorrectly() {
+        // Given: system property PROP_PRINT_UUID_SIZE set to "10"
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "10");  // Covered by @ResetSessionConfig
+        // When: init() is called
+        SessionConfig.init();
+        // Then: uuidSize should reflect the system property value
+        assertEquals(10, SessionConfig.uuidSize);
+    }
+}
+```
+
 ### Charset Validation in Tests
 **All test classes must declare the `@ValidateCharset` annotation** to ensure the JVM uses the expected charset.
+
+### Locale-Sensitive Tests
+**Test classes that perform string comparisons involving number formatting or date formatting must use `@WithLocale("en")`** to ensure consistent behavior across different environments and operating systems.
+This is especially important for:
+- Numbers with decimal places (e.g., "123.45" vs "123,45" in different locales)
+- Date/time formatting (e.g., "12/31/2025" vs "31/12/2025")
+- Currency formatting
+- Sorting and collation of strings
+
+Example:
+```java
+@ValidateCharset
+@WithLocale("en")  // Ensures decimal points, date format, etc. are consistent
+class NumberFormattingTest {
+    @Test
+    @DisplayName("should format decimal number with point separator")
+    void shouldFormatDecimalNumberCorrectly() {
+        // Given: a decimal number
+        // When: formatted as string
+        // Then: should use dot (.) not comma (,) as decimal separator
+        assertEquals("123.45", String.format("%.2f", 123.45));
+    }
+}
+```
 
 ### Replace Legacy extensions 
 -  If you find `@ExtendWith(FeaturedExtension.class)` in test code, replace it with `@Featured` for consistency and clarity.
