@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @see Charset#defaultCharset()
  * @author Daniel Felix Ferber
  */
-public class CharsetConsistency implements BeforeAllCallback {
+public class CharsetConsistencyExtension implements BeforeAllCallback {
 
     /**
      * Validates that the default charset matches {@link SessionConfig#charset}.

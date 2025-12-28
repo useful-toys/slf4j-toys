@@ -24,8 +24,8 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistency;
-import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ResetReporterConfigExtension;
 import org.usefultoys.test.WithLocale;
 
 import java.lang.management.ManagementFactory;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
+@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportJvmArgumentsTest {
 

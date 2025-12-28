@@ -26,8 +26,8 @@ import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistency;
-import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ResetReporterConfigExtension;
 import org.usefultoys.test.WithLocale;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ import java.io.StringWriter;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
+@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportServletTest {
 

@@ -16,82 +16,51 @@
 
 package org.usefultoys.test;
 
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.SystemConfig;
-import org.usefultoys.slf4j.report.ReporterConfig;
-import org.usefultoys.slf4j.utils.ConfigParser;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * JUnit 5 extension that resets {@link ReporterConfig} and related configurations before and after each test.
+ * Test annotation to automatically reset {@link org.usefultoys.slf4j.report.ReporterConfig} before and after each test.
  * <p>
- * This extension ensures test isolation by resetting all reporter-related configuration state
- * between test executions. It clears:
- * <ul>
- *   <li>{@link ConfigParser} initialization errors</li>
- *   <li>{@link ReporterConfig} to default values</li>
- *   <li>{@link SessionConfig} to default values</li>
- *   <li>{@link SystemConfig} to default values</li>
- * </ul>
+ * This annotation provides a cleaner alternative to using {@code @ExtendWith(ResetReporterConfigExtension.class)}.
+ * It ensures test isolation by resetting all reporter-related configuration state between test executions.
+ * This is the most comprehensive reset annotation, resetting all three configuration levels
+ * (Reporter, Session, and System).
  * <p>
- * This is essential for tests that modify reporter configuration, preventing configuration
- * changes from one test affecting others. This is the most comprehensive reset extension,
- * resetting all three configuration levels.
- * <p>
- * <b>Usage:</b>
+ * <b>Usage on test class:</b>
  * <pre>{@code
- * @ExtendWith(ResetReporterConfig.class)
+ * @ResetReporter
  * class ReporterConfigTest {
  *     @Test
- *     void testCustomReporter() {
+ *     void testCustomConfig() {
  *         ReporterConfig.someProperty = "custom";
  *         // All configs are automatically reset after this test
  *     }
  * }
  * }</pre>
+ * <p>
+ * <b>Usage on test method:</b>
+ * <pre>{@code
+ * class MyTest {
+ *     @Test
+ *     @ResetReporter
+ *     void testThatModifiesReporterConfig() {
+ *         // ReporterConfig is reset before and after this test only
+ *     }
+ * }
+ * }</pre>
  *
- * @see ReporterConfig
- * @see SessionConfig
- * @see SystemConfig
- * @see ConfigParser
+ * @see ResetReporterConfigExtension
+ * @see org.usefultoys.slf4j.report.ReporterConfig
  * @author Daniel Felix Ferber
  */
-public class ResetReporterConfig implements BeforeEachCallback, AfterEachCallback {
-
-    /**
-     * Resets all configuration before each test execution.
-     * <p>
-     * Ensures the test starts with clean, default configuration state across
-     * all three configuration levels (Reporter, Session, System).
-     *
-     * @param context the current extension context
-     */
-    @Override
-    public void beforeEach(ExtensionContext context) {
-        // Clear any accumulated parsing errors
-        ConfigParser.clearInitializationErrors();
-        // Reset all three config levels to their default values
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
-
-    /**
-     * Resets all configuration after each test execution.
-     * <p>
-     * Ensures configuration changes don't leak to subsequent tests,
-     * even if the test fails or throws an exception.
-     *
-     * @param context the current extension context
-     */
-    @Override
-    public void afterEach(ExtensionContext context) {
-        // Clean up any errors or config changes made during the test
-        ConfigParser.clearInitializationErrors();
-        ReporterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.METHOD })
+@ExtendWith(ResetReporterConfigExtension.class)
+public @interface ResetReporterConfig {
 }
+
