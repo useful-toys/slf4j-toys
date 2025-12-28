@@ -16,81 +16,127 @@
 
 package org.usefultoys.slf4j;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetSessionConfigExtension;
+import org.usefultoys.test.ResetSessionConfig;
+import org.usefultoys.test.ResetSystemProperty;
+import org.usefultoys.test.ValidateCharset;
 
 import java.nio.charset.Charset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-@ExtendWith({ResetSessionConfigExtension.class, CharsetConsistencyExtension.class})
+/**
+ * Unit tests for {@link SessionConfig}.
+ * <p>
+ * Tests validate that SessionConfig correctly parses and applies system properties,
+ * with proper error handling for invalid values and correct defaults.
+ */
+@ValidateCharset
+@ResetSessionConfig
+@ResetSystemProperty(SessionConfig.PROP_PRINT_UUID_SIZE)
+@ResetSystemProperty(SessionConfig.PROP_PRINT_CHARSET)
 class SessionConfigTest {
+
     @Test
-    void testDefaultValues() {
+    @DisplayName("should have correct default values on init")
+    void shouldHaveCorrectDefaultValuesOnInit() {
+        // Given: SessionConfig not yet initialized
+        // When: init() is called
         SessionConfig.init();
-        assertEquals(5, SessionConfig.uuidSize);
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset);
+        // Then: should have default values
+        assertEquals(5, SessionConfig.uuidSize, "should have default uuidSize of 5");
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "should have default charset");
     }
 
     @Test
-    void testResetValues() {
+    @DisplayName("should reset to default values")
+    void shouldResetToDefaultValues() {
+        // Given: SessionConfig with custom values
+        // When: reset() is called
         SessionConfig.reset();
-        assertEquals(5, SessionConfig.uuidSize);
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset);
+        // Then: should return to defaults
+        assertEquals(5, SessionConfig.uuidSize, "should reset uuidSize to default 5");
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "should reset charset to default");
     }
 
     @Test
-    void testUuidSizeProperty() {
+    @DisplayName("should parse uuidSize property correctly")
+    void shouldParseUuidSizePropertyCorrectly() {
+        // Given: system property PROP_PRINT_UUID_SIZE set to "10"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "10");
-        SessionConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(10, SessionConfig.uuidSize, "uuidSize should reflect the system property value");
+        // When: init() is called
+        SessionConfig.init();
+        // Then: uuidSize should reflect the system property value
+        assertEquals(10, SessionConfig.uuidSize, "should parse uuidSize from system property");
     }
 
     @Test
-    void testUuidSizePropertyWithNonDefaultValue() {
+    @DisplayName("should parse uuidSize property with non-default value")
+    void shouldParseUuidSizePropertyWithNonDefaultValue() {
+        // Given: system property PROP_PRINT_UUID_SIZE set to "15"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "15");
-        SessionConfig.init(); // Reinitialize to apply new system properties
-        assertEquals(15, SessionConfig.uuidSize, "uuidSize should reflect the system property value");
+        // When: init() is called
+        SessionConfig.init();
+        // Then: uuidSize should reflect the system property value
+        assertEquals(15, SessionConfig.uuidSize, "should parse uuidSize from system property");
     }
 
     @Test
-    void testUuidSizePropertyWithinBounds() {
+    @DisplayName("should accept uuidSize within bounds")
+    void shouldAcceptUuidSizeWithinBounds() {
+        // Given: system property set to lower bound value "0"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "0");
+        // When: init() is called
         SessionConfig.init();
-        assertEquals(0, SessionConfig.uuidSize, "uuidSize should be 0");
+        // Then: should accept the value
+        assertEquals(0, SessionConfig.uuidSize, "should accept uuidSize of 0");
 
+        // Given: system property set to upper bound value "32"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "32");
+        // When: init() is called again
         SessionConfig.init();
-        assertEquals(32, SessionConfig.uuidSize, "uuidSize should be 32");
+        // Then: should accept the value
+        assertEquals(32, SessionConfig.uuidSize, "should accept uuidSize of 32");
     }
 
     @Test
-    void testUuidSizePropertyOutOfBounds() {
-        // Below lower bound
+    @DisplayName("should use default when uuidSize is out of bounds")
+    void shouldUseDefaultWhenUuidSizeIsOutOfBounds() {
+        // Given: system property set below lower bound "-1"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "-1");
+        // When: init() is called
         SessionConfig.init();
-        assertEquals(5, SessionConfig.uuidSize, "uuidSize should fall back to default for values below range");
+        // Then: should fall back to default
+        assertEquals(5, SessionConfig.uuidSize, "should fall back to default for values below range");
 
-        // Above upper bound
+        // Given: system property set above upper bound "33"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "33");
+        // When: init() is called again
         SessionConfig.init();
-        assertEquals(5, SessionConfig.uuidSize, "uuidSize should fall back to default for values above range");
+        // Then: should fall back to default
+        assertEquals(5, SessionConfig.uuidSize, "should fall back to default for values above range");
     }
 
     @Test
-    void testUuidSizePropertyInvalid() {
+    @DisplayName("should use default when uuidSize has invalid format")
+    void shouldUseDefaultWhenUuidSizeHasInvalidFormat() {
+        // Given: system property set to invalid value "invalid"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "invalid");
+        // When: init() is called
         SessionConfig.init();
-        assertEquals(5, SessionConfig.uuidSize, "uuidSize should fall back to default for invalid values");
+        // Then: should fall back to default
+        assertEquals(5, SessionConfig.uuidSize, "should fall back to default for invalid values");
     }
 
     @Test
-    public void testCharsetProperty() {
+    @DisplayName("should parse charset property correctly")
+    void shouldParseCharsetPropertyCorrectly() {
+        // Given: system property PROP_PRINT_CHARSET set to "ISO-8859-1"
         System.setProperty(SessionConfig.PROP_PRINT_CHARSET, "ISO-8859-1");
-        SessionConfig.init(); // Reinitialize to apply new system properties
-        assertEquals("ISO-8859-1", SessionConfig.charset, "charset should reflect the system property value");
+        // When: init() is called
+        SessionConfig.init();
+        // Then: charset should reflect the system property value
+        assertEquals("ISO-8859-1", SessionConfig.charset, "should parse charset from system property");
     }
 }
