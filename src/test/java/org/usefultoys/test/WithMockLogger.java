@@ -29,13 +29,13 @@ import java.lang.annotation.Target;
  * Test annotation to enable automatic MockLogger management via {@link MockLoggerExtension}.
  * <p>
  * This annotation simplifies the use of {@link MockLoggerExtension} by automatically registering
- * the extension. Use this annotation on test classes that have fields annotated with
- * {@link org.slf4j.Slf4jMock} to enable automatic MockLogger injection and lifecycle management.
+ * the extension. Use this annotation on test classes that have Logger fields to enable automatic
+ * MockLogger injection and lifecycle management via the `@Slf4jMock` field annotation.
  * <p>
  * The extension automatically:
  * <ul>
- *   <li>Initializes MockLogger instances for fields annotated with {@code @Slf4jMock}</li>
- *   <li>Enables the MockLogger with {@code setEnabled(true)} before each test</li>
+ *   <li>Initializes MockLogger instances for fields annotated with `@Slf4jMock`</li>
+ *   <li>Enables the MockLogger with `setEnabled(true)` before each test</li>
  *   <li>Resets (clears events) before and after each test</li>
  * </ul>
  * <p>
@@ -56,7 +56,6 @@ import java.lang.annotation.Target;
  * }</pre>
  *
  * @see MockLoggerExtension
- * @see org.slf4j.Slf4jMock
  * @see AssertLogger
  * @author Daniel Felix Ferber
  */
