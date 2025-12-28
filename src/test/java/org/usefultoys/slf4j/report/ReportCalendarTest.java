@@ -16,6 +16,7 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -23,28 +24,38 @@ import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportCalendar}.
+ * <p>
+ * Tests verify that ReportCalendar correctly formats and logs calendar information
+ * including current date/time, timezone details, and available timezone IDs.
+ */
+@DisplayName("ReportCalendar")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@ExtendWith(MockLoggerExtension.class)
 class ReportCalendarTest {
 
-    @Slf4jMock("test.report.calendar")
+    @Slf4jMock
     private Logger logger;
 
     @Test
+    @DisplayName("should log default calendar information")
     void shouldLogDefaultCalendarInformation() {
-        // Arrange
-        final Date fixedCurrentDate = new Date(1678886400000L); // Use a fixed date for determinism (March 15, 2023 00:00:00 GMT)
-        final TimeZone defaultTimeZone = TimeZone.getDefault(); // Still use actual default timezone
+        // Given: a calendar info provider with fixed date and default timezone
+        final Date fixedCurrentDate = new Date(1678886400000L); // March 15, 2023 00:00:00 GMT
+        final TimeZone defaultTimeZone = TimeZone.getDefault();
 
-        ReportCalendar.CalendarInfoProvider provider = new ReportCalendar.CalendarInfoProvider() {
+        final ReportCalendar.CalendarInfoProvider provider = new ReportCalendar.CalendarInfoProvider() {
             @Override
             public Date getCurrentDate() {
                 return fixedCurrentDate;
@@ -52,28 +63,29 @@ class ReportCalendarTest {
 
             @Override
             public TimeZone getDefaultTimeZone() {
-                return TimeZone.getDefault(); // Use actual default timezone
+                return TimeZone.getDefault();
             }
 
             @Override
             public String[] getAvailableTimeZoneIDs() {
-                return TimeZone.getAvailableIDs(); // Use actual available IDs
+                return TimeZone.getAvailableIDs();
             }
         };
 
-        ReportCalendar report = new ReportCalendar(logger) {
+        final ReportCalendar report = new ReportCalendar(logger) {
             @Override
             protected ReportCalendar.CalendarInfoProvider getCalendarInfoProvider() {
                 return provider;
             }
         };
 
-        // Act
+        // When: report is executed
         report.run();
 
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-        df.setTimeZone(defaultTimeZone); // Ensure formatter uses the actual default timezone for comparison
-        String expectedDateString = df.format(fixedCurrentDate);
+        // Then: should log calendar information with default timezone details
+        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        df.setTimeZone(defaultTimeZone);
+        final String expectedDateString = df.format(fixedCurrentDate);
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Calendar",
             " - current date/time: " + expectedDateString,
@@ -89,13 +101,14 @@ class ReportCalendarTest {
     }
 
     @Test
+    @DisplayName("should log custom calendar information")
     void shouldLogCustomCalendarInformation() {
-        // Arrange: create a CalendarInfoProvider with controlled values
+        // Given: a calendar info provider with custom date, timezone, and available IDs
         final Date customDate = new Date(1678886400000L); // March 15, 2023 00:00:00 GMT
-        final TimeZone customTimeZone = TimeZone.getTimeZone("Europe/Berlin"); // Berlin timezone
+        final TimeZone customTimeZone = TimeZone.getTimeZone("Europe/Berlin");
         final String[] customAvailableIDs = {"Europe/Berlin", "America/New_York", "Asia/Tokyo"};
 
-        ReportCalendar.CalendarInfoProvider provider = new ReportCalendar.CalendarInfoProvider() {
+        final ReportCalendar.CalendarInfoProvider provider = new ReportCalendar.CalendarInfoProvider() {
             @Override
             public Date getCurrentDate() {
                 return customDate;
@@ -112,19 +125,20 @@ class ReportCalendarTest {
             }
         };
 
-        ReportCalendar report = new ReportCalendar(logger) {
+        final ReportCalendar report = new ReportCalendar(logger) {
             @Override
             protected ReportCalendar.CalendarInfoProvider getCalendarInfoProvider() {
                 return provider;
             }
         };
 
-        // Act
+        // When: report is executed
         report.run();
 
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-        df.setTimeZone(customTimeZone); // Ensure formatter uses the custom timezone for comparison
-        String expectedDateString = df.format(customDate); // Get the full formatted string
+        // Then: should log calendar information with custom timezone details and available IDs
+        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        df.setTimeZone(customTimeZone);
+        final String expectedDateString = df.format(customDate);
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Calendar",
             " - current date/time: " + expectedDateString,
