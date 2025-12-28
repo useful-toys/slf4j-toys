@@ -16,36 +16,53 @@
 
 package org.usefultoys.slf4j;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ValidateCharset;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-
-@ExtendWith(CharsetConsistencyExtension.class)
+/**
+ * Unit tests for {@link NullOutputStream}.
+ * <p>
+ * Tests validate that NullOutputStream silently ignores all write operations
+ * without throwing exceptions, providing a no-op OutputStream implementation.
+ */
+@ValidateCharset
 class NullOutputStreamTest {
 
     @Test
-    void testWriteSingleByte() {
+    @DisplayName("should write single byte without throwing exceptions")
+    void shouldWriteSingleByteWithoutThrowingExceptions() {
+        // Given: a new NullOutputStream instance
         final NullOutputStream nullOutputStream = new NullOutputStream();
+        // When: write(int) is called
         assertDoesNotThrow(() -> nullOutputStream.write(0));
+        // Then: should not throw exceptions and operations should succeed
         assertDoesNotThrow(nullOutputStream::flush);
         assertDoesNotThrow(nullOutputStream::close);
     }
 
     @Test
-    void testWriteByteArray() {
+    @DisplayName("should write byte array without throwing exceptions")
+    void shouldWriteByteArrayWithoutThrowingExceptions() {
+        // Given: a new NullOutputStream instance
         final NullOutputStream nullOutputStream = new NullOutputStream();
+        // When: write(byte[]) is called
         assertDoesNotThrow(() -> nullOutputStream.write(new byte[]{1, 2, 3}));
+        // Then: should not throw exceptions and operations should succeed
         assertDoesNotThrow(nullOutputStream::flush);
         assertDoesNotThrow(nullOutputStream::close);
     }
 
     @Test
-    void testWriteByteArrayWithOffsetAndLength() {
+    @DisplayName("should write byte array with offset and length without throwing exceptions")
+    void shouldWriteByteArrayWithOffsetAndLengthWithoutThrowingExceptions() {
+        // Given: a new NullOutputStream instance
         final NullOutputStream nullOutputStream = new NullOutputStream();
+        // When: write(byte[], int, int) is called
         assertDoesNotThrow(() -> nullOutputStream.write(new byte[]{1, 2, 3, 4}, 1, 2));
+        // Then: should not throw exceptions and operations should succeed
         assertDoesNotThrow(nullOutputStream::flush);
         assertDoesNotThrow(nullOutputStream::close);
     }
