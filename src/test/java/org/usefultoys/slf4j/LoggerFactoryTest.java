@@ -16,210 +16,261 @@
 
 package org.usefultoys.slf4j;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ValidateCharset;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-
-@ExtendWith(CharsetConsistencyExtension.class)
+/**
+ * Unit tests for {@link LoggerFactory}.
+ * <p>
+ * Tests validate that LoggerFactory correctly creates loggers and print/output streams,
+ * with proper behavior for enabled and disabled loggers.
+ */
+@ValidateCharset
 class LoggerFactoryTest {
 
     @Test
-    void testGetLoggerByName() {
+    @DisplayName("should get logger by name")
+    void shouldGetLoggerByName() {
+        // Given: a logger name
+        // When: getLogger is called with the name
         final Logger logger = LoggerFactory.getLogger("testLogger");
-        assertNotNull(logger);
-        assertInstanceOf(MockLogger.class, logger);
-        assertEquals("testLogger", logger.getName());
+        // Then: should return a non-null MockLogger with the correct name
+        assertNotNull(logger, "should return non-null logger");
+        assertInstanceOf(MockLogger.class, logger, "should return MockLogger instance");
+        assertEquals("testLogger", logger.getName(), "should have correct logger name");
     }
 
     @Test
-    void testGetLoggerByClass() {
+    @DisplayName("should get logger by class")
+    void shouldGetLoggerByClass() {
+        // Given: a test class
+        // When: getLogger is called with the class
         final Logger logger = LoggerFactory.getLogger(LoggerFactoryTest.class);
-        assertNotNull(logger);
-        assertInstanceOf(MockLogger.class, logger);
-        assertEquals(LoggerFactoryTest.class.getName(), logger.getName());
+        // Then: should return a non-null MockLogger with class name
+        assertNotNull(logger, "should return non-null logger");
+        assertInstanceOf(MockLogger.class, logger, "should return MockLogger instance");
+        assertEquals(LoggerFactoryTest.class.getName(), logger.getName(), "should have class name");
     }
 
     @Test
-    void testGetLoggerByClassAndName() {
+    @DisplayName("should get logger by class and feature name")
+    void shouldGetLoggerByClassAndFeatureName() {
+        // Given: a test class and feature name
+        // When: getLogger is called with class and feature
         final Logger logger = LoggerFactory.getLogger(LoggerFactoryTest.class, "feature");
-        assertNotNull(logger);
-        assertInstanceOf(MockLogger.class, logger);
-        assertEquals(LoggerFactoryTest.class.getName() + ".feature", logger.getName());
+        // Then: should return logger with combined name
+        assertNotNull(logger, "should return non-null logger");
+        assertInstanceOf(MockLogger.class, logger, "should return MockLogger instance");
+        assertEquals(LoggerFactoryTest.class.getName() + ".feature", logger.getName(), "should have combined name");
     }
 
     @Test
-    void testGetLoggerByParentLoggerAndName() {
+    @DisplayName("should get logger by parent logger and child name")
+    void shouldGetLoggerByParentLoggerAndChildName() {
+        // Given: a parent logger and child name
         final Logger parentLogger = LoggerFactory.getLogger("parentLogger");
+        // When: getLogger is called with parent and child name
         final Logger childLogger = LoggerFactory.getLogger(parentLogger, "child");
-        assertNotNull(childLogger);
-        assertInstanceOf(MockLogger.class, childLogger);
-        assertEquals("parentLogger.child", childLogger.getName());
+        // Then: should return child logger with hierarchical name
+        assertNotNull(childLogger, "should return non-null logger");
+        assertInstanceOf(MockLogger.class, childLogger, "should return MockLogger instance");
+        assertEquals("parentLogger.child", childLogger.getName(), "should have hierarchical name");
     }
 
     @Test
-    void testGetTracePrintStream() {
+    @DisplayName("should get trace print stream when logger enabled")
+    void shouldGetTracePrintStreamWhenLoggerEnabled() {
+        // Given: a logger with trace enabled
         final Logger logger = LoggerFactory.getLogger("traceLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setTraceEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getTracePrintStream is called
         final PrintStream traceStream = LoggerFactory.getTracePrintStream(logger);
-        assertNotNull(traceStream);
+        // Then: should return print stream that logs trace messages
+        assertNotNull(traceStream, "should return non-null print stream");
         traceStream.print("Trace message");
         traceStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Trace message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.TRACE, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Trace message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.TRACE, mockLogger.getEvent(0).getLevel(), "should be trace level");
     }
 
     @Test
-    void testGetDebugPrintStream() {
+    @DisplayName("should get debug print stream when logger enabled")
+    void shouldGetDebugPrintStreamWhenLoggerEnabled() {
+        // Given: a logger with debug enabled
         final Logger logger = LoggerFactory.getLogger("debugLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setDebugEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getDebugPrintStream is called
         final PrintStream debugStream = LoggerFactory.getDebugPrintStream(logger);
-        assertNotNull(debugStream);
+        // Then: should return print stream that logs debug messages
+        assertNotNull(debugStream, "should return non-null print stream");
         debugStream.print("Debug message");
         debugStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Debug message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.DEBUG, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Debug message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.DEBUG, mockLogger.getEvent(0).getLevel(), "should be debug level");
     }
 
     @Test
-    void testGetInfoPrintStream() {
+    @DisplayName("should get info print stream when logger enabled")
+    void shouldGetInfoPrintStreamWhenLoggerEnabled() {
+        // Given: a logger with info enabled
         final Logger logger = LoggerFactory.getLogger("infoLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setInfoEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getInfoPrintStream is called
         final PrintStream infoStream = LoggerFactory.getInfoPrintStream(logger);
-        assertNotNull(infoStream);
+        // Then: should return print stream that logs info messages
+        assertNotNull(infoStream, "should return non-null print stream");
         infoStream.print("Info message");
         infoStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Info message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.INFO, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Info message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.INFO, mockLogger.getEvent(0).getLevel(), "should be info level");
     }
 
     @Test
-    void testGetWarnPrintStream() {
+    @DisplayName("should get warn print stream when logger enabled")
+    void shouldGetWarnPrintStreamWhenLoggerEnabled() {
+        // Given: a logger with warn enabled
         final Logger logger = LoggerFactory.getLogger("warnLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setWarnEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getWarnPrintStream is called
         final PrintStream warnStream = LoggerFactory.getWarnPrintStream(logger);
-        assertNotNull(warnStream);
+        // Then: should return print stream that logs warn messages
+        assertNotNull(warnStream, "should return non-null print stream");
         warnStream.print("Warn message");
         warnStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Warn message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.WARN, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Warn message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.WARN, mockLogger.getEvent(0).getLevel(), "should be warn level");
     }
 
     @Test
-    void testGetErrorPrintStream() {
+    @DisplayName("should get error print stream when logger enabled")
+    void shouldGetErrorPrintStreamWhenLoggerEnabled() {
+        // Given: a logger with error enabled
         final Logger logger = LoggerFactory.getLogger("errorLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setErrorEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getErrorPrintStream is called
         final PrintStream errorStream = LoggerFactory.getErrorPrintStream(logger);
-        assertNotNull(errorStream);
+        // Then: should return print stream that logs error messages
+        assertNotNull(errorStream, "should return non-null print stream");
         errorStream.print("Error message");
         errorStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Error message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.ERROR, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Error message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.ERROR, mockLogger.getEvent(0).getLevel(), "should be error level");
     }
 
     @Test
-    void testGetTracePrintStreamWithLoggerDisabled() {
+    @DisplayName("should return NullPrintStream when trace logger disabled")
+    void shouldReturnNullPrintStreamWhenTraceLoggerDisabled() {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("traceLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
         mockLogger.clearEvents();
-
+        // When: getTracePrintStream is called
         final PrintStream traceStream = LoggerFactory.getTracePrintStream(logger);
-        assertNotNull(traceStream);
-        assertInstanceOf(NullPrintStream.class, traceStream);
-        // Ensure no events are logged
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullPrintStream and not log
+        assertNotNull(traceStream, "should return non-null print stream");
+        assertInstanceOf(NullPrintStream.class, traceStream, "should return NullPrintStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testGetDebugPrintStreamWithLoggerDisabled() {
+    @DisplayName("should return NullPrintStream when debug logger disabled")
+    void shouldReturnNullPrintStreamWhenDebugLoggerDisabled() {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("debugLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
         mockLogger.clearEvents();
-
+        // When: getDebugPrintStream is called
         final PrintStream debugStream = LoggerFactory.getDebugPrintStream(logger);
-        assertNotNull(debugStream);
-        assertInstanceOf(NullPrintStream.class, debugStream);
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullPrintStream and not log
+        assertNotNull(debugStream, "should return non-null print stream");
+        assertInstanceOf(NullPrintStream.class, debugStream, "should return NullPrintStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testGetInfoPrintStreamWithLoggerDisabled() {
+    @DisplayName("should return NullPrintStream when info logger disabled")
+    void shouldReturnNullPrintStreamWhenInfoLoggerDisabled() {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("infoLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
         mockLogger.clearEvents();
-
+        // When: getInfoPrintStream is called
         final PrintStream infoStream = LoggerFactory.getInfoPrintStream(logger);
-        assertNotNull(infoStream);
-        assertInstanceOf(NullPrintStream.class, infoStream);
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullPrintStream and not log
+        assertNotNull(infoStream, "should return non-null print stream");
+        assertInstanceOf(NullPrintStream.class, infoStream, "should return NullPrintStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testGetWarnPrintStreamWithLoggerDisabled() {
+    @DisplayName("should return NullPrintStream when warn logger disabled")
+    void shouldReturnNullPrintStreamWhenWarnLoggerDisabled() {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("warnLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
         mockLogger.clearEvents();
-
+        // When: getWarnPrintStream is called
         final PrintStream warnStream = LoggerFactory.getWarnPrintStream(logger);
-        assertNotNull(warnStream);
-        assertInstanceOf(NullPrintStream.class, warnStream);
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullPrintStream and not log
+        assertNotNull(warnStream, "should return non-null print stream");
+        assertInstanceOf(NullPrintStream.class, warnStream, "should return NullPrintStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testGetErrorPrintStreamWithLoggerDisabled() {
+    @DisplayName("should return NullPrintStream when error logger disabled")
+    void shouldReturnNullPrintStreamWhenErrorLoggerDisabled() {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("errorLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
         mockLogger.clearEvents();
-
+        // When: getErrorPrintStream is called
         final PrintStream errorStream = LoggerFactory.getErrorPrintStream(logger);
-        assertNotNull(errorStream);
-        assertInstanceOf(NullPrintStream.class, errorStream);
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullPrintStream and not log
+        assertNotNull(errorStream, "should return non-null print stream");
+        assertInstanceOf(NullPrintStream.class, errorStream, "should return NullPrintStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testNullPrintStreamBehavior() {
+    @DisplayName("should handle NullPrintStream operations without throwing exceptions")
+    void shouldHandleNullPrintStreamOperationsWithoutThrowingExceptions() {
+        // Given: a NullPrintStream instance
         final NullPrintStream nullPrintStream = new NullPrintStream();
+        // When: various operations are called
         assertDoesNotThrow(() -> {
             nullPrintStream.print("test");
             nullPrintStream.println("test");
@@ -228,168 +279,195 @@ class LoggerFactoryTest {
             nullPrintStream.write("test".getBytes(StandardCharsets.UTF_8), 0, 2);
             nullPrintStream.flush();
             nullPrintStream.close();
-        });
+        }, "should not throw exceptions on NullPrintStream operations");
     }
 
     @Test
-    void testGetTraceOutputStream() throws Exception {
+    @DisplayName("should get trace output stream when logger enabled")
+    void shouldGetTraceOutputStreamWhenLoggerEnabled() throws Exception {
+        // Given: a logger with trace enabled
         final Logger logger = LoggerFactory.getLogger("traceLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setTraceEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getTraceOutputStream is called
         final OutputStream traceStream = LoggerFactory.getTraceOutputStream(logger);
-        assertNotNull(traceStream);
+        // Then: should return output stream that logs trace messages
+        assertNotNull(traceStream, "should return non-null output stream");
         traceStream.write("Trace message".getBytes(StandardCharsets.UTF_8));
         traceStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Trace message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.TRACE, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Trace message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.TRACE, mockLogger.getEvent(0).getLevel(), "should be trace level");
     }
 
     @Test
-    void testGetDebugOutputStream() throws Exception {
+    @DisplayName("should get debug output stream when logger enabled")
+    void shouldGetDebugOutputStreamWhenLoggerEnabled() throws Exception {
+        // Given: a logger with debug enabled
         final Logger logger = LoggerFactory.getLogger("debugLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setDebugEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getDebugOutputStream is called
         final OutputStream debugStream = LoggerFactory.getDebugOutputStream(logger);
-        assertNotNull(debugStream);
+        // Then: should return output stream that logs debug messages
+        assertNotNull(debugStream, "should return non-null output stream");
         debugStream.write("Debug message".getBytes(StandardCharsets.UTF_8));
         debugStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Debug message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.DEBUG, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Debug message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.DEBUG, mockLogger.getEvent(0).getLevel(), "should be debug level");
     }
 
     @Test
-    void testGetInfoOutputStream() throws Exception {
+    @DisplayName("should get info output stream when logger enabled")
+    void shouldGetInfoOutputStreamWhenLoggerEnabled() throws Exception {
+        // Given: a logger with info enabled
         final Logger logger = LoggerFactory.getLogger("infoLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setInfoEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getInfoOutputStream is called
         final OutputStream infoStream = LoggerFactory.getInfoOutputStream(logger);
-        assertNotNull(infoStream);
+        // Then: should return output stream that logs info messages
+        assertNotNull(infoStream, "should return non-null output stream");
         infoStream.write("Info message".getBytes(StandardCharsets.UTF_8));
         infoStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Info message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.INFO, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Info message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.INFO, mockLogger.getEvent(0).getLevel(), "should be info level");
     }
 
     @Test
-    void testGetWarnOutputStream() throws Exception {
+    @DisplayName("should get warn output stream when logger enabled")
+    void shouldGetWarnOutputStreamWhenLoggerEnabled() throws Exception {
+        // Given: a logger with warn enabled
         final Logger logger = LoggerFactory.getLogger("warnLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setWarnEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getWarnOutputStream is called
         final OutputStream warnStream = LoggerFactory.getWarnOutputStream(logger);
-        assertNotNull(warnStream);
+        // Then: should return output stream that logs warn messages
+        assertNotNull(warnStream, "should return non-null output stream");
         warnStream.write("Warn message".getBytes(StandardCharsets.UTF_8));
         warnStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Warn message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.WARN, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Warn message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.WARN, mockLogger.getEvent(0).getLevel(), "should be warn level");
     }
 
     @Test
-    void testGetErrorOutputStream() throws Exception {
+    @DisplayName("should get error output stream when logger enabled")
+    void shouldGetErrorOutputStreamWhenLoggerEnabled() throws Exception {
+        // Given: a logger with error enabled
         final Logger logger = LoggerFactory.getLogger("errorLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setErrorEnabled(true);
         mockLogger.clearEvents();
-
+        // When: getErrorOutputStream is called
         final OutputStream errorStream = LoggerFactory.getErrorOutputStream(logger);
-        assertNotNull(errorStream);
+        // Then: should return output stream that logs error messages
+        assertNotNull(errorStream, "should return non-null output stream");
         errorStream.write("Error message".getBytes(StandardCharsets.UTF_8));
         errorStream.close();
-
-        assertEquals(1, mockLogger.getEventCount());
-        assertEquals("Error message", mockLogger.getEvent(0).getFormattedMessage());
-        assertEquals(MockLoggerEvent.Level.ERROR, mockLogger.getEvent(0).getLevel());
+        assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
+        assertEquals("Error message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
+        assertEquals(MockLoggerEvent.Level.ERROR, mockLogger.getEvent(0).getLevel(), "should be error level");
     }
 
     @Test
-    void testGetTraceOutputStreamWithLoggerDisabled() throws Exception {
+    @DisplayName("should return NullOutputStream when trace logger disabled")
+    void shouldReturnNullOutputStreamWhenTraceLoggerDisabled() throws Exception {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("traceLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
-
+        // When: getTraceOutputStream is called
         final OutputStream traceStream = LoggerFactory.getTraceOutputStream(logger);
-        assertNotNull(traceStream);
-        assertInstanceOf(NullOutputStream.class, traceStream);
-        // Ensure no events are logged
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullOutputStream and not log
+        assertNotNull(traceStream, "should return non-null output stream");
+        assertInstanceOf(NullOutputStream.class, traceStream, "should return NullOutputStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testGetDebugOutputStreamWithLoggerDisabled() throws Exception {
+    @DisplayName("should return NullOutputStream when debug logger disabled")
+    void shouldReturnNullOutputStreamWhenDebugLoggerDisabled() throws Exception {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("debugLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
         mockLogger.clearEvents();
-
+        // When: getDebugOutputStream is called
         final OutputStream debugStream = LoggerFactory.getDebugOutputStream(logger);
-        assertNotNull(debugStream);
-        assertInstanceOf(NullOutputStream.class, debugStream);
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullOutputStream and not log
+        assertNotNull(debugStream, "should return non-null output stream");
+        assertInstanceOf(NullOutputStream.class, debugStream, "should return NullOutputStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testGetInfoOutputStreamWithLoggerDisabled() throws Exception {
+    @DisplayName("should return NullOutputStream when info logger disabled")
+    void shouldReturnNullOutputStreamWhenInfoLoggerDisabled() throws Exception {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("infoLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
         mockLogger.clearEvents();
-
+        // When: getInfoOutputStream is called
         final OutputStream infoStream = LoggerFactory.getInfoOutputStream(logger);
-        assertNotNull(infoStream);
-        assertInstanceOf(NullOutputStream.class, infoStream);
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullOutputStream and not log
+        assertNotNull(infoStream, "should return non-null output stream");
+        assertInstanceOf(NullOutputStream.class, infoStream, "should return NullOutputStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testGetWarnOutputStreamWithLoggerDisabled() throws Exception {
+    @DisplayName("should return NullOutputStream when warn logger disabled")
+    void shouldReturnNullOutputStreamWhenWarnLoggerDisabled() throws Exception {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("warnLogger");
         final MockLogger mockLogger = (MockLogger) logger;
         mockLogger.setEnabled(false);
         mockLogger.clearEvents();
-
+        // When: getWarnOutputStream is called
         final OutputStream warnStream = LoggerFactory.getWarnOutputStream(logger);
-        assertNotNull(warnStream);
-        assertInstanceOf(NullOutputStream.class, warnStream);
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullOutputStream and not log
+        assertNotNull(warnStream, "should return non-null output stream");
+        assertInstanceOf(NullOutputStream.class, warnStream, "should return NullOutputStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testGetErrorOutputStreamWithLoggerDisabled() throws Exception {
+    @DisplayName("should return NullOutputStream when error logger disabled")
+    void shouldReturnNullOutputStreamWhenErrorLoggerDisabled() throws Exception {
+        // Given: a disabled logger
         final Logger logger = LoggerFactory.getLogger("errorLogger");
         final MockLogger mockLogger = (MockLogger) logger;
-        mockLogger.setErrorEnabled(false); // Disable error
+        mockLogger.setErrorEnabled(false);
         mockLogger.clearEvents();
-
+        // When: getErrorOutputStream is called
         final OutputStream errorStream = LoggerFactory.getErrorOutputStream(logger);
-        assertNotNull(errorStream);
-        assertInstanceOf(NullOutputStream.class, errorStream);
-        assertEquals(0, mockLogger.getEventCount());
+        // Then: should return NullOutputStream and not log
+        assertNotNull(errorStream, "should return non-null output stream");
+        assertInstanceOf(NullOutputStream.class, errorStream, "should return NullOutputStream");
+        assertEquals(0, mockLogger.getEventCount(), "should not log any events");
     }
 
     @Test
-    void testNullOutputStreamBehavior() {
+    @DisplayName("should handle NullOutputStream operations without throwing exceptions")
+    void shouldHandleNullOutputStreamOperationsWithoutThrowingExceptions() {
+        // Given: a NullOutputStream instance
         final NullOutputStream nullOutputStream = new NullOutputStream();
+        // When: various operations are called
         assertDoesNotThrow(() -> {
             nullOutputStream.write(1);
             nullOutputStream.write("test".getBytes(StandardCharsets.UTF_8));
             nullOutputStream.write("test".getBytes(StandardCharsets.UTF_8), 0, 2);
             nullOutputStream.flush();
             nullOutputStream.close();
-        });
+        }, "should not throw exceptions on NullOutputStream operations");
     }
 }
