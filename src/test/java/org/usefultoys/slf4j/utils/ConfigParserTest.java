@@ -23,13 +23,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.usefultoys.test.CharsetConsistency;
-import org.usefultoys.test.ClearConfigParser;
+import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ClearConfigParserExtension;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith({CharsetConsistency.class, ClearConfigParser.class})
+@ExtendWith({CharsetConsistencyExtension.class, ClearConfigParserExtension.class})
 @WithLocale("en")
 class ConfigParserTest {
 

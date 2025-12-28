@@ -24,14 +24,14 @@ import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistency;
-import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ResetReporterConfigExtension;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
+@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportSystemPropertiesTest {
 

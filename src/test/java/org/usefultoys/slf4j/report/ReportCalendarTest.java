@@ -23,15 +23,15 @@ import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistency;
-import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ResetReporterConfigExtension;
 import org.usefultoys.test.WithLocale;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
+@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportCalendarTest {
 

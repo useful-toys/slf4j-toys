@@ -20,13 +20,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.usefultoys.slf4j.utils.ConfigParser;
-import org.usefultoys.test.CharsetConsistency;
-import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ResetReporterConfigExtension;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class})
+@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class})
 @WithLocale("en")
 class ReporterConfigTest {
 

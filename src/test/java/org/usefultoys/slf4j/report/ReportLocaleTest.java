@@ -21,15 +21,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistency;
-import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ResetReporterConfigExtension;
 import org.usefultoys.test.WithLocale;
 
 import java.util.Locale;
 
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({ResetReporterConfig.class, CharsetConsistency.class, MockLoggerExtension.class})
+@ExtendWith({ResetReporterConfigExtension.class, CharsetConsistencyExtension.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportLocaleTest {
 

@@ -18,7 +18,7 @@ package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.CharsetConsistencyExtension;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-@ExtendWith(CharsetConsistency.class)
+@ExtendWith(CharsetConsistencyExtension.class)
 class LoggerOutputStreamTest {
 
     static class TestLoggerOutputStream extends LoggerOutputStream {

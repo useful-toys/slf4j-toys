@@ -12,7 +12,7 @@ All utilities are designed to ensure **test isolation** by resetting state betwe
 
 These extensions reset configuration state before and after each test to prevent test interference.
 
-#### `@ResetSystem` / `ResetSystemConfig`
+#### `@ResetSystem` / `ResetSystemConfigExtension`
 
 Resets `SystemConfig` and `SessionConfig` before and after each test.
 
@@ -28,7 +28,7 @@ class SystemConfigTest {
 }
 ```
 
-#### `@ResetSession` / `ResetSessionConfig`
+#### `@ResetSession` / `ResetSessionConfigExtension`
 
 Resets `SessionConfig` and `SystemConfig` before and after each test.
 
@@ -44,7 +44,7 @@ class SessionConfigTest {
 }
 ```
 
-#### `@ResetReporter` / `ResetReporterConfig`
+#### `@ResetReporter` / `ResetReporterConfigExtension`
 
 Resets `ReporterConfig`, `SessionConfig`, and `SystemConfig` before and after each test.
 This is the most comprehensive reset, covering all three configuration levels.
@@ -61,13 +61,13 @@ class ReporterConfigTest {
 }
 ```
 
-#### `ClearConfigParser`
+#### `@ClearParserErrors` / `ClearConfigParserExtension`
 
 Clears `ConfigParser` initialization errors before and after each test.
 
 **Usage:**
 ```java
-@ExtendWith(ClearConfigParser.class)
+@ClearParserErrors
 class ConfigParserTest {
     @Test
     void testInvalidConfig() {
@@ -108,13 +108,13 @@ class LocaleSensitiveTest {
 - `"fr-FR"` - French (France)
 - `"de-DE"` - German (Germany)
 
-#### `CharsetConsistency`
+#### `@ValidateCharset` / `CharsetConsistencyExtension`
 
 Validates that the JVM's default charset matches `SessionConfig.charset` before running tests.
 
 **Usage:**
 ```java
-@ExtendWith(CharsetConsistency.class)
+@ValidateCharset
 class CharsetSensitiveTest {
     @Test
     void testStringEncoding() {
@@ -130,7 +130,7 @@ class CharsetSensitiveTest {
 - **Testing `SystemConfig` only** → Use `@ResetSystem`
 - **Testing `SessionConfig` only** → Use `@ResetSession`
 - **Testing `ReporterConfig`** → Use `@ResetReporter` (resets all levels)
-- **Testing `ConfigParser` error handling** → Add `@ExtendWith(ClearConfigParser.class)`
+- **Testing `ConfigParser` error handling** → Use `@ClearParserErrors`
 
 ### For Locale-Sensitive Tests
 
@@ -139,7 +139,7 @@ class CharsetSensitiveTest {
 
 ### For Charset-Sensitive Tests
 
-- **File I/O, character encoding** → Add `@ExtendWith(CharsetConsistency.class)`
+- **File I/O, character encoding** → Use `@ValidateCharset`
 - Fails fast if charset mismatch detected
 
 ## Design Notes
@@ -147,7 +147,7 @@ class CharsetSensitiveTest {
 ### Why Both Annotations and Extension Classes?
 
 - **Annotations** (e.g., `@ResetSystem`) provide a cleaner, more declarative API
-- **Extension classes** (e.g., `ResetSystemConfig`) are used internally by annotations
+- **Extension classes** (e.g., `ResetSystemConfigExtension`) are used internally by annotations
 - Both approaches are supported for flexibility
 
 ### Annotation vs. @ExtendWith
@@ -155,10 +155,12 @@ class CharsetSensitiveTest {
 ```java
 // Clean, declarative (recommended)
 @ResetSystem
+@ValidateCharset
 class MyTest { }
 
 // Verbose, but equivalent
-@ExtendWith(ResetSystemConfig.class)
+@ExtendWith(ResetSystemConfigExtension.class)
+@ExtendWith(CharsetConsistencyExtension.class)
 class MyTest { }
 ```
 
@@ -183,9 +185,10 @@ class MyTest {
 
 1. **Use the most specific reset needed** - Don't use `@ResetReporter` if you only need `@ResetSession`
 2. **Combine multiple extensions** - You can use multiple annotations on the same test
-3. **Prefer annotations** - Use `@ResetSystem` instead of `@ExtendWith(ResetSystemConfig.class)`
+3. **Prefer annotations** - Use `@ResetSystem` instead of `@ExtendWith(ResetSystemConfigExtension.class)`
 4. **Use `@WithLocale` for cross-platform tests** - Ensures consistent number/date formatting
-5. **Document why you need the extension** - Add a comment explaining locale-sensitive operations
+5. **Use `@ValidateCharset` for encoding tests** - Prevents charset-related bugs
+6. **Document why you need the extension** - Add a comment explaining locale-sensitive operations
 
 ## Examples
 
@@ -194,7 +197,7 @@ class MyTest {
 ```java
 @WithLocale("en-US")
 @ResetSystem
-@ExtendWith(CharsetConsistency.class)
+@ValidateCharset
 class ComprehensiveTest {
     @Test
     void testWithAllGuarantees() {
@@ -227,17 +230,19 @@ class MixedTest {
 
 ```
 org.usefultoys.test/
-├── WithLocale.java              - Locale control annotation
-├── WithLocaleExtension.java     - Locale control implementation
-├── ResetSystem.java             - SystemConfig reset annotation
-├── ResetSystemConfig.java       - SystemConfig reset implementation
-├── ResetSession.java            - SessionConfig reset annotation
-├── ResetSessionConfig.java      - SessionConfig reset implementation
-├── ResetReporter.java           - ReporterConfig reset annotation
-├── ResetReporterConfig.java     - ReporterConfig reset implementation
-├── ClearConfigParser.java       - ConfigParser error clearing
-├── CharsetConsistency.java      - Charset validation
-└── CallerStackTraceThrowableTest.java - Stack trace test utilities
+├── WithLocale.java                      - Locale control annotation
+├── WithLocaleExtension.java             - Locale control implementation
+├── ResetSystem.java                     - SystemConfig reset annotation
+├── ResetSystemConfigExtension.java      - SystemConfig reset implementation
+├── ResetSession.java                    - SessionConfig reset annotation
+├── ResetSessionConfigExtension.java     - SessionConfig reset implementation
+├── ResetReporter.java                   - ReporterConfig reset annotation
+├── ResetReporterConfigExtension.java    - ReporterConfig reset implementation
+├── ClearParserErrors.java               - ConfigParser error clearing annotation
+├── ClearConfigParserExtension.java      - ConfigParser error clearing implementation
+├── ValidateCharset.java                 - Charset validation annotation
+├── CharsetConsistencyExtension.java     - Charset validation implementation
+└── CallerStackTraceThrowableTest.java   - Stack trace test utilities
 ```
 
 ## See Also
@@ -245,4 +250,3 @@ org.usefultoys.test/
 - [JUnit 5 Extension Model](https://junit.org/junit5/docs/current/user-guide/#extensions)
 - [Copilot Instructions](../../../.github/copilot-instructions.md) - Test conventions
 - [AI Instructions](../../../AI-INSTRUCTIONS.md) - Project guidelines
-

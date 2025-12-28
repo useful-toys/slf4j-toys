@@ -23,8 +23,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.usefultoys.slf4j.SystemConfig;
-import org.usefultoys.test.CharsetConsistency;
-import org.usefultoys.test.ResetSystemConfig;
+import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ResetSystemConfigExtension;
 
 import java.lang.management.*;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@ExtendWith({CharsetConsistency.class, ResetSystemConfig.class})
+@ExtendWith({CharsetConsistencyExtension.class, ResetSystemConfigExtension.class})
 class SystemMetricsCollectorTest {
     @Mock
     private com.sun.management.OperatingSystemMXBean mockSunOsBean;

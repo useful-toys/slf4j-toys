@@ -24,19 +24,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Test annotation to automatically reset {@link org.usefultoys.slf4j.SystemConfig} before and after each test.
+ * Test annotation to automatically clear {@link org.usefultoys.slf4j.utils.ConfigParser} errors before and after each test.
  * <p>
- * This annotation provides a cleaner alternative to using {@code @ExtendWith(ResetSystemConfig.class)}.
- * It ensures test isolation by resetting configuration state between test executions.
+ * This annotation ensures that tests using {@link org.usefultoys.slf4j.utils.ConfigParser}
+ * start with a clean state, preventing error accumulation from previous test executions.
+ * This is particularly important for tests that intentionally trigger parsing errors to
+ * validate error handling behavior.
  * <p>
  * <b>Usage on test class:</b>
  * <pre>{@code
- * @ResetSystem
- * class SystemConfigTest {
+ * @ClearParserErrors
+ * class ConfigParserTest {
  *     @Test
- *     void testCustomConfig() {
- *         SystemConfig.someProperty = "custom";
- *         // Config is automatically reset after this test
+ *     void testInvalidConfig() {
+ *         // ConfigParser starts with no accumulated errors
  *     }
  * }
  * }</pre>
@@ -45,20 +46,27 @@ import java.lang.annotation.Target;
  * <pre>{@code
  * class MyTest {
  *     @Test
- *     @ResetSystem
- *     void testThatModifiesSystemConfig() {
- *         // SystemConfig is reset before and after this test only
+ *     @ClearParserErrors
+ *     void testThatTriggersParsingErrors() {
+ *         // Parser errors are cleared before and after this test only
  *     }
  * }
  * }</pre>
+ * <p>
+ * <b>When to use:</b>
+ * <ul>
+ *   <li>Tests that validate ConfigParser error handling</li>
+ *   <li>Tests that parse invalid configuration strings</li>
+ *   <li>Tests that need to ensure no residual errors from previous tests</li>
+ * </ul>
  *
- * @see ResetSystemConfig
- * @see org.usefultoys.slf4j.SystemConfig
+ * @see ClearConfigParserExtension
+ * @see org.usefultoys.slf4j.utils.ConfigParser
  * @author Daniel Felix Ferber
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
-@ExtendWith(ResetSystemConfig.class)
-public @interface ResetSystem {
+@ExtendWith(ClearConfigParserExtension.class)
+public @interface ClearParserErrors {
 }
 

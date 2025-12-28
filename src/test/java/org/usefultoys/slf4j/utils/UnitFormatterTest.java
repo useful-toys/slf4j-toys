@@ -18,7 +18,7 @@ package org.usefultoys.slf4j.utils;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.CharsetConsistencyExtension;
 import org.usefultoys.test.WithLocale;
 
 import java.util.stream.Stream;
@@ -30,7 +30,7 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  *
  * @author Daniel
  */
-@ExtendWith(CharsetConsistency.class)
+@ExtendWith(CharsetConsistencyExtension.class)
 @WithLocale("en")
 class UnitFormatterTest {
 

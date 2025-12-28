@@ -18,13 +18,13 @@ package org.usefultoys.slf4j.internal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.CharsetConsistencyExtension;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @WithLocale("en")
-@ExtendWith(CharsetConsistency.class)
+@ExtendWith(CharsetConsistencyExtension.class)
 class EventDataTest {
 
     private static final String FIXED_UUID = "12345"; // Fixed UUID as requested

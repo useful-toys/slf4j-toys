@@ -18,12 +18,12 @@ package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.CharsetConsistencyExtension;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 
-@ExtendWith(CharsetConsistency.class)
+@ExtendWith(CharsetConsistencyExtension.class)
 class NullOutputStreamTest {
 
     @Test

@@ -18,13 +18,13 @@ package org.usefultoys.slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.MarkerFactory;
-import org.usefultoys.test.CharsetConsistency;
+import org.usefultoys.test.CharsetConsistencyExtension;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
-@ExtendWith(CharsetConsistency.class)
+@ExtendWith(CharsetConsistencyExtension.class)
 class NullLoggerTest {
 
     private final NullLogger nullLogger = NullLogger.INSTANCE;

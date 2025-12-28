@@ -19,13 +19,12 @@ package org.usefultoys.slf4j.report;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistency;
-import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ResetReporterConfigExtension;
 import org.usefultoys.test.WithLocale;
 
 import java.nio.charset.Charset;
@@ -33,7 +32,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@ExtendWith({CharsetConsistency.class, ResetReporterConfig.class, MockLoggerExtension.class})
+@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
 @WithLocale("en")
 class ReportCharsetTest {
 

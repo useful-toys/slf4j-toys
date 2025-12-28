@@ -16,75 +16,49 @@
 
 package org.usefultoys.test;
 
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.SystemConfig;
-import org.usefultoys.slf4j.utils.ConfigParser;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * JUnit 5 extension that resets {@link SessionConfig} and related configurations before and after each test.
+ * Test annotation to automatically reset {@link org.usefultoys.slf4j.SessionConfig} before and after each test.
  * <p>
- * This extension ensures test isolation by resetting configuration state between test executions.
- * It clears:
- * <ul>
- *   <li>{@link ConfigParser} initialization errors</li>
- *   <li>{@link SessionConfig} to default values</li>
- *   <li>{@link SystemConfig} to default values</li>
- * </ul>
+ * This annotation provides a cleaner alternative to using {@code @ExtendWith(ResetSessionConfigExtension.class)}.
+ * It ensures test isolation by resetting configuration state between test executions.
  * <p>
- * This is essential for tests that modify session-level configuration, preventing configuration
- * changes from one test affecting others.
- * <p>
- * <b>Usage:</b>
+ * <b>Usage on test class:</b>
  * <pre>{@code
- * @ExtendWith(ResetSessionConfig.class)
+ * @ResetSession
  * class SessionConfigTest {
  *     @Test
- *     void testCustomSession() {
+ *     void testCustomConfig() {
  *         SessionConfig.someProperty = "custom";
  *         // Config is automatically reset after this test
  *     }
  * }
  * }</pre>
+ * <p>
+ * <b>Usage on test method:</b>
+ * <pre>{@code
+ * class MyTest {
+ *     @Test
+ *     @ResetSession
+ *     void testThatModifiesSessionConfig() {
+ *         // SessionConfig is reset before and after this test only
+ *     }
+ * }
+ * }</pre>
  *
- * @see SessionConfig
- * @see SystemConfig
- * @see ConfigParser
+ * @see ResetSessionConfigExtension
+ * @see org.usefultoys.slf4j.SessionConfig
  * @author Daniel Felix Ferber
  */
-public class ResetSessionConfig implements BeforeEachCallback, AfterEachCallback {
-
-    /**
-     * Resets all configuration before each test execution.
-     * <p>
-     * Ensures the test starts with clean, default configuration state.
-     *
-     * @param context the current extension context
-     */
-    @Override
-    public void beforeEach(ExtensionContext context) {
-        // Clear any accumulated parsing errors
-        ConfigParser.clearInitializationErrors();
-        // Reset both configs to their default values
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
-
-    /**
-     * Resets all configuration after each test execution.
-     * <p>
-     * Ensures configuration changes don't leak to subsequent tests,
-     * even if the test fails or throws an exception.
-     *
-     * @param context the current extension context
-     */
-    @Override
-    public void afterEach(ExtensionContext context) {
-        // Clean up any errors or config changes made during the test
-        ConfigParser.clearInitializationErrors();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.METHOD })
+@ExtendWith(ResetSessionConfigExtension.class)
+public @interface ResetSessionConfig {
 }
+
