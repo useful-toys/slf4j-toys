@@ -18,15 +18,26 @@ package org.usefultoys.slf4j.logback;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Marker;
 import org.usefultoys.slf4j.meter.Markers;
+import org.usefultoys.test.ValidateCharset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit tests for {@link StatusConverter}.
+ * <p>
+ * Tests validate that StatusConverter correctly converts log markers and log levels
+ * to appropriate status strings for formatting log output.
+ */
+@DisplayName("StatusConverter")
+@ValidateCharset
 class StatusConverterTest {
 
     private StatusConverter converter;
@@ -34,7 +45,7 @@ class StatusConverterTest {
     @Mock
     private ILoggingEvent mockEvent;
     @Mock
-    private Marker mockMarker; // For unknown markers
+    private Marker mockMarker;
 
     @BeforeEach
     void setUp() {
@@ -42,178 +53,328 @@ class StatusConverterTest {
         converter = new StatusConverter();
     }
 
-    // --- Tests for specific Markers ---
+    @Nested
+    @DisplayName("Message markers")
+    class MessageMarkersTest {
 
-    @Test
-    void testConvertWithMsgStartMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.MSG_START);
-        assertEquals("START", converter.convert(mockEvent));
+        @Test
+        @DisplayName("should convert MSG_START marker to START")
+        void testMsgStartMarker() {
+            // Given: logging event with MSG_START marker
+            when(mockEvent.getMarker()).thenReturn(Markers.MSG_START);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return START status
+            assertEquals("START", result);
+        }
+
+        @Test
+        @DisplayName("should convert MSG_PROGRESS marker to PROGR")
+        void testMsgProgressMarker() {
+            // Given: logging event with MSG_PROGRESS marker
+            when(mockEvent.getMarker()).thenReturn(Markers.MSG_PROGRESS);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return PROGR status
+            assertEquals("PROGR", result);
+        }
+
+        @Test
+        @DisplayName("should convert MSG_OK marker to OK")
+        void testMsgOkMarker() {
+            // Given: logging event with MSG_OK marker
+            when(mockEvent.getMarker()).thenReturn(Markers.MSG_OK);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return OK status
+            assertEquals("OK", result);
+        }
+
+        @Test
+        @DisplayName("should convert MSG_SLOW_OK marker to SLOW")
+        void testMsgSlowOkMarker() {
+            // Given: logging event with MSG_SLOW_OK marker
+            when(mockEvent.getMarker()).thenReturn(Markers.MSG_SLOW_OK);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return SLOW status
+            assertEquals("SLOW", result);
+        }
+
+        @Test
+        @DisplayName("should convert MSG_REJECT marker to REJECT")
+        void testMsgRejectMarker() {
+            // Given: logging event with MSG_REJECT marker
+            when(mockEvent.getMarker()).thenReturn(Markers.MSG_REJECT);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return REJECT status
+            assertEquals("REJECT", result);
+        }
+
+        @Test
+        @DisplayName("should convert MSG_FAIL marker to FAIL")
+        void testMsgFailMarker() {
+            // Given: logging event with MSG_FAIL marker
+            when(mockEvent.getMarker()).thenReturn(Markers.MSG_FAIL);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return FAIL status
+            assertEquals("FAIL", result);
+        }
     }
 
-    @Test
-    void testConvertWithMsgProgressMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.MSG_PROGRESS);
-        assertEquals("PROGR", converter.convert(mockEvent));
+    @Nested
+    @DisplayName("Data markers (empty string)")
+    class DataMarkersTest {
+
+        @Test
+        @DisplayName("should convert DATA_START marker to empty string")
+        void testDataStartMarker() {
+            // Given: logging event with DATA_START marker
+            when(mockEvent.getMarker()).thenReturn(Markers.DATA_START);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return empty string
+            assertEquals("", result);
+        }
+
+        @Test
+        @DisplayName("should convert DATA_PROGRESS marker to empty string")
+        void testDataProgressMarker() {
+            // Given: logging event with DATA_PROGRESS marker
+            when(mockEvent.getMarker()).thenReturn(Markers.DATA_PROGRESS);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return empty string
+            assertEquals("", result);
+        }
+
+        @Test
+        @DisplayName("should convert DATA_OK marker to empty string")
+        void testDataOkMarker() {
+            // Given: logging event with DATA_OK marker
+            when(mockEvent.getMarker()).thenReturn(Markers.DATA_OK);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return empty string
+            assertEquals("", result);
+        }
+
+        @Test
+        @DisplayName("should convert DATA_SLOW_OK marker to empty string")
+        void testDataSlowOkMarker() {
+            // Given: logging event with DATA_SLOW_OK marker
+            when(mockEvent.getMarker()).thenReturn(Markers.DATA_SLOW_OK);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return empty string
+            assertEquals("", result);
+        }
+
+        @Test
+        @DisplayName("should convert DATA_REJECT marker to empty string")
+        void testDataRejectMarker() {
+            // Given: logging event with DATA_REJECT marker
+            when(mockEvent.getMarker()).thenReturn(Markers.DATA_REJECT);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return empty string
+            assertEquals("", result);
+        }
+
+        @Test
+        @DisplayName("should convert DATA_FAIL marker to empty string")
+        void testDataFailMarker() {
+            // Given: logging event with DATA_FAIL marker
+            when(mockEvent.getMarker()).thenReturn(Markers.DATA_FAIL);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return empty string
+            assertEquals("", result);
+        }
+
+        @Test
+        @DisplayName("should convert DATA_WATCHER marker to empty string")
+        void testWatcherDataMarker() {
+            // Given: logging event with DATA_WATCHER marker
+            when(mockEvent.getMarker()).thenReturn(org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return empty string
+            assertEquals("", result);
+        }
     }
 
-    @Test
-    void testConvertWithMsgOkMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.MSG_OK);
-        assertEquals("OK", converter.convert(mockEvent));
+    @Nested
+    @DisplayName("Error markers")
+    class ErrorMarkersTest {
+
+        @Test
+        @DisplayName("should convert BUG marker to BUG")
+        void testBugMarker() {
+            // Given: logging event with BUG marker
+            when(mockEvent.getMarker()).thenReturn(Markers.BUG);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return BUG status
+            assertEquals("BUG", result);
+        }
+
+        @Test
+        @DisplayName("should convert ILLEGAL marker to ILLEGAL")
+        void testIllegalMarker() {
+            // Given: logging event with ILLEGAL marker
+            when(mockEvent.getMarker()).thenReturn(Markers.ILLEGAL);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return ILLEGAL status
+            assertEquals("ILLEGAL", result);
+        }
+
+        @Test
+        @DisplayName("should convert INCONSISTENT_START marker to INCONSISTENT")
+        void testInconsistentStartMarker() {
+            // Given: logging event with INCONSISTENT_START marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_START);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return INCONSISTENT status
+            assertEquals("INCONSISTENT", result);
+        }
+
+        @Test
+        @DisplayName("should convert INCONSISTENT_INCREMENT marker to INCONSISTENT")
+        void testInconsistentIncrementMarker() {
+            // Given: logging event with INCONSISTENT_INCREMENT marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_INCREMENT);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return INCONSISTENT status
+            assertEquals("INCONSISTENT", result);
+        }
+
+        @Test
+        @DisplayName("should convert INCONSISTENT_PROGRESS marker to INCONSISTENT")
+        void testInconsistentProgressMarker() {
+            // Given: logging event with INCONSISTENT_PROGRESS marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_PROGRESS);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return INCONSISTENT status
+            assertEquals("INCONSISTENT", result);
+        }
+
+        @Test
+        @DisplayName("should convert INCONSISTENT_EXCEPTION marker to INCONSISTENT")
+        void testInconsistentExceptionMarker() {
+            // Given: logging event with INCONSISTENT_EXCEPTION marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_EXCEPTION);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return INCONSISTENT status
+            assertEquals("INCONSISTENT", result);
+        }
+
+        @Test
+        @DisplayName("should convert INCONSISTENT_REJECT marker to INCONSISTENT")
+        void testInconsistentRejectMarker() {
+            // Given: logging event with INCONSISTENT_REJECT marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_REJECT);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return INCONSISTENT status
+            assertEquals("INCONSISTENT", result);
+        }
+
+        @Test
+        @DisplayName("should convert INCONSISTENT_OK marker to INCONSISTENT")
+        void testInconsistentOkMarker() {
+            // Given: logging event with INCONSISTENT_OK marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_OK);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return INCONSISTENT status
+            assertEquals("INCONSISTENT", result);
+        }
+
+        @Test
+        @DisplayName("should convert INCONSISTENT_FAIL marker to INCONSISTENT")
+        void testInconsistentFailMarker() {
+            // Given: logging event with INCONSISTENT_FAIL marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_FAIL);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return INCONSISTENT status
+            assertEquals("INCONSISTENT", result);
+        }
+
+        @Test
+        @DisplayName("should convert INCONSISTENT_FINALIZED marker to INCONSISTENT")
+        void testInconsistentFinalizedMarker() {
+            // Given: logging event with INCONSISTENT_FINALIZED marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_FINALIZED);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return INCONSISTENT status
+            assertEquals("INCONSISTENT", result);
+        }
     }
 
-    @Test
-    void testConvertWithMsgSlowOkMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.MSG_SLOW_OK);
-        assertEquals("SLOW", converter.convert(mockEvent));
+    @Nested
+    @DisplayName("Watcher marker")
+    class WatcherMarkerTest {
+
+        @Test
+        @DisplayName("should convert MSG_WATCHER marker to WATCHER")
+        void testWatcherMsgMarker() {
+            // Given: logging event with MSG_WATCHER marker
+            when(mockEvent.getMarker()).thenReturn(org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return WATCHER status
+            assertEquals("WATCHER", result);
+        }
     }
 
-    @Test
-    void testConvertWithMsgRejectMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.MSG_REJECT);
-        assertEquals("REJECT", converter.convert(mockEvent));
-    }
+    @Nested
+    @DisplayName("Default behavior (no matching marker)")
+    class DefaultBehaviorTest {
 
-    @Test
-    void testConvertWithMsgFailMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.MSG_FAIL);
-        assertEquals("FAIL", converter.convert(mockEvent));
-    }
+        @Test
+        @DisplayName("should return level string for unknown marker and INFO level")
+        void testUnknownMarkerAndInfoLevel() {
+            // Given: logging event with unknown marker and INFO level
+            when(mockEvent.getMarker()).thenReturn(mockMarker);
+            when(mockEvent.getLevel()).thenReturn(Level.INFO);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return level name
+            assertEquals("INFO", result);
+        }
 
-    // --- Tests for empty string Markers ---
+        @Test
+        @DisplayName("should return level string for null marker and DEBUG level")
+        void testNullMarkerAndDebugLevel() {
+            // Given: logging event with null marker and DEBUG level
+            when(mockEvent.getMarker()).thenReturn(null);
+            when(mockEvent.getLevel()).thenReturn(Level.DEBUG);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return level name
+            assertEquals("DEBUG", result);
+        }
 
-    @Test
-    void testConvertWithDataStartMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.DATA_START);
-        assertEquals("", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithDataProgressMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.DATA_PROGRESS);
-        assertEquals("", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithDataOkMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.DATA_OK);
-        assertEquals("", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithDataSlowOkMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.DATA_SLOW_OK);
-        assertEquals("", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithDataRejectMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.DATA_REJECT);
-        assertEquals("", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithDataFailMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.DATA_FAIL);
-        assertEquals("", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithWatcherDataMarker() {
-        when(mockEvent.getMarker()).thenReturn(org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER);
-        assertEquals("", converter.convert(mockEvent));
-    }
-
-    // --- Tests for INCONSISTENT Markers ---
-
-    @Test
-    void testConvertWithBugMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.BUG);
-        assertEquals("BUG", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithIllegalMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.ILLEGAL);
-        assertEquals("ILLEGAL", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithInconsistentStartMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_START);
-        assertEquals("INCONSISTENT", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithInconsistentIncrementMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_INCREMENT);
-        assertEquals("INCONSISTENT", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithInconsistentProgressMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_PROGRESS);
-        assertEquals("INCONSISTENT", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithInconsistentExceptionMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_EXCEPTION);
-        assertEquals("INCONSISTENT", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithInconsistentRejectMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_REJECT);
-        assertEquals("INCONSISTENT", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithInconsistentOkMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_OK);
-        assertEquals("INCONSISTENT", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithInconsistentFailMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_FAIL);
-        assertEquals("INCONSISTENT", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithInconsistentFinalizedMarker() {
-        when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_FINALIZED);
-        assertEquals("INCONSISTENT", converter.convert(mockEvent));
-    }
-
-    // --- Tests for WATCHER Marker ---
-
-    @Test
-    void testConvertWithWatcherMsgMarker() {
-        when(mockEvent.getMarker()).thenReturn(org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER);
-        assertEquals("WATCHER", converter.convert(mockEvent));
-    }
-
-    // --- Tests for default behavior (no matching marker) ---
-
-    @Test
-    void testConvertWithUnknownMarkerAndInfoLevel() {
-        when(mockEvent.getMarker()).thenReturn(mockMarker); // A generic mock marker not in the list
-        when(mockEvent.getLevel()).thenReturn(Level.INFO);
-        assertEquals("INFO", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithNullMarkerAndDebugLevel() {
-        when(mockEvent.getMarker()).thenReturn(null);
-        when(mockEvent.getLevel()).thenReturn(Level.DEBUG);
-        assertEquals("DEBUG", converter.convert(mockEvent));
-    }
-
-    @Test
-    void testConvertWithNullMarkerAndErrorLevel() {
-        when(mockEvent.getMarker()).thenReturn(null);
-        when(mockEvent.getLevel()).thenReturn(Level.ERROR);
-        assertEquals("ERROR", converter.convert(mockEvent));
+        @Test
+        @DisplayName("should return level string for null marker and ERROR level")
+        void testNullMarkerAndErrorLevel() {
+            // Given: logging event with null marker and ERROR level
+            when(mockEvent.getMarker()).thenReturn(null);
+            when(mockEvent.getLevel()).thenReturn(Level.ERROR);
+            // When: convert is called
+            final String result = converter.convert(mockEvent);
+            // Then: should return level name
+            assertEquals("ERROR", result);
+        }
     }
 }
