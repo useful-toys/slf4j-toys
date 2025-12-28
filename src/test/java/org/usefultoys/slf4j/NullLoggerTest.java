@@ -15,33 +15,49 @@
  */
 package org.usefultoys.slf4j;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.MarkerFactory;
-import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ValidateCharset;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-
-@ExtendWith(CharsetConsistencyExtension.class)
+/**
+ * Unit tests for {@link NullLogger}.
+ * <p>
+ * Tests validate that NullLogger silently ignores all logging operations
+ * without throwing exceptions, providing a no-op Logger implementation.
+ */
+@ValidateCharset
 class NullLoggerTest {
 
     private final NullLogger nullLogger = NullLogger.INSTANCE;
 
     @Test
-    void testGetName() {
+    @DisplayName("should return name without throwing exceptions")
+    void shouldReturnNameWithoutThrowingExceptions() {
+        // Given: NullLogger instance
+        // When: getName() is called
+        // Then: should not throw exception
         assertDoesNotThrow(() -> nullLogger.getName());
     }
 
     @Test
-    void testIsTraceEnabled() {
-        assertFalse(nullLogger.isTraceEnabled());
-        assertFalse(nullLogger.isTraceEnabled(MarkerFactory.getMarker("TEST")));
+    @DisplayName("should report trace is not enabled")
+    void shouldReportTraceIsNotEnabled() {
+        // Given: NullLogger instance
+        // When: isTraceEnabled is checked
+        // Then: should return false
+        assertFalse(nullLogger.isTraceEnabled(), "should report trace not enabled");
+        assertFalse(nullLogger.isTraceEnabled(MarkerFactory.getMarker("TEST")), "should report trace not enabled with marker");
     }
 
     @Test
-    void testTraceMethodsDoNotThrowExceptions() {
+    @DisplayName("should execute all trace methods without throwing exceptions")
+    void shouldExecuteAllTraceMethodsWithoutThrowingExceptions() {
+        // Given: NullLogger instance
+        // When: various trace methods are called
         assertDoesNotThrow(() -> nullLogger.trace("message"));
         assertDoesNotThrow(() -> nullLogger.trace("format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.trace("format {} {}", "arg1", "arg2"));
@@ -51,17 +67,25 @@ class NullLoggerTest {
         assertDoesNotThrow(() -> nullLogger.trace(MarkerFactory.getMarker("TEST"), "format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.trace(MarkerFactory.getMarker("TEST"), "format {} {}", "arg1", "arg2"));
         assertDoesNotThrow(() -> nullLogger.trace(MarkerFactory.getMarker("TEST"), "format {}", new Object[]{"arg"}));
+        // Then: should not throw exceptions
         assertDoesNotThrow(() -> nullLogger.trace(MarkerFactory.getMarker("TEST"), "message", new RuntimeException()));
     }
 
     @Test
-    void testIsDebugEnabled() {
-        assertFalse(nullLogger.isDebugEnabled());
-        assertFalse(nullLogger.isDebugEnabled(MarkerFactory.getMarker("TEST")));
+    @DisplayName("should report debug is not enabled")
+    void shouldReportDebugIsNotEnabled() {
+        // Given: NullLogger instance
+        // When: isDebugEnabled is checked
+        // Then: should return false
+        assertFalse(nullLogger.isDebugEnabled(), "should report debug not enabled");
+        assertFalse(nullLogger.isDebugEnabled(MarkerFactory.getMarker("TEST")), "should report debug not enabled with marker");
     }
 
     @Test
-    void testDebugMethodsDoNotThrowExceptions() {
+    @DisplayName("should execute all debug methods without throwing exceptions")
+    void shouldExecuteAllDebugMethodsWithoutThrowingExceptions() {
+        // Given: NullLogger instance
+        // When: various debug methods are called
         assertDoesNotThrow(() -> nullLogger.debug("message"));
         assertDoesNotThrow(() -> nullLogger.debug("format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.debug("format {} {}", "arg1", "arg2"));
@@ -71,17 +95,25 @@ class NullLoggerTest {
         assertDoesNotThrow(() -> nullLogger.debug(MarkerFactory.getMarker("TEST"), "format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.debug(MarkerFactory.getMarker("TEST"), "format {} {}", "arg1", "arg2"));
         assertDoesNotThrow(() -> nullLogger.debug(MarkerFactory.getMarker("TEST"), "format {}", new Object[]{"arg"}));
+        // Then: should not throw exceptions
         assertDoesNotThrow(() -> nullLogger.debug(MarkerFactory.getMarker("TEST"), "message", new RuntimeException()));
     }
 
     @Test
-    void testIsInfoEnabled() {
-        assertFalse(nullLogger.isInfoEnabled());
-        assertFalse(nullLogger.isInfoEnabled(MarkerFactory.getMarker("TEST")));
+    @DisplayName("should report info is not enabled")
+    void shouldReportInfoIsNotEnabled() {
+        // Given: NullLogger instance
+        // When: isInfoEnabled is checked
+        // Then: should return false
+        assertFalse(nullLogger.isInfoEnabled(), "should report info not enabled");
+        assertFalse(nullLogger.isInfoEnabled(MarkerFactory.getMarker("TEST")), "should report info not enabled with marker");
     }
 
     @Test
-    void testInfoMethodsDoNotThrowExceptions() {
+    @DisplayName("should execute all info methods without throwing exceptions")
+    void shouldExecuteAllInfoMethodsWithoutThrowingExceptions() {
+        // Given: NullLogger instance
+        // When: various info methods are called
         assertDoesNotThrow(() -> nullLogger.info("message"));
         assertDoesNotThrow(() -> nullLogger.info("format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.info("format {} {}", "arg1", "arg2"));
@@ -91,17 +123,25 @@ class NullLoggerTest {
         assertDoesNotThrow(() -> nullLogger.info(MarkerFactory.getMarker("TEST"), "format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.info(MarkerFactory.getMarker("TEST"), "format {} {}", "arg1", "arg2"));
         assertDoesNotThrow(() -> nullLogger.info(MarkerFactory.getMarker("TEST"), "format {}", new Object[]{"arg"}));
+        // Then: should not throw exceptions
         assertDoesNotThrow(() -> nullLogger.info(MarkerFactory.getMarker("TEST"), "message", new RuntimeException()));
     }
 
     @Test
-    void testIsWarnEnabled() {
-        assertFalse(nullLogger.isWarnEnabled());
-        assertFalse(nullLogger.isWarnEnabled(MarkerFactory.getMarker("TEST")));
+    @DisplayName("should report warn is not enabled")
+    void shouldReportWarnIsNotEnabled() {
+        // Given: NullLogger instance
+        // When: isWarnEnabled is checked
+        // Then: should return false
+        assertFalse(nullLogger.isWarnEnabled(), "should report warn not enabled");
+        assertFalse(nullLogger.isWarnEnabled(MarkerFactory.getMarker("TEST")), "should report warn not enabled with marker");
     }
 
     @Test
-    void testWarnMethodsDoNotThrowExceptions() {
+    @DisplayName("should execute all warn methods without throwing exceptions")
+    void shouldExecuteAllWarnMethodsWithoutThrowingExceptions() {
+        // Given: NullLogger instance
+        // When: various warn methods are called
         assertDoesNotThrow(() -> nullLogger.warn("message"));
         assertDoesNotThrow(() -> nullLogger.warn("format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.warn("format {} {}", "arg1", "arg2"));
@@ -111,17 +151,25 @@ class NullLoggerTest {
         assertDoesNotThrow(() -> nullLogger.warn(MarkerFactory.getMarker("TEST"), "format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.warn(MarkerFactory.getMarker("TEST"), "format {} {}", "arg1", "arg2"));
         assertDoesNotThrow(() -> nullLogger.warn(MarkerFactory.getMarker("TEST"), "format {}", new Object[]{"arg"}));
+        // Then: should not throw exceptions
         assertDoesNotThrow(() -> nullLogger.warn(MarkerFactory.getMarker("TEST"), "message", new RuntimeException()));
     }
 
     @Test
-    void testIsErrorEnabled() {
-        assertFalse(nullLogger.isErrorEnabled());
-        assertFalse(nullLogger.isErrorEnabled(MarkerFactory.getMarker("TEST")));
+    @DisplayName("should report error is not enabled")
+    void shouldReportErrorIsNotEnabled() {
+        // Given: NullLogger instance
+        // When: isErrorEnabled is checked
+        // Then: should return false
+        assertFalse(nullLogger.isErrorEnabled(), "should report error not enabled");
+        assertFalse(nullLogger.isErrorEnabled(MarkerFactory.getMarker("TEST")), "should report error not enabled with marker");
     }
 
     @Test
-    void testErrorMethodsDoNotThrowExceptions() {
+    @DisplayName("should execute all error methods without throwing exceptions")
+    void shouldExecuteAllErrorMethodsWithoutThrowingExceptions() {
+        // Given: NullLogger instance
+        // When: various error methods are called
         assertDoesNotThrow(() -> nullLogger.error("message"));
         assertDoesNotThrow(() -> nullLogger.error("format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.error("format {} {}", "arg1", "arg2"));
@@ -131,6 +179,7 @@ class NullLoggerTest {
         assertDoesNotThrow(() -> nullLogger.error(MarkerFactory.getMarker("TEST"), "format {}", "arg"));
         assertDoesNotThrow(() -> nullLogger.error(MarkerFactory.getMarker("TEST"), "format {} {}", "arg1", "arg2"));
         assertDoesNotThrow(() -> nullLogger.error(MarkerFactory.getMarker("TEST"), "format {}", new Object[]{"arg"}));
+        // Then: should not throw exceptions
         assertDoesNotThrow(() -> nullLogger.error(MarkerFactory.getMarker("TEST"), "message", new RuntimeException()));
     }
 }
