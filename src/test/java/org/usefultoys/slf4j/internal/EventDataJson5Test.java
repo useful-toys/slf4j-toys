@@ -16,27 +16,33 @@
 package org.usefultoys.slf4j.internal;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for {@link EventDataJson5}.
+ * <p>
+ * Tests verify that EventData can be correctly serialized to and deserialized from JSON5 format,
+ * including round-trip consistency and edge case handling.
+ */
+@DisplayName("EventDataJson5")
+@ValidateCharset
 @WithLocale("en")
-@ExtendWith(CharsetConsistencyExtension.class)
 class EventDataJson5Test {
+
     // Concrete class for testing the abstract EventData
     private static class TestEventData extends EventData {
         TestEventData() {
-            super();
         }
 
-        TestEventData(String sessionUuid, long position, long lastCurrentTime) {
+        TestEventData(final String sessionUuid, final long position, final long lastCurrentTime) {
             super(sessionUuid, position, lastCurrentTime);
         }
     }
@@ -58,29 +64,33 @@ class EventDataJson5Test {
                 Arguments.of(
                         "Zero values",
                         new TestEventData(uuid2, 0, 0),
-                        String.format("_:%s,$:0,t:0",uuid2)
+                        String.format("_:%s,$:0,t:0", uuid2)
                 )
         );
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("roundTripScenarios")
-    @DisplayName("Should correctly serialize and deserialize (round-trip)")
-    void testRoundTrip(String testName, EventData originalData, String expectedJson) {
-        // 1. Test Serialization (Write)
+    @DisplayName("should correctly serialize and deserialize (round-trip)")
+    void testRoundTrip(final String testName, final EventData originalData, final String expectedJson) {
+        // Given: EventData with various field combinations
         final StringBuilder sb = new StringBuilder();
+
+        // When: data is serialized to JSON5
         EventDataJson5.write(originalData, sb);
         final String actualJson = sb.toString();
-        assertEquals(expectedJson, actualJson);
 
-        // 2. Test Deserialization (Read)
+        // Then: serialized JSON should match expected format
+        assertEquals(expectedJson, actualJson, "Serialized JSON should match expected format for: " + testName);
+
+        // When: serialized data is deserialized
         final TestEventData newData = new TestEventData();
-        EventDataJson5.read(newData, "{"+actualJson+"}");
+        EventDataJson5.read(newData, "{" + actualJson + "}");
 
-        // 3. Assert Round-trip consistency
-        assertEquals(originalData.getSessionUuid(), newData.getSessionUuid());
-        assertEquals(originalData.getPosition(), newData.getPosition());
-        assertEquals(originalData.getLastCurrentTime(), newData.getLastCurrentTime());
+        // Then: round-trip should preserve all data
+        assertEquals(originalData.getSessionUuid(), newData.getSessionUuid(), "Session UUID should be preserved");
+        assertEquals(originalData.getPosition(), newData.getPosition(), "Position should be preserved");
+        assertEquals(originalData.getLastCurrentTime(), newData.getLastCurrentTime(), "Last current time should be preserved");
     }
 
     static Stream<Arguments> readEdgeCaseScenarios() {
@@ -111,13 +121,17 @@ class EventDataJson5Test {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("readEdgeCaseScenarios")
-    @DisplayName("Should correctly read edge cases")
-    void testReadEdgeCases(String testName, String inputJson, EventData expectedData) {
+    @DisplayName("should correctly read edge cases")
+    void testReadEdgeCases(final String testName, final String inputJson, final EventData expectedData) {
+        // Given: JSON5 with edge case formatting
         final TestEventData actualData = new TestEventData();
+
+        // When: JSON5 is deserialized
         EventDataJson5.read(actualData, inputJson);
 
-        assertEquals(expectedData.getSessionUuid(), actualData.getSessionUuid());
-        assertEquals(expectedData.getPosition(), actualData.getPosition());
-        assertEquals(expectedData.getLastCurrentTime(), actualData.getLastCurrentTime());
+        // Then: should handle edge cases correctly
+        assertEquals(expectedData.getSessionUuid(), actualData.getSessionUuid(), "Session UUID should match for: " + testName);
+        assertEquals(expectedData.getPosition(), actualData.getPosition(), "Position should match for: " + testName);
+        assertEquals(expectedData.getLastCurrentTime(), actualData.getLastCurrentTime(), "Last current time should match for: " + testName);
     }
 }
