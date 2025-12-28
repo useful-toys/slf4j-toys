@@ -15,10 +15,10 @@
  */
 package org.usefultoys.slf4j.utils;
 
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.util.stream.Stream;
@@ -27,10 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.of;
 
 /**
- *
- * @author Daniel
+ * Unit tests for {@link UnitFormatter}.
+ * <p>
+ * Tests validate that UnitFormatter correctly formats various numeric values
+ * with appropriate units for bytes, time, iterations, and custom units.
  */
-@ExtendWith(CharsetConsistencyExtension.class)
+@ValidateCharset
 @WithLocale("en")
 class UnitFormatterTest {
 
@@ -80,8 +82,13 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideLongUnitTestCases")
-    public void testLongUnit(final long value, final String expected) {
-        assertEquals(expected, UnitFormatter.longUnit(value, UNITS, FACTORS));
+    @DisplayName("should format long values with custom units correctly")
+    void shouldFormatLongValueWithCustomUnitsCorrectly(final long value, final String expected) {
+        // Given: a long value and custom units array
+        // When: longUnit is called
+        final String result = UnitFormatter.longUnit(value, UNITS, FACTORS);
+        // Then: should return correctly formatted value with unit
+        assertEquals(expected, result, "should format value " + value + " as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideLongUnitWithLongParametersTestCases() {
@@ -129,8 +136,13 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideLongUnitWithLongParametersTestCases")
-    public void testLongUnitWithLongParameters(final double value, final String expected) {
-        assertEquals(expected, UnitFormatter.doubleUnit(value, UNITS, FACTORS));
+    @DisplayName("should format double values with custom units correctly")
+    void shouldFormatDoubleValueWithCustomUnitsCorrectly(final double value, final String expected) {
+        // Given: a double value and custom units array
+        // When: doubleUnit is called
+        final String result = UnitFormatter.doubleUnit(value, UNITS, FACTORS);
+        // Then: should return correctly formatted value with unit
+        assertEquals(expected, result, "should format value " + value + " as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideBytesTestCases() {
@@ -147,8 +159,13 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideBytesTestCases")
-    void testBytes(final long value, final String expected) {
-        assertEquals(expected, UnitFormatter.bytes(value));
+    @DisplayName("should format byte sizes with correct unit suffixes")
+    void shouldFormatByteSizesWithCorrectUnitSuffixes(final long value, final String expected) {
+        // Given: a byte value
+        // When: bytes formatter is called
+        final String result = UnitFormatter.bytes(value);
+        // Then: should return value formatted with B, kB, MB suffixes
+        assertEquals(expected, result, "should format " + value + " bytes as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideNanosecondsLongTestCases() {
@@ -172,8 +189,13 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideNanosecondsLongTestCases")
-    void testNanosecondsLong(final long value, final String expected) {
-        assertEquals(expected, UnitFormatter.nanoseconds(value));
+    @DisplayName("should format nanoseconds (long) with correct time unit suffixes")
+    void shouldFormatNanosecondsLongWithCorrectTimeUnitSuffixes(final long value, final String expected) {
+        // Given: a nanosecond value as long
+        // When: nanoseconds formatter is called
+        final String result = UnitFormatter.nanoseconds(value);
+        // Then: should return value formatted with ns, us, ms suffixes
+        assertEquals(expected, result, "should format " + value + "ns as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideNanosecondsDoubleTestCases() {
@@ -188,8 +210,13 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideNanosecondsDoubleTestCases")
-    void testNanosecondsDouble(final double value, final String expected) {
-        assertEquals(expected, UnitFormatter.nanoseconds(value));
+    @DisplayName("should format nanoseconds (double) with correct time unit suffixes")
+    void shouldFormatNanosecondsDoubleWithCorrectTimeUnitSuffixes(final double value, final String expected) {
+        // Given: a nanosecond value as double
+        // When: nanoseconds formatter is called
+        final String result = UnitFormatter.nanoseconds(value);
+        // Then: should return value formatted with ns, us, ms suffixes
+        assertEquals(expected, result, "should format " + value + "ns as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsPerSecondTestCases() {
@@ -219,8 +246,13 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideIterationsPerSecondTestCases")
-    void testIterationsPerSecond(final double value, final String expected) {
-        assertEquals(expected, UnitFormatter.iterationsPerSecond(value));
+    @DisplayName("should format iterations per second with correct unit suffixes")
+    void shouldFormatIterationsPerSecondWithCorrectUnitSuffixes(final double value, final String expected) {
+        // Given: an iterations per second value
+        // When: iterationsPerSecond formatter is called
+        final String result = UnitFormatter.iterationsPerSecond(value);
+        // Then: should return value formatted with /s, k/s, M/s suffixes
+        assertEquals(expected, result, "should format " + value + "/s as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsTestCases() {
@@ -240,8 +272,13 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideIterationsTestCases")
-    void testIterationsPerSecond(final long value, final String expected) {
-        assertEquals(expected, UnitFormatter.iterations(value));
+    @DisplayName("should format iteration counts with correct unit suffixes")
+    void shouldFormatIterationCountsWithCorrectUnitSuffixes(final long value, final String expected) {
+        // Given: an iteration count value
+        // When: iterations formatter is called
+        final String result = UnitFormatter.iterations(value);
+        // Then: should return value formatted with k, M suffixes
+        assertEquals(expected, result, "should format " + value + " iterations as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideTimeUnitTestCases() {
@@ -265,8 +302,13 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideTimeUnitTestCases")
-    public void testTimeUnit(final long value, final String expected) {
-        assertEquals(expected, UnitFormatter.nanoseconds(value));
+    @DisplayName("should format time duration with comprehensive time unit conversion")
+    void shouldFormatTimeDurationWithComprehensiveTimeUnitConversion(final long value, final String expected) {
+        // Given: a time duration in nanoseconds
+        // When: nanoseconds formatter is called for comprehensive time conversion
+        final String result = UnitFormatter.nanoseconds(value);
+        // Then: should return value formatted with ns, us, ms, s, m, h suffixes
+        assertEquals(expected, result, "should format " + value + "ns as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideDoubleTimeUnitTestCases() {
@@ -290,7 +332,13 @@ class UnitFormatterTest {
 
     @ParameterizedTest
     @MethodSource("provideDoubleTimeUnitTestCases")
-    public void testDoubleTimeUnit(final float value, final String expected) {
-        assertEquals(expected, UnitFormatter.nanoseconds(value));
+    @DisplayName("should format time duration (double) with comprehensive time unit conversion")
+    void shouldFormatTimeDurationDoubleWithComprehensiveTimeUnitConversion(final float value, final String expected) {
+        // Given: a time duration in nanoseconds as double
+        // When: nanoseconds formatter is called for comprehensive time conversion
+        final String result = UnitFormatter.nanoseconds(value);
+        // Then: should return value formatted with ns, us, ms, s, m, h suffixes
+        assertEquals(expected, result, "should format " + value + "ns as " + expected);
     }
 }
+
