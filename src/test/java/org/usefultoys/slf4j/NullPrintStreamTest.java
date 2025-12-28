@@ -16,9 +16,9 @@
 
 package org.usefultoys.slf4j;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.util.Locale;
@@ -26,24 +26,37 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+/**
+ * Unit tests for {@link NullPrintStream}.
+ * <p>
+ * Tests validate that NullPrintStream silently ignores all output operations
+ * without throwing exceptions, providing a no-op PrintStream implementation.
+ */
+@ValidateCharset
 @WithLocale("en")
-@ExtendWith(CharsetConsistencyExtension.class)
 class NullPrintStreamTest {
 
     @Test
-    void testWriteMethods() {
+    @DisplayName("should execute all write methods without throwing exceptions")
+    void shouldExecuteAllWriteMethodsWithoutThrowingExceptions() {
+        // Given: a new NullPrintStream instance
         final NullPrintStream nullPrintStream = new NullPrintStream();
+        // When: write methods are called with various arguments
         assertDoesNotThrow(() -> nullPrintStream.write(new byte[]{1, 2, 3}));
         assertDoesNotThrow(() -> nullPrintStream.write(1));
         assertDoesNotThrow(() -> nullPrintStream.write(new byte[]{1, 2, 3}, 0, 2));
-        assertFalse(nullPrintStream.checkError());
+        // Then: should not report errors and should not throw
+        assertFalse(nullPrintStream.checkError(), "should not report errors after write operations");
         assertDoesNotThrow(nullPrintStream::flush);
         assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
-    void testPrintMethods() {
+    @DisplayName("should execute all print methods without throwing exceptions")
+    void shouldExecuteAllPrintMethodsWithoutThrowingExceptions() {
+        // Given: a new NullPrintStream instance
         final NullPrintStream nullPrintStream = new NullPrintStream();
+        // When: print methods are called with various data types
         assertDoesNotThrow(() -> nullPrintStream.print("test"));
         assertDoesNotThrow(() -> nullPrintStream.print(' '));
         assertDoesNotThrow(() -> nullPrintStream.print(true));
@@ -54,14 +67,18 @@ class NullPrintStreamTest {
         assertDoesNotThrow(() -> nullPrintStream.print(true));
         assertDoesNotThrow(() -> nullPrintStream.print(new Object()));
         assertDoesNotThrow(() -> nullPrintStream.print(new char[]{'a', 'b'}));
-        assertFalse(nullPrintStream.checkError());
+        // Then: should not report errors
+        assertFalse(nullPrintStream.checkError(), "should not report errors after print operations");
         assertDoesNotThrow(nullPrintStream::flush);
         assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
-    void testPrintlnMethods() {
+    @DisplayName("should execute all println methods without throwing exceptions")
+    void shouldExecuteAllPrintlnMethodsWithoutThrowingExceptions() {
+        // Given: a new NullPrintStream instance
         final NullPrintStream nullPrintStream = new NullPrintStream();
+        // When: println methods are called with various data types
         assertDoesNotThrow(() -> nullPrintStream.println());
         assertDoesNotThrow(() -> nullPrintStream.println("test"));
         assertDoesNotThrow(() -> nullPrintStream.println(' '));
@@ -72,38 +89,51 @@ class NullPrintStreamTest {
         assertDoesNotThrow(() -> nullPrintStream.println(true));
         assertDoesNotThrow(() -> nullPrintStream.println(new Object()));
         assertDoesNotThrow(() -> nullPrintStream.println(new char[]{'a', 'b'}));
-        assertFalse(nullPrintStream.checkError());
+        // Then: should not report errors
+        assertFalse(nullPrintStream.checkError(), "should not report errors after println operations");
         assertDoesNotThrow(nullPrintStream::flush);
         assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
-    void testAppendMethods() {
+    @DisplayName("should execute all append methods without throwing exceptions")
+    void shouldExecuteAllAppendMethodsWithoutThrowingExceptions() {
+        // Given: a new NullPrintStream instance
         final NullPrintStream nullPrintStream = new NullPrintStream();
+        // When: append methods are called with various arguments
         assertDoesNotThrow(() -> nullPrintStream.append("test"));
         assertDoesNotThrow(() -> nullPrintStream.append('c'));
         assertDoesNotThrow(() -> nullPrintStream.append("test", 0, 2));
-        assertFalse(nullPrintStream.checkError());
+        // Then: should not report errors
+        assertFalse(nullPrintStream.checkError(), "should not report errors after append operations");
         assertDoesNotThrow(nullPrintStream::flush);
         assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
-    void testFormatMethods() {
+    @DisplayName("should execute all format methods without throwing exceptions")
+    void shouldExecuteAllFormatMethodsWithoutThrowingExceptions() {
+        // Given: a new NullPrintStream instance
         final NullPrintStream nullPrintStream = new NullPrintStream();
+        // When: format methods are called with format strings
         assertDoesNotThrow(() -> nullPrintStream.format("test %s", "value"));
         assertDoesNotThrow(() -> nullPrintStream.format(Locale.US, "test %s", "value"));
-        assertFalse(nullPrintStream.checkError());
+        // Then: should not report errors
+        assertFalse(nullPrintStream.checkError(), "should not report errors after format operations");
         assertDoesNotThrow(nullPrintStream::flush);
         assertDoesNotThrow(nullPrintStream::close);
     }
 
     @Test
-    void testPrintfMethods() {
+    @DisplayName("should execute all printf methods without throwing exceptions")
+    void shouldExecuteAllPrintfMethodsWithoutThrowingExceptions() {
+        // Given: a new NullPrintStream instance
         final NullPrintStream nullPrintStream = new NullPrintStream();
+        // When: printf methods are called with format strings
         assertDoesNotThrow(() -> nullPrintStream.printf("test %s", "value"));
         assertDoesNotThrow(() -> nullPrintStream.printf(Locale.US, "test %s", "value"));
-        assertFalse(nullPrintStream.checkError());
+        // Then: should not report errors
+        assertFalse(nullPrintStream.checkError(), "should not report errors after printf operations");
         assertDoesNotThrow(nullPrintStream::flush);
         assertDoesNotThrow(nullPrintStream::close);
     }
