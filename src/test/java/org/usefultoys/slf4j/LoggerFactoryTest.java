@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ValidateCharset;
@@ -108,10 +109,10 @@ class LoggerFactoryTest {
             traceStream.print("Trace message");
             traceStream.close();
             // Then: should return print stream that logs trace messages
-            assertNotNull(traceStream, "should return non-null print stream");
             assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
             assertEquals("Trace message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
             assertEquals(MockLoggerEvent.Level.TRACE, mockLogger.getEvent(0).getLevel(), "should be trace level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.TRACE, "Trace message");
         }
 
         @Test
@@ -123,10 +124,7 @@ class LoggerFactoryTest {
             debugStream.print("Debug message");
             debugStream.close();
             // Then: should return print stream that logs debug messages
-            assertNotNull(debugStream, "should return non-null print stream");
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Debug message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.DEBUG, mockLogger.getEvent(0).getLevel(), "should be debug level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.DEBUG, "Debug message");
         }
 
         @Test
@@ -138,10 +136,7 @@ class LoggerFactoryTest {
             infoStream.print("Info message");
             infoStream.close();
             // Then: should return print stream that logs info messages
-            assertNotNull(infoStream, "should return non-null print stream");
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Info message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.INFO, mockLogger.getEvent(0).getLevel(), "should be info level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.INFO, "Info message");
         }
 
         @Test
@@ -153,10 +148,7 @@ class LoggerFactoryTest {
             warnStream.print("Warn message");
             warnStream.close();
             // Then: should return print stream that logs warn messages
-            assertNotNull(warnStream, "should return non-null print stream");
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Warn message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.WARN, mockLogger.getEvent(0).getLevel(), "should be warn level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.WARN, "Warn message");
         }
 
         @Test
@@ -168,10 +160,7 @@ class LoggerFactoryTest {
             errorStream.print("Error message");
             errorStream.close();
             // Then: should return print stream that logs error messages
-            assertNotNull(errorStream, "should return non-null print stream");
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Error message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.ERROR, mockLogger.getEvent(0).getLevel(), "should be error level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.ERROR, "Error message");
         }
     }
 
@@ -187,7 +176,6 @@ class LoggerFactoryTest {
             traceStream.println("Trace message");
             traceStream.close();
             // Then: should return NullPrintStream and not log
-            assertNotNull(traceStream, "should return non-null print stream");
             assertInstanceOf(NullPrintStream.class, traceStream, "should return NullPrintStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
@@ -201,7 +189,6 @@ class LoggerFactoryTest {
             debugStream.println("Debug message");
             debugStream.close();
             // Then: should return NullPrintStream and not log
-            assertNotNull(debugStream, "should return non-null print stream");
             assertInstanceOf(NullPrintStream.class, debugStream, "should return NullPrintStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
@@ -215,7 +202,6 @@ class LoggerFactoryTest {
             infoStream.println("Info message");
             infoStream.close();
             // Then: should return NullPrintStream and not log
-            assertNotNull(infoStream, "should return non-null print stream");
             assertInstanceOf(NullPrintStream.class, infoStream, "should return NullPrintStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
@@ -229,7 +215,6 @@ class LoggerFactoryTest {
             warnStream.println("Warn message");
             warnStream.close();
             // Then: should return NullPrintStream and not log
-            assertNotNull(warnStream, "should return non-null print stream");
             assertInstanceOf(NullPrintStream.class, warnStream, "should return NullPrintStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
@@ -243,7 +228,6 @@ class LoggerFactoryTest {
             errorStream.println("Error message");
             errorStream.close();
             // Then: should return NullPrintStream and not log
-            assertNotNull(errorStream, "should return non-null print stream");
             assertInstanceOf(NullPrintStream.class, errorStream, "should return NullPrintStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
@@ -278,10 +262,7 @@ class LoggerFactoryTest {
             traceStream.write("Trace message".getBytes(StandardCharsets.UTF_8));
             traceStream.close();
             // Then: should return output stream that logs trace messages
-            assertNotNull(traceStream, "should return non-null output stream");
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Trace message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.TRACE, mockLogger.getEvent(0).getLevel(), "should be trace level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.TRACE, "Trace message");
         }
 
         @Test
@@ -293,10 +274,7 @@ class LoggerFactoryTest {
             debugStream.write("Debug message".getBytes(StandardCharsets.UTF_8));
             debugStream.close();
             // Then: should return output stream that logs debug messages
-            assertNotNull(debugStream, "should return non-null output stream");
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Debug message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.DEBUG, mockLogger.getEvent(0).getLevel(), "should be debug level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.DEBUG, "Debug message");
         }
 
         @Test
@@ -308,10 +286,7 @@ class LoggerFactoryTest {
             infoStream.write("Info message".getBytes(StandardCharsets.UTF_8));
             infoStream.close();
             // Then: should return output stream that logs info messages
-            assertNotNull(infoStream, "should return non-null output stream");
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Info message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.INFO, mockLogger.getEvent(0).getLevel(), "should be info level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.INFO, "Info message");
         }
 
         @Test
@@ -323,10 +298,7 @@ class LoggerFactoryTest {
             warnStream.write("Warn message".getBytes(StandardCharsets.UTF_8));
             warnStream.close();
             // Then: should return output stream that logs warn messages
-            assertNotNull(warnStream, "should return non-null output stream");
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Warn message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.WARN, mockLogger.getEvent(0).getLevel(), "should be warn level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.WARN, "Warn message");
         }
 
         @Test
@@ -338,10 +310,7 @@ class LoggerFactoryTest {
             errorStream.write("Error message".getBytes(StandardCharsets.UTF_8));
             errorStream.close();
             // Then: should return output stream that logs error messages
-            assertNotNull(errorStream, "should return non-null output stream");
-            assertEquals(1, mockLogger.getEventCount(), "should have logged one event");
-            assertEquals("Error message", mockLogger.getEvent(0).getFormattedMessage(), "should log message");
-            assertEquals(MockLoggerEvent.Level.ERROR, mockLogger.getEvent(0).getLevel(), "should be error level");
+            AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.ERROR, "Error message");
         }
     }
 
@@ -357,7 +326,6 @@ class LoggerFactoryTest {
             traceStream.write("Trace message".getBytes(StandardCharsets.UTF_8));
             traceStream.close();
             // Then: should return NullOutputStream and not log
-            assertNotNull(traceStream, "should return non-null output stream");
             assertInstanceOf(NullOutputStream.class, traceStream, "should return NullOutputStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
@@ -371,7 +339,6 @@ class LoggerFactoryTest {
             debugStream.write("Debug message".getBytes(StandardCharsets.UTF_8));
             debugStream.close();
             // Then: should return NullOutputStream and not log
-            assertNotNull(debugStream, "should return non-null output stream");
             assertInstanceOf(NullOutputStream.class, debugStream, "should return NullOutputStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
@@ -385,7 +352,6 @@ class LoggerFactoryTest {
             infoStream.write("Info message".getBytes(StandardCharsets.UTF_8));
             infoStream.close();
             // Then: should return NullOutputStream and not log
-            assertNotNull(infoStream, "should return non-null output stream");
             assertInstanceOf(NullOutputStream.class, infoStream, "should return NullOutputStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
@@ -399,7 +365,6 @@ class LoggerFactoryTest {
             warnStream.write("Warn message".getBytes(StandardCharsets.UTF_8));
             warnStream.close();
             // Then: should return NullOutputStream and not log
-            assertNotNull(warnStream, "should return non-null output stream");
             assertInstanceOf(NullOutputStream.class, warnStream, "should return NullOutputStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
@@ -413,7 +378,6 @@ class LoggerFactoryTest {
             errorStream.write("Error message".getBytes(StandardCharsets.UTF_8));
             errorStream.close();
             // Then: should return NullOutputStream and not log
-            assertNotNull(errorStream, "should return non-null output stream");
             assertInstanceOf(NullOutputStream.class, errorStream, "should return NullOutputStream");
             assertEquals(0, mockLogger.getEventCount(), "should not log any events");
         }
