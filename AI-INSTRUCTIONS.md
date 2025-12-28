@@ -63,6 +63,35 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
 - Create a test group for each method or feature of the class under test
 - Use `@DisplayName` with descriptive names for all test classes and methods
 - Test method names should be descriptive and follow the pattern `shouldDoSomethingWhenCondition`
+- **Use Given-When-Then structure in test comments** for clarity and documentation:
+  ```java
+  @Test
+  @DisplayName("should do something when condition is met")
+  void shouldDoSomethingWhenConditionIsMet() {
+      // Given: initial setup describing the test preconditions
+      // When: the action being tested
+      // Then: the expected outcome or assertion
+      assertEquals(expected, actual, "should match expected value");
+  }
+  ```
+  This structure makes tests self-documenting and easier to understand and maintain.
+
+### Configuration Reset in Tests
+If a test uses a configuration class (e.g., `SessionConfig`), the test class must include the appropriate reset annotation:
+- Use `@ResetSystemConfig` for tests modifying `SystemConfig`
+- Use `@ResetSessionConfig` for tests modifying `SessionConfig`
+- Use `@ResetReporterConfig` for tests modifying `ReporterConfig` (resets all three levels, including SystemConfig and SessionConfig)
+- Use `@ResetMeterConfig` for tests modifying `MeterConfig` (resets all three levels, including SystemConfig and SessionConfig)
+- Use `@ClearParserErrors` for tests involving `ConfigParser` error handling
+
+This eliminates the need for `@BeforeAll` and `@AfterAll` methods that reset the configuration. This applies to all configuration sources, including `SystemConfig`, `MeterConfig`, `WatcherConfig`, and `ReporterConfig`.
+
+### Charset Validation in Tests
+**All test classes must declare the `@ValidateCharset` annotation** to ensure the JVM uses the expected charset.
+
+### Replace Legacy extensions 
+-  If you find `@ExtendWith(FeaturedExtension.class)` in test code, replace it with `@Featured` for consistency and clarity.
+ - Example: If you find `@ExtendWith(CharsetConsistencyExtension.class)` in test code, replace it with `@ValidateCharset`.
 
 ### Test Assertions
 - **All assertions must include a descriptive message** using "should" format (e.g., "should return non-null value", "should throw IllegalArgumentException")
