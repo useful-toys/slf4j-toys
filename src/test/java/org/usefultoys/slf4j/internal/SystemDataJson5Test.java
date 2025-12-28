@@ -16,27 +16,33 @@
 package org.usefultoys.slf4j.internal;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.test.CharsetConsistencyExtension;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for {@link SystemDataJson5}.
+ * <p>
+ * Tests verify that SystemData can be correctly serialized to and deserialized from JSON5 format,
+ * including round-trip consistency and edge case handling.
+ */
+@DisplayName("SystemDataJson5")
+@ValidateCharset
 @WithLocale("en")
-@ExtendWith(CharsetConsistencyExtension.class)
 class SystemDataJson5Test {
+
     // Concrete class for testing the abstract SystemData
     private static class TestSystemData extends SystemData {
         TestSystemData() {
-            super();
         }
 
-        TestSystemData(String sessionUuid, long position, long lastCurrentTime, long heap_commited, long heap_max, long heap_used, long nonHeap_commited, long nonHeap_max, long nonHeap_used, long objectPendingFinalizationCount, long classLoading_loaded, long classLoading_total, long classLoading_unloaded, long compilationTime, long garbageCollector_count, long garbageCollector_time, long runtime_usedMemory, long runtime_maxMemory, long runtime_totalMemory, double systemLoad) {
+        TestSystemData(final String sessionUuid, final long position, final long lastCurrentTime, final long heap_commited, final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded, final long compilationTime, final long garbageCollector_count, final long garbageCollector_time, final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory, final double systemLoad) {
             super(sessionUuid, position, lastCurrentTime, heap_commited, heap_max, heap_used, nonHeap_commited, nonHeap_max, nonHeap_used, objectPendingFinalizationCount, classLoading_loaded, classLoading_total, classLoading_unloaded, compilationTime, garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory, runtime_totalMemory, systemLoad);
         }
     }
@@ -57,46 +63,50 @@ class SystemDataJson5Test {
                 Arguments.of(
                         "Partial data: only garbageCollector_time",
                         new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0.0),
-                        String.format(",gc:[0,14]")
+                        ",gc:[0,14]"
                 ),
                 Arguments.of(
                         "Partial data: only systemLoad",
                         new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18.0),
-                        String.format(",sl:18.0")
+                        ",sl:18.0"
                 ),
                 Arguments.of(
                         "Combination: Runtime Memory + System Load",
                         new TestSystemData(uuid1, 1, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 16, 17, 18.0),
-                        String.format(",m:[15,17,16],sl:18.0")
+                        ",m:[15,17,16],sl:18.0"
                 ),
                 Arguments.of(
                         "Combination: Heap + Class Loading",
                         new TestSystemData(uuid1, 1, 1000, 2, 3, 4, 0, 0, 0, 0, 9, 10, 11, 0, 0, 0, 0, 0, 0, 0.0),
-                        String.format(",h:[4,2,3],cl:[10,9,11]")
+                        ",h:[4,2,3],cl:[10,9,11]"
                 ),
                 Arguments.of(
                         "Combination: Non-Heap + GC",
                         new TestSystemData(uuid1, 1, 1000, 0, 0, 0, 5, 6, 7, 0, 0, 0, 0, 0, 13, 14, 0, 0, 0, 0.0),
-                        String.format(",nh:[7,5,6],gc:[13,14]")
+                        ",nh:[7,5,6],gc:[13,14]"
                 )
         );
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("roundTripScenarios")
-    @DisplayName("Should correctly serialize and deserialize (round-trip)")
-    void testRoundTrip(String testName, SystemData originalData, String expectedJson) {
-        // 1. Test Serialization (Write)
+    @DisplayName("should correctly serialize and deserialize (round-trip)")
+    void testRoundTrip(final String testName, final SystemData originalData, final String expectedJson) {
+        // Given: SystemData with various field combinations
         final StringBuilder sb = new StringBuilder();
+
+        // When: data is serialized to JSON5
         SystemDataJson5.write(originalData, sb);
         final String actualJson = sb.toString();
-        assertEquals(expectedJson, actualJson);
 
-        // 2. Test Deserialization (Read)
+        // Then: serialized JSON should match expected format
+        assertEquals(expectedJson, actualJson, "Serialized JSON should match expected format for: " + testName);
+
+        // When: serialized data is deserialized
         final TestSystemData newData = new TestSystemData();
         SystemDataJson5.read(newData, "{"+actualJson+"}");
 
-        // 3. Assert Round-trip consistency
+        // Then: round-trip should preserve all data
         assertSystemDataEquals(originalData, newData);
     }
 
@@ -118,15 +128,20 @@ class SystemDataJson5Test {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("readEdgeCaseScenarios")
-    @DisplayName("Should correctly read edge cases")
-    void testReadEdgeCases(String testName, String inputJson, SystemData expectedData) {
+    @DisplayName("should correctly read edge cases")
+    void testReadEdgeCases(final String testName, final String inputJson, final SystemData expectedData) {
+        // Given: JSON5 with edge case formatting
         final TestSystemData actualData = new TestSystemData();
+
+        // When: JSON5 is deserialized
         SystemDataJson5.read(actualData, inputJson);
+
+        // Then: should handle edge cases correctly
         assertSystemDataEquals(expectedData, actualData);
     }
 
-    private static void assertSystemDataEquals(SystemData expected, SystemData actual) {
-        // SystemData fields
+    private static void assertSystemDataEquals(final SystemData expected, final SystemData actual) {
+        // ...existing assertions...
         assertEquals(expected.getHeap_commited(), actual.getHeap_commited());
         assertEquals(expected.getHeap_max(), actual.getHeap_max());
         assertEquals(expected.getHeap_used(), actual.getHeap_used());
