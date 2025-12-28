@@ -76,6 +76,31 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
   ```
   This structure makes tests self-documenting and easier to understand and maintain.
 
+### Test Validation - Charset Consistency
+
+**All test classes must declare `@ValidateCharset`** to ensure the test runs with the expected default charset. This annotation automatically validates that `SessionConfig.charset` matches `Charset.defaultCharset()`.
+
+**Important**: When using `@ValidateCharset`, **do NOT include manual charset validation assertions** like:
+```java
+// ❌ WRONG: Redundant when @ValidateCharset is present
+@ValidateCharset
+class MyTest {
+    @BeforeAll
+    static void validateCharset() {
+        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, 
+            "Test requires SessionConfig.charset = default charset");
+    }
+}
+
+// ✅ CORRECT: Just use the annotation
+@ValidateCharset
+class MyTest {
+    // No manual charset validation needed - @ValidateCharset handles it
+}
+```
+
+**When adjusting legacy tests**: Remove any manual charset validation methods or assertions that check `SessionConfig.charset == Charset.defaultCharset()` if `@ValidateCharset` is already present on the class.
+
 ### Configuration Reset in Tests
 If a test uses a configuration class (e.g., `SessionConfig`), the test class must include the appropriate reset annotation:
 - Use `@ResetSystemConfig` for tests modifying `SystemConfig`
@@ -258,6 +283,86 @@ The project uses a three-stage CI/CD pipeline:
 ### Publishing & Releases
 - **Primary goal**: Publish artifacts to Maven Central
 - **Secondary goal**: Create corresponding GitHub Releases for new versions
+
+k### MockLogger for Log Output Validation
+
+**Test classes that validate logger output must use `MockLogger` via the `@Slf4jMock` annotation and `MockLoggerExtension`.** This eliminates the need for manual MockLogger management.
+
+**Key Rules:**
+
+1. **Use `@Slf4jMock` annotation** instead of manually instantiating `MockLogger`:
+   ```java
+   @Slf4jMock  // Omit the name - uses FQN of test class automatically
+   private Logger logger;
+   ```
+   - **Preferred**: Omit the logger name to automatically use the fully qualified class name
+   - **Reason**: Prevents accidental logger reuse between test classes
+   - **Legacy tests only**: If adjusting legacy tests where the logger name is already established, use the existing logger name:
+     ```java
+     @Slf4jMock("org.usefultoys.slf4j.report.LegacyTest")  // Only if this name was already in use
+     private Logger logger;
+     ```
+
+Lo2. **Use `@WithMockLogger` annotation** on the test class:
+   - Simplifies `@ExtendWith({MockLoggerExtension.class})`
+   - The extension automatically:
+     - Initializes the MockLogger instance
+     - Sets `setEnabled(true)` before each test
+     - Resets (clears events) before and after each test
+   - **No manual `clearEvents()` calls needed**
+   - **No manual `setEnabled(true)` calls needed**
+   - **No manual @AfterEach, @AfterAll, @BeforeEach, @BeforeAll calls needed to handle MockLogger state**
+
+3. **Use `AssertLogger` for validations** instead of direct `MockLogger` assertions:
+   ```java
+   // ✅ CORRECT: Use AssertLogger methods
+   AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+       "expected substring 1",
+       "expected substring 2");
+   
+   AssertLogger.assertEventNot(logger, 0, MockLoggerEvent.Level.INFO,
+       "unexpected substring");
+   
+   // ❌ LEGACY (to be replaced):
+   // mockLogger.assertEvent(0, MockLoggerEvent.Level.INFO, Markers.SOME_MARKER);
+   // ✅ REPLACED WITH:
+   // AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "substring");
+   ```
+   - When adjusting legacy tests, **replace all `MockLogger.assert***` calls with `AssertLogger.assert***` equivalents**
+   - Example migration:
+     ```java
+     // ❌ BEFORE (legacy):
+     mockLogger.assertEvent(0, MockLoggerEvent.Level.INFO, Markers.MSG_WATCHER);
+     
+     // ✅ AFTER (new pattern):
+     AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "expected content");
+     ```
+
+**Example of correct test structure:**
+```java
+@ValidateCharset
+@ResetReporterConfig
+@WithLocale("en")
+@WithMockLogger  // Enables MockLoggerExtension automatically
+class MyLogValidationTest {
+    
+    @Slf4jMock  // Omit name - automatically uses org.usefultoys.slf4j.report.MyLogValidationTest
+    private Logger logger;
+    
+    @Test
+    @DisplayName("should log message with correct format")
+    void shouldLogMessageWithCorrectFormat() {
+        // Given: logger is initialized and enabled (automatic via @Slf4jMock and @WithMockLogger)
+        // When: code is executed
+        MyClass.doSomething();
+        
+        // Then: assertions using AssertLogger
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "expected message part 1",
+            "expected message part 2");
+    }
+}
+```
 
 ## Technical Decision Records (TDRs)
 
