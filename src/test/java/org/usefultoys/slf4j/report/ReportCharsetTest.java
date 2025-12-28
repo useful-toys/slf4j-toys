@@ -16,44 +16,48 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.AssertLogger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.nio.charset.Charset;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportCharset}.
+ * <p>
+ * Tests verify that ReportCharset correctly formats and logs charset information
+ * including default charset details, available charsets, and edge cases like empty charsets.
+ */
+@DisplayName("ReportCharset")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportCharsetTest {
 
-    @Slf4jMock("test.report.charset")
+    @Slf4jMock
     private Logger logger;
     private static final Random random = new Random();
 
-    private org.slf4j.impl.MockLogger getMockLogger() {
-        return (org.slf4j.impl.MockLogger) logger;
-    }
-
     @Test
+    @DisplayName("should log default charset information")
     void shouldLogDefaultCharsetInformation() {
-        // Arrange
+        // Given: a report with default charset
         final ReportCharset report = new ReportCharset(logger);
         final Charset defaultCharset = Charset.defaultCharset();
 
-        // Act
+        // When: report is executed
         report.run();
 
-        // Assert
+        // Then: should log charset information with default charset details
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Charset",
             " - default charset: " + defaultCharset.displayName(),
@@ -65,14 +69,15 @@ class ReportCharsetTest {
     }
 
     @Test
+    @DisplayName("should log custom charset information")
     void shouldLogCustomCharsetInformation() {
-        // Arrange: create a CharsetInfoProvider with controlled values
+        // Given: a charset info provider with custom default and available charsets
         final Charset customDefaultCharset = Charset.forName("UTF-16");
         final Map<String, Charset> customAvailableCharsets = new LinkedHashMap<>();
         customAvailableCharsets.put("UTF-16", Charset.forName("UTF-16"));
         customAvailableCharsets.put("US-ASCII", Charset.forName("US-ASCII"));
 
-        ReportCharset.CharsetInfoProvider provider = new ReportCharset.CharsetInfoProvider() {
+        final ReportCharset.CharsetInfoProvider provider = new ReportCharset.CharsetInfoProvider() {
             @Override
             public Charset defaultCharset() {
                 return customDefaultCharset;
@@ -84,17 +89,17 @@ class ReportCharsetTest {
             }
         };
 
-        ReportCharset report = new ReportCharset(logger) {
+        final ReportCharset report = new ReportCharset(logger) {
             @Override
             protected ReportCharset.CharsetInfoProvider getCharsetInfoProvider() {
                 return provider;
             }
         };
 
-        // Act
+        // When: report is executed
         report.run();
 
-        // Assert
+        // Then: should log custom charset information and verify absence of non-included charsets
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Charset",
             " - default charset: " + customDefaultCharset.displayName(),
@@ -103,16 +108,17 @@ class ReportCharsetTest {
             " - available charsets: ",
             Charset.forName("UTF-16").displayName() + "; ",
             Charset.forName("US-ASCII").displayName() + "; ");
-        assertFalse(getMockLogger().toText().contains(Charset.forName("ISO-8859-1").displayName()), "Should not contain ISO-8859-1 display name");
+        AssertLogger.assertEventNot(logger, 0, MockLoggerEvent.Level.INFO, Charset.forName("ISO-8859-1").displayName());
     }
 
     @Test
+    @DisplayName("should log empty available charsets")
     void shouldLogEmptyAvailableCharsets() {
-        // Arrange: create a CharsetInfoProvider with no available charsets
+        // Given: a charset info provider with empty available charsets map
         final Charset customDefaultCharset = Charset.forName("UTF-8");
         final Map<String, Charset> customAvailableCharsets = Collections.emptyMap();
 
-        ReportCharset.CharsetInfoProvider provider = new ReportCharset.CharsetInfoProvider() {
+        final ReportCharset.CharsetInfoProvider provider = new ReportCharset.CharsetInfoProvider() {
             @Override
             public Charset defaultCharset() {
                 return customDefaultCharset;
@@ -124,42 +130,54 @@ class ReportCharsetTest {
             }
         };
 
-        ReportCharset report = new ReportCharset(logger) {
+        final ReportCharset report = new ReportCharset(logger) {
             @Override
             protected ReportCharset.CharsetInfoProvider getCharsetInfoProvider() {
                 return provider;
             }
         };
 
-        // Act
+        // When: report is executed
         report.run();
 
-        // Assert
+        // Then: should log default charset info and empty available charsets section
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Charset",
             " - default charset: " + customDefaultCharset.displayName(),
             "; name=" + customDefaultCharset.name(),
             "; canEncode=" + customDefaultCharset.canEncode(),
             " - available charsets: ");
-        assertFalse(getMockLogger().toText().contains(Charset.forName("UTF-16").displayName()), "Should not contain UTF-16 display name");
+        AssertLogger.assertEventNot(logger, 0, MockLoggerEvent.Level.INFO, Charset.forName("UTF-16").displayName());
     }
 
     @Test
+    @DisplayName("should log ten random available charsets")
     void shouldLogTenRandomAvailableCharsets() {
+        // Given: a charset info provider with 10 random charsets
         testWithRandomCharsets(10);
     }
 
     @Test
+    @DisplayName("should log twenty random available charsets")
     void shouldLogTwentyRandomAvailableCharsets() {
+        // Given: a charset info provider with 20 random charsets
         testWithRandomCharsets(20);
     }
 
+    /**
+     * Helper method to test report with a variable number of random charsets.
+     * <p>
+     * Generates random charset selection, executes the report, and verifies that
+     * all selected charsets are included in the logged output.
+     *
+     * @param count the number of random charsets to generate and test
+     */
     private void testWithRandomCharsets(int count) {
-        // Arrange
-        final Charset customDefaultCharset = Charset.forName("UTF-8"); // Keep default for simplicity
+        // Given: a charset info provider with 'count' random charsets
+        final Charset customDefaultCharset = Charset.forName("UTF-8");
         final Map<String, Charset> randomCharsets = generateRandomCharsets(count);
 
-        ReportCharset.CharsetInfoProvider provider = new ReportCharset.CharsetInfoProvider() {
+        final ReportCharset.CharsetInfoProvider provider = new ReportCharset.CharsetInfoProvider() {
             @Override
             public Charset defaultCharset() {
                 return customDefaultCharset;
@@ -171,17 +189,17 @@ class ReportCharsetTest {
             }
         };
 
-        ReportCharset report = new ReportCharset(logger) {
+        final ReportCharset report = new ReportCharset(logger) {
             @Override
             protected ReportCharset.CharsetInfoProvider getCharsetInfoProvider() {
                 return provider;
             }
         };
 
-        // Act
+        // When: report is executed
         report.run();
 
-        // Assert
+        // Then: should log default charset and all random charsets
         final List<String> expectedFragments = new ArrayList<>(Arrays.asList(
             "Charset",
             " - default charset: " + customDefaultCharset.displayName(),
@@ -194,18 +212,26 @@ class ReportCharsetTest {
 
     /**
      * Generates a map of 'count' unique charsets randomly selected from all available charsets.
+     * <p>
      * If 'count' is greater than the total number of available charsets, all available charsets are returned.
+     *
+     * @param count the number of random charsets to select
+     * @return a LinkedHashMap with randomly selected charsets
      */
     private Map<String, Charset> generateRandomCharsets(int count) {
-        List<Charset> allAvailable = new ArrayList<>(Charset.availableCharsets().values());
-        Collections.shuffle(allAvailable, random); // Shuffle to get random order
+        final List<Charset> allAvailable = new ArrayList<>(Charset.availableCharsets().values());
+        Collections.shuffle(allAvailable, random);
 
-        Map<String, Charset> selectedCharsets = new LinkedHashMap<>();
-        int limit = Math.min(count, allAvailable.size());
+        final Map<String, Charset> selectedCharsets = new LinkedHashMap<>();
+        final int limit = Math.min(count, allAvailable.size());
         for (int i = 0; i < limit; i++) {
-            Charset charset = allAvailable.get(i);
+            final Charset charset = allAvailable.get(i);
             selectedCharsets.put(charset.name(), charset);
         }
         return selectedCharsets;
     }
 }
+
+
+
+
