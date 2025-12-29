@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright 2025 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,54 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.usefultoys.slf4j.report;
 
- import org.junit.jupiter.api.BeforeAll;
- import org.junit.jupiter.api.BeforeEach;
- import org.junit.jupiter.api.Test;
- import org.slf4j.LoggerFactory;
- import org.slf4j.impl.MockLogger;
- import org.usefultoys.slf4j.SessionConfig;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.WithLocale;
 
- import java.nio.charset.Charset;
-
- import static org.junit.jupiter.api.Assertions.assertEquals;
- import static org.junit.jupiter.api.Assertions.assertTrue;
- import static org.mockito.Mockito.doThrow;
- import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 
 /**
- * Tests SecurityException handling when accessing system properties.
+ * Unit tests for {@link ReportSystemPropertiesSecurityException}.
  * <p>
- * Uses Mockito spy to simulate SecurityException, compatible with Java 21+ where SecurityManager was removed.
+ * Tests verify that ReportSystemProperties correctly handles SecurityException
+ * when system properties cannot be accessed due to security restrictions.
+ * Uses Mockito spy to avoid interfering with System class loading.
  */
+@DisplayName("ReportSystemPropertiesSecurityException")
+@ValidateCharset
+@ResetReporterConfig
+@WithLocale("en")
+@WithMockLogger
 class ReportSystemPropertiesSecurityExceptionTest {
 
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    private MockLogger mockLogger;
-
-    @BeforeEach
-    void setUp() {
-        mockLogger = (MockLogger) LoggerFactory.getLogger(ReportSystemProperties.class);
-        mockLogger.setEnabled(true);
-        mockLogger.clearEvents();
-    }
+    @Slf4jMock
+    private Logger logger;
 
     @Test
+    @DisplayName("should handle security exception when accessing system properties")
     void shouldHandleSecurityExceptionWhenAccessingSystemProperties() {
-        final ReportSystemProperties reporter = spy(new ReportSystemProperties(mockLogger));
-        doThrow(new SecurityException("Access to system properties denied for testing"))
+        // Given: ReportSystemProperties that throws SecurityException on getSystemProperties()
+        final ReportSystemProperties reporter = spy(new ReportSystemProperties(logger));
+        doThrow(new SecurityException("Access denied"))
                 .when(reporter).getSystemProperties();
 
+        // When: report is executed
         reporter.run();
 
-        assertTrue(mockLogger.getEventCount() > 0, "should have logged at least one event");
-        final String logs = mockLogger.getEvent(0).getFormattedMessage();
-        assertTrue(logs.contains("System Properties: access denied"),
-                   "should contain access denied message, but got: " + logs);
+        // Then: should log error message
+        assertHasEvent(logger, "System Properties: access denied");
     }
 }
