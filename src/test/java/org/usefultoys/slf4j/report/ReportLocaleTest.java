@@ -16,36 +16,46 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.util.Locale;
 
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({ResetReporterConfigExtension.class, CharsetConsistencyExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportLocale}.
+ * <p>
+ * Tests verify that ReportLocale correctly reports locale information
+ * including default locale, language, country, variant, and available locales.
+ */
+@DisplayName("ReportLocale")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportLocaleTest {
 
-    @Slf4jMock("test.report.locale")
+    @Slf4jMock
     private Logger logger;
 
     @Test
+    @DisplayName("should log locale information")
     void shouldLogLocaleInformation() {
-        // Arrange
+        // Given: ReportLocale instance with default locale
         final ReportLocale report = new ReportLocale(logger);
         final Locale defaultLocale = Locale.getDefault();
 
-        // Act
+        // When: report is executed
         report.run();
 
-        // Assert
+        // Then: should log locale information including default locale and available locales
         assertEvent(logger, 0,
                 "Locale",
                 "default locale: " + defaultLocale.getDisplayName(),
