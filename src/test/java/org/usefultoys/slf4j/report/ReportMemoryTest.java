@@ -54,12 +54,12 @@ class ReportMemoryTest {
     @Test
     void shouldLogCustomJvmMemoryInformation() {
         // Arrange: create a MemoryInfoProvider with controlled values
-        ReportMemory.MemoryInfoProvider provider = new ReportMemory.MemoryInfoProvider() {
+        final ReportMemory.MemoryInfoProvider provider = new ReportMemory.MemoryInfoProvider() {
             @Override public long maxMemory() { return 1024L * 1024 * 1024; } // 1GB
             @Override public long totalMemory() { return 1024L * 1024 * 512; } // 512MB
             @Override public long freeMemory() { return 1024L * 1024 * 128; } // 128MB
         };
-        ReportMemory report = new ReportMemory(logger) {
+        final ReportMemory report = new ReportMemory(logger) {
             @Override
             protected MemoryInfoProvider getMemoryInfoProvider() {
                 return provider;
@@ -96,12 +96,12 @@ class ReportMemoryTest {
     @Test
     void shouldLogUnlimitedMaxMemoryInformation() {
         // Arrange: create a MemoryInfoProvider with unlimited maxMemory
-        ReportMemory.MemoryInfoProvider provider = new ReportMemory.MemoryInfoProvider() {
+        final ReportMemory.MemoryInfoProvider provider = new ReportMemory.MemoryInfoProvider() {
             @Override public long maxMemory() { return Long.MAX_VALUE; }
             @Override public long totalMemory() { return 1024L * 1024 * 512; } // 512MB
             @Override public long freeMemory() { return 1024L * 1024 * 128; } // 128MB
         };
-        ReportMemory report = new ReportMemory(logger) {
+        final ReportMemory report = new ReportMemory(logger) {
             @Override
             protected MemoryInfoProvider getMemoryInfoProvider() {
                 return provider;
@@ -131,3 +131,4 @@ class ReportMemoryTest {
             expectedFreeMemory);
     }
 }
+
