@@ -16,34 +16,43 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.AssertLogger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
-@ExtendWith({ResetReporterConfigExtension.class, CharsetConsistencyExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportMemory}.
+ * <p>
+ * Tests validate that ReportMemory correctly reports JVM memory information,
+ * including maximum allowed memory, allocated memory, and currently used memory.
+ */
+@DisplayName("ReportMemory")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportMemoryTest {
 
-    @Slf4jMock("test.report.memory")
+    @Slf4jMock
     private Logger logger;
 
     @Test
+    @DisplayName("should log JVM memory information")
     void shouldLogJvmMemoryInformation() {
-        // Arrange
+        // Given: ReportMemory initialized with system runtime memory info
         final ReportMemory report = new ReportMemory(logger);
 
-        // Act
+        // When: report is executed
         report.run();
 
-        // Assert: Verify the structure of the logged message without exact memory values
-        // to avoid failures due to slight memory variations during test execution
+        // Then: should log memory structure with all memory metrics
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Memory:",
             "maximum allowed:",
@@ -52,8 +61,9 @@ class ReportMemoryTest {
     }
 
     @Test
+    @DisplayName("should log custom JVM memory information with controlled values")
     void shouldLogCustomJvmMemoryInformation() {
-        // Arrange: create a MemoryInfoProvider with controlled values
+        // Given: custom MemoryInfoProvider with controlled memory values
         final ReportMemory.MemoryInfoProvider provider = new ReportMemory.MemoryInfoProvider() {
             @Override public long maxMemory() { return 1024L * 1024 * 1024; } // 1GB
             @Override public long totalMemory() { return 1024L * 1024 * 512; } // 512MB
@@ -65,10 +75,11 @@ class ReportMemoryTest {
                 return provider;
             }
         };
-        // Act
+
+        // When: report is executed
         report.run();
-        // Assert
-        // Use AssertLogger to validate the INFO report contents
+
+        // Then: should log formatted memory values matching the provider values
         final long maxMemory = provider.maxMemory();
         final long totalMemory = provider.totalMemory();
         final long freeMemory = provider.freeMemory();
@@ -94,8 +105,9 @@ class ReportMemoryTest {
     }
 
     @Test
+    @DisplayName("should log unlimited max memory with special handling")
     void shouldLogUnlimitedMaxMemoryInformation() {
-        // Arrange: create a MemoryInfoProvider with unlimited maxMemory
+        // Given: MemoryInfoProvider with unlimited maxMemory (Long.MAX_VALUE)
         final ReportMemory.MemoryInfoProvider provider = new ReportMemory.MemoryInfoProvider() {
             @Override public long maxMemory() { return Long.MAX_VALUE; }
             @Override public long totalMemory() { return 1024L * 1024 * 512; } // 512MB
@@ -107,10 +119,11 @@ class ReportMemoryTest {
                 return provider;
             }
         };
-        // Act
+
+        // When: report is executed
         report.run();
-        // Assert
-        // Use AssertLogger to validate the INFO report contents
+
+        // Then: should display "no limit" for max memory and "n/a" for additional available memory
         final long maxMemory = provider.maxMemory();
         final long totalMemory = provider.totalMemory();
         final long freeMemory = provider.freeMemory();
@@ -131,4 +144,3 @@ class ReportMemoryTest {
             expectedFreeMemory);
     }
 }
-
