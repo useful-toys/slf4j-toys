@@ -17,31 +17,41 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportJvmArguments}.
+ * <p>
+ * Tests verify that ReportJvmArguments correctly reports JVM arguments
+ * and censors sensitive arguments based on configurable regex patterns.
+ */
+@DisplayName("ReportJvmArguments")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportJvmArgumentsTest {
 
-    @Slf4jMock("test.report.jvm.arguments")
+    @Slf4jMock
     private Logger logger;
     private MockedStatic<ManagementFactory> mockedManagementFactory;
     private RuntimeMXBean mockRuntimeMXBean;
@@ -51,7 +61,6 @@ class ReportJvmArgumentsTest {
         if (mockedManagementFactory != null) {
             mockedManagementFactory.close(); // Close the mock static
         }
-        System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
     }
 
     private void setupManagedFactory() {
@@ -61,22 +70,28 @@ class ReportJvmArgumentsTest {
     }
 
     @Test
-    void testJvmArgumentsAreReported() {
+    @DisplayName("should report JVM arguments")
+    void shouldReportJvmArguments() {
+        // Given: JVM arguments configured in RuntimeMXBean
         setupManagedFactory();
-        List<String> jvmArgs = Arrays.asList("-Xmx512m", "-Djava.awt.headless=true");
+        final List<String> jvmArgs = Arrays.asList("-Xmx512m", "-Djava.awt.headless=true");
         when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
 
+        // When: report is executed
         new ReportJvmArguments(logger).run();
 
+        // Then: should log all JVM arguments
         assertHasEvent(logger, "JVM Arguments:");
         assertHasEvent(logger, " - -Xmx512m");
         assertHasEvent(logger, " - -Djava.awt.headless=true");
     }
 
     @Test
-    void testSensitiveJvmArgumentsAreCensoredWithDefaultRegex() {
+    @DisplayName("should censor sensitive JVM arguments with default regex")
+    void shouldCensorSensitiveJvmArgumentsWithDefaultRegex() {
+        // Given: JVM arguments with sensitive properties
         setupManagedFactory();
-        List<String> jvmArgs = Arrays.asList(
+        final List<String> jvmArgs = Arrays.asList(
                 "-Xmx512m",
                 "-Dmy.password=secret123",
                 "-Ddb.key=dbkeyvalue",
@@ -84,38 +99,48 @@ class ReportJvmArgumentsTest {
         );
         when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
 
+        // When: report is executed
         new ReportJvmArguments(logger).run();
 
+        // Then: sensitive arguments should be censored with default regex
         assertHasEvent(logger, " - -Dmy.password=********");
         assertHasEvent(logger, " - -Ddb.key=********");
         assertHasEvent(logger, " - -Dnormal.prop=normalvalue");
     }
 
     @Test
-    void testSensitiveJvmArgumentsAreCensoredWithCustomRegex() {
+    @DisplayName("should censor sensitive JVM arguments with custom regex")
+    void shouldCensorSensitiveJvmArgumentsWithCustomRegex() {
+        // Given: custom forbidden regex and JVM arguments
         setupManagedFactory();
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*custom.*");
         ReporterConfig.init(); // Reinitialize to apply custom regex
 
-        List<String> jvmArgs = Arrays.asList(
+        final List<String> jvmArgs = Arrays.asList(
                 "-Dapp.custom.token=tokenvalue",
                 "-Dapp.normal=normalvalue"
         );
         when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
 
+        // When: report is executed
         new ReportJvmArguments(logger).run();
 
+        // Then: arguments matching custom regex should be censored
         assertHasEvent(logger, " - -Dapp.custom.token=********");
         assertHasEvent(logger, " - -Dapp.normal=normalvalue");
     }
 
     @Test
-    void testNoJvmArgumentsFound() {
+    @DisplayName("should handle no JVM arguments")
+    void shouldHandleNoJvmArguments() {
+        // Given: no JVM arguments available
         setupManagedFactory();
-        when(mockRuntimeMXBean.getInputArguments()).thenReturn(Arrays.asList());
+        when(mockRuntimeMXBean.getInputArguments()).thenReturn(Collections.emptyList());
 
+        // When: report is executed
         new ReportJvmArguments(logger).run();
 
+        // Then: should log that no arguments were found
         assertHasEvent(logger, " - No JVM arguments found.");
     }
 }
