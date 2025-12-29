@@ -16,17 +16,16 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4jtestmock.AssertLogger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
-import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4j.utils.ConfigParser;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.io.IOException;
@@ -34,27 +33,28 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportContainerInfo}.
+ * <p>
+ * Tests verify that ReportContainerInfo correctly detects and logs container environment information
+ * including Docker, Kubernetes, cgroup limits, and various error scenarios.
+ */
+@DisplayName("ReportContainerInfo")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportContainerInfoTest {
 
-    private static final String TEST_LOGGER_NAME = "test.report.container";
-    @Slf4jMock(TEST_LOGGER_NAME)
+    @Slf4jMock
     private Logger logger;
 
-    private org.slf4j.impl.MockLogger getMockLogger() {
-        return (org.slf4j.impl.MockLogger) logger;
-    }
-
-    // Helper method to create a ReportContainerInfo instance with mocked environment and file system
-    private ReportContainerInfo createReportContainerInfo(Map<String, String> envMap, Map<String, String> fileContentMap) {
-        final MockLogger mockLogger = getMockLogger();
-        mockLogger.clearEvents();
-        mockLogger.setInfoEnabled(true);
-        mockLogger.setWarnEnabled(true);
+    /**
+     * Helper method to create a ReportContainerInfo instance with mocked environment and file system.
+     */
+    private ReportContainerInfo createReportContainerInfo(final Map<String, String> envMap, final Map<String, String> fileContentMap) {
         return new ReportContainerInfo(logger) {
             @Override
             protected Map<String, String> getEnvironmentVariables() {
@@ -62,8 +62,7 @@ class ReportContainerInfoTest {
             }
 
             @Override
-            protected String readFileContent(String path) throws IOException {
-                // Simulate IOException if a specific path is marked for it
+            protected String readFileContent(final String path) throws IOException {
                 if ("throw_io_exception".equals(fileContentMap.get(path))) {
                     throw new IOException("Simulated IO Error for " + path);
                 }
@@ -73,20 +72,25 @@ class ReportContainerInfoTest {
     }
 
     @Test
+    @DisplayName("should report container info for Docker")
     void testContainerInfoIsReportedForDocker() {
-        Map<String, String> env = new HashMap<>();
+        // Given: Docker environment with container ID and resource limits
+        final Map<String, String> env = new HashMap<>();
         env.put("HOSTNAME", "my-docker-container");
         env.put("DOCKER_CONTAINER_ID", "a1b2c3d4e5f6");
 
-        Map<String, String> fileContent = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
         fileContent.put("/proc/self/cgroup", "1:name=systemd:/docker/a1b2c3d4e5f67890abcdef1234567890");
         fileContent.put("/sys/fs/cgroup/memory/memory.limit_in_bytes", "1073741824"); // 1GB
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "100000"); // 1 CPU
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", "100000");
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
+        // Then: should log Docker container info with all details
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Container Info:",
             " - Hostname: my-docker-container",
@@ -95,27 +99,31 @@ class ReportContainerInfoTest {
             " - CPU Limit: 1.00 cores",
             " - Docker Container ID (env): a1b2c3d4e5f6");
         assertTrue(ConfigParser.isInitializationOK());
-        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
     }
 
     @Test
+    @DisplayName("should report container info for Kubernetes")
     void testContainerInfoIsReportedForKubernetes() {
-        Map<String, String> env = new HashMap<>();
+        // Given: Kubernetes environment with pod and namespace info
+        final Map<String, String> env = new HashMap<>();
         env.put("HOSTNAME", "my-pod-123");
         env.put("KUBERNETES_POD_NAME", "my-app-pod-xyz");
         env.put("KUBERNETES_NAMESPACE", "production");
         env.put("KUBERNETES_NODE_NAME", "worker-node-1");
 
-        Map<String, String> fileContent = new HashMap<>();
-        // Simulate cgroup files not existing for simplicity in Kubernetes context
+        final Map<String, String> fileContent = new HashMap<>();
         fileContent.put("/proc/self/cgroup", null);
         fileContent.put("/sys/fs/cgroup/memory/memory.limit_in_bytes", null);
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", null);
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", null);
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
+        // Then: should log Kubernetes pod info with unavailable cgroup limits
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Container Info:",
             " - Hostname: my-pod-123",
@@ -126,21 +134,26 @@ class ReportContainerInfoTest {
             " - Memory Limit: Not available (not in Linux container or no read access)",
             " - CPU Limit: Not available (not in Linux container or no read access)");
         assertTrue(ConfigParser.isInitializationOK());
-        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
     }
 
     @Test
+    @DisplayName("should report when not running in container")
     void testContainerInfoNotAvailableWhenNotInContainer() {
-        Map<String, String> env = Collections.emptyMap();
-        Map<String, String> fileContent = new HashMap<>();
+        // Given: non-container environment with no cgroup files
+        final Map<String, String> env = Collections.emptyMap();
+        final Map<String, String> fileContent = new HashMap<>();
         fileContent.put("/proc/self/cgroup", null);
         fileContent.put("/sys/fs/cgroup/memory/memory.limit_in_bytes", null);
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", null);
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", null);
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
+        // Then: should log unavailable container info
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Container Info:",
             " - Hostname: unknown",
@@ -148,150 +161,185 @@ class ReportContainerInfoTest {
             " - Memory Limit: Not available (not in Linux container or no read access)",
             " - CPU Limit: Not available (not in Linux container or no read access)");
         assertTrue(ConfigParser.isInitializationOK());
-        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
     }
 
     @Test
+    @DisplayName("should handle cgroup file read error")
     void testCgroupFileReadError() {
-        Map<String, String> env = new HashMap<>();
+        // Given: environment with cgroup file read error
+        final Map<String, String> env = new HashMap<>();
         env.put("HOSTNAME", "test-host");
 
-        Map<String, String> fileContent = new HashMap<>();
-        fileContent.put("/proc/self/cgroup", "throw_io_exception"); // Special value to trigger IOException in mock
+        final Map<String, String> fileContent = new HashMap<>();
+        fileContent.put("/proc/self/cgroup", "throw_io_exception");
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
-        final int infoEventIndex = getMockLogger().getEventCount() - 1;
-
-        AssertLogger.assertEvent(logger, infoEventIndex, MockLoggerEvent.Level.INFO,
-            "Container Info:",
-            " - Hostname: test-host",
-            " - Container ID (cgroup): Error reading cgroup file");
-        assertEquals(1, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "One WARN log expected");
-        assertTrue(getMockLogger().getLoggerEvents().stream().anyMatch(e -> e.getFormattedMessage().contains("Failed to read /proc/self/cgroup: Simulated IO Error for /proc/self/cgroup")));
+        // Then: should log error reading cgroup and warning message
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.WARN,
+                "Failed to read /proc/self/cgroup: Simulated IO Error for /proc/self/cgroup");
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO,
+                "Container Info:",
+                " - Hostname: test-host",
+                " - Container ID (cgroup): Error reading cgroup file");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
+    @DisplayName("should handle memory limit parsing error")
     void testMemoryLimitParsingError() {
-        Map<String, String> env = new HashMap<>();
-        Map<String, String> fileContent = new HashMap<>();
+        // Given: environment with invalid memory limit value
+        final Map<String, String> env = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
         fileContent.put("/sys/fs/cgroup/memory/memory.limit_in_bytes", "invalid_number");
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
-        final int infoEventIndex = getMockLogger().getEventCount() - 1;
-
-        AssertLogger.assertEvent(logger, infoEventIndex, MockLoggerEvent.Level.INFO,
-            "Container Info:",
-            " - Memory Limit: Error reading");
-        assertEquals(1, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "One WARN log expected");
-        assertTrue(getMockLogger().getLoggerEvents().stream().anyMatch(e -> e.getFormattedMessage().contains("Failed to read memory limit from cgroup: For input string: \"invalid_number\"")));
+        // Then: should log error reading memory limit and warning message
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.WARN,
+                "Failed to read memory limit from cgroup: For input string: \"invalid_number\"");
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO,
+                "Container Info:",
+                " - Memory Limit: Error reading");
         assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
+    @DisplayName("should handle CPU limit parsing error")
     void testCpuLimitParsingError() {
-        Map<String, String> env = new HashMap<>();
-        Map<String, String> fileContent = new HashMap<>();
+        // Given: environment with invalid CPU quota value
+        final Map<String, String> env = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "invalid_quota");
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", "100000");
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
-        final int infoEventIndex = getMockLogger().getEventCount() - 1;
+        // Then: should log error reading CPU limit and warning message
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO,
+                "Container Info:",
+                " - CPU Limit: Error reading");
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.WARN,
+                "Failed to read CPU limit from cgroup: For input string: \"invalid_quota\"");
 
-        AssertLogger.assertEvent(logger, infoEventIndex, MockLoggerEvent.Level.INFO,
-            "Container Info:",
-            " - CPU Limit: Error reading");
-        assertEquals(1, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "One WARN log expected");
-        assertTrue(getMockLogger().getLoggerEvents().stream().anyMatch(e -> e.getFormattedMessage().contains("Failed to read CPU limit from cgroup: For input string: \"invalid_quota\"")));
         assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
+    @DisplayName("should handle cgroup container ID pattern no match")
     void testCgroupContainerIdPatternNoMatch() {
-        Map<String, String> env = new HashMap<>();
-        Map<String, String> fileContent = new HashMap<>();
-        fileContent.put("/proc/self/cgroup", "1:name=systemd:/some/other/path"); // Does not match Docker pattern
+        // Given: environment with cgroup path that doesn't match Docker pattern
+        final Map<String, String> env = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
+        fileContent.put("/proc/self/cgroup", "1:name=systemd:/some/other/path");
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
+        // Then: should log that container ID not found in cgroup
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Container Info:",
             " - Container ID (cgroup): Not found in cgroup (not a Docker container?)");
-        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
         assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
+    @DisplayName("should report when memory limit has no limit set")
     void testMemoryLimitNoLimitSet() {
-        Map<String, String> env = new HashMap<>();
-        Map<String, String> fileContent = new HashMap<>();
-        fileContent.put("/sys/fs/cgroup/memory/memory.limit_in_bytes", String.valueOf(Long.MAX_VALUE)); // Simulate no limit
+        // Given: environment with no memory limit (MAX_VALUE)
+        final Map<String, String> env = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
+        fileContent.put("/sys/fs/cgroup/memory/memory.limit_in_bytes", String.valueOf(Long.MAX_VALUE));
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
+        // Then: should log no memory limit set
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Container Info:",
             " - Memory Limit: No limit set");
-        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
         assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
+    @DisplayName("should report when CPU limit has no limit set")
     void testCpuLimitNoLimitSet() {
-        Map<String, String> env = new HashMap<>();
-        Map<String, String> fileContent = new HashMap<>();
-        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "-1"); // -1 indicates no quota
+        // Given: environment with no CPU limit (quota = -1)
+        final Map<String, String> env = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
+        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "-1");
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", "100000");
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
+        // Then: should log no CPU limit set
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Container Info:",
             " - CPU Limit: No limit set");
-        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
         assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
+    @DisplayName("should report when CPU limit has zero quota")
     void testCpuLimitZeroQuota() {
-        Map<String, String> env = new HashMap<>();
-        Map<String, String> fileContent = new HashMap<>();
-        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "0"); // Zero quota
+        // Given: environment with zero CPU quota
+        final Map<String, String> env = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
+        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "0");
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", "100000");
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
+        // Then: should log no CPU limit set
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Container Info:",
             " - CPU Limit: No limit set");
-        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
         assertTrue(ConfigParser.isInitializationOK());
     }
 
     @Test
+    @DisplayName("should report when CPU limit has zero period")
     void testCpuLimitZeroPeriod() {
-        Map<String, String> env = new HashMap<>();
-        Map<String, String> fileContent = new HashMap<>();
+        // Given: environment with zero CPU period
+        final Map<String, String> env = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
         fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "100000");
-        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", "0"); // Zero period
+        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", "0");
 
-        ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
         reporter.run();
 
+        // Then: should log no CPU limit set and no warnings
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Container Info:",
             " - CPU Limit: No limit set");
-        assertEquals(0, getMockLogger().getLoggerEvents().stream().filter(e -> e.getLevel() == MockLoggerEvent.Level.WARN).count(), "No WARN logs expected");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
         assertTrue(ConfigParser.isInitializationOK());
     }
 }
