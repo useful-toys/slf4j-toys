@@ -16,6 +16,7 @@
 
 package org.usefultoys.slf4j.report;
 
+import jakarta.servlet.ServletContextEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,11 +25,8 @@ import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ResetReporterConfig;
-import org.usefultoys.test.ResetSystemProperty;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
-
-import jakarta.servlet.ServletContextEvent;
 
 import static org.mockito.Mockito.mock;
 
@@ -55,21 +53,6 @@ class ReportContextListenerTest {
 
     @Test
     @DisplayName("should log reports on context initialization")
-    @ResetSystemProperty(ReporterConfig.PROP_NAME)
-    @ResetSystemProperty(ReporterConfig.PROP_VM)
-    @ResetSystemProperty(ReporterConfig.PROP_MEMORY)
-    @ResetSystemProperty(ReporterConfig.PROP_USER)
-    @ResetSystemProperty(ReporterConfig.PROP_OPERATING_SYSTEM)
-    @ResetSystemProperty(ReporterConfig.PROP_PHYSICAL_SYSTEM)
-    @ResetSystemProperty(ReporterConfig.PROP_ENVIRONMENT)
-    @ResetSystemProperty(ReporterConfig.PROP_PROPERTIES)
-    @ResetSystemProperty(ReporterConfig.PROP_FILE_SYSTEM)
-    @ResetSystemProperty(ReporterConfig.PROP_CALENDAR)
-    @ResetSystemProperty(ReporterConfig.PROP_LOCALE)
-    @ResetSystemProperty(ReporterConfig.PROP_CHARSET)
-    @ResetSystemProperty(ReporterConfig.PROP_NETWORK_INTERFACE)
-    @ResetSystemProperty(ReporterConfig.PROP_SSL_CONTEXT)
-    @ResetSystemProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE)
     void shouldLogReportsOnContextInitialization() {
         // Given: reporter configured to use test logger with only VM report enabled
         System.setProperty(ReporterConfig.PROP_NAME, getClass().getCanonicalName());
@@ -108,7 +91,6 @@ class ReportContextListenerTest {
         listener.contextDestroyed(event);
 
         // Then: no side effects expected — especially no logging
-        AssertLogger.assertNoEvent(logger, "Java Virtual Machine");
-        AssertLogger.assertNoEvent(logger, "Physical system");
+        AssertLogger.assertEventCount(logger, 0);
     }
 }
