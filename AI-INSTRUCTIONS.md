@@ -51,6 +51,58 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
 - Write clear, concise descriptions that explain the method's purpose and behavior
 - Use proper Javadoc formatting with complete sentences ending in periods
 
+### Test Class Javadoc Requirements
+**All test classes must include a Javadoc that documents what the tests are covering.**
+
+The test class Javadoc must include:
+1. **Brief description**: What class/feature is being tested (use `{@link ClassName}` for the class under test)
+2. **Coverage section**: Detailed list of what the tests validate and cover
+
+**Format:**
+```java
+/**
+ * Unit tests for {@link ClassUnderTest}.
+ * <p>
+ * Tests validate that ClassUnderTest correctly [main functionality description].
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Feature 1:</b> Description of what is validated</li>
+ *   <li><b>Feature 2:</b> Description of what is validated</li>
+ *   <li><b>Edge Case 1:</b> Description of what is validated</li>
+ * </ul>
+ */
+@ValidateCharset
+class MyClassTest {
+    // ... test methods
+}
+```
+
+**Example:**
+```java
+/**
+ * Unit tests for {@link Session}.
+ * <p>
+ * Tests validate that Session correctly generates and manages UUIDs,
+ * with proper immutability and formatting validation.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>UUID Generation:</b> Verifies that Session generates a non-null UUID on first access</li>
+ *   <li><b>UUID Immutability:</b> Ensures that the UUID remains constant across multiple accesses</li>
+ *   <li><b>UUID Format:</b> Validates that generated UUIDs are 32-character hexadecimal strings</li>
+ *   <li><b>Short UUID with Default Size:</b> Tests shortSessionUuid() method with default SessionConfig.uuidSize</li>
+ *   <li><b>Short UUID with Custom Size:</b> Tests shortSessionUuid() method with custom SessionConfig.uuidSize configuration</li>
+ * </ul>
+ */
+```
+
+This makes it clear to future readers:
+- What component is being tested
+- What specific aspects/features are covered by the test suite
+- What edge cases are handled
+- How to add new tests to extend coverage
+
 ## Testing Standards
 
 ### Testing
