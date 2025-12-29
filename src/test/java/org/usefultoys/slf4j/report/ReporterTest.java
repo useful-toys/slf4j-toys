@@ -83,8 +83,8 @@ class ReporterTest {
         ReporterConfig.init();
 
         // Use a custom executor to count executions
-        AtomicInteger executionCount = new AtomicInteger(0);
-        Executor countingExecutor = command -> {
+        final AtomicInteger executionCount = new AtomicInteger(0);
+        final Executor countingExecutor = command -> {
             command.run();
             executionCount.incrementAndGet();
         };
@@ -110,8 +110,8 @@ class ReporterTest {
 
         ReporterConfig.init();
 
-        AtomicInteger executionCount = new AtomicInteger(0);
-        Executor countingExecutor = command -> {
+        final AtomicInteger executionCount = new AtomicInteger(0);
+        final Executor countingExecutor = command -> {
             command.run();
             executionCount.incrementAndGet();
         };
@@ -149,8 +149,8 @@ class ReporterTest {
         System.setProperty(ReporterConfig.PROP_CONTAINER_INFO, "false");
         ReporterConfig.init();
 
-        AtomicInteger executionCount = new AtomicInteger(0);
-        Executor countingExecutor = command -> {
+        final AtomicInteger executionCount = new AtomicInteger(0);
+        final Executor countingExecutor = command -> {
             command.run();
             executionCount.incrementAndGet();
         };
@@ -189,15 +189,15 @@ class ReporterTest {
         System.setProperty(ReporterConfig.PROP_NETWORK_INTERFACE, "true");
         ReporterConfig.init();
 
-        Reporter testReporter = new Reporter(logger) {
+        final Reporter testReporter = new Reporter(logger) {
             @Override
             protected Enumeration<NetworkInterface> getNetworkInterfaces() throws SocketException {
                 throw new SocketException("Simulated network error");
             }
         };
 
-        AtomicInteger executionCount = new AtomicInteger(0);
-        Executor countingExecutor = command -> {
+        final AtomicInteger executionCount = new AtomicInteger(0);
+        final Executor countingExecutor = command -> {
             command.run();
             executionCount.incrementAndGet();
         };
@@ -218,7 +218,7 @@ class ReporterTest {
         ReporterConfig.init();
 
         // Mock NetworkInterface 1 (e.g., eth0)
-        NetworkInterface mockNif1 = mock(NetworkInterface.class);
+        final NetworkInterface mockNif1 = mock(NetworkInterface.class);
         when(mockNif1.getName()).thenReturn("eth0");
         when(mockNif1.getDisplayName()).thenReturn("Ethernet 0");
         when(mockNif1.getMTU()).thenReturn(1500);
@@ -228,7 +228,7 @@ class ReporterTest {
         when(mockNif1.isVirtual()).thenReturn(false);
         when(mockNif1.supportsMulticast()).thenReturn(true);
         when(mockNif1.getHardwareAddress()).thenReturn(new byte[]{0x00, 0x11, 0x22, 0x33, 0x44, 0x55});
-        Inet4Address mockIpv4_1 = mock(Inet4Address.class);
+        final Inet4Address mockIpv4_1 = mock(Inet4Address.class);
         when(mockIpv4_1.getHostAddress()).thenReturn("192.168.1.10");
         when(mockIpv4_1.getHostName()).thenReturn("host1.local");
         when(mockIpv4_1.getCanonicalHostName()).thenReturn("host1.local");
@@ -242,7 +242,7 @@ class ReporterTest {
 
 
         // Mock NetworkInterface 2 (e.g., lo)
-        NetworkInterface mockNif2 = mock(NetworkInterface.class);
+        final NetworkInterface mockNif2 = mock(NetworkInterface.class);
         when(mockNif2.getName()).thenReturn("lo");
         when(mockNif2.getDisplayName()).thenReturn("Loopback");
         when(mockNif2.getMTU()).thenReturn(65536);
@@ -252,7 +252,7 @@ class ReporterTest {
         when(mockNif2.isVirtual()).thenReturn(false);
         when(mockNif2.supportsMulticast()).thenReturn(false);
         when(mockNif2.getHardwareAddress()).thenReturn(null);
-        Inet4Address mockIpv4_2 = mock(Inet4Address.class);
+        final Inet4Address mockIpv4_2 = mock(Inet4Address.class);
         when(mockIpv4_2.getHostAddress()).thenReturn("127.0.0.1");
         when(mockIpv4_2.getHostName()).thenReturn("localhost");
         when(mockIpv4_2.getCanonicalHostName()).thenReturn("localhost");
@@ -265,20 +265,20 @@ class ReporterTest {
         when(mockNif2.getInetAddresses()).thenReturn(Collections.enumeration(Collections.singletonList(mockIpv4_2)));
 
 
-        Vector<NetworkInterface> nifs = new Vector<>();
+        final Vector<NetworkInterface> nifs = new Vector<>();
         nifs.add(mockNif1);
         nifs.add(mockNif2);
-        Enumeration<NetworkInterface> mockEnumeration = nifs.elements();
+        final Enumeration<NetworkInterface> mockEnumeration = nifs.elements();
 
-        Reporter testReporter = new Reporter(logger) {
+        final Reporter testReporter = new Reporter(logger) {
             @Override
             protected Enumeration<NetworkInterface> getNetworkInterfaces() throws SocketException {
                 return mockEnumeration;
             }
         };
 
-        AtomicInteger executionCount = new AtomicInteger(0);
-        Executor countingExecutor = command -> {
+        final AtomicInteger executionCount = new AtomicInteger(0);
+        final Executor countingExecutor = command -> {
             command.run();
             executionCount.incrementAndGet();
         };
@@ -295,15 +295,15 @@ class ReporterTest {
 
     @Test
     void testReporterDefaultConstructor() {
-        String customLoggerName = "my.custom.logger";
+        final String customLoggerName = "my.custom.logger";
         System.setProperty(ReporterConfig.PROP_NAME, customLoggerName);
         ReporterConfig.init();
 
         // Create a new Logger for the custom name to capture its events
-        Logger customLogger = LoggerFactory.getLogger(customLoggerName);
+        final Logger customLogger = LoggerFactory.getLogger(customLoggerName);
         ((MockLogger) customLogger).clearEvents();
 
-        Reporter defaultReporter = new Reporter();
+        final Reporter defaultReporter = new Reporter();
         // Now, when defaultReporter logs, it should log to customLogger.
         // Let's enable a report and see if it logs to the customLogger.
         System.setProperty(ReporterConfig.PROP_VM, "true");
@@ -313,10 +313,6 @@ class ReporterTest {
 
         AssertLogger.assertHasEvent(customLogger, "Physical system");
         AssertLogger.assertNoEvent(logger, "Physical system");
-
-        // Reset for other tests
-        System.clearProperty(ReporterConfig.PROP_NAME);
-        ReporterConfig.init();
     }
 
     @Test
@@ -328,8 +324,8 @@ class ReporterTest {
         System.setProperty(ReporterConfig.PROP_PROPERTIES, "true");
         ReporterConfig.init();
 
-        AtomicInteger executionCount = new AtomicInteger(0);
-        Executor countingExecutor = command -> {
+        final AtomicInteger executionCount = new AtomicInteger(0);
+        final Executor countingExecutor = command -> {
             command.run();
             executionCount.incrementAndGet();
         };
