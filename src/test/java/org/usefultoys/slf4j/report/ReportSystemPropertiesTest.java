@@ -16,44 +16,54 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.utils.ConfigParser;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ResetSystemProperty;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportSystemProperties}.
+ * <p>
+ * Tests verify that ReportSystemProperties correctly reports system properties
+ * and censors sensitive properties based on configurable regex patterns.
+ */
+@DisplayName("ReportSystemProperties")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportSystemPropertiesTest {
 
-    @Slf4jMock("test.logger.props")
+    @Slf4jMock
     private Logger logger;
 
-    @AfterEach
-    void tearDown() {
-        // Clear test properties
-        System.clearProperty("test.password");
-        System.clearProperty("test.secret");
-        System.clearProperty("test.normal");
-    }
 
     @Test
-    void testSensitivePropertiesAreCensoredWithDefaultRegex() {
+    @DisplayName("should censor sensitive properties with default regex")
+    @ResetSystemProperty("test.password")
+    @ResetSystemProperty("test.secret")
+    @ResetSystemProperty("test.normal")
+    void shouldCensorSensitivePropertiesWithDefaultRegex() {
+        // Given: system properties with sensitive and normal values
         System.setProperty("test.password", "mysecretpassword");
         System.setProperty("test.secret", "anothersecret");
         System.setProperty("test.normal", "normalvalue");
 
+        // When: report is executed
         new ReportSystemProperties(logger).run();
 
+        // Then: sensitive properties should be censored with default regex
         assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "test.password: ********",
                 "test.secret: ********",
@@ -62,15 +72,21 @@ class ReportSystemPropertiesTest {
     }
 
     @Test
-    void testSensitivePropertiesAreCensoredWithCustomRegex() {
+    @DisplayName("should censor sensitive properties with custom regex")
+    @ResetSystemProperty("test.custom.key")
+    @ResetSystemProperty("test.normal")
+    void shouldCensorSensitivePropertiesWithCustomRegex() {
+        // Given: custom forbidden regex and system properties
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*custom.*");
         ReporterConfig.init(); // Reinitialize to apply custom regex
 
         System.setProperty("test.custom.key", "customvalue");
         System.setProperty("test.normal", "normalvalue");
 
+        // When: report is executed
         new ReportSystemProperties(logger).run();
 
+        // Then: properties matching custom regex should be censored
         assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "test.custom.key: ********",
                 "test.normal: normalvalue");
@@ -78,15 +94,21 @@ class ReportSystemPropertiesTest {
     }
 
     @Test
-    void testNoCensoringWhenRegexIsEmpty() {
+    @DisplayName("should not censor when regex is empty")
+    @ResetSystemProperty("test.password")
+    @ResetSystemProperty("test.secret")
+    void shouldNotCensorWhenRegexIsEmpty() {
+        // Given: empty forbidden regex and system properties
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "");
         ReporterConfig.init(); // Reinitialize to apply empty regex
 
         System.setProperty("test.password", "mysecretpassword");
         System.setProperty("test.secret", "anothersecret");
 
+        // When: report is executed
         new ReportSystemProperties(logger).run();
 
+        // Then: no properties should be censored
         assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "test.password: mysecretpassword",
                 "test.secret: anothersecret");
@@ -94,15 +116,21 @@ class ReportSystemPropertiesTest {
     }
 
     @Test
-    void testNoCensoringWhenRegexDoesNotMatch() {
+    @DisplayName("should not censor when regex does not match")
+    @ResetSystemProperty("test.password")
+    @ResetSystemProperty("test.secret")
+    void shouldNotCensorWhenRegexDoesNotMatch() {
+        // Given: non-matching forbidden regex and system properties
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, ".*nonexistent.*");
         ReporterConfig.init(); // Reinitialize to apply non-matching regex
 
         System.setProperty("test.password", "mysecretpassword");
         System.setProperty("test.secret", "anothersecret");
 
+        // When: report is executed
         new ReportSystemProperties(logger).run();
 
+        // Then: no properties should be censored since regex doesn't match
         assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "test.password: mysecretpassword",
                 "test.secret: anothersecret");
