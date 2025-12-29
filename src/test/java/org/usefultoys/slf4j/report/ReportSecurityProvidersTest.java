@@ -18,18 +18,18 @@ package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.slf4jtestmock.AssertLogger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.security.Provider;
@@ -40,11 +40,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportSecurityProviders}.
+ * <p>
+ * Tests verify that ReportSecurityProviders correctly reports security provider information
+ * including provider names, versions, info descriptions, and available services.
+ */
+@DisplayName("ReportSecurityProviders")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportSecurityProvidersTest {
 
-    @Slf4jMock("test.logger")
+    @Slf4jMock
     private Logger logger;
     private MockedStatic<Security> mockedSecurity;
 
@@ -60,7 +69,9 @@ class ReportSecurityProvidersTest {
     }
 
     @Test
-    void testSecurityProvidersAreReported() {
+    @DisplayName("should report security providers with services")
+    void shouldReportSecurityProvidersWithServices() {
+        // Given: two security providers with services configured
         Provider provider1 = mock(Provider.class);
         when(provider1.getName()).thenReturn("SUN");
         when(provider1.getVersion()).thenReturn(1.8);
@@ -75,8 +86,10 @@ class ReportSecurityProvidersTest {
 
         when(Security.getProviders()).thenReturn(new Provider[]{provider1, provider2});
 
+        // When: report is executed
         new ReportSecurityProviders(logger).run();
 
+        // Then: should log all providers with their services
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "Security Providers:",
                 " - Provider 1: SUN (Version: 1.800000)",
@@ -92,11 +105,15 @@ class ReportSecurityProvidersTest {
     }
 
     @Test
-    void testNoSecurityProvidersFound() {
+    @DisplayName("should handle no security providers found")
+    void shouldHandleNoSecurityProvidersFound() {
+        // Given: no security providers available
         when(Security.getProviders()).thenReturn(new Provider[]{});
 
+        // When: report is executed
         new ReportSecurityProviders(logger).run();
 
+        // Then: should log that no providers were found
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "Security Providers:", " - No security providers found.");
         assertTrue(ConfigParser.isInitializationOK());
     }
