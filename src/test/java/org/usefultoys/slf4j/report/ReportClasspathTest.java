@@ -17,18 +17,18 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4jtestmock.AssertLogger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
-import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4j.utils.ConfigParser;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.lang.management.ManagementFactory;
@@ -40,16 +40,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportClasspath}.
+ * <p>
+ * Tests verify that ReportClasspath correctly reads and logs classpath entries
+ * including various separators (Unix, Windows) and edge cases (empty, null).
+ */
+@DisplayName("ReportClasspath")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportClasspathTest {
 
-    private static final String TEST_LOGGER_NAME = "test.report.classpath";
-    @Slf4jMock(TEST_LOGGER_NAME)
+    @Slf4jMock
     private Logger logger;
     private MockedStatic<ManagementFactory> mockedManagementFactory;
     private RuntimeMXBean mockRuntimeMXBean;
 
+    /**
+     * Setup mocked ManagementFactory and RuntimeMXBean for testing.
+     */
     private void setupRuntimeMXBean() {
         mockedManagementFactory = Mockito.mockStatic(ManagementFactory.class);
         mockRuntimeMXBean = mock(RuntimeMXBean.class);
@@ -59,22 +70,27 @@ class ReportClasspathTest {
     @AfterEach
     void tearDown() {
         if (mockedManagementFactory != null) {
-            mockedManagementFactory.close(); // Close the mock static
+            mockedManagementFactory.close();
         }
     }
 
     @Test
+    @DisplayName("should report classpath entries")
     void testClasspathIsReported() {
-        String classpath = "/path/to/my.jar:/path/to/classes";
-        String pathSeparator = ":";
-        Map<String, String> systemProperties = new HashMap<>();
+        // Given: a classpath with multiple entries separated by colon
+        final String classpath = "/path/to/my.jar:/path/to/classes";
+        final String pathSeparator = ":";
+        final Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put("path.separator", pathSeparator);
 
         setupRuntimeMXBean();
         when(mockRuntimeMXBean.getClassPath()).thenReturn(classpath);
         when(mockRuntimeMXBean.getSystemProperties()).thenReturn(systemProperties);
 
+        // When: report is executed
         new ReportClasspath(logger).run();
+
+        // Then: should log all classpath entries
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Classpath:",
             " - /path/to/my.jar",
@@ -83,17 +99,22 @@ class ReportClasspathTest {
     }
 
     @Test
+    @DisplayName("should report empty classpath")
     void testEmptyClasspathIsReported() {
-        String classpath = "";
-        String pathSeparator = ":";
-        Map<String, String> systemProperties = new HashMap<>();
+        // Given: an empty classpath
+        final String classpath = "";
+        final String pathSeparator = ":";
+        final Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put("path.separator", pathSeparator);
 
         setupRuntimeMXBean();
         when(mockRuntimeMXBean.getClassPath()).thenReturn(classpath);
         when(mockRuntimeMXBean.getSystemProperties()).thenReturn(systemProperties);
 
+        // When: report is executed
         new ReportClasspath(logger).run();
+
+        // Then: should log that classpath is empty
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Classpath:",
             " - Classpath is empty.");
@@ -101,17 +122,22 @@ class ReportClasspathTest {
     }
 
     @Test
+    @DisplayName("should report null classpath as empty")
     void testNullClasspathIsReportedAsEmpty() {
-        String classpath = null;
-        String pathSeparator = ":";
-        Map<String, String> systemProperties = new HashMap<>();
+        // Given: a null classpath
+        final String classpath = null;
+        final String pathSeparator = ":";
+        final Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put("path.separator", pathSeparator);
 
         setupRuntimeMXBean();
         when(mockRuntimeMXBean.getClassPath()).thenReturn(classpath);
         when(mockRuntimeMXBean.getSystemProperties()).thenReturn(systemProperties);
 
+        // When: report is executed
         new ReportClasspath(logger).run();
+
+        // Then: should log that classpath is empty
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Classpath:",
             " - Classpath is empty.");
@@ -119,17 +145,22 @@ class ReportClasspathTest {
     }
 
     @Test
+    @DisplayName("should report classpath with Windows separator")
     void testClasspathWithWindowsSeparator() {
-        String classpath = "C:\\path\\to\\my.jar;C:\\path\\to\\classes";
-        String pathSeparator = ";";
-        Map<String, String> systemProperties = new HashMap<>();
+        // Given: a classpath with Windows separator and paths
+        final String classpath = "C:\\path\\to\\my.jar;C:\\path\\to\\classes";
+        final String pathSeparator = ";";
+        final Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put("path.separator", pathSeparator);
 
         setupRuntimeMXBean();
         when(mockRuntimeMXBean.getClassPath()).thenReturn(classpath);
         when(mockRuntimeMXBean.getSystemProperties()).thenReturn(systemProperties);
 
+        // When: report is executed
         new ReportClasspath(logger).run();
+
+        // Then: should log all classpath entries correctly separated
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Classpath:",
             " - C:\\path\\to\\my.jar",
