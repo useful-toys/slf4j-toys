@@ -30,7 +30,7 @@ import static org.mockito.Mockito.spy;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 
 /**
- * Unit tests for {@link ReportSystemPropertiesSecurityException}.
+ * Unit tests for {@link ReportSystemProperties}.
  * <p>
  * Tests verify that ReportSystemProperties correctly handles SecurityException
  * when system properties cannot be accessed due to security restrictions.
