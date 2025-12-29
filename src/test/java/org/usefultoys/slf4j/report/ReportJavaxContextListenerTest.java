@@ -16,25 +16,36 @@
 
 package org.usefultoys.slf4j.report;
 
-import javax.servlet.ServletContextEvent;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
+
+import javax.servlet.ServletContextEvent;
 
 import static org.mockito.Mockito.mock;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
-import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvent;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportJavaxContextListener}.
+ * <p>
+ * Tests verify that ReportJavaxContextListener correctly initializes and executes reports
+ * when the servlet context is initialized, and performs no operations when context is destroyed.
+ * Uses javax.servlet API (Servlet 3.x).
+ */
+@DisplayName("ReportJavaxContextListener")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportJavaxContextListenerTest {
-    @Slf4jMock("test.report.contextlistener")
+    @Slf4jMock
     private Logger logger;
     private ReportJavaxContextListener listener;
 
@@ -44,9 +55,11 @@ class ReportJavaxContextListenerTest {
     }
 
     @Test
+    @DisplayName("should log reports on context initialization")
     void shouldLogReportsOnContextInitialization() {
+        // Given: reporter configured to use test logger with only VM report enabled
         // Configure reporter to use our test logger
-        System.setProperty(ReporterConfig.PROP_NAME, "test.report.contextlistener");
+        System.setProperty(ReporterConfig.PROP_NAME, getClass().getCanonicalName());
 
         // Enable only one report to simplify the test
         System.setProperty(ReporterConfig.PROP_VM, "true");
@@ -67,23 +80,23 @@ class ReportJavaxContextListenerTest {
 
         final ServletContextEvent event = mock(ServletContextEvent.class);
 
-        // Act
+        // When: context initialization is triggered
         listener.contextInitialized(event);
 
-        // Assert
+        // Then: should log Java Virtual Machine report
         assertHasEvent(logger, "Java Virtual Machine");
     }
 
     @Test
+    @DisplayName("should do nothing on context destroyed")
     void shouldDoNothingOnContextDestroyed() {
+        // Given: servlet context event
         final ServletContextEvent event = mock(ServletContextEvent.class);
 
-        // Act
+        // When: context destroyed is triggered
         listener.contextDestroyed(event);
 
-        // Assert
-        // No side effect expected — especially no logging - verify no events were logged at all
-        assertNoEvent(logger, "Java Virtual Machine");
-        assertNoEvent(logger, "Physical system");
+        // Then: no side effects expected — especially no logging
+        AssertLogger.assertEventCount(logger, 0);
     }
 }

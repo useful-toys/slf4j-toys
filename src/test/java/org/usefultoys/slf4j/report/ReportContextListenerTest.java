@@ -56,6 +56,8 @@ class ReportContextListenerTest {
     void shouldLogReportsOnContextInitialization() {
         // Given: reporter configured to use test logger with only VM report enabled
         System.setProperty(ReporterConfig.PROP_NAME, getClass().getCanonicalName());
+
+        // Enable only one report to simplify the test
         System.setProperty(ReporterConfig.PROP_VM, "true");
         System.setProperty(ReporterConfig.PROP_MEMORY, "false");
         System.setProperty(ReporterConfig.PROP_USER, "false");
