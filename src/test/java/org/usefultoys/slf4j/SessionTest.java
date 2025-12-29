@@ -21,13 +21,24 @@ import org.junit.jupiter.api.Test;
 import org.usefultoys.test.ResetSessionConfig;
 import org.usefultoys.test.ValidateCharset;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link Session}.
  * <p>
  * Tests validate that Session correctly generates and manages UUIDs,
  * with proper immutability and formatting validation.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>UUID Generation:</b> Verifies that Session generates a non-null UUID on first access</li>
+ *   <li><b>UUID Immutability:</b> Ensures that the UUID remains constant across multiple accesses</li>
+ *   <li><b>UUID Format:</b> Validates that generated UUIDs are 32-character hexadecimal strings</li>
+ *   <li><b>Short UUID with Default Size:</b> Tests shortSessionUuid() method with default SessionConfig.uuidSize</li>
+ *   <li><b>Short UUID with Custom Size:</b> Tests shortSessionUuid() method with custom SessionConfig.uuidSize configuration</li>
+ * </ul>
  */
 @ValidateCharset
 @ResetSessionConfig
