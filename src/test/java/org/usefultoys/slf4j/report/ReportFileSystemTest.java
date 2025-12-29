@@ -16,46 +16,63 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.AssertLogger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.io.File;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportFileSystem}.
+ * <p>
+ * Tests verify that ReportFileSystem correctly reports file system roots,
+ * handles multiple file systems, and formats space information appropriately.
+ */
+@DisplayName("ReportFileSystem")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportFileSystemTest {
 
-    @Slf4jMock("test.report.filesystem")
+    @Slf4jMock
     private Logger logger;
 
     @Test
-    void testRunWithNoFileSystemRoots() {
-        try (MockedStatic<File> mockedStatic = mockStatic(File.class)) {
+    @DisplayName("should report when no file system roots exist")
+    void shouldReportWhenNoFileSystemRoots() {
+        // Given: File system with no roots
+        try (final MockedStatic<File> mockedStatic = mockStatic(File.class)) {
             mockedStatic.when(File::listRoots).thenReturn(new File[0]);
 
             final ReportFileSystem report = new ReportFileSystem(logger);
+
+            // When: report is executed
             report.run();
 
-            // Assert that the log message does not contain any file system root information
+            // Then: no file system root information should be logged
             AssertLogger.assertNoEvent(logger, "File system root:");
         }
     }
 
     @Test
-    void testRunWithOneFileSystemRoot() {
-        try (MockedStatic<File> mockedStatic = mockStatic(File.class)) {
-            File mockRoot = mock(File.class);
+    @DisplayName("should report one file system root")
+    void shouldReportOneFileSystemRoot() {
+        // Given: File system with one root
+        try (final MockedStatic<File> mockedStatic = mockStatic(File.class)) {
+            final File mockRoot = mock(File.class);
             when(mockRoot.getAbsolutePath()).thenReturn("/mock_root_a");
             when(mockRoot.getTotalSpace()).thenReturn(1000000000L); // 1 GB
             when(mockRoot.getFreeSpace()).thenReturn(500000000L);   // 0.5 GB
@@ -64,8 +81,11 @@ class ReportFileSystemTest {
             mockedStatic.when(File::listRoots).thenReturn(new File[]{mockRoot});
 
             final ReportFileSystem report = new ReportFileSystem(logger);
+
+            // When: report is executed
             report.run();
 
+            // Then: should log file system root with space information
             AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "File system root: /mock_root_a",
                 " - total space: 1000.0MB",
@@ -74,15 +94,17 @@ class ReportFileSystemTest {
     }
 
     @Test
-    void testRunWithMultipleFileSystemRoots() {
-        try (MockedStatic<File> mockedStatic = mockStatic(File.class)) {
-            File mockRootA = mock(File.class);
+    @DisplayName("should report multiple file system roots")
+    void shouldReportMultipleFileSystemRoots() {
+        // Given: File system with multiple roots
+        try (final MockedStatic<File> mockedStatic = mockStatic(File.class)) {
+            final File mockRootA = mock(File.class);
             when(mockRootA.getAbsolutePath()).thenReturn("/mock_root_a");
             when(mockRootA.getTotalSpace()).thenReturn(1000000000L);
             when(mockRootA.getFreeSpace()).thenReturn(500000000L);
             when(mockRootA.getUsableSpace()).thenReturn(250000000L);
 
-            File mockRootB = mock(File.class);
+            final File mockRootB = mock(File.class);
             when(mockRootB.getAbsolutePath()).thenReturn("/mock_root_b");
             when(mockRootB.getTotalSpace()).thenReturn(2000000000L);
             when(mockRootB.getFreeSpace()).thenReturn(1000000000L);
@@ -91,8 +113,11 @@ class ReportFileSystemTest {
             mockedStatic.when(File::listRoots).thenReturn(new File[]{mockRootA, mockRootB});
 
             final ReportFileSystem report = new ReportFileSystem(logger);
+
+            // When: report is executed
             report.run();
 
+            // Then: should log both file system roots with their space information
             AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "File system root: /mock_root_a",
                 " - total space: 1000.0MB",
@@ -104,9 +129,11 @@ class ReportFileSystemTest {
     }
 
     @Test
-    void testRunWithZeroSpaceFileSystemRoot() {
-        try (MockedStatic<File> mockedStatic = mockStatic(File.class)) {
-            File mockRoot = mock(File.class);
+    @DisplayName("should report file system root with zero space")
+    void shouldReportZeroSpaceFileSystemRoot() {
+        // Given: File system root with zero space
+        try (final MockedStatic<File> mockedStatic = mockStatic(File.class)) {
+            final File mockRoot = mock(File.class);
             when(mockRoot.getAbsolutePath()).thenReturn("/zero_space_root");
             when(mockRoot.getTotalSpace()).thenReturn(0L);
             when(mockRoot.getFreeSpace()).thenReturn(0L);
@@ -115,8 +142,11 @@ class ReportFileSystemTest {
             mockedStatic.when(File::listRoots).thenReturn(new File[]{mockRoot});
 
             final ReportFileSystem report = new ReportFileSystem(logger);
+
+            // When: report is executed
             report.run();
 
+            // Then: should log file system root with zero space values
             AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "File system root: /zero_space_root",
                 " - total space: 0B",
