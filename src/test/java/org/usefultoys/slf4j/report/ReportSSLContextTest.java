@@ -16,16 +16,16 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.AssertLogger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import javax.net.ssl.SSLContext;
@@ -38,15 +38,27 @@ import java.util.Properties;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportSSLContext}.
+ * <p>
+ * Tests verify that ReportSSLContext correctly reports SSL context information
+ * including protocol, provider, socket factories, server socket factories,
+ * SSL parameters, cipher suites, and handles unavailable SSL contexts.
+ */
+@DisplayName("ReportSSLContext")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportSSLContextTest {
 
-    @Slf4jMock("test.report.sslcontext")
+    @Slf4jMock
     private Logger logger;
 
     @Test
-    void testRun() throws Exception {
+    @DisplayName("should report SSL context with full details")
+    void shouldReportSSLContextWithFullDetails() throws Exception {
+        // Given: fully configured SSL context with all properties
         try (MockedStatic<SSLContext> mockedStatic = mockStatic(SSLContext.class)) {
             final SSLContext mockSslContext = mock(SSLContext.class);
             final Provider mockProvider = mock(Provider.class);
@@ -81,9 +93,11 @@ class ReportSSLContextTest {
             when(mockSupportedParams.getProtocols()).thenReturn(new String[]{"TLSv1.2", "TLSv1.3", "Proto3", "Proto4", "Proto5", "Proto6", "Proto7", "Proto8", "Proto9", "Proto10", "Proto11", "Proto12"});
             when(mockSupportedParams.getCipherSuites()).thenReturn(new String[]{"TLS_DHE_DSS_WITH_AES_128_CBC_SHA", "TLS_AES_128_GCM_SHA256"});
 
+            // When: report is executed
             final ReportSSLContext report = new ReportSSLContext(logger);
             report.run();
 
+            // Then: should log complete SSL context details including protocol, provider, factories and parameters
             AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "SSL Context Default",
                 "   Protocol: TLSv1.2",
@@ -112,13 +126,17 @@ class ReportSSLContextTest {
     }
 
     @Test
-    void testRunGetInstanceThrowsException() throws Exception {
+    @DisplayName("should handle SSL context not available")
+    void shouldHandleSSLContextNotAvailable() throws Exception {
+        // Given: SSLContext.getInstance throws exception for unavailable protocol
         try (MockedStatic<SSLContext> mockedStatic = mockStatic(SSLContext.class)) {
             mockedStatic.when(() -> SSLContext.getInstance("SSLv2")).thenThrow(new java.security.NoSuchAlgorithmException("SSLv2 not available"));
 
+            // When: report is executed
             final ReportSSLContext report = new ReportSSLContext(logger);
             report.run();
 
+            // Then: should log error message for unavailable SSL context
             AssertLogger.assertHasEvent(logger, MockLoggerEvent.Level.INFO, "SSL Context SSLv2", "Failed to detail SSLContext: SSLv2 not available");
         }
     }
