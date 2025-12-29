@@ -16,34 +16,45 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4jtestmock.AssertLogger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
-@ExtendWith({ResetReporterConfigExtension.class, CharsetConsistencyExtension.class, MockLoggerExtension.class})
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
+
+/**
+ * Unit tests for {@link ReportVM}.
+ * <p>
+ * Tests verify that ReportVM correctly reports Java Virtual Machine information
+ * including vendor, version, and installation directory.
+ */
+@DisplayName("ReportVM")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportVMTest {
 
-    @Slf4jMock("test.report.vm")
+    @Slf4jMock
     private Logger logger;
 
     @Test
-    void shouldLogJvmInformation() {
-        // Arrange
+    @DisplayName("should log VM information")
+    void shouldLogVMInformation() {
+        // Given: ReportVM instance
         final ReportVM report = new ReportVM(logger);
 
-        // Act
+        // When: report is executed
         report.run();
 
-        // Assert
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+        // Then: should log JVM details
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "Java Virtual Machine",
                 "vendor: " + System.getProperty("java.vendor"),
                 "version: " + System.getProperty("java.version"),
