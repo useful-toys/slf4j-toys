@@ -16,7 +16,6 @@
 
 package org.usefultoys.slf4j.report;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -78,11 +77,6 @@ class ReportJavaxServletTest {
         when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
     }
 
-    @AfterEach
-    void tearDown() {
-        System.clearProperty(ReporterConfig.PROP_NAME);
-    }
-
     @Test
     @DisplayName("should return not found when no path info provided")
     void shouldReturnNotFoundWhenNoPathInfo() throws IOException {
@@ -101,15 +95,15 @@ class ReportJavaxServletTest {
     }
 
     @Test
-    @DisplayName("should return not found when unknown path info provided")
-    void shouldReturnNotFoundWhenUnknownPathInfo() throws IOException {
+    @DisplayName("should return not found when unknown path")
+    void shouldReturnNotFoundWhenUnknownPath() throws IOException {
         // Given: request with unknown path
         when(request.getPathInfo()).thenReturn("/unknown");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 404 with appropriate message
+        // Then: should return 404 and log warning
         verify(response).setStatus(HttpServletResponse.SC_NOT_FOUND);
         verify(response).setContentType("text/plain");
         assertTrue(responseWriter.toString().contains("Unknown report path: unknown"));
@@ -126,37 +120,37 @@ class ReportJavaxServletTest {
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log VM report
+        // Then: should return success and log VM report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: vm"));
-        AssertLogger.assertEvent(reportLogger,0,  MockLoggerEvent.Level.INFO, "Java Virtual Machine");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Java Virtual Machine");
     }
 
     @Test
     @DisplayName("should generate file system report")
     void shouldGenerateFileSystemReport() throws IOException {
-        // Given: request for FileSystem report
+        // Given: request for file system report
         when(request.getPathInfo()).thenReturn("/FileSystem");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log file system report
+        // Then: should return success and log file system report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: filesystem"));
-        AssertLogger.assertEvent(reportLogger,0,  MockLoggerEvent.Level.INFO, "File system root:");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "File system root:");
     }
 
     @Test
     @DisplayName("should generate memory report")
     void shouldGenerateMemoryReport() throws IOException {
-        // Given: request for Memory report
+        // Given: request for memory report
         when(request.getPathInfo()).thenReturn("/Memory");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log memory report
+        // Then: should return success and log memory report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: memory"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
@@ -165,28 +159,28 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate user report")
     void shouldGenerateUserReport() throws IOException {
-        // Given: request for User report
+        // Given: request for user report
         when(request.getPathInfo()).thenReturn("/User");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log user report
+        // Then: should return success and log user report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: user"));
-        AssertLogger.assertEvent(reportLogger,0,  MockLoggerEvent.Level.INFO, "User:");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "User:");
     }
 
     @Test
     @DisplayName("should generate physical system report")
     void shouldGeneratePhysicalSystemReport() throws IOException {
-        // Given: request for PhysicalSystem report
+        // Given: request for physical system report
         when(request.getPathInfo()).thenReturn("/PhysicalSystem");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log physical system report
+        // Then: should return success and log physical system report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: physicalsystem"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Physical system");
@@ -195,13 +189,13 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate operating system report")
     void shouldGenerateOperatingSystemReport() throws IOException {
-        // Given: request for OperatingSystem report
+        // Given: request for operating system report
         when(request.getPathInfo()).thenReturn("/OperatingSystem");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log operating system report
+        // Then: should return success and log operating system report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: operatingsystem"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Operating System");
@@ -210,28 +204,28 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate calendar report")
     void shouldGenerateCalendarReport() throws IOException {
-        // Given: request for Calendar report
+        // Given: request for calendar report
         when(request.getPathInfo()).thenReturn("/Calendar");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log calendar report
+        // Then: should return success and log calendar report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: calendar"));
-        AssertLogger.assertEvent(reportLogger,0,  MockLoggerEvent.Level.INFO, "Calendar");
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Calendar");
     }
 
     @Test
     @DisplayName("should generate locale report")
     void shouldGenerateLocaleReport() throws IOException {
-        // Given: request for Locale report
+        // Given: request for locale report
         when(request.getPathInfo()).thenReturn("/Locale");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log locale report
+        // Then: should return success and log locale report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: locale"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Locale");
@@ -240,13 +234,13 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate charset report")
     void shouldGenerateCharsetReport() throws IOException {
-        // Given: request for Charset report
+        // Given: request for charset report
         when(request.getPathInfo()).thenReturn("/Charset");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log charset report
+        // Then: should return success and log charset report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: charset"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Charset");
@@ -258,6 +252,8 @@ class ReportJavaxServletTest {
         // Given: request for NetworkInterface report
         // Note: Mocking NetworkInterface.getNetworkInterfaces() is complex.
         // This test primarily checks if the servlet attempts to run the report.
+
+        // Given: request for network interface report
         when(request.getPathInfo()).thenReturn("/NetworkInterface");
 
         // When: servlet processes GET request
@@ -273,13 +269,13 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate SSL context report")
     void shouldGenerateSSLContextReport() throws IOException {
-        // Given: request for SSLContext report
+        // Given: request for SSL context report
         when(request.getPathInfo()).thenReturn("/SSLContext");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log SSL context report
+        // Then: should return success and log SSL context report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: sslcontext"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "SSL Context");
@@ -288,13 +284,13 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate default trust keystore report")
     void shouldGenerateDefaultTrustKeyStoreReport() throws IOException {
-        // Given: request for DefaultTrustKeyStore report
+        // Given: request for default trust keystore report
         when(request.getPathInfo()).thenReturn("/DefaultTrustKeyStore");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log trust keystore report
+        // Then: should return success and log trust keystore report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: defaulttrustkeystore"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Trust Keystore");
@@ -303,13 +299,13 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate environment report")
     void shouldGenerateEnvironmentReport() throws IOException {
-        // Given: request for Environment report
+        // Given: request for environment report
         when(request.getPathInfo()).thenReturn("/Environment");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log environment report
+        // Then: should return success and log environment report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: environment"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "System Environment:");
@@ -318,13 +314,13 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate properties report")
     void shouldGeneratePropertiesReport() throws IOException {
-        // Given: request for Properties report
+        // Given: request for properties report
         when(request.getPathInfo()).thenReturn("/Properties");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log properties report
+        // Then: should return success and log properties report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: properties"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "System Properties:");
@@ -333,13 +329,13 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate JVM arguments report")
     void shouldGenerateJvmArgumentsReport() throws IOException {
-        // Given: request for JvmArguments report
+        // Given: request for JVM arguments report
         when(request.getPathInfo()).thenReturn("/JvmArguments");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log JVM arguments report
+        // Then: should return success and log JVM arguments report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: jvmarguments"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "JVM Arguments:");
@@ -348,13 +344,13 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate classpath report")
     void shouldGenerateClasspathReport() throws IOException {
-        // Given: request for Classpath report
+        // Given: request for classpath report
         when(request.getPathInfo()).thenReturn("/Classpath");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log classpath report
+        // Then: should return success and log classpath report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: classpath"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Classpath:");
@@ -363,13 +359,13 @@ class ReportJavaxServletTest {
     @Test
     @DisplayName("should generate garbage collector report")
     void shouldGenerateGarbageCollectorReport() throws IOException {
-        // Given: request for GarbageCollector report
+        // Given: request for garbage collector report
         when(request.getPathInfo()).thenReturn("/GarbageCollector");
 
         // When: servlet processes GET request
         servlet.doGet(request, response);
 
-        // Then: should return 200 and log garbage collector report
+        // Then: should return success and log garbage collector report
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: garbagecollector"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Garbage Collectors:");
