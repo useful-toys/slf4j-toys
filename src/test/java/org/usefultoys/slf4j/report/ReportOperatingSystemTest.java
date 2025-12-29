@@ -16,34 +16,44 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportOperatingSystem}.
+ * <p>
+ * Tests verify that ReportOperatingSystem correctly reports operating system information
+ * including OS name, version, architecture, and file/path/line separators.
+ */
+@DisplayName("ReportOperatingSystem")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportOperatingSystemTest {
 
-    @Slf4jMock("test.report.os")
+    @Slf4jMock
     private Logger logger;
 
     @Test
+    @DisplayName("should log operating system information")
     void shouldLogOperatingSystemInformation() {
-        // Arrange
+        // Given: ReportOperatingSystem instance
         final ReportOperatingSystem report = new ReportOperatingSystem(logger);
 
-        // Act
+        // When: report is executed
         report.run();
 
-        // Assert
+        // Then: should log operating system details including separators
         assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "Operating System",
                 "architecture: " + System.getProperty("os.arch"),
