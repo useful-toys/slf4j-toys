@@ -80,7 +80,7 @@
         <!-- Defaults to 5.x for Java 11+ (can be overridden by JDK profiles) -->
         <mockito.version>5.7.0</mockito.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <slf4j-test-mock.version>0.0.6</slf4j-test-mock.version>
+        <slf4j-test-mock.version>0.0.7-SNAPSHOT</slf4j-test-mock.version>
 
         <!-- Maven Plugins Versions -->
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
