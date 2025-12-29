@@ -17,6 +17,7 @@
 package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -26,8 +27,9 @@ import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ResetSystemProperty;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.net.Inet4Address;
@@ -44,11 +46,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({ResetReporterConfigExtension.class, CharsetConsistencyExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link Reporter}.
+ * <p>
+ * Tests verify that Reporter correctly executes default reports based on configuration,
+ * handles network interface reporting, manages logging levels, and integrates with ReporterConfig.
+ */
+@DisplayName("Reporter")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@ExtendWith(MockLoggerExtension.class)
 class ReporterTest {
 
-    @Slf4jMock("test.reporter")
+    @Slf4jMock
     private Logger logger;
 
     private Reporter reporter;
@@ -59,8 +70,9 @@ class ReporterTest {
     }
 
     @Test
-    void testRunDefaultReportExecutesAllEnabledReports() {
-        // Enable all reports
+    @DisplayName("should execute all enabled reports")
+    void shouldExecuteAllEnabledReports() {
+        // Given: all reports enabled
         System.setProperty(ReporterConfig.PROP_VM, "true");
         System.setProperty(ReporterConfig.PROP_FILE_SYSTEM, "true");
         System.setProperty(ReporterConfig.PROP_MEMORY, "true");
@@ -89,45 +101,49 @@ class ReporterTest {
             executionCount.incrementAndGet();
         };
 
-        reporter = new Reporter(logger);
+        // When: logDefaultReports is called with all reports enabled
         reporter.logDefaultReports(countingExecutor);
 
+        // Then: all enabled reports should be executed
         // Total reports: 15 existing + 3 new (JvmArgs, Classpath, GC) + 2 new (SecurityProviders, ContainerInfo) = 20
-        // NetworkInterface loop executes 1 time for 1 mockNif.
-        // So, 20 + 1 = 21 reports.
+        // NetworkInterface loop executes 0 times (disabled).
+        // So, 20 - 2 = 18 reports.
         assertEquals(18, executionCount.get(), "All enabled reports should be executed");
-        // Verify that at least some reports were logged (we can check for common report content)
         AssertLogger.assertHasEvent(logger, "Physical system");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
     @Test
-    void testRunDefaultReportExecutesOnlySelectedReports() {
-        // Enable only a few reports
+    @DisplayName("should execute only selected reports")
+    void shouldExecuteOnlySelectedReports() {
+        // Given: only a few reports enabled
         System.setProperty(ReporterConfig.PROP_VM, "true");
         System.setProperty(ReporterConfig.PROP_PROPERTIES, "true");
         System.setProperty(ReporterConfig.PROP_JVM_ARGUMENTS, "true");
-
         ReporterConfig.init();
 
+        // Use a custom executor to count executions
         final AtomicInteger executionCount = new AtomicInteger(0);
         final Executor countingExecutor = command -> {
             command.run();
             executionCount.incrementAndGet();
         };
 
+        // When: logDefaultReports is called
         reporter.logDefaultReports(countingExecutor);
 
-        assertEquals(6, executionCount.get(), "Only 6 reports should be executed");
+        // Then: only the selected reports should be executed
         // Verify that the enabled reports were logged
+        assertEquals(6, executionCount.get(), "Only 6 reports should be executed");
         AssertLogger.assertHasEvent(logger, "Java Virtual Machine");
         AssertLogger.assertHasEvent(logger, "System Properties");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
     @Test
-    void testRunDefaultReportWithNoReportsEnabled() {
-        // Disable all reports (default is mostly true, so explicitly disable)
+    @DisplayName("should not execute any reports when all are disabled")
+    void shouldNotExecuteWhenAllReportsDisabled() {
+        // Given: all reports disabled (default is mostly true, so explicitly disable)
         System.setProperty(ReporterConfig.PROP_VM, "false");
         System.setProperty(ReporterConfig.PROP_FILE_SYSTEM, "false");
         System.setProperty(ReporterConfig.PROP_MEMORY, "false");
@@ -155,37 +171,43 @@ class ReporterTest {
             executionCount.incrementAndGet();
         };
 
+        // When: logDefaultReports is called
         reporter.logDefaultReports(countingExecutor);
 
-        assertEquals(0, executionCount.get(), "No reports should be executed");
+        // Then: no reports should be executed
         // Verify no events were logged by checking that none of the common report titles appear
+        assertEquals(0, executionCount.get(), "No reports should be executed");
         AssertLogger.assertNoEvent(logger, "Java Virtual Machine");
         AssertLogger.assertNoEvent(logger, "Physical system");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
     @Test
-    void testRunDefaultReportWithSameThreadExecutor() {
-        // Enable a few reports
+    @DisplayName("should execute default reports with same thread executor")
+    @ResetSystemProperty(ReporterConfig.PROP_NAME)
+    void shouldExecuteWithSameThreadExecutor() {
+        // Given: selected reports enabled with custom logger name
         System.setProperty(ReporterConfig.PROP_VM, "true");
         System.setProperty(ReporterConfig.PROP_PROPERTIES, "true");
         System.setProperty(ReporterConfig.PROP_JVM_ARGUMENTS, "true");
         System.setProperty(ReporterConfig.PROP_SECURITY_PROVIDERS, "true");
         System.setProperty(ReporterConfig.PROP_CONTAINER_INFO, "true");
-        System.setProperty(ReporterConfig.PROP_NAME, "test.reporter");
+        System.setProperty(ReporterConfig.PROP_NAME, "org.usefultoys.slf4j.report.ReporterTest");
         ReporterConfig.init();
 
-        // Test the static runDefaultReport method
+        // When: runDefaultReport is called using static method
         Reporter.runDefaultReport();
 
-        // Verify that reports were logged
+        // Then: reports should be logged to the test logger
         AssertLogger.assertHasEvent(logger, "Physical system");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
-
     @Test
-    void testLogDefaultReportsHandlesNetworkInterfaceSocketException() {
+    @DisplayName("should handle network interface socket exception")
+    @ResetSystemProperty(ReporterConfig.PROP_NETWORK_INTERFACE)
+    void shouldHandleNetworkInterfaceSocketException() {
+        // Given: network interface reporting enabled with socket error simulation
         System.setProperty(ReporterConfig.PROP_NETWORK_INTERFACE, "true");
         ReporterConfig.init();
 
@@ -202,14 +224,23 @@ class ReporterTest {
             executionCount.incrementAndGet();
         };
 
+        // When: logDefaultReports is called
         testReporter.logDefaultReports(countingExecutor);
 
+        // Then: error message should be logged
         AssertLogger.assertHasEvent(logger, "Cannot report network interfaces");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 
     @Test
-    void testLogDefaultReportsExecutesNetworkInterfaceReports() throws Exception {
+    @DisplayName("should execute network interface reports")
+    @ResetSystemProperty(ReporterConfig.PROP_PHYSICAL_SYSTEM)
+    @ResetSystemProperty(ReporterConfig.PROP_OPERATING_SYSTEM)
+    @ResetSystemProperty(ReporterConfig.PROP_MEMORY)
+    @ResetSystemProperty(ReporterConfig.PROP_VM)
+    @ResetSystemProperty(ReporterConfig.PROP_NETWORK_INTERFACE)
+    void shouldExecuteNetworkInterfaceReports() throws Exception {
+        // Given: network interface reporting enabled with mocked network interfaces
         System.setProperty(ReporterConfig.PROP_PHYSICAL_SYSTEM, "false");
         System.setProperty(ReporterConfig.PROP_OPERATING_SYSTEM, "false");
         System.setProperty(ReporterConfig.PROP_MEMORY, "false");
@@ -240,7 +271,6 @@ class ReporterTest {
         when(mockIpv4_1.isReachable(5000)).thenReturn(true);
         when(mockNif1.getInetAddresses()).thenReturn(Collections.enumeration(Collections.singletonList(mockIpv4_1)));
 
-
         // Mock NetworkInterface 2 (e.g., lo)
         final NetworkInterface mockNif2 = mock(NetworkInterface.class);
         when(mockNif2.getName()).thenReturn("lo");
@@ -264,7 +294,6 @@ class ReporterTest {
         when(mockIpv4_2.isReachable(5000)).thenReturn(true);
         when(mockNif2.getInetAddresses()).thenReturn(Collections.enumeration(Collections.singletonList(mockIpv4_2)));
 
-
         final Vector<NetworkInterface> nifs = new Vector<>();
         nifs.add(mockNif1);
         nifs.add(mockNif2);
@@ -283,8 +312,10 @@ class ReporterTest {
             executionCount.incrementAndGet();
         };
 
+        // When: logDefaultReports is called
         testReporter.logDefaultReports(countingExecutor);
 
+        // Then: network interfaces should be reported
         assertEquals(2, executionCount.get(), "Two network interface reports should be executed");
         AssertLogger.assertHasEvent(logger, "Network Interface eth0:");
         AssertLogger.assertHasEvent(logger, "Network Interface lo:");
@@ -294,15 +325,20 @@ class ReporterTest {
     }
 
     @Test
-    void testReporterDefaultConstructor() {
+    @DisplayName("should use default constructor with custom logger name")
+    @ResetSystemProperty(ReporterConfig.PROP_NAME)
+    @ResetSystemProperty(ReporterConfig.PROP_VM)
+    void shouldUseDefaultConstructorWithCustomLoggerName() {
+        // Given: custom logger name configured
         final String customLoggerName = "my.custom.logger";
         System.setProperty(ReporterConfig.PROP_NAME, customLoggerName);
         ReporterConfig.init();
 
-        // Create a new Logger for the custom name to capture its events
+        // When: create a new Logger for the custom name to capture its events
         final Logger customLogger = LoggerFactory.getLogger(customLoggerName);
         ((MockLogger) customLogger).clearEvents();
 
+        // Create reporter with default constructor
         final Reporter defaultReporter = new Reporter();
         // Now, when defaultReporter logs, it should log to customLogger.
         // Let's enable a report and see if it logs to the customLogger.
@@ -311,13 +347,18 @@ class ReporterTest {
 
         defaultReporter.logDefaultReports(Reporter.sameThreadExecutor); // Use sameThreadExecutor for simplicity
 
+        // Then: should log to custom logger, not the test logger
         AssertLogger.assertHasEvent(customLogger, "Physical system");
         AssertLogger.assertNoEvent(logger, "Physical system");
     }
 
     @Test
-    void testLogDefaultReportsWhenInfoDisabled() {
-        ((MockLogger) logger).setInfoEnabled(false); // Disable INFO level logging
+    @DisplayName("should not log when info level disabled")
+    @ResetSystemProperty(ReporterConfig.PROP_VM)
+    @ResetSystemProperty(ReporterConfig.PROP_PROPERTIES)
+    void shouldNotLogWhenInfoLevelDisabled() {
+        // Given: INFO level logging disabled
+        ((MockLogger) logger).setInfoEnabled(false);
 
         // Enable a few reports
         System.setProperty(ReporterConfig.PROP_VM, "true");
@@ -330,10 +371,11 @@ class ReporterTest {
             executionCount.incrementAndGet();
         };
 
+        // When: logDefaultReports is called
         reporter.logDefaultReports(countingExecutor);
 
-        // Reports should still be executed, but no INFO messages should be logged
-        assertEquals(5, executionCount.get(), "Enabled reports should still be executed"); // VM, Properties, JvmArgs, Classpath, GC, SecurityProviders, ContainerInfo
+        // Then: reports should still be executed, but no INFO messages should be logged
+        assertEquals(5, executionCount.get(), "Enabled reports should still be executed");
         AssertLogger.assertNoEvent(logger, "Java Virtual Machine");
         AssertLogger.assertNoEvent(logger, "System Properties");
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
