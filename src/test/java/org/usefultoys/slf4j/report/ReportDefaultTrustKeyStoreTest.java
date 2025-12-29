@@ -16,14 +16,14 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.slf4j.Logger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import javax.net.ssl.TrustManager;
@@ -41,15 +41,26 @@ import static org.mockito.Mockito.*;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvent;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportDefaultTrustKeyStore}.
+ * <p>
+ * Tests verify that ReportDefaultTrustKeyStore correctly reads and logs default trust keystore information,
+ * including trust managers, certificates, and handles various error scenarios.
+ */
+@DisplayName("ReportDefaultTrustKeyStore")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportDefaultTrustKeyStoreTest {
 
-    @Slf4jMock("test.report.truststore")
+    @Slf4jMock
     private Logger logger;
 
     @Test
-    void testRun() throws Exception {
+    @DisplayName("should report trust keystore with certificate information")
+    void shouldReportTrustKeystoreWithCertificateInformation() throws Exception {
+        // Given: TrustManagerFactory with mock trust manager and certificate
         try (MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
             final TrustManagerFactory mockTmf = mock(TrustManagerFactory.class);
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenReturn(mockTmf);
@@ -63,14 +74,16 @@ class ReportDefaultTrustKeyStoreTest {
             when(mockCert.getSubjectX500Principal()).thenReturn(new X500Principal("CN=Test Subject"));
             when(mockCert.getIssuerX500Principal()).thenReturn(new X500Principal("CN=Test Issuer"));
             when(mockCert.getSerialNumber()).thenReturn(BigInteger.valueOf(12345));
-            Date notBefore = new Date(1000000000000L);
-            Date notAfter = new Date(2000000000000L);
+            final Date notBefore = new Date(1000000000000L);
+            final Date notAfter = new Date(2000000000000L);
             when(mockCert.getNotBefore()).thenReturn(notBefore);
             when(mockCert.getNotAfter()).thenReturn(notAfter);
 
+            // When: report is executed
             final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
+            // Then: should log trust keystore and certificate details
             assertHasEvent(logger, "Trust Keystore");
             assertHasEvent(logger, " - TrustManager: 0 (class org.mockito.codegen.X509TrustManager$MockitoMock$");
             assertHasEvent(logger, "   - Certificate #0");
@@ -81,42 +94,54 @@ class ReportDefaultTrustKeyStoreTest {
     }
 
     @Test
-    void testRunNoTrustManagers() throws Exception {
+    @DisplayName("should report trust keystore when no trust managers")
+    void shouldReportTrustKeystoreWhenNoTrustManagers() throws Exception {
+        // Given: TrustManagerFactory with no trust managers
         try (MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
             final TrustManagerFactory mockTmf = mock(TrustManagerFactory.class);
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenReturn(mockTmf);
             when(mockTmf.getTrustManagers()).thenReturn(new TrustManager[0]);
 
+            // When: report is executed
             final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
+            // Then: should log trust keystore header but no trust managers
             assertHasEvent(logger, "Trust Keystore");
             assertNoEvent(logger, " - TrustManager:");
         }
     }
 
     @Test
-    void testRunKeyStoreException() throws Exception {
+    @DisplayName("should report error when KeyStore exception occurs")
+    void shouldReportErrorWhenKeyStoreException() throws Exception {
+        // Given: TrustManagerFactory that throws KeyStoreException on init
         try (MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
             final TrustManagerFactory mockTmf = mock(TrustManagerFactory.class);
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenReturn(mockTmf);
             doThrow(new KeyStoreException("Test KeyStore Exception")).when(mockTmf).init((KeyStore) null);
 
+            // When: report is executed
             final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
+            // Then: should log error message
             assertHasEvent(logger, "Cannot read TrustManager: Test KeyStore Exception");
         }
     }
 
     @Test
-    void testRunNoSuchAlgorithmException() throws Exception {
+    @DisplayName("should report error when NoSuchAlgorithm exception occurs")
+    void shouldReportErrorWhenNoSuchAlgorithmException() throws Exception {
+        // Given: TrustManagerFactory that throws NoSuchAlgorithmException
         try (MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenThrow(new NoSuchAlgorithmException("Test Algorithm Exception"));
 
+            // When: report is executed
             final ReportDefaultTrustKeyStore report = new ReportDefaultTrustKeyStore(logger);
             report.run();
 
+            // Then: should log error message
             assertHasEvent(logger, "Cannot read TrustManager: Test Algorithm Exception");
         }
     }
