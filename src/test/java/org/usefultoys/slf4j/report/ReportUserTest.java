@@ -16,36 +16,49 @@
 
 package org.usefultoys.slf4j.report;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
+import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
-@ExtendWith({ResetReporterConfigExtension.class, CharsetConsistencyExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportUser}.
+ * <p>
+ * Tests verify that ReportUser correctly reports user information
+ * including username, home directory, working directory, and temporary directory.
+ */
+@DisplayName("ReportUser")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportUserTest {
 
-    @Slf4jMock("test.report.user")
+    @Slf4jMock
     private Logger logger;
 
     @Test
+    @DisplayName("should log user information")
     void shouldLogUserInformation() {
-        // Arrange
+        // Given: ReportUser instance
         final ReportUser report = new ReportUser(logger);
 
-        // Act
+        // When: report is executed
         report.run();
 
-        // Assert
-        assertEvent(logger, 0,
-                "User:",
+        // Then: should log user details
+        assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "User",
                 "name: " + System.getProperty("user.name"),
-                "home: " + System.getProperty("user.home"));
+                "home directory: " + System.getProperty("user.home"),
+                "working directory: " + System.getProperty("user.dir"),
+                "temporary directory: " + System.getProperty("java.io.tmpdir"));
     }
 }
