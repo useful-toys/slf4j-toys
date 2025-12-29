@@ -28,7 +28,7 @@ import static org.usefultoys.slf4j.report.ReporterConfig.getPropertySafely;
 
 /**
  * A report module that provides information about the current user running the application.
- * It includes the user's name and home directory.
+ * It includes the user's name, home directory, working directory, and temporary directory.
  * This report is useful for auditing or understanding the execution context.
  *
  * @author Daniel Felix Ferber
@@ -51,7 +51,9 @@ public class ReportUser implements Runnable {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("User:");
         ps.printf(" - name: %s%n", getPropertySafely("user.name"));
-        ps.printf(" - home: %s%n", getPropertySafely("user.home"));
+        ps.printf(" - home directory: %s%n", getPropertySafely("user.home"));
+        ps.printf(" - working directory: %s%n", getPropertySafely("user.dir"));
+        ps.printf(" - temporary directory: %s%n", getPropertySafely("java.io.tmpdir"));
         ps.println(); // Ensure a newline at the end of the report
     }
 }
