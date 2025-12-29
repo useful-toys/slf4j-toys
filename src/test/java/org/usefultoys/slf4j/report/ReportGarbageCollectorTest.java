@@ -18,16 +18,16 @@ package org.usefultoys.slf4j.report;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.utils.ConfigParser;
-import org.usefultoys.slf4jtestmock.MockLoggerExtension;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
-import org.usefultoys.test.CharsetConsistencyExtension;
-import org.usefultoys.test.ResetReporterConfigExtension;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.lang.management.GarbageCollectorMXBean;
@@ -40,11 +40,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 
-@ExtendWith({CharsetConsistencyExtension.class, ResetReporterConfigExtension.class, MockLoggerExtension.class})
+/**
+ * Unit tests for {@link ReportGarbageCollector}.
+ * <p>
+ * Tests verify that ReportGarbageCollector correctly reports garbage collector information
+ * including names, collection counts, times, and memory pool names.
+ */
+@DisplayName("ReportGarbageCollector")
+@ValidateCharset
+@ResetReporterConfig
 @WithLocale("en")
+@WithMockLogger
 class ReportGarbageCollectorTest {
 
-    @Slf4jMock("test.report.garbagecollector")
+    @Slf4jMock
     private Logger logger;
 
     private MockedStatic<ManagementFactory> mockedManagementFactory;
@@ -57,19 +66,21 @@ class ReportGarbageCollectorTest {
 
     @AfterEach
     void tearDown() {
-        mockedManagementFactory.close(); // Close the mock static
+        mockedManagementFactory.close();
     }
 
 
     @Test
-    void testGarbageCollectorsAreReported() {
-        GarbageCollectorMXBean gc1 = mock(GarbageCollectorMXBean.class);
+    @DisplayName("should report garbage collectors information")
+    void shouldReportGarbageCollectors() {
+        // Given: two garbage collectors configured with collection statistics
+        final GarbageCollectorMXBean gc1 = mock(GarbageCollectorMXBean.class);
         when(gc1.getName()).thenReturn("G1 Young Generation");
         when(gc1.getCollectionCount()).thenReturn(100L);
         when(gc1.getCollectionTime()).thenReturn(5000L);
         when(gc1.getMemoryPoolNames()).thenReturn(new String[]{"G1 Eden Space", "G1 Survivor Space"});
 
-        GarbageCollectorMXBean gc2 = mock(GarbageCollectorMXBean.class);
+        final GarbageCollectorMXBean gc2 = mock(GarbageCollectorMXBean.class);
         when(gc2.getName()).thenReturn("G1 Old Generation");
         when(gc2.getCollectionCount()).thenReturn(10L);
         when(gc2.getCollectionTime()).thenReturn(15000L);
@@ -77,8 +88,10 @@ class ReportGarbageCollectorTest {
 
         when(ManagementFactory.getGarbageCollectorMXBeans()).thenReturn(Arrays.asList(gc1, gc2));
 
+        // When: report is executed
         new ReportGarbageCollector(logger).run();
 
+        // Then: should log garbage collector details
         assertHasEvent(logger, "Garbage Collectors:");
         assertHasEvent(logger, " - Name: G1 Young Generation");
         assertHasEvent(logger, "   Collection Count: 100");
@@ -92,11 +105,15 @@ class ReportGarbageCollectorTest {
     }
 
     @Test
-    void testNoGarbageCollectorsFound() {
+    @DisplayName("should report when no garbage collectors found")
+    void shouldReportNoGarbageCollectors() {
+        // Given: no garbage collectors available
         when(ManagementFactory.getGarbageCollectorMXBeans()).thenReturn(Collections.emptyList());
 
+        // When: report is executed
         new ReportGarbageCollector(logger).run();
 
+        // Then: should log that no garbage collectors were found
         assertHasEvent(logger, " - No garbage collectors found.");
         assertTrue(ConfigParser.isInitializationOK());
     }
