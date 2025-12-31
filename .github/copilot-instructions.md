@@ -5,6 +5,7 @@
 ## General Instructions
 
 Please follow all guidelines specified in [AI-INSTRUCTIONS.md](../AI-INSTRUCTIONS.md), including:
+Further, flollow all guidelines specified in [AI-PROJECT-INSTRUCTIONS.md](../AI-PROJECT-INSTRUCTIONS.md), including:
 
 ## Copilot-Specific Notes
 
