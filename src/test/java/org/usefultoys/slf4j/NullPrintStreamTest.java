@@ -31,6 +31,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * <p>
  * Tests validate that NullPrintStream silently ignores all output operations
  * without throwing exceptions, providing a no-op PrintStream implementation.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Write Methods:</b> Tests write operations with byte arrays, single bytes, and offset/length variants</li>
+ *   <li><b>Print Methods:</b> Verifies print operations for all primitive types and objects</li>
+ *   <li><b>Println Methods:</b> Ensures println operations for all types execute without exceptions</li>
+ *   <li><b>Append Methods:</b> Validates append operations with various parameters</li>
+ *   <li><b>Format Methods:</b> Tests format and printf methods with different arguments</li>
+ *   <li><b>Error Checking:</b> Confirms no errors are reported after operations</li>
+ * </ul>
  */
 @ValidateCharset
 @WithLocale("en")

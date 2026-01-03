@@ -30,6 +30,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <p>
  * Tests validate that LoggerOutputStream correctly writes data and logs it when closed,
  * with proper handling of various write operations.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Data Writing:</b> Verifies writing byte arrays, single bytes, and byte arrays with offset and length</li>
+ *   <li><b>Flush Behavior:</b> Ensures data is not logged on flush, only extracted</li>
+ *   <li><b>Close Behavior:</b> Validates that data is logged when the stream is closed</li>
+ *   <li><b>String Conversion:</b> Tests conversion of written data to string</li>
+ * </ul>
  */
 @ValidateCharset
 class LoggerOutputStreamTest {

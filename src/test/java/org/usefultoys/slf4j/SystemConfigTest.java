@@ -29,6 +29,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * <p>
  * Tests validate that SystemConfig correctly parses and applies system properties,
  * with proper error handling for invalid values.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Default Values:</b> Verifies that all managed bean flags are false by default and no initialization errors occur</li>
+ *   <li><b>Reset Functionality:</b> Ensures that reset() restores all values to defaults without errors</li>
+ *   <li><b>Boolean Property Parsing:</b> Tests parsing of useClassLoadingManagedBean, useMemoryManagedBean, useCompilationManagedBean, useGarbageCollectionManagedBean, and usePlatformManagedBean with true, false, and invalid values</li>
+ *   <li><b>Error Handling:</b> Validates that invalid boolean values fall back to defaults and report errors via ConfigParser</li>
+ * </ul>
  */
 @ValidateCharset
 @ResetSystemConfig

@@ -30,6 +30,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <p>
  * Tests validate that SessionConfig correctly parses and applies system properties,
  * with proper error handling for invalid values and correct defaults.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Default Values:</b> Verifies correct default values for uuidSize and charset on initialization</li>
+ *   <li><b>Reset Functionality:</b> Ensures reset() restores default values</li>
+ *   <li><b>UUID Size Parsing:</b> Tests parsing uuidSize with valid values, bounds checking, and invalid formats</li>
+ *   <li><b>Charset Parsing:</b> Validates parsing of charset property</li>
+ * </ul>
  */
 @ValidateCharset
 @ResetSessionConfig
