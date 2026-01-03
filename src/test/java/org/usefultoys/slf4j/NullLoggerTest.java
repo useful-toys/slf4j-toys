@@ -28,6 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * <p>
  * Tests validate that NullLogger silently ignores all logging operations
  * without throwing exceptions, providing a no-op Logger implementation.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Logger Name:</b> Verifies getName() returns without exceptions</li>
+ *   <li><b>Level Enabled Checks:</b> Confirms all logging levels (trace, debug, info, warn, error) report as not enabled</li>
+ *   <li><b>Logging Methods:</b> Tests all logging methods (with and without markers, various argument counts) execute without exceptions</li>
+ * </ul>
  */
 @ValidateCharset
 class NullLoggerTest {

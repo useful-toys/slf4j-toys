@@ -41,6 +41,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * <p>
  * Tests validate that LoggerFactory correctly creates loggers and print/output streams, with proper behavior for
  * enabled and disabled loggers.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Logger Creation:</b> Verifies creation of loggers by name, class, class with feature name, and parent logger with child name</li>
+ *   <li><b>Enabled Print Streams:</b> Tests that print streams log messages when the corresponding logger level is enabled</li>
+ *   <li><b>Disabled Print Streams:</b> Tests that print streams do not log when the corresponding logger level is disabled</li>
+ *   <li><b>Enabled Output Streams:</b> Tests that output streams log data when the corresponding logger level is enabled</li>
+ *   <li><b>Disabled Output Streams:</b> Tests that output streams do not log when the corresponding logger level is disabled</li>
+ *   <li><b>Null Streams:</b> Validates that null print and output streams handle operations without exceptions</li>
+ * </ul>
  */
 @ValidateCharset
 class LoggerFactoryTest {

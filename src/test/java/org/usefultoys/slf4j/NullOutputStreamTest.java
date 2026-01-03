@@ -27,6 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
  * <p>
  * Tests validate that NullOutputStream silently ignores all write operations
  * without throwing exceptions, providing a no-op OutputStream implementation.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Write Operations:</b> Verifies writing single bytes, full byte arrays, and byte arrays with offset and length without exceptions</li>
+ *   <li><b>Stream Operations:</b> Ensures flush and close operations complete without errors</li>
+ * </ul>
  */
 @ValidateCharset
 class NullOutputStreamTest {
