@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,11 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
  * Tests verify that ReportSystemEnvironment correctly handles SecurityException
  * when environment variables cannot be accessed due to security restrictions.
  * Uses Mockito spy to avoid interfering with System class loading.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Security Exception Handling:</b> Verifies proper handling of SecurityException when accessing environment variables</li>
+ * </ul>
  */
 @DisplayName("ReportSystemEnvironmentSecurityException")
 @ValidateCharset

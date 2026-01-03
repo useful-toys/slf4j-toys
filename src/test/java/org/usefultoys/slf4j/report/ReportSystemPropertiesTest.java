@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,14 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
  * <p>
  * Tests verify that ReportSystemProperties correctly reports system properties
  * and censors sensitive properties based on configurable regex patterns.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>System Property Reporting:</b> Tests reporting of system properties with censoring of sensitive data using default regex</li>
+ *   <li><b>Custom Regex Censoring:</b> Verifies censoring based on custom regex patterns</li>
+ *   <li><b>Empty Regex Handling:</b> Tests behavior when no censoring regex is configured</li>
+ *   <li><b>Non-Matching Regex:</b> Ensures properties are not censored when regex doesn't match</li>
+ * </ul>
  */
 @DisplayName("ReportSystemProperties")
 @ValidateCharset

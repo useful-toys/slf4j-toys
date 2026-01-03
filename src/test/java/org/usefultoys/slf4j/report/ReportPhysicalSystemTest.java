@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,11 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
  * <p>
  * Tests verify that ReportPhysicalSystem correctly reports physical system information
  * including processor count.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Physical System Information Reporting:</b> Verifies logging of available processor count</li>
+ * </ul>
  */
 @DisplayName("ReportPhysicalSystem")
 @ValidateCharset

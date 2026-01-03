@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,12 @@ import static org.mockito.Mockito.when;
  * <p>
  * Tests verify that ReportSecurityProviders correctly reports security provider information
  * including provider names, versions, info descriptions, and available services.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Security Providers Reporting:</b> Verifies logging of security providers with names, versions, info, and services</li>
+ *   <li><b>No Providers Handling:</b> Tests proper handling when no security providers are found</li>
+ * </ul>
  */
 @DisplayName("ReportSecurityProviders")
 @ValidateCharset

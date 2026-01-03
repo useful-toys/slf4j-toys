@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -44,6 +44,18 @@ import static org.mockito.Mockito.when;
  * Tests verify that ReportNetworkInterface correctly reports network interface information
  * including loopback, physical, virtual interfaces, IP addresses (IPv4/IPv6),
  * hardware addresses, and handles various edge cases and exceptions.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Loopback Interface Reporting:</b> Verifies reporting of loopback network interfaces</li>
+ *   <li><b>Physical Interface Reporting:</b> Tests reporting of physical interfaces with IP addresses</li>
+ *   <li><b>Virtual Interface Reporting:</b> Verifies reporting of virtual network interfaces</li>
+ *   <li><b>Hardware Address Handling:</b> Tests interfaces with and without hardware addresses</li>
+ *   <li><b>Exception Handling:</b> Verifies proper handling of IO exceptions on interface properties and address reachability</li>
+ *   <li><b>IPv4 Address Reporting:</b> Tests reporting of IPv4 addresses with all properties</li>
+ *   <li><b>IPv6 Address Reporting:</b> Tests reporting of IPv6 addresses with all properties</li>
+ *   <li><b>Null Host Names Handling:</b> Verifies handling of addresses with null host names</li>
+ * </ul>
  */
 @DisplayName("ReportNetworkInterface")
 @ValidateCharset

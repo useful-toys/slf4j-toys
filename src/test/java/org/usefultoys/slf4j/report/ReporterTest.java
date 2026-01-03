@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,16 @@ import static org.mockito.Mockito.when;
  * <p>
  * Tests verify that Reporter correctly executes default reports based on configuration,
  * handles network interface reporting, manages logging levels, and integrates with ReporterConfig.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Report Execution Control:</b> Verifies selective execution of reports based on configuration, including all enabled, selected subset, and none disabled scenarios</li>
+ *   <li><b>Executor Integration:</b> Tests execution using custom executors for counting and same-thread execution models</li>
+ *   <li><b>Network Interface Reporting:</b> Validates proper handling of network interfaces including mock data, error conditions (SocketException), and detailed interface information logging</li>
+ *   <li><b>Logger Configuration:</b> Ensures correct logger selection using default constructor with custom logger names from ReporterConfig</li>
+ *   <li><b>Logging Level Handling:</b> Tests behavior when INFO logging level is disabled, ensuring reports execute but no messages are logged</li>
+ *   <li><b>Configuration Integration:</b> Verifies integration with ReporterConfig for enabling/disabling specific report types</li>
+ * </ul>
  */
 @DisplayName("Reporter")
 @ValidateCharset
