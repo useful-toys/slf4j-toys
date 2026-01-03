@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,44 +16,43 @@
 
 package org.usefultoys.slf4j.meter;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.utils.ConfigParser;
-
-import java.nio.charset.Charset;
+import org.usefultoys.test.ClearParserErrors;
+import org.usefultoys.test.ResetMeterConfig;
+import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link MeterConfig}.
+ * <p>
+ * Tests validate that MeterConfig correctly parses system properties and provides
+ * appropriate default values and error handling for invalid inputs.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Default Values:</b> Verifies all configuration properties have correct defaults</li>
+ *   <li><b>Property Parsing:</b> Tests parsing of all system properties with valid values</li>
+ *   <li><b>Error Handling:</b> Validates fallback to defaults and error reporting for invalid property values</li>
+ *   <li><b>Reset Functionality:</b> Ensures reset() restores all properties to defaults</li>
+ * </ul>
+ */
+@DisplayName("MeterConfig")
+@ValidateCharset
+@ResetMeterConfig
+@WithLocale("en")
 class MeterConfigTest {
 
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    @BeforeEach
-    void setUp() {
-        // Reinitialize each configuration to ensure a clean configuration before each test
-        MeterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-        ConfigParser.clearInitializationErrors(); // Clear errors for each test
-    }
-
-    @AfterAll
-    static void tearDown() {
-        // Reinitialize SystemConfig to ensure clean state for further tests
-        MeterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-        ConfigParser.clearInitializationErrors(); // Clear errors after all tests
-    }
-
+    /**
+     * Tests that MeterConfig initializes with correct default values.
+     */
     @Test
+    @DisplayName("should have correct default values")
     void testDefaultValues() {
         MeterConfig.init();
         assertFalse(MeterConfig.printCategory, "Default value for printCategory should be false");
@@ -68,7 +67,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for default values");
     }
 
+    /**
+     * Tests that MeterConfig reset restores all properties to their default values.
+     */
     @Test
+    @DisplayName("should reset to default values")
     void testResetValues() {
         MeterConfig.reset();
         assertEquals(2000L, MeterConfig.progressPeriodMilliseconds, "Default value for progressPeriodMilliseconds should be 2000ms");
@@ -85,7 +88,11 @@ class MeterConfigTest {
     }
 
 
+    /**
+     * Tests that progressPeriodMilliseconds property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse progressPeriodMilliseconds property correctly")
     void testProgressPeriodMillisecondsProperty() {
         System.setProperty(MeterConfig.PROP_PROGRESS_PERIOD, "5000");
         MeterConfig.init();
@@ -93,7 +100,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid progressPeriodMilliseconds");
     }
 
+    /**
+     * Tests that invalid progressPeriodMilliseconds property falls back to default and reports error.
+     */
     @Test
+    @DisplayName("should handle invalid progressPeriodMilliseconds format")
     void testProgressPeriodMillisecondsInvalidFormat() {
         System.setProperty(MeterConfig.PROP_PROGRESS_PERIOD, "invalid");
         MeterConfig.init();
@@ -103,7 +114,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid time value for property '" + MeterConfig.PROP_PROGRESS_PERIOD));
     }
 
+    /**
+     * Tests that printCategory property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse printCategory property correctly")
     void testPrintCategoryProperty() {
         System.setProperty(MeterConfig.PROP_PRINT_CATEGORY, "true");
         MeterConfig.init();
@@ -111,7 +126,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printCategory");
     }
 
+    /**
+     * Tests that invalid printCategory property falls back to default and reports error.
+     */
     @Test
+    @DisplayName("should handle invalid printCategory format")
     void testPrintCategoryInvalidFormat() {
         System.setProperty(MeterConfig.PROP_PRINT_CATEGORY, "invalid");
         MeterConfig.init();
@@ -121,7 +140,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_CATEGORY));
     }
 
+    /**
+     * Tests that printStatus property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse printStatus property correctly")
     void testPrintStatusProperty() {
         System.setProperty(MeterConfig.PROP_PRINT_STATUS, "false");
         MeterConfig.init();
@@ -129,7 +152,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printStatus");
     }
 
+    /**
+     * Tests that invalid printStatus property falls back to default and reports error.
+     */
     @Test
+    @DisplayName("should handle invalid printStatus format")
     void testPrintStatusInvalidFormat() {
         System.setProperty(MeterConfig.PROP_PRINT_STATUS, "invalid");
         MeterConfig.init();
@@ -139,7 +166,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_STATUS));
     }
 
+    /**
+     * Tests that printPosition property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse printPosition property correctly")
     void testPrintPositionProperty() {
         System.setProperty(MeterConfig.PROP_PRINT_POSITION, "true");
         MeterConfig.init();
@@ -147,7 +178,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printPosition");
     }
 
+    /**
+     * Tests that invalid printPosition property falls back to default and reports error.
+     */
     @Test
+    @DisplayName("should handle invalid printPosition format")
     void testPrintPositionInvalidFormat() {
         System.setProperty(MeterConfig.PROP_PRINT_POSITION, "invalid");
         MeterConfig.init();
@@ -157,7 +192,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_POSITION));
     }
 
+    /**
+     * Tests that printLoad property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse printLoad property correctly")
     void testPrintLoadProperty() {
         System.setProperty(MeterConfig.PROP_PRINT_LOAD, "true");
         MeterConfig.init();
@@ -165,7 +204,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printLoad");
     }
 
+    /**
+     * Tests that invalid printLoad property falls back to default and reports error.
+     */
     @Test
+    @DisplayName("should handle invalid printLoad format")
     void testPrintLoadInvalidFormat() {
         System.setProperty(MeterConfig.PROP_PRINT_LOAD, "invalid");
         MeterConfig.init();
@@ -175,7 +218,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_LOAD));
     }
 
+    /**
+     * Tests that printMemory property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse printMemory property correctly")
     void testPrintMemoryProperty() {
         System.setProperty(MeterConfig.PROP_PRINT_MEMORY, "true");
         MeterConfig.init();
@@ -183,7 +230,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid printMemory");
     }
 
+    /**
+     * Tests that invalid printMemory property falls back to default and reports error.
+     */
     @Test
+    @DisplayName("should handle invalid printMemory format")
     void testPrintMemoryInvalidFormat() {
         System.setProperty(MeterConfig.PROP_PRINT_MEMORY, "invalid");
         MeterConfig.init();
@@ -193,7 +244,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_MEMORY));
     }
 
+    /**
+     * Tests that dataPrefix property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse dataPrefix property correctly")
     void testDataPrefixProperty() {
         System.setProperty(MeterConfig.PROP_DATA_PREFIX, "data.");
         MeterConfig.init();
@@ -201,7 +256,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid dataPrefix");
     }
 
+    /**
+     * Tests that dataSuffix property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse dataSuffix property correctly")
     void testDataSuffixProperty() {
         System.setProperty(MeterConfig.PROP_DATA_SUFFIX, ".data");
         MeterConfig.init();
@@ -209,7 +268,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid dataSuffix");
     }
 
+    /**
+     * Tests that messagePrefix property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse messagePrefix property correctly")
     void testMessagePrefixProperty() {
         System.setProperty(MeterConfig.PROP_MESSAGE_PREFIX, "message.");
         MeterConfig.init();
@@ -217,7 +280,11 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid messagePrefix");
     }
 
+    /**
+     * Tests that messageSuffix property is correctly parsed from system property.
+     */
     @Test
+    @DisplayName("should parse messageSuffix property correctly")
     void testMessageSuffixProperty() {
         System.setProperty(MeterConfig.PROP_MESSAGE_SUFFIX, ".message");
         MeterConfig.init();
