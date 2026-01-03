@@ -15,11 +15,11 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.test.ResetSessionConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
@@ -58,6 +58,7 @@ class MeterAnalysisTest {
      * of MeterAnalysis interface methods.
      */
     @Getter
+    @AllArgsConstructor
     static class MeterAnalysisScenario implements MeterAnalysis {
         long lastCurrentTime;
         String category;
@@ -85,105 +86,9 @@ class MeterAnalysisTest {
         long expectedWaitingTime;
         boolean expectedIsSlow;
 
-        // Complete constructor to facilitate scenario creation
-        public MeterAnalysisScenario(
-                final long lastCurrentTime,
-                final String category, final String operation, final String parent,
-                final long createTime, final long startTime, final long stopTime, final long timeLimit,
-                final long currentIteration, final String okPath, final String rejectPath, final String failPath,
-                final String expectedFullID, final boolean expectedIsStarted, final boolean expectedIsStopped,
-                final boolean expectedIsOK, final boolean expectedIsReject, final boolean expectedIsFail,
-                final String expectedPath, final double expectedIterationsPerSecond, final long expectedExecutionTime,
-                final long expectedWaitingTime, final boolean expectedIsSlow) {
-            this.lastCurrentTime = lastCurrentTime;
-            this.category = category;
-            this.operation = operation;
-            this.parent = parent;
-            this.createTime = createTime;
-            this.startTime = startTime;
-            this.stopTime = stopTime;
-            this.timeLimit = timeLimit;
-            this.currentIteration = currentIteration;
-            this.okPath = okPath;
-            this.rejectPath = rejectPath;
-            this.failPath = failPath;
-            this.expectedFullID = expectedFullID;
-            this.expectedIsStarted = expectedIsStarted;
-            this.expectedIsStopped = expectedIsStopped;
-            this.expectedIsOK = expectedIsOK;
-            this.expectedIsReject = expectedIsReject;
-            this.expectedIsFail = expectedIsFail;
-            this.expectedPath = expectedPath;
-            this.expectedIterationsPerSecond = expectedIterationsPerSecond;
-            this.expectedExecutionTime = expectedExecutionTime;
-            this.expectedWaitingTime = expectedWaitingTime;
-            this.expectedIsSlow = expectedIsSlow;
-        }
-
         @Override
         public String toString() {
             return String.format("Scenario(category='%s', operation='%s')", category, operation);
-        }
-
-        // --- Implementation of abstract methods from MeterAnalysis ---
-        @Override
-        public long getLastCurrentTime() {
-            return lastCurrentTime;
-        }
-
-        @Override
-        public String getCategory() {
-            return category;
-        }
-
-        @Override
-        public String getOperation() {
-            return operation;
-        }
-
-        @Override
-        public String getParent() {
-            return parent;
-        }
-
-        @Override
-        public long getCreateTime() {
-            return createTime;
-        }
-
-        @Override
-        public long getStartTime() {
-            return startTime;
-        }
-
-        @Override
-        public long getStopTime() {
-            return stopTime;
-        }
-
-        @Override
-        public long getTimeLimit() {
-            return timeLimit;
-        }
-
-        @Override
-        public long getCurrentIteration() {
-            return currentIteration;
-        }
-
-        @Override
-        public String getOkPath() {
-            return okPath;
-        }
-
-        @Override
-        public String getRejectPath() {
-            return rejectPath;
-        }
-
-        @Override
-        public String getFailPath() {
-            return failPath;
         }
     }
 
