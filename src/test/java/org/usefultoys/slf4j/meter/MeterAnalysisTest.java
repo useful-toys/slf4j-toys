@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,47 @@
 package org.usefultoys.slf4j.meter;
 
 import lombok.Getter;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.ResetSessionConfig;
+import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.WithLocale;
 
-import java.nio.charset.Charset;
-import java.util.Locale;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for {@link MeterAnalysis}.
+ * <p>
+ * Tests validate that MeterAnalysis correctly analyzes meter states and calculates performance metrics
+ * based on timing data, iteration counts, and outcome paths.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Operation State Detection:</b> Verifies isStarted(), isStopped(), isOK(), isReject(), and isFail() methods correctly identify operation states based on start/stop times and paths</li>
+ *   <li><b>Outcome Path Resolution:</b> Tests getPath() method returns correct outcome (OK, reject, fail) based on configured paths</li>
+ *   <li><b>Performance Metrics:</b> Validates getIterationsPerSecond() calculation using iteration count and elapsed time</li>
+ *   <li><b>Timing Calculations:</b> Ensures getExecutionTime() and getWaitingTime() compute correct durations from create/start/stop times</li>
+ *   <li><b>Slow Operation Detection:</b> Tests isSlow() identifies operations exceeding time limits</li>
+ *   <li><b>Edge Cases:</b> Covers scenarios with no operation, null values, zero iterations, and various timing combinations</li>
+ * </ul>
+ */
+@DisplayName("MeterAnalysis")
+@ValidateCharset
+@ResetSessionConfig
+@WithLocale("en")
 class MeterAnalysisTest {
-    @BeforeAll
-    static void setupConsistentLocale() {
-        Locale.setDefault(Locale.ENGLISH);
-    }
 
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
-
-    // Classe de cenário de testes que implementa MeterAnalysis
+    // Test scenario class that implements MeterAnalysis
+    /**
+     * Test scenario class that implements {@link MeterAnalysis} for parameterized testing.
+     * <p>
+     * Provides predefined meter states and expected outcomes for comprehensive validation
+     * of MeterAnalysis interface methods.
+     */
     @Getter
     static class MeterAnalysisScenario implements MeterAnalysis {
         long lastCurrentTime;
@@ -55,7 +72,7 @@ class MeterAnalysisTest {
         String rejectPath;
         String failPath;
 
-        // Campos esperados para as asserções
+        // Expected fields for assertions
         String expectedFullID;
         boolean expectedIsStarted;
         boolean expectedIsStopped;
@@ -68,7 +85,7 @@ class MeterAnalysisTest {
         long expectedWaitingTime;
         boolean expectedIsSlow;
 
-        // Construtor completo para facilitar a criação de cenários
+        // Complete constructor to facilitate scenario creation
         public MeterAnalysisScenario(
                 final long lastCurrentTime,
                 final String category, final String operation, final String parent,
@@ -108,7 +125,7 @@ class MeterAnalysisTest {
             return String.format("Scenario(category='%s', operation='%s')", category, operation);
         }
 
-        // --- Implementação dos métodos abstratos de MeterAnalysis ---
+        // --- Implementation of abstract methods from MeterAnalysis ---
         @Override
         public long getLastCurrentTime() {
             return lastCurrentTime;
@@ -170,10 +187,17 @@ class MeterAnalysisTest {
         }
     }
 
-    // Método que fornece os cenários de teste
+    /**
+     * Provides a stream of test scenarios for {@link MeterAnalysis} validation.
+     * <p>
+     * Each scenario represents different meter states (started, stopped, OK, reject, fail)
+     * with expected outcomes for all MeterAnalysis methods.
+     *
+     * @return stream of MeterAnalysisScenario instances for parameterized tests
+     */
     static Stream<MeterAnalysisScenario> provideMeterAnalysisScenarios() {
         return Stream.of(
-                // Cenário 1: Operação em andamento, sem falha/rejeição
+                // Scenario 1: Operation in progress, no failure/rejection
                 new MeterAnalysisScenario(
                         1000L,
                         "cat1", "op1", null,
@@ -184,7 +208,7 @@ class MeterAnalysisTest {
                         "ok", 10.0 / (1000.0 - 500.0) * 1_000_000_000, 500L,
                         400L, false
                 ),
-                // Cenário 2: Operação concluída com sucesso
+                // Scenario 2: Operation completed successfully
                 new MeterAnalysisScenario(
                         1500L,
                         "cat1", "op1", null,
@@ -195,7 +219,7 @@ class MeterAnalysisTest {
                         "ok", 20.0 / (1200.0 - 500.0) * 1_000_000_000, 700L,
                         400L, false
                 ),
-                // Cenário 3: Operação rejeitada
+                // Scenario 3: Operation rejected
                 new MeterAnalysisScenario(
                         2000L,
                         "cat2", "op2", null,
@@ -206,7 +230,7 @@ class MeterAnalysisTest {
                         "rejected", 5.0 / (1800.0 - 600.0) * 1_000_000_000, 1200L,
                         400L, false
                 ),
-                // Cenário 4: Operação falhou
+                // Scenario 4: Operation failed
                 new MeterAnalysisScenario(
                         2500L,
                         "cat3", "op3", null,
@@ -217,7 +241,7 @@ class MeterAnalysisTest {
                         "failed", 1.0 / (2200.0 - 700.0) * 1_000_000_000, 1500L,
                         400L, false
                 ),
-                // Cenário 5: Operação não iniciada
+                // Scenario 5: Operation not started
                 new MeterAnalysisScenario(
                         500L,
                         "cat4", "op4", null,
@@ -228,7 +252,7 @@ class MeterAnalysisTest {
                         null, 0.0, 0L,
                         400L, false
                 ),
-                // Cenário 6: Operação lenta
+                // Scenario 6: Slow operation
                 new MeterAnalysisScenario(
                         3000L,
                         "cat5", "op5", null,
@@ -239,7 +263,7 @@ class MeterAnalysisTest {
                         "ok", 10.0 / (2800.0 - 800.0) * 1_000_000_000, 2000L,
                         400L, true
                 ),
-                // Cenário 7: Operação rápida (não lenta)
+                // Scenario 7: Fast operation (not slow)
                 new MeterAnalysisScenario(
                         3500L,
                         "cat6", "op6", null,
@@ -250,7 +274,7 @@ class MeterAnalysisTest {
                         "ok", 5.0 / (1200.0 - 900.0) * 1_000_000_000, 300L,
                         400L, false
                 ),
-                // Cenário 8: getFullID sem operação
+                // Scenario 8: getFullID without operation
                 new MeterAnalysisScenario(
                         3500L,
                         "cat7", null, null,
@@ -264,6 +288,9 @@ class MeterAnalysisTest {
         );
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#isStarted()} correctly indicates if the operation has started.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isStarted should correctly indicate if the operation has started")
@@ -272,6 +299,9 @@ class MeterAnalysisTest {
                 "isStarted should match the expected value for scenario: " + scenario);
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#isStopped()} correctly indicates if the operation has stopped.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isStopped should correctly indicate if the operation has stopped")
@@ -280,6 +310,9 @@ class MeterAnalysisTest {
                 "isStopped should match the expected value for scenario: " + scenario);
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#isOK()} correctly indicates if the operation completed successfully.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isOK should correctly indicate if the operation completed successfully")
@@ -288,6 +321,9 @@ class MeterAnalysisTest {
                 "isOK should match the expected value for scenario: " + scenario);
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#isReject()} correctly indicates if the operation was rejected.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isReject should correctly indicate if the operation was rejected")
@@ -296,6 +332,9 @@ class MeterAnalysisTest {
                 "isReject should match the expected value for scenario: " + scenario);
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#isFail()} correctly indicates if the operation failed.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isFail should correctly indicate if the operation failed")
@@ -304,6 +343,9 @@ class MeterAnalysisTest {
                 "isFail should match the expected value for scenario: " + scenario);
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#getPath()} returns the correct outcome path.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("getPath should return the correct outcome path")
@@ -312,14 +354,20 @@ class MeterAnalysisTest {
                 "Path should match the expected value for scenario: " + scenario);
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#getIterationsPerSecond()} calculates the correct iterations per second.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("getIterationsPerSecond should calculate the correct iterations per second")
     void testGetIterationsPerSecond(final MeterAnalysisScenario scenario) {
-        assertEquals(scenario.expectedIterationsPerSecond, scenario.getIterationsPerSecond(), 0.000000001, // Delta para comparação de doubles
+        assertEquals(scenario.expectedIterationsPerSecond, scenario.getIterationsPerSecond(), 0.000000001, // Delta for double comparison
                 "Iterations per second should match the expected value for scenario: " + scenario);
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#getExecutionTime()} calculates the correct execution time.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("getExecutionTime should calculate the correct execution time")
@@ -328,6 +376,9 @@ class MeterAnalysisTest {
                 "Execution time should match the expected value for scenario: " + scenario);
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#getWaitingTime()} calculates the correct waiting time.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("getWaitingTime should calculate the correct waiting time")
@@ -336,6 +387,9 @@ class MeterAnalysisTest {
                 "Waiting time should match the expected value for scenario: " + scenario);
     }
 
+    /**
+     * Tests that {@link MeterAnalysis#isSlow()} correctly indicates if the operation is slow.
+     */
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideMeterAnalysisScenarios")
     @DisplayName("isSlow should correctly indicate if the operation is slow")
