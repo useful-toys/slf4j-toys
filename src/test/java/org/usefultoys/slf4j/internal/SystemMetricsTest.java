@@ -12,6 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * <p>
  * Tests verify that SystemMetrics correctly provides a singleton instance
  * of SystemMetricsCollector, ensuring consistent behavior across calls.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Singleton Pattern:</b> Verifies that getInstance() returns a non-null SystemMetricsCollector and the same instance on multiple calls</li>
+ * </ul>
  */
 @DisplayName("SystemMetrics")
 @ValidateCharset

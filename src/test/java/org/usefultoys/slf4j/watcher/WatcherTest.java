@@ -35,6 +35,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * Tests validate that Watcher correctly logs messages and data based on configuration,
  * with proper handling of various logger states and prefix/suffix combinations.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Message Logging:</b> Tests logging of messages with various prefixes and suffixes</li>
+ *   <li><b>Data Logging:</b> Verifies logging of WatcherData with different configurations</li>
+ *   <li><b>Logger State Handling:</b> Ensures correct behavior with enabled/disabled loggers</li>
+ *   <li><b>Configuration Scenarios:</b> Covers multiple combinations of watcher settings</li>
+ * </ul>
  */
 @ValidateCharset
 @ResetWatcherConfig

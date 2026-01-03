@@ -44,6 +44,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * <p>
  * Tests validate that WatcherSingleton correctly starts and stops scheduled watchers
  * using both ExecutorService and Timer approaches, with proper event logging.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Executor-based Watchers:</b> Tests starting and stopping watchers using ScheduledExecutorService</li>
+ *   <li><b>Timer-based Watchers:</b> Tests starting and stopping watchers using Timer</li>
+ *   <li><b>Status Logging:</b> Verifies correct logging of system status during watcher execution</li>
+ *   <li><b>Watcher Management:</b> Ensures proper cleanup and singleton behavior</li>
+ * </ul>
  */
 @ValidateCharset
 @ResetWatcherConfig

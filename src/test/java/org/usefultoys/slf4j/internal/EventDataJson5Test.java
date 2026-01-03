@@ -31,6 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <p>
  * Tests verify that EventData can be correctly serialized to and deserialized from JSON5 format,
  * including round-trip consistency and edge case handling.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Round-trip Serialization:</b> Tests serialization to JSON5 and deserialization back to EventData</li>
+ *   <li><b>Edge Case Handling:</b> Verifies correct handling of null values, empty strings, and boundary conditions</li>
+ *   <li><b>Consistency:</b> Ensures that serialize/deserialize maintains data integrity</li>
+ * </ul>
  */
 @DisplayName("EventDataJson5")
 @ValidateCharset

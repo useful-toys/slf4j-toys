@@ -34,6 +34,14 @@ import static org.mockito.Mockito.when;
  * <p>
  * Tests validate that MessageHighlightConverter correctly maps log markers to appropriate
  * foreground color codes, supporting visibility levels for message highlighting.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>MORE_VISIBILITY Markers:</b> Tests color mapping for markers requiring high visibility</li>
+ *   <li><b>LESS_VISIBILITY Markers:</b> Tests color mapping for markers requiring low visibility</li>
+ *   <li><b>ERROR_VISIBILITY Markers:</b> Tests color mapping for error-related markers</li>
+ *   <li><b>DEFAULT_VISIBILITY:</b> Verifies fallback color mapping for unmapped markers</li>
+ * </ul>
  */
 @DisplayName("MessageHighlightConverter")
 @ValidateCharset

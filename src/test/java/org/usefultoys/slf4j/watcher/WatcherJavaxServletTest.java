@@ -43,6 +43,13 @@ import static org.mockito.Mockito.when;
  * <p>
  * Tests validate that WatcherJavaxServlet correctly handles HTTP requests, logs runtime state,
  * and handles exceptions appropriately. Uses javax.servlet API (Java EE / Jakarta EE 8 and earlier).
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>HTTP Request Handling:</b> Verifies correct processing of GET requests and response writing</li>
+ *   <li><b>System Status Logging:</b> Tests logging of runtime state with appropriate log levels</li>
+ *   <li><b>Exception Handling:</b> Ensures graceful handling of exceptions during watcher execution</li>
+ * </ul>
  */
 @ValidateCharset
 @ResetWatcherConfig

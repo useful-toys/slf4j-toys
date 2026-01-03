@@ -31,6 +31,15 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  * <p>
  * Tests validate that UnitFormatter correctly formats various numeric values
  * with appropriate units for bytes, time, iterations, and custom units.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Custom Units:</b> Tests formatting of long and double values with custom unit arrays</li>
+ *   <li><b>Byte Units:</b> Verifies formatting of byte values with appropriate units (B, KB, MB, etc.)</li>
+ *   <li><b>Time Units:</b> Covers formatting of time values in nanoseconds, microseconds, milliseconds, seconds</li>
+ *   <li><b>Iteration Units:</b> Tests formatting of iteration counts with appropriate units</li>
+ *   <li><b>Edge Cases:</b> Ensures correct handling of zero, negative, and large values</li>
+ * </ul>
  */
 @ValidateCharset
 @WithLocale("en")

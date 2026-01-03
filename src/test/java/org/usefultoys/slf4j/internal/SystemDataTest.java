@@ -28,6 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * <p>
  * Tests verify that SystemData correctly initializes, manages, and resets system monitoring information
  * including memory, garbage collection, class loading, and compilation metrics.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Constructor Initialization:</b> Tests initialization with full constructor setting all system metrics</li>
+ *   <li><b>Reset Functionality:</b> Verifies that reset clears all fields to default values</li>
+ *   <li><b>Field Management:</b> Ensures correct setting and getting of memory, GC, class loading, and compilation data</li>
+ * </ul>
  */
 @DisplayName("SystemData")
 @ValidateCharset

@@ -45,6 +45,14 @@ import static org.mockito.Mockito.when;
  * <p>
  * Tests verify that SystemMetricsCollector correctly collects system metrics from various MXBeans,
  * handles configuration flags, and gracefully handles edge cases and null beans.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>MXBean Collection:</b> Tests collection from MemoryMXBean, ClassLoadingMXBean, CompilationMXBean, GarbageCollectorMXBean, and OperatingSystemMXBean</li>
+ *   <li><b>Configuration Flags:</b> Verifies that SystemConfig flags control which metrics are collected</li>
+ *   <li><b>Edge Cases:</b> Ensures graceful handling of null beans, unavailable metrics, and boundary conditions</li>
+ *   <li><b>System Load:</b> Tests collection of system load average from OperatingSystemMXBean</li>
+ * </ul>
  */
 @DisplayName("SystemMetricsCollector")
 @ValidateCharset
