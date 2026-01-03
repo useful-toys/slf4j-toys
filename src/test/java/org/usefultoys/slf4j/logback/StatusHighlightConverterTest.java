@@ -35,6 +35,15 @@ import static org.mockito.Mockito.when;
  * <p>
  * Tests validate that StatusHighlightConverter correctly maps log markers and log levels
  * to appropriate foreground color codes for terminal output highlighting.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Message Markers:</b> Tests color mapping for message-related markers</li>
+ *   <li><b>Data Markers:</b> Verifies color mapping for data markers (LESS_VISIBILITY)</li>
+ *   <li><b>Inconsistency Markers:</b> Tests color mapping for inconsistency-related markers</li>
+ *   <li><b>Watcher Marker:</b> Covers color mapping for watcher-specific markers</li>
+ *   <li><b>Default Behavior:</b> Ensures fallback color mapping for unmapped cases</li>
+ * </ul>
  */
 @DisplayName("StatusHighlightConverter")
 @ValidateCharset

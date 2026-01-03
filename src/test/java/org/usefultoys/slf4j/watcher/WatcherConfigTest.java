@@ -32,6 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * Tests validate that WatcherConfig correctly initializes default values, parses system properties,
  * handles invalid configurations, and properly resets to default state.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Default Values:</b> Verifies correct initialization of default values for delay and period</li>
+ *   <li><b>Reset Functionality:</b> Ensures reset() restores all values to defaults</li>
+ *   <li><b>Property Parsing:</b> Tests parsing of delayMilliseconds and periodMilliseconds from system properties</li>
+ *   <li><b>Error Handling:</b> Validates fallback to defaults for invalid property formats</li>
+ * </ul>
  */
 @DisplayName("WatcherConfig")
 @ValidateCharset

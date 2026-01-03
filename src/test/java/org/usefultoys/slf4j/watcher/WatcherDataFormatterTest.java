@@ -33,6 +33,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <p>
  * Tests validate that WatcherDataFormatter correctly formats WatcherData into human-readable strings,
  * handling memory values, system load, and UUID information with proper locale-specific formatting.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Data Formatting:</b> Verifies formatting of WatcherData with various memory configurations (used, total, free)</li>
+ *   <li><b>Locale Handling:</b> Ensures consistent formatting across different data scenarios</li>
+ * </ul>
  */
 @DisplayName("WatcherDataFormatter")
 @ValidateCharset

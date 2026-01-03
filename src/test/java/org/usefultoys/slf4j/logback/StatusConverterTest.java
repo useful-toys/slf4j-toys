@@ -35,6 +35,15 @@ import static org.mockito.Mockito.when;
  * <p>
  * Tests validate that StatusConverter correctly converts log markers and log levels
  * to appropriate status strings for formatting log output.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Message Markers:</b> Tests conversion of message-related markers to status strings</li>
+ *   <li><b>Data Markers:</b> Verifies conversion of data markers (returning empty string)</li>
+ *   <li><b>Error Markers:</b> Tests conversion of error-related markers to status strings</li>
+ *   <li><b>Watcher Marker:</b> Covers conversion of watcher-specific markers</li>
+ *   <li><b>Default Behavior:</b> Ensures fallback handling for unmapped markers</li>
+ * </ul>
  */
 @DisplayName("StatusConverter")
 @ValidateCharset

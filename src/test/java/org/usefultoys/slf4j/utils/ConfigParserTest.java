@@ -35,6 +35,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * Tests validate that ConfigParser correctly parses and applies various property types,
  * with proper error handling for invalid values and correct defaults.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>String Properties:</b> Tests parsing of string properties with whitespace handling</li>
+ *   <li><b>Boolean Properties:</b> Verifies parsing of boolean values with true/false and invalid formats</li>
+ *   <li><b>Numeric Properties:</b> Covers parsing of int, long, and double properties with bounds and invalid formats</li>
+ *   <li><b>Default Values:</b> Ensures correct fallback to default values when properties are missing or invalid</li>
+ *   <li><b>Error Handling:</b> Validates error reporting for invalid property values</li>
+ * </ul>
  */
 @ValidateCharset
 @ClearParserErrors

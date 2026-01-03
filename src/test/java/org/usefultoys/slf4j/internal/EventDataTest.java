@@ -29,6 +29,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * Tests verify that EventData correctly initializes, manages, and resets event information
  * including session UUID, position, and timing data.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Constructor Initialization:</b> Tests initialization with no-arg, single-arg, and multi-arg constructors</li>
+ *   <li><b>Field Management:</b> Verifies correct setting and getting of sessionUuid, position, and timing fields</li>
+ *   <li><b>Time Collection:</b> Ensures collectCurrentTime updates lastCurrentTime with current nano time</li>
+ *   <li><b>Reset Functionality:</b> Tests that reset clears all fields to default values</li>
+ * </ul>
  */
 @DisplayName("EventData")
 @ValidateCharset
