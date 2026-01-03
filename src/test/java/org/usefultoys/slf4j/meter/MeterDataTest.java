@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
+import org.usefultoys.test.ResetSessionConfig;
+import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.WithLocale;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -33,21 +36,26 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 /**
- * @author Daniel
+ * Unit tests for {@link MeterData}.
+ * <p>
+ * Tests validate that MeterData correctly manages meter data including timing,
+ * context information, and provides proper string representations for logging.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Meter data initialization:</b> Verifies proper initialization of meter data fields</li>
+ *   <li><b>Timing operations:</b> Tests start/stop timing and elapsed time calculations</li>
+ *   <li><b>Context management:</b> Tests context map operations and data storage</li>
+ *   <li><b>String representation:</b> Tests toString() and print() methods for logging output</li>
+ *   <li><b>Status management:</b> Tests meter status transitions and state tracking</li>
+ *   <li><b>Configuration integration:</b> Tests integration with SystemConfig and SessionConfig</li>
+ * </ul>
  */
+@ValidateCharset
+@ResetSessionConfig
+@WithLocale("en")
 public class MeterDataTest {
-
-    @BeforeAll
-    public static void setupConsistentLocale() {
-        Locale.setDefault(Locale.ENGLISH);
-    }
-
-    @BeforeAll
-    public static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     @BeforeEach
     void resetMeterConfigBeforeEach() {
@@ -82,12 +90,12 @@ public class MeterDataTest {
 
     @Test
     void testConstructorAndGetters() {
-        // Create a map for context
+        // Given: a context map with test data
         final Map<String, String> contextMap = new HashMap<>();
         contextMap.put("key1", "value1");
         contextMap.put("key2", "value2");
 
-        // Create MeterData with all fields populated
+        // When: creating MeterData with all fields populated
         final MeterData meterData = new MeterData(
                 "abc", // sessionUuid
                 1, // position
@@ -126,6 +134,7 @@ public class MeterDataTest {
                 contextMap // context
         );
 
+        // Then: all fields should be properly initialized and accessible via getters
         // Verify inherited fields from SystemData
         assertEquals("abc", meterData.getSessionUuid());
         assertEquals(1, meterData.getPosition());
@@ -180,11 +189,11 @@ public class MeterDataTest {
 
     @Test
     void testResetClearsFields() {
-        // Create a map for context
+        // Given: a context map with test data
         final Map<String, String> contextMap = new HashMap<>();
         contextMap.put("key1", "value1");
 
-        // Create MeterData with all fields populated
+        // When: creating MeterData with all fields populated and then calling reset()
         final MeterData meterData = new MeterData(
                 "abc", // sessionUuid
                 1, // position
@@ -226,6 +235,7 @@ public class MeterDataTest {
         // Reset the meterData
         meterData.reset();
 
+        // Then: all fields should be cleared to default values
         // Verify inherited fields from SystemData are cleared
         assertNull(meterData.getSessionUuid());
         assertEquals(0L, meterData.getPosition());
@@ -289,7 +299,11 @@ public class MeterDataTest {
     @ParameterizedTest
     @MethodSource("providePathTestCases")
     void testPath(final MeterData value, final String expected) {
-        assertEquals(expected, value.getPath());
+        // Given: a MeterData instance with various path configurations
+        // When: calling getPath() method
+        final String actual = value.getPath();
+        // Then: the path should match the expected value
+        assertEquals(expected, actual);
     }
 
     static Stream<Arguments> provideFullIDTestCases() {
@@ -304,18 +318,27 @@ public class MeterDataTest {
     @ParameterizedTest
     @MethodSource("provideFullIDTestCases")
     void testFullID(final MeterData value, final String expected) {
-        assertEquals(expected, value.getFullID());
+        // Given: a MeterData instance with various category and operation configurations
+        // When: calling getFullID() method
+        final String actual = value.getFullID();
+        // Then: the full ID should match the expected format
+        assertEquals(expected, actual);
     }
 
     @Test
     void testEqualsAndHashCode() {
-        MeterData data1 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
-        MeterData data2 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
-        MeterData data3 = new MeterData("uuid2", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat2", "op2", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+        // Given: three MeterData instances - two identical and one different
+        final MeterData data1 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+        final MeterData data2 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+        final MeterData data3 = new MeterData("uuid2", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat2", "op2", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
 
-        assertEquals(data1, data2);
-        assertNotEquals(data1, data3);
-        assertEquals(data1.hashCode(), data2.hashCode());
-        assertNotEquals(data1.hashCode(), data3.hashCode());
+        // When: comparing the instances for equality
+        // Then: identical instances should be equal, different instances should not be equal
+        assertEquals(data1, data2, "should be equal when all fields are identical");
+        assertNotEquals(data1, data3, "should not be equal when fields differ");
+
+        // And: hash codes should be consistent with equality
+        assertEquals(data1.hashCode(), data2.hashCode(), "hash codes should be equal when objects are equal");
+        assertNotEquals(data1.hashCode(), data3.hashCode(), "hash codes should differ when objects are not equal");
     }
 }
