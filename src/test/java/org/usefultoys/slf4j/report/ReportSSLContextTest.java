@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,12 @@ import static org.mockito.Mockito.*;
  * Tests verify that ReportSSLContext correctly reports SSL context information
  * including protocol, provider, socket factories, server socket factories,
  * SSL parameters, cipher suites, and handles unavailable SSL contexts.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>SSL Context Full Details Reporting:</b> Verifies reporting of SSL context with protocol, provider, socket factories, cipher suites, and SSL parameters</li>
+ *   <li><b>SSL Context Unavailability Handling:</b> Tests proper handling when SSL context is not available</li>
+ * </ul>
  */
 @DisplayName("ReportSSLContext")
 @ValidateCharset

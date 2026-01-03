@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,14 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
  * <p>
  * Tests verify that ReportGarbageCollector correctly reports garbage collector information
  * including names, collection counts, times, and memory pool names.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Garbage Collector Details:</b> Verifies logging of garbage collector names, collection counts, collection times, and associated memory pool names</li>
+ *   <li><b>Multiple Collectors:</b> Tests handling of multiple garbage collectors, ensuring each collector's information is properly reported</li>
+ *   <li><b>No Collectors Scenario:</b> Validates behavior when no garbage collectors are available, logging appropriate "no collectors found" message</li>
+ *   <li><b>Memory Pool Names:</b> Ensures memory pool names associated with each garbage collector are correctly listed and formatted</li>
+ * </ul>
  */
 @DisplayName("ReportGarbageCollector")
 @ValidateCharset

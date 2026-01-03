@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,13 @@ import static org.mockito.Mockito.mock;
  * <p>
  * Tests verify that ReportContextListener correctly initializes and executes reports
  * when the servlet context is initialized, and performs no operations when context is destroyed.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Context Initialization:</b> Verifies that reports are executed and logged when the servlet context is initialized, with proper configuration handling</li>
+ *   <li><b>Context Destruction:</b> Ensures no operations or logging occur when the servlet context is destroyed</li>
+ *   <li><b>Report Configuration:</b> Tests selective enabling of specific reports (VM report) while disabling others to validate configuration-driven behavior</li>
+ * </ul>
  */
 @DisplayName("ReportContextListener")
 @ValidateCharset

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,11 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
  * <p>
  * Tests verify that ReportUser correctly reports user information
  * including username, home directory, working directory, and temporary directory.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>User Information Reporting:</b> Verifies logging of user name, home directory, working directory, and temporary directory</li>
+ * </ul>
  */
 @DisplayName("ReportUser")
 @ValidateCharset

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,14 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvent;
  * <p>
  * Tests verify that ReportDefaultTrustKeyStore correctly reads and logs default trust keystore information,
  * including trust managers, certificates, and handles various error scenarios.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Certificate Information Logging:</b> Verifies logging of trust keystore details including trust manager types, certificate subjects, issuers, serial numbers, and validity periods</li>
+ *   <li><b>Empty Trust Managers:</b> Tests behavior when no trust managers are available, ensuring proper header logging without manager details</li>
+ *   <li><b>KeyStore Exception Handling:</b> Validates error reporting when KeyStore initialization fails with KeyStoreException</li>
+ *   <li><b>Algorithm Exception Handling:</b> Ensures proper error logging when TrustManagerFactory algorithm is not available (NoSuchAlgorithmException)</li>
+ * </ul>
  */
 @DisplayName("ReportDefaultTrustKeyStore")
 @ValidateCharset

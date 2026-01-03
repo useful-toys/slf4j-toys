@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,18 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvent;
  * <p>
  * Tests verify that ReportJdbcConnection correctly reports JDBC connection information
  * including connection properties, metadata, client info, and handles various edge cases.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Connection State:</b> Verifies reporting of closed vs open connections, ensuring appropriate detail levels</li>
+ *   <li><b>Basic Properties:</b> Tests logging of catalog, schema, URL, username, and connection state properties</li>
+ *   <li><b>Connection Configuration:</b> Validates reporting of auto-commit, read-only mode, holdability, transaction isolation, and network timeout</li>
+ *   <li><b>Client Information:</b> Ensures proper handling and display of client info properties and type maps</li>
+ *   <li><b>Database Metadata:</b> Tests reporting of database product info, driver details, JDBC version, and connection limits</li>
+ *   <li><b>Null/Empty Values:</b> Verifies behavior with null catalogs/schemas and empty client info</li>
+ *   <li><b>Edge Cases:</b> Covers unknown holdability values, various transaction isolation levels, and error conditions</li>
+ *   <li><b>Property Filtering:</b> Ensures sensitive information is properly handled according to configuration</li>
+ * </ul>
  */
 @DisplayName("ReportJdbcConnection")
 @ValidateCharset

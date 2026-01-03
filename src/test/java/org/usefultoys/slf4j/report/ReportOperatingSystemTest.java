@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,11 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
  * <p>
  * Tests verify that ReportOperatingSystem correctly reports operating system information
  * including OS name, version, architecture, and file/path/line separators.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Operating System Information Reporting:</b> Verifies logging of OS architecture, name, version, and separators (file, path, line)</li>
+ * </ul>
  */
 @DisplayName("ReportOperatingSystem")
 @ValidateCharset

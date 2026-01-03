@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,13 @@ import org.usefultoys.test.WithLocale;
  * <p>
  * Tests validate that ReportMemory correctly reports JVM memory information,
  * including maximum allowed memory, allocated memory, and currently used memory.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>JVM Memory Information Reporting:</b> Verifies logging of maximum allowed, currently allocated, and currently used memory</li>
+ *   <li><b>Custom Memory Information:</b> Tests reporting with controlled memory values using custom provider</li>
+ *   <li><b>Unlimited Max Memory Handling:</b> Verifies special handling for unlimited maximum memory (Long.MAX_VALUE)</li>
+ * </ul>
  */
 @DisplayName("ReportMemory")
 @ValidateCharset

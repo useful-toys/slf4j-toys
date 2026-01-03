@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,15 @@ import static org.mockito.Mockito.when;
  * <p>
  * Tests verify that ReportFileSystem correctly reports file system roots,
  * handles multiple file systems, and formats space information appropriately.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Empty File Systems:</b> Verifies behavior when no file system roots exist, ensuring no logging occurs</li>
+ *   <li><b>Single File System:</b> Tests reporting of individual file system roots with total, free, and usable space information</li>
+ *   <li><b>Multiple File Systems:</b> Validates handling of multiple file system roots, logging each with appropriate space formatting</li>
+ *   <li><b>Zero Space Scenarios:</b> Ensures proper formatting and reporting when file systems have zero total/free/usable space</li>
+ *   <li><b>Space Unit Formatting:</b> Tests automatic unit conversion (bytes to MB/GB) for different space magnitudes</li>
+ * </ul>
  */
 @DisplayName("ReportFileSystem")
 @ValidateCharset

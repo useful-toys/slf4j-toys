@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,15 @@ import static org.mockito.Mockito.when;
  * Tests verify that ReportServlet correctly handles HTTP requests for various report types,
  * returns appropriate status codes, and logs reports using the configured logger.
  * Uses Jakarta Servlet API (Servlet 5.0+).
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>HTTP Request Handling:</b> Verifies proper handling of HTTP requests for different report types</li>
+ *   <li><b>Status Code Responses:</b> Tests appropriate HTTP status codes for valid and invalid requests</li>
+ *   <li><b>Report Generation:</b> Verifies generation of VM, filesystem, memory, user, physical system, OS, calendar, locale, charset, and network interface reports</li>
+ *   <li><b>Path Handling:</b> Tests handling of valid paths, unknown paths, and missing path info</li>
+ *   <li><b>Logger Integration:</b> Ensures reports are logged using the correct logger instances</li>
+ * </ul>
  */
 @DisplayName("ReportServlet")
 @ValidateCharset

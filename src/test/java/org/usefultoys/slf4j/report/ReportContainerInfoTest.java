@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * Tests verify that ReportContainerInfo correctly detects and logs container environment information
  * including Docker, Kubernetes, cgroup limits, and various error scenarios.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Docker Container Detection:</b> Verifies detection and logging of Docker container information including hostname, container ID from cgroup, memory and CPU limits, and environment variables</li>
+ *   <li><b>Kubernetes Pod Detection:</b> Tests identification and reporting of Kubernetes pod information including pod name, namespace, node name, and unavailable cgroup limits</li>
+ *   <li><b>Non-Container Environment:</b> Ensures proper handling when not running in a container, logging unavailable container information</li>
+ *   <li><b>Cgroup File Read Errors:</b> Validates error handling when cgroup files cannot be read, logging appropriate warnings and error messages</li>
+ *   <li><b>Memory Limit Parsing:</b> Tests parsing of memory limits from cgroup files, including error cases with invalid values</li>
+ *   <li><b>CPU Limit Parsing:</b> Verifies CPU limit calculation from cgroup quota and period values, handling parsing errors</li>
+ *   <li><b>Container ID Pattern Matching:</b> Ensures proper extraction of container IDs from cgroup paths, handling non-matching patterns</li>
+ *   <li><b>Unlimited Resource Limits:</b> Tests reporting when memory or CPU limits are not set (unlimited)</li>
+ *   <li><b>Edge Cases:</b> Covers zero quota/period values and various error conditions in container detection</li>
+ * </ul>
  */
 @DisplayName("ReportContainerInfo")
 @ValidateCharset

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,12 @@ import java.util.TimeZone;
  * <p>
  * Tests verify that ReportCalendar correctly formats and logs calendar information
  * including current date/time, timezone details, and available timezone IDs.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Default Calendar Information:</b> Verifies logging of calendar information with default timezone details</li>
+ *   <li><b>Custom Calendar Information:</b> Tests reporting with custom timezone and date settings</li>
+ * </ul>
  */
 @DisplayName("ReportCalendar")
 @ValidateCharset

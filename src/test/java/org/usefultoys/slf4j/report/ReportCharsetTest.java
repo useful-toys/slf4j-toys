@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,14 @@ import java.util.*;
  * <p>
  * Tests verify that ReportCharset correctly formats and logs charset information
  * including default charset details, available charsets, and edge cases like empty charsets.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Default Charset Information:</b> Verifies logging of default charset details and available charsets</li>
+ *   <li><b>Custom Charset Information:</b> Tests reporting with custom charset provider</li>
+ *   <li><b>Empty Available Charsets:</b> Verifies handling when no charsets are available</li>
+ *   <li><b>Random Charset Sampling:</b> Tests reporting of random subsets of available charsets</li>
+ * </ul>
  */
 @DisplayName("ReportCharset")
 @ValidateCharset
