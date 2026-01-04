@@ -15,32 +15,42 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.WithLocale;
 
-import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+/**
+ * Unit tests for {@link MeterDataJson5}.
+ * <p>
+ * Tests validate that MeterDataJson5 correctly serializes and deserializes {@link MeterData} objects
+ * to/from JSON5 format, handling various data scenarios, edge cases, and invalid inputs.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Round-Trip Serialization:</b> Verifies that a full MeterData object can be serialized to JSON and deserialized back with no data loss.</li>
+ *   <li><b>Edge Cases:</b> Validates handling of disordered fields, missing fields, and various path types.</li>
+ *   <li><b>Specific Fields:</b> Tests reading of individual fields like description, category, operation, and paths.</li>
+ *   <li><b>Timing & Iteration:</b> Ensures timing (create, start, stop) and iteration counts are correctly parsed.</li>
+ *   <li><b>Context Data:</b> Validates parsing of the context map, including null values, spaces, and numeric values.</li>
+ *   <li><b>Invalid JSON:</b> Verifies that the parser handles malformed JSON gracefully without throwing exceptions.</li>
+ * </ul>
+ *
+ * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Gemini 3 Pro (Preview)
+ */
+@ValidateCharset
+@WithLocale("en")
 class MeterDataJson5Test {
-    @BeforeAll
-    static void setupConsistentLocale() {
-        Locale.setDefault(Locale.ENGLISH);
-    }
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     // Concrete class for testing the abstract MeterData
     private static class TestMeterData extends MeterData {
@@ -107,18 +117,21 @@ class MeterDataJson5Test {
     @ParameterizedTest(name = "{0}")
     @MethodSource("roundTripScenarios")
     @DisplayName("Should correctly serialize and deserialize (round-trip)")
-    void testRoundTrip(String testName, MeterData originalData, String expectedJson) {
-        // 1. Test Serialization (Write)
+    void shouldCorrectlySerializeAndDeserializeRoundTrip(String testName, MeterData originalData, String expectedJson) {
+        // Given: original MeterData object and expected JSON string
+        // When: data is serialized to JSON
         final StringBuilder sb = new StringBuilder();
         MeterDataJson5.write(originalData, sb);
         final String actualJson = sb.toString();
+        
+        // Then: JSON should match expected format
         assertEquals(expectedJson, actualJson);
 
-        // 2. Test Deserialization (Read)
+        // When: JSON is deserialized back to MeterData
         final TestMeterData newData = new TestMeterData();
         MeterDataJson5.read(newData, "{" + actualJson + "}");
 
-        // 3. Assert Round-trip consistency
+        // Then: deserialized object should match original data
         assertMeterDataEquals(originalData, newData);
     }
 
@@ -161,9 +174,14 @@ class MeterDataJson5Test {
     @ParameterizedTest(name = "{0}")
     @MethodSource("readEdgeCaseScenarios")
     @DisplayName("Should correctly read edge cases")
-    void testReadEdgeCases(String testName, String inputJson, MeterData expectedData) {
+    void shouldCorrectlyReadEdgeCases(String testName, String inputJson, MeterData expectedData) {
+        // Given: input JSON with edge cases (disordered, missing fields, etc.)
         final TestMeterData actualData = new TestMeterData();
+        
+        // When: JSON is parsed
         MeterDataJson5.read(actualData, inputJson);
+        
+        // Then: parsed data should match expected MeterData
         assertMeterDataEquals(expectedData, actualData);
     }
 
@@ -223,11 +241,14 @@ class MeterDataJson5Test {
     @ParameterizedTest(name = "{0}")
     @MethodSource("readSpecificFieldScenarios")
     @DisplayName("Should correctly read specific fields")
-    void testReadSpecificFields(String testName, String inputJson, String expectedDescription, String expectedPath) {
+    void shouldCorrectlyReadSpecificFields(String testName, String inputJson, String expectedDescription, String expectedPath) {
+        // Given: input JSON containing specific fields
         final TestMeterData data = new TestMeterData();
         
+        // When: JSON is parsed
         MeterDataJson5.read(data, inputJson);
         
+        // Then: specific fields should be correctly populated
         if (expectedDescription != null) {
             assertEquals(expectedDescription, data.description);
         }
@@ -294,10 +315,14 @@ class MeterDataJson5Test {
     @ParameterizedTest(name = "{0}")
     @MethodSource("readTimingFieldScenarios")
     @DisplayName("Should correctly read timing and iteration fields")
-    void testReadTimingFields(String testName, String inputJson, long expectedCreateTime, long expectedStartTime, long expectedStopTime, long expectedTimeLimit, long expectedCurrentIteration, long expectedExpectedIterations) {
+    void shouldCorrectlyReadTimingAndIterationFields(String testName, String inputJson, long expectedCreateTime, long expectedStartTime, long expectedStopTime, long expectedTimeLimit, long expectedCurrentIteration, long expectedExpectedIterations) {
+        // Given: input JSON with timing/iteration data
         final TestMeterData data = new TestMeterData();
+        
+        // When: JSON is parsed
         MeterDataJson5.read(data, inputJson);
         
+        // Then: timing and iteration fields should match expected values
         assertEquals(expectedCreateTime, data.createTime);
         assertEquals(expectedStartTime, data.startTime);
         assertEquals(expectedStopTime, data.stopTime);
@@ -374,10 +399,14 @@ class MeterDataJson5Test {
     @ParameterizedTest(name = "{0}")
     @MethodSource("readContextScenarios")
     @DisplayName("Should correctly read context fields")
-    void testReadContextFields(String testName, String inputJson, Map<String, String> expectedContext) {
+    void shouldCorrectlyReadContextFields(String testName, String inputJson, Map<String, String> expectedContext) {
+        // Given: input JSON with context data
         final TestMeterData data = new TestMeterData();
+        
+        // When: JSON is parsed
         MeterDataJson5.read(data, inputJson);
         
+        // Then: context map should match expected values
         if (expectedContext.isEmpty()) {
             assertEquals(expectedContext, data.getContext());
         } else {
@@ -388,16 +417,18 @@ class MeterDataJson5Test {
     @ParameterizedTest(name = "Invalid JSON: {0}")
     @DisplayName("Should handle invalid JSON gracefully")
     @MethodSource("invalidJsonScenarios")
-    void testInvalidJsonHandling(String testName, String invalidJson) {
+    void shouldHandleInvalidJsonGracefully(String testName, String invalidJson) {
+        // Given: invalid JSON input
         final TestMeterData data = new TestMeterData();
-        // Should not throw exceptions for truly invalid JSON that doesn't match any patterns
+        
+        // When: JSON is parsed (should not throw exception)
         try {
             MeterDataJson5.read(data, invalidJson);
         } catch (Exception e) {
             // Allow exceptions for truly malformed input
         }
         
-        // For empty or truly invalid JSON, no fields should be set
+        // Then: no fields should be set for invalid input
         if (invalidJson.isEmpty() || invalidJson.equals("{}") || !invalidJson.contains(":")) {
             assertNull(data.description);
             assertNull(data.category);
