@@ -81,6 +81,7 @@
         <mockito.version>5.7.0</mockito.version>
         <awaitility.version>4.2.0</awaitility.version>
         <slf4j-test-mock.version>0.0.7</slf4j-test-mock.version>
+        <archunit.version>1.4.1</archunit.version>
 
         <!-- Maven Plugins Versions -->
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
@@ -168,6 +169,18 @@
             <groupId>org.usefultoys</groupId>
             <artifactId>slf4j-test-mock</artifactId>
             <version>${slf4j-test-mock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5-api</artifactId>
+            <version>${archunit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit</artifactId>
+            <version>${archunit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
