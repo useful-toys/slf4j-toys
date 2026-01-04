@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.meter.legacy;
+package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.*;
 import org.slf4j.impl.MockLogger;
@@ -36,7 +36,7 @@ import static org.usefultoys.slf4j.meter.Markers.*;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("UnusedAssignment")
-class MeterCallableTest {
+class MeterCallableLegacyTest {
 
     static final String meterCategory = "category";
     static final MockLogger logger = (MockLogger) LoggerFactory.getLogger(meterCategory);
