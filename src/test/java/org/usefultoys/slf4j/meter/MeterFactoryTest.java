@@ -578,9 +578,9 @@ class MeterFactoryTest {
     class GetCurrentSubMeterTests {
 
         @Test
-        @DisplayName("should create sub meter with concatenated operation and parent")
-        void shouldCreateSubMeterWithConcatenatedOperationAndParent() {
-            // Given: a started parent meter
+        @DisplayName("should create sub meter with concatenated operation when parent has operation")
+        void shouldCreateSubMeterWithConcatenatedOperationWhenParentHasOperation() {
+            // Given: a started parent meter with operation
             final Meter parent = new Meter(testLogger, "parent");
             parent.start();
 
@@ -594,6 +594,87 @@ class MeterFactoryTest {
             assertEquals(parent.getFullID(), sub.getParent(), "should set parent to parent's full ID");
 
             parent.ok();
+        }
+
+        @Test
+        @DisplayName("should create sub meter with operation when parent has null operation")
+        void shouldCreateSubMeterWithOperationWhenParentHasNullOperation() {
+            // Given: a started parent meter without operation
+            final Meter parent = new Meter(testLogger, null);
+            parent.start();
+
+            // When: a sub meter is created from current meter
+            final Meter sub = MeterFactory.getCurrentSubMeter("child");
+
+            // Then: category is inherited, operation is just the sub name, and parent ID is set
+            assertNotNull(sub, "should create non-null sub meter");
+            assertEquals(TEST_CATEGORY, sub.getCategory(), "should inherit category from parent");
+            assertEquals("child", sub.getOperation(), "should use sub name as operation when parent operation is null");
+            assertEquals(parent.getFullID(), sub.getParent(), "should set parent to parent's full ID");
+
+            parent.ok();
+        }
+
+        @Test
+        @DisplayName("should create nested sub meters with hierarchical operations")
+        void shouldCreateNestedSubMetersWithHierarchicalOperations() {
+            // Given: a started parent meter
+            final Meter parent = new Meter(testLogger, "parent");
+            parent.start();
+
+            // When: creating nested sub meters
+            final Meter firstLevel = MeterFactory.getCurrentSubMeter("level1");
+            firstLevel.start();
+
+            final Meter secondLevel = MeterFactory.getCurrentSubMeter("level2");
+            secondLevel.start();
+
+            // Then: each level should have concatenated operations and correct parent IDs
+            assertEquals(TEST_CATEGORY, firstLevel.getCategory(), "should inherit category at first level");
+            assertEquals("parent/level1", firstLevel.getOperation(), "should concatenate operation at first level");
+            assertEquals(parent.getFullID(), firstLevel.getParent(), "should set parent ID at first level");
+
+            assertEquals(TEST_CATEGORY, secondLevel.getCategory(), "should inherit category at second level");
+            assertEquals("parent/level1/level2", secondLevel.getOperation(), "should concatenate operation at second level");
+            assertEquals(firstLevel.getFullID(), secondLevel.getParent(), "should set parent ID at second level");
+
+            secondLevel.ok();
+            firstLevel.ok();
+            parent.ok();
+        }
+
+        @Test
+        @DisplayName("should inherit category from parent regardless of parent's logger")
+        void shouldInheritCategoryFromParentRegardlessOfParentLogger() {
+            // Given: a started parent meter with a different category
+            final String customCategory = "custom.category";
+            final Logger customLogger = org.slf4j.LoggerFactory.getLogger(customCategory);
+            final Meter parent = new Meter(customLogger, "operation");
+            parent.start();
+
+            // When: a sub meter is created
+            final Meter sub = MeterFactory.getCurrentSubMeter("child");
+
+            // Then: the sub meter should inherit the parent's category
+            assertEquals(customCategory, sub.getCategory(), "should inherit custom category from parent");
+            assertEquals("operation/child", sub.getOperation(), "should concatenate operation correctly");
+            assertEquals(parent.getFullID(), sub.getParent(), "should set parent to parent's full ID");
+
+            parent.ok();
+        }
+
+        @Test
+        @DisplayName("should create sub meter from fallback when no current meter is started")
+        void shouldCreateSubMeterFromFallbackWhenNoCurrentMeterIsStarted() {
+            // Given: no active meter on the current thread
+
+            // When: a sub meter is requested
+            final Meter sub = MeterFactory.getCurrentSubMeter("child");
+
+            // Then: a sub meter should be created from the fallback meter
+            assertNotNull(sub, "should create non-null sub meter even without current meter");
+            assertEquals(Meter.UNKNOWN_LOGGER_NAME, sub.getCategory(), "should inherit fallback category");
+            assertEquals("child", sub.getOperation(), "should use sub name as operation when parent has no operation");
         }
     }
 }
