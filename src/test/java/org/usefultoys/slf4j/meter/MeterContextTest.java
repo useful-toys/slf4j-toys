@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,38 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.usefultoys.slf4j.SessionConfig;
-
-import java.nio.charset.Charset;
-import java.util.Locale;
+import org.usefultoys.test.ResetSessionConfig;
+import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.usefultoys.slf4j.meter.MeterData.NULL_VALUE;
 
+/**
+ * Unit tests for {@link MeterContext}.
+ * <p>
+ * Tests validate that MeterContext correctly manages the context map,
+ * supporting various data types, null values, and conditional additions.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Context Addition:</b> Verifies that ctx() methods correctly add entries for all supported types (int, long, boolean, float, double, Object, String, formatted String).</li>
+ *   <li><b>Null Handling:</b> Ensures that null keys and values are handled gracefully, using NULL_VALUE where appropriate.</li>
+ *   <li><b>Conditional Addition:</b> Validates that ctx(condition, ...) only adds entries when the condition is met.</li>
+ *   <li><b>Context Removal:</b> Tests that unctx() correctly removes entries from the context map.</li>
+ *   <li><b>Formatting:</b> Verifies that formatted strings are correctly generated and added to the context.</li>
+ *   <li><b>Edge Cases:</b> Covers illegal format strings and null format strings.</li>
+ * </ul>
+ *
+ * @author Co-authored-by: GitHub Copilot using Gemini 3 Flash (Preview)
+ */
+@ValidateCharset
+@WithLocale("en")
+@ResetSessionConfig
 class MeterContextTest {
-    @BeforeAll
-    static void setupConsistentLocale() {
-        Locale.setDefault(Locale.ENGLISH);
-    }
-
-    @BeforeAll
-    static void validateConsistentCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "Test requires SessionConfig.charset = default charset");
-    }
 
     // Implementação de teste da interface MeterContext
     static class TestMeterContext extends MeterData implements MeterContext {
@@ -47,351 +57,453 @@ class MeterContextTest {
     @BeforeEach
     void setUp() {
         meterContext = new TestMeterContext();
-        // Removido: assertTrue(meterContext.getContext().isEmpty(), "Context map should be empty initially");
     }
 
     @Test
     @DisplayName("ctx() with key-only should add key with null value")
-    void testCtxWithoutValue() {
-        final String key = "key1";
-        meterContext.ctx(key);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key + "'");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain '" + key + "'");
-        assertNull(meterContext.getContext().get(key), "Value for '" + key + "' should be null");
+    void shouldAddKeyWithNullValueWhenCtxWithKeyOnly() {
+        // When: ctx is called with only the key
+        meterContext.ctx("key1");
+
+        // Then: the context map should contain the key with a null value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key1"), "should contain the added key");
+        assertNull(meterContext.getContext().get("key1"), "should have null value for the key");
     }
 
     @Test
     @DisplayName("ctx() with null key should add entry with NULL_VALUE key")
-    void testCtxWithoutValueNull() {
-        final String key = null; // This will be converted to NULL_VALUE internally
-        meterContext.ctx(key);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + NULL_VALUE + "'");
-        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "Context map should contain '" + NULL_VALUE + "'");
-        assertNull(meterContext.getContext().get(NULL_VALUE), "Value for '" + NULL_VALUE + "' should be null");
+    void shouldAddNullValueKeyWhenCtxWithNullKey() {
+        // When: ctx is called with the null key
+        meterContext.ctx(null);
+
+        // Then: the context map should contain NULL_VALUE as key with a null value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding null key");
+        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "should contain NULL_VALUE as key");
+        assertNull(meterContext.getContext().get(NULL_VALUE), "should have null value for NULL_VALUE key");
     }
 
     @Test
     @DisplayName("ctx(name, int) should add key with integer value as string")
-    void testCtxWithStringAndInt() {
-        final String key = "key2";
-        meterContext.ctx(key, 42);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key + "'");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain '" + key + "'");
-        assertEquals("42", meterContext.getContext().get(key), "Value for '" + key + "' should be '42'");
+    void shouldAddKeyWithIntValueAsStringWhenCtxWithKeyAndInt() {
+        // When: ctx is called with key and int
+        meterContext.ctx("key2", 42);
+
+        // Then: the context map should contain the key with the integer value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key2"), "should contain the added key");
+        assertEquals("42", meterContext.getContext().get("key2"), "should have '42' as value");
     }
 
     @Test
     @DisplayName("ctx(name, long) should add key with long value as string")
-    void testCtxWithStringAndLong() {
-        final String key = "key3";
-        meterContext.ctx(key, 123456789L);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key + "'");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain '" + key + "'");
-        assertEquals("123456789", meterContext.getContext().get(key), "Value for '" + key + "' should be '123456789'");
+    void shouldAddKeyWithLongValueAsStringWhenCtxWithKeyAndLong() {
+        // When: ctx is called with key and long
+        meterContext.ctx("key3", 123456789L);
+
+        // Then: the context map should contain the key with the long value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key3"), "should contain the added key");
+        assertEquals("123456789", meterContext.getContext().get("key3"), "should have '123456789' as value");
     }
 
     @Test
     @DisplayName("ctx(name, boolean) should add key with boolean value as string")
-    void testCtxWithStringAndBoolean() {
-        final String key = "key4";
-        meterContext.ctx(key, true);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key + "'");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain '" + key + "'");
-        assertEquals("true", meterContext.getContext().get(key), "Value for '" + key + "' should be 'true'");
+    void shouldAddKeyWithBooleanValueAsStringWhenCtxWithKeyAndBoolean() {
+        // When: ctx is called with key and boolean
+        meterContext.ctx("key4", true);
+
+        // Then: the context map should contain the key with the boolean value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key4"), "should contain the added key");
+        assertEquals("true", meterContext.getContext().get("key4"), "should have 'true' as value");
     }
 
     @Test
     @DisplayName("ctx(name, float) should add key with float value as string")
-    void testCtxWithStringAndFloat() {
-        final String key = "key5";
-        meterContext.ctx(key, 3.14f);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key + "'");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain '" + key + "'");
-        assertEquals("3.14", meterContext.getContext().get(key), "Value for '" + key + "' should be '3.14'");
+    void shouldAddKeyWithFloatValueAsStringWhenCtxWithKeyAndFloat() {
+        // When: ctx is called with key and float
+        meterContext.ctx("key5", 3.14f);
+
+        // Then: the context map should contain the key with the float value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key5"), "should contain the added key");
+        assertEquals("3.14", meterContext.getContext().get("key5"), "should have '3.14' as value");
     }
 
     @Test
     @DisplayName("ctx(name, double) should add key with double value as string")
-    void testCtxWithStringAndDouble() {
-        final String key = "key6";
-        meterContext.ctx(key, 2.71828);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key + "'");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain '" + key + "'");
-        assertEquals("2.71828", meterContext.getContext().get(key), "Value for '" + key + "' should be '2.71828'");
+    void shouldAddKeyWithDoubleValueAsStringWhenCtxWithKeyAndDouble() {
+        // When: ctx is called with key and double
+        meterContext.ctx("key6", 2.71828);
+
+        // Then: the context map should contain the key with the double value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key6"), "should contain the added key");
+        assertEquals("2.71828", meterContext.getContext().get("key6"), "should have '2.71828' as value");
     }
 
     @Test
     @DisplayName("ctx(name, Object) should add key with object's toString() value")
-    void testCtxWithStringAndObject() {
-        final String key7 = "key7";
-        meterContext.ctx(key7, new Object() {
+    void shouldAddKeyWithObjectToStringValueWhenCtxWithKeyAndObject() {
+        // Given: an object with custom toString
+        final Object value = new Object() {
             @Override
             public String toString() {
                 return "customObject";
             }
-        });
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key7 + "'");
-        assertTrue(meterContext.getContext().containsKey(key7), "Context map should contain '" + key7 + "'");
-        assertEquals("customObject", meterContext.getContext().get(key7), "Value for '" + key7 + "' should be 'customObject'");
+        };
 
-        final String key7_null = "key7_null";
-        meterContext.ctx(key7_null, (Object) null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key7_null + "'");
-        assertTrue(meterContext.getContext().containsKey(key7_null), "Context map should contain '" + key7_null + "'");
-        assertEquals(NULL_VALUE, meterContext.getContext().get(key7_null), "Value for null object should be " + NULL_VALUE);
+        // When: ctx is called with key and object
+        meterContext.ctx("key7", value);
+
+        // Then: the context map should contain the key with the object's toString value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key7"), "should contain the added key");
+        assertEquals("customObject", meterContext.getContext().get("key7"), "should have 'customObject' as value");
+    }
+
+    @Test
+    @DisplayName("ctx(name, Object) with null object should add key with NULL_VALUE")
+    void shouldAddKeyWithNullValueWhenCtxWithKeyAndNullObject() {
+        // When: ctx is called with key and null object
+        meterContext.ctx("key7_null", null);
+
+        // Then: the context map should contain the key with NULL_VALUE
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key7_null"), "should contain the added key");
+        assertEquals(NULL_VALUE, meterContext.getContext().get("key7_null"), "should have NULL_VALUE as value");
     }
 
     @Test
     @DisplayName("ctx(name, String) should add key with string value")
-    void testCtxWithStringAndString() {
-        final String key8 = "key8";
-        meterContext.ctx(key8, "value8");
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key8 + "'");
-        assertTrue(meterContext.getContext().containsKey(key8), "Context map should contain '" + key8 + "'");
-        assertEquals("value8", meterContext.getContext().get(key8), "Value for '" + key8 + "' should be 'value8'");
+    void shouldAddKeyWithStringValueWhenCtxWithKeyAndString() {
+        // When: ctx is called with key and string
+        meterContext.ctx("key8", "value8");
 
-        final String key8_null = "key8_null";
-        meterContext.ctx(key8_null, (String) null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key8_null + "'");
-        assertTrue(meterContext.getContext().containsKey(key8_null), "Context map should contain '" + key8_null + "'");
-        assertEquals(NULL_VALUE, meterContext.getContext().get(key8_null), "Value for null string should be " + NULL_VALUE);
+        // Then: the context map should contain the key with the string value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key8"), "should contain the added key");
+        assertEquals("value8", meterContext.getContext().get("key8"), "should have 'value8' as value");
+    }
+
+    @Test
+    @DisplayName("ctx(name, String) with null string should add key with NULL_VALUE")
+    void shouldAddKeyWithNullValueWhenCtxWithKeyAndNullString() {
+        // When: ctx is called with key and null string
+        meterContext.ctx("key8_null", null);
+
+        // Then: the context map should contain the key with NULL_VALUE
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key8_null"), "should contain the added key");
+        assertEquals(NULL_VALUE, meterContext.getContext().get("key8_null"), "should have NULL_VALUE as value");
     }
 
     @Test
     @DisplayName("ctx(name, format, args) should add key with formatted string value")
-    void testCtxWithStringAndFormattedString() {
-        final String key = "key9";
-        meterContext.ctx(key, "formatted %d", 100);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key + "'");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain '" + key + "'");
-        assertEquals("formatted 100", meterContext.getContext().get(key), "Value for '" + key + "' should be 'formatted 100'");
+    void shouldAddKeyWithFormattedStringValueWhenCtxWithKeyAndFormat() {
+        // When: ctx is called with key, format, and arg
+        meterContext.ctx("key9", "formatted %d", 100);
+
+        // Then: the context map should contain the key with the formatted string value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key9"), "should contain the added key");
+        assertEquals("formatted 100", meterContext.getContext().get("key9"), "should have 'formatted 100' as value");
     }
 
     @Test
     @DisplayName("ctx(name, Integer) should add key with Integer object value as string")
-    void testCtxWithStringAndIntegerObject() {
-        final String key19 = "key19";
-        meterContext.ctx(key19, Integer.valueOf(123));
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key19 + "'");
-        assertTrue(meterContext.getContext().containsKey(key19), "Context map should contain '" + key19 + "'");
-        assertEquals("123", meterContext.getContext().get(key19), "Value for '" + key19 + "' should be '123'");
+    void shouldAddKeyWithIntValueAsStringWhenCtxWithKeyAndIntegerObject() {
+        // When: ctx is called with key and Integer object
+        meterContext.ctx("key19", Integer.valueOf(123));
 
-        final String key19_null = "key19_null";
-        meterContext.ctx(key19_null, (Integer) null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key19_null + "'");
-        assertTrue(meterContext.getContext().containsKey(key19_null), "Context map should contain '" + key19_null + "'");
-        assertEquals(NULL_VALUE, meterContext.getContext().get(key19_null), "Value for null Integer should be " + NULL_VALUE);
+        // Then: the context map should contain the key with the integer value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key19"), "should contain the added key");
+        assertEquals("123", meterContext.getContext().get("key19"), "should have '123' as value");
+    }
+
+    @Test
+    @DisplayName("ctx(name, Integer) with null Integer should add key with NULL_VALUE")
+    void shouldAddKeyWithNullValueWhenCtxWithKeyAndNullIntegerObject() {
+        // When: ctx is called with key and null Integer
+        meterContext.ctx("key19_null", (Integer) null);
+
+        // Then: the context map should contain the key with NULL_VALUE
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key19_null"), "should contain the added key");
+        assertEquals(NULL_VALUE, meterContext.getContext().get("key19_null"), "should have NULL_VALUE as value");
     }
 
     @Test
     @DisplayName("ctx(name, Long) should add key with Long object value as string")
-    void testCtxWithStringAndLongObject() {
-        final String key20 = "key20";
-        meterContext.ctx(key20, Long.valueOf(456L));
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key20 + "'");
-        assertTrue(meterContext.getContext().containsKey(key20), "Context map should contain '" + key20 + "'");
-        assertEquals("456", meterContext.getContext().get(key20), "Value for '" + key20 + "' should be '456'");
+    void shouldAddKeyWithLongValueAsStringWhenCtxWithKeyAndLongObject() {
+        // When: ctx is called with key and Long object
+        meterContext.ctx("key20", Long.valueOf(456L));
 
-        final String key20_null = "key20_null";
-        meterContext.ctx(key20_null, (Long) null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key20_null + "'");
-        assertTrue(meterContext.getContext().containsKey(key20_null), "Context map should contain '" + key20_null + "'");
-        assertEquals(NULL_VALUE, meterContext.getContext().get(key20_null), "Value for null Long should be " + NULL_VALUE);
+        // Then: the context map should contain the key with the long value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key20"), "should contain the added key");
+        assertEquals("456", meterContext.getContext().get("key20"), "should have '456' as value");
+    }
+
+    @Test
+    @DisplayName("ctx(name, Long) with null Long should add key with NULL_VALUE")
+    void shouldAddKeyWithNullValueWhenCtxWithKeyAndNullLongObject() {
+        // When: ctx is called with key and null Long
+        meterContext.ctx("key20_null", (Long) null);
+
+        // Then: the context map should contain the key with NULL_VALUE
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key20_null"), "should contain the added key");
+        assertEquals(NULL_VALUE, meterContext.getContext().get("key20_null"), "should have NULL_VALUE as value");
     }
 
     @Test
     @DisplayName("ctx(condition, trueName) should add trueName if condition is true")
-    void testCtxWithBooleanAndString_trueCondition() {
-        final String key = "valueTrue";
-        meterContext.ctx(true, key);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key + "'");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain '" + key + "'");
-        assertNull(meterContext.getContext().get(key), "Value for '" + key + "' should be null");
+    void shouldAddTrueNameWhenCtxWithTrueCondition() {
+        // When: ctx is called with true condition and key
+        meterContext.ctx(true, "valueTrue");
+
+        // Then: the context map should contain the key with null value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("valueTrue"), "should contain the added key");
+        assertNull(meterContext.getContext().get("valueTrue"), "should have null as value");
     }
 
     @Test
     @DisplayName("ctx(condition, trueName) should not add trueName if condition is false")
-    void testCtxWithBooleanAndString_falseCondition() {
-        final String key = "valueFalse";
-        meterContext.ctx(false, key);
-        assertTrue(meterContext.getContext().isEmpty(), "Context map should remain empty when condition is false");
-        assertFalse(meterContext.getContext().containsKey(key), "Context map should not contain '" + key + "'");
+    void shouldNotAddTrueNameWhenCtxWithFalseCondition() {
+        // When: ctx is called with false condition and key
+        meterContext.ctx(false, "valueFalse");
+
+        // Then: the context map should remain empty
+        assertTrue(meterContext.getContext().isEmpty(), "should remain empty when condition is false");
+        assertFalse(meterContext.getContext().containsKey("valueFalse"), "should not contain the key");
     }
 
     @Test
     @DisplayName("ctx(condition, trueName, falseName) should add trueName if condition is true")
-    void testCtxWithBooleanAndStringString_trueCondition() {
-        final String trueKey = "valueTrue";
-        final String falseKey = "valueFalse";
-        meterContext.ctx(true, trueKey, falseKey);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + trueKey + "'");
-        assertTrue(meterContext.getContext().containsKey(trueKey), "Context map should contain '" + trueKey + "'");
-        assertNull(meterContext.getContext().get(trueKey), "Value for '" + trueKey + "' should be null");
-        assertFalse(meterContext.getContext().containsKey(falseKey), "Context map should not contain '" + falseKey + "'");
+    void shouldAddTrueNameWhenCtxWithTrueConditionAndTwoNames() {
+        // When: ctx is called with true condition and two keys
+        meterContext.ctx(true, "valueTrue", "valueFalse");
+
+        // Then: the context map should contain the true key with null value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("valueTrue"), "should contain the true key");
+        assertNull(meterContext.getContext().get("valueTrue"), "should have null as value");
+        assertFalse(meterContext.getContext().containsKey("valueFalse"), "should not contain the false key");
     }
 
     @Test
     @DisplayName("ctx(condition, trueName, falseName) should add falseName if condition is false")
-    void testCtxWithBooleanAndStringString_falseCondition() {
-        final String trueKey = "valueTrue";
-        final String falseKey = "valueFalse";
-        meterContext.ctx(false, trueKey, falseKey);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + falseKey + "'");
-        assertTrue(meterContext.getContext().containsKey(falseKey), "Context map should contain '" + falseKey + "'");
-        assertNull(meterContext.getContext().get(falseKey), "Value for '" + falseKey + "' should be null");
-        assertFalse(meterContext.getContext().containsKey(trueKey), "Context map should not contain '" + trueKey + "'");
+    void shouldAddFalseNameWhenCtxWithFalseConditionAndTwoNames() {
+        // When: ctx is called with false condition and two keys
+        meterContext.ctx(false, "valueTrue", "valueFalse");
+
+        // Then: the context map should contain the false key with null value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("valueFalse"), "should contain the false key");
+        assertNull(meterContext.getContext().get("valueFalse"), "should have null as value");
+        assertFalse(meterContext.getContext().containsKey("valueTrue"), "should not contain the true key");
     }
 
     @Test
     @DisplayName("ctx(name, Float) should add key with Float object value as string")
-    void testCtxWithStringAndFloatObject() {
-        final String key21 = "key21";
-        meterContext.ctx(key21, Float.valueOf(3.14f));
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key21 + "'");
-        assertTrue(meterContext.getContext().containsKey(key21), "Context map should contain '" + key21 + "'");
-        assertEquals("3.14", meterContext.getContext().get(key21), "Value for '" + key21 + "' should be '3.14'");
+    void shouldAddKeyWithFloatValueAsStringWhenCtxWithKeyAndFloatObject() {
+        // When: ctx is called with key and Float object
+        meterContext.ctx("key21", Float.valueOf(3.14f));
 
-        final String key21_null = "key21_null";
-        meterContext.ctx(key21_null, (Float) null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key21_null + "'");
-        assertTrue(meterContext.getContext().containsKey(key21_null), "Context map should contain '" + key21_null + "'");
-        assertEquals(NULL_VALUE, meterContext.getContext().get(key21_null), "Value for null Float should be " + NULL_VALUE);
+        // Then: the context map should contain the key with the float value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key21"), "should contain the added key");
+        assertEquals("3.14", meterContext.getContext().get("key21"), "should have '3.14' as value");
+    }
+
+    @Test
+    @DisplayName("ctx(name, Float) with null Float should add key with NULL_VALUE")
+    void shouldAddKeyWithNullValueWhenCtxWithKeyAndNullFloatObject() {
+        // When: ctx is called with key and null Float
+        meterContext.ctx("key21_null", (Float) null);
+
+        // Then: the context map should contain the key with NULL_VALUE
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key21_null"), "should contain the added key");
+        assertEquals(NULL_VALUE, meterContext.getContext().get("key21_null"), "should have NULL_VALUE as value");
     }
 
     @Test
     @DisplayName("ctx(name, Double) should add key with Double object value as string")
-    void testCtxWithStringAndDoubleObject() {
-        final String key23 = "key23";
-        meterContext.ctx(key23, Double.valueOf(2.71828));
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key23 + "'");
-        assertTrue(meterContext.getContext().containsKey(key23), "Context map should contain '" + key23 + "'");
-        assertEquals("2.71828", meterContext.getContext().get(key23), "Value for '" + key23 + "' should be '2.71828'");
+    void shouldAddKeyWithDoubleValueAsStringWhenCtxWithKeyAndDoubleObject() {
+        // When: ctx is called with key and Double object
+        meterContext.ctx("key23", Double.valueOf(2.71828));
 
-        final String key23_null = "key23_null";
-        meterContext.ctx(key23_null, (Double) null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key23_null + "'");
-        assertTrue(meterContext.getContext().containsKey(key23_null), "Context map should contain '" + key23_null + "'");
-        assertEquals(NULL_VALUE, meterContext.getContext().get(key23_null), "Value for null Double should be " + NULL_VALUE);
+        // Then: the context map should contain the key with the double value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key23"), "should contain the added key");
+        assertEquals("2.71828", meterContext.getContext().get("key23"), "should have '2.71828' as value");
+    }
+
+    @Test
+    @DisplayName("ctx(name, Double) with null Double should add key with NULL_VALUE")
+    void shouldAddKeyWithNullValueWhenCtxWithKeyAndNullDoubleObject() {
+        // When: ctx is called with key and null Double
+        meterContext.ctx("key23_null", (Double) null);
+
+        // Then: the context map should contain the key with NULL_VALUE
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key23_null"), "should contain the added key");
+        assertEquals(NULL_VALUE, meterContext.getContext().get("key23_null"), "should have NULL_VALUE as value");
     }
 
     @Test
     @DisplayName("ctx(name, Boolean) should add key with Boolean object value as string")
-    void testCtxWithStringAndBooleanObject() {
-        final String key25 = "key25";
-        meterContext.ctx(key25, Boolean.TRUE);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key25 + "'");
-        assertTrue(meterContext.getContext().containsKey(key25), "Context map should contain '" + key25 + "'");
-        assertEquals("true", meterContext.getContext().get(key25), "Value for '" + key25 + "' should be 'true'");
+    void shouldAddKeyWithBooleanValueAsStringWhenCtxWithKeyAndBooleanObject() {
+        // When: ctx is called with key and Boolean object
+        meterContext.ctx("key25", Boolean.TRUE);
 
-        final String key25_null = "key25_null";
-        meterContext.ctx(key25_null, (Boolean) null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key25_null + "'");
-        assertTrue(meterContext.getContext().containsKey(key25_null), "Context map should contain '" + key25_null + "'");
-        assertEquals(NULL_VALUE, meterContext.getContext().get(key25_null), "Value for null Boolean should be " + NULL_VALUE);
+        // Then: the context map should contain the key with the boolean value as string
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key25"), "should contain the added key");
+        assertEquals("true", meterContext.getContext().get("key25"), "should have 'true' as value");
+    }
+
+    @Test
+    @DisplayName("ctx(name, Boolean) with null Boolean should add key with NULL_VALUE")
+    void shouldAddKeyWithNullValueWhenCtxWithKeyAndNullBooleanObject() {
+        // When: ctx is called with key and null Boolean
+        meterContext.ctx("key25_null", (Boolean) null);
+
+        // Then: the context map should contain the key with NULL_VALUE
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+        assertTrue(meterContext.getContext().containsKey("key25_null"), "should contain the added key");
+        assertEquals(NULL_VALUE, meterContext.getContext().get("key25_null"), "should have NULL_VALUE as value");
     }
 
     @Test
     @DisplayName("unctx() should remove existing key from context")
-    void testUnctx_existingKey() {
-        final String keyToRemove = "keyToRemove";
-        meterContext.ctx(keyToRemove);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + keyToRemove + "'");
-        assertTrue(meterContext.getContext().containsKey(keyToRemove), "Context map should contain '" + keyToRemove + "'");
-        meterContext.unctx(keyToRemove);
-        assertFalse(meterContext.getContext().containsKey(keyToRemove), "Context should not contain '" + keyToRemove + "' after removal");
+    void shouldRemoveExistingKeyWhenUnctx() {
+        // Given: a key added to context
+        meterContext.ctx("keyToRemove");
+        assertTrue(meterContext.getContext().containsKey("keyToRemove"), "should contain the key before removal");
+
+        // When: unctx is called with the key
+        meterContext.unctx("keyToRemove");
+
+        // Then: the context map should not contain the key
+        assertFalse(meterContext.getContext().containsKey("keyToRemove"), "should not contain the key after removal");
     }
 
     @Test
     @DisplayName("unctx() should do nothing if key does not exist")
-    void testUnctx_nonExistingKey() {
+    void shouldDoNothingWhenUnctxWithNonExistingKey() {
+        // When: unctx is called with non-existing key
         meterContext.unctx("nonExistentKey");
-        assertTrue(meterContext.getContext().isEmpty(), "Context map should remain empty after trying to remove non-existent key");
+
+        // Then: the context map should remain empty
+        assertTrue(meterContext.getContext().isEmpty(), "should remain empty");
     }
 
     @Test
     @DisplayName("ctx() with null name should add entry with NULL_VALUE key")
-    void testCtxWithNullName() {
+    void shouldAddNullValueKeyWhenCtxWithNullName() {
+        // When: ctx is called with null name
         meterContext.ctx(null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding null key");
-        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "Context map should contain '" + NULL_VALUE + "'");
-        assertNull(meterContext.getContext().get(NULL_VALUE), "Value for '" + NULL_VALUE + "' should be null");
+
+        // Then: the context map should contain NULL_VALUE as key
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding null key");
+        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "should contain NULL_VALUE as key");
+        assertNull(meterContext.getContext().get(NULL_VALUE), "should have null as value");
     }
 
     @Test
     @DisplayName("unctx() with null name should do nothing")
-    void testUnctxWithNullName() {
-        final String key1 = "key1";
-        meterContext.ctx(key1, "value1");
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding key '" + key1 + "'");
-        assertTrue(meterContext.getContext().containsKey(key1), "Context map should contain '" + key1 + "'");
+    void shouldDoNothingWhenUnctxWithNullName() {
+        // Given: a key added to context
+        meterContext.ctx("key1", "value1");
+        assertTrue(meterContext.getContext().containsKey("key1"), "should contain the key");
+
+        // When: unctx is called with null name
         meterContext.unctx(null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not change when removing null key");
-        assertTrue(meterContext.getContext().containsKey(key1), "Existing key should still be present");
+
+        // Then: the context map should remain unchanged
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+        assertTrue(meterContext.getContext().containsKey("key1"), "should still contain the key");
     }
 
     @Test
     @DisplayName("ctx(condition, trueName) with null trueName should add entry with NULL_VALUE key if condition is true")
-    void testCtxWithBooleanAndNullTrueName_trueCondition() {
+    void shouldAddNullValueKeyWhenCtxWithTrueConditionAndNullTrueName() {
+        // When: ctx is called with true condition and null trueName
         meterContext.ctx(true, null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty when trueName is null and condition is true");
-        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "Context map should contain '" + NULL_VALUE + "'");
-        assertNull(meterContext.getContext().get(NULL_VALUE), "Value for '" + NULL_VALUE + "' should be null");
+
+        // Then: the context map should contain NULL_VALUE as key
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "should contain NULL_VALUE as key");
+        assertNull(meterContext.getContext().get(NULL_VALUE), "should have null as value");
     }
 
     @Test
     @DisplayName("ctx(condition, trueName, falseName) with null trueName should add entry with NULL_VALUE key if condition is true")
-    void testCtxWithBooleanAndNullTrueNameFalseName_trueCondition() {
-        final String falseName = "falseName";
-        meterContext.ctx(true, null, falseName);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty when trueName is null and condition is true");
-        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "Context map should contain '" + NULL_VALUE + "'");
-        assertNull(meterContext.getContext().get(NULL_VALUE), "Value for '" + NULL_VALUE + "' should be null");
-        assertFalse(meterContext.getContext().containsKey(falseName), "Context map should not contain '" + falseName + "'");
+    void shouldAddNullValueKeyWhenCtxWithTrueConditionAndNullTrueNameAndFalseName() {
+        // When: ctx is called with true condition, null trueName, and falseName
+        meterContext.ctx(true, null, "falseName");
+
+        // Then: the context map should contain NULL_VALUE as key
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "should contain NULL_VALUE as key");
+        assertNull(meterContext.getContext().get(NULL_VALUE), "should have null as value");
+        assertFalse(meterContext.getContext().containsKey("falseName"), "should not contain falseName");
     }
 
     @Test
     @DisplayName("ctx(condition, trueName, falseName) with null falseName should add entry with NULL_VALUE key if condition is false")
-    void testCtxWithBooleanAndTrueNameNullFalseName_falseCondition() {
-        final String trueName = "trueName";
-        meterContext.ctx(false, trueName, null);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty when falseName is null and condition is false");
-        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "Context map should contain '" + NULL_VALUE + "'");
-        assertNull(meterContext.getContext().get(NULL_VALUE), "Value for '" + NULL_VALUE + "' should be null");
-        assertFalse(meterContext.getContext().containsKey(trueName), "Context map should not contain '" + trueName + "'");
+    void shouldAddNullValueKeyWhenCtxWithFalseConditionAndTrueNameAndNullFalseName() {
+        // When: ctx is called with false condition, trueName, and null falseName
+        meterContext.ctx(false, "trueName", null);
+
+        // Then: the context map should contain NULL_VALUE as key
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "should contain NULL_VALUE as key");
+        assertNull(meterContext.getContext().get(NULL_VALUE), "should have null as value");
+        assertFalse(meterContext.getContext().containsKey("trueName"), "should not contain trueName");
     }
 
     @Test
     @DisplayName("ctx(name, format, args) with null name should add entry with NULL_VALUE key and formatted value")
-    void testCtxWithFormattedStringAndNullName() {
-        final String format = "formatted %d";
-        final int arg = 100;
-        meterContext.ctx(null, format, arg);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after adding null key with formatted value");
-        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "Context map should contain '" + NULL_VALUE + "'");
-        assertEquals(String.format(format, arg), meterContext.getContext().get(NULL_VALUE), "Value for '" + NULL_VALUE + "' should be the formatted string");
+    void shouldAddNullValueKeyWithFormattedValueWhenCtxWithNullNameAndFormat() {
+        // When: ctx is called with null name, format, and arg
+        meterContext.ctx(null, "formatted %d", 100);
+
+        // Then: the context map should contain NULL_VALUE as key with formatted value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+        assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "should contain NULL_VALUE as key");
+        assertEquals("formatted 100", meterContext.getContext().get(NULL_VALUE), "should have formatted value");
     }
 
     @Test
     @DisplayName("ctx(name, format, args) with null format should add entry with '<null format>' value")
-    void testCtxWithFormattedStringAndNullFormat() {
-        final String key = "key";
-        meterContext.ctx(key, null, 100);
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after handling null format");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain key '" + key + "'");
-        assertEquals("<null format>", meterContext.getContext().get(key), "Value for key '" + key + "' should be '<null format>'");
+    void shouldAddNullFormatValueWhenCtxWithKeyAndNullFormat() {
+        // When: ctx is called with key and null format
+        meterContext.ctx("key", null, 100);
+
+        // Then: the context map should contain the key with '<null format>' value
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+        assertTrue(meterContext.getContext().containsKey("key"), "should contain the key");
+        assertEquals("<null format>", meterContext.getContext().get("key"), "should have '<null format>' as value");
     }
 
     @Test
     @DisplayName("ctx(name, format, args) with illegal format should add entry with exception message")
-    void testCtxWithFormattedStringAndIllegalFormat() {
-        final String key = "key";
-        final String format = "%d";
-        final Object arg = "not an int";
-        meterContext.ctx(key, format, arg); // Illegal format
-        assertFalse(meterContext.getContext().isEmpty(), "Context map should not be empty after illegal format");
-        assertTrue(meterContext.getContext().containsKey(key), "Context map should contain key '" + key + "'");
-        assertNotNull(meterContext.getContext().get(key), "Value for key '" + key + "' should not be null");
+    void shouldAddExceptionMessageWhenCtxWithIllegalFormat() {
+        // When: ctx is called with illegal format
+        meterContext.ctx("key", "%d", "not an int");
+
+        // Then: the context map should contain the key with non-null value (exception message)
+        assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+        assertTrue(meterContext.getContext().containsKey("key"), "should contain the key");
+        assertNotNull(meterContext.getContext().get("key"), "should have non-null value");
         // The exact message can vary by JVM/Locale, so we check for presence and type
-        assertTrue(meterContext.getContext().get(key).contains("java.lang.String"), "Value should contain format exception message");
+        assertTrue(meterContext.getContext().get("key").contains("java.lang.String"), "Value should contain format exception message");
     }
 }
