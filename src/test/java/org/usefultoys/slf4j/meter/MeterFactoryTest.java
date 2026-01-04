@@ -228,3 +228,4 @@ class MeterFactoryTest {
             originalMeter.ok();
         }
     }
+}
