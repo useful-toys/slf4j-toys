@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.usefultoys.slf4j.meter.legacy;
+package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
