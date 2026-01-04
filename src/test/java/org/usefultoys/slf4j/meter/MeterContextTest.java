@@ -43,6 +43,7 @@ import static org.usefultoys.slf4j.meter.MeterData.NULL_VALUE;
  * </ul>
  *
  * @author Co-authored-by: GitHub Copilot using Gemini 3 Flash (Preview)
+ * @author Co-authored-by: GitHub Copilot using Gemini 3 Pro (Preview)
  */
 @ValidateCharset
 @WithLocale("en")
