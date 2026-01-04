@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
@@ -59,152 +60,171 @@ class MeterFactoryTest {
     private static final String TEST_SUBOPERATION = "testSubOperation";
 
     @Slf4jMock(TEST_CATEGORY)
-    private Logger testLogger;
+    protected Logger testLogger;
 
-    @Test
-    @DisplayName("should create meter from logger")
-    void shouldCreateMeterFromLogger() {
-        // Given: a mock logger representing the measurement category
-        // When: a meter is created from that logger
-        final Meter meter = MeterFactory.getMeter(testLogger);
+    @Nested
+    @DisplayName("Meter Creation Tests")
+    class MeterCreationTests {
 
-        // Then: the meter category must match the logger name and no operation is set
-        assertNotNull(meter, "The Meter should not be null");
-        assertEquals(TEST_CATEGORY, meter.getCategory(), "The Meter's category should match the logger name");
-        assertNull(meter.getOperation(), "The operation name should be null when not specified");
+        @Test
+        @DisplayName("should create meter from logger")
+        void shouldCreateMeterFromLogger() {
+            // Given: a mock logger representing the measurement category
+            // When: a meter is created from that logger
+            final Meter meter = MeterFactory.getMeter(testLogger);
+
+            // Then: the meter category must match the logger name and no operation is set
+            assertNotNull(meter, "The Meter should not be null");
+            assertEquals(TEST_CATEGORY, meter.getCategory(), "The Meter's category should match the logger name");
+            assertNull(meter.getOperation(), "The operation name should be null when not specified");
+        }
+
+        @Test
+        @DisplayName("should create meter from category")
+        void shouldCreateMeterFromCategory() {
+            // Given: a category string
+            // When: a meter is created from the category
+            final Meter meter = MeterFactory.getMeter(TEST_CATEGORY);
+
+            // Then: the meter category should match the supplied category and operation remains null
+            assertNotNull(meter, "The Meter should not be null");
+            assertEquals(TEST_CATEGORY, meter.getCategory(), "The Meter's category should match the specified category");
+            assertNull(meter.getOperation(), "The operation name should be null when not specified");
+        }
+
+        @Test
+        @DisplayName("should create meter from class")
+        void shouldCreateMeterFromClass() {
+            // Given: a class reference
+            // When: a meter is created from the class
+            final Meter meter = MeterFactory.getMeter(MeterFactoryTest.class);
+
+            // Then: the meter category should be the class name
+            assertNotNull(meter, "The Meter should not be null");
+            assertEquals(MeterFactoryTest.class.getName(), meter.getCategory(), "The Meter's category should match the class name");
+            assertNull(meter.getOperation(), "The operation name should be null when not specified");
+        }
+
+        @Test
+        @DisplayName("should create meter from class and operation")
+        void shouldCreateMeterFromClassAndOperation() {
+            // Given: class and operation name
+            // When: meter is created with the specified operation
+            final Meter meter = MeterFactory.getMeter(MeterFactoryTest.class, TEST_OPERATION);
+
+            // Then: the meter carries the class name and operation
+            assertNotNull(meter, "The Meter should not be null");
+            assertEquals(MeterFactoryTest.class.getName(), meter.getCategory(), "The Meter's category should match the class name");
+            assertEquals(TEST_OPERATION, meter.getOperation(), "The operation name should match the specified name");
+        }
+
+        @Test
+        @DisplayName("should create meter from logger and operation")
+        void shouldCreateMeterFromLoggerAndOperation() {
+            // Given: logger and operation name
+            // When: meter is created from them
+            final Meter meter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+
+            // Then: the meter category is the logger name and operation matches
+            assertNotNull(meter, "The Meter should not be null");
+            assertEquals(TEST_CATEGORY, meter.getCategory(), "The Meter's category should match the logger name");
+            assertEquals(TEST_OPERATION, meter.getOperation(), "The operation name should match the specified name");
+        }
     }
 
-    @Test
-    @DisplayName("should create meter from category")
-    void shouldCreateMeterFromCategory() {
-        // Given: a category string
-        // When: a meter is created from the category
-        final Meter meter = MeterFactory.getMeter(TEST_CATEGORY);
+    @Nested
+    @DisplayName("Current Meter Tracking Tests")
+    class CurrentMeterTrackingTests {
 
-        // Then: the meter category should match the supplied category and operation remains null
-        assertNotNull(meter, "The Meter should not be null");
-        assertEquals(TEST_CATEGORY, meter.getCategory(), "The Meter's category should match the specified category");
-        assertNull(meter.getOperation(), "The operation name should be null when not specified");
+        @Test
+        @DisplayName("should report current meter after start")
+        void shouldReportCurrentMeterAfterStart() {
+            // Given: a meter that was started
+            final Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+            originalMeter.start();
+
+            // When: current meter is queried
+            final Meter currentMeter = MeterFactory.getCurrentMeter();
+
+            // Then: it should be the same meter that was started
+            assertNotNull(currentMeter, "The current Meter should not be null");
+            assertSame(originalMeter, currentMeter, "The current Meter should be the same as the last started one");
+            originalMeter.ok();
+        }
     }
 
-    @Test
-    @DisplayName("should create meter from class")
-    void shouldCreateMeterFromClass() {
-        // Given: a class reference
-        // When: a meter is created from the class
-        final Meter meter = MeterFactory.getMeter(MeterFactoryTest.class);
+    @Nested
+    @DisplayName("Fallback Meter Tests")
+    class FallbackMeterTests {
 
-        // Then: the meter category should be the class name
-        assertNotNull(meter, "The Meter should not be null");
-        assertEquals(MeterFactoryTest.class.getName(), meter.getCategory(), "The Meter's category should match the class name");
-        assertNull(meter.getOperation(), "The operation name should be null when not specified");
+        @Test
+        @DisplayName("should return fallback meter when none started")
+        void shouldReturnFallbackMeterWhenNoneStarted() {
+            // Given: (no active meter)
+            // When: current meter is requested without prior start
+            final Meter currentMeter = MeterFactory.getCurrentMeter();
+
+            // Then: fallback meter is provided
+            assertNotNull(currentMeter, "The Meter should not be null");
+            assertEquals("???", currentMeter.getCategory(), "The Meter's category should fall back to the logger placeholder");
+            assertNull(currentMeter.getOperation(), "The operation name should be null when not specified");
+        }
+
+        @Test
+        @DisplayName("should create fallback sub meter when none started")
+        void shouldCreateFallbackSubMeterWhenNoneStarted() {
+            // Given: (no active meter)
+            // When: sub meter is created without active meter
+            final Meter subMeter = MeterFactory.getCurrentSubMeter(TEST_SUBOPERATION);
+
+            // Then: fallback category and sub operation are returned
+            assertNotNull(subMeter, "The sub-Meter should not be null");
+            assertEquals("???", subMeter.getCategory(), "The sub-Meter's category should match the fallback category");
+            assertEquals(TEST_SUBOPERATION, subMeter.getOperation(), "The sub-Meter's operation name should match the requested sub-operation");
+        }
     }
 
-    @Test
-    @DisplayName("should create meter from class and operation")
-    void shouldCreateMeterFromClassAndOperation() {
-        // Given: class and operation name
-        // When: meter is created with the specified operation
-        final Meter meter = MeterFactory.getMeter(MeterFactoryTest.class, TEST_OPERATION);
+    @Nested
+    @DisplayName("Sub-Meter Tests")
+    class SubMeterTests {
 
-        // Then: the meter carries the class name and operation
-        assertNotNull(meter, "The Meter should not be null");
-        assertEquals(MeterFactoryTest.class.getName(), meter.getCategory(), "The Meter's category should match the class name");
-        assertEquals(TEST_OPERATION, meter.getOperation(), "The operation name should match the specified name");
+        @Test
+        @DisplayName("should create sub meter from current meter")
+        void shouldCreateSubMeterFromCurrentMeter() {
+            // Given: started meter
+            final Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+            originalMeter.start();
+
+            // When: a sub meter is created
+            final Meter subMeter = MeterFactory.getCurrentSubMeter(TEST_SUBOPERATION);
+
+            // Then: sub-meter category matches original and operation concatenates
+            assertNotNull(subMeter, "The sub-Meter should not be null");
+            assertEquals(TEST_CATEGORY, subMeter.getCategory(), "The sub-Meter's category should match the original Meter's category");
+            assertEquals(TEST_OPERATION + "/" + TEST_SUBOPERATION, subMeter.getOperation(), "The sub-Meter's operation name should combine the original operation and the sub-name");
+            originalMeter.ok();
+        }
+
+        @Test
+        @DisplayName("should allow multiple concurrent sub meters")
+        void shouldAllowMultipleConcurrentSubMeters() {
+            // Given: one parent meter
+            final Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+            originalMeter.start();
+
+            // When: multiple sub-meters are created
+            final Meter subMeter1 = MeterFactory.getCurrentSubMeter("sub1");
+            final Meter subMeter2 = MeterFactory.getCurrentSubMeter("sub2");
+
+            // Then: each sub-meter reports distinct operations and the most recent start becomes current
+            assertNotNull(subMeter1, "The first sub-Meter should not be null");
+            assertNotNull(subMeter2, "The second sub-Meter should not be null");
+            assertEquals(TEST_OPERATION + "/sub1", subMeter1.getOperation(), "The first sub-Meter's operation name should be correct");
+            assertEquals(TEST_OPERATION + "/sub2", subMeter2.getOperation(), "The second sub-Meter's operation name should be correct");
+
+            subMeter1.start();
+            assertSame(subMeter1, MeterFactory.getCurrentMeter(), "The current Meter should be the most recently started sub-Meter");
+            subMeter1.ok();
+            originalMeter.ok();
+        }
     }
-
-    @Test
-    @DisplayName("should create meter from logger and operation")
-    void shouldCreateMeterFromLoggerAndOperation() {
-        // Given: logger and operation name
-        // When: meter is created from them
-        final Meter meter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
-
-        // Then: the meter category is the logger name and operation matches
-        assertNotNull(meter, "The Meter should not be null");
-        assertEquals(TEST_CATEGORY, meter.getCategory(), "The Meter's category should match the logger name");
-        assertEquals(TEST_OPERATION, meter.getOperation(), "The operation name should match the specified name");
-    }
-
-    @Test
-    @DisplayName("should report current meter after start")
-    void shouldReportCurrentMeterAfterStart() {
-        // Given: a meter that was started
-        final Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
-        originalMeter.start();
-
-        // When: current meter is queried
-        final Meter currentMeter = MeterFactory.getCurrentMeter();
-
-        // Then: it should be the same meter that was started
-        assertNotNull(currentMeter, "The current Meter should not be null");
-        assertSame(originalMeter, currentMeter, "The current Meter should be the same as the last started one");
-        originalMeter.ok();
-    }
-
-    @Test
-    @DisplayName("should return fallback meter when none started")
-    void shouldReturnFallbackMeterWhenNoneStarted() {
-        // Given: (no active meter)
-        // When: current meter is requested without prior start
-        final Meter currentMeter = MeterFactory.getCurrentMeter();
-
-        // Then: fallback meter is provided
-        assertNotNull(currentMeter, "The Meter should not be null");
-        assertEquals("???", currentMeter.getCategory(), "The Meter's category should fall back to the logger placeholder");
-        assertNull(currentMeter.getOperation(), "The operation name should be null when not specified");
-    }
-
-    @Test
-    @DisplayName("should create sub meter from current meter")
-    void shouldCreateSubMeterFromCurrentMeter() {
-        // Given: started meter
-        final Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
-        originalMeter.start();
-
-        // When: a sub meter is created
-        final Meter subMeter = MeterFactory.getCurrentSubMeter(TEST_SUBOPERATION);
-
-        // Then: sub-meter category matches original and operation concatenates
-        assertNotNull(subMeter, "The sub-Meter should not be null");
-        assertEquals(TEST_CATEGORY, subMeter.getCategory(), "The sub-Meter's category should match the original Meter's category");
-        assertEquals(TEST_OPERATION + "/" + TEST_SUBOPERATION, subMeter.getOperation(), "The sub-Meter's operation name should combine the original operation and the sub-name");
-        originalMeter.ok();
-    }
-
-    @Test
-    @DisplayName("should create fallback sub meter when none started")
-    void shouldCreateFallbackSubMeterWhenNoneStarted() {
-        // Given: (no active meter)
-        // When: sub meter is created without active meter
-        final Meter subMeter = MeterFactory.getCurrentSubMeter(TEST_SUBOPERATION);
-
-        // Then: fallback category and sub operation are returned
-        assertNotNull(subMeter, "The sub-Meter should not be null");
-        assertEquals("???", subMeter.getCategory(), "The sub-Meter's category should match the fallback category");
-        assertEquals(TEST_SUBOPERATION, subMeter.getOperation(), "The sub-Meter's operation name should match the requested sub-operation");
-    }
-
-    @Test
-    @DisplayName("should allow multiple concurrent sub meters")
-    void shouldAllowMultipleConcurrentSubMeters() {
-        // Given: one parent meter
-        final Meter originalMeter = MeterFactory.getMeter(testLogger, TEST_OPERATION);
-        originalMeter.start();
-
-        // When: multiple sub-meters are created
-        final Meter subMeter1 = MeterFactory.getCurrentSubMeter("sub1");
-        final Meter subMeter2 = MeterFactory.getCurrentSubMeter("sub2");
-
-        // Then: each sub-meter reports distinct operations and the most recent start becomes current
-        assertNotNull(subMeter1, "The first sub-Meter should not be null");
-        assertNotNull(subMeter2, "The second sub-Meter should not be null");
-        assertEquals(TEST_OPERATION + "/sub1", subMeter1.getOperation(), "The first sub-Meter's operation name should be correct");
-        assertEquals(TEST_OPERATION + "/sub2", subMeter2.getOperation(), "The second sub-Meter's operation name should be correct");
-
-        subMeter1.start();
-        assertSame(subMeter1, MeterFactory.getCurrentMeter(), "The current Meter should be the most recently started sub-Meter");
-        subMeter1.ok();
-        originalMeter.ok();
-    }
-}
