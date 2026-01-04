@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,22 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
- * Unit tests for the {@link MeterFactory} helpers.
+ * Unit tests for {@link MeterFactory}.
+ * <p>
+ * Tests validate that MeterFactory correctly creates Meter instances from various sources
+ * and manages the current meter context in multi-threaded environments.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Meter Creation from Logger:</b> Verifies that Meter can be created from Logger instances</li>
+ *   <li><b>Meter Creation from Category:</b> Verifies that Meter can be created from category strings</li>
+ *   <li><b>Meter Creation from Class:</b> Verifies that Meter can be created from Class references</li>
+ *   <li><b>Meter Creation with Operation:</b> Verifies that operation names are properly set when provided</li>
+ *   <li><b>Current Meter Tracking:</b> Verifies that started Meters are tracked and accessible via getCurrentMeter()</li>
+ *   <li><b>Fallback Meter Behavior:</b> Verifies that fallback Meter is returned when no active Meter exists</li>
+ *   <li><b>Sub-Meter Creation:</b> Verifies that sub-Meters are created with concatenated operation names</li>
+ *   <li><b>Multiple Concurrent Sub-Meters:</b> Verifies that multiple sub-Meters can coexist with correct operation hierarchy</li>
+ * </ul>
  */
 @DisplayName("MeterFactory")
 @ValidateCharset
