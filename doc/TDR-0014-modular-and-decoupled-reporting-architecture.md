@@ -16,6 +16,11 @@ We implemented a modular architecture where each diagnostic report is a standalo
 3.  **Execution Strategy Flexibility**:
     *   **Synchronous**: A `sameThreadExecutor` is provided for simple, blocking execution (default for `runDefaultReport()`).
     *   **Asynchronous/Parallel**: Users can provide a thread pool or a managed executor (e.g., in JavaEE) to run reports in the background or in parallel.
+    *   **Thread-Safe Logging**: Since each `Report` module produces atomic log messages (individual log statements are atomic in SLF4J), multiple reports can safely execute in parallel without log output becoming interleaved or corrupted. Each logger implementation ensures that individual log statements are atomic units.
+    *   **Use Cases for Parallel/Async Execution**:
+        - **Parallel Reports**: Some reports may be time-consuming (e.g., querying network interfaces, JDBC connections). Running them in parallel reduces total report generation time.
+        - **Deferred Execution**: Reports can be enqueued and executed asynchronously, allowing the application to request reports without blocking (e.g., on application startup without delaying initialization).
+        - **Servlet Integration**: HTTP servlets can request reports and return immediately, with the report execution happening asynchronously in the background.
 4.  **Hook Methods for Testability**: The `Reporter` class uses protected methods (e.g., `getNetworkInterfaces()`) to provide seams for mocking system resources in unit tests without relying on complex mocking frameworks or reflection.
 5.  **Internal Provider Pattern**: Some complex modules (like `ReportMemory`) use internal interfaces (e.g., `MemoryInfoProvider`) to abstract the source of information, further enhancing testability.
 
@@ -26,6 +31,10 @@ We implemented a modular architecture where each diagnostic report is a standalo
 *   **Testability**: Individual modules can be unit-tested in isolation. System resources can be mocked via hook methods or internal providers.
 *   **Environment Adaptability**: The library can be used in environments with strict threading policies (like JavaEE or reactive frameworks) by providing a compatible `Executor`.
 *   **Separation of Concerns**: The `Reporter` class manages the "what" (which reports to run), while the modules manage the "how" (how to gather and format the data).
+*   **Parallel and Asynchronous Execution**: Reports can be safely executed in parallel or enqueued for asynchronous execution without log corruption, as each logger produces atomic log messages. This enables use cases like:
+    - Reducing total report generation time by running time-consuming reports concurrently
+    - Non-blocking report requests (e.g., HTTP servlets returning immediately while reports execute in background)
+    - Deferred report execution during application startup without delaying initialization
 
 **Negative**:
 *   **Boilerplate**: Each module requires a similar structure (constructor, `run` method), leading to some repetitive code.

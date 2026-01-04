@@ -11,10 +11,10 @@ We adopted a "non-intrusive" philosophy for validation and error handling, centr
 
 ### Key Principles
 1.  **Never Throw Exceptions**: No method in the public API (except for constructors in some cases) should throw checked or unchecked exceptions.
-2.  **Log Instead of Crash**: If an invalid state is detected (e.g., `Meter` started twice), the library logs an error message with a `CallerStackTraceThrowable` (see [TDR-0016](TDR-0016-artificial-throwable-for-usage-reporting.md)) but continues execution.
+2.  **Log Instead of Crash**: If an invalid state is detected (e.g., `Meter` started twice), the library logs an error message with a `CallerStackTraceThrowable` (see [TDR-0016](TDR-0016-artificial-throwable-for-usage-reporting.md)) that captures the stack trace pointing directly to the client code where the inconsistency occurred, but continues execution. This enables developers to quickly identify and fix the problematic code without exception handling being required.
 3.  **Defensive Internal Catching**: Internal logic (e.g., in `start()`, `ok()`, `progress()`) is wrapped in `try-catch` blocks that catch `Exception`. Any caught exception is logged as a "bug" but not rethrown.
 4.  **Validation Offloading**: Validation logic is moved out of the main `Meter` class into `MeterValidator` to keep the core logic clean and focused.
-5.  **Silent Failure for Optional Features**: If a feature like "data logging" is disabled, the library uses Null Objects (see [TDR-0011](TDR-0011-null-object-pattern-for-optional-logging.md)) to avoid null checks and potential `NullPointerException`.
+5.  **Null Object Pattern for Optional Features**: If a feature is disabled or optional (e.g., disabled reporters, disabled watchers), the library uses Null Objects (see [TDR-0011](TDR-0011-null-object-pattern-for-optional-logging.md)) instead of null references. This allows clean, null-check-free client code that works identically whether the feature is enabled or disabled, without exposing the disabled state to callers.
 
 ## Consequences
 **Positive**:
@@ -26,6 +26,7 @@ We adopted a "non-intrusive" philosophy for validation and error handling, centr
 *   **Silent Bugs**: If logs are not monitored, incorrect usage might go unnoticed for a long time.
 *   **Performance Overhead**: The use of `try-catch` blocks and validation methods adds a small overhead to every call.
 *   **Code Verbosity**: Requires wrapping many methods in `try-catch` and calling validator methods.
+*   **Manual Implementation**: This non-intrusive validation strategy deviates from Lombok's standard fail-fast approach (e.g., `@NonNull` validation). The custom validation logic in `MeterValidator` and `try-catch` blocks must be implemented and maintained manually instead of relying on auto-generated validation from Lombok.
 
 ## Alternatives
 *   **Fail-Fast**: Throw exceptions immediately upon detecting misuse. **Rejected because** it violates the principle that a monitoring tool should not be a point of failure.

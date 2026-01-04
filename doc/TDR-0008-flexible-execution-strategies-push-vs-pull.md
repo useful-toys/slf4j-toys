@@ -16,7 +16,7 @@ The `Watcher` component is responsible for periodic system monitoring. However, 
 We decided to implement a **Multi-Strategy Execution Model** that supports both "Push" and "Pull" patterns, while keeping the core `Watcher` logic passive.
 
 ### 1. Passive Core (`Runnable`)
-The `Watcher` class implements `java.lang.Runnable`. It contains no internal scheduling logic. This makes it a "passive" component that can be plugged into any scheduling framework (Spring, EJB Timer, Quartz).
+Both `Watcher` and `Reporter` classes implement `java.lang.Runnable`. They contain no internal scheduling logic. This makes them "passive" components that can be plugged into any scheduling framework (Spring, EJB Timer, Quartz, custom application schedulers, or any other execution mechanism that accepts `Runnable` instances).
 
 ### 2. Push Strategy (Internal Scheduling)
 For simple architectures, `WatcherSingleton` provides a built-in "Push" mechanism:
@@ -27,10 +27,12 @@ For simple architectures, `WatcherSingleton` provides a built-in "Push" mechanis
 ### 3. Pull Strategy (External Triggers)
 For managed or probe-based environments, we provide a "Pull" mechanism via Servlets:
 *   **`WatcherServlet` / `WatcherJavaxServlet`**: Exposes the `Watcher` execution via an HTTP GET request.
+*   **`ReporterServlet` / `ReporterJavaxServlet`**: Exposes the `Reporter` execution via an HTTP GET request.
 *   **Rationale**: 
     *   Complies with JavaEE restrictions by not creating background threads.
     *   Allows external monitoring systems to "pull" a status report on demand.
     *   Enables integration with infrastructure-level schedulers (e.g., `curl` via `cron`).
+    *   Both `Watcher` and `Reporter` support both servlet specifications: Jakarta EE (modern) and javax (legacy).
 
 ## Consequences
 
@@ -55,9 +57,10 @@ For managed or probe-based environments, we provide a "Pull" mechanism via Servl
 
 ## Implementation
 
-*   `Watcher` implements `Runnable`.
+*   `Watcher` and `Reporter` implement `Runnable`, making them compatible with any scheduling or execution mechanism that accepts `Runnable` instances.
 *   `WatcherSingleton` manages the lifecycle of the default instance and its optional internal executors.
-*   `WatcherServlet` (Jakarta) and `WatcherJavaxServlet` (Legacy) provide the HTTP bridge.
+*   `WatcherServlet` (Jakarta) and `WatcherJavaxServlet` (Legacy) provide the HTTP bridge for Watcher.
+*   `ReporterServlet` (Jakarta) and `ReporterJavaxServlet` (Legacy) provide the HTTP bridge for Reporter.
 
 ## References
 
