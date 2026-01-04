@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -47,22 +48,72 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  *
  * @author Daniel Felix Ferber
  * @author Co-authored-by: GitHub Copilot using Gemini 3 Pro (Preview)
+ * @author Co-authored-by: GitHub Copilot using Gemini 3 Flash (Preview)
  */
 @ValidateCharset
 @WithLocale("en")
 class MeterDataJson5Test {
 
-    // Concrete class for testing the abstract MeterData
+    /**
+     * Concrete class for testing the abstract {@link MeterData}.
+     */
     private static class TestMeterData extends MeterData {
+        /**
+         * Default constructor.
+         */
         TestMeterData() {
             super();
         }
 
-        TestMeterData(String sessionUuid, long position, long time, long heap_commited, long heap_max, long heap_used, long nonHeap_commited, long nonHeap_max, long nonHeap_used, long objectPendingFinalizationCount, long classLoading_loaded, long classLoading_total, long classLoading_unloaded, long compilationTime, long garbageCollector_count, long garbageCollector_time, long runtime_usedMemory, long runtime_maxMemory, long runtime_totalMemory, double systemLoad, String category, String operation, String parent, String description, long createTime, long startTime, long stopTime, long timeLimit, long currentIteration, long expectedIterations, String okPath, String rejectPath, String failPath, String failMessage, Map<String, String> context) {
+        /**
+         * Full constructor.
+         *
+         * @param sessionUuid session UUID
+         * @param position position
+         * @param time time
+         * @param heap_commited heap committed
+         * @param heap_max heap max
+         * @param heap_used heap used
+         * @param nonHeap_commited non-heap committed
+         * @param nonHeap_max non-heap max
+         * @param nonHeap_used non-heap used
+         * @param objectPendingFinalizationCount object pending finalization count
+         * @param classLoading_loaded class loading loaded
+         * @param classLoading_total class loading total
+         * @param classLoading_unloaded class loading unloaded
+         * @param compilationTime compilation time
+         * @param garbageCollector_count garbage collector count
+         * @param garbageCollector_time garbage collector time
+         * @param runtime_usedMemory runtime used memory
+         * @param runtime_maxMemory runtime max memory
+         * @param runtime_totalMemory runtime total memory
+         * @param systemLoad system load
+         * @param category category
+         * @param operation operation
+         * @param parent parent
+         * @param description description
+         * @param createTime create time
+         * @param startTime start time
+         * @param stopTime stop time
+         * @param timeLimit time limit
+         * @param currentIteration current iteration
+         * @param expectedIterations expected iterations
+         * @param okPath OK path
+         * @param rejectPath reject path
+         * @param failPath fail path
+         * @param failMessage fail message
+         * @param context context
+         */
+        TestMeterData(final String sessionUuid, final long position, final long time, final long heap_commited, final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded, final long compilationTime, final long garbageCollector_count, final long garbageCollector_time, final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory, final double systemLoad, final String category, final String operation, final String parent, final String description, final long createTime, final long startTime, final long stopTime, final long timeLimit, final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage, final Map<String, String> context) {
             super(sessionUuid, position, time, heap_commited, heap_max, heap_used, nonHeap_commited, nonHeap_max, nonHeap_used, objectPendingFinalizationCount, classLoading_loaded, classLoading_total, classLoading_unloaded, compilationTime, garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory, runtime_totalMemory, systemLoad, category, operation, parent, description, createTime, startTime, stopTime, timeLimit, currentIteration, expectedIterations, okPath, rejectPath, failPath, failMessage, context);
         }
     }
 
+    /**
+     * Data provider for round-trip serialization scenarios.
+     *
+     * @return stream of arguments
+     */
     static Stream<Arguments> roundTripScenarios() {
         final String uuid1 = "8ae94091";
         final Map<String, String> testContext = new HashMap<>();
@@ -114,27 +165,39 @@ class MeterDataJson5Test {
         );
     }
 
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("roundTripScenarios")
-    @DisplayName("Should correctly serialize and deserialize (round-trip)")
-    void shouldCorrectlySerializeAndDeserializeRoundTrip(String testName, MeterData originalData, String expectedJson) {
-        // Given: original MeterData object and expected JSON string
-        // When: data is serialized to JSON
-        final StringBuilder sb = new StringBuilder();
-        MeterDataJson5.write(originalData, sb);
-        final String actualJson = sb.toString();
-        
-        // Then: JSON should match expected format
-        assertEquals(expectedJson, actualJson);
+    /**
+     * Tests for round-trip serialization.
+     */
+    @Nested
+    @DisplayName("Round-trip serialization tests")
+    class RoundTrip {
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("org.usefultoys.slf4j.meter.MeterDataJson5Test#roundTripScenarios")
+        @DisplayName("Should correctly serialize and deserialize (round-trip)")
+        void shouldCorrectlySerializeAndDeserializeRoundTrip(final String testName, final MeterData originalData, final String expectedJson) {
+            // Given: original MeterData object and expected JSON string
+            // When: data is serialized to JSON
+            final StringBuilder sb = new StringBuilder();
+            MeterDataJson5.write(originalData, sb);
+            final String actualJson = sb.toString();
 
-        // When: JSON is deserialized back to MeterData
-        final TestMeterData newData = new TestMeterData();
-        MeterDataJson5.read(newData, "{" + actualJson + "}");
+            // Then: JSON should match expected format
+            assertEquals(expectedJson, actualJson, "serialized JSON should match expected format");
 
-        // Then: deserialized object should match original data
-        assertMeterDataEquals(originalData, newData);
+            // When: JSON is deserialized back to MeterData
+            final TestMeterData newData = new TestMeterData();
+            MeterDataJson5.read(newData, "{" + actualJson + "}");
+
+            // Then: deserialized object should match original data
+            assertMeterDataEquals(originalData, newData);
+        }
     }
 
+    /**
+     * Data provider for edge case scenarios.
+     *
+     * @return stream of arguments
+     */
     static Stream<Arguments> readEdgeCaseScenarios() {
         final String uuid = "8ae94091";
         final Map<String, String> expectedContext = new HashMap<>();
@@ -171,20 +234,32 @@ class MeterDataJson5Test {
         );
     }
 
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("readEdgeCaseScenarios")
-    @DisplayName("Should correctly read edge cases")
-    void shouldCorrectlyReadEdgeCases(String testName, String inputJson, MeterData expectedData) {
-        // Given: input JSON with edge cases (disordered, missing fields, etc.)
-        final TestMeterData actualData = new TestMeterData();
-        
-        // When: JSON is parsed
-        MeterDataJson5.read(actualData, inputJson);
-        
-        // Then: parsed data should match expected MeterData
-        assertMeterDataEquals(expectedData, actualData);
+    /**
+     * Tests for edge case scenarios.
+     */
+    @Nested
+    @DisplayName("Edge case tests")
+    class EdgeCases {
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("org.usefultoys.slf4j.meter.MeterDataJson5Test#readEdgeCaseScenarios")
+        @DisplayName("Should correctly read edge cases")
+        void shouldCorrectlyReadEdgeCases(final String testName, final String inputJson, final MeterData expectedData) {
+            // Given: input JSON with edge cases (disordered, missing fields, etc.)
+            final TestMeterData actualData = new TestMeterData();
+
+            // When: JSON is parsed
+            MeterDataJson5.read(actualData, inputJson);
+
+            // Then: parsed data should match expected MeterData
+            assertMeterDataEquals(expectedData, actualData);
+        }
     }
 
+    /**
+     * Data provider for specific field scenarios.
+     *
+     * @return stream of arguments
+     */
     static Stream<Arguments> readSpecificFieldScenarios() {
         return Stream.of(
                 Arguments.of(
@@ -200,7 +275,7 @@ class MeterDataJson5Test {
                         "successPath"
                 ),
                 Arguments.of(
-                        "Reject path field", 
+                        "Reject path field",
                         "{r:rejectedPath}",
                         null,
                         "rejectedPath"
@@ -224,7 +299,7 @@ class MeterDataJson5Test {
                         "TestCategory"
                 ),
                 Arguments.of(
-                        "Operation field", 
+                        "Operation field",
                         "{n:testOperation}",
                         null,
                         "testOperation"
@@ -238,40 +313,52 @@ class MeterDataJson5Test {
         );
     }
 
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("readSpecificFieldScenarios")
-    @DisplayName("Should correctly read specific fields")
-    void shouldCorrectlyReadSpecificFields(String testName, String inputJson, String expectedDescription, String expectedPath) {
-        // Given: input JSON containing specific fields
-        final TestMeterData data = new TestMeterData();
-        
-        // When: JSON is parsed
-        MeterDataJson5.read(data, inputJson);
-        
-        // Then: specific fields should be correctly populated
-        if (expectedDescription != null) {
-            assertEquals(expectedDescription, data.description);
-        }
-        // Thes was a strange solution used by IA to decide which attribute to assert.
-        if (expectedPath != null) {
-            if (inputJson.contains("ep:")) {
-                assertEquals(expectedPath, data.parent);
-            } else if (inputJson.contains("p:")) {
-                assertEquals(expectedPath, data.okPath);
-            } else if (inputJson.contains("r:")) {
-                assertEquals(expectedPath, data.rejectPath);
-            } else if (inputJson.contains("f:")) {
-                assertEquals(expectedPath, data.failPath);
-            } else if (inputJson.contains("c:")) {
-                assertEquals(expectedPath, data.category);
-            } else if (inputJson.contains("n:")) {
-                assertEquals(expectedPath, data.operation);
-            } else if (inputJson.contains("fm:")) {
-                assertEquals(expectedPath, data.failMessage);
+    /**
+     * Tests for specific field reading.
+     */
+    @Nested
+    @DisplayName("Specific field tests")
+    class SpecificFields {
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("org.usefultoys.slf4j.meter.MeterDataJson5Test#readSpecificFieldScenarios")
+        @DisplayName("Should correctly read specific fields")
+        void shouldCorrectlyReadSpecificFields(final String testName, final String inputJson, final String expectedDescription, final String expectedPath) {
+            // Given: input JSON containing specific fields
+            final TestMeterData data = new TestMeterData();
+
+            // When: JSON is parsed
+            MeterDataJson5.read(data, inputJson);
+
+            // Then: specific fields should be correctly populated
+            if (expectedDescription != null) {
+                assertEquals(expectedDescription, data.description, "description should match expected value");
+            }
+            // Thes was a strange solution used by IA to decide which attribute to assert.
+            if (expectedPath != null) {
+                if (inputJson.contains("ep:")) {
+                    assertEquals(expectedPath, data.parent, "parent should match expected value");
+                } else if (inputJson.contains("p:")) {
+                    assertEquals(expectedPath, data.okPath, "okPath should match expected value");
+                } else if (inputJson.contains("r:")) {
+                    assertEquals(expectedPath, data.rejectPath, "rejectPath should match expected value");
+                } else if (inputJson.contains("f:")) {
+                    assertEquals(expectedPath, data.failPath, "failPath should match expected value");
+                } else if (inputJson.contains("c:")) {
+                    assertEquals(expectedPath, data.category, "category should match expected value");
+                } else if (inputJson.contains("n:")) {
+                    assertEquals(expectedPath, data.operation, "operation should match expected value");
+                } else if (inputJson.contains("fm:")) {
+                    assertEquals(expectedPath, data.failMessage, "failMessage should match expected value");
+                }
             }
         }
     }
 
+    /**
+     * Data provider for timing and iteration field scenarios.
+     *
+     * @return stream of arguments
+     */
     static Stream<Arguments> readTimingFieldScenarios() {
         return Stream.of(
                 Arguments.of(
@@ -312,25 +399,37 @@ class MeterDataJson5Test {
         );
     }
 
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("readTimingFieldScenarios")
-    @DisplayName("Should correctly read timing and iteration fields")
-    void shouldCorrectlyReadTimingAndIterationFields(String testName, String inputJson, long expectedCreateTime, long expectedStartTime, long expectedStopTime, long expectedTimeLimit, long expectedCurrentIteration, long expectedExpectedIterations) {
-        // Given: input JSON with timing/iteration data
-        final TestMeterData data = new TestMeterData();
-        
-        // When: JSON is parsed
-        MeterDataJson5.read(data, inputJson);
-        
-        // Then: timing and iteration fields should match expected values
-        assertEquals(expectedCreateTime, data.createTime);
-        assertEquals(expectedStartTime, data.startTime);
-        assertEquals(expectedStopTime, data.stopTime);
-        assertEquals(expectedTimeLimit, data.timeLimit);
-        assertEquals(expectedCurrentIteration, data.currentIteration);
-        assertEquals(expectedExpectedIterations, data.expectedIterations);
+    /**
+     * Tests for timing and iteration field reading.
+     */
+    @Nested
+    @DisplayName("Timing and iteration tests")
+    class TimingAndIteration {
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("org.usefultoys.slf4j.meter.MeterDataJson5Test#readTimingFieldScenarios")
+        @DisplayName("Should correctly read timing and iteration fields")
+        void shouldCorrectlyReadTimingAndIterationFields(final String testName, final String inputJson, final long expectedCreateTime, final long expectedStartTime, final long expectedStopTime, final long expectedTimeLimit, final long expectedCurrentIteration, final long expectedExpectedIterations) {
+            // Given: input JSON with timing/iteration data
+            final TestMeterData data = new TestMeterData();
+
+            // When: JSON is parsed
+            MeterDataJson5.read(data, inputJson);
+
+            // Then: timing and iteration fields should match expected values
+            assertEquals(expectedCreateTime, data.createTime, "createTime should match expected value");
+            assertEquals(expectedStartTime, data.startTime, "startTime should match expected value");
+            assertEquals(expectedStopTime, data.stopTime, "stopTime should match expected value");
+            assertEquals(expectedTimeLimit, data.timeLimit, "timeLimit should match expected value");
+            assertEquals(expectedCurrentIteration, data.currentIteration, "currentIteration should match expected value");
+            assertEquals(expectedExpectedIterations, data.expectedIterations, "expectedIterations should match expected value");
+        }
     }
 
+    /**
+     * Data provider for context field scenarios.
+     *
+     * @return stream of arguments
+     */
     static Stream<Arguments> readContextScenarios() {
         return Stream.of(
                 Arguments.of(
@@ -366,88 +465,77 @@ class MeterDataJson5Test {
         );
     }
 
-    // Helper methods for creating maps (Java 8 compatible)
-    private static Map<String, String> createMap(String k1, String v1) {
-        Map<String, String> map = new HashMap<>();
+    /**
+     * Helper method for creating maps (Java 8 compatible).
+     */
+    private static Map<String, String> createMap(final String k1, final String v1) {
+        final Map<String, String> map = new HashMap<>();
         map.put(k1, v1);
         return map;
     }
 
-    private static Map<String, String> createMap(String k1, String v1, String k2, String v2) {
-        Map<String, String> map = new HashMap<>();
+    /**
+     * Helper method for creating maps (Java 8 compatible).
+     */
+    private static Map<String, String> createMap(final String k1, final String v1, final String k2, final String v2) {
+        final Map<String, String> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
         return map;
     }
 
-    private static Map<String, String> createMap(String k1, String v1, String k2, String v2, String k3, String v3) {
-        Map<String, String> map = new HashMap<>();
+    /**
+     * Helper method for creating maps (Java 8 compatible).
+     */
+    private static Map<String, String> createMap(final String k1, final String v1, final String k2, final String v2, final String k3, final String v3) {
+        final Map<String, String> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
         map.put(k3, v3);
         return map;
     }
 
-    private static Map<String, String> createMapWithNull(String k1, String v1, String k2, String v2, String k3, String v3) {
-        Map<String, String> map = new HashMap<>();
+    /**
+     * Helper method for creating maps with null values (Java 8 compatible).
+     */
+    private static Map<String, String> createMapWithNull(final String k1, final String v1, final String k2, final String v2, final String k3, final String v3) {
+        final Map<String, String> map = new HashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
         map.put(k3, v3);
         return map;
     }
 
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("readContextScenarios")
-    @DisplayName("Should correctly read context fields")
-    void shouldCorrectlyReadContextFields(String testName, String inputJson, Map<String, String> expectedContext) {
-        // Given: input JSON with context data
-        final TestMeterData data = new TestMeterData();
-        
-        // When: JSON is parsed
-        MeterDataJson5.read(data, inputJson);
-        
-        // Then: context map should match expected values
-        if (expectedContext.isEmpty()) {
-            assertEquals(expectedContext, data.getContext());
-        } else {
-            assertEquals(expectedContext, data.context);
+    /**
+     * Tests for context field reading.
+     */
+    @Nested
+    @DisplayName("Context field tests")
+    class ContextFields {
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("org.usefultoys.slf4j.meter.MeterDataJson5Test#readContextScenarios")
+        @DisplayName("Should correctly read context fields")
+        void shouldCorrectlyReadContextFields(final String testName, final String inputJson, final Map<String, String> expectedContext) {
+            // Given: input JSON with context data
+            final TestMeterData data = new TestMeterData();
+
+            // When: JSON is parsed
+            MeterDataJson5.read(data, inputJson);
+
+            // Then: context map should match expected values
+            if (expectedContext.isEmpty()) {
+                assertEquals(expectedContext, data.getContext(), "context map should be empty");
+            } else {
+                assertEquals(expectedContext, data.context, "context map should match expected values");
+            }
         }
     }
 
-    @ParameterizedTest(name = "Invalid JSON: {0}")
-    @DisplayName("Should handle invalid JSON gracefully")
-    @MethodSource("invalidJsonScenarios")
-    void shouldHandleInvalidJsonGracefully(String testName, String invalidJson) {
-        // Given: invalid JSON input
-        final TestMeterData data = new TestMeterData();
-        
-        // When: JSON is parsed (should not throw exception)
-        try {
-            MeterDataJson5.read(data, invalidJson);
-        } catch (Exception e) {
-            // Allow exceptions for truly malformed input
-        }
-        
-        // Then: no fields should be set for invalid input
-        if (invalidJson.isEmpty() || invalidJson.equals("{}") || !invalidJson.contains(":")) {
-            assertNull(data.description);
-            assertNull(data.category);
-            assertNull(data.operation);
-            assertNull(data.parent);
-            assertNull(data.okPath);
-            assertNull(data.rejectPath);
-            assertNull(data.failPath);
-            assertNull(data.failMessage);
-            assertEquals(0L, data.createTime);
-            assertEquals(0L, data.startTime);
-            assertEquals(0L, data.stopTime);
-            assertEquals(0L, data.timeLimit);
-            assertEquals(0L, data.currentIteration);
-            assertEquals(0L, data.expectedIterations);
-            assertNull(data.context);
-        }
-    }
-
+    /**
+     * Data provider for invalid JSON scenarios.
+     *
+     * @return stream of arguments
+     */
     static Stream<Arguments> invalidJsonScenarios() {
         return Stream.of(
                 Arguments.of("Empty string", ""),
@@ -457,22 +545,69 @@ class MeterDataJson5Test {
         );
     }
 
-    private static void assertMeterDataEquals(MeterData expected, MeterData actual) {
+    /**
+     * Tests for invalid JSON handling.
+     */
+    @Nested
+    @DisplayName("Invalid JSON tests")
+    class InvalidJson {
+        @ParameterizedTest(name = "Invalid JSON: {0}")
+        @MethodSource("org.usefultoys.slf4j.meter.MeterDataJson5Test#invalidJsonScenarios")
+        @DisplayName("Should handle invalid JSON gracefully")
+        void shouldHandleInvalidJsonGracefully(final String testName, final String invalidJson) {
+            // Given: invalid JSON input
+            final TestMeterData data = new TestMeterData();
+
+            // When: JSON is parsed (should not throw exception)
+            try {
+                MeterDataJson5.read(data, invalidJson);
+            } catch (final Exception e) {
+                // Allow exceptions for truly malformed input
+            }
+
+            // Then: no fields should be set for invalid input
+            if (invalidJson.isEmpty() || invalidJson.equals("{}") || !invalidJson.contains(":")) {
+                assertNull(data.description, "description should be null");
+                assertNull(data.category, "category should be null");
+                assertNull(data.operation, "operation should be null");
+                assertNull(data.parent, "parent should be null");
+                assertNull(data.okPath, "okPath should be null");
+                assertNull(data.rejectPath, "rejectPath should be null");
+                assertNull(data.failPath, "failPath should be null");
+                assertNull(data.failMessage, "failMessage should be null");
+                assertEquals(0L, data.createTime, "createTime should be 0");
+                assertEquals(0L, data.startTime, "startTime should be 0");
+                assertEquals(0L, data.stopTime, "stopTime should be 0");
+                assertEquals(0L, data.timeLimit, "timeLimit should be 0");
+                assertEquals(0L, data.currentIteration, "currentIteration should be 0");
+                assertEquals(0L, data.expectedIterations, "expectedIterations should be 0");
+                assertNull(data.context, "context should be null");
+            }
+        }
+    }
+
+    /**
+     * Asserts that two {@link MeterData} objects are equal.
+     *
+     * @param expected expected data
+     * @param actual actual data
+     */
+    private static void assertMeterDataEquals(final MeterData expected, final MeterData actual) {
         // MeterData specific fields
-        assertEquals(expected.category, actual.category);
-        assertEquals(expected.operation, actual.operation);
-        assertEquals(expected.parent, actual.parent);
-        assertEquals(expected.description, actual.description);
-        assertEquals(expected.createTime, actual.createTime);
-        assertEquals(expected.startTime, actual.startTime);
-        assertEquals(expected.stopTime, actual.stopTime);
-        assertEquals(expected.timeLimit, actual.timeLimit);
-        assertEquals(expected.currentIteration, actual.currentIteration);
-        assertEquals(expected.expectedIterations, actual.expectedIterations);
-        assertEquals(expected.okPath, actual.okPath);
-        assertEquals(expected.rejectPath, actual.rejectPath);
-        assertEquals(expected.failPath, actual.failPath);
-        assertEquals(expected.failMessage, actual.failMessage);
-        assertEquals(expected.getContext(), actual.getContext());
+        assertEquals(expected.category, actual.category, "category should match");
+        assertEquals(expected.operation, actual.operation, "operation should match");
+        assertEquals(expected.parent, actual.parent, "parent should match");
+        assertEquals(expected.description, actual.description, "description should match");
+        assertEquals(expected.createTime, actual.createTime, "createTime should match");
+        assertEquals(expected.startTime, actual.startTime, "startTime should match");
+        assertEquals(expected.stopTime, actual.stopTime, "stopTime should match");
+        assertEquals(expected.timeLimit, actual.timeLimit, "timeLimit should match");
+        assertEquals(expected.currentIteration, actual.currentIteration, "currentIteration should match");
+        assertEquals(expected.expectedIterations, actual.expectedIterations, "expectedIterations should match");
+        assertEquals(expected.okPath, actual.okPath, "okPath should match");
+        assertEquals(expected.rejectPath, actual.rejectPath, "rejectPath should match");
+        assertEquals(expected.failPath, actual.failPath, "failPath should match");
+        assertEquals(expected.failMessage, actual.failMessage, "failMessage should match");
+        assertEquals(expected.getContext(), actual.getContext(), "context should match");
     }
 }
