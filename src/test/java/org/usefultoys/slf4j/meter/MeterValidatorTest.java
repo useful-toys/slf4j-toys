@@ -15,15 +15,19 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.CallerStackTraceThrowable;
-import org.usefultoys.slf4jtestmock.testing.Slf4jMock;
-import org.usefultoys.slf4jtestmock.testing.WithMockLogger;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.test.ResetMeterConfig;
+import org.usefultoys.test.ValidateCharset;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
@@ -49,392 +53,462 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.*;
  *   <li><b>Error Logging:</b> Validates proper error logging with markers and stack traces</li>
  * </ul>
  */
-@org.usefultoys.slf4jtestmock.testing.ValidateCharset
-@org.usefultoys.slf4jtestmock.testing.ResetMeterConfig
+@ValidateCharset
+@ResetMeterConfig
 @WithMockLogger
 public class MeterValidatorTest {
 
     @Mock
-    private Meter meter;
+    protected Meter meter;
 
     @Slf4jMock
-    private Logger logger;
+    protected Logger logger;
 
-    @org.junit.jupiter.api.BeforeEach
+    @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         lenient().when(meter.getMessageLogger()).thenReturn(logger);
         lenient().when(meter.getFullID()).thenReturn("test-id");
     }
 
-    @Test
-    @DisplayName("should validate start precondition when meter is not started")
-    void shouldValidateStartPreconditionWhenNotStarted() {
-        // Given: meter has not been started (start time = 0)
-        when(meter.getStartTime()).thenReturn(0L);
-        // When: validateStartPrecondition is called
-        // Then: should return true and log no events
-        assertTrue(MeterValidator.validateStartPrecondition(meter), "should allow start when not started");
-        assertNoEvents(logger);
+    @Nested
+    @DisplayName("Start Precondition Tests")
+    class StartPreconditionTests {
+
+        @Test
+        @DisplayName("should validate start precondition when meter is not started")
+        void shouldValidateStartPreconditionWhenNotStarted() {
+            // Given: meter has not been started (start time = 0)
+            when(meter.getStartTime()).thenReturn(0L);
+            // When: validateStartPrecondition is called
+            // Then: should return true and log no events
+            assertTrue(MeterValidator.validateStartPrecondition(meter), "should allow start when not started");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should prevent start when meter is already started")
+        void shouldValidateStartPreconditionWhenAlreadyStarted() {
+            // Given: meter has already been started (start time = 1L)
+            when(meter.getStartTime()).thenReturn(1L);
+            // When: validateStartPrecondition is called
+            // Then: should return false and log error event
+            assertFalse(MeterValidator.validateStartPrecondition(meter), "should reject start when already started");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should prevent start when meter is already started")
-    void shouldValidateStartPreconditionWhenAlreadyStarted() {
-        // Given: meter has already been started (start time = 1L)
-        when(meter.getStartTime()).thenReturn(1L);
-        // When: validateStartPrecondition is called
-        // Then: should return false and log error event
-        assertFalse(MeterValidator.validateStartPrecondition(meter), "should reject start when already started");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+    @Nested
+    @DisplayName("Stop Precondition Tests")
+    class StopPreconditionTests {
+
+        @Test
+        @DisplayName("should validate stop precondition when conditions are met")
+        void shouldValidateStopPreconditionWhenOk() {
+            // Given: meter has been started and not stopped, and is the current instance
+            when(meter.getStopTime()).thenReturn(0L);
+            when(meter.getStartTime()).thenReturn(1L);
+            when(meter.checkCurrentInstance()).thenReturn(false);
+            // When: validateStopPrecondition is called
+            // Then: should not log any events
+            MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should prevent stop when meter is already stopped")
+        void shouldValidateStopPreconditionWhenAlreadyStopped() {
+            // Given: meter has already been stopped (stop time = 1L)
+            when(meter.getStopTime()).thenReturn(1L);
+            // When: validateStopPrecondition is called
+            // Then: should log error event
+            MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should prevent stop when meter is not started")
+        void shouldValidateStopPreconditionWhenNotStarted() {
+            // Given: meter has not been started (start time = 0L) and not stopped (stop time = 0L)
+            when(meter.getStopTime()).thenReturn(0L);
+            when(meter.getStartTime()).thenReturn(0L);
+            // When: validateStopPrecondition is called
+            // Then: should log error event
+            MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should prevent stop when meter is out of order")
+        void shouldValidateStopPreconditionWhenOutOfOrder() {
+            // Given: meter is started but out of order (checkCurrentInstance returns true)
+            when(meter.getStopTime()).thenReturn(0L);
+            when(meter.getStartTime()).thenReturn(1L);
+            when(meter.checkCurrentInstance()).thenReturn(true);
+            // When: validateStopPrecondition is called
+            // Then: should log error event
+            MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter out of order; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should validate stop precondition when conditions are met")
-    void shouldValidateStopPreconditionWhenOk() {
-        // Given: meter has been started and not stopped, and is the current instance
-        when(meter.getStopTime()).thenReturn(0L);
-        when(meter.getStartTime()).thenReturn(1L);
-        when(meter.checkCurrentInstance()).thenReturn(false);
-        // When: validateStopPrecondition is called
-        // Then: should not log any events
-        MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
-        assertNoEvents(logger);
+    @Nested
+    @DisplayName("Sub-call Arguments Tests")
+    class SubCallArgumentsTests {
+
+        @Test
+        @DisplayName("should validate sub-call arguments when name is provided")
+        void shouldValidateSubCallArgumentsWhenOk() {
+            // Given: a valid sub-operation name
+            // When: validateSubCallArguments is called
+            // Then: should not log any events
+            MeterValidator.validateSubCallArguments(meter, "sub-op");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject sub-call when name is null")
+        void shouldValidateSubCallArgumentsWhenNull() {
+            // Given: a null sub-operation name
+            // When: validateSubCallArguments is called
+            // Then: should log illegal argument error
+            MeterValidator.validateSubCallArguments(meter, null);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.sub(name): Null argument; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should prevent stop when meter is already stopped")
-    void shouldValidateStopPreconditionWhenAlreadyStopped() {
-        // Given: meter has already been stopped (stop time = 1L)
-        when(meter.getStopTime()).thenReturn(1L);
-        // When: validateStopPrecondition is called
-        // Then: should log error event
-        MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+    @Nested
+    @DisplayName("Message Arguments Tests")
+    class MessageArgumentsTests {
+
+        @Test
+        @DisplayName("should validate message call arguments when message is provided")
+        void shouldValidateMCallArgumentsWithMessageWhenOk() {
+            // Given: a valid message string
+            // When: validateMCallArguments is called
+            // Then: should return true and not log any events
+            assertTrue(MeterValidator.validateMCallArguments(meter, "message"), "should accept valid message");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject message call when message is null")
+        void shouldValidateMCallArgumentsWithMessageWhenNull() {
+            // Given: a null message
+            // When: validateMCallArguments is called
+            // Then: should return false and log illegal argument error
+            assertFalse(MeterValidator.validateMCallArguments(meter, null), "should reject null message");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.m(message): Null argument; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should prevent stop when meter is not started")
-    void shouldValidateStopPreconditionWhenNotStarted() {
-        // Given: meter has not been started (start time = 0L) and not stopped (stop time = 0L)
-        when(meter.getStopTime()).thenReturn(0L);
-        when(meter.getStartTime()).thenReturn(0L);
-        // When: validateStopPrecondition is called
-        // Then: should log error event
-        MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+    @Nested
+    @DisplayName("Format and Message Arguments Tests")
+    class FormatAndMessageArgumentsTests {
+
+        @Test
+        @DisplayName("should format message with arguments when format is valid")
+        void shouldValidateAndFormatMCallArgumentsWhenOk() {
+            // Given: a valid format string and arguments
+            // When: validateAndFormatMCallArguments is called
+            // Then: should return formatted message and not log any events
+            assertEquals("message 1", MeterValidator.validateAndFormatMCallArguments(meter, "message %d", 1), "should format message correctly");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject format when message is null")
+        void shouldValidateAndFormatMCallArgumentsWhenNull() {
+            // Given: a null message format string
+            // When: validateAndFormatMCallArguments is called
+            // Then: should return null and log illegal argument error
+            assertNull(MeterValidator.validateAndFormatMCallArguments(meter, null, 1), "should return null for null format");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.m(message, args...): Null argument; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should format message with extra arguments when there are too many args")
+        void shouldValidateAndFormatMCallArgumentsWhenIllegalFormat1() {
+            // Given: format string with fewer specifiers than provided arguments
+            // When: validateAndFormatMCallArguments is called
+            // Then: String.format handles it gracefully by returning formatted message
+            assertEquals("message 1", MeterValidator.validateAndFormatMCallArguments(meter, "message %s", 1, 2), "should format message with extra args");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject format when argument type does not match specifier")
+        void shouldValidateAndFormatMCallArgumentsWhenIllegalFormat2() {
+            // Given: format string with %d specifier but string argument
+            // When: validateAndFormatMCallArguments is called
+            // Then: should return null and log illegal format error
+            assertNull(MeterValidator.validateAndFormatMCallArguments(meter, "message %d", "s"), "should return null for mismatched format");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.m(message, args...): Illegal string format; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should prevent stop when meter is out of order")
-    void shouldValidateStopPreconditionWhenOutOfOrder() {
-        // Given: meter is started but out of order (checkCurrentInstance returns true)
-        when(meter.getStopTime()).thenReturn(0L);
-        when(meter.getStartTime()).thenReturn(1L);
-        when(meter.checkCurrentInstance()).thenReturn(true);
-        // When: validateStopPrecondition is called
-        // Then: should log error event
-        MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter out of order; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+    @Nested
+    @DisplayName("Time Limit Arguments Tests")
+    class TimeLimitArgumentsTests {
+
+        @Test
+        @DisplayName("should validate limit milliseconds when value is positive")
+        void shouldValidateLimitMillisecondsCallArgumentsWhenOk() {
+            // Given: a positive time limit in milliseconds
+            // When: validateLimitMillisecondsCallArguments is called
+            // Then: should return true and not log any events
+            assertTrue(MeterValidator.validateLimitMillisecondsCallArguments(meter, 100L), "should accept positive limit");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject limit milliseconds when value is not positive")
+        void shouldValidateLimitMillisecondsCallArgumentsWhenNonPositive() {
+            // Given: a non-positive time limit value
+            // When: validateLimitMillisecondsCallArguments is called
+            // Then: should return false and log illegal argument error
+            assertFalse(MeterValidator.validateLimitMillisecondsCallArguments(meter, 0L), "should reject non-positive limit");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.limitMilliseconds(timeLimit): Non-positive argument; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should validate sub-call arguments when name is provided")
-    void shouldValidateSubCallArgumentsWhenOk() {
-        // Given: a valid sub-operation name
-        // When: validateSubCallArguments is called
-        // Then: should not log any events
-        MeterValidator.validateSubCallArguments(meter, "sub-op");
-        assertNoEvents(logger);
+    @Nested
+    @DisplayName("Iterations Arguments Tests")
+    class IterationsArgumentsTests {
+
+        @Test
+        @DisplayName("should validate iterations when count is positive")
+        void shouldValidateIterationsCallArgumentsWhenOk() {
+            // Given: a positive iteration count
+            // When: validateIterationsCallArguments is called
+            // Then: should return true and not log any events
+            assertTrue(MeterValidator.validateIterationsCallArguments(meter, 100L), "should accept positive iteration count");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject iterations when count is not positive")
+        void shouldValidateIterationsCallArgumentsWhenNonPositive() {
+            // Given: a non-positive iteration count
+            // When: validateIterationsCallArguments is called
+            // Then: should return false and log illegal argument error
+            assertFalse(MeterValidator.validateIterationsCallArguments(meter, 0L), "should reject non-positive iteration count");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.iterations(expectedIterations): Non-positive argument; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should reject sub-call when name is null")
-    void shouldValidateSubCallArgumentsWhenNull() {
-        // Given: a null sub-operation name
-        // When: validateSubCallArguments is called
-        // Then: should log illegal argument error
-        MeterValidator.validateSubCallArguments(meter, null);
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.sub(name): Null argument; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+    @Nested
+    @DisplayName("Increment Precondition Tests")
+    class IncrementPreconditionTests {
+
+        @Test
+        @DisplayName("should validate increment precondition when meter is started")
+        void shouldValidateIncPreconditionWhenOk() {
+            // Given: meter has been started (start time = 1L)
+            when(meter.getStartTime()).thenReturn(1L);
+            // When: validateIncPrecondition is called
+            // Then: should return true and not log any events
+            assertTrue(MeterValidator.validateIncPrecondition(meter), "should allow increment when started");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should prevent increment when meter is not started")
+        void shouldValidateIncPreconditionWhenNotStarted() {
+            // Given: meter has not been started (start time = 0L)
+            when(meter.getStartTime()).thenReturn(0L);
+            // When: validateIncPrecondition is called
+            // Then: should return false and log inconsistent increment error
+            assertFalse(MeterValidator.validateIncPrecondition(meter), "should reject increment when not started");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should validate message call arguments when message is provided")
-    void shouldValidateMCallArgumentsWithMessageWhenOk() {
-        // Given: a valid message string
-        // When: validateMCallArguments is called
-        // Then: should return true and not log any events
-        assertTrue(MeterValidator.validateMCallArguments(meter, "message"), "should accept valid message");
-        assertNoEvents(logger);
+    @Nested
+    @DisplayName("Increment By Tests")
+    class IncrementByTests {
+
+        @Test
+        @DisplayName("should validate increment-by when value is positive")
+        void shouldValidateIncByWhenOk() {
+            // Given: a positive increment value
+            // When: validateIncBy is called
+            // Then: should return true and not log any events
+            assertTrue(MeterValidator.validateIncBy(meter, 10L), "should accept positive increment");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject increment-by when value is not positive")
+        void shouldValidateIncByWhenNonPositive() {
+            // Given: a non-positive increment value
+            // When: validateIncBy is called
+            // Then: should return false and log illegal argument error
+            assertFalse(MeterValidator.validateIncBy(meter, 0L), "should reject non-positive increment");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incBy(increment): Non-positive increment; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should reject message call when message is null")
-    void shouldValidateMCallArgumentsWithMessageWhenNull() {
-        // Given: a null message
-        // When: validateMCallArguments is called
-        // Then: should return false and log illegal argument error
-        assertFalse(MeterValidator.validateMCallArguments(meter, null), "should reject null message");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.m(message): Null argument; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+    @Nested
+    @DisplayName("Increment To Arguments Tests")
+    class IncrementToArgumentsTests {
+
+        @Test
+        @DisplayName("should validate increment-to when value is forward")
+        void shouldValidateIncToArgumentsWhenOk() {
+            // Given: current iteration is 5 and target is 10 (forward direction)
+            when(meter.getCurrentIteration()).thenReturn(5L);
+            // When: validateIncToArguments is called
+            // Then: should return true and not log any events
+            assertTrue(MeterValidator.validateIncToArguments(meter, 10L), "should accept forward increment");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject increment-to when value is not positive")
+        void shouldValidateIncToArgumentsWhenNonPositive() {
+            // Given: a non-positive target iteration value
+            // When: validateIncToArguments is called
+            // Then: should return false and log illegal argument error
+            assertFalse(MeterValidator.validateIncToArguments(meter, 0L), "should reject non-positive target iteration");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-positive argument; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should reject increment-to when value does not move forward")
+        void shouldValidateIncToArgumentsWhenNotForward() {
+            // Given: current iteration is 10 and target is also 10 (no forward movement)
+            when(meter.getCurrentIteration()).thenReturn(10L);
+            // When: validateIncToArguments is called
+            // Then: should return false and log non-forward increment error
+            assertFalse(MeterValidator.validateIncToArguments(meter, 10L), "should reject non-forward increment");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-forward increment; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should format message with arguments when format is valid")
-    void shouldValidateAndFormatMCallArgumentsWhenOk() {
-        // Given: a valid format string and arguments
-        // When: validateAndFormatMCallArguments is called
-        // Then: should return formatted message and not log any events
-        assertEquals("message 1", MeterValidator.validateAndFormatMCallArguments(meter, "message %d", 1), "should format message correctly");
-        assertNoEvents(logger);
+    @Nested
+    @DisplayName("Progress Precondition Tests")
+    class ProgressPreconditionTests {
+
+        @Test
+        @DisplayName("should validate progress precondition when meter is started")
+        void shouldValidateProgressPreconditionWhenOk() {
+            // Given: meter has been started (start time = 1L)
+            when(meter.getStartTime()).thenReturn(1L);
+            // When: validateProgressPrecondition is called
+            // Then: should return true and not log any events
+            assertTrue(MeterValidator.validateProgressPrecondition(meter), "should allow progress when started");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should prevent progress when meter is not started")
+        void shouldValidateProgressPreconditionWhenNotStarted() {
+            // Given: meter has not been started (start time = 0L)
+            when(meter.getStartTime()).thenReturn(0L);
+            // When: validateProgressPrecondition is called
+            // Then: should return false and log inconsistent progress error
+            assertFalse(MeterValidator.validateProgressPrecondition(meter), "should reject progress when not started");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should reject format when message is null")
-    void shouldValidateAndFormatMCallArgumentsWhenNull() {
-        // Given: a null message format string
-        // When: validateAndFormatMCallArguments is called
-        // Then: should return null and log illegal argument error
-        assertNull(MeterValidator.validateAndFormatMCallArguments(meter, null, 1), "should return null for null format");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.m(message, args...): Null argument; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+    @Nested
+    @DisplayName("Path Arguments Tests")
+    class PathArgumentsTests {
+
+        @Test
+        @DisplayName("should validate path argument when path is provided")
+        void shouldValidatePathArgumentWhenOk() {
+            // Given: a valid path argument
+            // When: validatePathArgument is called
+            // Then: should not log any events
+            MeterValidator.validatePathArgument(meter, "myMethod", "path");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject path argument when path is null")
+        void shouldValidatePathArgumentWhenNull() {
+            // Given: a null path argument
+            // When: validatePathArgument is called
+            // Then: should log illegal argument error
+            MeterValidator.validatePathArgument(meter, "myMethod", null);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.myMethod: Null argument; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
     }
 
-    @Test
-    @DisplayName("should format message with extra arguments when there are too many args")
-    void shouldValidateAndFormatMCallArgumentsWhenIllegalFormat1() {
-        // Given: format string with fewer specifiers than provided arguments
-        // When: validateAndFormatMCallArguments is called
-        // Then: String.format handles it gracefully by returning formatted message
-        assertEquals("message 1", MeterValidator.validateAndFormatMCallArguments(meter, "message %s", 1, 2), "should format message with extra args");
-        assertNoEvents(logger);
+    @Nested
+    @DisplayName("Error Logging Tests")
+    class ErrorLoggingTests {
+
+        @Test
+        @DisplayName("should log bug when exception is thrown")
+        void shouldLogBugWhenExceptionThrown() {
+            // Given: a throwable exception from a meter method
+            Throwable t = new RuntimeException("bug");
+            // When: logBug is called
+            // Then: should log bug marker with exception information
+            MeterValidator.logBug(meter, "testMethod", t);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.BUG, "Meter.testMethod method threw exception; id=test-id");
+            assertEventWithThrowable(logger, 0, RuntimeException.class, "bug");
+        }
     }
 
-    @Test
-    @DisplayName("should reject format when argument type does not match specifier")
-    void shouldValidateAndFormatMCallArgumentsWhenIllegalFormat2() {
-        // Given: format string with %d specifier but string argument
-        // When: validateAndFormatMCallArguments is called
-        // Then: should return null and log illegal format error
-        assertNull(MeterValidator.validateAndFormatMCallArguments(meter, "message %d", "s"), "should return null for mismatched format");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.m(message, args...): Illegal string format; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
+    @Nested
+    @DisplayName("Finalization Tests")
+    class FinalizationTests {
 
-    @Test
-    @DisplayName("should validate limit milliseconds when value is positive")
-    void shouldValidateLimitMillisecondsCallArgumentsWhenOk() {
-        // Given: a positive time limit in milliseconds
-        // When: validateLimitMillisecondsCallArguments is called
-        // Then: should return true and not log any events
-        assertTrue(MeterValidator.validateLimitMillisecondsCallArguments(meter, 100L), "should accept positive limit");
-        assertNoEvents(logger);
-    }
+        @Test
+        @DisplayName("should log error when meter is not stopped during finalization")
+        void shouldValidateFinalizeWhenNotStopped() {
+            // Given: meter has not been stopped (stop time = 0L) and has a valid category
+            when(meter.getStopTime()).thenReturn(0L);
+            when(meter.getCategory()).thenReturn("test-category");
+            // When: validateFinalize is called
+            // Then: should log finalization error
+            MeterValidator.validateFinalize(meter);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped; id={}");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
 
-    @Test
-    @DisplayName("should reject limit milliseconds when value is not positive")
-    void shouldValidateLimitMillisecondsCallArgumentsWhenNonPositive() {
-        // Given: a non-positive time limit value
-        // When: validateLimitMillisecondsCallArguments is called
-        // Then: should return false and log illegal argument error
-        assertFalse(MeterValidator.validateLimitMillisecondsCallArguments(meter, 0L), "should reject non-positive limit");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.limitMilliseconds(timeLimit): Non-positive argument; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
+        @Test
+        @DisplayName("should not log error when meter is already stopped")
+        void shouldValidateFinalizeWhenAlreadyStopped() {
+            // Given: meter has already been stopped (stop time = 1L)
+            when(meter.getStopTime()).thenReturn(1L);
+            // When: validateFinalize is called
+            // Then: should not log any events
+            MeterValidator.validateFinalize(meter);
+            assertNoEvents(logger);
+        }
 
-    @Test
-    @DisplayName("should validate iterations when count is positive")
-    void shouldValidateIterationsCallArgumentsWhenOk() {
-        // Given: a positive iteration count
-        // When: validateIterationsCallArguments is called
-        // Then: should return true and not log any events
-        assertTrue(MeterValidator.validateIterationsCallArguments(meter, 100L), "should accept positive iteration count");
-        assertNoEvents(logger);
-    }
-
-    @Test
-    @DisplayName("should reject iterations when count is not positive")
-    void shouldValidateIterationsCallArgumentsWhenNonPositive() {
-        // Given: a non-positive iteration count
-        // When: validateIterationsCallArguments is called
-        // Then: should return false and log illegal argument error
-        assertFalse(MeterValidator.validateIterationsCallArguments(meter, 0L), "should reject non-positive iteration count");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.iterations(expectedIterations): Non-positive argument; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
-
-    @Test
-    @DisplayName("should validate increment precondition when meter is started")
-    void shouldValidateIncPreconditionWhenOk() {
-        // Given: meter has been started (start time = 1L)
-        when(meter.getStartTime()).thenReturn(1L);
-        // When: validateIncPrecondition is called
-        // Then: should return true and not log any events
-        assertTrue(MeterValidator.validateIncPrecondition(meter), "should allow increment when started");
-        assertNoEvents(logger);
-    }
-
-    @Test
-    @DisplayName("should prevent increment when meter is not started")
-    void shouldValidateIncPreconditionWhenNotStarted() {
-        // Given: meter has not been started (start time = 0L)
-        when(meter.getStartTime()).thenReturn(0L);
-        // When: validateIncPrecondition is called
-        // Then: should return false and log inconsistent increment error
-        assertFalse(MeterValidator.validateIncPrecondition(meter), "should reject increment when not started");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
-
-    @Test
-    @DisplayName("should validate increment-by when value is positive")
-    void shouldValidateIncByWhenOk() {
-        // Given: a positive increment value
-        // When: validateIncBy is called
-        // Then: should return true and not log any events
-        assertTrue(MeterValidator.validateIncBy(meter, 10L), "should accept positive increment");
-        assertNoEvents(logger);
-    }
-
-    @Test
-    @DisplayName("should reject increment-by when value is not positive")
-    void shouldValidateIncByWhenNonPositive() {
-        // Given: a non-positive increment value
-        // When: validateIncBy is called
-        // Then: should return false and log illegal argument error
-        assertFalse(MeterValidator.validateIncBy(meter, 0L), "should reject non-positive increment");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incBy(increment): Non-positive increment; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
-
-    @Test
-    @DisplayName("should validate increment-to when value is forward")
-    void shouldValidateIncToArgumentsWhenOk() {
-        // Given: current iteration is 5 and target is 10 (forward direction)
-        when(meter.getCurrentIteration()).thenReturn(5L);
-        // When: validateIncToArguments is called
-        // Then: should return true and not log any events
-        assertTrue(MeterValidator.validateIncToArguments(meter, 10L), "should accept forward increment");
-        assertNoEvents(logger);
-    }
-
-    @Test
-    @DisplayName("should reject increment-to when value is not positive")
-    void shouldValidateIncToArgumentsWhenNonPositive() {
-        // Given: a non-positive target iteration value
-        // When: validateIncToArguments is called
-        // Then: should return false and log illegal argument error
-        assertFalse(MeterValidator.validateIncToArguments(meter, 0L), "should reject non-positive target iteration");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-positive argument; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
-
-    @Test
-    @DisplayName("should reject increment-to when value does not move forward")
-    void shouldValidateIncToArgumentsWhenNotForward() {
-        // Given: current iteration is 10 and target is also 10 (no forward movement)
-        when(meter.getCurrentIteration()).thenReturn(10L);
-        // When: validateIncToArguments is called
-        // Then: should return false and log non-forward increment error
-        assertFalse(MeterValidator.validateIncToArguments(meter, 10L), "should reject non-forward increment");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incTo(currentIteration): Non-forward increment; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
-
-    @Test
-    @DisplayName("should validate progress precondition when meter is started")
-    void shouldValidateProgressPreconditionWhenOk() {
-        // Given: meter has been started (start time = 1L)
-        when(meter.getStartTime()).thenReturn(1L);
-        // When: validateProgressPrecondition is called
-        // Then: should return true and not log any events
-        assertTrue(MeterValidator.validateProgressPrecondition(meter), "should allow progress when started");
-        assertNoEvents(logger);
-    }
-
-    @Test
-    @DisplayName("should prevent progress when meter is not started")
-    void shouldValidateProgressPreconditionWhenNotStarted() {
-        // Given: meter has not been started (start time = 0L)
-        when(meter.getStartTime()).thenReturn(0L);
-        // When: validateProgressPrecondition is called
-        // Then: should return false and log inconsistent progress error
-        assertFalse(MeterValidator.validateProgressPrecondition(meter), "should reject progress when not started");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
-
-    @Test
-    @DisplayName("should validate path argument when path is provided")
-    void shouldValidatePathArgumentWhenOk() {
-        // Given: a valid path argument
-        // When: validatePathArgument is called
-        // Then: should not log any events
-        MeterValidator.validatePathArgument(meter, "myMethod", "path");
-        assertNoEvents(logger);
-    }
-
-    @Test
-    @DisplayName("should reject path argument when path is null")
-    void shouldValidatePathArgumentWhenNull() {
-        // Given: a null path argument
-        // When: validatePathArgument is called
-        // Then: should log illegal argument error
-        MeterValidator.validatePathArgument(meter, "myMethod", null);
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.myMethod: Null argument; id=test-id");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
-
-    @Test
-    @DisplayName("should log bug when exception is thrown")
-    void shouldLogBugWhenExceptionThrown() {
-        // Given: a throwable exception from a meter method
-        Throwable t = new RuntimeException("bug");
-        // When: logBug is called
-        // Then: should log bug marker with exception information
-        MeterValidator.logBug(meter, "testMethod", t);
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.BUG, "Meter.testMethod method threw exception; id=test-id");
-        assertEventWithThrowable(logger, 0, RuntimeException.class, "bug");
-    }
-
-    @Test
-    @DisplayName("should log error when meter is not stopped during finalization")
-    void shouldValidateFinalizeWhenNotStopped() {
-        // Given: meter has not been stopped (stop time = 0L) and has a valid category
-        when(meter.getStopTime()).thenReturn(0L);
-        when(meter.getCategory()).thenReturn("test-category");
-        // When: validateFinalize is called
-        // Then: should log finalization error
-        MeterValidator.validateFinalize(meter);
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped; id={}");
-        assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-    }
-
-    @Test
-    @DisplayName("should not log error when meter is already stopped")
-    void shouldValidateFinalizeWhenAlreadyStopped() {
-        // Given: meter has already been stopped (stop time = 1L)
-        when(meter.getStopTime()).thenReturn(1L);
-        // When: validateFinalize is called
-        // Then: should not log any events
-        MeterValidator.validateFinalize(meter);
-        assertNoEvents(logger);
-    }
-
-    @Test
-    @DisplayName("should not log error when meter uses unknown logger name")
-    void shouldValidateFinalizeWhenUnknownLogger() {
-        // Given: meter has not been stopped but uses unknown logger name
-        when(meter.getStopTime()).thenReturn(0L);
-        when(meter.getCategory()).thenReturn(Meter.UNKNOWN_LOGGER_NAME);
-        // When: validateFinalize is called
-        // Then: should not log any events (unknown logger is acceptable)
-        MeterValidator.validateFinalize(meter);
-        assertNoEvents(logger);
+        @Test
+        @DisplayName("should not log error when meter uses unknown logger name")
+        void shouldValidateFinalizeWhenUnknownLogger() {
+            // Given: meter has not been stopped but uses unknown logger name
+            when(meter.getStopTime()).thenReturn(0L);
+            when(meter.getCategory()).thenReturn(Meter.UNKNOWN_LOGGER_NAME);
+            // When: validateFinalize is called
+            // Then: should not log any events (unknown logger is acceptable)
+            MeterValidator.validateFinalize(meter);
+            assertNoEvents(logger);
+        }
     }
 }
