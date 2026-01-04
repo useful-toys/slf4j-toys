@@ -192,7 +192,7 @@ class MeterContextTest {
         @DisplayName("ctx(name, Object) with null object should add key with NULL_VALUE")
         void shouldAddKeyWithNullValueWhenCtxWithKeyAndNullObject() {
             // When: ctx is called with key and null object
-            meterContext.ctx("key7_null", null);
+            meterContext.ctx("key7_null", (Integer) null);
 
             // Then: the context map should contain the key with NULL_VALUE
             assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
@@ -216,7 +216,7 @@ class MeterContextTest {
         @DisplayName("ctx(name, String) with null string should add key with NULL_VALUE")
         void shouldAddKeyWithNullValueWhenCtxWithKeyAndNullString() {
             // When: ctx is called with key and null string
-            meterContext.ctx("key8_null", null);
+            meterContext.ctx("key8_null", (String) null);
 
             // Then: the context map should contain the key with NULL_VALUE
             assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
