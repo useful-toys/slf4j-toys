@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.usefultoys.slf4j.meter;
+package org.usefultoys.slf4j.meter.legacy;
 
 import org.junit.jupiter.api.*;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.meter.Meter;
+import org.usefultoys.slf4j.meter.MeterConfig;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
