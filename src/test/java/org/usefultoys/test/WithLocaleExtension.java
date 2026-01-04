@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
+import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -121,21 +122,30 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
      * <ol>
      *   <li>Test method annotation (highest priority)</li>
      *   <li>Test class annotation (fallback)</li>
+     *   <li>Outer class annotations (for @Nested tests)</li>
      * </ol>
      *
      * @param context the current extension context
      * @return an {@link Optional} containing the annotation if found, or empty if not found
      */
-    private Optional<WithLocale> findWithLocaleAnnotation(ExtensionContext context) {
+    private Optional<WithLocale> findWithLocaleAnnotation(final ExtensionContext context) {
         // 1) First, check if the annotation is on the test method
-        Optional<WithLocale> methodAnnotation = context.getTestMethod()
-                .map(m -> m.getAnnotation(WithLocale.class));
+        final Optional<WithLocale> methodAnnotation = context.getTestMethod()
+                .flatMap(m -> AnnotationSupport.findAnnotation(m, WithLocale.class));
         if (methodAnnotation.isPresent()) {
             return methodAnnotation;
         }
 
-        // 2) If not on method, check if it's on the test class
-        return context.getTestClass()
-                .map(c -> c.getAnnotation(WithLocale.class));
+        // 2) If not on method, check the test class and its enclosing classes (for @Nested)
+        Optional<Class<?>> currentClass = context.getTestClass();
+        while (currentClass.isPresent()) {
+            final Optional<WithLocale> classAnnotation = AnnotationSupport.findAnnotation(currentClass.get(), WithLocale.class);
+            if (classAnnotation.isPresent()) {
+                return classAnnotation;
+            }
+            currentClass = Optional.ofNullable(currentClass.get().getEnclosingClass());
+        }
+
+        return Optional.empty();
     }
 }
