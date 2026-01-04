@@ -1,13 +1,18 @@
 # TDR-0006: Security Considerations in Diagnostic Reporting
 
 **Status**: Accepted
-**Date**: 2026-01-03
+**Date**: 2026-01-04
 
 ## Context
 
 The `Reporter` component is designed to provide comprehensive diagnostic information about the JVM, the operating system, and the environment. This creates an inherent conflict in the library's design: its primary goal is to provide maximum **transparency** about the runtime environment to aid in troubleshooting and auditing, but this same transparency can inadvertently **reveal sensitive details** about the infrastructure, configuration, or credentials.
 
 While this information is invaluable for troubleshooting, it involves accessing and logging potentially sensitive data (e.g., system properties, environment variables, user paths, network configurations). If not handled carefully, these reports could leak credentials, tokens, or internal infrastructure details into log files.
+
+The same security principle also applies to `Meter` diagnostics. `Meter` supports a context map (key-value metadata) intended for parameters, decisions, and return values. Because context values are rendered via `toString()`, sensitive information may be accidentally written to logs if:
+
+* a secret is added to meter context directly, or
+* an object is added to meter context and its `toString()` includes secrets.
 
 ## Decision
 
@@ -29,6 +34,11 @@ We implemented several security-conscious design patterns and features to mitiga
     *   Report modules (e.g., `ReportSystemProperties`) catch `SecurityException` during bulk access and log a descriptive message.
 4.  **Human-Readable Focus**: Reports are designed for human consumption (INFO level), which typically undergo different retention and access policies than machine-parsable data logs.
 5.  **Log-Only Output (No Remote Leakage)**: Even when reports are triggered remotely (e.g., via a Servlet or JMX), the information is **never returned to the caller**. It is strictly written to the system logs. This ensures that an external attacker cannot directly scrape system details via the reporting trigger.
+
+6.  **Context Awareness for Meter Metadata**: `Meter` context is treated as diagnostic output and therefore subject to the same security constraints as reports.
+    *   **Guidance**: Do not put secrets (passwords, tokens, credentials, personal data) into meter context.
+    *   **Guidance**: Ensure `toString()` implementations used as context values do not expose secrets.
+    *   **Rationale**: Context is written to logs, and per-event context deltas can accumulate across lifecycle messages.
 
 ## Consequences
 
@@ -64,4 +74,5 @@ We implemented several security-conscious design patterns and features to mitiga
 *   [Reporter.java](../src/main/java/org/usefultoys/slf4j/report/Reporter.java)
 *   [ReporterConfig.java](../src/main/java/org/usefultoys/slf4j/report/ReporterConfig.java)
 *   [ReportSystemProperties.java](../src/main/java/org/usefultoys/slf4j/report/ReportSystemProperties.java)
+*   [TDR-0027: Context as Event Metadata and Post-Emission Clearing](./TDR-0027-context-as-event-metadata-and-post-emission-clearing.md)
 *   [TDR-0005: Robust and Minimalist Configuration Mechanism](./TDR-0005-robust-and-minimalist-configuration-mechanism.md)
