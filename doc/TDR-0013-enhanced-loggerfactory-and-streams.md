@@ -17,9 +17,9 @@ Key features include:
 
 ## Consequences
 **Positive**:
-*   **Improved Observability**: Allows capturing output from legacy code or external tools that only write to `System.out` or `System.err`.
+*   **Stream-to-Logger Integration**: Provides standard Java `OutputStream` and `PrintStream` instances that write to SLF4J loggers, enabling integration with APIs that require stream objects.
 *   **Consistent Naming**: Encourages a consistent hierarchical naming pattern for sub-components or specific features within a class.
-*   **Performance**: By returning "Null" objects when logging is disabled, we minimize the performance impact of capturing stream data.
+*   **Performance**: By returning "Null" objects when logging is disabled, we minimize the performance impact of creating and using streams that would produce no output.
 *   **Developer Productivity**: Reduces boilerplate code needed to wrap streams into loggers manually.
 
 **Negative**:

@@ -21,8 +21,11 @@ We decided to implement the **Null Object Pattern** for optional logging compone
 1.  **`NullLogger` Class**: We created a specialized implementation of the SLF4J `Logger` interface that silently discards all events.
     *   **Methods**: All `is...Enabled()` methods return `false`. All logging methods (`trace`, `debug`, `info`, etc.) are empty.
     *   **Singleton**: A single static instance (`NullLogger.INSTANCE`) is reused throughout the library to minimize memory overhead.
-2.  **Initialization**: In classes like `Watcher`, the logger fields are always initialized. If a specific logging channel is disabled, it is assigned the `NullLogger.INSTANCE` instead of `null`.
-3.  **Usage**: The execution logic (e.g., `Watcher.run()`) interacts with the loggers without any null checks, relying on the `Logger` interface's contract.
+2.  **`NullOutputStream` and `NullPrintStream` Classes**: We created specialized implementations that discard all output data.
+    *   **Usage**: When an `OutputStream` or `PrintStream` is mapped to a logger at a level that won't generate messages (e.g., logger level is higher than the stream's target level), the null object implementations are used instead of actual logging streams.
+    *   **Benefit**: Prevents unnecessary overhead from writing to streams that would produce no logging output, while maintaining a consistent API where streams are always available.
+3.  **Initialization**: In classes like `Watcher`, the logger fields are always initialized. If a specific logging channel is disabled, it is assigned the `NullLogger.INSTANCE` instead of `null`. Similarly, OutputStreams and PrintStreams mapped to disabled logging levels use `NullOutputStream.INSTANCE` or `NullPrintStream.INSTANCE`.
+4.  **Usage**: The execution logic (e.g., `Watcher.run()`) interacts with the loggers without any null checks, relying on the `Logger` interface's contract.
 
 ## Consequences
 
@@ -49,11 +52,17 @@ We decided to implement the **Null Object Pattern** for optional logging compone
 ## Implementation
 
 *   `NullLogger` implements `org.slf4j.Logger`.
+*   `NullOutputStream` extends `java.io.OutputStream` and discards all writes.
+*   `NullPrintStream` extends `java.io.PrintStream` and discards all writes.
 *   `Watcher` constructor uses `NullLogger.INSTANCE` when `dataEnabled` is false.
+*   `LoggerOutputStream` and `LoggerPrintStream` use null object implementations when the target logging level is disabled.
 *   `Watcher.run()` performs checks like `if (messageLogger.isInfoEnabled() || dataLogger.isTraceEnabled())` which naturally handle the disabled state via the `NullLogger`'s return values.
 
 ## References
 
 *   [NullLogger.java](../src/main/java/org/usefultoys/slf4j/NullLogger.java)
+*   [NullOutputStream.java](../src/main/java/org/usefultoys/slf4j/NullOutputStream.java)
+*   [NullPrintStream.java](../src/main/java/org/usefultoys/slf4j/NullPrintStream.java)
+*   [LoggerOutputStream.java](../src/main/java/org/usefultoys/slf4j/LoggerOutputStream.java)
 *   [Watcher.java](../src/main/java/org/usefultoys/slf4j/watcher/Watcher.java)
 *   [TDR-0008: Flexible Execution Strategies (Push vs. Pull)](./TDR-0008-flexible-execution-strategies-push-vs-pull.md)

@@ -31,6 +31,7 @@ We implemented a "safe-cast" strategy in `SystemMetricsCollector` to access plat
 **Negative**:
 *   **Compiler Warnings**: Requires `@SuppressWarnings("Since15")` or similar to handle references to classes that might not be available in all target environments during compilation.
 *   **Incomplete Data**: On some JVMs (e.g., IBM J9, GraalVM in some configurations), these metrics might be missing, leading to gaps in the diagnostic data.
+*   **Simplistic Implementation**: The current approach uses a basic `instanceof` check with direct casting. It does not exploit more advanced platform-specific capabilities that could be available through operating system APIs, system libraries, or JDK-specific implementations (e.g., JFR, internal APIs, platform-specific profiling tools). Future improvements could explore more comprehensive metrics collection strategies tailored to specific operating systems (Linux: `/proc` filesystem, Windows: WMI/Performance Counters, macOS: system frameworks) or leverage deeper JDK implementations (OpenJDK internal APIs, GraalVM-specific metrics, etc.).
 
 ## Alternatives
 *   **Reflection**: Use reflection to call `getSystemCpuLoad()`. **Rejected because** it's slower and less type-safe than a direct cast with `instanceof`.

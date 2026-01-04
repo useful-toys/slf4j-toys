@@ -30,7 +30,7 @@ For the machine-parsable channel, we chose **JSON** (specifically a JSON5-compat
 The channels can be distinguished and routed using three complementary mechanisms:
 
 1.  **Logger Name Prefixes and Suffixes**:
-    *   The name of the loggers can be decorated with configurable prefixes and suffixes (e.g., `msg.org.example.MyService` vs `data.org.example.MyService`).
+    *   The name of the loggers can be decorated with configurable prefixes and suffixes (e.g., `msg.org.example.MyService` vs `data.org.example.MyService`; or `org.example.MyService.msg` vs `org.example.MyService.data`).
     *   Configurable via system properties: `slf4jtoys.meter.message.prefix/suffix` and `slf4jtoys.meter.data.prefix/suffix`.
     *   **Use case**: Routing logs to different files or appenders based on logger name patterns in the logging configuration.
 

@@ -26,7 +26,7 @@ We decided to maintain a single JAR that is binary-compatible with both SLF4J 1.
     *   **Profile `slf4j-1.7-javax`**: Validates compatibility with SLF4J 1.7.36 and Logback 1.2.13.
     *   **Profile `slf4j-2.0-javax`**: Validates compatibility with SLF4J 2.0.16 and Logback 1.3.14.
     *   **Profile `slf4j-2.0` (Default)**: Validates compatibility with SLF4J 2.0.16 and Logback 1.5.23.
-4.  **No Classloader Conflicts**: Since the library only depends on the `slf4j-api` and does not bundle any logging implementation, it avoids the "multiple bindings" error. It simply uses whatever `Logger` implementation is provided at runtime.
+5.  **No Classloader Conflicts**: Since the library only depends on the `slf4j-api` and does not bundle any logging implementation, it avoids the "multiple bindings" error. It simply uses whatever `Logger` implementation is provided at runtime.
 
 ## Consequences
 
@@ -36,7 +36,7 @@ We decided to maintain a single JAR that is binary-compatible with both SLF4J 1.
 *   **Future-Proof**: The library is ready for SLF4J 2.0 features while remaining accessible to older systems.
 
 **Negative**:
-*   **API Restrictions**: We cannot use the new SLF4J 2.0 Fluent API (e.g., `logger.atInfo().log(...)`) in the library's core code, as this would cause `NoSuchMethodError` when running under SLF4J 1.7.
+*   **API Restrictions**: We cannot use the new SLF4J 2.0 Fluent API (e.g., `logger.atInfo().log(...)`) in the library's core code, as this would cause `NoSuchMethodError` when running under SLF4J 1.7. ArchUnit tests enforce this restriction automatically.
 *   **Build Maintenance**: The `pom.xml` must maintain complex profiles and dependency management to ensure all versions are tested correctly during CI/CD.
 
 **Neutral**:
@@ -53,9 +53,11 @@ We decided to maintain a single JAR that is binary-compatible with both SLF4J 1.
 
 *   The `pom.xml` defines `slf4j.version` and `logback.version` as properties that are overridden by profiles.
 *   The `maven-compiler-plugin` is fixed to Java 1.8 to ensure bytecode compatibility.
+*   ArchUnit tests (`Slf4jCompatibilityArchTest`) automatically verify that no SLF4J 2.0-specific APIs are used in the codebase.
 *   The CI/CD pipeline (GitHub Actions) is configured to run `mvn test` for each relevant profile.
 
 ## References
 
 *   [pom.xml](../pom.xml)
+*   [Slf4jCompatibilityArchTest.java](../src/test/java/org/usefultoys/slf4j/architecture/Slf4jCompatibilityArchTest.java)
 *   [TDR-0009: Multi-Spec Servlet Support (javax vs. jakarta)](./TDR-0009-multi-spec-servlet-support-javax-vs-jakarta.md)

@@ -4,7 +4,7 @@
 **Date**: 2026-01-03
 
 ## Context
-When a developer misuses the library (e.g., stopping a `Meter` twice, or closing it without starting it), simply logging an error message is often insufficient. The library must be very clear in reporting incorrect usage to the developer. They need to know exactly *where* in their code the incorrect call was made. A standard log message only shows the library's internal state, not the caller's context.
+When a developer misuses the library (e.g., stopping a `Meter` twice, or closing it without starting it), simply logging an error message is often insufficient. The library must be very clear in reporting incorrect usage to the developer. They need to know exactly *where* in their code the incorrect call was made, what `Meter` instance caused the failure, and ideally where that `Meter` was created and where the invalida call was made. A standard log message only shows the library's internal stacktrace, not the caller's context. Without this information, developers waste time investigating library internals instead of locating and fixing their code.
 
 ## Decision
 We implemented `CallerStackTraceThrowable`, an artificial `Throwable` designed to capture and manipulate the stack trace to point directly to the library's caller. This ensures that whenever an inconsistency is found, the logs point directly to the client code responsible.
@@ -17,9 +17,10 @@ We implemented `CallerStackTraceThrowable`, an artificial `Throwable` designed t
 
 ## Consequences
 **Positive**:
-*   **Actionable Logs**: Developers can immediately see the exact line in their code that caused the library to log a warning or error.
+*   **Actionable Logs**: Developers can immediately see the exact line in their code that caused the library to log a warning or error, knowing precisely where to investigate and fix.
+*   **Instance Traceability**: Combined with the error message containing the `Meter` instance details (e.g., meter ID, state), developers can identify which specific `Meter` instance failed and often trace back to where it was created via the stack trace.
 *   **Cleaner Output**: Removes internal library implementation details from the stack trace, reducing noise.
-*   **Ease of Debugging**: Significantly reduces the time needed to troubleshoot integration issues.
+*   **Ease of Debugging**: Significantly reduces the time needed to troubleshoot integration issues by pointing directly to client code.
 
 **Negative**:
 *   **Performance Cost**: Capturing a stack trace is a relatively expensive operation. However, since this is only done in "error" or "illegal usage" scenarios, the impact on the "happy path" is zero.
