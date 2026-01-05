@@ -190,14 +190,22 @@ class MeterFactoryTest {
             seedPositionCounter(TEST_CATEGORY, null, Long.MAX_VALUE - 1);
 
             // When: creating meters repeatedly for the same key (logger category, no operation)
+            final long beforeNanos1 = System.nanoTime();
             final Meter last = MeterFactory.getMeter(testLogger);
+            final long afterNanos1 = System.nanoTime();
+
+            final long beforeNanos2 = System.nanoTime();
             final Meter wrapped = MeterFactory.getMeter(testLogger);
+            final long afterNanos2 = System.nanoTime();
+
+            final long beforeNanos3 = System.nanoTime();
             final Meter afterWrapped = MeterFactory.getMeter(testLogger);
+            final long afterNanos3 = System.nanoTime();
 
             // Then: the sequence should reach MAX_VALUE and then wrap to 1 (not 0)
-            assertEquals(Long.MAX_VALUE, last.getPosition(), "should reach Long.MAX_VALUE before wrapping");
-            assertEquals(1L, wrapped.getPosition(), "should wrap back to 1 after reaching Long.MAX_VALUE");
-            assertEquals(2L, afterWrapped.getPosition(), "should keep incrementing after wrap");
+            assertNewMeterDefaults(last, TEST_CATEGORY, null, null, Long.MAX_VALUE, beforeNanos1, afterNanos1);
+            assertNewMeterDefaults(wrapped, TEST_CATEGORY, null, null, 1L, beforeNanos2, afterNanos2);
+            assertNewMeterDefaults(afterWrapped, TEST_CATEGORY, null, null, 2L, beforeNanos3, afterNanos3);
         }
     }
 
@@ -263,14 +271,22 @@ class MeterFactoryTest {
             seedPositionCounter(category, null, Long.MAX_VALUE - 1);
 
             // When: creating meters repeatedly for the same key (category, no operation)
+            final long beforeNanos1 = System.nanoTime();
             final Meter last = MeterFactory.getMeter(category);
+            final long afterNanos1 = System.nanoTime();
+
+            final long beforeNanos2 = System.nanoTime();
             final Meter wrapped = MeterFactory.getMeter(category);
+            final long afterNanos2 = System.nanoTime();
+
+            final long beforeNanos3 = System.nanoTime();
             final Meter afterWrapped = MeterFactory.getMeter(category);
+            final long afterNanos3 = System.nanoTime();
 
             // Then: the sequence should reach MAX_VALUE and then wrap to 1 (not 0)
-            assertEquals(Long.MAX_VALUE, last.getPosition(), "should reach Long.MAX_VALUE before wrapping");
-            assertEquals(1L, wrapped.getPosition(), "should wrap back to 1 after reaching Long.MAX_VALUE");
-            assertEquals(2L, afterWrapped.getPosition(), "should keep incrementing after wrap");
+            assertNewMeterDefaults(last, category, null, null, Long.MAX_VALUE, beforeNanos1, afterNanos1);
+            assertNewMeterDefaults(wrapped, category, null, null, 1L, beforeNanos2, afterNanos2);
+            assertNewMeterDefaults(afterWrapped, category, null, null, 2L, beforeNanos3, afterNanos3);
         }
     }
 
@@ -334,14 +350,22 @@ class MeterFactoryTest {
             seedPositionCounter(MeterFactoryTest.class.getName(), null, Long.MAX_VALUE - 1);
 
             // When: creating meters repeatedly for the same key (class category, no operation)
+            final long beforeNanos1 = System.nanoTime();
             final Meter last = MeterFactory.getMeter(MeterFactoryTest.class);
+            final long afterNanos1 = System.nanoTime();
+
+            final long beforeNanos2 = System.nanoTime();
             final Meter wrapped = MeterFactory.getMeter(MeterFactoryTest.class);
+            final long afterNanos2 = System.nanoTime();
+
+            final long beforeNanos3 = System.nanoTime();
             final Meter afterWrapped = MeterFactory.getMeter(MeterFactoryTest.class);
+            final long afterNanos3 = System.nanoTime();
 
             // Then: the sequence should reach MAX_VALUE and then wrap to 1 (not 0)
-            assertEquals(Long.MAX_VALUE, last.getPosition(), "should reach Long.MAX_VALUE before wrapping");
-            assertEquals(1L, wrapped.getPosition(), "should wrap back to 1 after reaching Long.MAX_VALUE");
-            assertEquals(2L, afterWrapped.getPosition(), "should keep incrementing after wrap");
+            assertNewMeterDefaults(last, MeterFactoryTest.class.getName(), null, null, Long.MAX_VALUE, beforeNanos1, afterNanos1);
+            assertNewMeterDefaults(wrapped, MeterFactoryTest.class.getName(), null, null, 1L, beforeNanos2, afterNanos2);
+            assertNewMeterDefaults(afterWrapped, MeterFactoryTest.class.getName(), null, null, 2L, beforeNanos3, afterNanos3);
         }
     }
 
@@ -420,14 +444,22 @@ class MeterFactoryTest {
             seedPositionCounter(MeterFactoryTest.class.getName(), TEST_OPERATION, Long.MAX_VALUE - 1);
 
             // When: creating meters repeatedly for the same key (class category and operation)
+            final long beforeNanos1 = System.nanoTime();
             final Meter last = MeterFactory.getMeter(MeterFactoryTest.class, TEST_OPERATION);
+            final long afterNanos1 = System.nanoTime();
+
+            final long beforeNanos2 = System.nanoTime();
             final Meter wrapped = MeterFactory.getMeter(MeterFactoryTest.class, TEST_OPERATION);
+            final long afterNanos2 = System.nanoTime();
+
+            final long beforeNanos3 = System.nanoTime();
             final Meter afterWrapped = MeterFactory.getMeter(MeterFactoryTest.class, TEST_OPERATION);
+            final long afterNanos3 = System.nanoTime();
 
             // Then: the sequence should reach MAX_VALUE and then wrap to 1 (not 0)
-            assertEquals(Long.MAX_VALUE, last.getPosition(), "should reach Long.MAX_VALUE before wrapping");
-            assertEquals(1L, wrapped.getPosition(), "should wrap back to 1 after reaching Long.MAX_VALUE");
-            assertEquals(2L, afterWrapped.getPosition(), "should keep incrementing after wrap");
+            assertNewMeterDefaults(last, MeterFactoryTest.class.getName(), TEST_OPERATION, null, Long.MAX_VALUE, beforeNanos1, afterNanos1);
+            assertNewMeterDefaults(wrapped, MeterFactoryTest.class.getName(), TEST_OPERATION, null, 1L, beforeNanos2, afterNanos2);
+            assertNewMeterDefaults(afterWrapped, MeterFactoryTest.class.getName(), TEST_OPERATION, null, 2L, beforeNanos3, afterNanos3);
         }
     }
 
@@ -486,14 +518,22 @@ class MeterFactoryTest {
             seedPositionCounter(TEST_CATEGORY, TEST_OPERATION, Long.MAX_VALUE - 1);
 
             // When: creating meters repeatedly for the same key (logger category and operation)
+            final long beforeNanos1 = System.nanoTime();
             final Meter last = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+            final long afterNanos1 = System.nanoTime();
+
+            final long beforeNanos2 = System.nanoTime();
             final Meter wrapped = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+            final long afterNanos2 = System.nanoTime();
+
+            final long beforeNanos3 = System.nanoTime();
             final Meter afterWrapped = MeterFactory.getMeter(testLogger, TEST_OPERATION);
+            final long afterNanos3 = System.nanoTime();
 
             // Then: the sequence should reach MAX_VALUE and then wrap to 1 (not 0)
-            assertEquals(Long.MAX_VALUE, last.getPosition(), "should reach Long.MAX_VALUE before wrapping");
-            assertEquals(1L, wrapped.getPosition(), "should wrap back to 1 after reaching Long.MAX_VALUE");
-            assertEquals(2L, afterWrapped.getPosition(), "should keep incrementing after wrap");
+            assertNewMeterDefaults(last, TEST_CATEGORY, TEST_OPERATION, null, Long.MAX_VALUE, beforeNanos1, afterNanos1);
+            assertNewMeterDefaults(wrapped, TEST_CATEGORY, TEST_OPERATION, null, 1L, beforeNanos2, afterNanos2);
+            assertNewMeterDefaults(afterWrapped, TEST_CATEGORY, TEST_OPERATION, null, 2L, beforeNanos3, afterNanos3);
         }
 
         @Test
