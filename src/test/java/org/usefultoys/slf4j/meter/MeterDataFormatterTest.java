@@ -429,12 +429,12 @@ class MeterDataFormatterTest {
                 Arguments.of(
                         "STARTED fast",
                         createMeterData(now, null, now, now - 100_000_000L, 0, 0, 0, null, "okPath", null, null, null, null, null, 0.0),
-                        "STARTED",
-                        "STARTED: TestCategory",
-                        "",
-                        "STARTED: #1",
-                        "STARTED",
-                        "STARTED"
+                        "STARTED: [okPath] 100.0ms",
+                        "STARTED: TestCategory[okPath] 100.0ms",
+                        "[okPath] 100.0ms",
+                        "STARTED: #1[okPath] 100.0ms",
+                        "STARTED: [okPath] 100.0ms",
+                        "STARTED: [okPath] 100.0ms"
                 ),
                 Arguments.of(
                         "OK with only current iterations (no expected)",
