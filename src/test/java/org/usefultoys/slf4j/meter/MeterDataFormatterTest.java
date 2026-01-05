@@ -64,6 +64,8 @@ class MeterDataFormatterTest {
     private static final String TEST_UUID = UUID.randomUUID().toString();
 
     private static Stream<Arguments> provideMeterDataForReadableStringBuilder() {
+        MeterConfig.progressPeriodMilliseconds = 2000;
+        System.out.println("DEBUG: MeterConfig.progressPeriodMilliseconds = " + MeterConfig.progressPeriodMilliseconds);
         // Fixed timestamp for deterministic testing
         final long now = 1000000000000L; // Fixed timestamp in nanoseconds
         
@@ -174,6 +176,17 @@ class MeterDataFormatterTest {
                         "PROGRESS (Slow): #1 5/10; 15.0s; 0.3/s 3.0s",
                         "PROGRESS (Slow): 5/10; 15.0s; 0.3/s 3.0s",
                         "PROGRESS (Slow): 5/10; 15.0s; 0.3/s 3.0s"
+                ),
+
+                Arguments.of(
+                        "PROGRESS with iterations but very fast",
+                        createMeterData(now, null, now, now - 1000L, 0, 5, 10, null, null, null, null, null, null, null, 0.0),
+                        "PROGRESS: 5/10",
+                        "PROGRESS: TestCategory 5/10",
+                        "5/10",
+                        "PROGRESS: #1 5/10",
+                        "PROGRESS: 5/10",
+                        "PROGRESS: 5/10"
                 ),
 
                 // === OK state (stopped successfully) ===
@@ -348,6 +361,28 @@ class MeterDataFormatterTest {
                         "OK: [okPath] 100.0ms; 'test description'; key1=value1"
                 ),
 
+                Arguments.of(
+                        "OK with empty context",
+                        createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, null, "okPath", null, null, null, createContext(), null, 0.0),
+                        "OK: [okPath] 100.0ms",
+                        "OK: TestCategory[okPath] 100.0ms",
+                        "[okPath] 100.0ms",
+                        "OK: #1[okPath] 100.0ms",
+                        "OK: [okPath] 100.0ms",
+                        "OK: [okPath] 100.0ms"
+                ),
+
+                Arguments.of(
+                        "OK with context null value",
+                        createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, null, "okPath", null, null, null, createContext("key1", null), null, 0.0),
+                        "OK: [okPath] 100.0ms; key1",
+                        "OK: TestCategory[okPath] 100.0ms; key1",
+                        "[okPath] 100.0ms; key1",
+                        "OK: #1[okPath] 100.0ms; key1",
+                        "OK: [okPath] 100.0ms; key1",
+                        "OK: [okPath] 100.0ms; key1"
+                ),
+
                 // === System info combinations (with MeterConfig) ===
                 Arguments.of(
                         "OK with UUID",
@@ -392,6 +427,16 @@ class MeterDataFormatterTest {
                         "STARTED: 5.0s"
                 ),
                 Arguments.of(
+                        "STARTED fast",
+                        createMeterData(now, null, now, now - 100_000_000L, 0, 0, 0, null, "okPath", null, null, null, null, null, 0.0),
+                        "STARTED",
+                        "STARTED: TestCategory",
+                        "",
+                        "STARTED: #1",
+                        "STARTED",
+                        "STARTED"
+                ),
+                Arguments.of(
                         "OK with only current iterations (no expected)",
                         createMeterData(now, null, now, now - 1_000_000_000L, now, 50, 0, null, "okPath", null, null, null, null, null, 0.0),
                         "OK: [okPath] 50; 1000.0ms; 50.0/s 20.0ms",
@@ -400,6 +445,18 @@ class MeterDataFormatterTest {
                         "OK: #1[okPath] 50; 1000.0ms; 50.0/s 20.0ms",
                         "OK: [okPath] 50; 1000.0ms; 50.0/s 20.0ms",
                         "OK: [okPath] 50; 1000.0ms; 50.0/s 20.0ms"
+                ),
+
+                // === System info combinations (with Memory and Load) ===
+                Arguments.of(
+                        "OK with Memory and Load",
+                        createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, null, "okPath", null, null, null, null, null, 0.5, 1000, 2000),
+                        "OK: [okPath] 100.0ms",
+                        "OK: TestCategory[okPath] 100.0ms",
+                        "[okPath] 100.0ms",
+                        "OK: #1[okPath] 100.0ms",
+                        "OK: [okPath] 100.0ms; 1000B",
+                        "OK: [okPath] 100.0ms; 50%"
                 ),
 
                 // === Empty/minimal state ===
