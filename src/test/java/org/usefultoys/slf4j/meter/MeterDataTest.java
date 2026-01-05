@@ -15,15 +15,14 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
+import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ResetSessionConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
@@ -53,25 +52,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * </ul>
  */
 @ValidateCharset
+@ResetMeterConfig
 @ResetSessionConfig
 @WithLocale("en")
-public class MeterDataTest {
-
-    @BeforeEach
-    void resetMeterConfigBeforeEach() {
-        // Reinitialize MeterConfig to ensure clean configuration before each test
-        MeterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
-
-    @AfterAll
-    static void resetMeterConfigAfterAll() {
-        // Reinitialize MeterConfig to ensure clean configuration for further tests
-        MeterConfig.reset();
-        SessionConfig.reset();
-        SystemConfig.reset();
-    }
+class MeterDataTest {
 
     private static class MockMeterData extends MeterData {
 
@@ -89,6 +73,7 @@ public class MeterDataTest {
 
 
     @Test
+    @DisplayName("should initialize all fields correctly and provide proper getters")
     void testConstructorAndGetters() {
         // Given: a context map with test data
         final Map<String, String> contextMap = new HashMap<>();
@@ -188,6 +173,7 @@ public class MeterDataTest {
     }
 
     @Test
+    @DisplayName("should clear all fields to default values when reset is called")
     void testResetClearsFields() {
         // Given: a context map with test data
         final Map<String, String> contextMap = new HashMap<>();
@@ -298,12 +284,13 @@ public class MeterDataTest {
 
     @ParameterizedTest
     @MethodSource("providePathTestCases")
+    @DisplayName("should return correct path based on ok, reject, or fail paths")
     void testPath(final MeterData value, final String expected) {
         // Given: a MeterData instance with various path configurations
         // When: calling getPath() method
         final String actual = value.getPath();
         // Then: the path should match the expected value
-        assertEquals(expected, actual);
+        assertEquals(expected, actual, "should match expected path");
     }
 
     static Stream<Arguments> provideFullIDTestCases() {
@@ -317,15 +304,17 @@ public class MeterDataTest {
 
     @ParameterizedTest
     @MethodSource("provideFullIDTestCases")
+    @DisplayName("should generate full ID in correct format from category, operation, and position")
     void testFullID(final MeterData value, final String expected) {
         // Given: a MeterData instance with various category and operation configurations
         // When: calling getFullID() method
         final String actual = value.getFullID();
         // Then: the full ID should match the expected format
-        assertEquals(expected, actual);
+        assertEquals(expected, actual, "should match expected full ID format");
     }
 
     @Test
+    @DisplayName("should implement equals and hashCode correctly")
     void testEqualsAndHashCode() {
         // Given: three MeterData instances - two identical and one different
         final MeterData data1 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
