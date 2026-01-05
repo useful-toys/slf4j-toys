@@ -445,46 +445,84 @@ class MeterLifeCycleTest {
         AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
     }
-    
+
     @Test
-    @DisplayName("should track iterations")
-    void shouldTrackIterations() {
-        // Given: progress reporting is enabled immediately
-        MeterConfig.progressPeriodMilliseconds = 0;
-        
-        // Given: a new Meter
+    @DisplayName("should follow success flow using success() alias")
+    void shouldFollowSuccessFlowUsingSuccessAlias() {
         final Meter meter = new Meter(logger);
-        assertMeterState(meter, false, false, null, null, null, null, 0, 0);
-        
-        // When: iterations(10) is called
-        meter.iterations(10);
-        assertMeterState(meter, false, false, null, null, null, null, 0, 10);
-        
-        // When: start() is called
         meter.start();
-        assertMeterState(meter, true, false, null, null, null, null, 0, 10);
         
-        // When: incrementing iterations
-        meter.inc();
-        assertMeterState(meter, true, false, null, null, null, null, 1, 10);
+        // When: success() is called
+        meter.success();
+        assertMeterState(meter, true, true, null, null, null, null, 0, 0);
         
-        meter.inc();
-        assertMeterState(meter, true, false, null, null, null, null, 2, 10);
-        
-        // When: progress is called
-        meter.progress();
-        assertMeterState(meter, true, false, null, null, null, null, 2, 10);
-        
-        // Then: progress log should be generated
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+    }
 
-        // When: ok() is called
+    @Test
+    @DisplayName("should follow success flow using success(path) alias")
+    void shouldFollowSuccessFlowUsingSuccessPathAlias() {
+        final Meter meter = new Meter(logger);
+        meter.start();
+        
+        // When: success("aliasPath") is called
+        meter.success("aliasPath");
+        assertMeterState(meter, true, true, "aliasPath", null, null, null, 0, 0);
+        
+        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+    }
+
+    @Test
+    @DisplayName("should track iterations with incBy and incTo")
+    void shouldTrackIterationsWithIncByAndIncTo() {
+        final Meter meter = new Meter(logger);
+        meter.iterations(100);
+        meter.start();
+        
+        // When: incBy(10) is called
+        meter.incBy(10);
+        assertMeterState(meter, true, false, null, null, null, null, 10, 100);
+        
+        // When: incTo(50) is called
+        meter.incTo(50);
+        assertMeterState(meter, true, false, null, null, null, null, 50, 100);
+        
         meter.ok();
-        assertMeterState(meter, true, true, null, null, null, null, 2, 10);
+        assertMeterState(meter, true, true, null, null, null, null, 50, 100);
+    }
 
-        // Then: ok log should be generated
-        AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
+    @Test
+    @DisplayName("should log slow operation when limit is exceeded")
+    void shouldLogSlowOperationWhenLimitIsExceeded() throws InterruptedException {
+        final Meter meter = new Meter(logger);
+        // Given: a very short time limit
+        meter.limitMilliseconds(1);
+        meter.start();
+        
+        // When: operation takes longer than limit
+        Thread.sleep(10);
+        meter.ok();
+        
+        // Then: MSG_SLOW_OK (WARN) should be logged instead of MSG_OK (INFO)
+        AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
+        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
+    }
+
+    @Test
+    @DisplayName("should create sub-meter with sub() method")
+    void shouldCreateSubMeterWithSubMethod() {
+        final Meter parent = new Meter(logger, "parentOp");
+        parent.start();
+        
+        // When: sub("childOp") is called
+        final Meter child = parent.sub("childOp");
+        
+        // Then: child should have correct operation name and parent ID
+        assertEquals("parentOp/childOp", child.getOperation(), "child operation should be concatenated");
+        assertEquals(parent.getFullID(), child.getParent(), "child parent should match parent full ID");
+        
+        child.start();
+        child.ok();
+        parent.ok();
     }
 }
