@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent.Level;
@@ -118,411 +119,435 @@ class MeterLifeCycleTest {
         }
     }
 
-    @Test
-    @DisplayName("should follow normal success flow")
-    void shouldFollowNormalSuccessFlow() {
-        // Given: a new Meter
-        final Meter meter = new Meter(logger);
-        assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+    @Nested
+    @DisplayName("Success Flow")
+    class SuccessFlow {
+        @Test
+        @DisplayName("should follow normal success flow")
+        void shouldFollowNormalSuccessFlow() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
-        // When: start() is called
-        meter.start();
-        assertMeterState(meter, true, false, null, null, null, null, 0, 0);
-        AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
 
-        // When: ok() is called
-        meter.ok();
-        assertMeterState(meter, true, true, null, null, null, null, 0, 0);
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-    }
-
-    @Test
-    @DisplayName("should follow success flow with path (String)")
-    void shouldFollowSuccessFlowWithPathString() {
-        // Given: a new Meter
-        final Meter meter = new Meter(logger);
-        assertMeterState(meter, false, false, null, null, null, null, 0, 0);
-        
-        // When: start() is called
-        meter.start();
-        assertMeterState(meter, true, false, null, null, null, null, 0, 0);
-        
-        // When: ok("customPath") is called
-        meter.ok("customPath");
-        assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-    }
-
-    @Test
-    @DisplayName("should follow success flow with path (Enum)")
-    void shouldFollowSuccessFlowWithPathEnum() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        meter.ok(TestEnum.VALUE1);
-        assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow success flow with path (Throwable)")
-    void shouldFollowSuccessFlowWithPathThrowable() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        final Exception ex = new RuntimeException("error");
-        meter.ok(ex);
-        assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow success flow with path (Object)")
-    void shouldFollowSuccessFlowWithPathObject() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        final TestObject obj = new TestObject();
-        meter.ok(obj);
-        assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow success flow with path() method (String)")
-    void shouldFollowSuccessFlowWithPathMethodString() {
-        // Given: a new Meter
-        final Meter meter = new Meter(logger);
-        assertMeterState(meter, false, false, null, null, null, null, 0, 0);
-        
-        // When: start() is called
-        meter.start();
-        assertMeterState(meter, true, false, null, null, null, null, 0, 0);
-        
-        // When: path("predefinedPath") is called
-        meter.path("predefinedPath");
-        assertMeterState(meter, true, false, "predefinedPath", null, null, null, 0, 0);
-        
-        // When: ok() is called
-        meter.ok();
-        assertMeterState(meter, true, true, "predefinedPath", null, null, null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-    }
-
-    @Test
-    @DisplayName("should follow success flow with path() method (Enum)")
-    void shouldFollowSuccessFlowWithPathMethodEnum() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        meter.path(TestEnum.VALUE2);
-        assertMeterState(meter, true, false, TestEnum.VALUE2.name(), null, null, null, 0, 0);
-        meter.ok();
-        assertMeterState(meter, true, true, TestEnum.VALUE2.name(), null, null, null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow success flow with path() method (Throwable)")
-    void shouldFollowSuccessFlowWithPathMethodThrowable() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        final Exception ex = new IllegalArgumentException("invalid");
-        meter.path(ex);
-        assertMeterState(meter, true, false, ex.getClass().getSimpleName(), null, null, null, 0, 0);
-        meter.ok();
-        assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow success flow with path() method (Object)")
-    void shouldFollowSuccessFlowWithPathMethodObject() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        final TestObject obj = new TestObject();
-        meter.path(obj);
-        assertMeterState(meter, true, false, obj.toString(), null, null, null, 0, 0);
-        meter.ok();
-        assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow success flow with path override")
-    void shouldFollowSuccessFlowWithPathOverride() {
-        // Given: a new Meter
-        final Meter meter = new Meter(logger);
-        assertMeterState(meter, false, false, null, null, null, null, 0, 0);
-        
-        // When: start() is called
-        meter.start();
-        assertMeterState(meter, true, false, null, null, null, null, 0, 0);
-        
-        // When: path("initialPath") is called
-        meter.path("initialPath");
-        assertMeterState(meter, true, false, "initialPath", null, null, null, 0, 0);
-        
-        // When: ok("finalPath") is called (overriding initialPath)
-        meter.ok("finalPath");
-        assertMeterState(meter, true, true, "finalPath", null, null, null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-    }
-
-    @Test
-    @DisplayName("should follow rejection flow (String)")
-    void shouldFollowRejectionFlowString() {
-        // Given: a new Meter
-        final Meter meter = new Meter(logger);
-        assertMeterState(meter, false, false, null, null, null, null, 0, 0);
-        
-        // When: start() is called
-        meter.start();
-        assertMeterState(meter, true, false, null, null, null, null, 0, 0);
-        
-        // When: reject("businessRule") is called
-        meter.reject("businessRule");
-        assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
-    }
-
-    @Test
-    @DisplayName("should follow rejection flow (Enum)")
-    void shouldFollowRejectionFlowEnum() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        meter.reject(TestEnum.VALUE1);
-        assertMeterState(meter, true, true, null, TestEnum.VALUE1.name(), null, null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow rejection flow (Throwable)")
-    void shouldFollowRejectionFlowThrowable() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        final Exception ex = new RuntimeException("rejected");
-        meter.reject(ex);
-        assertMeterState(meter, true, true, null, ex.getClass().getSimpleName(), null, null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow rejection flow (Object)")
-    void shouldFollowRejectionFlowObject() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        final TestObject obj = new TestObject();
-        meter.reject(obj);
-        assertMeterState(meter, true, true, null, obj.toString(), null, null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow failure flow (Throwable)")
-    void shouldFollowFailureFlowThrowable() {
-        // Given: a new Meter
-        final Meter meter = new Meter(logger);
-        assertMeterState(meter, false, false, null, null, null, null, 0, 0);
-        
-        // When: start() is called
-        meter.start();
-        assertMeterState(meter, true, false, null, null, null, null, 0, 0);
-        
-        final Exception ex = new RuntimeException("technical error");
-        
-        // When: fail(ex) is called
-        meter.fail(ex);
-        assertMeterState(meter, true, true, null, null, ex.getClass().getName(), ex.getMessage(), 0, 0);
-        
-        AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
-    }
-
-    @Test
-    @DisplayName("should follow failure flow (String)")
-    void shouldFollowFailureFlowString() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        meter.fail("technical error");
-        assertMeterState(meter, true, true, null, null, "technical error", null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow failure flow (Enum)")
-    void shouldFollowFailureFlowEnum() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        meter.fail(TestEnum.VALUE2);
-        assertMeterState(meter, true, true, null, null, TestEnum.VALUE2.name(), null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow failure flow (Object)")
-    void shouldFollowFailureFlowObject() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        final TestObject obj = new TestObject();
-        meter.fail(obj);
-        assertMeterState(meter, true, true, null, null, obj.toString(), null, 0, 0);
-    }
-
-    @Test
-    @DisplayName("should follow try-with-resources flow (implicit failure)")
-    void shouldFollowTryWithResourcesFlowImplicitFailure() {
-        final Meter meter;
-        // When: Meter is used in try-with-resources and not explicitly stopped
-        try (Meter m = new Meter(logger)) {
-            assertMeterState(m, false, false, null, null, null, null, 0, 0);
-            m.start();
-            assertMeterState(m, true, false, null, null, null, null, 0, 0);
-            meter = m;
-            // do nothing
+            // When: ok() is called
+            meter.ok();
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
-        
-        // Then: it should be automatically failed on close()
-        assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
-    }
 
-    @Test
-    @DisplayName("should follow try-with-resources flow (explicit success)")
-    void shouldFollowTryWithResourcesFlowExplicitSuccess() {
-        final Meter meter;
-        // When: Meter is used in try-with-resources and explicitly stopped with ok()
-        try (Meter m = new Meter(logger)) {
-            m.start();
-            m.ok();
-            meter = m;
+        @Test
+        @DisplayName("should follow success flow with path (String)")
+        void shouldFollowSuccessFlowWithPathString() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+            // When: ok("customPath") is called
+            meter.ok("customPath");
+            assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
-        
-        // Then: it should remain in success state after close()
-        assertMeterState(meter, true, true, null, null, null, null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-    }
 
-    @Test
-    @DisplayName("should follow try-with-resources flow (explicit rejection)")
-    void shouldFollowTryWithResourcesFlowExplicitRejection() {
-        final Meter meter;
-        // When: Meter is used in try-with-resources and explicitly stopped with reject()
-        try (Meter m = new Meter(logger)) {
-            m.start();
-            m.reject("rejected");
-            meter = m;
+        @Test
+        @DisplayName("should follow success flow with path (Enum)")
+        void shouldFollowSuccessFlowWithPathEnum() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.ok(TestEnum.VALUE1);
+            assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0);
         }
-        
-        // Then: it should remain in rejection state after close()
-        assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
-    }
 
-    @Test
-    @DisplayName("should follow try-with-resources flow (explicit failure)")
-    void shouldFollowTryWithResourcesFlowExplicitFailure() {
-        final Meter meter;
-        // When: Meter is used in try-with-resources and explicitly stopped with fail()
-        try (Meter m = new Meter(logger)) {
-            m.start();
-            m.fail("failed");
-            meter = m;
+        @Test
+        @DisplayName("should follow success flow with path (Throwable)")
+        void shouldFollowSuccessFlowWithPathThrowable() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            final Exception ex = new RuntimeException("error");
+            meter.ok(ex);
+            assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0);
         }
-        
-        // Then: it should remain in failure state after close()
-        assertMeterState(meter, true, true, null, null, "failed", null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+
+        @Test
+        @DisplayName("should follow success flow with path (Object)")
+        void shouldFollowSuccessFlowWithPathObject() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            final TestObject obj = new TestObject();
+            meter.ok(obj);
+            assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should follow success flow with path() method (String)")
+        void shouldFollowSuccessFlowWithPathMethodString() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+            // When: path("predefinedPath") is called
+            meter.path("predefinedPath");
+            assertMeterState(meter, true, false, "predefinedPath", null, null, null, 0, 0);
+
+            // When: ok() is called
+            meter.ok();
+            assertMeterState(meter, true, true, "predefinedPath", null, null, null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should follow success flow with path() method (Enum)")
+        void shouldFollowSuccessFlowWithPathMethodEnum() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.path(TestEnum.VALUE2);
+            assertMeterState(meter, true, false, TestEnum.VALUE2.name(), null, null, null, 0, 0);
+            meter.ok();
+            assertMeterState(meter, true, true, TestEnum.VALUE2.name(), null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should follow success flow with path() method (Throwable)")
+        void shouldFollowSuccessFlowWithPathMethodThrowable() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            final Exception ex = new IllegalArgumentException("invalid");
+            meter.path(ex);
+            assertMeterState(meter, true, false, ex.getClass().getSimpleName(), null, null, null, 0, 0);
+            meter.ok();
+            assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should follow success flow with path() method (Object)")
+        void shouldFollowSuccessFlowWithPathMethodObject() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            final TestObject obj = new TestObject();
+            meter.path(obj);
+            assertMeterState(meter, true, false, obj.toString(), null, null, null, 0, 0);
+            meter.ok();
+            assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should follow success flow with path override")
+        void shouldFollowSuccessFlowWithPathOverride() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+            // When: path("initialPath") is called
+            meter.path("initialPath");
+            assertMeterState(meter, true, false, "initialPath", null, null, null, 0, 0);
+
+            // When: ok("finalPath") is called (overriding initialPath)
+            meter.ok("finalPath");
+            assertMeterState(meter, true, true, "finalPath", null, null, null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should follow success flow using success() alias")
+        void shouldFollowSuccessFlowUsingSuccessAlias() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+
+            // When: success() is called
+            meter.success();
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+        }
+
+        @Test
+        @DisplayName("should follow success flow using success(path) alias")
+        void shouldFollowSuccessFlowUsingSuccessPathAlias() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+
+            // When: success("aliasPath") is called
+            meter.success("aliasPath");
+            assertMeterState(meter, true, true, "aliasPath", null, null, null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+        }
     }
 
-    @Test
-    @DisplayName("should follow success flow using success() alias")
-    void shouldFollowSuccessFlowUsingSuccessAlias() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        
-        // When: success() is called
-        meter.success();
-        assertMeterState(meter, true, true, null, null, null, null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+    @Nested
+    @DisplayName("Rejection Flow")
+    class RejectionFlow {
+        @Test
+        @DisplayName("should follow rejection flow (String)")
+        void shouldFollowRejectionFlowString() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+            // When: reject("businessRule") is called
+            meter.reject("businessRule");
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should follow rejection flow (Enum)")
+        void shouldFollowRejectionFlowEnum() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.reject(TestEnum.VALUE1);
+            assertMeterState(meter, true, true, null, TestEnum.VALUE1.name(), null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should follow rejection flow (Throwable)")
+        void shouldFollowRejectionFlowThrowable() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            final Exception ex = new RuntimeException("rejected");
+            meter.reject(ex);
+            assertMeterState(meter, true, true, null, ex.getClass().getSimpleName(), null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should follow rejection flow (Object)")
+        void shouldFollowRejectionFlowObject() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            final TestObject obj = new TestObject();
+            meter.reject(obj);
+            assertMeterState(meter, true, true, null, obj.toString(), null, null, 0, 0);
+        }
     }
 
-    @Test
-    @DisplayName("should follow success flow using success(path) alias")
-    void shouldFollowSuccessFlowUsingSuccessPathAlias() {
-        final Meter meter = new Meter(logger);
-        meter.start();
-        
-        // When: success("aliasPath") is called
-        meter.success("aliasPath");
-        assertMeterState(meter, true, true, "aliasPath", null, null, null, 0, 0);
-        
-        AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+    @Nested
+    @DisplayName("Failure Flow")
+    class FailureFlow {
+        @Test
+        @DisplayName("should follow failure flow (Throwable)")
+        void shouldFollowFailureFlowThrowable() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+            final Exception ex = new RuntimeException("technical error");
+
+            // When: fail(ex) is called
+            meter.fail(ex);
+            assertMeterState(meter, true, true, null, null, ex.getClass().getName(), ex.getMessage(), 0, 0);
+
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should follow failure flow (String)")
+        void shouldFollowFailureFlowString() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.fail("technical error");
+            assertMeterState(meter, true, true, null, null, "technical error", null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should follow failure flow (Enum)")
+        void shouldFollowFailureFlowEnum() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.fail(TestEnum.VALUE2);
+            assertMeterState(meter, true, true, null, null, TestEnum.VALUE2.name(), null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should follow failure flow (Object)")
+        void shouldFollowFailureFlowObject() {
+            final Meter meter = new Meter(logger);
+            meter.start();
+            final TestObject obj = new TestObject();
+            meter.fail(obj);
+            assertMeterState(meter, true, true, null, null, obj.toString(), null, 0, 0);
+        }
     }
 
-    @Test
-    @DisplayName("should track iterations with incBy and incTo")
-    void shouldTrackIterationsWithIncByAndIncTo() {
-        final Meter meter = new Meter(logger);
-        meter.iterations(100);
-        meter.start();
-        
-        // When: incBy(10) is called
-        meter.incBy(10);
-        assertMeterState(meter, true, false, null, null, null, null, 10, 100);
-        
-        // When: incTo(50) is called
-        meter.incTo(50);
-        assertMeterState(meter, true, false, null, null, null, null, 50, 100);
-        
-        meter.ok();
-        assertMeterState(meter, true, true, null, null, null, null, 50, 100);
+    @Nested
+    @DisplayName("Try-With-Resources")
+    class TryWithResources {
+        @Test
+        @DisplayName("should follow try-with-resources flow (implicit failure)")
+        void shouldFollowTryWithResourcesFlowImplicitFailure() {
+            final Meter meter;
+            // When: Meter is used in try-with-resources and not explicitly stopped
+            try (Meter m = new Meter(logger)) {
+                assertMeterState(m, false, false, null, null, null, null, 0, 0);
+                m.start();
+                assertMeterState(m, true, false, null, null, null, null, 0, 0);
+                meter = m;
+                // do nothing
+            }
+
+            // Then: it should be automatically failed on close()
+            assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should follow try-with-resources flow (explicit success)")
+        void shouldFollowTryWithResourcesFlowExplicitSuccess() {
+            final Meter meter;
+            // When: Meter is used in try-with-resources and explicitly stopped with ok()
+            try (Meter m = new Meter(logger)) {
+                m.start();
+                m.ok();
+                meter = m;
+            }
+
+            // Then: it should remain in success state after close()
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should follow try-with-resources flow (explicit rejection)")
+        void shouldFollowTryWithResourcesFlowExplicitRejection() {
+            final Meter meter;
+            // When: Meter is used in try-with-resources and explicitly stopped with reject()
+            try (Meter m = new Meter(logger)) {
+                m.start();
+                m.reject("rejected");
+                meter = m;
+            }
+
+            // Then: it should remain in rejection state after close()
+            assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should follow try-with-resources flow (explicit failure)")
+        void shouldFollowTryWithResourcesFlowExplicitFailure() {
+            final Meter meter;
+            // When: Meter is used in try-with-resources and explicitly stopped with fail()
+            try (Meter m = new Meter(logger)) {
+                m.start();
+                m.fail("failed");
+                meter = m;
+            }
+
+            // Then: it should remain in failure state after close()
+            assertMeterState(meter, true, true, null, null, "failed", null, 0, 0);
+
+            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
     }
 
-    @Test
-    @DisplayName("should log slow operation when limit is exceeded")
-    void shouldLogSlowOperationWhenLimitIsExceeded() throws InterruptedException {
-        final Meter meter = new Meter(logger);
-        // Given: a very short time limit
-        meter.limitMilliseconds(1);
-        meter.start();
-        
-        // When: operation takes longer than limit
-        Thread.sleep(10);
-        meter.ok();
-        
-        // Then: MSG_SLOW_OK (WARN) should be logged instead of MSG_OK (INFO)
-        AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
-        AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
+    @Nested
+    @DisplayName("Iteration Tracking")
+    class IterationTracking {
+        @Test
+        @DisplayName("should track iterations with incBy and incTo")
+        void shouldTrackIterationsWithIncByAndIncTo() {
+            final Meter meter = new Meter(logger);
+            meter.iterations(100);
+            meter.start();
+
+            // When: incBy(10) is called
+            meter.incBy(10);
+            assertMeterState(meter, true, false, null, null, null, null, 10, 100);
+
+            // When: incTo(50) is called
+            meter.incTo(50);
+            assertMeterState(meter, true, false, null, null, null, null, 50, 100);
+
+            meter.ok();
+            assertMeterState(meter, true, true, null, null, null, null, 50, 100);
+        }
     }
 
-    @Test
-    @DisplayName("should create sub-meter with sub() method")
-    void shouldCreateSubMeterWithSubMethod() {
-        final Meter parent = new Meter(logger, "parentOp");
-        parent.start();
-        
-        // When: sub("childOp") is called
-        final Meter child = parent.sub("childOp");
-        
-        // Then: child should have correct operation name and parent ID
-        assertEquals("parentOp/childOp", child.getOperation(), "child operation should be concatenated");
-        assertEquals(parent.getFullID(), child.getParent(), "child parent should match parent full ID");
-        
-        child.start();
-        child.ok();
-        parent.ok();
+    @Nested
+    @DisplayName("Advanced Features")
+    class AdvancedFeatures {
+        @Test
+        @DisplayName("should log slow operation when limit is exceeded")
+        void shouldLogSlowOperationWhenLimitIsExceeded() throws InterruptedException {
+            final Meter meter = new Meter(logger);
+            // Given: a very short time limit
+            meter.limitMilliseconds(1);
+            meter.start();
+
+            // When: operation takes longer than limit
+            Thread.sleep(10);
+            meter.ok();
+
+            // Then: MSG_SLOW_OK (WARN) should be logged instead of MSG_OK (INFO)
+            AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
+        }
+
+        @Test
+        @DisplayName("should create sub-meter with sub() method")
+        void shouldCreateSubMeterWithSubMethod() {
+            final Meter parent = new Meter(logger, "parentOp");
+            parent.start();
+
+            // When: sub("childOp") is called
+            final Meter child = parent.sub("childOp");
+
+            // Then: child should have correct operation name and parent ID
+            assertEquals("parentOp/childOp", child.getOperation(), "child operation should be concatenated");
+            assertEquals(parent.getFullID(), child.getParent(), "child parent should match parent full ID");
+
+            child.start();
+            child.ok();
+            parent.ok();
+        }
     }
 }
