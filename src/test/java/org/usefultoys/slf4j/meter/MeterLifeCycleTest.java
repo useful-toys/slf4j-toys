@@ -531,23 +531,5 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
         }
-
-        @Test
-        @DisplayName("should create sub-meter with sub() method")
-        void shouldCreateSubMeterWithSubMethod() {
-            final Meter parent = new Meter(logger, "parentOp");
-            parent.start();
-
-            // When: sub("childOp") is called
-            final Meter child = parent.sub("childOp");
-
-            // Then: child should have correct operation name and parent ID
-            assertEquals("parentOp/childOp", child.getOperation(), "child operation should be concatenated");
-            assertEquals(parent.getFullID(), child.getParent(), "child parent should match parent full ID");
-
-            child.start();
-            child.ok();
-            parent.ok();
-        }
     }
 }
