@@ -72,194 +72,226 @@ class MeterDataFormatterTest {
                 Arguments.of(
                         "SCHEDULED with minimal data",
                         createMeterData(now, null, now, 0, 0, 0, 0, null, null, null, null, null, null, null, 0.0),
-                        "SCHEDULED: 0ns"
+                        "SCHEDULED: 0ns",
+                        "SCHEDULED: TestCategory 0ns"
                 ),
                 Arguments.of(
                         "SCHEDULED with operation",
                         createMeterData(now, null, now, 0, 0, 0, 0, TEST_OPERATION, null, null, null, null, null, null, 0.0),
-                        "SCHEDULED: testOperation 0ns"
+                        "SCHEDULED: testOperation 0ns",
+                        "SCHEDULED: TestCategory/testOperation 0ns"
                 ),
                 Arguments.of(
                         "SCHEDULED with waiting time",
                         createMeterData(now, null, now - 100_000_000L, 0, 0, 0, 0, null, null, null, null, null, null, null, 0.0),
-                        "SCHEDULED: 100.0ms"
+                        "SCHEDULED: 100.0ms",
+                        "SCHEDULED: TestCategory 100.0ms"
                 ),
                 Arguments.of(
                         "SCHEDULED with description",
                         createMeterData(now, null, now, 0, 0, 0, 0, null, null, null, null, TEST_DESCRIPTION, null, null, 0.0),
-                        "SCHEDULED: 0ns; 'test description'"
+                        "SCHEDULED: 0ns; 'test description'",
+                        "SCHEDULED: TestCategory 0ns; 'test description'"
                 ),
 
                 // === STARTED state (no iterations yet) ===
                 Arguments.of(
                         "STARTED with minimal data",
                         createMeterData(now, null, now, now, 0, 0, 0, null, null, null, null, null, null, null, 0.0),
-                        "STARTED: "
+                        "STARTED: ",
+                        "STARTED: TestCategory "
                 ),
                 Arguments.of(
                         "STARTED with operation",
                         createMeterData(now, null, now, now, 0, 0, 0, TEST_OPERATION, null, null, null, null, null, null, 0.0),
-                        "STARTED: testOperation "
+                        "STARTED: testOperation ",
+                        "STARTED: TestCategory/testOperation "
                 ),
                 Arguments.of(
                         "STARTED with description and context",
                         createMeterData(now, null, now, now, 0, 0, 0, null, null, null, null, TEST_DESCRIPTION, createContext("key1", "value1"), null, 0.0),
-                        "STARTED: 'test description'; key1=value1"
+                        "STARTED: 'test description'; key1=value1",
+                        "STARTED: TestCategory 'test description'; key1=value1"
                 ),
 
                 // === PROGRESS state (with iterations, not slow) ===
                 Arguments.of(
                         "PROGRESS with iterations below threshold",
                         createMeterData(now, null, now, now - 500_000_000L, 0, 5, 10, null, null, null, null, null, null, null, 0.0),
-                        "PROGRESS: 5/10; 500.0ms; 10.0/s 100.0ms"
+                        "PROGRESS: 5/10; 500.0ms; 10.0/s 100.0ms",
+                        "PROGRESS: TestCategory 5/10; 500.0ms; 10.0/s 100.0ms"
                 ),
                 Arguments.of(
                         "PROGRESS with iterations above threshold",
                         createMeterData(now, null, now, now - 5_000_000_000L, 0L, 5L, 10L, null, null, null, null, null, null, null, 0.0),
-                        "PROGRESS: 5/10; 5.0s; 1.0/s 1000.0ms"
+                        "PROGRESS: 5/10; 5.0s; 1.0/s 1000.0ms",
+                        "PROGRESS: TestCategory 5/10; 5.0s; 1.0/s 1000.0ms"
                 ),
 
                 // === PROGRESS (Slow) state ===
                 Arguments.of(
                         "PROGRESS (Slow) with iterations",
                         createMeterData(now, null, now, now - 15_000_000_000L, 0, 5, 10, null, null, null, null, null, null, null, 0.0),
-                        "PROGRESS (Slow): 5/10; 15.0s; 0.3/s 3.0s"
+                        "PROGRESS (Slow): 5/10; 15.0s; 0.3/s 3.0s",
+                        "PROGRESS (Slow): TestCategory 5/10; 15.0s; 0.3/s 3.0s"
                 ),
 
                 // === OK state (stopped successfully) ===
                 Arguments.of(
                         "OK with minimal timing",
                         createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, null, "okPath", null, null, null, null, null, 0.0),
-                        "OK: [okPath] 100.0ms"
+                        "OK: [okPath] 100.0ms",
+                        "OK: TestCategory[okPath] 100.0ms"
                 ),
                 Arguments.of(
                         "OK with operation",
                         createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, TEST_OPERATION, "okPath", null, null, null, null, null, 0.0),
-                        "OK: testOperation[okPath] 100.0ms"
+                        "OK: testOperation[okPath] 100.0ms",
+                        "OK: TestCategory/testOperation[okPath] 100.0ms"
                 ),
                 Arguments.of(
                         "OK with iterations",
                         createMeterData(now, null, now, now - 2_000_000_000L, now, 100, 100, null, "okPath", null, null, null, null, null, 0.0),
-                        "OK: [okPath] 100/100; 2.0s; 50.0/s 20.0ms"
+                        "OK: [okPath] 100/100; 2.0s; 50.0/s 20.0ms",
+                        "OK: TestCategory[okPath] 100/100; 2.0s; 50.0/s 20.0ms"
                 ),
                 Arguments.of(
                         "OK with operation and parent",
                         createMeterData(now, TEST_PARENT, now, now - 1_000_000_000L, now, 0, 0, TEST_OPERATION, "okPath", null, null, null, null, null, 0.0),
-                        "OK: testParent/testOperation[okPath] 1000.0ms"
+                        "OK: testParent/testOperation[okPath] 1000.0ms",
+                        "OK: TestCategory/testParent/testOperation[okPath] 1000.0ms"
                 ),
 
                 // === OK (Slow) state ===
                 Arguments.of(
                         "OK (Slow) with timing",
                         createMeterData(now, null, now, now - 15_000_000_000L, now, 0, 0, null, "okPath", null, null, null, null, null, 0.0),
-                        "OK (Slow): [okPath] 15.0s"
+                        "OK (Slow): [okPath] 15.0s",
+                        "OK (Slow): TestCategory[okPath] 15.0s"
                 ),
                 Arguments.of(
                         "OK (Slow) with iterations",
                         createMeterData(now, null, now, now - 12_000_000_000L, now, 10, 10, null, "okPath", null, null, null, null, null, 0.0),
-                        "OK (Slow): [okPath] 10/10; 12.0s; 0.8/s 1.2s"
+                        "OK (Slow): [okPath] 10/10; 12.0s; 0.8/s 1.2s",
+                        "OK (Slow): TestCategory[okPath] 10/10; 12.0s; 0.8/s 1.2s"
                 ),
 
                 // === REJECT state ===
                 Arguments.of(
                         "REJECT with minimal data",
                         createMeterData(now, null, now, now - 500_000_000L, now, 0, 0, null, null, "rejectPath", null, null, null, null, 0.0),
-                        "REJECT: [rejectPath] 500.0ms"
+                        "REJECT: [rejectPath] 500.0ms",
+                        "REJECT: TestCategory[rejectPath] 500.0ms"
                 ),
                 Arguments.of(
                         "REJECT with operation",
                         createMeterData(now, null, now, now - 500_000_000L, now, 0, 0, TEST_OPERATION, null, "rejectPath", null, null, null, null, 0.0),
-                        "REJECT: testOperation[rejectPath] 500.0ms"
+                        "REJECT: testOperation[rejectPath] 500.0ms",
+                        "REJECT: TestCategory/testOperation[rejectPath] 500.0ms"
                 ),
                 Arguments.of(
                         "REJECT with description",
                         createMeterData(now, null, now, now - 200_000_000L, now, 0, 0, null, null, "rejectPath", null, TEST_DESCRIPTION, null, null, 0.0),
-                        "REJECT: [rejectPath] 200.0ms; 'test description'"
+                        "REJECT: [rejectPath] 200.0ms; 'test description'",
+                        "REJECT: TestCategory[rejectPath] 200.0ms; 'test description'"
                 ),
 
                 // === FAIL state ===
                 Arguments.of(
                         "FAIL with minimal data",
                         createMeterData(now, null, now, now - 300_000_000L, now, 0, 0, null, null, null, "failPath", null, null, null, 0.0),
-                        "FAIL: [failPath] 300.0ms"
+                        "FAIL: [failPath] 300.0ms",
+                        "FAIL: TestCategory[failPath] 300.0ms"
                 ),
                 Arguments.of(
                         "FAIL with message",
                         new MeterData(null, 1, now, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, 
                                 TEST_CATEGORY, null, null, null, now, now - 400_000_000L, now, 10_000_000_000L, 0, 0, null, null, "failPath", "Error occurred", null),
-                        "FAIL: [failPath; Error occurred] 400.0ms"
+                        "FAIL: [failPath; Error occurred] 400.0ms",
+                        "FAIL: TestCategory[failPath; Error occurred] 400.0ms"
                 ),
                 Arguments.of(
                         "FAIL with iterations and message",
                         new MeterData(null, 1, now, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
                                 TEST_CATEGORY, null, null, null, now, now - 2_000_000_000L, now, 10_000_000_000L, 5, 10, null, null, "failPath", "Interrupted", null),
-                        "FAIL: [failPath; Interrupted] 5/10; 2.0s; 2.5/s 400.0ms"
+                        "FAIL: [failPath; Interrupted] 5/10; 2.0s; 2.5/s 400.0ms",
+                        "FAIL: TestCategory[failPath; Interrupted] 5/10; 2.0s; 2.5/s 400.0ms"
                 ),
 
                 // === Context and metadata combinations ===
                 Arguments.of(
                         "OK with single context entry",
                         createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, null, "okPath", null, null, null, createContext("key1", "value1"), null, 0.0),
-                        "OK: [okPath] 100.0ms; key1=value1"
+                        "OK: [okPath] 100.0ms; key1=value1",
+                        "OK: TestCategory[okPath] 100.0ms; key1=value1"
                 ),
                 Arguments.of(
                         "OK with multiple context entries",
                         createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, null, "okPath", null, null, null, createContext("key1", "value1", "key2", "value2"), null, 0.0),
-                        "OK: [okPath] 100.0ms; key1=value1; key2=value2"
+                        "OK: [okPath] 100.0ms; key1=value1; key2=value2",
+                        "OK: TestCategory[okPath] 100.0ms; key1=value1; key2=value2"
                 ),
                 Arguments.of(
                         "OK with context entry without value",
                         createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, null, "okPath", null, null, null, createContext("flag", null), null, 0.0),
-                        "OK: [okPath] 100.0ms; flag"
+                        "OK: [okPath] 100.0ms; flag",
+                        "OK: TestCategory[okPath] 100.0ms; flag"
                 ),
                 Arguments.of(
                         "OK with description and context",
                         createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, null, "okPath", null, null, TEST_DESCRIPTION, createContext("key1", "value1"), null, 0.0),
-                        "OK: [okPath] 100.0ms; 'test description'; key1=value1"
+                        "OK: [okPath] 100.0ms; 'test description'; key1=value1",
+                        "OK: TestCategory[okPath] 100.0ms; 'test description'; key1=value1"
                 ),
 
                 // === System info combinations (with MeterConfig) ===
                 Arguments.of(
                         "OK with UUID",
                         createMeterData(now, null, now, now - 100_000_000L, now, 0, 0, null, "okPath", null, null, null, null, TEST_UUID, 0.0),
-                        "OK: [okPath] 100.0ms; " + TEST_UUID
+                        "OK: [okPath] 100.0ms; " + TEST_UUID,
+                        "OK: TestCategory[okPath] 100.0ms; " + TEST_UUID
                 ),
 
                 // === Edge cases ===
                 Arguments.of(
                         "OK with very small timing (microseconds)",
                         createMeterData(now, null, now, now - 1100L, now, 0, 0, null, "okPath", null, null, null, null, null, 0.0),
-                        "OK: [okPath] 1.1us"
+                        "OK: [okPath] 1.1us",
+                        "OK: TestCategory[okPath] 1.1us"
                 ),
                 Arguments.of(
                         "OK with large iteration count",
                         createMeterData(now, null, now, now - 1_000_000_000L, now, 1_000_000, 1_000_000, null, "okPath", null, null, null, null, null, 0.0),
-                        "OK: [okPath] 1000.0k/1000.0k; 1000.0ms; 1000.0k/s 1000.0ns"
+                        "OK: [okPath] 1000.0k/1000.0k; 1000.0ms; 1000.0k/s 1000.0ns",
+                        "OK: TestCategory[okPath] 1000.0k/1000.0k; 1000.0ms; 1000.0k/s 1000.0ns"
                 ),
                 Arguments.of(
                         "STARTED with expected iterations but no current",
                         createMeterData(now, null, now, now - 5_000_000_000L, 0, 0, 100, null, null, null, null, null, null, null, 0.0),
-                        "STARTED: 5.0s"
+                        "STARTED: 5.0s",
+                        "STARTED: TestCategory 5.0s"
                 ),
                 Arguments.of(
                         "OK with only current iterations (no expected)",
                         createMeterData(now, null, now, now - 1_000_000_000L, now, 50, 0, null, "okPath", null, null, null, null, null, 0.0),
-                        "OK: [okPath] 50; 1000.0ms; 50.0/s 20.0ms"
+                        "OK: [okPath] 50; 1000.0ms; 50.0/s 20.0ms",
+                        "OK: TestCategory[okPath] 50; 1000.0ms; 50.0/s 20.0ms"
                 ),
 
                 // === Empty/minimal state ===
                 Arguments.of(
                         "Empty data with all zeros",
                         new MeterData(null, 1, now, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, TEST_CATEGORY, null, null, null, now, 0, 0, 0, 0, 0, null, null, null, null, null),
-                        "SCHEDULED: 0ns"
+                        "SCHEDULED: 0ns",
+                        "SCHEDULED: TestCategory 0ns"
                 )
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideMeterDataForReadableStringBuilder")
-    @DisplayName("should format meter data to readable string")
-    void testReadableStringBuilder(final String testName, final MeterData data, final String expected) {
+    @DisplayName("should format meter data to readable string using default config")
+    void testReadableStringBuilderWithDefaultConfig(final String testName, final MeterData data, final String expectedDefault, final String expectedWithCategory) {
         // Given: MeterData with various combinations of status, timing, context, and system info
         final StringBuilder sb = new StringBuilder(256);
 
@@ -267,7 +299,22 @@ class MeterDataFormatterTest {
         MeterDataFormatter.readableStringBuilder(data, sb);
 
         // Then: should produce the expected formatted string with proper locale-specific formatting
-        assertEquals(expected, sb.toString(), "should format meter data correctly for: " + testName);
+        assertEquals(expectedDefault, sb.toString(), "should format meter data correctly for: " + testName);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideMeterDataForReadableStringBuilder")
+    @DisplayName("should format meter data to readable string using printCategory=true")
+    void testReadableStringBuilderWithPrintCategory(final String testName, final MeterData data, final String expectedDefault, final String expectedWithCategory) {
+        // Given: MeterData with various combinations of status, timing, context, and system info
+        MeterConfig.printCategory = true;
+        final StringBuilder sb = new StringBuilder(256);
+
+        // When: readableStringBuilder is called
+        MeterDataFormatter.readableStringBuilder(data, sb);
+
+        // Then: should produce the expected formatted string with proper locale-specific formatting
+        assertEquals(expectedWithCategory, sb.toString(), "should format meter data correctly for: " + testName);
     }
 
     /**
