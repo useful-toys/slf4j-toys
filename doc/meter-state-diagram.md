@@ -129,40 +129,40 @@ The following table details all possible transitions, including how the API hand
 **Legend:**
 - ✅ **OK**: Condition met in the expected flow (e.g., `Started -> ok() -> Stopped`).
 - ☑️ **OK**: Condition met for non-state-changing calls (e.g., setting iterations or path).
-- ❔ **Allowed**: Condition is suspicious, but call is allowed (e.g., setting path in any state).
+- ❔ **Allowed**: Condition is suspicious, but call is allowed in current implementation (e.g., setting path in any state).
 - ⚠️ **Applied**: Condition met, but not in the normal expected flow (e.g., `Created -> ok() -> Stopped`).
 - ❌ **Ignored**: Condition not met, transition not performed, `MeterData` not changed.
 
 | From State | Method Call | Condition (to realize transition) | To State | Attributes Changed | Logged (Message/Data) | Behavior |
 |:---|:---|:---|:---|:---|:---|:---|
-| **Created** | `start()` | ✅ `startTime == 0` (`validateStartPrecondition`) | **Started** | `startTime = now` | DEBUG (`MSG_START`) / TRACE (`DATA_START`) | Normal start. |
-| **Created** | `ok()` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = now` | ERROR (`INCONSISTENT_OK`) + INFO (`MSG_OK`) / TRACE (`DATA_OK`) | **Inconsistent**: transitions to Stopped but logs error. |
-| **Created** | `ok(pathId)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = now`, `okPath = pathId` | ERROR (`INCONSISTENT_OK`) + INFO (`MSG_OK`) / TRACE (`DATA_OK`) | **Inconsistent**: transitions to Stopped but logs error. |
-| **Created** | `reject(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Rejected)** | `stopTime = now`, `rejectPath = cause` | ERROR (`INCONSISTENT_REJECT`) + INFO (`MSG_REJECT`) / TRACE (`DATA_REJECT`) | **Inconsistent**: transitions to Stopped but logs error. |
-| **Created** | `fail(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = now`, `failPath = cause` | ERROR (`INCONSISTENT_FAIL`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Created** | `start()` | ✅ `startTime == 0` (`validateStartPrecondition`) | **Started** | `startTime = collectCurrentTime()` | DEBUG (`MSG_START`) / TRACE (`DATA_START`) | Normal start. |
+| **Created** | `ok()` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()` | ERROR (`INCONSISTENT_OK`) + INFO (`MSG_OK`) / TRACE (`DATA_OK`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Created** | `ok(pathId)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()`, `okPath = pathId` | ERROR (`INCONSISTENT_OK`) + INFO (`MSG_OK`) / TRACE (`DATA_OK`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Created** | `reject(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Rejected)** | `stopTime = collectCurrentTime()`, `rejectPath = cause` | ERROR (`INCONSISTENT_REJECT`) + INFO (`MSG_REJECT`) / TRACE (`DATA_REJECT`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Created** | `fail(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath = cause` | ERROR (`INCONSISTENT_FAIL`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
 | **Created** | `iterations(n)` | ✅ `n > 0` (`validateIterationsCallArguments`) | **Created** | `expectedIterations = n` | - | Configures expected iterations. |
-| **Created** | `path(pathId)` | ✅ `-` | **Created** | `okPath = pathId` | - | Sets the success path for later use. |
-| **Created** | `inc()`, `incBy()`, `incTo()` | ❌ `startTime != 0` (`validateIncPrecondition`) | **Created** | - | ERROR (`INCONSISTENT_INCREMENT`) | **Ignored**: condition not met. |
+| **Created** | `path(pathId)` | ☑️ | **Created** | `okPath = pathId` | - | Sets the success path for later use. |
+| **Created** | `inc()`, `incBy(n)`, `incTo(n)` | ❌ `startTime != 0` (`validateIncPrecondition`) | **Created** | - | ERROR (`INCONSISTENT_INCREMENT`) | **Ignored**: condition not met. |
 | **Created** | `progress()` | ❌ `startTime != 0` (`validateProgressPrecondition`) | **Created** | - | ERROR (`INCONSISTENT_PROGRESS`) | **Ignored**: condition not met. |
-| **Created** | `close()` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = now`, `failPath="try-with-resources"` | ERROR (`INCONSISTENT_CLOSE`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Created** | `close()` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath="try-with-resources"` | ERROR (`INCONSISTENT_CLOSE`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
 | **Started** | `inc()` | ✅ `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration++` | - | Increments iteration count. |
 | **Started** | `incBy(n)` | ✅ `n > 0` (`validateIncBy`) AND `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration += n` | - | Increments iteration count by `n`. |
 | **Started** | `incTo(n)` | ✅ `n > 0` AND `n > currentIteration` (`validateIncToArguments`) AND `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration = n` | - | Sets iteration count to `n`. |
 | **Started** | `iterations(n)` | ✅ `n > 0` (`validateIterationsCallArguments`) | **Started** | `expectedIterations = n` | - | Overrides expected iterations. |
 | **Started** | `path(pathId)` | ✅ `-` | **Started** | `okPath = pathId` | - | Sets or overrides the success path. |
-| **Started** | `progress()` | ✅ `startTime != 0` (`validateProgressPrecondition`) | **Started** | `lastProgressTime`, `lastProgressIteration` | INFO (`MSG_PROGRESS`) / TRACE (`DATA_PROGRESS`) | Normal progress report. |
-| **Started** | `ok()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = now` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination. |
-| **Started** | `ok(pathId)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = now`, `okPath = pathId` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination with path. |
-| **Started** | `reject(cause)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Rejected)** | `stopTime = now`, `rejectPath = cause` | INFO (`MSG_REJECT`) / TRACE (`DATA_REJECT`) | Normal rejection termination. |
-| **Started** | `fail(cause)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = now`, `failPath = cause` | ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | Normal failure termination. |
-| **Started** | `close()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = now`, `failPath="try-with-resources"` | ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Auto-fail**: triggered by try-with-resources if not stopped. |
+| **Started** | `progress()` | ✅ `startTime != 0` (`validateProgressPrecondition`) | **Started** | `lastProgressTime = collectCurrentTime()`, `lastProgressIteration = currentIteration` | INFO (`MSG_PROGRESS`) / TRACE (`DATA_PROGRESS`) | Normal progress report. |
+| **Started** | `ok()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination. |
+| **Started** | `ok(pathId)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()`, `okPath = pathId` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination with path. |
+| **Started** | `reject(cause)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Rejected)** | `stopTime = collectCurrentTime()`, `rejectPath = cause` | INFO (`MSG_REJECT`) / TRACE (`DATA_REJECT`) | Normal rejection termination. |
+| **Started** | `fail(cause)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath = cause` | ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | Normal failure termination. |
+| **Started** | `close()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath="try-with-resources"` | ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Auto-fail**: triggered by try-with-resources if not stopped. |
 | **Started** | `finalize()` | ⚠️ `startTime != 0 && stopTime == 0` (`validateFinalize`) | **[*]** | - | ERROR (`INCONSISTENT_FINALIZED`) | **GC Collection**: logs error if started but never stopped. |
 | **Started** | `start()` | ❌ `startTime == 0` (`validateStartPrecondition`) | **Started** | - | ERROR (`INCONSISTENT_START`) | **Ignored**: condition not met. |
 | **Stopped** | `path(pathId)` | ⚠️ `-` | **Stopped** | `okPath = pathId` | - | **Discouraged**: changes path even if already stopped. |
 | **Stopped** | `iterations(n)` | ⚠️ `n > 0` (`validateIterationsCallArguments`) | **Stopped** | `expectedIterations = n` | - | **Discouraged**: changes iterations even if already stopped. |
 | **Stopped** | `inc()`, `incBy()`, `incTo()` | ⚠️ `startTime != 0` (`validateIncPrecondition`) | **Stopped** | `currentIteration` | - | **Allowed**: increments even if stopped (current behavior). |
 | **Stopped** | `inc()`, `incBy()`, `incTo()` | ❌ `startTime == 0` (`validateIncPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_INCREMENT`) | **Ignored**: cannot increment if never started. |
-| **Stopped** | `progress()` | ⚠️ `startTime != 0` (`validateProgressPrecondition`) | **Stopped** | `lastProgressTime`, `lastProgressIteration` | INFO (`MSG_PROGRESS`) / TRACE (`DATA_PROGRESS`) | **Allowed**: reports progress even if stopped. |
+| **Stopped** | `progress()` | ⚠️ `startTime != 0` (`validateProgressPrecondition`) | **Stopped** | `lastProgressTime = collectCurrentTime()`, `lastProgressIteration = currentIteration` | INFO (`MSG_PROGRESS`) / TRACE (`DATA_PROGRESS`) | **Allowed**: reports progress even if stopped. |
 | **Stopped** | `progress()` | ❌ `startTime == 0` (`validateProgressPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_PROGRESS`) | **Ignored**: cannot report progress if never started. |
 | **Stopped** | `start()` | ❌ `startTime == 0` (`validateStartPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_START`) | **Ignored**: condition not met. |
 | **Stopped** | `ok()`, `ok(pathId)` | ❌ `stopTime == 0` (`validateStopPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_OK`) | **Ignored**: condition not met. |
