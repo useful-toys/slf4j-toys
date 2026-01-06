@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ValidateCharset
 @ResetSessionConfig
 @WithLocale("en")
-class MeterAnalysisTest {
+class MeterAnalysisLegacyTest {
 
     // Test scenario class that implements MeterAnalysis
     /**
