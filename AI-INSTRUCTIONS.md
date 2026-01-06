@@ -23,7 +23,9 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
 
 ### Development Environment
 - **JDK**: 21 (locate in the `.jdks` directory in the home directory and use the latest version of 21 available in that directory)
+  - **Important**: Before running any build commands, ensure `JAVA_HOME` points to this JDK and that it is first in the `PATH`.
 - **Terminal**: PowerShell (Windows) or equivalent shell (Unix/Linux/macOS)
+  - **Important**: Use the terminal directly to run commands. Never create a sub-shell (e.g., do not use `powershell -c "..."`, `cmd /c "..."`) to ensure environment variables and terminal state are preserved.
 - **IDEs**: IntelliJ IDEA, VS Code, GitHub Codespaces
 - **Version Control**: Git
 
