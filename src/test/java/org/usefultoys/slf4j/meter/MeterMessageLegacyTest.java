@@ -35,7 +35,7 @@ import static org.usefultoys.slf4j.meter.Markers.*;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("UnusedAssignment")
-public class MeterMessageTest {
+public class MeterMessageLegacyTest {
 
     static final String meterCategory = "category";
     static final String meterName = "name";
@@ -50,7 +50,7 @@ public class MeterMessageTest {
     static final String MESSAGE_REJECT_PREFIX = "REJECT";
     static final String MESSAGE_FAIL_PREFIX = "FAIL";
 
-    public MeterMessageTest() {
+    public MeterMessageLegacyTest() {
     }
 
     @BeforeAll
