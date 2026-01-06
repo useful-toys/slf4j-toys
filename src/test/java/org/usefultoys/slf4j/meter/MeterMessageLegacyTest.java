@@ -280,7 +280,6 @@ public class MeterMessageLegacyTest {
     @Test
     public void testIteration() {
         MeterConfig.progressPeriodMilliseconds = 0;
-        System.out.println("testIteration:");
         final String title = "Example of execution that succeeds and reports progress of completed iterations.";
         final Meter m = new Meter(logger).m(title).iterations(4).start();
         try {
@@ -316,7 +315,6 @@ public class MeterMessageLegacyTest {
 
     @Test
     public void testIteration2() {
-        System.out.println("testIteration2:");
         final Meter m = new Meter(logger).m("Example of execution that succeeds and reports progress of completed iterations.").iterations(30).start();
         final Random r = new Random();
         try {
@@ -339,7 +337,6 @@ public class MeterMessageLegacyTest {
 
     @Test
     public void testIteration3() {
-        System.out.println("testIteration3:");
         final Meter m = new Meter(logger).m("Example of execution that succeeds and reports progress of completed iterations.").iterations(30).start();
         final Random r = new Random();
         try {
@@ -366,7 +363,6 @@ public class MeterMessageLegacyTest {
      */
     @Test
     public void testContext0() {
-        System.out.println("testContext1:");
         final String title = "Example of execution that succeeds and reports context.";
 
         final MockLogger logger2 = (MockLogger) LoggerFactory.getLogger("context");
@@ -407,7 +403,6 @@ public class MeterMessageLegacyTest {
      */
     @Test
     public void testContext1() {
-        System.out.println("testContext1:");
         final String title = "Example of execution that succeeds and reports context.";
 
         final MockLogger logger2 = (MockLogger) LoggerFactory.getLogger("context");
@@ -453,7 +448,6 @@ public class MeterMessageLegacyTest {
      */
     @Test
     public void testContext2() {
-        System.out.println("testContext1:");
         final String title = "Example of execution that succeeds and reports context.";
 
         final MockLogger logger2 = (MockLogger) LoggerFactory.getLogger("context");
