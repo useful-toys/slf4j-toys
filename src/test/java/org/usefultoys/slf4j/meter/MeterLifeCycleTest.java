@@ -271,6 +271,80 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
+        // @Test
+        // @DisplayName("should override path when path() is called twice")
+        // void shouldOverridePathWhenPathCalledTwice() {
+        //     // Given: a new Meter
+        //     final Meter meter = new Meter(logger);
+        //     assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+        //     // When: start() is called
+        //     meter.start();
+        //     assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+        //     // When: path("firstPath") is called
+        //     meter.path("firstPath");
+        //     assertMeterState(meter, true, false, "firstPath", null, null, null, 0, 0);
+
+        //     // When: path("secondPath") is called (should override firstPath)
+        //     meter.path("secondPath");
+        //     assertMeterState(meter, true, false, "secondPath", null, null, null, 0, 0);
+
+        //     // When: ok() is called
+        //     meter.ok();
+        //     assertMeterState(meter, true, true, "secondPath", null, null, null, 0, 0);
+
+        //     AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+        // }
+
+        // @Test
+        // @DisplayName("should log error and keep previous path when path(non-null) then path(null)")
+        // void shouldKeepPreviousPathWhenPathNullAfterNonNull() {
+        //     // Given: a new Meter
+        //     final Meter meter = new Meter(logger);
+        //     assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+        //     // When: start() is called
+        //     meter.start();
+        //     assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+        //     // When: path("validPath") is called
+        //     meter.path("validPath");
+        //     assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0);
+
+        //     // When: path(null) is called (should log error but keep validPath)
+        //     meter.path(null);
+        //     assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0);
+        //     AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+
+        //     // When: ok() is called
+        //     meter.ok();
+        //     assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0);
+        //     AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
+        // }
+
+        @Test
+        @DisplayName("should log error for ok(null) but complete with set path")
+        void shouldCompleteWithPathWhenOkNullAfterPathNonNull() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+            // When: path("validPath") is called
+            meter.path("validPath");
+            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0);
+
+            // When: ok(null) is called (should log error but complete with validPath)
+            meter.ok(null);
+            assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+        }
+
         @Test
         @DisplayName("should follow success flow using success() alias")
         void shouldFollowSuccessFlowUsingSuccessAlias() {
@@ -295,6 +369,44 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, true, "aliasPath", null, null, null, 0, 0);
 
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+        }
+
+        @Test
+        @DisplayName("should log error and continue when path(null) is called")
+        void shouldLogErrorAndContinueWhenPathNullIsCalled() {
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+            // When: path(null) is called (should log error but not throw)
+            meter.path(null);
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+
+            // When: ok() is called after null path
+            meter.ok();
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+        }
+
+        @Test
+        @DisplayName("should log error and continue when ok(null) is called")
+        void shouldLogErrorAndContinueWhenOkNullIsCalled() {
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+            // When: ok(null) is called (should log error but complete operation)
+            meter.ok(null);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
         }
 
         @Test
