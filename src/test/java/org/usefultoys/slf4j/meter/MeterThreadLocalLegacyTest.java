@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Validates use cases for meter and threadlocal.
  * @author Daniel Felix Ferber
  */
-public class MeterThreadLocalTest {
+public class MeterThreadLocalLegacyTest {
 
     @BeforeAll
     public static void validateConsistentCharset() {
