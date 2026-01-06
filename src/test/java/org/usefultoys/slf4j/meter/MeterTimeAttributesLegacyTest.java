@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Daniel Felix Ferber
  */
-public class MeterTimeAttributesTest {
+public class MeterTimeAttributesLegacyTest {
 
 
     @BeforeAll
@@ -44,7 +44,7 @@ public class MeterTimeAttributesTest {
 
     MockLogger logger = (MockLogger) LoggerFactory.getLogger("Test");
 
-    public MeterTimeAttributesTest() {
+    public MeterTimeAttributesLegacyTest() {
         logger.setEnabled(false);
     }
 
