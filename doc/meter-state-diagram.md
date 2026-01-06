@@ -1,204 +1,206 @@
 # Meter State Diagram
 
-This document describes the valid lifecycle states and transitions for the `Meter` class.
+This document describes the lifecycle states and transitions for the `Meter` class, based on the attributes defined in `MeterData`.
+
+## Class Hierarchy
+
+```mermaid
+classDiagram
+    direction TB
+
+    %% Superclasses (Above)
+    class EventData {
+        + sessionUuid: String
+        + position: long
+        + lastCurrentTime: long
+    }
+
+    class SystemData {
+        <<abstract>>
+    }
+
+    class MeterData {
+        + category: String
+        + operation: String
+        + parent: String
+        + description: String
+        + createTime: long
+        + startTime: long
+        + stopTime: long
+        + timeLimit: long
+        + currentIteration: long
+        + expectedIterations: long
+        + okPath: String
+        + rejectPath: String
+        + failPath: String
+        + failMessage: String
+        + context: Map$String,String$
+        + getFullID() String
+        + collectCurrentWaitingTime() long
+        + collectCurrentExecutionTime() long
+        + readableMessage() String
+        + json5Message() String
+    }
+
+    class Meter {
+        + messageLogger: Logger«final»
+        + dataLogger: Logger«final»
+        ~ lastProgressTime: long
+        - lastProgressIteration: long
+        - previousInstance: WeakReference$Meter$
+    }
+
+    %% Mixins (Below)
+    class MeterAnalysis {
+        <<interface>>
+        + isStarted(): boolean
+        + isStopped(): boolean
+        + isOK(): boolean
+        + isReject(): boolean
+        + isFail(): boolean
+        + getPath(): String
+        + getIterationsPerSecond(): double
+        + getExecutionTime(): long
+        + getWaitingTime(): long
+        + isSlow(): boolean
+    }
+
+    %% Hierarchy
+    EventData <|-- SystemData
+    SystemData <|-- MeterData
+    MeterData <|-- Meter
+    
+    %% Mixin Implementations
+    MeterAnalysis <|.. MeterData
+```
+
+**Visibility symbols:**  
+  - `+` public  
+  - `-` private  
+  - `#` protected  
+  - `~` package-private (default)
+
 
 ## States
 
-A `Meter` instance can be in one of the following states:
+A `Meter` instance is always in one of the following states, determined by its `MeterData` attributes:
 
-| State | Description | Condition |
-|-------|-------------|-----------|
-| **Created** | Meter created but not started | `startTime == 0 && stopTime == 0` |
-| **Started** | Meter running (operation in progress) | `startTime != 0 && stopTime == 0` |
-| **Stopped** | Meter finished (terminal state) | `stopTime != 0` |
+| State | Description | Condition (MeterData) |
+|-------|-------------|-----------------------|
+| **Created** | Initial state after instantiation | `startTime == 0 && stopTime == 0` |
+| **Started** | Operation in progress | `startTime != 0 && stopTime == 0` |
+| **Stopped (OK)** | Successful completion | `stopTime != 0 && failPath == null && rejectPath == null` |
+| **Stopped (Rejected)** | Business rule rejection | `stopTime != 0 && rejectPath != null` |
+| **Stopped (Failed)** | Technical failure | `stopTime != 0 && failPath != null` |
 
-### Terminal Substates
-
-When **Stopped**, the Meter can be in one of three mutually exclusive substates:
-
-| Substate | Description | Condition | Log Level |
-|----------|-------------|-----------|-----------|
-| **OK** | Operation completed successfully | `stopTime != 0 && failPath == null && rejectPath == null` | INFO (WARN if slow) |
-| **Rejected** | Operation terminated due to business rules | `stopTime != 0 && rejectPath != null` | INFO |
-| **Failed** | Operation terminated due to technical error | `stopTime != 0 && failPath != null` | ERROR |
+States are mutually exclusive and collectively exhaustive.
+The state is queried from the `MeterAnalysis` mixin interface which implements que state methods based on `MeterData` attributes.
 
 ## State Transition Diagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Created: new Meter()
+    [*] --> Created
     
-    Created --> Started: start()
+    Created --> Created: iterations(n)<br/>path(pathId)
+    Created --> Started: ✅ start()
+    Created --> OK: ⚠️ ok() / ok(pathId)
+    Created --> Rejected: ⚠️ reject()
+    Created --> Failed: ⚠️ fail()
+    Created --> Failed: ⚠️ close()
     
-    Started --> Started: progress()<br/>inc()<br/>path()
-    
-    Started --> OK: ok()<br/>ok(pathId)
-    Started --> Rejected: reject(cause)
-    Started --> Failed: fail(cause)<br/>fail(exception)
-    Started --> Failed: close() (try-with-resources)<br/>if not explicitly stopped
+    Started --> Started: inc() / incBy() / incTo()<br/>iterations(n) / path(pathId)<br/>progress()
+    Started --> OK: ✅ ok() / ok(pathId)
+    Started --> Rejected: ✅ reject()
+    Started --> Failed: ✅ fail()
+    Started --> Failed: ✅ close()
+    Started --> [*]: ⚠️ finalize() (GC)
     
     OK --> [*]
     Rejected --> [*]
     Failed --> [*]
-    
-    note right of Created
-        Initial state
-        No logging yet
-    end note
-    
-    note right of Started
-        Operation in progress
-        Can report progress
-        Can set path
-    end note
-    
-    note right of OK
-        Success state
-        isOK() = true
-    end note
-    
-    note right of Rejected
-        Expected termination
-        isReject() = true
-    end note
-    
-    note right of Failed
-        Unexpected error
-        isFail() = true
-    end note
+
 ```
 
-## Valid Transitions
+## Transitions
 
-### 1. Normal Success Flow
+The following table details all possible transitions, including how the API handles invalid calls (non-intrusive behavior).
 
-```java
-Meter meter = new Meter(logger, "operation");
-meter.start();           // Created → Started
-meter.inc();             // increment iteration counter
-meter.progress();        // log intermediate progress
-meter.ok();              // Started → OK (Stopped)
-```
+**Legend:**
+- ✅ **OK**: Condition met in the expected flow (e.g., `Started -> ok() -> Stopped`).
+- ☑️ **OK**: Condition met for non-state-changing calls (e.g., setting iterations or path).
+- ❔ **Allowed**: Condition is suspicious, but call is allowed (e.g., setting path in any state).
+- ⚠️ **Applied**: Condition met, but not in the normal expected flow (e.g., `Created -> ok() -> Stopped`).
+- ❌ **Ignored**: Condition not met, transition not performed, `MeterData` not changed.
 
-### 2. Success with Path
-
-```java
-Meter meter = new Meter(logger, "operation");
-meter.start();           // Created → Started
-meter.path("mainPath");  // set success path
-meter.ok();              // Started → OK with path
-// or: meter.ok("altPath");  // override with different path
-```
-
-### 3. Rejection Flow
-
-```java
-Meter meter = new Meter(logger, "operation");
-meter.start();              // Created → Started
-meter.reject("validation"); // Started → Rejected (Stopped)
-```
-
-### 4. Failure Flow
-
-```java
-Meter meter = new Meter(logger, "operation");
-meter.start();                                    // Created → Started
-meter.fail(new IllegalStateException("error"));   // Started → Failed (Stopped)
-```
-
-### 5. Try-With-Resources (Automatic Failure)
-
-```java
-try (Meter meter = new Meter(logger, "operation").start()) {
-    // if no explicit ok/reject/fail is called before close()...
-} // close() → Started → Failed with failPath="try-with-resources"
-```
-
-## Invalid/Ignored Transitions
-
-The `Meter` API is **non-intrusive** and will not throw exceptions for invalid state transitions. Instead, it logs warnings and ignores the invalid calls:
-
-| From State | Method Call | Behavior |
-|------------|-------------|----------|
-| Created | `ok()`, `reject()`, `fail()` | Logs warning, no effect |
-| Created | `progress()` | Logs warning, no effect |
-| Started | `start()` (again) | Logs warning, ignores second start |
-| Stopped (any) | `start()` | Logs warning, ignores restart |
-| Stopped (any) | `ok()`, `reject()`, `fail()` | Logs warning, no state change |
-| Stopped (any) | `progress()` | Logs warning, no effect |
-
-### Idempotency After Stop
-
-Once a `Meter` reaches a **Stopped** state, it **cannot transition to any other state**. Subsequent calls to termination methods are ignored:
-
-```java
-meter.start();
-meter.ok();              // Started → OK
-meter.fail(exception);   // IGNORED - already stopped
-meter.reject("reason");  // IGNORED - already stopped
-```
-
-The **first termination call wins**:
-
-```java
-meter.start();
-meter.reject("validation");  // Started → Rejected (WINS)
-meter.ok();                  // IGNORED
-```
+| From State | Method Call | Condition (to realize transition) | To State | Attributes Changed | Logged (Message/Data) | Behavior |
+|:---|:---|:---|:---|:---|:---|:---|
+| **Created** | `start()` | ✅ `startTime == 0` (`validateStartPrecondition`) | **Started** | `startTime = now` | DEBUG (`MSG_START`) / TRACE (`DATA_START`) | Normal start. |
+| **Created** | `ok()` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = now` | ERROR (`INCONSISTENT_OK`) + INFO (`MSG_OK`) / TRACE (`DATA_OK`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Created** | `ok(pathId)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = now`, `okPath = pathId` | ERROR (`INCONSISTENT_OK`) + INFO (`MSG_OK`) / TRACE (`DATA_OK`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Created** | `reject(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Rejected)** | `stopTime = now`, `rejectPath = cause` | ERROR (`INCONSISTENT_REJECT`) + INFO (`MSG_REJECT`) / TRACE (`DATA_REJECT`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Created** | `fail(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = now`, `failPath = cause` | ERROR (`INCONSISTENT_FAIL`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Created** | `iterations(n)` | ✅ `n > 0` (`validateIterationsCallArguments`) | **Created** | `expectedIterations = n` | - | Configures expected iterations. |
+| **Created** | `path(pathId)` | ✅ `-` | **Created** | `okPath = pathId` | - | Sets the success path for later use. |
+| **Created** | `inc()`, `incBy()`, `incTo()` | ❌ `startTime != 0` (`validateIncPrecondition`) | **Created** | - | ERROR (`INCONSISTENT_INCREMENT`) | **Ignored**: condition not met. |
+| **Created** | `progress()` | ❌ `startTime != 0` (`validateProgressPrecondition`) | **Created** | - | ERROR (`INCONSISTENT_PROGRESS`) | **Ignored**: condition not met. |
+| **Created** | `close()` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = now`, `failPath="try-with-resources"` | ERROR (`INCONSISTENT_CLOSE`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
+| **Started** | `inc()` | ✅ `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration++` | - | Increments iteration count. |
+| **Started** | `incBy(n)` | ✅ `n > 0` (`validateIncBy`) AND `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration += n` | - | Increments iteration count by `n`. |
+| **Started** | `incTo(n)` | ✅ `n > 0` AND `n > currentIteration` (`validateIncToArguments`) AND `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration = n` | - | Sets iteration count to `n`. |
+| **Started** | `iterations(n)` | ✅ `n > 0` (`validateIterationsCallArguments`) | **Started** | `expectedIterations = n` | - | Overrides expected iterations. |
+| **Started** | `path(pathId)` | ✅ `-` | **Started** | `okPath = pathId` | - | Sets or overrides the success path. |
+| **Started** | `progress()` | ✅ `startTime != 0` (`validateProgressPrecondition`) | **Started** | `lastProgressTime`, `lastProgressIteration` | INFO (`MSG_PROGRESS`) / TRACE (`DATA_PROGRESS`) | Normal progress report. |
+| **Started** | `ok()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = now` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination. |
+| **Started** | `ok(pathId)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = now`, `okPath = pathId` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination with path. |
+| **Started** | `reject(cause)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Rejected)** | `stopTime = now`, `rejectPath = cause` | INFO (`MSG_REJECT`) / TRACE (`DATA_REJECT`) | Normal rejection termination. |
+| **Started** | `fail(cause)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = now`, `failPath = cause` | ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | Normal failure termination. |
+| **Started** | `close()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = now`, `failPath="try-with-resources"` | ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Auto-fail**: triggered by try-with-resources if not stopped. |
+| **Started** | `finalize()` | ⚠️ `startTime != 0 && stopTime == 0` (`validateFinalize`) | **[*]** | - | ERROR (`INCONSISTENT_FINALIZED`) | **GC Collection**: logs error if started but never stopped. |
+| **Started** | `start()` | ❌ `startTime == 0` (`validateStartPrecondition`) | **Started** | - | ERROR (`INCONSISTENT_START`) | **Ignored**: condition not met. |
+| **Stopped** | `path(pathId)` | ⚠️ `-` | **Stopped** | `okPath = pathId` | - | **Discouraged**: changes path even if already stopped. |
+| **Stopped** | `iterations(n)` | ⚠️ `n > 0` (`validateIterationsCallArguments`) | **Stopped** | `expectedIterations = n` | - | **Discouraged**: changes iterations even if already stopped. |
+| **Stopped** | `inc()`, `incBy()`, `incTo()` | ⚠️ `startTime != 0` (`validateIncPrecondition`) | **Stopped** | `currentIteration` | - | **Allowed**: increments even if stopped (current behavior). |
+| **Stopped** | `inc()`, `incBy()`, `incTo()` | ❌ `startTime == 0` (`validateIncPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_INCREMENT`) | **Ignored**: cannot increment if never started. |
+| **Stopped** | `progress()` | ⚠️ `startTime != 0` (`validateProgressPrecondition`) | **Stopped** | `lastProgressTime`, `lastProgressIteration` | INFO (`MSG_PROGRESS`) / TRACE (`DATA_PROGRESS`) | **Allowed**: reports progress even if stopped. |
+| **Stopped** | `progress()` | ❌ `startTime == 0` (`validateProgressPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_PROGRESS`) | **Ignored**: cannot report progress if never started. |
+| **Stopped** | `start()` | ❌ `startTime == 0` (`validateStartPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_START`) | **Ignored**: condition not met. |
+| **Stopped** | `ok()`, `ok(pathId)` | ❌ `stopTime == 0` (`validateStopPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_OK`) | **Ignored**: condition not met. |
+| **Stopped** | `reject(cause)` | ❌ `stopTime == 0` (`validateStopPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_REJECT`) | **Ignored**: condition not met. |
+| **Stopped** | `fail(cause)` | ❌ `stopTime == 0` (`validateStopPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_FAIL`) | **Ignored**: condition not met. |
+| **Stopped** | `close()` | ❌ `stopTime == 0` | **Stopped** | - | - | **Ignored**: condition not met. |
 
 ## State Query Methods
 
-| Method | Returns `true` when |
-|--------|---------------------|
-| `isStarted()` | `startTime != 0` |
-| `isStopped()` | `stopTime != 0` |
-| `isOK()` | Stopped successfully (no fail/reject) |
-| `isReject()` | Stopped with rejection |
-| `isFail()` | Stopped with failure |
-| `isSlow()` | Execution time exceeds configured limit |
+| Method | Returns `true` when | Condition (MeterData) |
+|--------|---------------------|-----------------------|
+| `isStarted()` | Operation has started | `startTime != 0` |
+| `isStopped()` | Operation has finished | `stopTime != 0` |
+| `isOK()` | Stopped successfully | `stopTime != 0 && failPath == null && rejectPath == null` |
+| `isReject()` | Stopped with rejection | `stopTime != 0 && rejectPath != null` |
+| `isFail()` | Stopped with failure | `stopTime != 0 && failPath != null` |
+| `isSlow()` | Execution time exceeds limit | `timeLimit != 0 && startTime != 0 && (executionTime > timeLimit)` |
 
-## Logging Behavior by State
-
-| Transition | Message Logger | Data Logger | Marker |
-|------------|----------------|-------------|--------|
-| `start()` | DEBUG | TRACE | `MSG_START`, `DATA_START` |
-| `ok()` | INFO (or WARN if slow) | TRACE | `MSG_OK`, `DATA_OK` |
-| `reject()` | INFO | TRACE | `MSG_REJECT`, `DATA_REJECT` |
-| `fail()` | ERROR | TRACE | `MSG_FAIL`, `DATA_FAIL` |
-| `progress()` | INFO | TRACE | `MSG_PROGRESS`, `DATA_PROGRESS` |
-| Invalid call | WARN | - | `INCONSISTENT_*` |
+> **Note**: `executionTime` is `stopTime - startTime` if stopped, or `now - startTime` if still running.
 
 ## Validation and Error Handling
 
 All state validations are handled by [MeterValidator.java](../src/main/java/org/usefultoys/slf4j/meter/MeterValidator.java):
 
-- **`validateStartPrecondition()`**: Ensures meter hasn't already started
-- **`validateStopPrecondition()`**: Ensures meter was started and not already stopped
-- **`validateProgressPrecondition()`**: Ensures meter has been started
-- **`validateFinalize()`**: Detects meters that were started but never stopped (logs error during garbage collection)
+- **`validateStartPrecondition()`**: Ensures meter hasn't already started (checks `startTime == 0`).
+- **`validateStopPrecondition()`**: Ensures meter was started and not already stopped (checks `stopTime == 0`).
+- **`validateProgressPrecondition()`**: Ensures meter has been started (checks `startTime != 0`).
+- **`validateIncPrecondition()`**: Ensures meter has been started before incrementing (checks `startTime != 0`).
+- **`validatePathArgument()`**: Logs an error if path identifiers are null (non-blocking).
+- **`validateIncBy()` / `validateIncToArguments()`**: Validates increment values and forward progress.
+- **`validateFinalize()`**: Detects meters that were started but never stopped (logs error during garbage collection).
 
 ## Thread-Local Stack Management
 
-When a `Meter` is started, it becomes the **current instance** for the thread:
+When a `Meter` is started, it becomes the **current instance** for the thread. Nested meters are supported via a thread-local stack. When a meter stops, the previous meter in the stack becomes current again.
 
 ```java
 Meter.getCurrentInstance()  // returns the most recently started meter
-```
-
-Nested meters are supported via a thread-local stack:
-
-```java
-Meter outer = new Meter(logger, "outer").start();
-// outer is current
-
-Meter inner = new Meter(logger, "inner").start();
-// inner is current
-
-inner.ok();
-// outer becomes current again
-
-outer.ok();
-// no current meter
 ```
 
 ## References
