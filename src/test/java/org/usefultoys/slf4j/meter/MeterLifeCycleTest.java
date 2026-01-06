@@ -296,6 +296,23 @@ class MeterLifeCycleTest {
 
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
         }
+
+        @Test
+        @DisplayName("should log slow operation when limit is exceeded")
+        void shouldLogSlowOperationWhenLimitIsExceeded() throws InterruptedException {
+            final Meter meter = new Meter(logger);
+            // Given: a very short time limit
+            meter.limitMilliseconds(1);
+            meter.start();
+
+            // When: operation takes longer than limit
+            Thread.sleep(10);
+            meter.ok();
+
+            // Then: MSG_SLOW_OK (WARN) should be logged instead of MSG_OK (INFO)
+            AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
+        }
     }
 
     @Nested
@@ -509,27 +526,6 @@ class MeterLifeCycleTest {
 
             meter.ok();
             assertMeterState(meter, true, true, null, null, null, null, 50, 100);
-        }
-    }
-
-    @Nested
-    @DisplayName("Advanced Features")
-    class AdvancedFeatures {
-        @Test
-        @DisplayName("should log slow operation when limit is exceeded")
-        void shouldLogSlowOperationWhenLimitIsExceeded() throws InterruptedException {
-            final Meter meter = new Meter(logger);
-            // Given: a very short time limit
-            meter.limitMilliseconds(1);
-            meter.start();
-
-            // When: operation takes longer than limit
-            Thread.sleep(10);
-            meter.ok();
-
-            // Then: MSG_SLOW_OK (WARN) should be logged instead of MSG_OK (INFO)
-            AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
         }
     }
 }
