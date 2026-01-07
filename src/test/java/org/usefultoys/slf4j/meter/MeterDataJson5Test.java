@@ -21,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import java.util.HashMap;
@@ -52,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 @ValidateCharset
 @WithLocale("en")
+@ValidateCleanMeter
 class MeterDataJson5Test {
 
     /**

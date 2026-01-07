@@ -28,6 +28,7 @@ import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
@@ -56,6 +57,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.*;
 @ValidateCharset
 @ResetMeterConfig
 @WithMockLogger
+@ValidateCleanMeter
 public class MeterValidatorTest {
 
     @Mock

@@ -24,6 +24,7 @@ import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.test.ClearParserErrors;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ValidateCharset
 @ResetMeterConfig
 @WithLocale("en")
+@ValidateCleanMeter
 class MeterConfigTest {
 
     /**

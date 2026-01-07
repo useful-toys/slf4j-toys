@@ -23,6 +23,7 @@ import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.test.ValidateCleanMeter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -39,6 +40,7 @@ import static org.usefultoys.slf4j.meter.Markers.*;
  * @author Co-authored-by: GitHub Copilot using GPT-5.2
  */
 @DisplayName("MeterExecutor interface functionality tests")
+@ValidateCleanMeter
 class MeterExecutorTest {
 
     static final MockLogger logger = (MockLogger) LoggerFactory.getLogger("test.executor");

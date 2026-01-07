@@ -26,6 +26,7 @@ import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.slf4j.meter.MeterConfig;
 import org.usefultoys.slf4j.meter.MeterData;
+import org.usefultoys.test.ValidateCleanMeter;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ValidateCleanMeter
 public class ReadableMessageLegacyTest {
 
     

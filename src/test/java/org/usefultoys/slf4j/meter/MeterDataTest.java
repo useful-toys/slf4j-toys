@@ -25,6 +25,7 @@ import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ResetSessionConfig;
 import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import java.nio.charset.Charset;
@@ -55,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ResetMeterConfig
 @ResetSessionConfig
 @WithLocale("en")
+@ValidateCleanMeter
 class MeterDataTest {
 
     private static class MockMeterData extends MeterData {

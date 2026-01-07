@@ -22,6 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.test.ResetSessionConfig;
 import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import java.util.stream.Stream;
@@ -50,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ValidateCharset
 @ResetSessionConfig
 @WithLocale("en")
+@ValidateCleanMeter
 class MeterAnalysisLegacyTest {
 
     // Test scenario class that implements MeterAnalysis

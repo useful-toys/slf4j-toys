@@ -26,6 +26,7 @@ import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ResetMeterConfig
 @WithLocale("en")
 @WithMockLogger
+@ValidateCleanMeter
 class MeterLifeCycleTest {
 
     @Slf4jMock
@@ -271,57 +273,59 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
-        // @Test
-        // @DisplayName("should override path when path() is called twice")
-        // void shouldOverridePathWhenPathCalledTwice() {
-        //     // Given: a new Meter
-        //     final Meter meter = new Meter(logger);
-        //     assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+        @Test
+        @DisplayName("should override path when path() is called twice")
+        void shouldOverridePathWhenPathCalledTwice() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
-        //     // When: start() is called
-        //     meter.start();
-        //     assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
-        //     // When: path("firstPath") is called
-        //     meter.path("firstPath");
-        //     assertMeterState(meter, true, false, "firstPath", null, null, null, 0, 0);
+            // When: path("firstPath") is called
+            meter.path("firstPath");
+            assertMeterState(meter, true, false, "firstPath", null, null, null, 0, 0);
 
-        //     // When: path("secondPath") is called (should override firstPath)
-        //     meter.path("secondPath");
-        //     assertMeterState(meter, true, false, "secondPath", null, null, null, 0, 0);
+            // When: path("secondPath") is called (should override firstPath)
+            meter.path("secondPath");
+            assertMeterState(meter, true, false, "secondPath", null, null, null, 0, 0);
 
-        //     // When: ok() is called
-        //     meter.ok();
-        //     assertMeterState(meter, true, true, "secondPath", null, null, null, 0, 0);
+            // When: ok() is called
+            meter.ok();
+            assertMeterState(meter, true, true, "secondPath", null, null, null, 0, 0);
 
-        //     AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
-        // }
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
 
-        // @Test
-        // @DisplayName("should log error and keep previous path when path(non-null) then path(null)")
-        // void shouldKeepPreviousPathWhenPathNullAfterNonNull() {
-        //     // Given: a new Meter
-        //     final Meter meter = new Meter(logger);
-        //     assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+        @Test
+        @DisplayName("should log error and keep previous path when path(non-null) then path(null)")
+        void shouldKeepPreviousPathWhenPathNullAfterNonNull() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
-        //     // When: start() is called
-        //     meter.start();
-        //     assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+            // When: start() is called
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
-        //     // When: path("validPath") is called
-        //     meter.path("validPath");
-        //     assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0);
+            // When: path("validPath") is called
+            meter.path("validPath");
+            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0);
 
-        //     // When: path(null) is called (should log error but keep validPath)
-        //     meter.path(null);
-        //     assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0);
-        //     AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // When: path(null) is called (should log error but keep validPath)
+            meter.path(null);
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
 
-        //     // When: ok() is called
-        //     meter.ok();
-        //     assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0);
-        //     AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
-        // }
+            // When: ok() is called
+            meter.ok();
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
+        }
 
         @Test
         @DisplayName("should log error for ok(null) but complete with set path")
@@ -424,6 +428,66 @@ class MeterLifeCycleTest {
             // Then: MSG_SLOW_OK (WARN) should be logged instead of MSG_OK (INFO)
             AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
+        }
+    }
+
+    @Nested
+    @DisplayName("Created State Path Calls")
+    class CreatedStatePathCallTests {
+        @Test
+        @DisplayName("should modify okPath even when path(String) is called before start()")
+        void shouldModifyPathEvenWhenPathStringBeforeStart() {
+            // Given: a new Meter (Created state)
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: path("pathId") is called before start()
+            meter.path("pathId");
+
+            // Then: path is set (path() does not validate preconditions)
+            assertMeterState(meter, false, false, "pathId", null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should modify okPath even when path(Enum) is called before start()")
+        void shouldModifyPathEvenWhenPathEnumBeforeStart() {
+            // Given: a new Meter (Created state)
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: path(TestEnum.VALUE1) is called before start()
+            meter.path(TestEnum.VALUE1);
+
+            // Then: path is set (path() does not validate preconditions)
+            assertMeterState(meter, false, false, "VALUE1", null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should modify okPath even when path(Throwable) is called before start()")
+        void shouldModifyPathEvenWhenPathThrowableBeforeStart() {
+            // Given: a new Meter (Created state)
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: path(new Exception()) is called before start()
+            meter.path(new RuntimeException("test"));
+
+            // Then: path is set (path() does not validate preconditions)
+            assertMeterState(meter, false, false, "RuntimeException", null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should modify okPath even when path(Object) is called before start()")
+        void shouldModifyPathEvenWhenPathObjectBeforeStart() {
+            // Given: a new Meter (Created state)
+            final Meter meter = new Meter(logger);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+
+            // When: path(new TestObject()) is called before start()
+            meter.path(new TestObject());
+
+            // Then: path is set (path() does not validate preconditions)
+            assertMeterState(meter, false, false, "testObjectString", null, null, null, 0, 0);
         }
     }
 
@@ -615,6 +679,106 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+    }
+
+    @Nested
+    @DisplayName("Stopped State Path Calls")
+    class StoppedStatePathCallTests {
+        @Test
+        @DisplayName("should modify okPath even when path(String) is called after ok()")
+        void shouldModifyPathEvenWhenPathStringAfterOk() {
+            // Given: a Meter that has completed successfully
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.ok();
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+
+            // When: path("newPath") is called after ok()
+            meter.path("newPath");
+
+            // Then: okPath should be modified (path() does not validate postcondition)
+            assertMeterState(meter, true, true, "newPath", null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should modify okPath even when path(Enum) is called after ok()")
+        void shouldModifyPathEvenWhenPathEnumAfterOk() {
+            // Given: a Meter that has completed successfully
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.ok();
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+
+            // When: path(TestEnum.VALUE1) is called after ok()
+            meter.path(TestEnum.VALUE1);
+
+            // Then: okPath should be modified
+            assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should modify okPath even when path(Throwable) is called after ok()")
+        void shouldModifyPathEvenWhenPathThrowableAfterOk() {
+            // Given: a Meter that has completed successfully
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.ok();
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+
+            // When: path(new Exception()) is called after ok()
+            meter.path(new RuntimeException("test"));
+
+            // Then: okPath should be modified
+            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should modify okPath even when path(Object) is called after ok()")
+        void shouldModifyPathEvenWhenPathObjectAfterOk() {
+            // Given: a Meter that has completed successfully
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.ok();
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+
+            // When: path(new TestObject()) is called after ok()
+            meter.path(new TestObject());
+
+            // Then: okPath should be modified
+            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should modify okPath even when path() is called after reject()")
+        void shouldModifyPathEvenWhenPathAfterReject() {
+            // Given: a Meter that has been rejected
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.reject("businessRule");
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0);
+
+            // When: path("newPath") is called after reject()
+            meter.path("newPath");
+
+            // Then: okPath should be modified
+            assertMeterState(meter, true, true, "newPath", "businessRule", null, null, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should modify okPath even when path() is called after fail()")
+        void shouldModifyPathEvenWhenPathAfterFail() {
+            // Given: a Meter that has failed
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.fail("error occurred");
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0);
+
+            // When: path("newPath") is called after fail()
+            meter.path("newPath");
+
+            // Then: okPath should be modified
+            assertMeterState(meter, true, true, "newPath", null, "error occurred", null, 0, 0);
         }
     }
 

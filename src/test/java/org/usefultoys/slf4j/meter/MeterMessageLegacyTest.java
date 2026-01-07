@@ -22,6 +22,7 @@ import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.ValidateCleanMeter;
 
 import java.nio.charset.Charset;
 import java.util.Random;
@@ -35,6 +36,7 @@ import static org.usefultoys.slf4j.meter.Markers.*;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("UnusedAssignment")
+@ValidateCleanMeter
 public class MeterMessageLegacyTest {
 
     static final String meterCategory = "category";

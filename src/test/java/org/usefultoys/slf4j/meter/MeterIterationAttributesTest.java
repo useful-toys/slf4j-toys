@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.ValidateCleanMeter;
 
 import java.nio.charset.Charset;
 
@@ -35,6 +36,7 @@ import static org.usefultoys.slf4j.meter.Markers.ILLEGAL;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("UnusedAssignment")
+@ValidateCleanMeter
 class MeterIterationAttributesTest {
 
     MockLogger logger = (MockLogger) LoggerFactory.getLogger("MeterIterationAttributesTest");

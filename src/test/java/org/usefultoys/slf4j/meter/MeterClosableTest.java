@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.ValidateCleanMeter;
 
 import java.nio.charset.Charset;
 
@@ -45,6 +46,7 @@ import static org.usefultoys.slf4j.meter.Markers.MSG_REJECT;
  * @author Daniel Felix Ferber
  */
 @SuppressWarnings("UnusedAssignment")
+@ValidateCleanMeter
 class MeterClosableTest {
 
     static final String meterCategory = "category";

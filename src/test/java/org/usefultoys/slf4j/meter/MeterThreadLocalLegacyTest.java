@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.ValidateCleanMeter;
 
 import java.nio.charset.Charset;
 
@@ -31,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Validates use cases for meter and threadlocal.
  * @author Daniel Felix Ferber
  */
+@ValidateCleanMeter
 public class MeterThreadLocalLegacyTest {
 
     @BeforeAll
