@@ -24,6 +24,7 @@ import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
@@ -54,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @WithLocale("en")
 @WithMockLogger
 @ValidateCleanMeter
+@WithMockLoggerDebug
 class MeterLifeCycleTest {
 
     @Slf4jMock
