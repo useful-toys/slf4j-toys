@@ -595,72 +595,88 @@ class MeterLifeCycleTest {
     @DisplayName("Created State Path Calls")
     class CreatedStatePathCallTests {
         @Test
-        @DisplayName("should modify okPath even when path(String) is called before start()")
-        void shouldModifyPathEvenWhenPathStringBeforeStart() {
+        @DisplayName("should NOT modify okPath when path(String) is called before start()")
+        void shouldNotModifyPathWhenPathStringBeforeStart() {
             // Given: a new, not yet started Meter
             final Meter meter = new Meter(logger);
 
             // When: path("pathId") is called before start()
             meter.path("pathId");
 
-            // Then: path is set (path() does not validate preconditions)
-            assertMeterState(meter, false, false, "pathId", null, null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
+                "Meter path() called but not started");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Enum) is called before start()")
-        void shouldModifyPathEvenWhenPathEnumBeforeStart() {
+        @DisplayName("should NOT modify okPath when path(Enum) is called before start()")
+        void shouldNotModifyPathWhenPathEnumBeforeStart() {
             // Given: a new, not yet started Meter
             final Meter meter = new Meter(logger);
 
             // When: path(TestEnum.VALUE1) is called before start()
             meter.path(TestEnum.VALUE1);
 
-            // Then: path is set (path() does not validate preconditions)
-            assertMeterState(meter, false, false, "VALUE1", null, null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
+                "Meter path() called but not started");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Throwable) is called before start()")
-        void shouldModifyPathEvenWhenPathThrowableBeforeStart() {
+        @DisplayName("should NOT modify okPath when path(Throwable) is called before start()")
+        void shouldNotModifyPathWhenPathThrowableBeforeStart() {
             // Given: a new, not yet started Meter
             final Meter meter = new Meter(logger);
 
             // When: path(new Exception()) is called before start()
             meter.path(new RuntimeException("test"));
 
-            // Then: path is set (path() does not validate preconditions)
-            assertMeterState(meter, false, false, "RuntimeException", null, null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
+                "Meter path() called but not started");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Object) is called before start()")
-        void shouldModifyPathEvenWhenPathObjectBeforeStart() {
+        @DisplayName("should NOT modify okPath when path(Object) is called before start()")
+        void shouldNotModifyPathWhenPathObjectBeforeStart() {
             // Given: a new, not yet started Meter
             final Meter meter = new Meter(logger);
 
             // When: path(new TestObject()) is called before start()
             meter.path(new TestObject());
 
-            // Then: path is set (path() does not validate preconditions)
-            assertMeterState(meter, false, false, "testObjectString", null, null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
+                "Meter path() called but not started");
         }
 
         @Test
-        @DisplayName("should clear okPath when path(null) is called before start()")
-        void shouldClearPathWhenPathNullBeforeStart() {
-            // Given: a new, not yet started Meter with a path already set
+        @DisplayName("should NOT modify okPath when path(null) is called before start()")
+        void shouldNotModifyPathWhenPathNullBeforeStart() {
+            // Given: a new, not yet started Meter
             final Meter meter = new Meter(logger);
-            meter.path("initialPath");
-            
-            // Then: path is set
-            assertMeterState(meter, false, false, "initialPath", null, null, null, 0, 0, 0);
 
-            // When: path(null) is called before start()
+            // When: path(null) is called before start() (null argument)
             meter.path(null);
 
-            // Then: okPath should be cleared (null overwrites previous value)
+            // Then: okPath should remain null (illegal call ignored)
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker for null argument
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
+                "Null argument");
         }
     }
 
