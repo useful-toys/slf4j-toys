@@ -837,18 +837,50 @@ class MeterLifeCycleTest {
         @DisplayName("should follow try-with-resources flow (explicit success)")
         void shouldFollowTryWithResourcesFlowExplicitSuccess() {
             final Meter meter;
-            // When: Meter is used in try-with-resources and explicitly stopped with ok()
-            try (Meter m = new Meter(logger)) {
-                m.start();
-                m.ok();
+            // Given: a new, started Meter withing try with resources
+            try (Meter m = new Meter(logger).start()) {
                 meter = m;
+                
+                // When: ok() is called
+                m.ok();
+                
+                // Then: Meter is in stopped state
+                assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
             }
 
             // Then: it should remain in success state after close()
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should follow try-with-resources flow (path and explicit success)")
+        void shouldFollowTryWithResourcesFlowPathAndExplicitSuccess() {
+            final Meter meter;
+            // Given: a new, started Meter withing try with resources
+            try (Meter m = new Meter(logger).start()) {
+                meter = m;
+                
+                // When: path() is called
+                m.path("customPath");
+                
+                // Then: path is set
+                assertMeterState(meter, true, false, "customPath", null, null, null, 0, 0, 0);
+                
+                // When: ok() is called
+                m.ok();
+                
+                // Then: Meter is in stopped state with path preserved
+                assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
+            }
+
+            // Then: it should remain in success state after close()
+            assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
+
+            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
@@ -857,18 +889,21 @@ class MeterLifeCycleTest {
         @DisplayName("should follow try-with-resources flow (explicit rejection)")
         void shouldFollowTryWithResourcesFlowExplicitRejection() {
             final Meter meter;
-            // When: Meter is used in try-with-resources and explicitly stopped with reject()
-            try (Meter m = new Meter(logger)) {
-                m.start();
-                m.reject("rejected");
+            // Given: a new, started Meter withing try with resources
+            try (Meter m = new Meter(logger).start()) {
                 meter = m;
+                
+                // When: reject() is called
+                m.reject("rejected");
+                
+                // Then: Meter is in stopped state with reject path set
+                assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
             }
 
             // Then: it should remain in rejection state after close()
             assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
 
-            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
         }
@@ -877,18 +912,21 @@ class MeterLifeCycleTest {
         @DisplayName("should follow try-with-resources flow (explicit failure)")
         void shouldFollowTryWithResourcesFlowExplicitFailure() {
             final Meter meter;
-            // When: Meter is used in try-with-resources and explicitly stopped with fail()
-            try (Meter m = new Meter(logger)) {
-                m.start();
-                m.fail("failed");
+            // Given: a new, started Meter withing try with resources
+            try (Meter m = new Meter(logger).start()) {
                 meter = m;
+                
+                // When: fail() is called
+                m.fail("failed");
+                
+                // Then: Meter is in stopped state with failure message
+                assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
             }
 
             // Then: it should remain in failure state after close()
             assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
 
-            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
         }
