@@ -608,7 +608,7 @@ class MeterLifeCycleTest {
 
             // Then: error logged with ILLEGAL marker
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
-                "Meter path() called but not started");
+                "Meter path but not started");
         }
 
         @Test
@@ -625,7 +625,7 @@ class MeterLifeCycleTest {
 
             // Then: error logged with ILLEGAL marker
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
-                "Meter path() called but not started");
+                "Meter path but not started");
         }
 
         @Test
@@ -642,7 +642,7 @@ class MeterLifeCycleTest {
 
             // Then: error logged with ILLEGAL marker
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
-                "Meter path() called but not started");
+                "Meter path but not started");
         }
 
         @Test
@@ -659,7 +659,7 @@ class MeterLifeCycleTest {
 
             // Then: error logged with ILLEGAL marker
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
-                "Meter path() called but not started");
+                "Meter path but not started");
         }
 
         @Test
@@ -952,200 +952,262 @@ class MeterLifeCycleTest {
     @DisplayName("Stopped State Path Calls")
     class StoppedStatePathCallTests {
         @Test
-        @DisplayName("should modify okPath even when path(String) is called after ok()")
-        void shouldModifyPathEvenWhenPathStringAfterOk() {
+        @DisplayName("should NOT modify okPath when path(String) is called after ok()")
+        void shouldNotModifyPathWhenPathStringAfterOk() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().ok();
 
             // When: path("newPath") is called after ok()
             meter.path("newPath");
 
-            // Then: okPath should be modified (path() does not validate postcondition)
-            assertMeterState(meter, true, true, "newPath", null, null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Enum) is called after ok()")
-        void shouldModifyPathEvenWhenPathEnumAfterOk() {
+        @DisplayName("should NOT modify okPath when path(Enum) is called after ok()")
+        void shouldNotModifyPathWhenPathEnumAfterOk() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().ok();
 
             // When: path(TestEnum.VALUE1) is called after ok()
             meter.path(TestEnum.VALUE1);
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Throwable) is called after ok()")
-        void shouldModifyPathEvenWhenPathThrowableAfterOk() {
+        @DisplayName("should NOT modify okPath when path(Throwable) is called after ok()")
+        void shouldNotModifyPathWhenPathThrowableAfterOk() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().ok();
 
             // When: path(new Exception()) is called after ok()
             meter.path(new RuntimeException("test"));
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Object) is called after ok()")
-        void shouldModifyPathEvenWhenPathObjectAfterOk() {
+        @DisplayName("should NOT modify okPath when path(Object) is called after ok()")
+        void shouldNotModifyPathWhenPathObjectAfterOk() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().ok();
 
             // When: path(new TestObject()) is called after ok()
             meter.path(new TestObject());
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(String) is called after reject()")
-        void shouldModifyPathEvenWhenPathStringAfterReject() {
+        @DisplayName("should NOT modify okPath when path(String) is called after reject()")
+        void shouldNotModifyPathWhenPathStringAfterReject() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().reject("businessRule");
 
             // When: path("newPath") is called after reject()
             meter.path("newPath");
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "newPath", "businessRule", null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Enum) is called after reject()")
-        void shouldModifyPathEvenWhenPathEnumAfterReject() {
+        @DisplayName("should NOT modify okPath when path(Enum) is called after reject()")
+        void shouldNotModifyPathWhenPathEnumAfterReject() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().reject("businessRule");
 
             // When: path(TestEnum.VALUE1) is called after reject()
             meter.path(TestEnum.VALUE1);
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "VALUE1", "businessRule", null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Throwable) is called after reject()")
-        void shouldModifyPathEvenWhenPathThrowableAfterReject() {
+        @DisplayName("should NOT modify okPath when path(Throwable) is called after reject()")
+        void shouldNotModifyPathWhenPathThrowableAfterReject() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().reject("businessRule");
 
             // When: path(new Exception()) is called after reject()
             meter.path(new RuntimeException("test"));
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "RuntimeException", "businessRule", null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Object) is called after reject()")
-        void shouldModifyPathEvenWhenPathObjectAfterReject() {
+        @DisplayName("should NOT modify okPath when path(Object) is called after reject()")
+        void shouldNotModifyPathWhenPathObjectAfterReject() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().reject("businessRule");
 
             // When: path(new TestObject()) is called after reject()
             meter.path(new TestObject());
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "testObjectString", "businessRule", null, null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(String) is called after fail()")
-        void shouldModifyPathEvenWhenPathStringAfterFail() {
+        @DisplayName("should NOT modify okPath when path(String) is called after fail()")
+        void shouldNotModifyPathWhenPathStringAfterFail() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().fail("error occurred");
 
             // When: path("newPath") is called after fail()
             meter.path("newPath");
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "newPath", null, "error occurred", null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Enum) is called after fail()")
-        void shouldModifyPathEvenWhenPathEnumAfterFail() {
+        @DisplayName("should NOT modify okPath when path(Enum) is called after fail()")
+        void shouldNotModifyPathWhenPathEnumAfterFail() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().fail("error occurred");
 
             // When: path(TestEnum.VALUE1) is called after fail()
             meter.path(TestEnum.VALUE1);
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "VALUE1", null, "error occurred", null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Throwable) is called after fail()")
-        void shouldModifyPathEvenWhenPathThrowableAfterFail() {
+        @DisplayName("should NOT modify okPath when path(Throwable) is called after fail()")
+        void shouldNotModifyPathWhenPathThrowableAfterFail() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().fail("error occurred");
 
             // When: path(new Exception()) is called after fail()
             meter.path(new RuntimeException("test"));
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "RuntimeException", null, "error occurred", null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should modify okPath even when path(Object) is called after fail()")
-        void shouldModifyPathEvenWhenPathObjectAfterFail() {
+        @DisplayName("should NOT modify okPath when path(Object) is called after fail()")
+        void shouldNotModifyPathWhenPathObjectAfterFail() {
             // Given: a new, stopped Meter
             final Meter meter = new Meter(logger).start().fail("error occurred");
 
             // When: path(new TestObject()) is called after fail()
             meter.path(new TestObject());
 
-            // Then: okPath should be modified
-            assertMeterState(meter, true, true, "testObjectString", null, "error occurred", null, 0, 0, 0);
+            // Then: okPath should remain null (illegal call ignored)
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should clear okPath when path(null) is called after ok()")
-        void shouldClearPathWhenPathNullAfterOk() {
-            // Given: a new, stopped Meter
+        @DisplayName("should NOT modify okPath when path(null) is called after ok()")
+        void shouldNotModifyPathWhenPathNullAfterOk() {
+            // Given: a new, stopped Meter with a success path
             final Meter meter = new Meter(logger).start().ok("successPath");
 
-            // When: path(null) is called after ok()
+            // When: path(null) is called after ok() (null argument)
             meter.path(null);
 
-            // Then: okPath should be cleared (null overwrites previous value)
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            // Then: okPath should remain "successPath" (illegal calls ignored)
+            assertMeterState(meter, true, true, "successPath", null, null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker for null argument
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Null argument");
         }
 
         @Test
-        @DisplayName("should clear okPath when path(null) is called after reject()")
-        void shouldClearPathWhenPathNullAfterReject() {
-            // Given: a new, stopped Meter
+        @DisplayName("should NOT modify okPath when path(null) is called after reject()")
+        void shouldNotModifyPathWhenPathNullAfterReject() {
+            // Given: a new, stopped Meter with a reject path and ok path set
             final Meter meter = new Meter(logger).start().reject("businessRule");
-            meter.path("rejectPath");
 
-            // When: path(null) is called after reject()
+            // When: path(null) is called after reject() (null argument)
             meter.path(null);
 
-            // Then: okPath should be cleared (null overwrites previous value)
+            // Then: okPath should remain null (illegal calls ignored)
             assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker for already stopped and null argument
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Null argument");
+            AssertLogger.assertEvent(logger, 5, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
 
         @Test
-        @DisplayName("should clear okPath when path(null) is called after fail()")
-        void shouldClearPathWhenPathNullAfterFail() {
-            // Given: a new, stopped Meter
+        @DisplayName("should NOT modify okPath when path(null) is called after fail()")
+        void shouldNotModifyPathWhenPathNullAfterFail() {
+            // Given: a new, stopped Meter with a fail path and ok path set
             final Meter meter = new Meter(logger).start().fail("error occurred");
-            meter.path("failPath");
 
-            // When: path(null) is called after fail()
+            // When: path(null) is called after fail() (null argument)
             meter.path(null);
 
-            // Then: okPath should be cleared (null overwrites previous value)
+            // Then: okPath should remain null (illegal calls ignored)
             assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
+
+            // Then: error logged with ILLEGAL marker for already stopped and null argument
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
+                "Null argument");
+            AssertLogger.assertEvent(logger, 5, Level.ERROR, Markers.ILLEGAL,
+                "Meter path but already stopped");
         }
     }
 
