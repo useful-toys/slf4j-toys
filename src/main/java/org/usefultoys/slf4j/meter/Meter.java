@@ -488,9 +488,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * Notifies the `Meter` that the operation has completed successfully, specifying an execution path.
      * This method logs a **human-readable summary** (INFO level) and a **machine-parsable data message** (TRACE level)
      * with the current system status. If a time limit was set and exceeded, a WARN level message is logged instead, indicating a slow operation.
+     * <p>
+     * If {@code pathId} is {@code null}, the method completes successfully without modifying the current path.
      *
      * @param pathId An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that identifies
-     *               the successful execution path.
+     *               the successful execution path. If {@code null}, the current path is preserved.
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ok(final Object pathId) {
@@ -515,9 +517,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * alias for {@link #ok(Object)}.
      * This method logs a **human-readable summary** (INFO level) and a **machine-parsable data message** (TRACE level)
      * with the current system status. If a time limit was set and exceeded, a WARN level message is logged instead, indicating a slow operation.
+     * <p>
+     * If {@code pathId} is {@code null}, the method completes successfully without modifying the current path.
      *
      * @param pathId An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that identifies
-     *               the successful execution path.
+     *               the successful execution path. If {@code null}, the current path is preserved.
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter success(final Object pathId) {

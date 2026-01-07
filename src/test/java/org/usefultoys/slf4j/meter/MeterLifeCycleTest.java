@@ -459,7 +459,7 @@ class MeterLifeCycleTest {
         }
 
         @Test
-        @DisplayName("should log error for ok(null) but complete with set path")
+        @DisplayName("should complete with set path when ok(null) is called")
         void shouldCompleteWithPathWhenOkNullAfterPathNonNull() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
@@ -470,7 +470,7 @@ class MeterLifeCycleTest {
             // Then: path is set
             assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
 
-            // When: ok(null) is called (should log error but complete with validPath)
+            // When: ok(null) is called (should complete with validPath preserved)
             meter.ok(null);
 
             // Then: Meter is in stopped state with validPath preserved
@@ -479,6 +479,7 @@ class MeterLifeCycleTest {
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -540,15 +541,15 @@ class MeterLifeCycleTest {
         }
 
         @Test
-        @DisplayName("should log error and continue when ok(null) is called")
+        @DisplayName("should complete successfully when ok(null) is called")
         void shouldLogErrorAndContinueWhenOkNullIsCalled() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
 
-            // When: ok(null) is called (should log error but complete operation)
+            // When: ok(null) is called (should complete operation without path)
             meter.ok(null);
 
-            // Then: Meter is in stopped state
+            // Then: Meter is in stopped state with no path set
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
