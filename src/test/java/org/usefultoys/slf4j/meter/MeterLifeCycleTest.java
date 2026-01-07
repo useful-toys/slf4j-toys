@@ -70,7 +70,7 @@ class MeterLifeCycleTest {
         }
     }
 
-    private void assertMeterState(Meter meter, boolean started, boolean stopped, String okPath, String rejectPath, String failPath, String failMessage, long currentIteration, long expectedIterations) {
+    private void assertMeterState(Meter meter, boolean started, boolean stopped, String okPath, String rejectPath, String failPath, String failMessage, long currentIteration, long expectedIterations, long timeLimitMilliseconds) {
         if (started) {
             assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         } else {
@@ -110,6 +110,7 @@ class MeterLifeCycleTest {
 
         assertEquals(currentIteration, meter.getCurrentIteration(), "currentIteration should match expected value: " + currentIteration);
         assertEquals(expectedIterations, meter.getExpectedIterations(), "expectedIterations should match expected value: " + expectedIterations);
+        assertEquals(timeLimitMilliseconds * 1000 * 1000, meter.getTimeLimit(), "timeLimit should match expected value: " + timeLimitMilliseconds + "ms");
 
         assertTrue(meter.getCreateTime() > 0, "createTime should be > 0");
         if (stopped) {
@@ -131,7 +132,7 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
 
             // Then: meter has expected initial state
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -146,9 +147,46 @@ class MeterLifeCycleTest {
             meter.start();
 
             // Then: Meter is in executing state
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // Then: log messages recorded correctly
+            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+        }
+
+        @Test
+        @DisplayName("should start meter in try-with-resources")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldStartMeterinTryWithResources1() {
+            // Given: Meter is created in try-with-resources
+            try (Meter m = new Meter(logger)) {
+                // Then: meter has expected initial state
+                assertMeterState(m, false, false, null, null, null, null, 0, 0, 0);
+                
+                // When: start() is called
+                m.start();
+                
+                // Then: meter is in executing state
+                assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
+            }
+
+            // Then: start log messages recorded correctly
+            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+        }
+
+        
+        @Test
+        @DisplayName("should start meter with chained call in try-with-resources")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldStartMeterinTryWithResources2() {
+            // Given: Meter is created with chained start() in try-with-resources
+            try (Meter m = new Meter(logger).start()) {
+                // Then: meter is in executing state
+                assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
+            }
+
+            // Then: start log messages recorded correctly
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
         }
@@ -167,7 +205,7 @@ class MeterLifeCycleTest {
             meter.ok();
 
             // Then: Meter is in stopped state
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -184,7 +222,7 @@ class MeterLifeCycleTest {
             meter.ok("customPath");
 
             // Then: Meter is in stopped state with path set
-            assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -201,7 +239,7 @@ class MeterLifeCycleTest {
             meter.ok(TestEnum.VALUE1);
 
             // Then: Meter is in stopped state with enum path
-            assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0);
+            assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -219,7 +257,7 @@ class MeterLifeCycleTest {
             meter.ok(ex);
 
             // Then: Meter is in stopped state with exception class as path
-            assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0);
+            assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -237,7 +275,7 @@ class MeterLifeCycleTest {
             meter.ok(obj);
 
             // Then: Meter is in stopped state with object toString as path
-            assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0);
+            assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -254,13 +292,13 @@ class MeterLifeCycleTest {
             meter.path("predefinedPath");
 
             // Then: path is set
-            assertMeterState(meter, true, false, "predefinedPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, false, "predefinedPath", null, null, null, 0, 0, 0);
 
             // When: ok() is called
             meter.ok();
 
             // Then: Meter is in stopped state with path preserved
-            assertMeterState(meter, true, true, "predefinedPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "predefinedPath", null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -277,13 +315,13 @@ class MeterLifeCycleTest {
             meter.path(TestEnum.VALUE2);
 
             // Then: enum path is set
-            assertMeterState(meter, true, false, TestEnum.VALUE2.name(), null, null, null, 0, 0);
+            assertMeterState(meter, true, false, TestEnum.VALUE2.name(), null, null, null, 0, 0, 0);
 
             // When: ok() is called
             meter.ok();
 
             // Then: Meter is in stopped state with enum path preserved
-            assertMeterState(meter, true, true, TestEnum.VALUE2.name(), null, null, null, 0, 0);
+            assertMeterState(meter, true, true, TestEnum.VALUE2.name(), null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -301,13 +339,13 @@ class MeterLifeCycleTest {
             meter.path(ex);
 
             // Then: exception class is set as path
-            assertMeterState(meter, true, false, ex.getClass().getSimpleName(), null, null, null, 0, 0);
+            assertMeterState(meter, true, false, ex.getClass().getSimpleName(), null, null, null, 0, 0, 0);
 
             // When: ok() is called
             meter.ok();
 
             // Then: Meter is in stopped state with exception path preserved
-            assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0);
+            assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -325,13 +363,13 @@ class MeterLifeCycleTest {
             meter.path(obj);
 
             // Then: object toString is set as path
-            assertMeterState(meter, true, false, obj.toString(), null, null, null, 0, 0);
+            assertMeterState(meter, true, false, obj.toString(), null, null, null, 0, 0, 0);
 
             // When: ok() is called
             meter.ok();
 
             // Then: Meter is in stopped state with object path preserved
-            assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0);
+            assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -348,13 +386,13 @@ class MeterLifeCycleTest {
             meter.path("initialPath");
 
             // Then: initial path is set
-            assertMeterState(meter, true, false, "initialPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, false, "initialPath", null, null, null, 0, 0, 0);
 
             // When: ok("finalPath") is called (overriding initialPath)
             meter.ok("finalPath");
 
             // Then: final path overrides initial path
-            assertMeterState(meter, true, true, "finalPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "finalPath", null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -371,19 +409,19 @@ class MeterLifeCycleTest {
             meter.path("firstPath");
 
             // Then: first path is set
-            assertMeterState(meter, true, false, "firstPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, false, "firstPath", null, null, null, 0, 0, 0);
 
             // When: path("secondPath") is called (should override firstPath)
             meter.path("secondPath");
 
             // Then: second path overrides first path
-            assertMeterState(meter, true, false, "secondPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, false, "secondPath", null, null, null, 0, 0, 0);
 
             // When: ok() is called
             meter.ok();
 
             // Then: Meter is in stopped state with second path preserved
-            assertMeterState(meter, true, true, "secondPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "secondPath", null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -400,19 +438,19 @@ class MeterLifeCycleTest {
             meter.path("validPath");
 
             // Then: path is set
-            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
 
             // When: path(null) is called (should log error and clear path)
             meter.path(null);
 
             // Then: path is cleared
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: ok() is called
             meter.ok();
 
             // Then: Meter is in stopped state
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
@@ -430,13 +468,13 @@ class MeterLifeCycleTest {
             meter.path("validPath");
 
             // Then: path is set
-            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
 
             // When: ok(null) is called (should log error but complete with validPath)
             meter.ok(null);
 
             // Then: Meter is in stopped state with validPath preserved
-            assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
@@ -453,7 +491,7 @@ class MeterLifeCycleTest {
             meter.success();
 
             // Then: Meter is in stopped state
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -470,7 +508,7 @@ class MeterLifeCycleTest {
             meter.success("aliasPath");
 
             // Then: Meter is in stopped state with path set
-            assertMeterState(meter, true, true, "aliasPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "aliasPath", null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
@@ -487,13 +525,13 @@ class MeterLifeCycleTest {
             meter.path(null);
 
             // Then: path remains null
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: ok() is called after null path
             meter.ok();
 
             // Then: Meter is in stopped state
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
@@ -511,7 +549,7 @@ class MeterLifeCycleTest {
             meter.ok(null);
 
             // Then: Meter is in stopped state
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
@@ -522,17 +560,30 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should log slow operation when limit is exceeded")
         void shouldLogSlowOperationWhenLimitIsExceeded() throws InterruptedException {
-            // Given: a new, started Meter with very short time limit
+            // Given: a new Meter
             final Meter meter = new Meter(logger);
+            
+            // Then: meter has expected initial state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            
+            // When: limitMilliseconds(1) is called
             meter.limitMilliseconds(1);
+            
+            // Then: time limit is set
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 1);
+            
+            // When: start() is called
             meter.start();
+            
+            // Then: meter is in executing state with time limit
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 1);
 
             // When: operation takes longer than limit
             Thread.sleep(10);
             meter.ok();
 
-            // Then: Meter is in stopped state
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            // Then: Meter is in stopped state with time limit preserved
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 1);
 
             // Then: MSG_SLOW_OK (WARN) should be logged instead of MSG_OK (INFO)
             AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
@@ -548,13 +599,13 @@ class MeterLifeCycleTest {
         void shouldModifyPathEvenWhenPathStringBeforeStart() {
             // Given: a new Meter (Created state)
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
 
             // When: path("pathId") is called before start()
             meter.path("pathId");
 
             // Then: path is set (path() does not validate preconditions)
-            assertMeterState(meter, false, false, "pathId", null, null, null, 0, 0);
+            assertMeterState(meter, false, false, "pathId", null, null, null, 0, 0, 0);
         }
 
         @Test
@@ -562,13 +613,13 @@ class MeterLifeCycleTest {
         void shouldModifyPathEvenWhenPathEnumBeforeStart() {
             // Given: a new Meter (Created state)
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
 
             // When: path(TestEnum.VALUE1) is called before start()
             meter.path(TestEnum.VALUE1);
 
             // Then: path is set (path() does not validate preconditions)
-            assertMeterState(meter, false, false, "VALUE1", null, null, null, 0, 0);
+            assertMeterState(meter, false, false, "VALUE1", null, null, null, 0, 0, 0);
         }
 
         @Test
@@ -576,13 +627,13 @@ class MeterLifeCycleTest {
         void shouldModifyPathEvenWhenPathThrowableBeforeStart() {
             // Given: a new Meter (Created state)
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
 
             // When: path(new Exception()) is called before start()
             meter.path(new RuntimeException("test"));
 
             // Then: path is set (path() does not validate preconditions)
-            assertMeterState(meter, false, false, "RuntimeException", null, null, null, 0, 0);
+            assertMeterState(meter, false, false, "RuntimeException", null, null, null, 0, 0, 0);
         }
 
         @Test
@@ -590,13 +641,13 @@ class MeterLifeCycleTest {
         void shouldModifyPathEvenWhenPathObjectBeforeStart() {
             // Given: a new Meter (Created state)
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
 
             // When: path(new TestObject()) is called before start()
             meter.path(new TestObject());
 
             // Then: path is set (path() does not validate preconditions)
-            assertMeterState(meter, false, false, "testObjectString", null, null, null, 0, 0);
+            assertMeterState(meter, false, false, "testObjectString", null, null, null, 0, 0, 0);
         }
 
         @Test
@@ -605,13 +656,13 @@ class MeterLifeCycleTest {
             // Given: a new Meter (Created state) with a path already set
             final Meter meter = new Meter(logger);
             meter.path("initialPath");
-            assertMeterState(meter, false, false, "initialPath", null, null, null, 0, 0);
+            assertMeterState(meter, false, false, "initialPath", null, null, null, 0, 0, 0);
 
             // When: path(null) is called before start()
             meter.path(null);
 
             // Then: okPath should be cleared (null overwrites previous value)
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         }
     }
 
@@ -628,7 +679,7 @@ class MeterLifeCycleTest {
             meter.reject("businessRule");
 
             // Then: Meter is in stopped state with reject path set
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
@@ -645,7 +696,7 @@ class MeterLifeCycleTest {
             meter.reject(TestEnum.VALUE1);
 
             // Then: Meter is in stopped state with enum reject path
-            assertMeterState(meter, true, true, null, TestEnum.VALUE1.name(), null, null, 0, 0);
+            assertMeterState(meter, true, true, null, TestEnum.VALUE1.name(), null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
@@ -663,7 +714,7 @@ class MeterLifeCycleTest {
             meter.reject(ex);
 
             // Then: Meter is in stopped state with exception class as reject path
-            assertMeterState(meter, true, true, null, ex.getClass().getSimpleName(), null, null, 0, 0);
+            assertMeterState(meter, true, true, null, ex.getClass().getSimpleName(), null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
@@ -681,7 +732,7 @@ class MeterLifeCycleTest {
             meter.reject(obj);
 
             // Then: Meter is in stopped state with object toString as reject path
-            assertMeterState(meter, true, true, null, obj.toString(), null, null, 0, 0);
+            assertMeterState(meter, true, true, null, obj.toString(), null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
@@ -703,7 +754,7 @@ class MeterLifeCycleTest {
             meter.fail(ex);
 
             // Then: Meter is in stopped state with exception details in fail path
-            assertMeterState(meter, true, true, null, null, ex.getClass().getName(), ex.getMessage(), 0, 0);
+            assertMeterState(meter, true, true, null, null, ex.getClass().getName(), ex.getMessage(), 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
@@ -720,7 +771,7 @@ class MeterLifeCycleTest {
             meter.fail("technical error");
 
             // Then: Meter is in stopped state with failure message
-            assertMeterState(meter, true, true, null, null, "technical error", null, 0, 0);
+            assertMeterState(meter, true, true, null, null, "technical error", null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
@@ -737,7 +788,7 @@ class MeterLifeCycleTest {
             meter.fail(TestEnum.VALUE2);
 
             // Then: Meter is in stopped state with enum fail path
-            assertMeterState(meter, true, true, null, null, TestEnum.VALUE2.name(), null, 0, 0);
+            assertMeterState(meter, true, true, null, null, TestEnum.VALUE2.name(), null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
@@ -755,7 +806,7 @@ class MeterLifeCycleTest {
             meter.fail(obj);
 
             // Then: Meter is in stopped state with object toString as fail path
-            assertMeterState(meter, true, true, null, null, obj.toString(), null, 0, 0);
+            assertMeterState(meter, true, true, null, null, obj.toString(), null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
@@ -772,15 +823,15 @@ class MeterLifeCycleTest {
             final Meter meter;
             // When: Meter is used in try-with-resources and not explicitly stopped
             try (Meter m = new Meter(logger)) {
-                assertMeterState(m, false, false, null, null, null, null, 0, 0);
+                assertMeterState(m, false, false, null, null, null, null, 0, 0, 0);
                 m.start();
-                assertMeterState(m, true, false, null, null, null, null, 0, 0);
+                assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
                 meter = m;
                 // do nothing
             }
 
             // Then: it should be automatically failed on close()
-            assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0);
+            assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
 
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
@@ -800,7 +851,7 @@ class MeterLifeCycleTest {
             }
 
             // Then: it should remain in success state after close()
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
@@ -820,7 +871,7 @@ class MeterLifeCycleTest {
             }
 
             // Then: it should remain in rejection state after close()
-            assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0);
+            assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
 
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
@@ -840,7 +891,7 @@ class MeterLifeCycleTest {
             }
 
             // Then: it should remain in failure state after close()
-            assertMeterState(meter, true, true, null, null, "failed", null, 0, 0);
+            assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
 
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
@@ -859,13 +910,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.ok();
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // When: path("newPath") is called after ok()
             meter.path("newPath");
 
             // Then: okPath should be modified (path() does not validate postcondition)
-            assertMeterState(meter, true, true, "newPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "newPath", null, null, null, 0, 0, 0);
         }
 
         @Test
@@ -875,13 +926,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.ok();
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // When: path(TestEnum.VALUE1) is called after ok()
             meter.path(TestEnum.VALUE1);
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0);
+            assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0, 0);
         }
 
         @Test
@@ -891,13 +942,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.ok();
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // When: path(new Exception()) is called after ok()
             meter.path(new RuntimeException("test"));
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
         }
 
         @Test
@@ -907,13 +958,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.ok();
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // When: path(new TestObject()) is called after ok()
             meter.path(new TestObject());
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
         }
 
         @Test
@@ -923,13 +974,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.reject("businessRule");
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
 
             // When: path("newPath") is called after reject()
             meter.path("newPath");
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "newPath", "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, "newPath", "businessRule", null, null, 0, 0, 0);
         }
 
         @Test
@@ -939,13 +990,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.reject("businessRule");
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
 
             // When: path(TestEnum.VALUE1) is called after reject()
             meter.path(TestEnum.VALUE1);
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "VALUE1", "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, "VALUE1", "businessRule", null, null, 0, 0, 0);
         }
 
         @Test
@@ -955,13 +1006,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.reject("businessRule");
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
 
             // When: path(new Exception()) is called after reject()
             meter.path(new RuntimeException("test"));
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "RuntimeException", "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, "RuntimeException", "businessRule", null, null, 0, 0, 0);
         }
 
         @Test
@@ -971,13 +1022,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.reject("businessRule");
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
 
             // When: path(new TestObject()) is called after reject()
             meter.path(new TestObject());
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "testObjectString", "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, "testObjectString", "businessRule", null, null, 0, 0, 0);
         }
 
         @Test
@@ -987,13 +1038,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.fail("error occurred");
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
 
             // When: path("newPath") is called after fail()
             meter.path("newPath");
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "newPath", null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, "newPath", null, "error occurred", null, 0, 0, 0);
         }
 
         @Test
@@ -1003,13 +1054,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.fail("error occurred");
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
 
             // When: path(TestEnum.VALUE1) is called after fail()
             meter.path(TestEnum.VALUE1);
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "VALUE1", null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, "VALUE1", null, "error occurred", null, 0, 0, 0);
         }
 
         @Test
@@ -1019,13 +1070,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.fail("error occurred");
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
 
             // When: path(new Exception()) is called after fail()
             meter.path(new RuntimeException("test"));
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "RuntimeException", null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, "RuntimeException", null, "error occurred", null, 0, 0, 0);
         }
 
         @Test
@@ -1035,13 +1086,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.fail("error occurred");
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
 
             // When: path(new TestObject()) is called after fail()
             meter.path(new TestObject());
 
             // Then: okPath should be modified
-            assertMeterState(meter, true, true, "testObjectString", null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, "testObjectString", null, "error occurred", null, 0, 0, 0);
         }
 
         @Test
@@ -1051,13 +1102,13 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             meter.ok("successPath");
-            assertMeterState(meter, true, true, "successPath", null, null, null, 0, 0);
+            assertMeterState(meter, true, true, "successPath", null, null, null, 0, 0, 0);
 
             // When: path(null) is called after ok()
             meter.path(null);
 
             // Then: okPath should be cleared (null overwrites previous value)
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         }
 
         @Test
@@ -1068,13 +1119,13 @@ class MeterLifeCycleTest {
             meter.start();
             meter.reject("businessRule");
             meter.path("rejectPath");
-            assertMeterState(meter, true, true, "rejectPath", "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, "rejectPath", "businessRule", null, null, 0, 0, 0);
 
             // When: path(null) is called after reject()
             meter.path(null);
 
             // Then: okPath should be cleared (null overwrites previous value)
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0);
+            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
         }
 
         @Test
@@ -1085,13 +1136,13 @@ class MeterLifeCycleTest {
             meter.start();
             meter.fail("error occurred");
             meter.path("failPath");
-            assertMeterState(meter, true, true, "failPath", null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, "failPath", null, "error occurred", null, 0, 0, 0);
 
             // When: path(null) is called after fail()
             meter.path(null);
 
             // Then: okPath should be cleared (null overwrites previous value)
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0);
+            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
         }
     }
 
@@ -1107,14 +1158,14 @@ class MeterLifeCycleTest {
 
             // When: incBy(10) is called
             meter.incBy(10);
-            assertMeterState(meter, true, false, null, null, null, null, 10, 100);
+            assertMeterState(meter, true, false, null, null, null, null, 10, 100, 0);
 
             // When: incTo(50) is called
             meter.incTo(50);
-            assertMeterState(meter, true, false, null, null, null, null, 50, 100);
+            assertMeterState(meter, true, false, null, null, null, null, 50, 100, 0);
 
             meter.ok();
-            assertMeterState(meter, true, true, null, null, null, null, 50, 100);
+            assertMeterState(meter, true, true, null, null, null, null, 50, 100, 0);
         }
     }
 }
