@@ -26,13 +26,20 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
   - **Important**: Before running any build commands, ensure `JAVA_HOME` points to this JDK and that it is first in the `PATH`.
 - **Terminal**: PowerShell (Windows) or equivalent shell (Unix/Linux/macOS)
   - **Important**: Use the terminal directly to run commands. Never create a sub-shell (e.g., do not use `powershell -c "..."`, `cmd /c "..."`) to ensure environment variables and terminal state are preserved.
-  - **JAVA_HOME Setup (PowerShell)**: Set `JAVA_HOME` permanently for the terminal session using:
+  - **JAVA_HOME Setup (PowerShell - Session Permanent)**: To set `JAVA_HOME` for the current terminal session (permanent for this session only), execute once:
     ```powershell
     $jdk21 = Get-ChildItem -Path "$env:USERPROFILE\.jdks" -Filter "*21*" | Sort-Object -Property Name -Descending | Select-Object -First 1
-    $env:JAVA_HOME = $jdk21.FullName
-    $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+    if ($null -ne $jdk21) {
+        $env:JAVA_HOME = $jdk21.FullName
+        $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+    }
     ```
-    This command finds the latest JDK 21 in `.jdks`, sets `JAVA_HOME`, and ensures it appears first in `PATH`.
+    This command finds the latest JDK 21 in `.jdks` and sets `JAVA_HOME` for the current terminal session. The setting will persist for all subsequent commands in this terminal, but will be lost when you close the terminal.
+  - **Verification**: To verify the setup:
+    ```powershell
+    java -version
+    $env:JAVA_HOME
+    ```
 - **IDEs**: IntelliJ IDEA, VS Code, GitHub Codespaces
 - **Version Control**: Git
 
