@@ -24,12 +24,15 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.usefultoys.slf4j.meter.Meter;
 
+import java.lang.reflect.AnnotatedElement;
+import java.util.Optional;
+
 /**
  * JUnit 5 extension that validates and ensures the Meter thread-local stack is clean.
  * <p>
  * This extension ensures that {@link Meter#getCurrentInstance()} returns the "unknown" Meter
  * (with category equal to {@code "???"}), before each test method. After each test, the behavior
- * depends on whether the test passed or failed.
+ * depends on whether the test passed or failed, and the {@code expectDirtyStack} parameter.
  * <p>
  * <b>Before test:</b> Ensures the stack is clean by removing any leftover Meter instances.
  * This prevents cascade failures from previous tests and provides a clean slate.
@@ -38,12 +41,21 @@ import org.usefultoys.slf4j.meter.Meter;
  * <ul>
  *   <li><b>If the test failed:</b> Cleans the Meter stack by closing any active Meter instances,
  *       preventing cascade failures in subsequent tests. No validation is performed.</li>
- *   <li><b>If the test passed:</b> Validates that the stack is clean. If a Meter is still active,
- *       the test fails with a descriptive message indicating the current test did not clean up properly.</li>
+ *   <li><b>If the test passed:</b>
+ *     <ul>
+ *       <li><b>If {@code expectDirtyStack = false} (default):</b> Validates that the stack is clean.
+ *           If a Meter is still active, the test fails with a descriptive message.</li>
+ *       <li><b>If {@code expectDirtyStack = true}:</b> Cleans the Meter stack without validation
+ *           or failure. This is useful for tests that intentionally leave Meters on the stack.</li>
+ *     </ul>
+ *   </li>
  * </ul>
  * <p>
+ * The annotation can be applied at both class and method level. Method-level annotations take precedence
+ * over class-level settings for determining the {@code expectDirtyStack} behavior.
+ * <p>
  * This approach provides both resilience (removes leftover state) and visibility
- * (fails if current test leaves the stack dirty when it passes).
+ * (fails if current test leaves the stack dirty when it shouldn't).
  * <p>
  * <b>Usage:</b>
  * <pre>{@code
@@ -83,17 +95,22 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
     /**
      * Handles Meter stack cleanup after the test completes.
      * <p>
-     * Behavior depends on whether the test passed or failed:
+     * Behavior depends on whether the test passed or failed, and the {@code expectDirtyStack} parameter:
      * <ul>
      *   <li><b>Test failed:</b> Cleans the Meter stack (same as {@code beforeEach}) to prevent
      *       cascade failures in subsequent tests. No validation is performed.</li>
-     *   <li><b>Test passed:</b> Validates that the Meter stack is clean. If a non-unknown Meter
-     *       is found, fails the test with a descriptive message indicating the test did not
-     *       properly clean up the Meter stack.</li>
+     *   <li><b>Test passed:</b>
+     *     <ul>
+     *       <li><b>If {@code expectDirtyStack = false} (default):</b> Validates that the Meter stack is clean.
+     *           If a non-unknown Meter is found, fails the test with a descriptive message.</li>
+     *       <li><b>If {@code expectDirtyStack = true}:</b> Cleans the Meter stack without validation
+     *           or failure. This is useful for tests that intentionally leave Meters on the stack.</li>
+     *     </ul>
+     *   </li>
      * </ul>
      *
      * @param context the current extension context
-     * @throws AssertionError if the test passed but a non-unknown Meter is found on the thread-local stack
+     * @throws AssertionError if the test passed, expectDirtyStack=false, and a non-unknown Meter is found
      */
     @Override
     public void afterEach(final ExtensionContext context) {
@@ -104,9 +121,44 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
             // Test failed: clean the stack to prevent cascade failures
             ensureMeterStackIsClean(context);
         } else {
-            // Test passed: validate the stack is clean, fail if not
-            validateMeterStackIsClean("after", context);
+            // Test passed: check if dirty stack is expected
+            final boolean expectDirtyStack = getExpectDirtyStack(context);
+            if (expectDirtyStack) {
+                // Dirty stack is expected - clean without validation
+                ensureMeterStackIsClean(context);
+            } else {
+                // Dirty stack is NOT expected - validate and fail if not clean
+                validateMeterStackIsClean("after", context);
+            }
         }
+    }
+
+    /**
+     * Retrieves the {@code expectDirtyStack} parameter from the ValidateCleanMeter annotation.
+     * <p>
+     * Checks method-level annotation first, then falls back to class-level annotation.
+     * Method-level annotations take precedence over class-level settings.
+     *
+     * @param context the test execution context
+     * @return {@code true} if dirty stack is expected, {@code false} otherwise (default)
+     */
+    private boolean getExpectDirtyStack(final ExtensionContext context) {
+        // Check method-level annotation first
+        final Optional<ValidateCleanMeter> methodAnnotation = context.getTestMethod()
+                .flatMap(method -> Optional.ofNullable(method.getAnnotation(ValidateCleanMeter.class)));
+        if (methodAnnotation.isPresent()) {
+            return methodAnnotation.get().expectDirtyStack();
+        }
+
+        // Fall back to class-level annotation
+        final Optional<ValidateCleanMeter> classAnnotation = context.getTestClass()
+                .flatMap(clazz -> Optional.ofNullable(clazz.getAnnotation(ValidateCleanMeter.class)));
+        if (classAnnotation.isPresent()) {
+            return classAnnotation.get().expectDirtyStack();
+        }
+
+        // Default: dirty stack is NOT expected
+        return false;
     }
 
     /**
