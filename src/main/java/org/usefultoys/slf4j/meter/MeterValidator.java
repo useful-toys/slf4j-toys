@@ -230,14 +230,18 @@ public class MeterValidator {
 
     /**
      * Validates the precondition for setting a path on a Meter.
-     * A path cannot be set if the meter has not been started.
+     * A path cannot be set if the meter has not been started or has already been stopped.
      *
      * @param meter The Meter instance to validate.
-     * @return {@code true} if the precondition is met (started), {@code false} otherwise.
+     * @return {@code true} if the precondition is met (started and not stopped), {@code false} otherwise.
      */
     public boolean validatePathPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
             logIllegalPrecondition(meter, Markers.ILLEGAL, "Meter path but not started");
+            return false;
+        }
+        if (meter.getStopTime() != 0) {
+            logIllegalPrecondition(meter, Markers.ILLEGAL, "Meter path but already stopped");
             return false;
         }
         return true;
