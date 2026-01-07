@@ -219,6 +219,41 @@ When writing documentation (guides, TDRs, implementation docs, etc.):
 
 ## Development Workflow
 
+### Test Execution Strategy
+
+**Important**: This project uses **two separate Surefire executions** with isolated classpaths to avoid SLF4J binding conflicts. You MUST specify which test execution to run:
+
+**Available Test Executions:**
+- **`unit-tests`** (default, enabled): Uses `MockLogger` from `slf4j-test-mock` for isolated testing
+  - All tests EXCEPT those matching `**/logback/**/*Test.java`
+  - Run with: `mvnw test` (runs unit-tests by default)
+  - Or explicit: `mvnw -Dgroups=unit-tests test`
+
+- **`logback-tests`** (currently disabled): Uses real `Logback` logger implementation
+  - Only tests matching `**/logback/**/*Test.java`
+  - To enable: Set `<skip>false</skip>` in logback-tests execution in pom.xml
+  - Run with: `mvnw -Dgroups=logback-tests test`
+
+**Why Two Executions?**
+- SLF4J ServiceLoader can only bind ONE logger implementation at runtime
+- Having both `slf4j-test-mock` and `logback-classic` on the same classpath causes runtime binding conflicts
+- Each execution removes its incompatible dependency via `<classpathDependencyExcludes>`
+
+**When Running Tests for a Specific Class:**
+- If the class is in `org/usefultoys/slf4j/meter/MeterLifeCycleTest.java` → runs in `unit-tests` execution
+- If the class is in `**/logback/**/*Test.java` → runs in `logback-tests` execution
+
+**⚠️ Critical Warning**: Running `mvnw test` without specifying the execution may cause:
+- `NullPointerException: Cannot invoke "org.slf4j.Logger.getName()" because "logger" is null`
+- `ClassCastException` between MockLogger and Logback Logger
+- Other false negative failures unrelated to actual code bugs
+
+These errors occur when Surefire tries to run unit tests with the logback-tests classpath (or vice versa). Always verify which execution completed successfully.
+
+**Current Status**:
+- `unit-tests`: **Enabled** (51+ tests in MeterLifeCycleTest)
+- `logback-tests`: **Disabled** (no tests currently matching this pattern)
+
 ### Code Generation
 - If code is adjusted, generated, or altered by AI, the class must include a Javadoc `@author` tag: `@author Co-authored-by: AI name using model name`
 - If an AI co-authorship `@author` tag already exists for a different model or AI, it must be preserved, and a new `@author` tag for the current AI and model must be added.
