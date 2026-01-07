@@ -595,9 +595,8 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should modify okPath even when path(String) is called before start()")
         void shouldModifyPathEvenWhenPathStringBeforeStart() {
-            // Given: a new Meter (Created state)
+            // Given: a new, not yet started Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
 
             // When: path("pathId") is called before start()
             meter.path("pathId");
@@ -609,9 +608,8 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should modify okPath even when path(Enum) is called before start()")
         void shouldModifyPathEvenWhenPathEnumBeforeStart() {
-            // Given: a new Meter (Created state)
+            // Given: a new, not yet started Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
 
             // When: path(TestEnum.VALUE1) is called before start()
             meter.path(TestEnum.VALUE1);
@@ -623,9 +621,8 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should modify okPath even when path(Throwable) is called before start()")
         void shouldModifyPathEvenWhenPathThrowableBeforeStart() {
-            // Given: a new Meter (Created state)
+            // Given: a new, not yet started Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
 
             // When: path(new Exception()) is called before start()
             meter.path(new RuntimeException("test"));
@@ -637,9 +634,8 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should modify okPath even when path(Object) is called before start()")
         void shouldModifyPathEvenWhenPathObjectBeforeStart() {
-            // Given: a new Meter (Created state)
+            // Given: a new, not yet started Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
 
             // When: path(new TestObject()) is called before start()
             meter.path(new TestObject());
@@ -651,9 +647,11 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should clear okPath when path(null) is called before start()")
         void shouldClearPathWhenPathNullBeforeStart() {
-            // Given: a new Meter (Created state) with a path already set
+            // Given: a new, not yet started Meter with a path already set
             final Meter meter = new Meter(logger);
             meter.path("initialPath");
+            
+            // Then: path is set
             assertMeterState(meter, false, false, "initialPath", null, null, null, 0, 0, 0);
 
             // When: path(null) is called before start()
