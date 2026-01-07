@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.usefultoys.test.ResetSessionConfig;
 import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,6 +49,7 @@ import static org.usefultoys.slf4j.meter.MeterData.NULL_VALUE;
 @ValidateCharset
 @WithLocale("en")
 @ResetSessionConfig
+@ValidateCleanMeter
 class MeterContextTest {
 
     // Implementação de teste da interface MeterContext

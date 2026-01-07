@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.impl.MockLogger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.test.ValidateCleanMeter;
 
 import java.nio.charset.Charset;
 
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Daniel Felix Ferber
  */
+@ValidateCleanMeter
 public class MeterTimeAttributesLegacyTest {
 
 
@@ -501,6 +503,7 @@ public class MeterTimeAttributesLegacyTest {
 
     @Test
     @DisplayName("Should correctly update time attributes on repeated start() calls")
+    @ValidateCleanMeter(expectDirtyStack = true)
     public void shouldUpdateTimesOnRepeatedStart() throws InterruptedException {
         final long now0 = System.nanoTime();
         final Meter m = new Meter(logger);

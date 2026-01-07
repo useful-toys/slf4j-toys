@@ -24,6 +24,7 @@ import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -54,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ResetMeterConfig
 @WithLocale("en")
 @WithMockLogger
+@ValidateCleanMeter
 class MeterConstructorTest {
 
     private static final String TEST_CATEGORY = "test.category";

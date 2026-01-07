@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import java.util.HashMap;
@@ -55,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ValidateCharset
 @ResetMeterConfig
 @WithLocale("en")
+@ValidateCleanMeter
 class MeterDataFormatterTest {
 
     private static final String TEST_CATEGORY = "org.example.TestCategory";
