@@ -27,13 +27,19 @@ import java.lang.annotation.Target;
  * Test annotation to validate that the Meter stack is clean before and after each test.
  * <p>
  * This annotation ensures that {@link org.usefultoys.slf4j.meter.Meter#getCurrentInstance()}
- * returns the "unknown" Meter (with category equal to {@code "???"}) both before and after
- * each test method. This validates that the thread-local Meter stack is properly cleaned up
- * and no Meter instances are left hanging in the thread after test execution.
+ * returns the "unknown" Meter (with category equal to {@code "???"}) before each test method.
  * <p>
- * The validation runs before each test and after each test. If a Meter instance with a
- * non-unknown category is found on the thread-local stack, the test fails with a descriptive
- * error message indicating that the Meter stack is not clean.
+ * <b>Before each test:</b> Automatically cleans any leftover Meter instances from previous tests,
+ * providing a clean slate and preventing cascade failures.
+ * <p>
+ * <b>After each test:</b>
+ * <ul>
+ *   <li><b>If the test failed:</b> Automatically cleans the Meter stack to prevent cascade
+ *       failures in subsequent tests. No validation is performed.</li>
+ *   <li><b>If the test passed:</b> Validates that the stack is clean. If a non-unknown Meter
+ *       is found, the test fails with a descriptive error message indicating the test did
+ *       not properly clean up the Meter thread-local stack.</li>
+ * </ul>
  * <p>
  * <b>Usage on test class:</b>
  * <pre>{@code
