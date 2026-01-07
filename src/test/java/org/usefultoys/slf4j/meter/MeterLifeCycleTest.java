@@ -202,6 +202,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with enum path
             assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -216,6 +220,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with exception class as path
             assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -230,6 +238,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with object toString as path
             assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -272,6 +284,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with enum path preserved
             assertMeterState(meter, true, true, TestEnum.VALUE2.name(), null, null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -292,6 +308,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with exception path preserved
             assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -312,6 +332,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with object path preserved
             assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -381,9 +405,8 @@ class MeterLifeCycleTest {
             // When: path(null) is called (should log error and clear path)
             meter.path(null);
 
-            // Then: path is cleared and error is logged
+            // Then: path is cleared
             assertMeterState(meter, true, false, null, null, null, null, 0, 0);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
 
             // When: ok() is called
             meter.ok();
@@ -392,6 +415,7 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, true, null, null, null, null, 0, 0);
 
             // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
         }
@@ -411,8 +435,10 @@ class MeterLifeCycleTest {
             // When: ok(null) is called (should log error but complete with validPath)
             meter.ok(null);
 
-            // Then: Meter is in stopped state with validPath preserved and error logged
+            // Then: Meter is in stopped state with validPath preserved
             assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
         }
@@ -431,6 +457,7 @@ class MeterLifeCycleTest {
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -447,6 +474,7 @@ class MeterLifeCycleTest {
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -458,9 +486,8 @@ class MeterLifeCycleTest {
             // When: path(null) is called (should log error but not throw)
             meter.path(null);
 
-            // Then: path remains null and error is logged
+            // Then: path remains null
             assertMeterState(meter, true, false, null, null, null, null, 0, 0);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
 
             // When: ok() is called after null path
             meter.ok();
@@ -469,7 +496,9 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, true, null, null, null, null, 0, 0);
 
             // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -481,10 +510,13 @@ class MeterLifeCycleTest {
             // When: ok(null) is called (should log error but complete operation)
             meter.ok(null);
 
-            // Then: Meter is in stopped state with error logged
+            // Then: Meter is in stopped state
             assertMeterState(meter, true, true, null, null, null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
@@ -498,6 +530,9 @@ class MeterLifeCycleTest {
             // When: operation takes longer than limit
             Thread.sleep(10);
             meter.ok();
+
+            // Then: Meter is in stopped state
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0);
 
             // Then: MSG_SLOW_OK (WARN) should be logged instead of MSG_OK (INFO)
             AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
@@ -611,6 +646,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with enum reject path
             assertMeterState(meter, true, true, null, TestEnum.VALUE1.name(), null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
         }
 
         @Test
@@ -625,6 +664,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with exception class as reject path
             assertMeterState(meter, true, true, null, ex.getClass().getSimpleName(), null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
         }
 
         @Test
@@ -639,6 +682,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with object toString as reject path
             assertMeterState(meter, true, true, null, obj.toString(), null, null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
         }
     }
 
@@ -674,6 +721,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with failure message
             assertMeterState(meter, true, true, null, null, "technical error", null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
         }
 
         @Test
@@ -687,6 +738,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with enum fail path
             assertMeterState(meter, true, true, null, null, TestEnum.VALUE2.name(), null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
         }
 
         @Test
@@ -701,6 +756,10 @@ class MeterLifeCycleTest {
 
             // Then: Meter is in stopped state with object toString as fail path
             assertMeterState(meter, true, true, null, null, obj.toString(), null, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
         }
     }
 
