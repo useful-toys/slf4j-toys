@@ -400,6 +400,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     /**
      * Sets the success path identifier for the operation. This is typically used with {@link #ok()} to distinguish
      * between different successful outcomes.
+     * <p>
+     * <b>Precondition:</b> This method must be called after {@link #start()}. Calling it before starting the Meter
+     * will log an error with {@link Markers#ILLEGAL} marker and have no effect on the Meter state.
      *
      * @param pathId An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that identifies
      *               the successful execution path.
@@ -407,6 +410,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter path(final Object pathId) {
         MeterValidator.validatePathArgument(this, "path(pathId)", pathId);
+        if (!MeterValidator.validatePathPrecondition(this)) {
+            return this;
+        }
         okPath = toPath(pathId, true);
         return this;
     }

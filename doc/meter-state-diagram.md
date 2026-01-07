@@ -126,9 +126,8 @@ The following table details all possible transitions, including how the API hand
 **Legend:**
 - ✅ **OK**: Condition met in the expected state-changing flow (e.g., `Started -> ok() -> Stopped`).
 - ☑️ **OK**: Condition met in the expected non-state-changing calls (e.g., setting iterations or path).
-- ❔ **Suspicious**: Condition allowed in current implementation, but  (e.g., setting path in any state, or setting path before `start()` or after `stop()`).
 - ⚠️ **Applied**: Condition met, but not in the normal expected flow (e.g., `Created -> ok() -> Stopped`).
-- ❌ **Ignored**: Condition not met, transition not performed, `MeterData` not changed.
+- ❌ **Ignored**: Condition not met, transition not performed.
 
 | From State | Method Call | Condition (to realize transition) | To State | Attributes Changed | Logged (Message/Data) | Behavior |
 |:---|:---|:---|:---|:---|:---|:---|
@@ -138,7 +137,7 @@ The following table details all possible transitions, including how the API hand
 | **Created** | `reject(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Rejected)** | `stopTime = collectCurrentTime()`, `rejectPath = cause` | ERROR (`INCONSISTENT_REJECT`) + INFO (`MSG_REJECT`) / TRACE (`DATA_REJECT`) | **Inconsistent**: transitions to Stopped but logs error. |
 | **Created** | `fail(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath = cause` | ERROR (`INCONSISTENT_FAIL`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
 | **Created** | `iterations(n)` | ✅ `n > 0` (`validateIterationsCallArguments`) | **Created** | `expectedIterations = n` | - | Configures expected iterations. |
-| **Created** | `path(pathId)` | ❔ `-` | **Created** | `okPath = pathId` | - | **Suspicious**: sets path before operation starts; should call path() after start(). |
+| **Created** | `path(pathId)` | ❌ `startTime != 0` (`validatePathPrecondition`) | **Created** | - | ERROR (`ILLEGAL`) | **Ignored**: condition not met. |
 | **Created** | `inc()`, `incBy(n)`, `incTo(n)` | ❌ `startTime != 0` (`validateIncPrecondition`) | **Created** | - | ERROR (`INCONSISTENT_INCREMENT`) | **Ignored**: condition not met. |
 | **Created** | `progress()` | ❌ `startTime != 0` (`validateProgressPrecondition`) | **Created** | - | ERROR (`INCONSISTENT_PROGRESS`) | **Ignored**: condition not met. |
 | **Created** | `close()` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath="try-with-resources"` | ERROR (`INCONSISTENT_CLOSE`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
@@ -146,7 +145,7 @@ The following table details all possible transitions, including how the API hand
 | **Started** | `incBy(n)` | ✅ `n > 0` (`validateIncBy`) AND `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration += n` | - | Increments iteration count by `n`. |
 | **Started** | `incTo(n)` | ✅ `n > 0` AND `n > currentIteration` (`validateIncToArguments`) AND `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration = n` | - | Sets iteration count to `n`. |
 | **Started** | `iterations(n)` | ✅ `n > 0` (`validateIterationsCallArguments`) | **Started** | `expectedIterations = n` | - | Overrides expected iterations. |
-| **Started** | `path(pathId)` | ✅ `-` | **Started** | `okPath = pathId` | - | Sets or overrides the success path (no validation). |
+| **Started** | `path(pathId)` | ✅ `startTime != 0` (`validatePathPrecondition`) | **Started** | `okPath = pathId` | - | Sets or overrides the success path. |
 | **Started** | `progress()` | ✅ `startTime != 0` (`validateProgressPrecondition`) | **Started** | `lastProgressTime = collectCurrentTime()`, `lastProgressIteration = currentIteration` | INFO (`MSG_PROGRESS`) / TRACE (`DATA_PROGRESS`) | Normal progress report. |
 | **Started** | `ok()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination. |
 | **Started** | `ok(pathId)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()`, `okPath = pathId` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination with path. |
@@ -155,7 +154,7 @@ The following table details all possible transitions, including how the API hand
 | **Started** | `close()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath="try-with-resources"` | ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Auto-fail**: triggered by try-with-resources if not stopped. |
 | **Started** | `finalize()` | ⚠️ `startTime != 0 && stopTime == 0` (`validateFinalize`) | **[*]** | - | ERROR (`INCONSISTENT_FINALIZED`) | **GC Collection**: logs error if started but never stopped. |
 | **Started** | `start()` | ❌ `startTime == 0` (`validateStartPrecondition`) | **Started** | - | ERROR (`INCONSISTENT_START`) | **Ignored**: condition not met. |
-| **Stopped** | `path(pathId)` | ❔ `-` | **Stopped** | `okPath = pathId` | - | **Suspicious**: allows path modification after completion; should set path before termination. |
+| **Stopped** | `path(pathId)` | ❌ `startTime != 0 && stopTime == 0` (`validatePathPrecondition`) | **Stopped** | - | ERROR (`ILLEGAL`) | **Ignored**: condition not met. |
 | **Stopped** | `iterations(n)` | ⚠️ `n > 0` (`validateIterationsCallArguments`) | **Stopped** | `expectedIterations = n` | - | **Discouraged**: changes iterations even if already stopped. |
 | **Stopped** | `inc()`, `incBy()`, `incTo()` | ⚠️ `startTime != 0` (`validateIncPrecondition`) | **Stopped** | `currentIteration` | - | **Allowed**: increments even if stopped (current behavior). |
 | **Stopped** | `inc()`, `incBy()`, `incTo()` | ❌ `startTime == 0` (`validateIncPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_INCREMENT`) | **Ignored**: cannot increment if never started. |
@@ -188,6 +187,7 @@ All state validations are handled by [MeterValidator.java](../src/main/java/org/
 - **`validateStopPrecondition()`**: Ensures meter was started and not already stopped (checks `stopTime == 0`).
 - **`validateProgressPrecondition()`**: Ensures meter has been started (checks `startTime != 0`).
 - **`validateIncPrecondition()`**: Ensures meter has been started before incrementing (checks `startTime != 0`).
+- **`validatePathPrecondition()`**: Ensures meter has been started before setting path (checks `startTime != 0`).
 - **`validatePathArgument()`**: Logs an error if path identifiers are null (non-blocking).
 - **`validateIncBy()` / `validateIncToArguments()`**: Validates increment values and forward progress.
 - **`validateFinalize()`**: Detects meters that were started but never stopped (logs error during garbage collection).
