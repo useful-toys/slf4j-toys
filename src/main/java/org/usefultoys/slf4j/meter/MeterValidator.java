@@ -253,11 +253,14 @@ public class MeterValidator {
      * @param meter      The Meter instance.
      * @param methodName The name of the method being called.
      * @param pathId     The path identifier object.
+     * @return {@code true} if the argument is valid, {@code false} otherwise.
      */
-    public void validatePathArgument(final Meter meter, final String methodName, final Object pathId) {
+    public boolean validatePathArgument(final Meter meter, final String methodName, final Object pathId) {
         if (pathId == null) {
             logIllegalCall(meter, methodName, "Null argument");
+            return false;
         }
+        return true;
     }
 
     /**

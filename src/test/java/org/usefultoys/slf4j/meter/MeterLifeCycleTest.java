@@ -440,17 +440,17 @@ class MeterLifeCycleTest {
             // Then: path is set
             assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
 
-            // When: path(null) is called (should log error and clear path)
+            // When: path(null) is called (should log error and ignore, keeping previous path)
             meter.path(null);
 
-            // Then: path is cleared
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            // Then: path is kept as "validPath" (null argument ignored)
+            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
 
             // When: ok() is called
             meter.ok();
 
-            // Then: Meter is in stopped state
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            // Then: Meter is in stopped state with okPath="validPath"
+            assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0, 0);
 
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
@@ -1184,11 +1184,9 @@ class MeterLifeCycleTest {
             // Then: okPath should remain null (illegal calls ignored)
             assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
 
-            // Then: error logged with ILLEGAL marker for already stopped and null argument
+            // Then: error logged with ILLEGAL marker for null argument
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
                 "Null argument");
-            AssertLogger.assertEvent(logger, 5, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
         }
 
         @Test
@@ -1203,11 +1201,9 @@ class MeterLifeCycleTest {
             // Then: okPath should remain null (illegal calls ignored)
             assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
 
-            // Then: error logged with ILLEGAL marker for already stopped and null argument
+            // Then: error logged with ILLEGAL marker for null argument
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
                 "Null argument");
-            AssertLogger.assertEvent(logger, 5, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
         }
     }
 

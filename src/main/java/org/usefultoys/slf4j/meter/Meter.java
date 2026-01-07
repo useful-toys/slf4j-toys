@@ -410,7 +410,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter path(final Object pathId) {
-        MeterValidator.validatePathArgument(this, "path(pathId)", pathId);
+        if (!MeterValidator.validatePathArgument(this, "path(pathId)", pathId)) {
+            return this;
+        }
         if (!MeterValidator.validatePathPrecondition(this)) {
             return this;
         }
