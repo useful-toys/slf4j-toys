@@ -36,18 +36,43 @@ import java.lang.annotation.Target;
  * <ul>
  *   <li><b>If the test failed:</b> Automatically cleans the Meter stack to prevent cascade
  *       failures in subsequent tests. No validation is performed.</li>
- *   <li><b>If the test passed:</b> Validates that the stack is clean. If a non-unknown Meter
- *       is found, the test fails with a descriptive error message indicating the test did
- *       not properly clean up the Meter thread-local stack.</li>
+ *   <li><b>If the test passed:</b>
+ *     <ul>
+ *       <li><b>If {@code expectDirtyStack = false} (default):</b> Validates that the stack is clean.
+ *           If a non-unknown Meter is found, the test fails with a descriptive error message.</li>
+ *       <li><b>If {@code expectDirtyStack = true}:</b> Automatically cleans the Meter stack without
+ *           validation or failure. This is useful for tests that intentionally leave Meters on the stack.</li>
+ *     </ul>
+ *   </li>
  * </ul>
  * <p>
- * <b>Usage on test class:</b>
+ * The annotation can be applied at both class and method level. Method-level annotations take precedence
+ * over class-level settings.
+ * <p>
+ * <b>Usage on test class (default behavior):</b>
  * <pre>{@code
  * @ValidateCleanMeter
  * class MeterOperationTest {
  *     @Test
  *     void testMeterOperation() {
- *         // Test runs with Meter stack validation before and after
+ *         // Must leave stack clean
+ *     }
+ * }
+ * }</pre>
+ * <p>
+ * <b>Usage with expectDirtyStack on specific test:</b>
+ * <pre>{@code
+ * @ValidateCleanMeter
+ * class MeterOperationTest {
+ *     @Test
+ *     void testNormalOperation() {
+ *         // Must leave stack clean
+ *     }
+ *
+ *     @Test
+ *     @ValidateCleanMeter(expectDirtyStack = true)
+ *     void testThatLeavesMeterOnStack() {
+ *         // Allowed to leave stack dirty - will be cleaned automatically
  *     }
  * }
  * }</pre>
@@ -56,6 +81,7 @@ import java.lang.annotation.Target;
  * <ul>
  *   <li>Tests that create and use Meter instances</li>
  *   <li>Tests that verify Meter thread-local stack management</li>
+ *   <li>Tests that intentionally leave Meters on stack (use {@code expectDirtyStack = true})</li>
  *   <li>Integration tests that need to ensure Meter cleanup</li>
  * </ul>
  *
@@ -65,7 +91,22 @@ import java.lang.annotation.Target;
  * @author Daniel Felix Ferber
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @ExtendWith(ValidateCleanMeterExtension.class)
 public @interface ValidateCleanMeter {
+    /**
+     * Indicates whether the test is expected to leave the Meter stack dirty.
+     * <p>
+     * <ul>
+     *   <li><b>false (default):</b> The test must leave the stack clean. If a non-unknown Meter
+     *       is found after the test passes, the test fails with a descriptive error.</li>
+     *   <li><b>true:</b> The test is allowed to leave the stack dirty. After the test passes,
+     *       the stack is automatically cleaned without validation or failure.</li>
+     * </ul>
+     * <p>
+     * Note: If the test fails, the stack is always cleaned regardless of this setting.
+     *
+     * @return {@code true} if the test is expected to leave the stack dirty, {@code false} otherwise
+     */
+    boolean expectDirtyStack() default false;
 }

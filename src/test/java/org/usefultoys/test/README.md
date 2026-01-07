@@ -181,7 +181,15 @@ Validates that the Meter thread-local stack is clean before and after each test.
 Ensures that `Meter.getCurrentInstance()` returns the "unknown" Meter (with category `"???"`)
 both before and after each test method. This prevents Meter instances from leaking between tests.
 
-**Usage:**
+**Behavior:**
+- **Before each test:** Automatically cleans any leftover Meter instances from previous tests
+- **After each test:**
+  - **If test failed:** Cleans the stack to prevent cascade failures in subsequent tests
+  - **If test passed:**
+    - **Default (`expectDirtyStack = false`):** Validates stack is clean, fails if not
+    - **With `expectDirtyStack = true`:** Cleans stack without validation (for tests intentionally leaving Meters)
+
+**Basic Usage:**
 ```java
 @ValidateCleanMeter
 class MeterOperationTest {
@@ -193,7 +201,32 @@ class MeterOperationTest {
             m.start();
             m.ok();
         }
-        // Stack is clean after test execution
+        // Stack must be clean after test execution
+    }
+}
+```
+
+**Advanced Usage - Allowing Dirty Stack:**
+```java
+@ValidateCleanMeter
+class MeterStackTest {
+    @Test
+    void testNormalCleanup() {
+        // Must leave stack clean - test fails if dirty
+        Meter meter = new Meter(logger);
+        meter.start();
+        meter.ok();
+        meter.close();
+    }
+    
+    @Test
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void testStackContamination() {
+        // Allowed to leave Meters on stack
+        // Stack is cleaned automatically without test failure
+        Meter meter = new Meter(logger);
+        meter.start();
+        // Intentionally not closing - testing contamination scenario
     }
 }
 ```
@@ -201,6 +234,7 @@ class MeterOperationTest {
 **Common use cases:**
 - Tests that create and use Meter instances
 - Tests that verify Meter thread-local stack management
+- Tests that intentionally leave Meters on stack (use `expectDirtyStack = true`)
 - Integration tests that need to ensure Meter cleanup
 
 ## Choosing the Right Extension
@@ -230,6 +264,8 @@ class MeterOperationTest {
 - **Tests that use Meter** → Use `@ValidateCleanMeter`
 - Ensures Meter thread-local stack doesn't leak between tests
 - Validates stack is clean both before and after test execution
+- **Tests that intentionally leave Meters on stack** → Use `@ValidateCleanMeter(expectDirtyStack = true)`
+- Stack is cleaned automatically without causing test failure
 
 ## Design Notes
 
