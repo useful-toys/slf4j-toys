@@ -40,8 +40,9 @@ import java.lang.annotation.Target;
  *     <ul>
  *       <li><b>If {@code expectDirtyStack = false} (default):</b> Validates that the stack is clean.
  *           If a non-unknown Meter is found, the test fails with a descriptive error message.</li>
- *       <li><b>If {@code expectDirtyStack = true}:</b> Automatically cleans the Meter stack without
- *           validation or failure. This is useful for tests that intentionally leave Meters on the stack.</li>
+ *       <li><b>If {@code expectDirtyStack = true}:</b> Validates that the stack is dirty (contains
+ *           a non-unknown Meter). If the stack is clean, the test fails with a descriptive error.
+ *           After successful validation, automatically cleans the Meter stack.</li>
  *     </ul>
  *   </li>
  * </ul>
@@ -72,7 +73,7 @@ import java.lang.annotation.Target;
  *     @Test
  *     @ValidateCleanMeter(expectDirtyStack = true)
  *     void testThatLeavesMeterOnStack() {
- *         // Allowed to leave stack dirty - will be cleaned automatically
+ *         // Must leave stack dirty - test will fail if stack is clean
  *     }
  * }
  * }</pre>
@@ -100,8 +101,9 @@ public @interface ValidateCleanMeter {
      * <ul>
      *   <li><b>false (default):</b> The test must leave the stack clean. If a non-unknown Meter
      *       is found after the test passes, the test fails with a descriptive error.</li>
-     *   <li><b>true:</b> The test is allowed to leave the stack dirty. After the test passes,
-     *       the stack is automatically cleaned without validation or failure.</li>
+     *   <li><b>true:</b> The test must leave the stack dirty. After the test passes, the extension
+     *       validates that a non-unknown Meter is on the stack. If the stack is clean, the test
+     *       fails with a descriptive error. After successful validation, the stack is automatically cleaned.</li>
      * </ul>
      * <p>
      * Note: If the test fails, the stack is always cleaned regardless of this setting.

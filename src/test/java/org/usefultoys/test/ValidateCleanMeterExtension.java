@@ -45,8 +45,9 @@ import java.util.Optional;
  *     <ul>
  *       <li><b>If {@code expectDirtyStack = false} (default):</b> Validates that the stack is clean.
  *           If a Meter is still active, the test fails with a descriptive message.</li>
- *       <li><b>If {@code expectDirtyStack = true}:</b> Cleans the Meter stack without validation
- *           or failure. This is useful for tests that intentionally leave Meters on the stack.</li>
+ *       <li><b>If {@code expectDirtyStack = true}:</b> Validates that the stack is dirty (contains
+ *           a non-unknown Meter). If the stack is clean, the test fails with a descriptive message.
+ *           After successful validation, cleans the Meter stack.</li>
  *     </ul>
  *   </li>
  * </ul>
@@ -103,14 +104,15 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
      *     <ul>
      *       <li><b>If {@code expectDirtyStack = false} (default):</b> Validates that the Meter stack is clean.
      *           If a non-unknown Meter is found, fails the test with a descriptive message.</li>
-     *       <li><b>If {@code expectDirtyStack = true}:</b> Cleans the Meter stack without validation
-     *           or failure. This is useful for tests that intentionally leave Meters on the stack.</li>
+     *       <li><b>If {@code expectDirtyStack = true}:</b> Validates that the Meter stack is dirty
+     *           (contains a non-unknown Meter). If the stack is clean, fails the test with a descriptive message.
+     *           After successful validation, cleans the Meter stack.</li>
      *     </ul>
      *   </li>
      * </ul>
      *
      * @param context the current extension context
-     * @throws AssertionError if the test passed, expectDirtyStack=false, and a non-unknown Meter is found
+     * @throws AssertionError if the test passed and the stack state doesn't match expectations
      */
     @Override
     public void afterEach(final ExtensionContext context) {
@@ -124,7 +126,8 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
             // Test passed: check if dirty stack is expected
             final boolean expectDirtyStack = getExpectDirtyStack(context);
             if (expectDirtyStack) {
-                // Dirty stack is expected - clean without validation
+                // Dirty stack is expected - validate it's dirty, then clean
+                validateMeterStackIsDirty("after", context);
                 ensureMeterStackIsClean(context);
             } else {
                 // Dirty stack is NOT expected - validate and fail if not clean
@@ -198,6 +201,30 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
                     "Meter stack must be clean " + timing + " test '" + testName + "': " +
                     "found active Meter  '" + currentMeter.getFullID() + "'";
             ensureMeterStackIsClean(context);        
+            throw new AssertionError(errorMessage);
+        }
+    }
+
+    /**
+     * Validates that the current Meter instance is NOT the unknown Meter (i.e., stack is dirty).
+     * <p>
+     * This validation is used when {@code expectDirtyStack = true} to ensure that the test
+     * actually left a Meter on the stack as expected. If validation fails, the test fails
+     * with a clear message indicating that the stack was unexpectedly clean.
+     *
+     * @param timing a descriptive string indicating when the validation occurred ("after")
+     * @param context the JUnit extension context
+     * @throws AssertionError if the current Meter's category is the unknown logger name (stack is clean)
+     */
+    private void validateMeterStackIsDirty(final String timing, final ExtensionContext context) {
+        final Meter currentMeter = Meter.getCurrentInstance();
+        if (Meter.UNKNOWN_LOGGER_NAME.equals(currentMeter.getCategory())) {
+            final String testName = context.getDisplayName();
+            final String errorMessage =
+                    "Meter stack was expected to be dirty " + timing + " test '" + testName + "', " +
+                    "but found clean stack (unknown Meter). " +
+                    "Test is annotated with @ValidateCleanMeter(expectDirtyStack = true), " +
+                    "but did not leave any Meter on the stack.";
             throw new AssertionError(errorMessage);
         }
     }

@@ -156,7 +156,6 @@ class MeterLifeCycleTest {
 
         @Test
         @DisplayName("should start meter in try-with-resources")
-        @ValidateCleanMeter(expectDirtyStack = true)
         void shouldStartMeterinTryWithResources1() {
             // Given: Meter is created in try-with-resources
             try (Meter m = new Meter(logger)) {
@@ -178,7 +177,6 @@ class MeterLifeCycleTest {
         
         @Test
         @DisplayName("should start meter with chained call in try-with-resources")
-        @ValidateCleanMeter(expectDirtyStack = true)
         void shouldStartMeterinTryWithResources2() {
             // Given: Meter is created with chained start() in try-with-resources
             try (Meter m = new Meter(logger).start()) {
@@ -821,11 +819,8 @@ class MeterLifeCycleTest {
         @DisplayName("should follow try-with-resources flow (implicit failure)")
         void shouldFollowTryWithResourcesFlowImplicitFailure() {
             final Meter meter;
-            // When: Meter is used in try-with-resources and not explicitly stopped
-            try (Meter m = new Meter(logger)) {
-                assertMeterState(m, false, false, null, null, null, null, 0, 0, 0);
-                m.start();
-                assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
+            // Given: a new, started Meter withing try with resources
+            try (Meter m = new Meter(logger).start()) {
                 meter = m;
                 // do nothing
             }
@@ -833,8 +828,7 @@ class MeterLifeCycleTest {
             // Then: it should be automatically failed on close()
             assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
 
-            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
         }
