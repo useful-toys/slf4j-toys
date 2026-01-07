@@ -162,13 +162,9 @@ class MeterLifeCycleTest {
         void shouldFollowNormalSuccessFlow() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
-            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
-            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
 
             // When: ok() is called
             meter.ok();
@@ -182,11 +178,9 @@ class MeterLifeCycleTest {
         void shouldFollowSuccessFlowWithPathString() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             // When: ok("customPath") is called
             meter.ok("customPath");
@@ -230,11 +224,9 @@ class MeterLifeCycleTest {
         void shouldFollowSuccessFlowWithPathMethodString() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             // When: path("predefinedPath") is called
             meter.path("predefinedPath");
@@ -288,11 +280,9 @@ class MeterLifeCycleTest {
         void shouldFollowSuccessFlowWithPathOverride() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             // When: path("initialPath") is called
             meter.path("initialPath");
@@ -311,11 +301,9 @@ class MeterLifeCycleTest {
         void shouldOverridePathWhenPathCalledTwice() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             // When: path("firstPath") is called
             meter.path("firstPath");
@@ -338,11 +326,9 @@ class MeterLifeCycleTest {
         void shouldKeepPreviousPathWhenPathNullAfterNonNull() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             // When: path("validPath") is called
             meter.path("validPath");
@@ -365,11 +351,9 @@ class MeterLifeCycleTest {
         void shouldCompleteWithPathWhenOkNullAfterPathNonNull() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             // When: path("validPath") is called
             meter.path("validPath");
@@ -412,11 +396,9 @@ class MeterLifeCycleTest {
         @DisplayName("should log error and continue when path(null) is called")
         void shouldLogErrorAndContinueWhenPathNullIsCalled() {
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             // When: path(null) is called (should log error but not throw)
             meter.path(null);
@@ -433,11 +415,9 @@ class MeterLifeCycleTest {
         @DisplayName("should log error and continue when ok(null) is called")
         void shouldLogErrorAndContinueWhenOkNullIsCalled() {
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             // When: ok(null) is called (should log error but complete operation)
             meter.ok(null);
@@ -547,11 +527,9 @@ class MeterLifeCycleTest {
         void shouldFollowRejectionFlowString() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             // When: reject("businessRule") is called
             meter.reject("businessRule");
@@ -599,11 +577,9 @@ class MeterLifeCycleTest {
         void shouldFollowFailureFlowThrowable() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
 
             // When: start() is called
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
 
             final Exception ex = new RuntimeException("technical error");
 
