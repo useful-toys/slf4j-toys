@@ -61,7 +61,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     private static final long serialVersionUID = 1L;
 
     /** Placeholder string for unknown logger names. */
-    static final String UNKNOWN_LOGGER_NAME = "???";
+    public static final String UNKNOWN_LOGGER_NAME = "???";
     /** Default failure path for operations terminated by `try-with-resources`. */
     private static final String FAIL_PATH_TRY_WITH_RESOURCES = "try-with-resources";
 

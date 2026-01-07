@@ -97,6 +97,46 @@ class SessionConfigTest {
 ### Charset Validation in Tests
 **All test classes must declare the `@ValidateCharset` annotation** to ensure the JVM uses the expected charset.
 
+### Meter Stack Validation in Tests
+
+**All test classes in the `org.usefultoys.slf4j.meter` package must declare the `@ValidateCleanMeter` annotation** to ensure the Meter thread-local stack is clean before and after each test.
+
+This annotation validates that `Meter.getCurrentInstance()` returns the "unknown" Meter (with category `"???"`) both before and after each test method. This prevents Meter instances from leaking between tests and ensures proper cleanup of the thread-local stack.
+
+**Why this matters:**
+- Prevents Meter instances from persisting across test boundaries
+- Catches bugs in Meter lifecycle management early
+- Ensures test isolation and prevents test interference
+- Validates that Meter cleanup is happening correctly
+
+**Usage in `org.usefultoys.slf4j.meter` tests:**
+```java
+@ValidateCharset
+@ResetMeterConfig
+@WithLocale("en")
+@ValidateCleanMeter  // REQUIRED for all tests in org.usefultoys.slf4j.meter
+class MeterOperationTest {
+    @Test
+    @DisplayName("should create and close meter")
+    void shouldCreateAndCloseMeter() {
+        // Given: no active meter on thread-local stack
+        // When: meter is created and used
+        Meter meter = new Meter(logger);
+        try (Meter m = meter) {
+            m.start();
+            m.ok();
+        }
+        // Then: meter stack is clean after test (validated by @ValidateCleanMeter)
+    }
+}
+```
+
+**Important**: The `@ValidateCleanMeter` annotation:
+- Automatically validates the stack before and after each test
+- Fails the test if any non-unknown Meter is found on the stack
+- Provides a descriptive error message indicating which Meter was left behind
+- Should be used on **all** test classes in the `org.usefultoys.slf4j.meter` package
+
 ### Locale-Sensitive Tests
 **Test classes that perform string comparisons involving number formatting or date formatting must use `@WithLocale("en")`** to ensure consistent behavior across different environments and operating systems.
 This is especially important for:

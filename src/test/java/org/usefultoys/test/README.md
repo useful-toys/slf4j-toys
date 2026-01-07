@@ -61,6 +61,58 @@ class ReporterConfigTest {
 }
 ```
 
+#### `@ResetMeterConfig` / `ResetMeterConfigExtension`
+
+Resets `MeterConfig`, `SessionConfig`, and `SystemConfig` before and after each test.
+This extension covers all meter-related configuration state.
+
+**Usage:**
+```java
+@ResetMeterConfig
+class MeterConfigTest {
+    @Test
+    void testCustomMeter() {
+        MeterConfig.someProperty = "custom";
+        // All configs are automatically reset after this test
+    }
+}
+```
+
+#### `@ResetWatcherConfig` / `ResetWatcherConfigExtension`
+
+Resets `WatcherConfig`, `SessionConfig`, and `SystemConfig` before and after each test.
+This extension covers all watcher-related configuration state.
+
+**Usage:**
+```java
+@ResetWatcherConfig
+class WatcherConfigTest {
+    @Test
+    void testCustomWatcher() {
+        WatcherConfig.someProperty = "custom";
+        // All configs are automatically reset after this test
+    }
+}
+```
+
+#### `@ResetSystemProperty` / `ResetSystemPropertyExtension`
+
+Resets specific system properties before and after each test.
+This annotation is repeatable, allowing multiple properties to be reset.
+
+**Usage:**
+```java
+@ResetSystemProperty("my.custom.property")
+@ResetSystemProperty("another.property")
+class SystemPropertyTest {
+    @Test
+    void testCustomProperty() {
+        System.setProperty("my.custom.property", "custom");
+        // Property is automatically removed after this test
+    }
+}
+```
+
 #### `@ClearParserErrors` / `ClearConfigParserExtension`
 
 Clears `ConfigParser` initialization errors before and after each test.
@@ -123,13 +175,44 @@ class CharsetSensitiveTest {
 }
 ```
 
+#### `@ValidateCleanMeter` / `ValidateCleanMeterExtension`
+
+Validates that the Meter thread-local stack is clean before and after each test.
+Ensures that `Meter.getCurrentInstance()` returns the "unknown" Meter (with category `"???"`)
+both before and after each test method. This prevents Meter instances from leaking between tests.
+
+**Usage:**
+```java
+@ValidateCleanMeter
+class MeterOperationTest {
+    @Test
+    void testMeterOperation() {
+        // Meter stack is validated before and after this test
+        Meter meter = new Meter(logger);
+        try (Meter m = meter) {
+            m.start();
+            m.ok();
+        }
+        // Stack is clean after test execution
+    }
+}
+```
+
+**Common use cases:**
+- Tests that create and use Meter instances
+- Tests that verify Meter thread-local stack management
+- Integration tests that need to ensure Meter cleanup
+
 ## Choosing the Right Extension
 
 ### For Configuration Tests
 
-- **Testing `SystemConfig` only** → Use `@ResetSystem`
-- **Testing `SessionConfig` only** → Use `@ResetSession`
-- **Testing `ReporterConfig`** → Use `@ResetReporter` (resets all levels)
+- **Testing `SystemConfig` only** → Use `@ResetSystemConfig`
+- **Testing `SessionConfig` only** → Use `@ResetSessionConfig`
+- **Testing `ReporterConfig`** → Use `@ResetReporterConfig` (resets all levels)
+- **Testing `MeterConfig`** → Use `@ResetMeterConfig` (resets all levels)
+- **Testing `WatcherConfig`** → Use `@ResetWatcherConfig` (resets all levels)
+- **Testing custom system properties** → Use `@ResetSystemProperty("property.name")`
 - **Testing `ConfigParser` error handling** → Use `@ClearParserErrors`
 
 ### For Locale-Sensitive Tests
@@ -142,6 +225,12 @@ class CharsetSensitiveTest {
 - **File I/O, character encoding** → Use `@ValidateCharset`
 - Fails fast if charset mismatch detected
 
+### For Meter-Based Tests
+
+- **Tests that use Meter** → Use `@ValidateCleanMeter`
+- Ensures Meter thread-local stack doesn't leak between tests
+- Validates stack is clean both before and after test execution
+
 ## Design Notes
 
 ### Why Both Annotations and Extension Classes?
@@ -151,7 +240,7 @@ class CharsetSensitiveTest {
 - Both approaches are supported for flexibility
 
 ### Annotation vs. @ExtendWith
-
+Config
 ```java
 // Clean, declarative (recommended)
 @ResetSystem
@@ -169,34 +258,34 @@ class MyTest { }
 All annotations can be used at both levels:
 
 ```java
-@ResetSystem  // Applies to all tests in this class
+@ResetSystemConfig  // Applies to all tests in this class
 class MyTest {
     
     @Test
     void test1() { }
     
     @Test
-    @ResetSession  // Additional reset for this test only
+    @ResetSessionConfig  // Additional reset for this test only
     void test2() { }
 }
 ```
 
 ## Best Practices
 
-1. **Use the most specific reset needed** - Don't use `@ResetReporter` if you only need `@ResetSession`
+1. **Use the most specific reset needed** - Don't use `@ResetReporterConfig` if you only need `@ResetSessionConfig`
 2. **Combine multiple extensions** - You can use multiple annotations on the same test
-3. **Prefer annotations** - Use `@ResetSystem` instead of `@ExtendWith(ResetSystemConfigExtension.class)`
+3. **Prefer annotations** - Use `@ResetSystemConfig` instead of `@ExtendWith(ResetSystemConfigExtension.class)`
 4. **Use `@WithLocale` for cross-platform tests** - Ensures consistent number/date formatting
 5. **Use `@ValidateCharset` for encoding tests** - Prevents charset-related bugs
-6. **Document why you need the extension** - Add a comment explaining locale-sensitive operations
+6. **Use `@ResetSystemProperty` for custom properties** - Ensures custom system properties don't leak between tests
+7. **Document why you need the extension** - Add a comment explaining locale-sensitive or configuration-dependent operations
 
 ## Examples
 
 ### Testing with Multiple Extensions
 
 ```java
-@WithLocale("en-US")
-@ResetSystem
+@WithLocale(Config
 @ValidateCharset
 class ComprehensiveTest {
     @Test
@@ -218,12 +307,35 @@ class MixedTest {
     }
     
     @Test
-    @ResetSession
+    @ResetSessionConfig
     void testThatModifiesSession() {
         SessionConfig.someProperty = "modified";
         // Only this test gets reset
     }
 }
+```
+
+### Testing with Custom System Properties
+
+```java
+@ResetSystemProperty("my.feature.enabled")
+@ResetSystemProperty("my.feature.timeout")
+class FeatureTest {
+    @TestConfig.java               - SystemConfig reset annotation
+├── ResetSystemConfigExtension.java      - SystemConfig reset implementation
+├── ResetSessionConfig.java              - SessionConfig reset annotation
+├── ResetSessionConfigExtension.java     - SessionConfig reset implementation
+├── ResetReporterConfig.java             - ReporterConfig reset annotation
+├── ResetReporterConfigExtension.java    - ReporterConfig reset implementation
+├── ResetMeterConfig.java                - MeterConfig reset annotation
+├── ResetMeterConfigExtension.java       - MeterConfig reset implementation
+├── ResetWatcherConfig.java              - WatcherConfig reset annotation
+├── ResetWatcherConfigExtension.java     - WatcherConfig reset implementation
+├── ResetSystemProperty.java             - System property reset annotation (repeatable)
+├── ResetSystemPropertyExtension.java    - System property reset implementation
+├── ClearParserErrors.java               - ConfigParser error clearing annotation
+├── ClearConfigParserExtension.java      - ConfigParser error clearing implementation
+├── ClearConfigParser.java               - Container for ClearParserErrors annotations
 ```
 
 ## Package Structure
@@ -232,17 +344,25 @@ class MixedTest {
 org.usefultoys.test/
 ├── WithLocale.java                      - Locale control annotation
 ├── WithLocaleExtension.java             - Locale control implementation
-├── ResetSystem.java                     - SystemConfig reset annotation
+├── ResetSystemConfig.java               - SystemConfig reset annotation
 ├── ResetSystemConfigExtension.java      - SystemConfig reset implementation
-├── ResetSession.java                    - SessionConfig reset annotation
+├── ResetSessionConfig.java              - SessionConfig reset annotation
 ├── ResetSessionConfigExtension.java     - SessionConfig reset implementation
-├── ResetReporter.java                   - ReporterConfig reset annotation
+├── ResetReporterConfig.java             - ReporterConfig reset annotation
 ├── ResetReporterConfigExtension.java    - ReporterConfig reset implementation
+├── ResetMeterConfig.java                - MeterConfig reset annotation
+├── ResetMeterConfigExtension.java       - MeterConfig reset implementation
+├── ResetWatcherConfig.java              - WatcherConfig reset annotation
+├── ResetWatcherConfigExtension.java     - WatcherConfig reset implementation
+├── ResetSystemProperty.java             - System property reset annotation (repeatable)
+├── ResetSystemPropertyExtension.java    - System property reset implementation
 ├── ClearParserErrors.java               - ConfigParser error clearing annotation
 ├── ClearConfigParserExtension.java      - ConfigParser error clearing implementation
 ├── ValidateCharset.java                 - Charset validation annotation
 ├── CharsetConsistencyExtension.java     - Charset validation implementation
-└── CallerStackTraceThrowableTest.java   - Stack trace test utilities
+├── ValidateCleanMeter.java              - Meter stack validation annotation
+├── ValidateCleanMeterExtension.java     - Meter stack validation implementation
+└── README.md                            - This documentation
 ```
 
 ## See Also
