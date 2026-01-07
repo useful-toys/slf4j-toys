@@ -122,6 +122,39 @@ class MeterLifeCycleTest {
     }
 
     @Nested
+    @DisplayName("Meter Initialization")
+    class MeterInitialization {
+        @Test
+        @DisplayName("should create meter with expected initial state")
+        void shouldCreateMeterWithExpectedInitialState() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // Then: meter has expected initial state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should start meter successfully")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldStartMeterSuccessfully() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: start() is called
+            meter.start();
+
+            // Then: Meter is in executing state
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0);
+
+            // Then: log messages recorded correctly
+            AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
+        }
+    }
+
+    @Nested
     @DisplayName("Success Flow")
     class SuccessFlow {
         @Test
