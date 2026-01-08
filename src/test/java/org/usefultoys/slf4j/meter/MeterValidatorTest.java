@@ -480,21 +480,22 @@ public class MeterValidatorTest {
         @Test
         @DisplayName("should log error when meter is not stopped during finalization")
         void shouldValidateFinalizeWhenNotStopped() {
-            // Given: meter has not been stopped (stop time = 0L) and has a valid category
+            // Given: meter has been started but not stopped (start time = 1L, stop time = 0L) and has a valid category
+            when(meter.getStartTime()).thenReturn(1L);
             when(meter.getStopTime()).thenReturn(0L);
             when(meter.getCategory()).thenReturn("test-category");
             // When: validateFinalize is called
             // Then: should log finalization error
             MeterValidator.validateFinalize(meter);
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped; id={}");
-            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FINALIZED, "Meter started but never stopped; id=test-id");
         }
 
         @Test
         @DisplayName("should not log error when meter is already stopped")
         void shouldValidateFinalizeWhenAlreadyStopped() {
-            // Given: meter has already been stopped (stop time = 1L)
-            when(meter.getStopTime()).thenReturn(1L);
+            // Given: meter has been started and stopped (start time = 1L, stop time = 2L)
+            when(meter.getStartTime()).thenReturn(1L);
+            when(meter.getStopTime()).thenReturn(2L);
             // When: validateFinalize is called
             // Then: should not log any events
             MeterValidator.validateFinalize(meter);
@@ -504,11 +505,25 @@ public class MeterValidatorTest {
         @Test
         @DisplayName("should not log error when meter uses unknown logger name")
         void shouldValidateFinalizeWhenUnknownLogger() {
-            // Given: meter has not been stopped but uses unknown logger name
+            // Given: meter has been started but not stopped and uses unknown logger name
+            when(meter.getStartTime()).thenReturn(1L);
             when(meter.getStopTime()).thenReturn(0L);
             when(meter.getCategory()).thenReturn(Meter.UNKNOWN_LOGGER_NAME);
             // When: validateFinalize is called
             // Then: should not log any events (unknown logger is acceptable)
+            MeterValidator.validateFinalize(meter);
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should not log error when meter was never started")
+        void shouldValidateFinalizeWhenNotStarted() {
+            // Given: meter was never started (start time = 0L)
+            when(meter.getStartTime()).thenReturn(0L);
+            when(meter.getStopTime()).thenReturn(0L);
+            when(meter.getCategory()).thenReturn("test-category");
+            // When: validateFinalize is called
+            // Then: should not log any events
             MeterValidator.validateFinalize(meter);
             assertNoEvents(logger);
         }
