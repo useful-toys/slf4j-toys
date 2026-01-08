@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * </ul>
  *
  * @author Co-authored-by: GitHub Copilot using Gemini 3 Flash (Preview)
+ * @author Co-authored-by: GitHub Copilot using GPT-5.2
  */
 @ValidateCharset
 @ResetMeterConfig
@@ -1228,6 +1229,106 @@ class MeterLifeCycleTest {
 
             meter.ok();
             assertMeterState(meter, true, true, null, null, null, null, 50, 100, 0);
+        }
+
+        @Test
+        @DisplayName("should log progress when progressPeriodMilliseconds is zero")
+        void shouldLogProgressWhenProgressPeriodMillisecondsIsZero() throws InterruptedException {
+            // Given: progress throttling disabled (period = 0ms)
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger);
+            meter.iterations(100);
+            meter.start();
+
+            // When: progress advances and enough time elapses
+            meter.inc();
+            Thread.sleep(5);
+            meter.progress();
+
+            // Then: meter is still started and progress is tracked
+            assertMeterState(meter, true, false, null, null, null, null, 1, 100, 0);
+
+            // When: operation completes successfully
+            meter.ok();
+
+            // Then: meter is stopped OK
+            assertMeterState(meter, true, true, null, null, null, null, 1, 100, 0);
+
+            // Then: progress and OK log messages are recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should NOT log progress when progressPeriodMilliseconds is high")
+        void shouldNotLogProgressWhenProgressPeriodMillisecondsIsHigh() throws InterruptedException {
+            // Given: progress throttling period is high
+            MeterConfig.progressPeriodMilliseconds = 10_000;
+            final Meter meter = new Meter(logger);
+            meter.iterations(100);
+            meter.start();
+
+            // When: progress advances but period has not elapsed
+            meter.inc();
+            Thread.sleep(5);
+            meter.progress();
+            meter.ok();
+
+            // Then: meter is stopped OK and iteration tracking is preserved
+            assertMeterState(meter, true, true, null, null, null, null, 1, 100, 0);
+
+            // Then: only start and OK logs exist (no progress logs)
+            AssertLogger.assertEventCount(logger, 4);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should log progress when using incBy with progressPeriodMilliseconds zero")
+        void shouldLogProgressWhenUsingIncByWithProgressPeriodMillisecondsZero() throws InterruptedException {
+            // Given: progress throttling disabled (period = 0ms)
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger);
+            meter.iterations(100);
+            meter.start();
+
+            // When: progress advances via incBy
+            meter.incBy(10);
+            Thread.sleep(5);
+            meter.progress();
+            meter.ok();
+
+            // Then: iteration tracking and logs reflect progress
+            assertMeterState(meter, true, true, null, null, null, null, 10, 100, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should log progress when using incTo with progressPeriodMilliseconds zero")
+        void shouldLogProgressWhenUsingIncToWithProgressPeriodMillisecondsZero() throws InterruptedException {
+            // Given: progress throttling disabled (period = 0ms)
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger);
+            meter.iterations(100);
+            meter.start();
+
+            // When: progress advances via incTo
+            meter.incTo(50);
+            Thread.sleep(5);
+            meter.progress();
+            meter.ok();
+
+            // Then: iteration tracking and logs reflect progress
+            assertMeterState(meter, true, true, null, null, null, null, 50, 100, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
         }
     }
 }
