@@ -112,7 +112,11 @@ stateDiagram-v2
     Started --> Failed: ✅ fail()
     Started --> Failed: ✅ close()
     Started --> Started: inc() / incBy() / incTo()<br/>iterations(n) / path(pathId)<br/>progress()
-    
+
+    OK --> [*]: ✅ close()
+    Rejected --> [*]: ✅ close()
+    Failed --> [*]: ✅ close()
+
     OK --> [*]
     Rejected --> [*]
     Failed --> [*]
@@ -121,50 +125,101 @@ stateDiagram-v2
 
 ## Transitions
 
-The following table details all possible transitions, including how the API handles invalid calls (non-intrusive behavior).
+The following table details all state-related method calls for `Meter`.
 
 **Legend:**
-- ✅ **OK**: Condition met in the expected state-changing flow (e.g., `Started -> ok() -> Stopped`).
-- ☑️ **OK**: Condition met in the expected non-state-changing calls (e.g., setting iterations or path).
-- ⚠️ **Applied**: Condition met, but not in the normal expected flow (e.g., `Created -> ok() -> Stopped`).
-- ❌ **Ignored**: Condition not met, transition not performed.
+- ✅ **Valid state-changing (expected flow):** A valid call that changes the lifecycle in the normal sequence (typically `Created → Started → (OK | Rejected | Failed)`), by updating state-driving attributes.
+- ☑️ **Valid non-state-changing (expected flow):** A valid call used while the meter is in a normal state for that call. It does not change the lifecycle classification, but may update supporting attributes.
+- ⚠️ **Outside expected flow (discouraged):** The call is executed even though it is outside the normal sequence, to keep the API non-intrusive and resilient. It may still change the lifecycle classification (Termination (resilience)) and/or update attributes (Applied but discouraged). An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
+- ❌ **Ignored (invalid call):** Preconditions and/or arguments are not met, so the call is ignored to preserve resilience. No transition/attribute change is applied for that call. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
 
-| From State | Method Call | Condition (to realize transition) | To State | Attributes Changed | Logged (Message/Data) | Behavior |
-|:---|:---|:---|:---|:---|:---|:---|
-| **Created** | `start()` | ✅ `startTime == 0` (`validateStartPrecondition`) | **Started** | `startTime = collectCurrentTime()` | DEBUG (`MSG_START`) / TRACE (`DATA_START`) | Normal start. |
-| **Created** | `ok()` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()` | ERROR (`INCONSISTENT_OK`) + INFO (`MSG_OK`) / TRACE (`DATA_OK`) | **Inconsistent**: transitions to Stopped but logs error. |
-| **Created** | `ok(pathId)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()`, `okPath = pathId` | ERROR (`INCONSISTENT_OK`) + INFO (`MSG_OK`) / TRACE (`DATA_OK`) | **Inconsistent**: transitions to Stopped but logs error. |
-| **Created** | `reject(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Rejected)** | `stopTime = collectCurrentTime()`, `rejectPath = cause` | ERROR (`INCONSISTENT_REJECT`) + INFO (`MSG_REJECT`) / TRACE (`DATA_REJECT`) | **Inconsistent**: transitions to Stopped but logs error. |
-| **Created** | `fail(cause)` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath = cause` | ERROR (`INCONSISTENT_FAIL`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
-| **Created** | `iterations(n)` | ✅ `n > 0` (`validateIterationsCallArguments`) | **Created** | `expectedIterations = n` | - | Configures expected iterations. |
-| **Created** | `path(pathId)` | ❌ `startTime != 0` (`validatePathPrecondition`) | **Created** | - | ERROR (`ILLEGAL`) | **Ignored**: condition not met. |
-| **Created** | `inc()`, `incBy(n)`, `incTo(n)` | ❌ `startTime != 0` (`validateIncPrecondition`) | **Created** | - | ERROR (`INCONSISTENT_INCREMENT`) | **Ignored**: condition not met. |
-| **Created** | `progress()` | ❌ `startTime != 0` (`validateProgressPrecondition`) | **Created** | - | ERROR (`INCONSISTENT_PROGRESS`) | **Ignored**: condition not met. |
-| **Created** | `close()` | ⚠️ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath="try-with-resources"` | ERROR (`INCONSISTENT_CLOSE`) + ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Inconsistent**: transitions to Stopped but logs error. |
-| **Started** | `inc()` | ✅ `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration++` | - | Increments iteration count. |
-| **Started** | `incBy(n)` | ✅ `n > 0` (`validateIncBy`) AND `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration += n` | - | Increments iteration count by `n`. |
-| **Started** | `incTo(n)` | ✅ `n > 0` AND `n > currentIteration` (`validateIncToArguments`) AND `startTime != 0` (`validateIncPrecondition`) | **Started** | `currentIteration = n` | - | Sets iteration count to `n`. |
-| **Started** | `iterations(n)` | ✅ `n > 0` (`validateIterationsCallArguments`) | **Started** | `expectedIterations = n` | - | Overrides expected iterations. |
-| **Started** | `path(pathId)` | ✅ `startTime != 0` (`validatePathPrecondition`) | **Started** | `okPath = pathId` | - | Sets or overrides the success path. |
-| **Started** | `progress()` | ✅ `startTime != 0` (`validateProgressPrecondition`) | **Started** | `lastProgressTime = collectCurrentTime()`, `lastProgressIteration = currentIteration` | INFO (`MSG_PROGRESS`) / TRACE (`DATA_PROGRESS`) | Normal progress report. |
-| **Started** | `ok()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination. |
-| **Started** | `ok(pathId)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (OK)** | `stopTime = collectCurrentTime()`, `okPath = pathId` | INFO (`MSG_OK`) or WARN (`MSG_SLOW_OK`) / TRACE (`DATA_OK`) | Normal success termination with path. |
-| **Started** | `reject(cause)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Rejected)** | `stopTime = collectCurrentTime()`, `rejectPath = cause` | INFO (`MSG_REJECT`) / TRACE (`DATA_REJECT`) | Normal rejection termination. |
-| **Started** | `fail(cause)` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath = cause` | ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | Normal failure termination. |
-| **Started** | `close()` | ✅ `stopTime == 0` (`validateStopPrecondition`) | **Stopped (Failed)** | `stopTime = collectCurrentTime()`, `failPath="try-with-resources"` | ERROR (`MSG_FAIL`) / TRACE (`DATA_FAIL`) | **Auto-fail**: triggered by try-with-resources if not stopped. |
-| **Started** | `finalize()` | ⚠️ `startTime != 0 && stopTime == 0` (`validateFinalize`) | **[*]** | - | ERROR (`INCONSISTENT_FINALIZED`) | **GC Collection**: logs error if started but never stopped. |
-| **Started** | `start()` | ❌ `startTime == 0` (`validateStartPrecondition`) | **Started** | - | ERROR (`INCONSISTENT_START`) | **Ignored**: condition not met. |
-| **Stopped** | `path(pathId)` | ❌ `stopTime == 0` (`validatePathPrecondition`) | **Stopped** | - | ERROR (`ILLEGAL`) | **Ignored**: condition not met. |
-| **Stopped** | `iterations(n)` | ⚠️ `n > 0` (`validateIterationsCallArguments`) | **Stopped** | `expectedIterations = n` | - | **Discouraged**: changes iterations even if already stopped. |
-| **Stopped** | `inc()`, `incBy()`, `incTo()` | ⚠️ `startTime != 0` (`validateIncPrecondition`) | **Stopped** | `currentIteration` | - | **Allowed**: increments even if stopped (current behavior). |
-| **Stopped** | `inc()`, `incBy()`, `incTo()` | ❌ `startTime == 0` (`validateIncPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_INCREMENT`) | **Ignored**: cannot increment if never started. |
-| **Stopped** | `progress()` | ⚠️ `startTime != 0` (`validateProgressPrecondition`) | **Stopped** | `lastProgressTime = collectCurrentTime()`, `lastProgressIteration = currentIteration` | INFO (`MSG_PROGRESS`) / TRACE (`DATA_PROGRESS`) | **Allowed**: reports progress even if stopped. |
-| **Stopped** | `progress()` | ❌ `startTime == 0` (`validateProgressPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_PROGRESS`) | **Ignored**: cannot report progress if never started. |
-| **Stopped** | `start()` | ❌ `startTime == 0` (`validateStartPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_START`) | **Ignored**: condition not met. |
-| **Stopped** | `ok()`, `ok(pathId)` | ❌ `stopTime == 0` (`validateStopPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_OK`) | **Ignored**: condition not met. |
-| **Stopped** | `reject(cause)` | ❌ `stopTime == 0` (`validateStopPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_REJECT`) | **Ignored**: condition not met. |
-| **Stopped** | `fail(cause)` | ❌ `stopTime == 0` (`validateStopPrecondition`) | **Stopped** | - | ERROR (`INCONSISTENT_FAIL`) | **Ignored**: condition not met. |
-| **Stopped** | `close()` | ❌ `stopTime == 0` | **Stopped** | - | - | **Ignored**: condition not met. |
+**Definitions:**
+- **Lifecycle classification:** The state returned by `isStarted()`, `isStopped()`, `isOK()`, `isReject()`, `isFail()`, and `isSlow()`, based on `MeterData` attributes.
+- **State-changing:** Any call that can change the lifecycle classification and/or the reported outcome path (notably `startTime`, `stopTime`, `rejectPath`, `failPath`, `okPath`, and `timeLimit`).
+- **Non-state-changing:** Calls that do not change the lifecycle classification, but may still update supporting attributes (e.g., `expectedIterations`, `currentIteration`, progress bookkeeping).
+- **Expected flow:** Calls made when the meter is in a state where that call is normally valid and intended to be used.
+- **Outside expected flow:** Calls made when the meter is in a state where that call is normally not intended, but is still applied for resilience.
+- **Invalid call:** Calls made when preconditions/arguments are invalid for that call, so the call is ignored to preserve resilience.
+- **Resilience:** The ability of the `Meter` to handle incorrect usage gracefully (non-intrusive behavior), without throwing exceptions or entering an invalid internal state.
+
+Some methods (as description, context) are not included in the table as they do not affect the lifecycle state.
+
+The table below is intentionally exhaustive: for each lifecycle state (`Created`, `Started`, `OK`, `Rejected`, `Failed`), it lists the behavior of every relevant call (including calls that are invalid or discouraged).
+
+Note: A call may be valid for a given state, but still be invalid if its arguments are invalid. For example, `Created → iterations(n) → Created` is valid when `n > 0`, but becomes an ❌ ignored call (with an error log entry) when `n <= 0`.
+
+|  | From State | Call | To State | Notes |
+|:--:|:---|:---|:---|:---|
+| ☑️ | **Created** | `iterations(n)` | **Created** | When `n > 0`: sets `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ☑️ | **Created** | `limitMilliseconds(n)` | **Created** | When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ❌ | **Created** | `path(okPath)` | **Created** | Ignored. Logs `ILLEGAL` (Meter path but not started).
+| ❌ | **Created** | `inc()` | **Created** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter not started).
+| ❌ | **Created** | `incBy(n)` | **Created** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter not started).
+| ❌ | **Created** | `incTo(n)` | **Created** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter not started).
+| ✅ | **Created** | `start()` | **Started** | Normal start. Sets `startTime` and enables thread-local propagation.
+| ❌ | **Created** | `progress()` | **Created** | Ignored. Logs `INCONSISTENT_PROGRESS` (Meter progress but not started).
+| ⚠️ | **Created** | `ok()` | **OK** | Termination (resilience). Logs `INCONSISTENT_OK` (Meter stopped but not started).
+| ⚠️ | **Created** | `ok(okPath)` | **OK** | Termination (resilience). When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter stopped but not started).
+| ⚠️ | **Created** | `reject(cause)` | **Rejected** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter stopped but not started).
+| ⚠️ | **Created** | `fail(cause)` | **Failed** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter stopped but not started).
+| ⚠️ | **Created** | `close()` | **Failed** | Termination (resilience). Logs `INCONSISTENT_CLOSE` (Meter stopped but not started).
+| ❌ | **Created** | `finalize()` | **Created** | Ignored. `validateFinalize` logs only when Started and not Stopped.
+| ⚠️ | **Started** | `start()` | **Started** | Applied but discouraged. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
+| ⚠️ | **Started** | `iterations(n)` | **Started** | When `n > 0`: sets/overrides `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ☑️ | **Started** | `limitMilliseconds(n)` | **Started** | When `n > 0`: sets/overrides `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ☑️ | **Started** | `path(okPath)` | **Started** | When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: sets/overrides `okPath`.
+| ☑️ | **Started** | `inc()` | **Started** | Increments `currentIteration`.
+| ☑️ | **Started** | `incBy(n)` | **Started** | When `n > 0`: adds `n` to `currentIteration`.<br/>Otherwise: logs `ILLEGAL` (Non-positive increment).
+| ☑️ | **Started** | `incTo(n)` | **Started** | When `n > 0` and `n > currentIteration`: sets `currentIteration = n`.<br/>Otherwise when `n <= 0`: logs `ILLEGAL` (Non-positive argument).<br/>Otherwise: logs `ILLEGAL` (Non-forward increment).
+| ☑️ | **Started** | `progress()` | **Started** | May log progress periodically (only when progress advanced and throttling allows).
+| ✅ | **Started** | `ok()` | **OK** | Normal termination.
+| ✅ | **Started** | `ok(okPath)` | **OK** | When okPath == null: logs `ILLEGAL` (Null argument).<br/>Otherwise: normal termination with path.
+| ✅ | **Started** | `reject(cause)` | **Rejected** | When cause == null: logs `ILLEGAL` (Null argument).<br/>Otherwise: normal rejection termination.
+| ✅ | **Started** | `fail(cause)` | **Failed** | When cause == null: logs `ILLEGAL` (Null argument).<br/>Otherwise: normal failure termination.
+| ✅ | **Started** | `close()` | **Failed** | Auto-fail for try-with-resources when not explicitly stopped.
+| ⚠️ | **Started** | `finalize()` | **Started** | Termination (resilience). Logs `INCONSISTENT_FINALIZED` (Meter started but never stopped).
+| ⚠️ | **OK** | `start()` | **OK** | Applied but discouraged. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
+| ⚠️ | **OK** | `iterations(n)` | **OK** | Applied but discouraged. When `n > 0`: sets `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ⚠️ | **OK** | `limitMilliseconds(n)` | **OK** | Applied but discouraged. When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ❌ | **OK** | `path(okPath)` | **OK** | Ignored. Logs `ILLEGAL` (Meter path but already stopped).
+| ⚠️ | **OK** | `inc()` | **OK** | Applied but discouraged: increments `currentIteration`.
+| ⚠️ | **OK** | `incBy(n)` | **OK** | Applied but discouraged. When `n > 0`: increments `currentIteration`.<br/>Otherwise: logs `ILLEGAL` (Non-positive increment).
+| ⚠️ | **OK** | `incTo(n)` | **OK** | Applied but discouraged. When `n > 0` and `n > currentIteration`: sets `currentIteration`.<br/>Otherwise when `n <= 0`: logs `ILLEGAL` (Non-positive argument).<br/>Otherwise: logs `ILLEGAL` (Non-forward increment).
+| ⚠️ | **OK** | `progress()` | **OK** | Applied but discouraged: may still log progress (subject to throttling).
+| ⚠️ | **OK** | `ok()` | **OK** | Termination (resilience). Logs `INCONSISTENT_OK` (Meter already stopped).
+| ⚠️ | **OK** | `ok(okPath)` | **OK** | Termination (resilience). When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped).
+| ⚠️ | **OK** | `reject(cause)` | **Rejected** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped).
+| ⚠️ | **OK** | `fail(cause)` | **Failed** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped).
+| ❌ | **OK** | `close()` | **OK** | Ignored. `close()` returns immediately when already stopped.
+| ❌ | **OK** | `finalize()` | **OK** | Ignored. `validateFinalize` logs only when Started and not Stopped.
+| ⚠️ | **Rejected** | `start()` | **Rejected** | Applied but discouraged. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
+| ⚠️ | **Rejected** | `iterations(n)` | **Rejected** | Applied but discouraged. When `n > 0`: sets `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ⚠️ | **Rejected** | `limitMilliseconds(n)` | **Rejected** | Applied but discouraged. When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ❌ | **Rejected** | `path(okPath)` | **Rejected** | Ignored. Logs `ILLEGAL` (Meter path but already stopped).
+| ⚠️ | **Rejected** | `inc()` | **Rejected** | Applied but discouraged: increments `currentIteration`.
+| ⚠️ | **Rejected** | `incBy(n)` | **Rejected** | Applied but discouraged. When `n > 0`: increments `currentIteration`.<br/>Otherwise: logs `ILLEGAL` (Non-positive increment).
+| ⚠️ | **Rejected** | `incTo(n)` | **Rejected** | Applied but discouraged. When `n > 0` and `n > currentIteration`: sets `currentIteration`.<br/>Otherwise when `n <= 0`: logs `ILLEGAL` (Non-positive argument).<br/>Otherwise: logs `ILLEGAL` (Non-forward increment).
+| ⚠️ | **Rejected** | `progress()` | **Rejected** | Applied but discouraged: may still log progress (subject to throttling).
+| ⚠️ | **Rejected** | `ok()` | **OK** | Termination (resilience). Logs `INCONSISTENT_OK` (Meter already stopped).
+| ⚠️ | **Rejected** | `ok(okPath)` | **OK** | Termination (resilience). When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped).
+| ⚠️ | **Rejected** | `reject(cause)` | **Rejected** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped).
+| ⚠️ | **Rejected** | `fail(cause)` | **Failed** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped).
+| ❌ | **Rejected** | `close()` | **Rejected** | Ignored. `close()` returns immediately when already stopped.
+| ❌ | **Rejected** | `finalize()` | **Rejected** | Ignored. `validateFinalize` logs only when Started and not Stopped.
+| ⚠️ | **Failed** | `start()` | **Failed** | Applied but discouraged. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
+| ⚠️ | **Failed** | `iterations(n)` | **Failed** | Applied but discouraged. When `n > 0`: sets `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ⚠️ | **Failed** | `limitMilliseconds(n)` | **Failed** | Applied but discouraged. When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ❌ | **Failed** | `path(okPath)` | **Failed** | Ignored. Logs `ILLEGAL` (Meter path but already stopped).
+| ⚠️ | **Failed** | `inc()` | **Failed** | Applied but discouraged: increments `currentIteration`.
+| ⚠️ | **Failed** | `incBy(n)` | **Failed** | Applied but discouraged. When `n > 0`: increments `currentIteration`.<br/>Otherwise: logs `ILLEGAL` (Non-positive increment).
+| ⚠️ | **Failed** | `incTo(n)` | **Failed** | Applied but discouraged. When `n > 0` and `n > currentIteration`: sets `currentIteration`.<br/>Otherwise when `n <= 0`: logs `ILLEGAL` (Non-positive argument).<br/>Otherwise: logs `ILLEGAL` (Non-forward increment).
+| ⚠️ | **Failed** | `progress()` | **Failed** | Applied but discouraged: may still log progress (subject to throttling).
+| ⚠️ | **Failed** | `ok()` | **OK** | Termination (resilience). Logs `INCONSISTENT_OK` (Meter already stopped).
+| ⚠️ | **Failed** | `ok(okPath)` | **OK** | Termination (resilience). When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped).
+| ⚠️ | **Failed** | `reject(cause)` | **Rejected** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped).
+| ⚠️ | **Failed** | `fail(cause)` | **Failed** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped).
+| ❌ | **Failed** | `close()` | **Failed** | Ignored. `close()` returns immediately when already stopped.
+| ❌ | **Failed** | `finalize()` | **Failed** | Ignored. `validateFinalize` logs only when Started and not Stopped.
 
 ## State Query Methods
 
