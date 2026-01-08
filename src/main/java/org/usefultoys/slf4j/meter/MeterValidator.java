@@ -281,8 +281,8 @@ public class MeterValidator {
      * @param meter The Meter instance being finalized.
      */
     public void validateFinalize(final Meter meter) {
-        if (meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
-            logIllegalPrecondition(meter, Markers.INCONSISTENT_FINALIZED, "Meter started and never stopped; id={}");
+        if (meter.getStartTime() != 0 && meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
+            meter.getMessageLogger().error(Markers.INCONSISTENT_FINALIZED,"Meter started but never stopped; id={}", meter.getFullID());
         }
     }
 }
