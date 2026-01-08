@@ -67,7 +67,6 @@ class MeterDataFormatterTest {
 
     private static Stream<Arguments> provideMeterDataForReadableStringBuilder() {
         MeterConfig.progressPeriodMilliseconds = 2000;
-        System.out.println("DEBUG: MeterConfig.progressPeriodMilliseconds = " + MeterConfig.progressPeriodMilliseconds);
         // Fixed timestamp for deterministic testing
         final long now = 1000000000000L; // Fixed timestamp in nanoseconds
         
