@@ -130,16 +130,17 @@ The following table details all state-related method calls for `Meter`.
 **Legend:**
 - ✅ **Valid state-changing (expected flow):** A valid call that changes the lifecycle in the normal sequence (typically `Created → Started → (OK | Rejected | Failed)`), by updating state-driving attributes.
 - ☑️ **Valid non-state-changing (expected flow):** A valid call used while the meter is in a normal state for that call. It does not change the lifecycle classification, but may update supporting attributes.
-- ⚠️ **Outside expected flow (discouraged):** The call is executed even though it is outside the normal sequence, to keep the API non-intrusive and resilient. It may still change the lifecycle classification (Termination (resilience)) and/or update attributes (Applied but discouraged). An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
-- ❌ **Ignored (invalid call):** Preconditions and/or arguments are not met, so the call is ignored to preserve resilience. No transition/attribute change is applied for that call. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
+- ⚠️ **State-correcting (outside expected flow):** The call violates the expected API contract, but is accepted and applied to correct the state to a valid configuration while maintaining resilience. It may change the lifecycle state and/or update attributes. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
+- ❌ **State-preserving (invalid flow):** Preconditions and/or arguments are not met, so the call is ignored to preserve the current valid state. No transition/attribute change is applied for that call. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
 
 **Definitions:**
 - **Lifecycle classification:** The state returned by `isStarted()`, `isStopped()`, `isOK()`, `isReject()`, `isFail()`, and `isSlow()`, based on `MeterData` attributes.
 - **State-changing:** Any call that can change the lifecycle classification and/or the reported outcome path (notably `startTime`, `stopTime`, `rejectPath`, `failPath`, `okPath`, and `timeLimit`).
 - **Non-state-changing:** Calls that do not change the lifecycle classification, but may still update supporting attributes (e.g., `expectedIterations`, `currentIteration`, progress bookkeeping).
 - **Expected flow:** Calls made when the meter is in a state where that call is normally valid and intended to be used.
-- **Outside expected flow:** Calls made when the meter is in a state where that call is normally not intended, but is still applied for resilience.
-- **Invalid call:** Calls made when preconditions/arguments are invalid for that call, so the call is ignored to preserve resilience.
+- **State-correcting:** Calls made when the meter is in a state where that call violates the expected API contract, but the call is applied anyway because it can still result in a valid state transition. The call is accepted through resilience to correct or advance the state to a valid configuration, even though the flow that led to the call was outside the expected sequence.
+- **State-preserving:** Calls made when preconditions or arguments are invalid, so the call is rejected and the state remains unchanged to preserve resilience.
+- **Invalid flow:** A flow characterized by either invalid method arguments (e.g., null values when not allowed, non-positive numbers when positivity is required) or preconditions that would result in invalid state transitions (e.g., violating the immutable lifecycle guarantee from [TDR-0019](TDR-0019-immutable-lifecycle-transitions.md)). Calls in invalid flows are rejected without state change.
 - **Resilience:** The ability of the `Meter` to handle incorrect usage gracefully (non-intrusive behavior), without throwing exceptions or entering an invalid internal state.
 
 Some methods (as description, context) are not included in the table as they do not affect the lifecycle state.
@@ -164,8 +165,8 @@ Note: A call may be valid for a given state, but still be invalid if its argumen
 | ⚠️ | **Created** | `fail(cause)` | **Failed** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter stopped but not started).
 | ⚠️ | **Created** | `close()` | **Failed** | Termination (resilience). Logs `INCONSISTENT_CLOSE` (Meter stopped but not started).
 | ❌ | **Created** | `finalize()` | **Created** | Ignored. `validateFinalize` logs only when Started and not Stopped.
-| ⚠️ | **Started** | `start()` | **Started** | Applied but discouraged. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
-| ⚠️ | **Started** | `iterations(n)` | **Started** | When `n > 0`: sets/overrides `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ⚠️ | **Started** | `start()` | **Started** | State-correcting. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
+| ☑️ | **Started** | `iterations(n)` | **Started** | When `n > 0`: sets/overrides `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
 | ☑️ | **Started** | `limitMilliseconds(n)` | **Started** | When `n > 0`: sets/overrides `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
 | ☑️ | **Started** | `path(okPath)` | **Started** | When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: sets/overrides `okPath`.
 | ☑️ | **Started** | `inc()` | **Started** | Increments `currentIteration`.
@@ -178,25 +179,25 @@ Note: A call may be valid for a given state, but still be invalid if its argumen
 | ✅ | **Started** | `fail(cause)` | **Failed** | When cause == null: logs `ILLEGAL` (Null argument).<br/>Otherwise: normal failure termination.
 | ✅ | **Started** | `close()` | **Failed** | Auto-fail for try-with-resources when not explicitly stopped.
 | ⚠️ | **Started** | `finalize()` | **Started** | Termination (resilience). Logs `INCONSISTENT_FINALIZED` (Meter started but never stopped).
-| ⚠️ | **OK** | `start()` | **OK** | Applied but discouraged. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
-| ⚠️ | **OK** | `iterations(n)` | **OK** | Applied but discouraged. When `n > 0`: sets `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
-| ⚠️ | **OK** | `limitMilliseconds(n)` | **OK** | Applied but discouraged. When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ⚠️ | **OK** | `start()` | **OK** | State-correcting. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
+| ❌ | **OK** | `iterations(n)` | **OK** | Ignored. Logs `ILLEGAL` (Meter iterations but already stopped).
+| ⚠️ | **OK** | `limitMilliseconds(n)` | **OK** | State-correcting. When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
 | ❌ | **OK** | `path(okPath)` | **OK** | Ignored. Logs `ILLEGAL` (Meter path but already stopped).
-| ⚠️ | **OK** | `inc()` | **OK** | Applied but discouraged: increments `currentIteration`.
-| ⚠️ | **OK** | `incBy(n)` | **OK** | Applied but discouraged. When `n > 0`: increments `currentIteration`.<br/>Otherwise: logs `ILLEGAL` (Non-positive increment).
-| ⚠️ | **OK** | `incTo(n)` | **OK** | Applied but discouraged. When `n > 0` and `n > currentIteration`: sets `currentIteration`.<br/>Otherwise when `n <= 0`: logs `ILLEGAL` (Non-positive argument).<br/>Otherwise: logs `ILLEGAL` (Non-forward increment).
-| ⚠️ | **OK** | `progress()` | **OK** | Applied but discouraged: may still log progress (subject to throttling).
+| ⚠️ | **OK** | `inc()` | **OK** | State-correcting: increments `currentIteration`.
+| ⚠️ | **OK** | `incBy(n)` | **OK** | State-correcting. When `n > 0`: increments `currentIteration`.<br/>Otherwise: logs `ILLEGAL` (Non-positive increment).
+| ⚠️ | **OK** | `incTo(n)` | **OK** | State-correcting. When `n > 0` and `n > currentIteration`: sets `currentIteration`.<br/>Otherwise when `n <= 0`: logs `ILLEGAL` (Non-positive argument).<br/>Otherwise: logs `ILLEGAL` (Non-forward increment).
+| ⚠️ | **OK** | `progress()` | **OK** | State-correcting: may still log progress (subject to throttling).
 | ⚠️ | **OK** | `ok()` | **OK** | Termination (resilience). Logs `INCONSISTENT_OK` (Meter already stopped).
 | ⚠️ | **OK** | `ok(okPath)` | **OK** | Termination (resilience). When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped).
 | ⚠️ | **OK** | `reject(cause)` | **Rejected** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped).
 | ⚠️ | **OK** | `fail(cause)` | **Failed** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped).
 | ❌ | **OK** | `close()` | **OK** | Ignored. `close()` returns immediately when already stopped.
 | ❌ | **OK** | `finalize()` | **OK** | Ignored. `validateFinalize` logs only when Started and not Stopped.
-| ⚠️ | **Rejected** | `start()` | **Rejected** | Applied but discouraged. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
-| ⚠️ | **Rejected** | `iterations(n)` | **Rejected** | Applied but discouraged. When `n > 0`: sets `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
-| ⚠️ | **Rejected** | `limitMilliseconds(n)` | **Rejected** | Applied but discouraged. When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ⚠️ | **Rejected** | `start()` | **Rejected** | State-correcting. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
+| ❌ | **Rejected** | `iterations(n)` | **Rejected** | Ignored. Logs `ILLEGAL` (Meter iterations but already stopped).
+| ⚠️ | **Rejected** | `limitMilliseconds(n)` | **Rejected** | State-correcting. When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
 | ❌ | **Rejected** | `path(okPath)` | **Rejected** | Ignored. Logs `ILLEGAL` (Meter path but already stopped).
-| ⚠️ | **Rejected** | `inc()` | **Rejected** | Applied but discouraged: increments `currentIteration`.
+| ⚠️ | **Rejected** | `inc()` | **Rejected** | State-correcting: increments `currentIteration`.
 | ⚠️ | **Rejected** | `incBy(n)` | **Rejected** | Applied but discouraged. When `n > 0`: increments `currentIteration`.<br/>Otherwise: logs `ILLEGAL` (Non-positive increment).
 | ⚠️ | **Rejected** | `incTo(n)` | **Rejected** | Applied but discouraged. When `n > 0` and `n > currentIteration`: sets `currentIteration`.<br/>Otherwise when `n <= 0`: logs `ILLEGAL` (Non-positive argument).<br/>Otherwise: logs `ILLEGAL` (Non-forward increment).
 | ⚠️ | **Rejected** | `progress()` | **Rejected** | Applied but discouraged: may still log progress (subject to throttling).
@@ -207,7 +208,7 @@ Note: A call may be valid for a given state, but still be invalid if its argumen
 | ❌ | **Rejected** | `close()` | **Rejected** | Ignored. `close()` returns immediately when already stopped.
 | ❌ | **Rejected** | `finalize()` | **Rejected** | Ignored. `validateFinalize` logs only when Started and not Stopped.
 | ⚠️ | **Failed** | `start()` | **Failed** | Applied but discouraged. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
-| ⚠️ | **Failed** | `iterations(n)` | **Failed** | Applied but discouraged. When `n > 0`: sets `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
+| ❌ | **Failed** | `iterations(n)` | **Failed** | Ignored. Logs `ILLEGAL` (Meter iterations but already stopped).
 | ⚠️ | **Failed** | `limitMilliseconds(n)` | **Failed** | Applied but discouraged. When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
 | ❌ | **Failed** | `path(okPath)` | **Failed** | Ignored. Logs `ILLEGAL` (Meter path but already stopped).
 | ⚠️ | **Failed** | `inc()` | **Failed** | Applied but discouraged: increments `currentIteration`.
@@ -241,6 +242,7 @@ All state validations are handled by [MeterValidator.java](../src/main/java/org/
 - **`validateStartPrecondition()`**: Ensures meter hasn't already started (checks `startTime == 0`).
 - **`validateStopPrecondition()`**: Ensures meter was started and not already stopped (checks `stopTime == 0`).
 - **`validateProgressPrecondition()`**: Ensures meter has been started (checks `startTime != 0`).
+- **`validateIterationsPrecondition()`**: Ensures iterations count is set before meter is stopped (checks `stopTime == 0`).
 - **`validateIncPrecondition()`**: Ensures meter has been started before incrementing (checks `startTime != 0`).
 - **`validatePathPrecondition()`**: Ensures meter has been started before setting path (checks `startTime != 0`).
 - **`validatePathArgument()`**: Logs an error if path identifiers are null (non-blocking).
