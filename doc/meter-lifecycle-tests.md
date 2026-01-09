@@ -1,0 +1,403 @@
+# Meter Lifecycle Test Hierarchy
+
+**Document:** `doc/meter-lifecycle-tests.md`  
+**Purpose:** Enumerate and organize test groups for comprehensive coverage of Meter state transitions across all four resilience tiers.  
+**Related TDRs:** [TDR-0019](TDR-0019-immutable-lifecycle-transitions.md), [TDR-0020](TDR-0020-three-outcome-types-ok-reject-fail.md), [TDR-0029](TDR-0029-resilient-state-transitions-with-chained-api.md), [meter-state-diagram.md](meter-state-diagram.md)
+
+---
+
+## Overview
+
+This document defines a hierarchical test strategy for the `Meter` lifecycle to achieve comprehensive coverage of:
+
+1. **Happy path** (Tier 1 - ✅ Valid state-changing) - Normal expected flows
+2. **Attribute updates** (Tier 2 - ☑️ Valid non-state-changing) - Support operations
+3. **State-correcting** (Tier 3 - ⚠️ Outside expected flow) - Violations that self-correct
+4. **State-preserving** (Tier 4 - ❌ Invalid flow) - Rejections that preserve state
+
+By organizing tests in groups from foundational (Group 1) to complex scenarios (Group 10), we ensure:
+- **Reliability**: Each test has a solid foundation to build upon
+- **Clarity**: Each test group focuses on a specific aspect of behavior
+- **Maintainability**: Changes to one group don't cascade to others
+- **Coverage**: All state transitions and error conditions are validated
+
+---
+
+## Test Group Hierarchy
+
+### **Group 1: Meter Initialization (Base Guarantee)**
+
+**Purpose:** Validate that Meter is created and started correctly. This group is the foundation for all subsequent tests, ensuring initialization reliability.
+
+**Test Scenarios:**
+
+1. **Meter creation with logger**
+   - `new Meter(logger)` → verify initial state (startTime = 0, stopTime = 0)
+   - Verify default attributes: currentIteration = 0, expectedIterations = 0, timeLimit = 0
+   - Verify timestamp: createTime > 0
+
+2. **Meter creation with logger + operationName**
+   - `new Meter(logger, "operationName")` → verify initial state
+   - Verify operationName is captured correctly
+
+3. **Meter creation with logger + operationName + parent**
+   - `new Meter(logger, "operationName", "parent-id")` → verify initial state
+   - Verify parent is captured correctly
+
+4. **Start Meter successfully**
+   - `new Meter(logger).start()` → transition Created → Started
+   - Verify startTime != 0
+   - Verify meter becomes current in thread-local stack (`Meter.getCurrentInstance()` returns this meter)
+   - Verify DEBUG log with system status information
+
+5. **Start Meter in try-with-resources (start in block)**
+   - `try (Meter m = new Meter(logger)) { m.start(); }` → create meter in resource, start in block
+   - Verify meter created successfully, then transitioned to started state
+   - Verify try-with-resources + sequential start work correctly
+
+6. **Start Meter with chained call in try-with-resources**
+   - `try (Meter m = new Meter(logger).start()) { ... }` → chain start() at creation
+   - Verify meter created and started in single expression
+   - Verify chained API works within try-with-resources scope
+
+---
+
+### **Group 2: Pre-Start Configuration (☑️ Tier 2 - Valid Non-State-Changing)**
+
+**Purpose:** Validate operations that update support attributes BEFORE `start()`. These calls do not change lifecycle classification but prepare the Meter for execution. Tests verify attribute storage, override behavior, and graceful rejection of invalid arguments.
+
+**Test Scenarios:**
+
+1. **Set time limit**
+   - `new Meter() → limitMilliseconds(5000)` → verify timeLimit = 5000 (before start)
+   - `new Meter() → limitMilliseconds(100) → limitMilliseconds(5000)` → verify last value wins (timeLimit = 5000)
+   - `new Meter() → limitMilliseconds(5000) → limitMilliseconds(0)` → verify invalid value ignored, preserves first valid value (timeLimit = 5000)
+   - `new Meter() → limitMilliseconds(-1)` → verify negative value logs ILLEGAL, state unchanged
+   - Verify no error logs for valid values, ILLEGAL logs for invalid values
+
+2. **Set expected iterations**
+   - `new Meter() → iterations(100)` → verify expectedIterations = 100 (before start)
+   - `new Meter() → iterations(50) → iterations(100)` → verify last value wins (expectedIterations = 100)
+   - `new Meter() → iterations(100) → iterations(0)` → verify invalid value ignored, preserves first valid value (expectedIterations = 100)
+   - `new Meter() → iterations(-5)` → verify negative value logs ILLEGAL, state unchanged
+   - Verify no error logs for valid values, ILLEGAL logs for invalid values
+
+3. **Add descriptive message**
+   - `new Meter() → m("starting operation")` → verify description = "starting operation" (before start)
+   - `new Meter() → m("step 1") → m("step 2")` → verify last value wins (description = "step 2")
+   - `new Meter() → m("step 1") → m(null)` → verify null value logs ILLEGAL, preserves previous value (description = "step 1")
+   - Verify no error logs for valid messages, ILLEGAL log for null
+
+4. **Add formatted descriptive message**
+   - `new Meter() → m("operation %s", "doWork")` → verify formatted description stored (before start)
+   - `new Meter() → m("step %d", 1) → m("step %d", 2)` → verify last value wins (description = "step 2")
+   - `new Meter() → m("valid: %s", "arg") → m(null, "arg")` → verify null format logs ILLEGAL, preserves previous value
+   - `new Meter() → m("invalid format %z", "arg")` → verify invalid format string logs ILLEGAL, state unchanged
+   - Verify no error logs for valid formats, ILLEGAL logs for null/invalid format
+
+5. **Add contextual key-value pairs (using ctx method)**
+   - `new Meter() → ctx("key1", "value1")` → verify context map contains key1=value1 (before start)
+   - `new Meter() → ctx("key", "val1") → ctx("key", "val2")` → verify last value wins in context (key=val2)
+   - `new Meter() → ctx("key", "valid") → ctx("key", null)` → verify null value replaced (key="<null>")
+   - Verify multiple different keys can coexist: `ctx("key1", "val1") → ctx("key2", "val2")` both stored
+
+6. **Chain multiple configurations**
+   - `new Meter() → iterations(100) → limitMilliseconds(5000) → m("starting operation")` → verify all attributes set correctly
+   - `new Meter() → m("op1") → limitMilliseconds(5000) → iterations(100) → m("op2")` → verify m() last value wins, iterations and limit preserved
+   - `new Meter() → limitMilliseconds(5000) → iterations(100) → limitMilliseconds(0) → iterations(-1)` → verify invalid values ignored, all valid values preserved
+   - Verify no error logs for valid values, ILLEGAL logs for each invalid attempt
+
+---
+
+### **Group 3: Valid Expected Flows (✅ Tier 1 - Valid State-Changing)**
+
+**Purpose:** Validate normal lifecycle transitions without errors. These are the expected, successful paths through the state machine.
+
+**Test Scenarios:**
+
+1. **Created → Started → OK (simple)**
+   - `new Meter().start() → ok()` → verify correct state transition
+   - Verify INFO log with completion report
+
+2. **Created → Started → OK with custom path**
+   - `new Meter().start() → ok("success_path")`
+   - `new Meter().start() → path("custom_path") → ok()`
+   - Verify variations: String, Enum, Throwable, Object as path
+
+3. **Created → Started → Rejected**
+   - `new Meter().start() → reject("business_rule_violation")`
+   - Verify variations: String, Enum, Throwable, Object as cause
+   - Verify rejectPath recorded
+
+4. **Created → Started → Failed**
+   - `new Meter().start() → fail("technical_error")`
+   - Verify variations: String, Enum, Throwable, Object as cause
+   - Verify failPath recorded
+
+5. **Created → Started → Failed (via try-with-resources)**
+   - `try (Meter m = new Meter().start()) { ... }` without calling ok(), reject(), or fail()
+   - Verify close() automatically triggers fail with path "try-with-resources"
+   - Verify WARN/ERROR log for implicit failure
+
+---
+
+### **Group 4: Attribute Operations During Execution (☑️ Tier 2 - Valid Non-State-Changing)**
+
+**Purpose:** Validate operations that update support attributes while Meter is Started. These do not change lifecycle but support progress tracking and context management.
+
+**Test Scenarios:**
+
+1. **Increment iteration counters**
+   - `start() → inc() → inc() → ok()` → currentIteration increments
+   - `start() → incBy(5) → incBy(3) → ok()` → increments by value
+   - `start() → incTo(10) → incTo(50) → ok()` → sets new value
+
+2. **Report progress (throttled)**
+   - `start() → [loop: inc() → progress() if throttled] → ok()`
+   - Verify progress() respects time throttle
+   - Verify progress() respects iteration throttle
+   - Verify INFO log with iterations/second rate
+
+3. **Add context during execution**
+   - `start() → m("step 1") → progress() → m("step 2") → ok()` → verify messages captured
+
+4. **Set path before terminating**
+   - `start() → path("custom_ok_path") → ok()` → verify custom path overrides default
+   - Verify path can be changed multiple times until termination
+
+---
+
+### **Group 5: State-Correcting Transitions (⚠️ Tier 3 - Outside Expected Flow)**
+
+**Purpose:** Validate that Meter handles violations of expected flow gracefully by self-correcting. These calls violate the API contract but achieve valid state with error logs.
+
+**Test Scenarios:**
+
+1. **Terminate without starting (Created → OK/Rejected/Failed)**
+   - `new Meter() → ok()` → logs INCONSISTENT_OK, but terminates correctly
+   - `new Meter() → ok("custom_path")` → logs INCONSISTENT_OK
+   - `new Meter() → reject("cause")` → logs INCONSISTENT_REJECT, terminates with rejection
+   - `new Meter() → fail("cause")` → logs INCONSISTENT_FAIL, terminates with failure
+   - Verify meter reaches terminated state despite violation
+
+2. **Multiple termination attempts (first-termination-wins immutability)**
+   - `start() → ok() → ok()` → second ok ignored, state unchanged
+   - `start() → ok() → reject("cause")` → reject ignored
+   - `start() → ok() → fail("cause")` → fail ignored
+   - `start() → reject("cause1") → fail("cause2")` → fail ignored
+   - `start() → fail("cause") → ok()` → ok ignored
+   - Verify INCONSISTENT_* logs for extra attempts
+
+---
+
+### **Group 6: State-Preserving - Invalid Preconditions (❌ Tier 4a)**
+
+**Purpose:** Validate that Meter rejects calls with invalid preconditions by preserving current state and logging errors.
+
+**Test Scenarios:**
+
+1. **Increment without starting**
+   - `new Meter() → inc()` → logs INCONSISTENT_INCREMENT
+   - `new Meter() → incBy(5)` → logs INCONSISTENT_INCREMENT
+   - `new Meter() → incTo(10)` → logs INCONSISTENT_INCREMENT
+   - Verify currentIteration unchanged
+
+2. **Progress without starting**
+   - `new Meter() → progress()` → logs INCONSISTENT_PROGRESS
+   - Verify state unchanged
+
+3. **Set path before starting**
+   - `new Meter() → path("some_path")` → logs ILLEGAL
+   - Verify okPath not defined
+
+4. **Start twice**
+   - `new Meter() → start() → start()` → second start ignored, logs ILLEGAL
+   - Verify startTime unchanged
+
+5. **Thread-local inconsistency**
+   - Create Meter m1, create Meter m2, call `m1.ok()` when m2 is current
+   - Logs INCONSISTENT_* for wrong thread-local context
+
+---
+
+### **Group 7: State-Preserving - Invalid Arguments (❌ Tier 4b)**
+
+**Purpose:** Validate that Meter rejects calls with invalid arguments by preserving current state and logging errors.
+
+**Test Scenarios:**
+
+1. **Invalid values before starting**
+   - `iterations(0)`, `iterations(-1)` → logs ILLEGAL
+   - `limitMilliseconds(0)`, `limitMilliseconds(-1)` → logs ILLEGAL
+   - `m(null)` when message required → logs ILLEGAL
+   - `m("format", ...)` with null/invalid format → logs ILLEGAL
+
+2. **Invalid values while started**
+   - `incBy(0)`, `incBy(-1)` → logs ILLEGAL
+   - `incTo(n)` where n <= currentIteration → logs ILLEGAL
+   - `ok(null)` if path required → logs ILLEGAL
+   - `reject(null)`, `fail(null)` → logs ILLEGAL
+   - `path(null)` → logs ILLEGAL
+
+3. **Invalid values on terminated meter**
+   - `ok() → ok()`, `ok() → reject()`, `ok() → fail()` → logs INCONSISTENT_*
+   - `ok() → inc()`, `ok() → progress()` → logs INCONSISTENT_*
+
+4. **Invalid constructor arguments**
+   - `new Meter(null)` → throws exception (@NonNull validation)
+
+---
+
+### **Group 8: Immutability Validation on Terminal States (State-Preserving)**
+
+**Purpose:** Validate that operations on terminal states do not alter core outcome attributes, preserving the first-termination-wins guarantee.
+
+**Test Scenarios:**
+
+1. **On OK state**
+   - `ok() → path("new_path")` → ignored
+   - `ok() → iterations(100)` → ignored
+   - `ok() → inc()` → ignored
+   - Verify original outcome path preserved
+
+2. **On Rejected state**
+   - `reject() → path("new_path")` → ignored
+   - `reject() → iterations(100)` → ignored
+   - `reject() → inc()` → ignored
+   - Verify original rejectPath preserved
+
+3. **On Failed state**
+   - `fail() → path("new_path")` → ignored
+   - `fail() → iterations(100)` → ignored
+   - `fail() → inc()` → ignored
+   - Verify original failPath preserved
+
+---
+
+### **Group 9: Thread-Local Stack Management (Lifecycle Complete)**
+
+**Purpose:** Validate correct behavior of thread-local Meter stack for single and nested Meters.
+
+**Test Scenarios:**
+
+1. **Single Meter (no nesting)**
+   - `Meter m → start() → getCurrentInstance() returns m`
+   - `m → ok() → getCurrentInstance() returns "unknown"`
+   - Verify stack cleaned after test
+
+2. **Nested Meters (parent-child)**
+   - `Meter m1 → start() → Meter m2 → start() → m2.ok() → m1.ok()`
+   - Verify m1 becomes current again after m2 terminates
+   - Verify parent-child relationship maintained
+   - Verify stack cleaned after test
+
+3. **@ValidateCleanMeter validation**
+   - Verify each test leaves stack clean
+   - Test fails if non-unknown Meter left on stack
+   - Provides descriptive error message for abandoned Meters
+
+---
+
+### **Group 10: Complex Combined Scenarios (All Tiers)**
+
+**Purpose:** Validate realistic, complex flows that combine multiple aspects of Meter behavior.
+
+**Test Scenarios:**
+
+1. **Operation with progress and context**
+   - `start() → m("starting") → iterations(100) → [loop: inc() → progress() throttled] → m("complete") → ok("done")`
+   - Verify context, progress, and iterations captured
+
+2. **Slow operation with timeLimit**
+   - `start() → limitMilliseconds(100) → [operation >100ms] → ok()`
+   - Verify `isSlow() == true`
+   - Verify log changes from INFO to WARN
+
+3. **Sub-operations**
+   - `start() → sub("subtask1") → progress() → sub("subtask2") → ok()`
+   - Verify sub-operations generate separate entries
+   - Verify parent-child relationships
+
+4. **Error recovery with state-correcting**
+   - `start() → [business error] → ok() [called incorrectly] → verify terminates despite error`
+   - Simulates real scenario where business code calls ok() out of order
+
+---
+
+## Test Coverage Summary
+
+| Group | Focus | Tiers | Logs | Purpose |
+|-------|-------|-------|------|---------|
+| **1** | Initialization | ✅ Base | None | Foundation for all tests |
+| **2** | Pre-Start Config | ☑️ Tier 2 | None | Attribute setup before start |
+| **3** | Happy Path | ✅ Tier 1 | Normal | Valid expected flows |
+| **4** | Execution Attrs | ☑️ Tier 2 | None | Progress & context during execution |
+| **5** | State-Correcting | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
+| **6** | Bad Preconditions | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
+| **7** | Bad Arguments | ❌ Tier 4 | ILLEGAL | Invalid argument values |
+| **8** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
+| **9** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
+| **10** | Complex Scenarios | All | Varies | Realistic workflows |
+
+---
+
+## Implementation Guidelines
+
+### Test Isolation with Group 1
+
+Each test in Groups 2-10 should:
+1. **Assume** Group 0 guarantees have been validated
+2. **Trust** that `new Meter(logger).start()` works correctly
+3. **Skip** redundant initialization checks
+4. **Focus** exclusively on the group's primary concern
+
+### Assertion Strategy
+
+- **Group 0-2**: All assertions pass without logs (valid operations)
+- **Group 3**: Assert successful state change + INCONSISTENT_* log present
+- **Group 4A-4B**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log present
+- **Group 5**: Assert terminal attributes unchanged + no state change
+- **Group 6**: Assert thread-local references correct + stack cleaned
+- **Group 7**: Assert combined behavior matches specification
+
+### Error Log Validation
+
+Use `AssertLogger` for all log validation:
+```java
+// ✅ CORRECT: Semantic assertion
+AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.WARN,
+    "INCONSISTENT_INCREMENT");
+
+// ❌ WRONG: Direct MockLogger assertion
+assertEquals(1, mockLogger.getEventCount());
+```
+
+### Configuration Annotations
+
+All test classes should use:
+```java
+@ValidateCharset
+@ResetMeterConfig
+@WithLocale("en")
+@WithMockLogger
+@ValidateCleanMeter
+class MeterLifeCycleTest { ... }
+```
+
+This ensures:
+- Consistent charset across environments
+- Clean configuration state for each test
+- Consistent locale for string comparisons
+- MockLogger for output validation
+- Clean meter stack verification
+
+---
+
+## References
+
+- [TDR-0019: Immutable Lifecycle Transitions](TDR-0019-immutable-lifecycle-transitions.md)
+- [TDR-0020: Three Outcome Types (OK, REJECT, FAIL)](TDR-0020-three-outcome-types-ok-reject-fail.md)
+- [TDR-0024: Try-With-Resources Lifecycle Fit and Limitations](TDR-0024-try-with-resources-lifecycle-fit-and-limitations.md)
+- [TDR-0029: Resilient State Transitions with Chained API](TDR-0029-resilient-state-transitions-with-chained-api.md)
+- [meter-state-diagram.md](meter-state-diagram.md) - Visual state machine representation
+- [MeterLifeCycleTest.java](../src/test/java/org/usefultoys/slf4j/meter/MeterLifeCycleTest.java) - Test implementation

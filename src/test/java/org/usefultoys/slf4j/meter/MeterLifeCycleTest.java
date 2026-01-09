@@ -15,12 +15,15 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent.Level;
-import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -29,8 +32,6 @@ import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link Meter} lifecycle.
@@ -126,17 +127,49 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Meter Initialization")
+    @DisplayName("Group 1: Meter Initialization (Base Guarantee)")
     class MeterInitialization {
         @Test
-        @DisplayName("should create meter with expected initial state")
-        void shouldCreateMeterWithExpectedInitialState() {
-            // Given: a new Meter
+        @DisplayName("should create meter with logger - initial state")
+        void shouldCreateMeterWithLoggerInitialState() {
+            // Given: a new Meter with logger only
             final Meter meter = new Meter(logger);
+
+            // Then: meter has expected initial state (startTime = 0, stopTime = 0)
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            
+            // Then: no logs yet
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should create meter with logger + operationName")
+        void shouldCreateMeterWithOperationName() {
+            // Given: a new Meter with logger and operationName
+            final String operationName = "testOperation";
+            final Meter meter = new Meter(logger, operationName);
 
             // Then: meter has expected initial state
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEventCount(logger, 0);
+            
+            // Then: operationName is captured correctly
+            assertEquals(operationName, meter.getOperation(), "operation name should match");
+        }
+
+        @Test
+        @DisplayName("should create meter with logger + operationName + parent")
+        void shouldCreateMeterWithParent() {
+            // Given: a new Meter with logger, operationName, and parent
+            final String operationName = "childOperation";
+            final String parentId = "parent-meter-id";
+            final Meter meter = new Meter(logger, operationName, parentId);
+
+            // Then: meter has expected initial state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            
+            // Then: operationName and parent are captured correctly
+            assertEquals(operationName, meter.getOperation(), "operation name should match");
+            assertEquals(parentId, meter.getParent(), "parent should match");
         }
 
         @Test
@@ -149,26 +182,29 @@ class MeterLifeCycleTest {
             // When: start() is called
             meter.start();
 
-            // Then: Meter is in executing state
+            // Then: Meter transitions from Created to Started
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            
+            // Then: meter becomes current in thread-local
+            assertEquals(meter, Meter.getCurrentInstance(), "meter should be current in thread-local");
 
-            // Then: log messages recorded correctly
+            // Then: log messages recorded correctly with system status information
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
         }
 
         @Test
-        @DisplayName("should start meter in try-with-resources")
-        void shouldStartMeterinTryWithResources1() {
+        @DisplayName("should start meter in try-with-resources (start in block)")
+        void shouldStartMeterInTryWithResourcesSequential() {
             // Given: Meter is created in try-with-resources
             try (Meter m = new Meter(logger)) {
-                // Then: meter has expected initial state
+                // Then: meter has expected initial state before start
                 assertMeterState(m, false, false, null, null, null, null, 0, 0, 0);
                 
-                // When: start() is called
+                // When: start() is called in the block
                 m.start();
                 
-                // Then: meter is in executing state
+                // Then: meter is transitioned to executing state
                 assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
             }
 
@@ -177,13 +213,12 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
         }
 
-        
         @Test
         @DisplayName("should start meter with chained call in try-with-resources")
-        void shouldStartMeterinTryWithResources2() {
+        void shouldStartMeterInTryWithResourcesChained() {
             // Given: Meter is created with chained start() in try-with-resources
             try (Meter m = new Meter(logger).start()) {
-                // Then: meter is in executing state
+                // Then: meter is in executing state (created and started in single expression)
                 assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
             }
 
