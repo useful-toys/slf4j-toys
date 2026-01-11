@@ -150,6 +150,21 @@ public class MeterValidator {
     }
 
     /**
+     * Validates the precondition for configuring a time limit on a Meter.
+     * The meter must not have already been stopped before a time limit can be configured.
+     *
+     * @param meter The Meter instance to validate.
+     * @return {@code true} if the precondition is met (not stopped), {@code false} otherwise.
+     */
+    public boolean validateLimitMillisecondsPrecondition(final Meter meter) {
+        if (meter.getStopTime() != 0) {
+            logIllegalPrecondition(meter, Markers.ILLEGAL, "Meter limitMilliseconds but already stopped");
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Validates the arguments for the `limitMilliseconds` method of a Meter.
      *
      * @param meter     The Meter instance.
