@@ -83,6 +83,11 @@
         <slf4j-test-mock.version>0.0.7</slf4j-test-mock.version>
         <archunit.version>1.4.1</archunit.version>
 
+        <!-- Surefire Execution Control Properties -->
+        <!-- Set to 'true' to skip specific test executions (use: -Dskip.unit.tests=true or -Dskip.logback.tests=true) -->
+        <skip.unit.tests>false</skip.unit.tests>
+        <skip.logback.tests>false</skip.logback.tests>
+
         <!-- Maven Plugins Versions -->
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
@@ -228,7 +233,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <skip>false</skip>
+                            <skip>${skip.unit.tests}</skip>
                             <!-- Exclude Logback-specific tests -->
                             <excludes>
                                 <exclude>**/logback/**/*Test.java</exclude>
@@ -247,7 +252,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <skip>false</skip>
+                            <skip>${skip.logback.tests}</skip>
                             <!-- Include only Logback-specific tests -->
                             <includes>
                                 <include>**/logback/**/*Test.java</include>
