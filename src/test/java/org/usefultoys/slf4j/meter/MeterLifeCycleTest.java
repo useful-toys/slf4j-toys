@@ -53,7 +53,6 @@ import org.usefultoys.test.WithLocale;
  * @author Co-authored-by: GitHub Copilot using Gemini 3 Flash (Preview)
  * @author Co-authored-by: GitHub Copilot using GPT-5.2
  */
-@Disabled("Temporarily disabled while fixing implementation to match TDR-0019 immutability guarantee")
 @ValidateCharset
 @ResetMeterConfig
 @WithLocale("en")
@@ -1651,7 +1650,13 @@ class MeterLifeCycleTest {
 
             // Then: Meter state unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected m() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -1666,7 +1671,13 @@ class MeterLifeCycleTest {
 
             // Then: Meter state unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected m() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -1681,7 +1692,13 @@ class MeterLifeCycleTest {
 
             // Then: Meter state unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected m() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -1696,7 +1713,13 @@ class MeterLifeCycleTest {
 
             // Then: Meter state unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected m() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -1711,7 +1734,13 @@ class MeterLifeCycleTest {
 
             // Then: Meter state unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected m() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -1726,7 +1755,13 @@ class MeterLifeCycleTest {
 
             // Then: Meter state unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected m() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         // ============================================================================
@@ -1745,7 +1780,13 @@ class MeterLifeCycleTest {
 
             // Then: currentIteration unchanged, logs INCONSISTENT_INCREMENT
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR INCONSISTENT_INCREMENT (from rejected inc() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
         }
 
         @Test
@@ -1760,7 +1801,13 @@ class MeterLifeCycleTest {
 
             // Then: currentIteration unchanged, logs INCONSISTENT_INCREMENT
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR INCONSISTENT_INCREMENT (from rejected incBy() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
         }
 
         @Test
@@ -1775,7 +1822,13 @@ class MeterLifeCycleTest {
 
             // Then: currentIteration unchanged, logs INCONSISTENT_INCREMENT
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR INCONSISTENT_INCREMENT (from rejected incTo() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
         }
 
         @Test
@@ -1790,7 +1843,13 @@ class MeterLifeCycleTest {
 
             // Then: currentIteration unchanged, logs INCONSISTENT_INCREMENT
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR INCONSISTENT_INCREMENT (from rejected inc() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
         }
 
         @Test
@@ -1805,7 +1864,13 @@ class MeterLifeCycleTest {
 
             // Then: currentIteration unchanged, logs INCONSISTENT_INCREMENT
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR INCONSISTENT_INCREMENT (from rejected incBy() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
         }
 
         @Test
@@ -1820,7 +1885,13 @@ class MeterLifeCycleTest {
 
             // Then: currentIteration unchanged, logs INCONSISTENT_INCREMENT
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR INCONSISTENT_INCREMENT (from rejected incTo() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
         }
 
         // ============================================================================
@@ -1839,7 +1910,13 @@ class MeterLifeCycleTest {
 
             // Then: Meter state unchanged, logs INCONSISTENT_PROGRESS
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR INCONSISTENT_PROGRESS (from rejected progress() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
         }
 
         @Test
@@ -1870,7 +1947,13 @@ class MeterLifeCycleTest {
 
             // Then: Meter state unchanged, logs INCONSISTENT_PROGRESS
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR INCONSISTENT_PROGRESS (from rejected progress() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
         }
 
         @Test
@@ -1905,7 +1988,13 @@ class MeterLifeCycleTest {
 
             // Then: context unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected ctx() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -1936,7 +2025,13 @@ class MeterLifeCycleTest {
 
             // Then: context unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected ctx() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -1971,7 +2066,13 @@ class MeterLifeCycleTest {
 
             // Then: okPath unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected path() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -1986,7 +2087,13 @@ class MeterLifeCycleTest {
 
             // Then: okPath remains original, logs ILLEGAL
             assertMeterState(meter, true, true, "original_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected path() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2001,7 +2108,13 @@ class MeterLifeCycleTest {
 
             // Then: okPath unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected path() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2016,7 +2129,13 @@ class MeterLifeCycleTest {
 
             // Then: okPath remains original, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected path() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2031,7 +2150,13 @@ class MeterLifeCycleTest {
 
             // Then: okPath unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected path() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         // ============================================================================
@@ -2050,7 +2175,13 @@ class MeterLifeCycleTest {
 
             // Then: timeLimit unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected limitMilliseconds() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2081,7 +2212,13 @@ class MeterLifeCycleTest {
 
             // Then: timeLimit unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected limitMilliseconds() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2096,7 +2233,13 @@ class MeterLifeCycleTest {
 
             // Then: timeLimit unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected limitMilliseconds() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2111,7 +2254,13 @@ class MeterLifeCycleTest {
 
             // Then: timeLimit unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected limitMilliseconds() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2142,7 +2291,13 @@ class MeterLifeCycleTest {
 
             // Then: timeLimit unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected limitMilliseconds() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2157,7 +2312,13 @@ class MeterLifeCycleTest {
 
             // Then: timeLimit unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected limitMilliseconds() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         // ============================================================================
@@ -2176,7 +2337,13 @@ class MeterLifeCycleTest {
 
             // Then: expectedIterations unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2207,7 +2374,13 @@ class MeterLifeCycleTest {
 
             // Then: expectedIterations unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2222,7 +2395,13 @@ class MeterLifeCycleTest {
 
             // Then: expectedIterations unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2237,7 +2416,13 @@ class MeterLifeCycleTest {
 
             // Then: expectedIterations unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2268,7 +2453,13 @@ class MeterLifeCycleTest {
 
             // Then: expectedIterations unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
         @Test
@@ -2283,7 +2474,13 @@ class MeterLifeCycleTest {
 
             // Then: expectedIterations unchanged, logs ILLEGAL
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            // Event sequence:
+            // Index 2: INFO MSG_OK (from ok())
+            // Index 3: TRACE DATA_OK (from ok())
+            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
     }
 
