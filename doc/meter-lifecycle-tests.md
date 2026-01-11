@@ -213,7 +213,156 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 5: Valid Expected Flows (✅ Tier 1 - Valid State-Changing)**
+### **Group 5: Post-Stop Configuration (❌ Tier 4 - Invalid State-Preserving)**
+
+**Purpose:** Validate that operations on terminated meters (OK state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped) and do not change state or outcome attributes.
+
+**Test Scenarios:**
+
+1. **Update description after stop (OK state)**
+   - `start() → ok() → m("step 1")` → logs ILLEGAL (Meter already stopped), description unchanged
+   - `start() → ok() → m("step %d", 1)` → logs ILLEGAL, description unchanged
+   - `start() → ok() → m(null)` → logs ILLEGAL, description unchanged
+   - `start() → ok("completion_path") → m("step 1")` → logs ILLEGAL, description unchanged
+   - `start() → ok("completion_path") → m("step %d", 1)` → logs ILLEGAL, description unchanged
+   - `start() → ok("completion_path") → m(null)` → logs ILLEGAL, description unchanged
+
+2. **Increment operations after stop (OK state)**
+   - `start() → ok() → inc()` → logs INCONSISTENT_INCREMENT (Meter already stopped), currentIteration unchanged (0)
+   - `start() → ok() → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+   - `start() → ok() → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+   - `start() → ok("completion_path") → inc()` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+   - `start() → ok("completion_path") → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+   - `start() → ok("completion_path") → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+
+3. **Progress after stop (OK state)**
+   - `start() → ok() → progress()` → logs INCONSISTENT_PROGRESS (Meter already stopped), no progress message
+   - `start() → inc() → ok() → progress()` → logs INCONSISTENT_PROGRESS, no further progress logged
+   - `start() → ok("completion_path") → progress()` → logs INCONSISTENT_PROGRESS, no progress message
+   - `start() → inc() → ok("completion_path") → progress()` → logs INCONSISTENT_PROGRESS, no further progress logged
+
+4. **Update context after stop (OK state)**
+   - `start() → ok() → ctx("key1", "value1")` → logs ILLEGAL (Meter already stopped), context unchanged
+   - `start() → ctx("key", "val") → ok() → ctx("key", "val2")` → logs ILLEGAL, context preserves original value
+   - `start() → ok("completion_path") → ctx("key1", "value1")` → logs ILLEGAL, context unchanged
+   - `start() → ctx("key", "val") → ok("completion_path") → ctx("key", "val2")` → logs ILLEGAL, context preserves original value
+
+5. **Set path after stop (OK state)**
+   - `start() → ok() → path("new_path")` → logs ILLEGAL (Meter already stopped), okPath unchanged/not redefined
+   - `start() → ok("original_path") → path("new_path")` → logs ILLEGAL, okPath remains "original_path"
+   - `start() → ok() → path(null)` → logs ILLEGAL, okPath unchanged
+   - `start() → ok("completion_path") → path("new_path")` → logs ILLEGAL, okPath remains "completion_path"
+   - `start() → ok("completion_path") → path(null)` → logs ILLEGAL, okPath unchanged
+
+6. **Update time limit after stop (OK state)**
+   - `start() → ok() → limitMilliseconds(5000)` → logs ILLEGAL (Meter already stopped), timeLimit unchanged
+   - `start() → limitMilliseconds(100) → ok() → limitMilliseconds(5000)` → logs ILLEGAL, timeLimit remains 100
+   - `start() → ok() → limitMilliseconds(0)` → logs ILLEGAL, timeLimit unchanged
+   - `start() → ok() → limitMilliseconds(-1)` → logs ILLEGAL, timeLimit unchanged
+   - `start() → ok("completion_path") → limitMilliseconds(5000)` → logs ILLEGAL, timeLimit unchanged
+   - `start() → limitMilliseconds(100) → ok("completion_path") → limitMilliseconds(5000)` → logs ILLEGAL, timeLimit remains 100
+   - `start() → ok("completion_path") → limitMilliseconds(0)` → logs ILLEGAL, timeLimit unchanged
+   - `start() → ok("completion_path") → limitMilliseconds(-1)` → logs ILLEGAL, timeLimit unchanged
+
+7. **Update expected iterations after stop (OK state)**
+   - `start() → ok() → iterations(100)` → logs ILLEGAL (Meter already stopped), expectedIterations unchanged
+   - `start() → iterations(50) → ok() → iterations(100)` → logs ILLEGAL, expectedIterations remains 50
+   - `start() → ok() → iterations(0)` → logs ILLEGAL, expectedIterations unchanged
+   - `start() → ok() → iterations(-5)` → logs ILLEGAL, expectedIterations unchanged
+   - `start() → ok("completion_path") → iterations(100)` → logs ILLEGAL, expectedIterations unchanged
+   - `start() → iterations(50) → ok("completion_path") → iterations(100)` → logs ILLEGAL, expectedIterations remains 50
+   - `start() → ok("completion_path") → iterations(0)` → logs ILLEGAL, expectedIterations unchanged
+   - `start() → ok("completion_path") → iterations(-5)` → logs ILLEGAL, expectedIterations unchanged
+
+---
+
+### **Group 6: Post-Stop Configuration - Rejected State (❌ Tier 4 - Invalid State-Preserving)**
+
+**Purpose:** Validate that operations on rejected meters (Rejected state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with rejection) and do not change state or outcome attributes.
+
+**Test Scenarios:**
+
+1. **Update description after reject (Rejected state)**
+   - `start() → reject("business_error") → m("step 1")` → logs ILLEGAL (Meter already stopped), description unchanged
+   - `start() → reject("business_error") → m("step %d", 1)` → logs ILLEGAL, description unchanged
+   - `start() → reject("business_error") → m(null)` → logs ILLEGAL, description unchanged
+
+2. **Increment operations after reject (Rejected state)**
+   - `start() → reject("business_error") → inc()` → logs INCONSISTENT_INCREMENT (Meter already stopped), currentIteration unchanged (0)
+   - `start() → reject("business_error") → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+   - `start() → reject("business_error") → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+
+3. **Progress after reject (Rejected state)**
+   - `start() → reject("business_error") → progress()` → logs INCONSISTENT_PROGRESS (Meter already stopped), no progress message
+   - `start() → inc() → reject("business_error") → progress()` → logs INCONSISTENT_PROGRESS, no further progress logged
+
+4. **Update context after reject (Rejected state)**
+   - `start() → reject("business_error") → ctx("key1", "value1")` → logs ILLEGAL (Meter already stopped), context unchanged
+   - `start() → ctx("key", "val") → reject("business_error") → ctx("key", "val2")` → logs ILLEGAL, context preserves original value
+
+5. **Set path after reject (Rejected state)**
+   - `start() → reject("business_error") → path("new_path")` → logs ILLEGAL (Meter already stopped), rejectPath unchanged/not redefined
+   - `start() → reject("original_error") → path("new_path")` → logs ILLEGAL, rejectPath remains "original_error"
+   - `start() → reject("business_error") → path(null)` → logs ILLEGAL, rejectPath unchanged
+
+6. **Update time limit after reject (Rejected state)**
+   - `start() → reject("business_error") → limitMilliseconds(5000)` → logs ILLEGAL (Meter already stopped), timeLimit unchanged
+   - `start() → limitMilliseconds(100) → reject("business_error") → limitMilliseconds(5000)` → logs ILLEGAL, timeLimit remains 100
+   - `start() → reject("business_error") → limitMilliseconds(0)` → logs ILLEGAL, timeLimit unchanged
+   - `start() → reject("business_error") → limitMilliseconds(-1)` → logs ILLEGAL, timeLimit unchanged
+
+7. **Update expected iterations after reject (Rejected state)**
+   - `start() → reject("business_error") → iterations(100)` → logs ILLEGAL (Meter already stopped), expectedIterations unchanged
+   - `start() → iterations(50) → reject("business_error") → iterations(100)` → logs ILLEGAL, expectedIterations remains 50
+   - `start() → reject("business_error") → iterations(0)` → logs ILLEGAL, expectedIterations unchanged
+   - `start() → reject("business_error") → iterations(-5)` → logs ILLEGAL, expectedIterations unchanged
+
+---
+
+### **Group 7: Post-Stop Configuration - Failed State (❌ Tier 4 - Invalid State-Preserving)**
+
+**Purpose:** Validate that operations on failed meters (Failed state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with failure) and do not change state or outcome attributes.
+
+**Test Scenarios:**
+
+1. **Update description after fail (Failed state)**
+   - `start() → fail("technical_error") → m("step 1")` → logs ILLEGAL (Meter already stopped), description unchanged
+   - `start() → fail("technical_error") → m("step %d", 1)` → logs ILLEGAL, description unchanged
+   - `start() → fail("technical_error") → m(null)` → logs ILLEGAL, description unchanged
+
+2. **Increment operations after fail (Failed state)**
+   - `start() → fail("technical_error") → inc()` → logs INCONSISTENT_INCREMENT (Meter already stopped), currentIteration unchanged (0)
+   - `start() → fail("technical_error") → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+   - `start() → fail("technical_error") → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+
+3. **Progress after fail (Failed state)**
+   - `start() → fail("technical_error") → progress()` → logs INCONSISTENT_PROGRESS (Meter already stopped), no progress message
+   - `start() → inc() → fail("technical_error") → progress()` → logs INCONSISTENT_PROGRESS, no further progress logged
+
+4. **Update context after fail (Failed state)**
+   - `start() → fail("technical_error") → ctx("key1", "value1")` → logs ILLEGAL (Meter already stopped), context unchanged
+   - `start() → ctx("key", "val") → fail("technical_error") → ctx("key", "val2")` → logs ILLEGAL, context preserves original value
+
+5. **Set path after fail (Failed state)**
+   - `start() → fail("technical_error") → path("new_path")` → logs ILLEGAL (Meter already stopped), failPath unchanged/not redefined
+   - `start() → fail("original_error") → path("new_path")` → logs ILLEGAL, failPath remains "original_error"
+   - `start() → fail("technical_error") → path(null)` → logs ILLEGAL, failPath unchanged
+
+6. **Update time limit after fail (Failed state)**
+   - `start() → fail("technical_error") → limitMilliseconds(5000)` → logs ILLEGAL (Meter already stopped), timeLimit unchanged
+   - `start() → limitMilliseconds(100) → fail("technical_error") → limitMilliseconds(5000)` → logs ILLEGAL, timeLimit remains 100
+   - `start() → fail("technical_error") → limitMilliseconds(0)` → logs ILLEGAL, timeLimit unchanged
+   - `start() → fail("technical_error") → limitMilliseconds(-1)` → logs ILLEGAL, timeLimit unchanged
+
+7. **Update expected iterations after fail (Failed state)**
+   - `start() → fail("technical_error") → iterations(100)` → logs ILLEGAL (Meter already stopped), expectedIterations unchanged
+   - `start() → iterations(50) → fail("technical_error") → iterations(100)` → logs ILLEGAL, expectedIterations remains 50
+   - `start() → fail("technical_error") → iterations(0)` → logs ILLEGAL, expectedIterations unchanged
+   - `start() → fail("technical_error") → iterations(-5)` → logs ILLEGAL, expectedIterations unchanged
+
+---
+
+### **Group 8: Valid Expected Flows (✅ Tier 1 - Valid State-Changing)**
 
 **Purpose:** Validate normal lifecycle transitions without errors. These are the expected, successful paths through the state machine.
 
@@ -245,7 +394,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 6: State-Correcting Transitions (⚠️ Tier 3 - Outside Expected Flow)**
+### **Group 9: State-Correcting Transitions (⚠️ Tier 3 - Outside Expected Flow)**
 
 **Purpose:** Validate that Meter handles violations of expected flow gracefully by self-correcting. These calls violate the API contract but achieve valid state with error logs.
 
@@ -268,7 +417,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 7: State-Preserving - Invalid Preconditions (❌ Tier 4a)**
+### **Group 10: State-Preserving - Invalid Preconditions (❌ Tier 4a)**
 
 **Purpose:** Validate that Meter rejects calls with invalid preconditions by preserving current state and logging errors.
 
@@ -298,7 +447,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 8: State-Preserving - Invalid Arguments (❌ Tier 4b)**
+### **Group 11: State-Preserving - Invalid Arguments (❌ Tier 4b)**
 
 **Purpose:** Validate that Meter rejects calls with invalid arguments by preserving current state and logging errors.
 
@@ -326,7 +475,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 9: Immutability Validation on Terminal States (State-Preserving)**
+### **Group 12: Immutability Validation on Terminal States (State-Preserving)**
 
 **Purpose:** Validate that operations on terminal states do not alter core outcome attributes, preserving the first-termination-wins guarantee.
 
@@ -352,7 +501,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 10: Thread-Local Stack Management (Lifecycle Complete)**
+### **Group 13: Thread-Local Stack Management (Lifecycle Complete)**
 
 **Purpose:** Validate correct behavior of thread-local Meter stack for single and nested Meters.
 
@@ -376,7 +525,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 11: Complex Combined Scenarios (All Tiers)**
+### **Group 14: Complex Combined Scenarios (All Tiers)**
 
 **Purpose:** Validate realistic, complex flows that combine multiple aspects of Meter behavior.
 
@@ -410,14 +559,16 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 | **2** | Pre-Start Config | ☑️ Tier 2 | None | Attribute setup before start |
 | **3** | Pre-Start Invalid | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations before start |
 | **4** | Post-Start Config | ☑️ Tier 2 | None | Attribute updates during execution |
-| **5** | Post-Start Invalid | ❌ Tier 4 | ILLEGAL | Invalid operations during execution |
-| **6** | Happy Path | ✅ Tier 1 | Normal | Valid expected flows |
-| **7** | State-Correcting | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
-| **8** | Bad Preconditions | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
-| **9** | Bad Arguments | ❌ Tier 4 | ILLEGAL | Invalid argument values |
-| **10** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
-| **11** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
-| **12** | Complex Scenarios | All | Varies | Realistic workflows |
+| **5** | Post-Stop Config (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
+| **6** | Post-Stop Config (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
+| **7** | Post-Stop Config (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
+| **8** | Happy Path | ✅ Tier 1 | Normal | Valid expected flows |
+| **9** | State-Correcting | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
+| **10** | Bad Preconditions | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
+| **11** | Bad Arguments | ❌ Tier 4 | ILLEGAL | Invalid argument values |
+| **12** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
+| **13** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
+| **14** | Complex Scenarios | All | Varies | Realistic workflows |
 
 ---
 
@@ -433,12 +584,15 @@ Each test in Groups 2-10 should:
 
 ### Assertion Strategy
 
-- **Group 0-2**: All assertions pass without logs (valid operations)
-- **Group 3**: Assert successful state change + INCONSISTENT_* log present
-- **Group 4A-4B**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log present
-- **Group 5**: Assert terminal attributes unchanged + no state change
-- **Group 6**: Assert thread-local references correct + stack cleaned
-- **Group 7**: Assert combined behavior matches specification
+- **Group 1-2**: All assertions pass without logs (valid operations)
+- **Group 3**: Assert state change + INCONSISTENT_* log (pre-start invalid)
+- **Group 4**: All assertions pass without logs (post-start valid)
+- **Group 5-7**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (post-stop invalid)
+- **Group 8**: Assert terminal attributes preserved + no state change (happy path)
+- **Group 9**: Assert state changes + error logs (state-correcting)
+- **Group 10-11**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (invalid flow)
+- **Group 12**: Assert thread-local references correct + stack cleaned
+- **Group 13**: Assert combined behavior matches specification
 
 ### Error Log Validation
 
