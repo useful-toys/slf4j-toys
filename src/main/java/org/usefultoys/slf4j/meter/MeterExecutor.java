@@ -149,8 +149,13 @@ public interface MeterExecutor<T> extends MeterAnalysis {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
-            putContext(CONTEXT_RESULT, result);
-            if (! isStopped()) ok();
+            /* Only add result context if meter is not yet stopped. If the callable invoked ok(), fail(), 
+               or reject(), the terminal message has already been emitted. Adding context after would not be
+               reflected in the already-logged output, so it's not useful and violates TDR-0019. */
+            if (! isStopped()) {
+                putContext(CONTEXT_RESULT, result);
+                ok();
+            }
             return result;
         } catch (final Exception e) {
             fail(e);
@@ -175,8 +180,13 @@ public interface MeterExecutor<T> extends MeterAnalysis {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
-            putContext(CONTEXT_RESULT, result);
-            if (! isStopped()) ok();
+            /* Only add result context if meter is not yet stopped. If the callable invoked ok(), fail(), 
+               or reject(), the terminal message has already been emitted. Adding context after would not be
+               reflected in the already-logged output, so it's not useful and violates TDR-0019. */
+            if (! isStopped()) {
+                putContext(CONTEXT_RESULT, result);
+                ok();
+            }
             return result;
         } catch (final RuntimeException e) {
             fail(e);
@@ -206,8 +216,13 @@ public interface MeterExecutor<T> extends MeterAnalysis {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
-            putContext(CONTEXT_RESULT, result);
-            if (! isStopped()) ok();
+            /* Only add result context if meter is not yet stopped. If the callable invoked ok(), fail(), 
+               or reject(), the terminal message has already been emitted. Adding context after would not be
+               reflected in the already-logged output, so it's not useful and violates TDR-0019. */
+            if (! isStopped()) {
+                putContext(CONTEXT_RESULT, result);
+                ok();
+            }
             return result;
         } catch (final Exception e) {
             for (final Class<? extends Exception> exceptionClass : exceptionsToReject) {
@@ -239,8 +254,13 @@ public interface MeterExecutor<T> extends MeterAnalysis {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
-            putContext(CONTEXT_RESULT, result);
-            if (! isStopped()) ok();
+            /* Only add result context if meter is not yet stopped. If the callable invoked ok(), fail(), 
+               or reject(), the terminal message has already been emitted. Adding context after would not be
+               reflected in the already-logged output, so it's not useful and violates TDR-0019. */
+            if (! isStopped()) {
+                putContext(CONTEXT_RESULT, result);
+                ok();
+            }
             return result;
         } catch (final RuntimeException e) {
             fail(e);
@@ -274,8 +294,13 @@ public interface MeterExecutor<T> extends MeterAnalysis {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
-            putContext(CONTEXT_RESULT, result);
-            if (! isStopped()) ok();
+            /* Only add result context if meter is not yet stopped. If the callable invoked ok(), fail(), 
+               or reject(), the terminal message has already been emitted. Adding context after would not be
+               reflected in the already-logged output, so it's not useful and violates TDR-0019. */
+            if (! isStopped()) {
+                putContext(CONTEXT_RESULT, result);
+                ok();
+            }
             return result;
         } catch (final RuntimeException e) {
             fail(e);

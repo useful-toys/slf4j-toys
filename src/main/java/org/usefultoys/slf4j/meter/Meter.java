@@ -281,6 +281,26 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     // ctx and unctx methods are now provided by MeterContext interface
     // ========================================================================
 
+    @Override
+    public void putContext(final String name, final Object value) {
+        if (!MeterValidator.validateContextPrecondition(this)) {
+            return;
+        }
+        super.putContext(name, value);
+    }
+
+    @Override
+    public void putContext(final String name) {
+        if (!MeterValidator.validateContextPrecondition(this)) {
+            return;
+        }
+        super.putContext(name);
+    }
+
+    // ========================================================================
+    // ctx and unctx methods are now provided by MeterContext interface
+    // ========================================================================
+
     /**
      * Notifies the `Meter` that the operation has started. This method logs a **human-readable summary** (DEBUG level)
      * and a **machine-parsable data message** (TRACE level) with the current system status.
