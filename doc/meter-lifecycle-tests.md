@@ -94,26 +94,134 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - Verify INFO log with completion report
 
 2. **Created → Started → OK with custom path**
-   - `new Meter().start() → ok("success_path")`
-   - `new Meter().start() → path("custom_path") → ok()`
-   - Verify variations: String, Enum, Throwable, Object as path
+   - `new Meter().start() → ok("success_path")` → verify okPath = "success_path"
+   - `new Meter().start() → path("custom_path") → ok()` → verify okPath = "custom_path" (path() sets default, ok() uses it)
+   - Verify variations of path types and ok() arguments:
+     - **String path**: `ok("success")`, `ok(new String("dynamic"))` → okPath as String
+     - **Enum path**: `ok(SomeEnum.SUCCESS)` → okPath = enum toString()
+     - **Throwable path**: `ok(new RuntimeException("cause message"))` → okPath = throwable message
+     - **Object path**: `ok(new CustomObject())` → okPath = object toString()
+   - **Path with successful ok (overriding default)**:
+     - `new Meter().start() → path("default_path") → ok("override_path")` → verify okPath = "override_path" (ok() argument overrides path())
+     - Verify INFO log shows final okPath in completion report
+   - **Multiple successive path() calls before ok()**:
+     - `new Meter().start() → path("first") → path("second") → path("third") → ok()` → verify okPath = "third" (last value wins)
+     - Verify no error logs for valid path values
+   - Verify all variations result in OK state with correct okPath recorded
 
 3. **Created → Started → Rejected**
-   - `new Meter().start() → reject("business_rule_violation")`
-   - Verify variations: String, Enum, Throwable, Object as cause
-   - Verify rejectPath recorded
+   - **Basic rejection with String cause**:
+     - `new Meter().start() → reject("business_rule_violation")` → verify rejectPath = "business_rule_violation"
+   - **Rejection with various cause types**:
+     - **String cause**: `reject("validation_failed")`, `reject(new String("dynamic"))` → rejectPath as String
+     - **Enum cause**: `reject(ValidationError.DUPLICATE_ENTRY)` → rejectPath = enum toString()
+     - **Throwable cause**: `reject(new IllegalArgumentException("invalid input format"))` → rejectPath = throwable class name + message or just message
+     - **Object cause**: `reject(new CustomErrorCode())` → rejectPath = object toString()
+   - **Multiple successive reject() calls** (last value wins):
+     - `new Meter().start() → reject("reason1") → reject("reason2")` → verify second reject() is ignored (logs INCONSISTENT_REJECT), meter remains in Rejected state from first call
+   - **Rejection after setting path() expectation** (rejection overrides path):
+     - `new Meter().start() → path("expected_ok_path") → reject("business_error")` → verify rejectPath = "business_error", okPath remains unset
+   - Verify WARN log with rejection report including correct rejectPath
+   - Verify meter transitions to Rejected state
 
 4. **Created → Started → Failed**
-   - `new Meter().start() → fail("technical_error")`
-   - Verify variations: String, Enum, Throwable, Object as cause
-   - Verify failPath recorded
+   - **Basic failure with String cause**:
+     - `new Meter().start() → fail("technical_error")` → verify failPath = "technical_error"
+   - **Failure with various cause types**:
+     - **String cause**: `fail("database_connection_timeout")`, `fail(new String("dynamic"))` → failPath as String
+     - **Enum cause**: `fail(ErrorType.DATABASE_ERROR)` → failPath = enum toString()
+     - **Throwable cause**: `fail(new SQLException("connection refused"))` → failPath = throwable class name + message or just message
+     - **Object cause**: `fail(new ErrorDetails())` → failPath = object toString()
+   - **Multiple successive fail() calls** (last value would win in theory, but immutability prevents this):
+     - `new Meter().start() → fail("reason1")` → attempt `fail("reason2")` → verify second fail() is ignored (logs INCONSISTENT_FAIL), meter remains in Failed state
+   - **Failure after setting path() expectation** (failure overrides path):
+     - `new Meter().start() → path("expected_ok_path") → fail("critical_error")` → verify failPath = "critical_error", okPath remains unset
+   - Verify ERROR log with failure report including correct failPath
+   - Verify meter transitions to Failed state
+   - Verify failPath immutability (cannot change once set to Failed)
 
-5. **Created → Started → Failed (via try-with-resources)**
-   - `try (Meter m = new Meter().start()) { ... }` without calling ok(), reject(), or fail()
-   - Verify close() automatically triggers fail with path "try-with-resources"
-   - Verify WARN/ERROR log for implicit failure
+5. **Created → Started → OK with mixed iterations and progress**
+   - `new Meter().start() → inc() × 10 → progress() → inc() × 15 → progress() → inc() × 25 → ok()`
+   - Verify currentIteration incremented on each `inc()` call: 10 → 25 → 50
+   - Verify `progress()` calls logged periodically during execution (throttled)
+   - Verify progress does not change lifecycle state (remains Started)
+   - Verify final currentIteration = 50
+   - Verify `getIterationsPerSecond()` calculated correctly
+   - Verify INFO log with completion report including iteration and progress metrics
+   - Verify progress calls interleaved correctly with iteration increments
+
+6. **Created → Started → OK with progress tracking**
+   - `new Meter().start() → progress() → ... → progress() → ok()` (multiple calls)
+   - Verify progress is logged periodically (throttled based on progress advancement)
+   - Verify progress does not change lifecycle state (remains Started)
+   - Verify final transition to OK state works correctly
+   - Verify completion report includes iteration metrics
+
+7. **Created → Started → OK with time limit (NOT slow)**
+    - `new Meter().start() → limitMilliseconds(5000) → [execute ~500ms] → ok()`
+    - Verify `timeLimit = 5000`
+    - Verify `executionTime < timeLimit` (e.g., 500 < 5000)
+    - Verify `isSlow() = false`
+    - Verify no slow operation warnings in INFO log
+    - Verify completion report includes timing metrics
+
+8. **Created → Started → OK with time limit (IS slow)**
+    - `new Meter().start() → limitMilliseconds(100) → [execute ~2000ms] → ok()`
+    - Verify `timeLimit = 100`
+    - Verify `executionTime > timeLimit` (e.g., 2000 > 100)
+    - Verify `isSlow() = true`
+    - Verify slow operation warning included in INFO log
+    - Verify completion report highlights slow timing
+
+9. **Created → Started → OK with high iteration count + time limit (NOT slow)**
+    - `new Meter().start() → iterations(1000) → limitMilliseconds(10000) → inc() × 500 → [execute ~1000ms] → ok()`
+    - Verify 500 iterations completed successfully
+    - Verify `executionTime = 1000ms < timeLimit = 10000ms` (not slow)
+    - Verify `isSlow() = false`
+    - Verify `getIterationsPerSecond()` = ~500 iterations/sec
+    - Verify INFO log shows high throughput without slow warnings
+
+10. **Created → Started → OK with high iteration count + strict time limit (IS slow)**
+    - `new Meter().start() → iterations(1000) → limitMilliseconds(500) → inc() × 100 → [execute ~2000ms] → ok()`
+    - Verify 100 iterations completed successfully
+    - Verify `executionTime = 2000ms > timeLimit = 500ms` (slow)
+    - Verify `isSlow() = true`
+    - Verify `getIterationsPerSecond()` = ~50 iterations/sec
+    - Verify INFO log includes slow operation warning with timing details
+
+11. **Created → Started → Rejected with iterations**
+    - `new Meter().start() → inc() × 25 → reject("validation_failed")`
+    - Verify currentIteration = 25 before rejection
+    - Verify rejectPath = "validation_failed"
+    - Verify WARN log with rejection report including iteration count
+    - Verify `getIterationsPerSecond()` calculated for rejected operation
+
+12. **Created → Started → Failed with progress tracking + time limit (slow)**
+    - `new Meter().start() → limitMilliseconds(1000) → progress() → ... → [execute ~3000ms] → fail("timeout")`
+    - Verify `timeLimit = 1000`
+    - Verify `executionTime = 3000ms > timeLimit` (slow)
+    - Verify `isSlow() = true`
+    - Verify failPath = "timeout"
+    - Verify ERROR log with failure report highlighting slow timeout
+    - Verify progress metrics included in error log
+
+13. **Created → Started → OK with borderline time limit**
+    - `new Meter().start() → limitMilliseconds(1000) → [execute ~1000ms (exactly equal)] → ok()`
+    - Verify `timeLimit = 1000`
+    - Verify `executionTime = 1000ms == timeLimit` (exactly at limit)
+    - Verify `isSlow() = false` (only true when executionTime **>** timeLimit, not >=)
+    - Verify completion report shows operation at exact limit, not slow
+    - Verify INFO log does not include slow warnings
+
+14. **Created → Started → OK with zero time limit**
+    - `new Meter().start() → limitMilliseconds(0) → [execute any duration] → ok()`
+    - Verify `timeLimit = 0` (no limit set)
+    - Verify `isSlow() = false` (isSlow requires timeLimit > 0)
+    - Verify no slow operation logic triggered
+    - Verify INFO log shows normal completion without timing analysis
 
 ---
+
 
 ### **Group 3: Try-With-Resources (All Lifecycle Scenarios)**
 
@@ -177,10 +285,107 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - Verify close() is no-op (no additional logs)
    - Test all fail() variations: `fail(String)`, `fail(Enum)`, `fail(Throwable)`, `fail(Object)`
 
+7. **Try-with-resources WITH start() - Implicit close + iterations via inc()**
+   - `try (Meter m = new Meter(logger).start()) { m.inc(); m.inc(); m.inc(); /* no explicit termination */ }` → implicit close() calls fail()
+   - Verify meter transitions Created → Started → Failed
+   - Verify currentIteration = 3 before failure
+   - Verify ERROR log with implicit failure report including iteration count
+   - Verify `getIterationsPerSecond()` calculated for failed operation
+   - Verify try-with-resources cleanup happens correctly
+
+8. **Try-with-resources WITH start() - Explicit ok() + iterations via incBy()**
+    - `try (Meter m = new Meter(logger).start()) { m.incBy(10); m.incBy(15); m.ok(); }` → explicit ok(), then close() does nothing
+    - Verify meter transitions Created → Started → OK
+    - Verify currentIteration = 25 (10 + 15)
+    - Verify INFO log with completion report showing iteration metrics
+    - Verify close() is no-op (no additional logs)
+    - Verify `getIterationsPerSecond()` accurately reflects throughput
+
+9. **Try-with-resources WITH start() - Explicit fail() + progress tracking**
+    - `try (Meter m = new Meter(logger).start()) { m.progress(); ... m.progress(); m.fail("timeout"); }` → explicit fail with progress tracking
+    - Verify meter transitions Created → Started → Failed
+    - Verify progress logs emitted during execution (throttled)
+    - Verify ERROR log with failure report
+    - Verify close() is no-op (no additional logs)
+    - Verify progress state preserved in error context
+
+10. **Try-with-resources WITH start() - Explicit reject() + time limit (NOT slow)**
+    - `try (Meter m = new Meter(logger).start()) { m.limitMilliseconds(5000); m.inc() × 50; /* execute ~500ms */ m.reject("validation_failed"); }`
+    - Verify meter transitions Created → Started → Rejected
+    - Verify `timeLimit = 5000`
+    - Verify `executionTime < timeLimit` (not slow)
+    - Verify `isSlow() = false`
+    - Verify currentIteration = 50
+    - Verify WARN log with rejection report, no slow operation warnings
+    - Verify close() is no-op (no additional logs)
+
+11. **Try-with-resources WITH start() - Explicit ok() + time limit (IS slow)**
+    - `try (Meter m = new Meter(logger).start()) { m.limitMilliseconds(500); /* execute ~2000ms */ m.ok(); }`
+    - Verify meter transitions Created → Started → OK
+    - Verify `timeLimit = 500`
+    - Verify `executionTime > timeLimit` (slow)
+    - Verify `isSlow() = true`
+    - Verify INFO log with completion report highlighting slow operation
+    - Verify close() is no-op (no additional logs)
+
+12. **Try-with-resources WITH start() - Implicit close (no explicit termination) + high iterations + strict time limit**
+    - `try (Meter m = new Meter(logger).start()) { m.iterations(500); m.limitMilliseconds(1000); m.inc() × 100; /* execute ~3000ms, no explicit termination */ }`
+    - Verify meter transitions Created → Started → Failed (implicit via close)
+    - Verify 100 iterations completed, 400 expected remaining
+    - Verify `timeLimit = 1000`
+    - Verify `executionTime ≈ 3000ms > timeLimit` (slow)
+    - Verify `isSlow() = true`
+    - Verify ERROR log with implicit failure, highlighting slow operation
+    - Verify try-with-resources cleanup happens correctly
+
+13. **Try-with-resources WITH start() - Explicit ok() + multiple progress() calls + time limit borderline**
+    - `try (Meter m = new Meter(logger).start()) { m.limitMilliseconds(1000); m.progress(); ... m.progress(); /* execute ~1000ms */ m.ok(); }`
+    - Verify meter transitions Created → Started → OK
+    - Verify `timeLimit = 1000`
+    - Verify `executionTime = 1000ms == timeLimit` (exactly at limit)
+    - Verify `isSlow() = false` (only when executionTime **>** timeLimit)
+    - Verify progress logs emitted during execution
+    - Verify INFO log shows operation completed at exact limit, not slow
+
+14. **Try-with-resources WITHOUT start() - Implicit close + implicit start with auto-correction**
+    - `try (Meter m = new Meter(logger)) { m.inc(); /* no start(), no explicit termination */ }` → implicit close() with auto-correction
+    - Verify meter transitions Created → Failed (via auto-correction and implicit close)
+    - Verify `inc()` call logged as INCONSISTENT_INCREMENT (meter not started)
+    - Verify currentIteration = 0 (increment was rejected/ignored)
+    - Verify INCONSISTENT_CLOSE + ERROR log for implicit failure
+    - Verify Meter removed from thread-local stack after block
+    - Verify startTime auto-initialized during close()
+
+15. **Try-with-resources WITHOUT start() - Explicit ok() + iterations setup (⚠️ Tier 3)**
+    - `try (Meter m = new Meter(logger)) { m.iterations(100); m.ok(); }` → explicit ok() without start()
+    - Verify meter transitions Created → OK (with startTime auto-initialized)
+    - Verify expectedIterations = 100 (setup before termination)
+    - Verify INCONSISTENT_OK + INFO log with completion report
+    - Verify close() is no-op (no additional logs)
+    - Verify expectedIterations preserved in OK state
+
+16. **Try-with-resources WITHOUT start() - Explicit reject() + time limit configuration (⚠️ Tier 3)**
+    - `try (Meter m = new Meter(logger)) { m.limitMilliseconds(5000); m.reject("business_error"); }`
+    - Verify meter transitions Created → Rejected (with startTime auto-initialized)
+    - Verify `timeLimit = 5000` (setup before termination)
+    - Verify INCONSISTENT_REJECT + WARN log with rejection report
+    - Verify close() is no-op (no additional logs)
+    - Verify timeLimit preserved in Rejected state
+
+17. **Try-with-resources WITHOUT start() - Implicit close + progress attempt (⚠️ Tier 3)**
+    - `try (Meter m = new Meter(logger)) { m.progress(); /* no start(), no explicit termination */ }` → implicit close() with auto-correction
+    - Verify meter transitions Created → Failed (via auto-correction and implicit close)
+    - Verify `progress()` call logged as INCONSISTENT_PROGRESS (meter not started)
+    - Verify INCONSISTENT_CLOSE + ERROR log for implicit failure
+    - Verify try-with-resources cleanup happens correctly
+    - Verify startTime auto-initialized during close()
+
 **Coverage Summary for Try-With-Resources:**
-- **WITH start()**: 1 implicit close + 4 explicit ok + 4 explicit reject + 4 explicit fail = **13 tests**
-- **WITHOUT start() (Tier 3)**: 1 implicit close + 5 explicit ok + 4 explicit reject + 4 explicit fail = **14 tests**
-- **Total try-with-resources tests: 27 scenarios** (currently 19 implemented)
+- **WITH start() (basic)**: 4 scenarios (implicit close, explicit ok, explicit reject, explicit fail)
+- **WITH start() (inc/progress/timeLimit)**: 6 scenarios (7-12)
+- **WITHOUT start() (basic)**: 4 scenarios (implicit close, explicit ok, explicit reject, explicit fail)
+- **WITHOUT start() (Tier 3 with config)**: 3 scenarios (15-17)
+- **Total try-with-resources tests: 17 scenarios** (4 base + 6 advanced = 10 WITH start; 4 base + 3 config = 7 WITHOUT start)
 
 ---
 
