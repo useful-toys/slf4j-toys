@@ -433,7 +433,7 @@ class MeterAnalysisLegacyTest {
         // Given: a meter analysis scenario
         // When: checking if the operation is slow
         // Then: it should match the expected value
-        assertEquals(scenario.isExpectedIsSlow(), scenario.isSlow(),
+        assertEquals(scenario.getExpectedIsSlow(), scenario.isSlow(),
                 "isSlow should match the expected value for scenario: " + scenario);
     }
 }
