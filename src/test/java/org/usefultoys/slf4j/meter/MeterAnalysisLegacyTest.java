@@ -117,6 +117,10 @@ class MeterAnalysisLegacyTest {
         public String toString() {
             return String.format("Scenario(category='%s', operation='%s')", category, operation);
         }
+
+        public boolean getExpectedIsSlow() {
+            return expectedIsSlow;
+        }
     }
 
     /**
@@ -244,7 +248,7 @@ class MeterAnalysisLegacyTest {
                         5000L,
                         "cat10", "op10", null,
                         100L, 1000L, 0L, 0L, // Not stopped
-                        15L, "ok", null, null,
+                        15L, null, null, null,
                         "cat10/op10#11", true, false,
                         false, false, false,
                         null, 15.0 / (5000.0 - 1000.0) * 1_000_000_000, 4000L,
