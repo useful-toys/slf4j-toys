@@ -85,6 +85,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 3. **Add descriptive message**
    - `new Meter() → m("starting operation")` → verify description = "starting operation" (before start)
    - `new Meter() → m("step 1") → m("step 2")` → verify last value wins (description = "step 2")
+   - `new Meter() → m(null)` → verify null value logs ILLEGAL, state unchanged
    - `new Meter() → m("step 1") → m(null)` → verify null value logs ILLEGAL, preserves previous value (description = "step 1")
    - Verify no error logs for valid messages, ILLEGAL log for null
 
@@ -109,7 +110,110 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 3: Valid Expected Flows (✅ Tier 1 - Valid State-Changing)**
+### **Group 3: Pre-Start Configuration - Invalid Operations (❌ Tier 4 - Invalid State-Preserving)**
+
+**Purpose:** Validate that Meter rejects invalid operations on unstarted Meters by preserving current state and logging errors. These calls have invalid preconditions (meter not yet started) or invalid arguments.
+
+**Test Scenarios:**
+
+1. **Increment operations without starting**
+   - `new Meter() → inc()` → logs INCONSISTENT_INCREMENT, currentIteration unchanged
+   - `new Meter() → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged
+   - `new Meter() → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged
+   - Verify meter remains in Created state
+
+2. **Progress without starting**
+   - `new Meter() → progress()` → logs INCONSISTENT_PROGRESS
+   - Verify meter remains in Created state
+   - Verify no progress report generated
+
+3. **Set path before starting**
+   - `new Meter() → path("some_path")` → logs ILLEGAL
+   - Verify okPath not defined
+   - Verify meter remains in Created state
+
+---
+
+### **Group 4: Post-Start Configuration (☑️ Tier 2 - Valid Non-State-Changing)**
+
+**Purpose:** Validate operations that update support attributes AFTER `start()`. These calls do not change lifecycle but support progress tracking and context management during execution. Tests verify attribute storage, override behavior, and graceful rejection of invalid arguments.
+
+**Test Scenarios:**
+
+1. **Update description with valid and invalid values**
+   - `start() → m("step 1")` → verify description = "step 1"
+   - `start() → m("step 1") → m("step 2")` → verify last message wins (description = "step 2")
+   - `start() → m("valid") → m(null)` → verify null rejected (logs ILLEGAL), preserves "valid"
+   - `start() → m("step %d", 1)` → verify formatted message (description = "step 1")
+   - `start() → m("step %d", 1) → m("step %d", 2)` → verify last format wins (description = "step 2")
+   - `start() → m("valid: %s", "arg") → m(null, "arg")` → verify null format rejected (logs ILLEGAL), preserves previous
+   - `start() → m("invalid %z", "arg")` → verify invalid format logs ILLEGAL, description unchanged
+   - `start() → m("valid") → m("invalid %z", "arg") → m("final")` → verify invalid attempt skipped, final overwrites
+
+2. **Update iteration counters with valid and invalid values**
+   - `start() → inc() → progress()` → verify currentIteration = 1, progress message logged (requires `MeterConfig.progressPeriodMilliseconds=0`)
+   - `start() → inc() → inc() → progress()` → verify currentIteration = 2, progress message logged
+   - `start() → incBy(5) → progress()` → verify currentIteration = 5, progress message logged
+   - `start() → incBy(5) → incBy(3) → progress()` → verify currentIteration = 8, progress message logged
+   - `start() → incTo(10) → progress()` → verify currentIteration = 10, progress message logged
+   - `start() → incTo(10) → incTo(50) → progress()` → verify currentIteration = 50, progress message logged
+   - `start() → incTo(100) → incTo(50) → progress()` → verify backward movement preserves current (currentIteration = 100), progress message logged
+   - `start() → incBy(5) → incBy(0) → progress()` → verify 0 rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
+   - `start() → incBy(5) → incBy(-3) → progress()` → verify negative rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
+   - `start() → incBy(-5) → progress()` → verify negative rejected (logs ILLEGAL), currentIteration = 0, progress message still logged
+   - `start() → incBy(0) → progress()` → verify zero rejected (logs ILLEGAL), currentIteration = 0, progress message still logged
+   - `start() → incTo(10) → incTo(3) → progress()` → verify backward target rejected (logs ILLEGAL), currentIteration = 10, progress message still logged
+   - `start() → incTo(-5) → progress()` → verify negative target rejected (logs ILLEGAL), currentIteration unchanged (0), progress message still logged
+   - `start() → incTo(0) → progress()` → verify zero target rejected (logs ILLEGAL), currentIteration unchanged (0), progress message still logged
+   - `start() → inc() → incBy(-1) → incTo(0) → inc() → progress()` → verify invalid attempts skipped, valid ones succeed, progress message logged
+
+   **Note:** To observe progress messages in test assertions, set `MeterConfig.progressPeriodMilliseconds = 0` before starting the meter. This eliminates the throttling delay and allows immediate progress reporting on each call to `progress()`, making message validation possible in unit tests.
+
+3. **Update context during execution**
+   - `start() → ctx("key1", "value1")` → verify context has key1=value1
+   - `start() → ctx("key", "val1") → ctx("key", "val2")` → verify last value wins (key=val2)
+   - `start() → ctx("key", "valid") → ctx("key", null)` → verify null stored as "<null>" (key="<null>")
+   - `start() → ctx("key1", "val1") → ctx("key2", "val2")` → verify multiple keys coexist
+   - `start() → ctx(null)` → verify stores with "<null>" key (valid behavior)
+   - `start() → ctx("key", null)` → verify stores "<null>" value (valid behavior)
+
+4. **Set path with valid values**
+   - `start() → path("custom_ok_path")` → verify okPath = "custom_ok_path"
+   - `start() → path("path1") → path("path2")` → verify last path wins (okPath = "path2")
+   - `start() → path("valid") → path(null)` → verify null rejected (logs ILLEGAL), preserves "valid"
+   - `start() → path(null)` → verify null rejected (logs ILLEGAL), okPath unchanged/not defined
+   - `start() → path(null) → path("valid")` → verify null rejected, then valid accepted (okPath = "valid")
+   - Verify path variations work: String, Enum, Throwable, Object values
+
+5. **Update time limit with valid and invalid values**
+   - `start() → limitMilliseconds(5000)` → verify timeLimit = 5000
+   - `start() → limitMilliseconds(100) → limitMilliseconds(5000)` → verify last value wins (timeLimit = 5000)
+   - `start() → limitMilliseconds(5000) → limitMilliseconds(100)` → verify valid value accepted, last wins (timeLimit = 100)
+   - `start() → limitMilliseconds(5000) → limitMilliseconds(0)` → verify 0 rejected (logs ILLEGAL), timeLimit = 5000
+   - `start() → limitMilliseconds(5000) → limitMilliseconds(-1)` → verify negative rejected (logs ILLEGAL), timeLimit = 5000
+   - `start() → limitMilliseconds(0)` → verify 0 rejected (logs ILLEGAL), timeLimit unchanged
+   - `start() → limitMilliseconds(-5)` → verify negative rejected (logs ILLEGAL), timeLimit unchanged
+
+6. **Update expected iterations with valid and invalid values**
+   - `start() → iterations(100)` → verify expectedIterations = 100
+   - `start() → iterations(50) → iterations(100)` → verify last value wins (expectedIterations = 100)
+   - `start() → iterations(100) → iterations(50)` → verify valid value accepted, last wins (expectedIterations = 50)
+   - `start() → iterations(100) → iterations(0)` → verify 0 rejected (logs ILLEGAL), expectedIterations = 100
+   - `start() → iterations(100) → iterations(-5)` → verify negative rejected (logs ILLEGAL), expectedIterations = 100
+   - `start() → iterations(0)` → verify 0 rejected (logs ILLEGAL), expectedIterations unchanged
+   - `start() → iterations(-5)` → verify negative rejected (logs ILLEGAL), expectedIterations unchanged
+
+7. **Chain operations mixing valid and invalid values**
+   - `start() → m("op1") → ctx("user", "alice") → iterations(100) → inc()` → all valid, all succeed
+   - `start() → limitMilliseconds(5000) → m("valid") → path("custom") → inc()` → all valid, all succeed
+   - `start() → m("valid") → m(null) → ctx("key", "val") → inc()` → one invalid (m(null)), others succeed
+   - `start() → iterations(100) → iterations(-1) → inc() → incBy(0) → inc()` → two invalid, valid ones succeed
+   - `start() → path("path1") → incBy(5) → m("step") → path(null) → incBy(3)` → mixed valid/invalid, verify correct ones apply
+   - `start() → m(null) → m("step1") → limitMilliseconds(-1) → limitMilliseconds(5000)` → invalid calls skipped, final values correct
+
+---
+
+### **Group 5: Valid Expected Flows (✅ Tier 1 - Valid State-Changing)**
 
 **Purpose:** Validate normal lifecycle transitions without errors. These are the expected, successful paths through the state machine.
 
@@ -141,33 +245,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 4: Attribute Operations During Execution (☑️ Tier 2 - Valid Non-State-Changing)**
-
-**Purpose:** Validate operations that update support attributes while Meter is Started. These do not change lifecycle but support progress tracking and context management.
-
-**Test Scenarios:**
-
-1. **Increment iteration counters**
-   - `start() → inc() → inc() → ok()` → currentIteration increments
-   - `start() → incBy(5) → incBy(3) → ok()` → increments by value
-   - `start() → incTo(10) → incTo(50) → ok()` → sets new value
-
-2. **Report progress (throttled)**
-   - `start() → [loop: inc() → progress() if throttled] → ok()`
-   - Verify progress() respects time throttle
-   - Verify progress() respects iteration throttle
-   - Verify INFO log with iterations/second rate
-
-3. **Add context during execution**
-   - `start() → m("step 1") → progress() → m("step 2") → ok()` → verify messages captured
-
-4. **Set path before terminating**
-   - `start() → path("custom_ok_path") → ok()` → verify custom path overrides default
-   - Verify path can be changed multiple times until termination
-
----
-
-### **Group 5: State-Correcting Transitions (⚠️ Tier 3 - Outside Expected Flow)**
+### **Group 6: State-Correcting Transitions (⚠️ Tier 3 - Outside Expected Flow)**
 
 **Purpose:** Validate that Meter handles violations of expected flow gracefully by self-correcting. These calls violate the API contract but achieve valid state with error logs.
 
@@ -190,7 +268,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 6: State-Preserving - Invalid Preconditions (❌ Tier 4a)**
+### **Group 7: State-Preserving - Invalid Preconditions (❌ Tier 4a)**
 
 **Purpose:** Validate that Meter rejects calls with invalid preconditions by preserving current state and logging errors.
 
@@ -220,7 +298,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 7: State-Preserving - Invalid Arguments (❌ Tier 4b)**
+### **Group 8: State-Preserving - Invalid Arguments (❌ Tier 4b)**
 
 **Purpose:** Validate that Meter rejects calls with invalid arguments by preserving current state and logging errors.
 
@@ -248,7 +326,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 8: Immutability Validation on Terminal States (State-Preserving)**
+### **Group 9: Immutability Validation on Terminal States (State-Preserving)**
 
 **Purpose:** Validate that operations on terminal states do not alter core outcome attributes, preserving the first-termination-wins guarantee.
 
@@ -274,7 +352,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 9: Thread-Local Stack Management (Lifecycle Complete)**
+### **Group 10: Thread-Local Stack Management (Lifecycle Complete)**
 
 **Purpose:** Validate correct behavior of thread-local Meter stack for single and nested Meters.
 
@@ -298,7 +376,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 10: Complex Combined Scenarios (All Tiers)**
+### **Group 11: Complex Combined Scenarios (All Tiers)**
 
 **Purpose:** Validate realistic, complex flows that combine multiple aspects of Meter behavior.
 
@@ -330,14 +408,16 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 |-------|-------|-------|------|---------|
 | **1** | Initialization | ✅ Base | None | Foundation for all tests |
 | **2** | Pre-Start Config | ☑️ Tier 2 | None | Attribute setup before start |
-| **3** | Happy Path | ✅ Tier 1 | Normal | Valid expected flows |
-| **4** | Execution Attrs | ☑️ Tier 2 | None | Progress & context during execution |
-| **5** | State-Correcting | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
-| **6** | Bad Preconditions | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
-| **7** | Bad Arguments | ❌ Tier 4 | ILLEGAL | Invalid argument values |
-| **8** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
-| **9** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
-| **10** | Complex Scenarios | All | Varies | Realistic workflows |
+| **3** | Pre-Start Invalid | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations before start |
+| **4** | Post-Start Config | ☑️ Tier 2 | None | Attribute updates during execution |
+| **5** | Post-Start Invalid | ❌ Tier 4 | ILLEGAL | Invalid operations during execution |
+| **6** | Happy Path | ✅ Tier 1 | Normal | Valid expected flows |
+| **7** | State-Correcting | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
+| **8** | Bad Preconditions | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
+| **9** | Bad Arguments | ❌ Tier 4 | ILLEGAL | Invalid argument values |
+| **10** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
+| **11** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
+| **12** | Complex Scenarios | All | Varies | Realistic workflows |
 
 ---
 
