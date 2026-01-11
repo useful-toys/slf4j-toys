@@ -25,7 +25,7 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
 - **JDK**: 21 (locate in the `.jdks` directory in the home directory and use the latest version of 21 available in that directory)
   - **Important**: Before running any build commands, ensure `JAVA_HOME` points to this JDK and that it is first in the `PATH`.
 - **Terminal**: PowerShell (Windows) or equivalent shell (Unix/Linux/macOS)
-  - **Important**: Use the terminal directly to run commands. Never create a sub-shell (e.g., do not use `powershell -c "..."`, `cmd /c "..."`) to ensure environment variables and terminal state are preserved.
+  - **Important**: Use the terminal directly to run commands. Never create a sub-shell (e.g., do not use `powershell -c "..."`, `cmd /c "..."`) to ensure environment variables (like `JAVA_HOME`) and terminal state are preserved. Do not start new terminal sessions.
   - **JAVA_HOME Setup (PowerShell - Session Permanent)**: To set `JAVA_HOME` for the current terminal session (permanent for this session only), execute once:
     ```powershell
     $jdk21 = Get-ChildItem -Path "$env:USERPROFILE\.jdks" -Filter "*21*" | Sort-Object -Property Name -Descending | Select-Object -First 1
@@ -39,6 +39,27 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
     ```powershell
     java -version
     $env:JAVA_HOME
+    ```
+  - **PowerShell Parameter Escaping**: When Maven/Java parameters contain special characters (`-D`, `@`, `#`, `=`), wrap them in single quotes to prevent PowerShell from interpreting them as delimiters:
+    ```powershell
+    # ✅ CORRECT: Single quotes protect special characters
+    .\mvnw clean compile test '-Dskip.logback.tests=true' -Dtest=ClassName
+    .\mvnw 'surefire:test@unit-tests'
+    
+    # ❌ WRONG: Without quotes, PowerShell misinterprets the parameters
+    .\mvnw clean compile test -Dskip.logback.tests=true    # Error: "Unknown lifecycle phase '.logback.tests=true'"
+    ```
+  - **Command Availability on PowerShell**: Always use PowerShell-native commands, not Unix/Linux/bash equivalents that don't exist on Windows:
+    ```powershell
+    # ✅ CORRECT: PowerShell commands
+    Get-ChildItem              # Instead of: ls
+    Get-Content -Tail 10       # Instead of: tail -10
+    Select-String "pattern"    # Instead of: grep "pattern"
+    
+    # ❌ WRONG: Unix/Linux commands don't work on Windows PowerShell
+    ls                         # May fail or produce unexpected results
+    tail -10 file.txt          # Command not found
+    grep "pattern" file.txt    # Command not found
     ```
 - **IDEs**: IntelliJ IDEA, VS Code, GitHub Codespaces
 - **Version Control**: Git

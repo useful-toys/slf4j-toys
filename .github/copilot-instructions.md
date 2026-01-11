@@ -18,5 +18,19 @@ Further, flollow all guidelines specified in [AI-PROJECT-INSTRUCTIONS.md](../AI-
   - Never create a sub-shell (e.g., do not use `powershell -c "..."`, `cmd /c "..."`) 
     to ensure environment variables (like `JAVA_HOME`) and terminal state are preserved.
   - Do not start new terminal sessions.
-  - On powershell terminal, use powershell syntax and commands 
+  - On PowerShell terminal, use PowerShell syntax and commands 
     (e.g., `Get-ChildItem`, `Select-Object`, pipes with `|`; not cmd.exe or bash syntax).
+
+### PowerShell-Specific Rules
+  - **Parameter Delimiters**: When Maven/Java parameters contain special characters (`-D`, `@`, `#`, `=`), wrap them in single quotes
+    - Example: `.\mvnw test '-Dskip.logback.tests=true'` (NOT `.\mvnw test -Dskip.logback.tests=true`)
+    - Example: `.\mvnw 'surefire:test@unit-tests'` (NOT `.\mvnw surefire:test@unit-tests`)
+  - **Valid PowerShell Commands**: Use only PowerShell commands, not Unix/Linux/bash equivalents
+    - ✅ `Get-ChildItem`, `Get-Content`, `Select-Object`, `Where-Object`, `Sort-Object`, `Format-Table`
+    - ✅ `Test-Path`, `Remove-Item`, `Copy-Item`, `Move-Item`, `New-Item`
+    - ❌ `ls` (use `Get-ChildItem` instead, though `ls` alias may work)
+    - ❌ `tail` (use `Get-Content -Tail` or `Select-Object -Last` instead)
+    - ❌ `grep` (use `Select-String` instead)
+    - ❌ `sed`, `awk`, `cat` (use PowerShell equivalents)
+  - **Command Availability**: Always verify Unix/Linux commands are NOT available on Windows PowerShell
+    - If a command works on Unix/Linux but the user is on Windows PowerShell, use PowerShell equivalent
