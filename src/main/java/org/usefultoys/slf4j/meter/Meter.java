@@ -254,7 +254,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter limitMilliseconds(final long timeLimit) {
-        if (!MeterValidator.validateLimitMillisecondsCallArguments(this, timeLimit)) {
+        if (!MeterValidator.validateLimitMillisecondsPrecondition(this) || !MeterValidator.validateLimitMillisecondsCallArguments(this, timeLimit)) {
             return this;
         }
         this.timeLimit = timeLimit * 1000 * 1000; // Convert milliseconds to nanoseconds

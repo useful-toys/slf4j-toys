@@ -312,6 +312,34 @@ public class MeterValidatorTest {
     }
 
     @Nested
+    @DisplayName("Time Limit Precondition Tests")
+    class TimeLimitPreconditionTests {
+
+        @Test
+        @DisplayName("should validate time limit precondition when not stopped")
+        void shouldValidateLimitMillisecondsPreconditionWhenNotStopped() {
+            // Given: meter is not stopped
+            when(meter.getStopTime()).thenReturn(0L);
+            // When: validateLimitMillisecondsPrecondition is called
+            // Then: should return true
+            assertTrue(MeterValidator.validateLimitMillisecondsPrecondition(meter), "should accept when meter not stopped");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject time limit precondition when already stopped")
+        void shouldValidateLimitMillisecondsPreconditionWhenStopped() {
+            // Given: meter is already stopped
+            when(meter.getStopTime()).thenReturn(12345L);
+            // When: validateLimitMillisecondsPrecondition is called
+            // Then: should return false and log illegal precondition error
+            assertFalse(MeterValidator.validateLimitMillisecondsPrecondition(meter), "should reject when meter already stopped");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Meter limitMilliseconds but already stopped; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+    }
+
+    @Nested
     @DisplayName("Iterations Arguments Tests")
     class IterationsArgumentsTests {
 
