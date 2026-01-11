@@ -263,6 +263,419 @@ class MeterLifeCycleTest {
     }
 
     @Nested
+    @DisplayName("Group 2: Pre-Start Configuration (Tier 2 - Valid Non-State-Changing)")
+    class PreStartConfiguration {
+        // ============================================================================
+        // Set time limit
+        // ============================================================================
+        
+        @Test
+        @DisplayName("should set time limit before start()")
+        void shouldSetTimeLimitBeforeStart() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: limitMilliseconds(5000) is called before start()
+            meter.limitMilliseconds(5000);
+
+            // Then: timeLimit attribute is stored correctly and meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should override time limit when set multiple times")
+        void shouldOverrideTimeLimitWhenSetMultipleTimes() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: limitMilliseconds() is called twice
+            meter.limitMilliseconds(100);
+            meter.limitMilliseconds(5000);
+
+            // Then: last value wins and meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should preserve valid time limit when invalid value attempted")
+        void shouldPreserveValidTimeLimitWhenInvalidValueAttempted() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: limitMilliseconds(5000) is called, then limitMilliseconds(0) is attempted
+            meter.limitMilliseconds(5000);
+            meter.limitMilliseconds(0);
+
+            // Then: first valid value is preserved, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should log ILLEGAL when negative time limit attempted")
+        void shouldLogIllegalWhenNegativeTimeLimitAttempted() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: limitMilliseconds(-1) is called
+            meter.limitMilliseconds(-1);
+
+            // Then: meter remains in Created state with no time limit set
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Set expected iterations
+        // ============================================================================
+        
+        @Test
+        @DisplayName("should set expected iterations before start()")
+        void shouldSetExpectedIterationsBeforeStart() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: iterations(100) is called before start()
+            meter.iterations(100);
+
+            // Then: expectedIterations attribute is stored correctly and meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should override expected iterations when set multiple times")
+        void shouldOverrideExpectedIterationsWhenSetMultipleTimes() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: iterations() is called twice
+            meter.iterations(50);
+            meter.iterations(100);
+
+            // Then: last value wins and meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should preserve valid iterations when invalid value attempted")
+        void shouldPreserveValidIterationsWhenInvalidValueAttempted() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: iterations(100) is called, then iterations(0) is attempted
+            meter.iterations(100);
+            meter.iterations(0);
+
+            // Then: first valid value is preserved, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should log ILLEGAL when negative iterations attempted")
+        void shouldLogIllegalWhenNegativeIterationsAttempted() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: iterations(-5) is called
+            meter.iterations(-5);
+
+            // Then: meter remains in Created state with no iterations set
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Add descriptive message
+        // ============================================================================
+        
+        @Test
+        @DisplayName("should add descriptive message before start()")
+        void shouldAddDescriptiveMessageBeforeStart() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: m(String) is called before start()
+            meter.m("starting operation");
+
+            // Then: description attribute is stored correctly and meter remains in Created state
+            assertEquals("starting operation", meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should override description when m() is called multiple times")
+        void shouldOverrideDescriptionWhenMCalledMultipleTimes() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: m() is called multiple times
+            meter.m("step 1");
+            meter.m("step 2");
+
+            // Then: last value wins and meter remains in Created state
+            assertEquals("step 2", meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should preserve valid message when null value attempted")
+        void shouldPreserveValidMessageWhenNullValueAttempted() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: m("step 1") is called, then m(null) is attempted
+            meter.m("step 1");
+            meter.m(null);
+
+            // Then: first valid value is preserved, meter remains in Created state
+            assertEquals("step 1", meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should log ILLEGAL when null message attempted before any valid message")
+        void shouldLogIllegalWhenNullMessageAttemptedBeforeAnyValidMessage() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: m(null) is called without setting a previous message
+            meter.m(null);
+
+            // Then: description remains null, meter remains in Created state
+            assertNull(meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Add formatted descriptive message
+        // ============================================================================
+        
+        @Test
+        @DisplayName("should add formatted descriptive message before start()")
+        void shouldAddFormattedDescriptiveMessageBeforeStart() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: m(format, args) is called before start()
+            meter.m("operation %s", "doWork");
+
+            // Then: description attribute is formatted and stored correctly and meter remains in Created state
+            assertEquals("operation doWork", meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should override formatted message when m() is called multiple times")
+        void shouldOverrideFormattedMessageWhenMCalledMultipleTimes() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: m(format, args) is called multiple times
+            meter.m("step %d", 1);
+            meter.m("step %d", 2);
+
+            // Then: last value wins and meter remains in Created state
+            assertEquals("step 2", meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should preserve valid formatted message when null format attempted")
+        void shouldPreserveValidFormattedMessageWhenNullFormatAttempted() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: m("valid: %s", "arg") is called, then m(null, "arg") is attempted
+            meter.m("valid: %s", "arg");
+            meter.m(null, "arg");
+
+            // Then: null format is rejected with ILLEGAL log, description is reset to null, meter remains in Created state
+            assertNull(meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should log ILLEGAL when invalid format string attempted")
+        void shouldLogIllegalWhenInvalidFormatStringAttempted() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: m("invalid format %z", "arg") is called (invalid format specifier)
+            meter.m("invalid format %z", "arg");
+
+            // Then: meter remains in Created state with no description set
+            assertNull(meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Add context key-value pairs
+        // ============================================================================
+        
+        @Test
+        @DisplayName("should add context key-value pair before start()")
+        void shouldAddContextKeyValuePairBeforeStart() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: ctx("key1", "value1") is called before start()
+            meter.ctx("key1", "value1");
+
+            // Then: context contains the key-value pair and meter remains in Created state
+            assertEquals("value1", meter.getContext().get("key1"));
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should override context value when same key set multiple times")
+        void shouldOverrideContextValueWhenSameKeySetMultipleTimes() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: ctx() is called twice with the same key
+            meter.ctx("key", "val1");
+            meter.ctx("key", "val2");
+
+            // Then: last value wins and meter remains in Created state
+            assertEquals("val2", meter.getContext().get("key"));
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should replace context value when null value set")
+        void shouldReplaceContextValueWhenNullValueSet() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: ctx("key", "valid") is called, then ctx("key", null) is called
+            meter.ctx("key", "valid");
+            meter.ctx("key", (String)null);
+
+            // Then: null value is stored as "<null>" placeholder (context stores null as string literal)
+            assertEquals("<null>", meter.getContext().get("key"));
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should store multiple different context key-value pairs")
+        void shouldStoreMultipleDifferentContextKeyValuePairs() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: ctx() is called multiple times with different keys
+            meter.ctx("key1", "value1");
+            meter.ctx("key2", "value2");
+            meter.ctx("key3", "value3");
+
+            // Then: all context key-value pairs are stored and meter remains in Created state
+            assertEquals("value1", meter.getContext().get("key1"));
+            assertEquals("value2", meter.getContext().get("key2"));
+            assertEquals("value3", meter.getContext().get("key3"));
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        // ============================================================================
+        // Chain multiple configurations
+        // ============================================================================
+        
+        @Test
+        @DisplayName("should chain multiple valid configurations before start()")
+        void shouldChainMultipleValidConfigurationsBeforeStart() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: multiple configuration methods are chained
+            meter
+                .iterations(100)
+                .limitMilliseconds(5000)
+                .m("starting operation");
+
+            // Then: all attributes are set correctly and meter remains in Created state
+            assertEquals("starting operation", meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should handle chained configuration with last m() value winning")
+        void shouldHandleChainedConfigurationWithLastMValueWinning() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: multiple configuration methods are chained with m() called multiple times
+            meter
+                .m("op1")
+                .limitMilliseconds(5000)
+                .iterations(100)
+                .m("op2");
+
+            // Then: m() last value wins, iterations and limit preserved
+            assertEquals("op2", meter.getDescription());
+            assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+
+        @Test
+        @DisplayName("should ignore invalid values in chained configuration")
+        void shouldIgnoreInvalidValuesInChainedConfiguration() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: chained configuration includes invalid values after valid values
+            meter
+                .limitMilliseconds(5000)
+                .iterations(100)
+                .limitMilliseconds(0)     // Invalid: 0
+                .iterations(-1);           // Invalid: -1
+
+            // Then: all valid values preserved, invalid attempts logged
+            assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should chain configuration with context operations")
+        void shouldChainConfigurationWithContextOperations() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: configuration is chained with context operations
+            meter
+                .iterations(100)
+                .limitMilliseconds(5000)
+                .m("starting operation")
+                .ctx("user", "testUser")
+                .ctx("session", "test-session-123");
+
+            // Then: all attributes are set correctly and meter remains in Created state
+            assertEquals("starting operation", meter.getDescription());
+            assertEquals("testUser", meter.getContext().get("user"));
+            assertEquals("test-session-123", meter.getContext().get("session"));
+            assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+            AssertLogger.assertEventCount(logger, 0);
+        }
+    }
+
+
+    @Nested
     @DisplayName("Success Flow")
     class SuccessFlow {
         @Test
