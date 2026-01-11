@@ -70,6 +70,21 @@ public class MeterValidator {
     }
 
     /**
+     * Validates the precondition for setting a description on a Meter with the `m` method.
+     * The meter must not have been stopped yet (not in terminal state: OK, Rejected, or Failed).
+     *
+     * @param meter The Meter instance to validate.
+     * @return {@code true} if the precondition is met, {@code false} otherwise.
+     */
+    public boolean validateMPrecondition(final Meter meter) {
+        if (meter.getStopTime() != 0) {
+            logIllegalPrecondition(meter, Markers.ILLEGAL, "Meter m but already stopped");
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Validates the preconditions for stopping a Meter operation.
      * Checks if the meter has already been stopped, if it was started, and if it's the current instance on the thread.
      *

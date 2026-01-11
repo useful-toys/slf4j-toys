@@ -159,6 +159,34 @@ public class MeterValidatorTest {
     }
 
     @Nested
+    @DisplayName("M Precondition Tests")
+    class MPreconditionTests {
+
+        @Test
+        @DisplayName("should validate m precondition when meter is not stopped")
+        void shouldValidateMPreconditionWhenNotStopped() {
+            // Given: meter has not been stopped (stop time = 0L)
+            when(meter.getStopTime()).thenReturn(0L);
+            // When: validateMPrecondition is called
+            // Then: should return true and log no events
+            assertTrue(MeterValidator.validateMPrecondition(meter), "should allow m() when not stopped");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject m when meter is already stopped")
+        void shouldValidateMPreconditionWhenStopped() {
+            // Given: meter has already been stopped (stop time = 1L)
+            when(meter.getStopTime()).thenReturn(1L);
+            // When: validateMPrecondition is called
+            // Then: should return false and log error event
+            assertFalse(MeterValidator.validateMPrecondition(meter), "should reject m() when already stopped");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Meter m but already stopped; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+    }
+
+    @Nested
     @DisplayName("Sub-call Arguments Tests")
     class SubCallArgumentsTests {
 
