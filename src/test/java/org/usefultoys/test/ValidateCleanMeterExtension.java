@@ -174,7 +174,6 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
     private void ensureMeterStackIsClean(final ExtensionContext context) {
         Meter currentMeter = Meter.getCurrentInstance();
         while (!Meter.UNKNOWN_LOGGER_NAME.equals(currentMeter.getCategory())) {
-            System.err.println("Test '"+context.getDisplayName()+"': Closing Meter '"+currentMeter.getFullID()+"'");
             currentMeter.close();
             currentMeter = Meter.getCurrentInstance();
         }
