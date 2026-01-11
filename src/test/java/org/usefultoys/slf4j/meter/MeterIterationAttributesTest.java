@@ -90,7 +90,7 @@ class MeterIterationAttributesTest {
 
     @Test
     @DisplayName("should calculate iterations per second correctly")
-    void shouldCalculateIterationsPerSecond() {
+    void shouldCalculateIterationsPerSecond() throws InterruptedException {
         // Given: a started meter
         final int iterationCount = 10;
         final Meter m1 = new Meter(logger).iterations(iterationCount).start();
@@ -98,14 +98,35 @@ class MeterIterationAttributesTest {
         assertEquals(0.0d, m1.getIterationsPerSecond(), Double.MIN_VALUE, "initial speed should be 0.0");
         
         // When: incrementing iterations
+        // Did not yet call getLastCurrentTime, so no known time elapsed since start
         m1.inc();
         // Then: speed should be positive
-        assertTrue(m1.getIterationsPerSecond() > 0.0, "speed should be positive after increments");
+        assertEquals(0.0, m1.getIterationsPerSecond(), "speed should be positive after increments");
 
         m1.incBy(2);
         m1.incTo(4);
-        assertTrue(m1.getIterationsPerSecond() > 0.0, "speed should still be positive");
+        assertEquals(0.0, m1.getIterationsPerSecond(), "speed should still be positive");
         
+        m1.ok();
+    }
+
+    @Test
+    @DisplayName("should calculate iterations per second correctly")
+    void shouldCalculateIterationsPerSecond2() throws InterruptedException {
+        // Given: a started meter
+        final int iterationCount = 10;
+        final Meter m1 = new Meter(logger).iterations(iterationCount).start();
+
+        assertEquals(0.0d, m1.getIterationsPerSecond(), Double.MIN_VALUE, "initial speed should be 0.0");
+
+        // When: incrementing iterations
+        m1.inc().progress();
+        // Then: speed should be positive
+        assertTrue(m1.getIterationsPerSecond()> 0.0, "speed should be positive after increments");
+
+        m1.incBy(2).incTo(4).progress();
+        assertTrue(m1.getIterationsPerSecond() > 0.0, "speed should still be positive");
+
         m1.ok();
     }
 
