@@ -92,6 +92,7 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
 - **Immutability**: Declare variables, parameters, and attributes `final` whenever possible
 - **Lombok usage**: Use Lombok annotations to reduce boilerplate
 - **UTF-8 encoding**: All source files must be encoded in UTF-8
+- **Comment style**: For comments explaining behavior or logic, prefer `/* ... */` style over `//` style
 - **Copyright Header**: All Java files must include the following Apache 2.0 license header at the top, with the current year (2026) in the copyright notice:
   ```
   /*
