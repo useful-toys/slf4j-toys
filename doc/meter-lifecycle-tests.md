@@ -110,7 +110,75 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 3: Pre-Start Configuration - Invalid Operations (❌ Tier 4 - Invalid State-Preserving)**
+### **Group 3: Pre-Start Termination (⚠️ Tier 3 - State-Correcting)**
+
+**Purpose:** Validate that Meter handles termination calls (ok, reject, fail) on unstarted meters by self-correcting: logs INCONSISTENT_* errors but still achieves valid terminal state. These calls violate expected flow (should start first) but succeed with error logging.
+
+**Test Scenarios:**
+
+1. **OK without starting (Created → OK)**
+   - `new Meter(logger) → ok()` → logs INCONSISTENT_OK, transitions to OK state
+   - Verify meter reaches OK state despite missing start()
+   - Verify startTime auto-initialized (not 0)
+   - Verify stopTime > 0
+   - Verify INFO log with completion report (includes INCONSISTENT_OK warning)
+   - Verify okPath not defined (default)
+   - Test path variations: `ok("success_path")`, `ok(SomeEnum.SUCCESS)`, `ok(new RuntimeException("cause"))`, `ok(new Object())`
+   - Verify all variations log INCONSISTENT_OK but transition successfully
+   - Verify path captured correctly for each variation (String, enum toString, throwable message, object toString)
+
+2. **Reject without starting (Created → Rejected)**
+   - `new Meter(logger) → reject("business_error")` → logs INCONSISTENT_REJECT, transitions to Rejected state
+   - Verify meter reaches Rejected state despite missing start()
+   - Verify startTime auto-initialized (not 0)
+   - Verify stopTime > 0
+   - Verify WARN log with rejection report (includes INCONSISTENT_REJECT warning)
+   - Verify rejectPath = "business_error"
+   - Test cause variations: `reject(SomeEnum.VALIDATION_ERROR)`, `reject(new IllegalArgumentException("invalid input"))`, `reject(new Object())`
+   - Verify all variations log INCONSISTENT_REJECT but transition successfully
+   - Verify cause captured correctly for each variation
+
+3. **Fail without starting (Created → Failed)**
+   - `new Meter(logger) → fail("technical_error")` → logs INCONSISTENT_FAIL, transitions to Failed state
+   - Verify meter reaches Failed state despite missing start()
+   - Verify startTime auto-initialized (not 0)
+   - Verify stopTime > 0
+   - Verify ERROR log with failure report (includes INCONSISTENT_FAIL warning)
+   - Verify failPath = "technical_error"
+   - Test cause variations: `fail(SomeEnum.DATABASE_ERROR)`, `fail(new SQLException("connection timeout"))`, `fail(new Object())`
+   - Verify all variations log INCONSISTENT_FAIL but transition successfully
+   - Verify cause captured correctly for each variation
+
+4. **Try-with-resources without start (implicit fail)**
+   - `try (Meter m = new Meter(logger)) { ... }` without calling start(), ok(), reject(), or fail()
+   - Verify close() triggers fail with path "try-with-resources"
+   - Verify INCONSISTENT_FAIL + ERROR log (implicit failure + no start)
+   - Verify meter reaches Failed state
+   - Verify startTime auto-initialized
+
+5. **Pre-configured attributes preserved on self-correcting termination**
+   - `new Meter(logger) → iterations(100) → limitMilliseconds(5000) → m("operation") → ok()` → logs INCONSISTENT_OK
+   - Verify expectedIterations = 100 preserved in terminal state
+   - Verify timeLimit = 5000 preserved
+   - Verify description = "operation" preserved
+   - Verify all attributes appear in completion report
+   - Test same with reject() and fail()
+
+6. **Context preserved on self-correcting termination**
+   - `new Meter(logger) → ctx("user", "alice") → ctx("action", "import") → reject("validation_error")` → logs INCONSISTENT_REJECT
+   - Verify context entries preserved in terminal state
+   - Verify context appears in rejection report
+   - Test same with ok() and fail()
+
+7. **Path set before starting (rejected, then termination)**
+   - `new Meter(logger) → path("custom") → ok()` → logs ILLEGAL (path before start), then INCONSISTENT_OK
+   - Verify path("custom") rejected (logs ILLEGAL), okPath remains undefined after ok()
+   - Verify meter still reaches OK state
+   - Test same pattern with reject() and fail()
+
+---
+
+### **Group 4: Pre-Start Configuration - Invalid Operations (❌ Tier 4 - Invalid State-Preserving)**
 
 **Purpose:** Validate that Meter rejects invalid operations on unstarted Meters by preserving current state and logging errors. These calls have invalid preconditions (meter not yet started) or invalid arguments.
 
@@ -134,7 +202,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 4: Post-Start Configuration (☑️ Tier 2 - Valid Non-State-Changing)**
+### **Group 5: Post-Start Configuration (☑️ Tier 2 - Valid Non-State-Changing)**
 
 **Purpose:** Validate operations that update support attributes AFTER `start()`. These calls do not change lifecycle but support progress tracking and context management during execution. Tests verify attribute storage, override behavior, and graceful rejection of invalid arguments.
 
@@ -213,7 +281,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 5: Post-Stop Configuration (❌ Tier 4 - Invalid State-Preserving)**
+### **Group 6: Post-Stop Configuration (❌ Tier 4 - Invalid State-Preserving)**
 
 **Purpose:** Validate that operations on terminated meters (OK state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped) and do not change state or outcome attributes.
 
@@ -276,7 +344,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 6: Post-Stop Configuration - Rejected State (❌ Tier 4 - Invalid State-Preserving)**
+### **Group 7: Post-Stop Configuration - Rejected State (❌ Tier 4 - Invalid State-Preserving)**
 
 **Purpose:** Validate that operations on rejected meters (Rejected state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with rejection) and do not change state or outcome attributes.
 
@@ -319,7 +387,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 7: Post-Stop Configuration - Failed State (❌ Tier 4 - Invalid State-Preserving)**
+### **Group 8: Post-Stop Configuration - Failed State (❌ Tier 4 - Invalid State-Preserving)**
 
 **Purpose:** Validate that operations on failed meters (Failed state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with failure) and do not change state or outcome attributes.
 
@@ -362,7 +430,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 8: Valid Expected Flows (✅ Tier 1 - Valid State-Changing)**
+### **Group 9: Valid Expected Flows (✅ Tier 1 - Valid State-Changing)**
 
 **Purpose:** Validate normal lifecycle transitions without errors. These are the expected, successful paths through the state machine.
 
@@ -394,20 +462,13 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 9: State-Correcting Transitions (⚠️ Tier 3 - Outside Expected Flow)**
+### **Group 10: State-Correcting Transitions (⚠️ Tier 3 - Outside Expected Flow)**
 
 **Purpose:** Validate that Meter handles violations of expected flow gracefully by self-correcting. These calls violate the API contract but achieve valid state with error logs.
 
 **Test Scenarios:**
 
-1. **Terminate without starting (Created → OK/Rejected/Failed)**
-   - `new Meter() → ok()` → logs INCONSISTENT_OK, but terminates correctly
-   - `new Meter() → ok("custom_path")` → logs INCONSISTENT_OK
-   - `new Meter() → reject("cause")` → logs INCONSISTENT_REJECT, terminates with rejection
-   - `new Meter() → fail("cause")` → logs INCONSISTENT_FAIL, terminates with failure
-   - Verify meter reaches terminated state despite violation
-
-2. **Multiple termination attempts (first-termination-wins immutability)**
+1. **Multiple termination attempts (first-termination-wins immutability)**
    - `start() → ok() → ok()` → second ok ignored, state unchanged
    - `start() → ok() → reject("cause")` → reject ignored
    - `start() → ok() → fail("cause")` → fail ignored
@@ -415,9 +476,14 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - `start() → fail("cause") → ok()` → ok ignored
    - Verify INCONSISTENT_* logs for extra attempts
 
+2. **Start after already started**
+   - `start() → start()` → second start ignored, logs ILLEGAL
+   - Verify startTime unchanged
+   - Verify meter remains in Started state
+
 ---
 
-### **Group 10: State-Preserving - Invalid Preconditions (❌ Tier 4a)**
+### **Group 11: State-Preserving - Invalid Preconditions (❌ Tier 4a)**
 
 **Purpose:** Validate that Meter rejects calls with invalid preconditions by preserving current state and logging errors.
 
@@ -447,7 +513,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 11: State-Preserving - Invalid Arguments (❌ Tier 4b)**
+### **Group 12: State-Preserving - Invalid Arguments (❌ Tier 4b)**
 
 **Purpose:** Validate that Meter rejects calls with invalid arguments by preserving current state and logging errors.
 
@@ -475,7 +541,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 12: Immutability Validation on Terminal States (State-Preserving)**
+### **Group 13: Immutability Validation on Terminal States (State-Preserving)**
 
 **Purpose:** Validate that operations on terminal states do not alter core outcome attributes, preserving the first-termination-wins guarantee.
 
@@ -501,7 +567,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 13: Thread-Local Stack Management (Lifecycle Complete)**
+### **Group 14: Thread-Local Stack Management (Lifecycle Complete)**
 
 **Purpose:** Validate correct behavior of thread-local Meter stack for single and nested Meters.
 
@@ -525,7 +591,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 14: Complex Combined Scenarios (All Tiers)**
+### **Group 15: Complex Combined Scenarios (All Tiers)**
 
 **Purpose:** Validate realistic, complex flows that combine multiple aspects of Meter behavior.
 
@@ -557,18 +623,19 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 |-------|-------|-------|------|---------|
 | **1** | Initialization | ✅ Base | None | Foundation for all tests |
 | **2** | Pre-Start Config | ☑️ Tier 2 | None | Attribute setup before start |
-| **3** | Pre-Start Invalid | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations before start |
-| **4** | Post-Start Config | ☑️ Tier 2 | None | Attribute updates during execution |
-| **5** | Post-Stop Config (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
-| **6** | Post-Stop Config (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
-| **7** | Post-Stop Config (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
-| **8** | Happy Path | ✅ Tier 1 | Normal | Valid expected flows |
-| **9** | State-Correcting | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
-| **10** | Bad Preconditions | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
-| **11** | Bad Arguments | ❌ Tier 4 | ILLEGAL | Invalid argument values |
-| **12** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
-| **13** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
-| **14** | Complex Scenarios | All | Varies | Realistic workflows |
+| **3** | Pre-Start Termination | ⚠️ Tier 3 | INCONSISTENT_* | Termination without start (self-correcting) |
+| **4** | Pre-Start Invalid | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations before start |
+| **5** | Post-Start Config | ☑️ Tier 2 | None | Attribute updates during execution |
+| **6** | Post-Stop Config (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
+| **7** | Post-Stop Config (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
+| **8** | Post-Stop Config (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
+| **9** | Happy Path | ✅ Tier 1 | Normal | Valid expected flows |
+| **10** | State-Correcting | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
+| **11** | Bad Preconditions | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
+| **12** | Bad Arguments | ❌ Tier 4 | ILLEGAL | Invalid argument values |
+| **13** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
+| **14** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
+| **15** | Complex Scenarios | All | Varies | Realistic workflows |
 
 ---
 
@@ -576,8 +643,8 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ### Test Isolation with Group 1
 
-Each test in Groups 2-10 should:
-1. **Assume** Group 0 guarantees have been validated
+Each test in Groups 2-15 should:
+1. **Assume** Group 1 guarantees have been validated
 2. **Trust** that `new Meter(logger).start()` works correctly
 3. **Skip** redundant initialization checks
 4. **Focus** exclusively on the group's primary concern
@@ -585,14 +652,15 @@ Each test in Groups 2-10 should:
 ### Assertion Strategy
 
 - **Group 1-2**: All assertions pass without logs (valid operations)
-- **Group 3**: Assert state change + INCONSISTENT_* log (pre-start invalid)
-- **Group 4**: All assertions pass without logs (post-start valid)
-- **Group 5-7**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (post-stop invalid)
-- **Group 8**: Assert terminal attributes preserved + no state change (happy path)
-- **Group 9**: Assert state changes + error logs (state-correcting)
-- **Group 10-11**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (invalid flow)
-- **Group 12**: Assert thread-local references correct + stack cleaned
-- **Group 13**: Assert combined behavior matches specification
+- **Group 3**: Assert state change + INCONSISTENT_* log (pre-start termination with self-correction)
+- **Group 4**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (pre-start invalid)
+- **Group 5**: All assertions pass without logs (post-start valid)
+- **Group 6-8**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (post-stop invalid)
+- **Group 9**: Assert terminal attributes preserved + no state change (happy path)
+- **Group 10**: Assert state changes + error logs (state-correcting)
+- **Group 11-12**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (invalid flow)
+- **Group 13**: Assert thread-local references correct + stack cleaned
+- **Group 14-15**: Assert combined behavior matches specification
 
 ### Error Log Validation
 
