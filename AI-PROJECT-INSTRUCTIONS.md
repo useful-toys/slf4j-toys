@@ -8,25 +8,27 @@
 
 ### Run ALL Tests
 ```powershell
-.\mvnw clean compile test
+.\mvnw test
 ```
 
 ### Run Specific Class or Method
 
 **For classes in `org.usefultoys.slf4j.logback`:**
 ```powershell
-.\mvnw clean compile test '-Dskip.unit.tests=true' -Dtest=MessageHighlightConverterTest
-.\mvnw clean compile test '-Dskip.unit.tests=true' '-Dtest=MessageHighlightConverterTest#testMsgStartMarker'
+.\mvnw test '-Dskip.unit.tests=true' -Dtest=MessageHighlightConverterTest
+.\mvnw test '-Dskip.unit.tests=true' '-Dtest=MessageHighlightConverterTest#testMsgStartMarker'
 ```
 
 **For classes in ANY OTHER package:**
 ```powershell
-.\mvnw clean compile test '-Dskip.logback.tests=true' -Dtest=MeterLifeCycleTest
-.\mvnw clean compile test '-Dskip.logback.tests=true' '-Dtest=MeterLifeCycleTest#shouldCreateMeterWithLoggerInitialState'
+.\mvnw test '-Dskip.logback.tests=true' -Dtest=MeterLifeCycleTest
+.\mvnw test '-Dskip.logback.tests=true' '-Dtest=MeterLifeCycleTest#shouldCreateMeterWithLoggerInitialState'
 ```
 
 **Summary:**
-- Always use `.\mvnw clean compile test` as the base command
+- Always use `.\mvnw test` as the base command (Maven recompiles automatically under demand)
+- **⚠️ AVOID `clean`**: Do not use `clean` unless explicitly clearing the build is necessary
+- Maven handles incremental compilation efficiently; trust the build cache
 - Use `-Dskip.logback.tests=true` to run only MockLogger tests (unit-tests execution)
 - Use `-Dskip.unit.tests=true` to run only Logback tests (logback-tests execution)
 - Add `-Dtest=ClassName` or `-Dtest=ClassName#methodName` to target specific tests
@@ -73,6 +75,40 @@ class MyTest {
 ```
 
 **When adjusting legacy tests**: Remove any manual charset validation methods or assertions that check `SessionConfig.charset == Charset.defaultCharset()` if `@ValidateCharset` is already present on the class.
+
+### Test Annotation Imports
+
+**All test annotations require correct imports. Use these imports in your test classes:**
+
+```java
+// Core test annotations
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+
+// Configuration reset annotations - from org.usefultoys.test
+import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ResetSystemConfig;
+import org.usefultoys.test.ResetSessionConfig;
+import org.usefultoys.test.ResetReporterConfig;
+import org.usefultoys.test.ResetMeterConfig;
+import org.usefultoys.test.ResetWatcherConfig;
+import org.usefultoys.test.ResetSystemProperty;
+import org.usefultoys.test.ClearParserErrors;
+import org.usefultoys.test.ValidateCleanMeter;
+import org.usefultoys.test.WithLocale;
+
+// MockLogger annotations - from org.usefultoys.slf4jtestmock
+import org.usefultoys.slf4jtestmock.Slf4jMock;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+```
+
+**Quick reference:**
+- **Configuration & Validation**: `org.usefultoys.test.*`
+- **MockLogger & Assertions**: `org.usefultoys.slf4jtestmock.*`
 
 ### Configuration Reset in Tests
 If a test uses a configuration class (e.g., `SessionConfig`), the test class must include the appropriate reset annotation:
@@ -263,6 +299,16 @@ AssertLogger.assertEventCount(mockLogger, 1);  // Asserts exactly 1 event
     - **No manual `setEnabled(true)` calls needed**
     - **No manual @AfterEach, @AfterAll, @BeforeEach, @BeforeAll calls needed to handle MockLogger state**
     - If a logger-output test cannot rely on `MockLoggerExtension` (see legacy scenarios or special setup requirements), add an inline comment explaining why the extension is inapplicable and how the manual handling differs.
+    - **IMPORTANT**: When using `@WithMockLogger`, you should also use `@WithMockLoggerDebug` to enable debug-level logging in the MockLogger. This ensures that all log levels (TRACE, DEBUG, INFO, WARN, ERROR) are captured during tests.
+      ```java
+      @ValidateCharset
+      @WithMockLogger       // Enables MockLoggerExtension
+      @WithMockLoggerDebug  // Enables DEBUG level (captures TRACE and DEBUG events)
+      class MyTest {
+          @Slf4jMock
+          private Logger logger;
+      }
+      ```
 
 3. **Use `AssertLogger` for validations** instead of direct `MockLogger` assertions:
    ```java
@@ -294,7 +340,8 @@ AssertLogger.assertEventCount(mockLogger, 1);  // Asserts exactly 1 event
 @ValidateCharset
 @ResetReporterConfig
 @WithLocale("en")
-@WithMockLogger  // Enables MockLoggerExtension automatically
+@WithMockLogger       // Enables MockLoggerExtension automatically
+@WithMockLoggerDebug  // Enables DEBUG level logging
 class MyLogValidationTest {
     
     @Slf4jMock  // Omit name - automatically uses org.usefultoys.slf4j.report.MyLogValidationTest
