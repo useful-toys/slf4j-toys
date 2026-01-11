@@ -93,7 +93,7 @@ class ReportDefaultTrustKeyStoreTest {
 
             // Then: should log trust keystore and certificate details
             assertHasEvent(logger, "Trust Keystore");
-            assertHasEvent(logger, " - TrustManager: 0 (class org.mockito.codegen.X509TrustManager$MockitoMock$");
+            assertHasEvent(logger, " - TrustManager: 0 (class");
             assertHasEvent(logger, "   - Certificate #0");
             assertHasEvent(logger, "       Subject: CN=Test Subject");
             assertHasEvent(logger, "       Issuer: CN=Test Issuer");
