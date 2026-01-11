@@ -165,6 +165,21 @@ public class MeterValidator {
     }
 
     /**
+     * Validates the precondition for configuring expected iterations on a Meter.
+     * The meter must not have already been stopped before iterations can be configured.
+     *
+     * @param meter The Meter instance to validate.
+     * @return {@code true} if the precondition is met (not stopped), {@code false} otherwise.
+     */
+    public boolean validateIterationsPrecondition(final Meter meter) {
+        if (meter.getStopTime() != 0) {
+            logIllegalPrecondition(meter, Markers.ILLEGAL, "Meter iterations but already stopped");
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Validates the arguments for the `iterations` method of a Meter.
      *
      * @param meter            The Meter instance.
@@ -186,7 +201,7 @@ public class MeterValidator {
      * @param increment The number of iterations to add.
      * @return {@code true} if the increment is positive, {@code false} otherwise.
      */
-    public boolean validateIncBy(final Meter meter, final long increment) {
+    public boolean validateIncByArguments(final Meter meter, final long increment) {
         if (increment <= 0) {
             logIllegalCall(meter, "incBy(increment)", "Non-positive increment");
             return false;
@@ -204,6 +219,10 @@ public class MeterValidator {
     public boolean validateIncPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
             logIllegalPrecondition(meter, Markers.INCONSISTENT_INCREMENT, "Meter not started");
+            return false;
+        }
+        if (meter.getStopTime() != 0) {
+            logIllegalPrecondition(meter, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped");
             return false;
         }
         return true;
@@ -238,6 +257,10 @@ public class MeterValidator {
     public boolean validateProgressPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
             logIllegalPrecondition(meter, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started");
+            return false;
+        }
+        if (meter.getStopTime() != 0) {
+            logIllegalPrecondition(meter, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped");
             return false;
         }
         return true;

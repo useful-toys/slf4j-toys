@@ -338,6 +338,34 @@ public class MeterValidatorTest {
     }
 
     @Nested
+    @DisplayName("Iterations Precondition Tests")
+    class IterationsPreconditionTests {
+
+        @Test
+        @DisplayName("should validate iterations precondition when not stopped")
+        void shouldValidateIterationsPreconditionWhenNotStopped() {
+            // Given: meter is not stopped
+            when(meter.getStopTime()).thenReturn(0L);
+            // When: validateIterationsPrecondition is called
+            // Then: should return true
+            assertTrue(MeterValidator.validateIterationsPrecondition(meter), "should accept when meter not stopped");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject iterations precondition when already stopped")
+        void shouldValidateIterationsPreconditionWhenStopped() {
+            // Given: meter is already stopped
+            when(meter.getStopTime()).thenReturn(12345L);
+            // When: validateIterationsPrecondition is called
+            // Then: should return false and log illegal precondition error
+            assertFalse(MeterValidator.validateIterationsPrecondition(meter), "should reject when meter already stopped");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Meter iterations but already stopped; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+    }
+
+    @Nested
     @DisplayName("Increment Precondition Tests")
     class IncrementPreconditionTests {
 
@@ -375,7 +403,7 @@ public class MeterValidatorTest {
             // Given: a positive increment value
             // When: validateIncBy is called
             // Then: should return true and not log any events
-            assertTrue(MeterValidator.validateIncBy(meter, 10L), "should accept positive increment");
+            assertTrue(MeterValidator.validateIncByArguments(meter, 10L), "should accept positive increment");
             assertNoEvents(logger);
         }
 
@@ -385,7 +413,7 @@ public class MeterValidatorTest {
             // Given: a non-positive increment value
             // When: validateIncBy is called
             // Then: should return false and log illegal argument error
-            assertFalse(MeterValidator.validateIncBy(meter, 0L), "should reject non-positive increment");
+            assertFalse(MeterValidator.validateIncByArguments(meter, 0L), "should reject non-positive increment");
             assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Illegal call to Meter.incBy(increment): Non-positive increment; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
