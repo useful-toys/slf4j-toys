@@ -455,6 +455,10 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_OK);
 
             stopTime = collectCurrentTime();
+            /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
+            if (startTime == 0) {
+                startTime = stopTime;
+            }
             failPath = null;
             failMessage = null;
             rejectPath = null;
@@ -567,6 +571,10 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_REJECT);
 
             stopTime = collectCurrentTime();
+            /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
+            if (startTime == 0) {
+                startTime = stopTime;
+            }
             failPath = null;
             failMessage = null;
             okPath = null;
@@ -612,6 +620,10 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_FAIL);
 
             stopTime = collectCurrentTime();
+            /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
+            if (startTime == 0) {
+                startTime = stopTime;
+            }
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
@@ -670,6 +682,10 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_CLOSE);
 
             stopTime = collectCurrentTime();
+            /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
+            if (startTime == 0) {
+                startTime = stopTime;
+            }
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);

@@ -216,6 +216,83 @@ class MeterAnalysisLegacyTest {
                         true, false, false,
                         "ok", 5.0 / (1200.0 - 900.0) * 1_000_000_000, 300L,
                         400L, false
+                ),
+                // Scenario 9: Zero iterations - getIterationsPerSecond should return 0.0
+                new MeterAnalysisScenario(
+                        2500L,
+                        "cat8", "op8", null,
+                        100L, 500L, 2000L, 0L,
+                        0L, "ok", null, null, // Zero iterations
+                        "cat8/op8#9", true, true,
+                        true, false, false,
+                        "ok", 0.0, 1500L,
+                        400L, false
+                ),
+                // Scenario 10: Zero duration when stopped (auto-corrected) - getIterationsPerSecond should return 0.0
+                new MeterAnalysisScenario(
+                        1500L,
+                        "cat9", "op9", null,
+                        500L, 1500L, 1500L, 0L, // startTime == stopTime (zero duration)
+                        10L, "ok", null, null,
+                        "cat9/op9#10", true, true,
+                        true, false, false,
+                        "ok", 0.0, 0L, // Zero duration means zero iterations per second
+                        1000L, false
+                ),
+                // Scenario 11: Started but not stopped - execution time based on lastCurrentTime
+                new MeterAnalysisScenario(
+                        5000L,
+                        "cat10", "op10", null,
+                        100L, 1000L, 0L, 0L, // Not stopped
+                        15L, "ok", null, null,
+                        "cat10/op10#11", true, false,
+                        false, false, false,
+                        null, 15.0 / (5000.0 - 1000.0) * 1_000_000_000, 4000L,
+                        900L, false
+                ),
+                // Scenario 12: Zero iterations and zero duration - both getIterationsPerSecond and getExecutionTime are zero
+                new MeterAnalysisScenario(
+                        2000L,
+                        "cat11", "op11", null,
+                        500L, 2000L, 2000L, 0L, // startTime == stopTime
+                        0L, "ok", null, null, // Zero iterations
+                        "cat11/op11#12", true, true,
+                        true, false, false,
+                        "ok", 0.0, 0L,
+                        1500L, false
+                ),
+                // Scenario 13: Operation with reject path but still running - no execution time yet
+                new MeterAnalysisScenario(
+                        1200L,
+                        "cat12", "op12", null,
+                        100L, 500L, 0L, 0L, // Not stopped yet
+                        8L, null, "rejected", null,
+                        "cat12/op12#13", true, false,
+                        false, false, false,
+                        "rejected", 8.0 / (1200.0 - 500.0) * 1_000_000_000, 700L,
+                        400L, false
+                ),
+                // Scenario 14: Large iteration count with very small duration
+                new MeterAnalysisScenario(
+                        1100L,
+                        "cat13", "op13", null,
+                        100L, 1000L, 1100L, 0L, // 100 nanosecond duration
+                        1000L, "ok", null, null,
+                        "cat13/op13#14", true, true,
+                        true, false, false,
+                        "ok", 1000.0 / (1100.0 - 1000.0) * 1_000_000_000, 100L,
+                        900L, false
+                ),
+                // Scenario 15: Operation with fail path and slow timing
+                new MeterAnalysisScenario(
+                        4500L,
+                        "cat14", "op14", null,
+                        500L, 1000L, 4000L, 1000L, // executionTime = 3000, timeLimit = 1000 (slow)
+                        20L, null, null, "failed",
+                        "cat14/op14#15", true, true,
+                        false, false, true,
+                        "failed", 20.0 / (4000.0 - 1000.0) * 1_000_000_000, 3000L,
+                        500L, true
                 )
         );
     }
