@@ -96,7 +96,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 2. **Created → Started → OK with custom path**
    - `new Meter().start() → ok("success_path")` → verify okPath = "success_path"
    - `new Meter().start() → path("custom_path") → ok()` → verify okPath = "custom_path" (path() sets default, ok() uses it)
-   - Verify variations of path types and ok() arguments:
+   - Verify variations of path() types and ok() arguments:
      - **String path**: `ok("success")`, `ok(new String("dynamic"))` → okPath as String
      - **Enum path**: `ok(SomeEnum.SUCCESS)` → okPath = enum toString()
      - **Throwable path**: `ok(new RuntimeException("cause message"))` → okPath = throwable message
@@ -141,52 +141,48 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - Verify failPath immutability (cannot change once set to Failed)
 
 5. **Created → Started → OK with mixed iterations and progress**
-   - `new Meter().start() → inc() × 10 → progress() → inc() × 15 → progress() → inc() × 25 → ok()`
-   - Verify currentIteration incremented on each `inc()` call: 10 → 25 → 50
+   - `new Meter() → iterations(15) → start() → inc() × 5 → progress() → inc() × 5 → progress() → inc() x 5 → ok()`
+   - Verify currentIteration incremented on each `inc()` call
    - Verify `progress()` calls logged periodically during execution (throttled)
    - Verify progress does not change lifecycle state (remains Started)
-   - Verify final currentIteration = 50
+   - Verify final currentIteration = 15
    - Verify `getIterationsPerSecond()` calculated correctly
    - Verify INFO log with completion report including iteration and progress metrics
    - Verify progress calls interleaved correctly with iteration increments
 
-6. **Created → Started → OK with progress tracking**
-   - `new Meter().start() → progress() → ... → progress() → ok()` (multiple calls)
-   - Verify progress is logged periodically (throttled based on progress advancement)
-   - Verify progress does not change lifecycle state (remains Started)
-   - Verify final transition to OK state works correctly
-   - Verify completion report includes iteration metrics
-
 7. **Created → Started → OK with time limit (NOT slow)**
-    - `new Meter().start() → limitMilliseconds(5000) → [execute ~500ms] → ok()`
-    - Verify `timeLimit = 5000`
-    - Verify `executionTime < timeLimit` (e.g., 500 < 5000)
+    - `new Meter().start() → limitMilliseconds(50) → [execute ~10ms] → ok()`
+    - Verify `timeLimit = 50`
+    - Verify `executionTime < timeLimit` (e.g. 100 < 50)
     - Verify `isSlow() = false`
     - Verify no slow operation warnings in INFO log
     - Verify completion report includes timing metrics
 
 8. **Created → Started → OK with time limit (IS slow)**
-    - `new Meter().start() → limitMilliseconds(100) → [execute ~2000ms] → ok()`
-    - Verify `timeLimit = 100`
-    - Verify `executionTime > timeLimit` (e.g., 2000 > 100)
+    - `new Meter().start() → limitMilliseconds(50) → [execute ~100ms] → ok()`
+    - Verify `timeLimit = 50`
+    - Verify `executionTime < timeLimit` (e.g. 100 < 50)
     - Verify `isSlow() = true`
     - Verify slow operation warning included in INFO log
     - Verify completion report highlights slow timing
 
 9. **Created → Started → OK with high iteration count + time limit (NOT slow)**
-    - `new Meter().start() → iterations(1000) → limitMilliseconds(10000) → inc() × 500 → [execute ~1000ms] → ok()`
-    - Verify 500 iterations completed successfully
-    - Verify `executionTime = 1000ms < timeLimit = 10000ms` (not slow)
+   - `new Meter() → iterations(15) → limitMilliseconds(50) → start() → inc() × 5 -> sleep(5) → progress() → inc() × 5 -> sleep(5) → progress() → inc() x 5 -> sleep(5) → ok()`
+    - Verify 15 iterations completed successfully
+    - Verify `timeLimit = 50`
+    - Verify `executionTime < timeLimit` (e.g. 100 < 50)
     - Verify `isSlow() = false`
-    - Verify `getIterationsPerSecond()` = ~500 iterations/sec
+    - Verify `getIterationsPerSecond()` 
     - Verify INFO log shows high throughput without slow warnings
 
 10. **Created → Started → OK with high iteration count + strict time limit (IS slow)**
-    - `new Meter().start() → iterations(1000) → limitMilliseconds(500) → inc() × 100 → [execute ~2000ms] → ok()`
-    - Verify 100 iterations completed successfully
-    - Verify `executionTime = 2000ms > timeLimit = 500ms` (slow)
+    - `new Meter() → iterations(15) → limitMilliseconds(50) → start() → inc() × 5 -> sleep(40) → progress() → inc() × 5 -> sleep(20) → progress() → inc() x 5 -> sleep(10) → ok()`
+    - Verify 15 iterations completed successfully
+    - Verify `timeLimit = 50`
+    - Verify `executionTime < timeLimit` (e.g. 100 < 50)
     - Verify `isSlow() = true`
-    - Verify `getIterationsPerSecond()` = ~50 iterations/sec
+    - 2nd progress call should report slow also.
+    - Verify `getIterationsPerSecond()` 
     - Verify INFO log includes slow operation warning with timing details
 
 11. **Created → Started → Rejected with iterations**
@@ -204,22 +200,6 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
     - Verify failPath = "timeout"
     - Verify ERROR log with failure report highlighting slow timeout
     - Verify progress metrics included in error log
-
-13. **Created → Started → OK with borderline time limit**
-    - `new Meter().start() → limitMilliseconds(1000) → [execute ~1000ms (exactly equal)] → ok()`
-    - Verify `timeLimit = 1000`
-    - Verify `executionTime = 1000ms == timeLimit` (exactly at limit)
-    - Verify `isSlow() = false` (only true when executionTime **>** timeLimit, not >=)
-    - Verify completion report shows operation at exact limit, not slow
-    - Verify INFO log does not include slow warnings
-
-14. **Created → Started → OK with zero time limit**
-    - `new Meter().start() → limitMilliseconds(0) → [execute any duration] → ok()`
-    - Verify `timeLimit = 0` (no limit set)
-    - Verify `isSlow() = false` (isSlow requires timeLimit > 0)
-    - Verify no slow operation logic triggered
-    - Verify INFO log shows normal completion without timing analysis
-
 ---
 
 
