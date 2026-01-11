@@ -138,6 +138,11 @@ class MeterLifeCycleTest {
             // Then: meter has expected initial state (startTime = 0, stopTime = 0)
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
             
+            // Then: before start(), getCurrentInstance() returns unknown meter
+            final Meter currentBeforeStart = Meter.getCurrentInstance();
+            assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
+                "before start(), getCurrentInstance() should return unknown meter");
+            
             // Then: no logs yet
             AssertLogger.assertEventCount(logger, 0);
         }
@@ -154,6 +159,11 @@ class MeterLifeCycleTest {
             
             // Then: operationName is captured correctly
             assertEquals(operationName, meter.getOperation(), "operation name should match");
+            
+            // Then: before start(), getCurrentInstance() returns unknown meter
+            final Meter currentBeforeStart = Meter.getCurrentInstance();
+            assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
+                "before start(), getCurrentInstance() should return unknown meter");
         }
 
         @Test
@@ -170,6 +180,11 @@ class MeterLifeCycleTest {
             // Then: operationName and parent are captured correctly
             assertEquals(operationName, meter.getOperation(), "operation name should match");
             assertEquals(parentId, meter.getParent(), "parent should match");
+            
+            // Then: before start(), getCurrentInstance() returns unknown meter
+            final Meter currentBeforeStart = Meter.getCurrentInstance();
+            assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
+                "before start(), getCurrentInstance() should return unknown meter");
         }
 
         @Test
@@ -178,6 +193,11 @@ class MeterLifeCycleTest {
         void shouldStartMeterSuccessfully() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
+            
+            // Then: before start(), getCurrentInstance() returns unknown meter
+            final Meter currentBeforeStart = Meter.getCurrentInstance();
+            assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
+                "before start(), getCurrentInstance() should return unknown meter");
 
             // When: start() is called
             meter.start();
@@ -185,8 +205,9 @@ class MeterLifeCycleTest {
             // Then: Meter transitions from Created to Started
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
             
-            // Then: meter becomes current in thread-local
-            assertEquals(meter, Meter.getCurrentInstance(), "meter should be current in thread-local");
+            // Then: after start(), meter becomes current in thread-local and is returned by getCurrentInstance()
+            final Meter currentAfterStart = Meter.getCurrentInstance();
+            assertEquals(meter, currentAfterStart, "after start(), meter should be current in thread-local");
 
             // Then: log messages recorded correctly with system status information
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
@@ -201,11 +222,20 @@ class MeterLifeCycleTest {
                 // Then: meter has expected initial state before start
                 assertMeterState(m, false, false, null, null, null, null, 0, 0, 0);
                 
+                // Then: before start(), getCurrentInstance() returns unknown meter
+                final Meter currentBeforeStart = Meter.getCurrentInstance();
+                assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
+                    "before start(), getCurrentInstance() should return unknown meter");
+                
                 // When: start() is called in the block
                 m.start();
                 
                 // Then: meter is transitioned to executing state
                 assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
+                
+                // Then: after start(), meter becomes current in thread-local
+                final Meter currentAfterStart = Meter.getCurrentInstance();
+                assertEquals(m, currentAfterStart, "after start(), meter should be current in thread-local");
             }
 
             // Then: start log messages recorded correctly
@@ -220,6 +250,10 @@ class MeterLifeCycleTest {
             try (Meter m = new Meter(logger).start()) {
                 // Then: meter is in executing state (created and started in single expression)
                 assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
+                
+                // Then: meter becomes current in thread-local after start()
+                final Meter currentAfterStart = Meter.getCurrentInstance();
+                assertEquals(m, currentAfterStart, "after start(), meter should be current in thread-local");
             }
 
             // Then: start log messages recorded correctly
