@@ -1,5 +1,37 @@
 # Instructions for AI Assistants (Gemini & GitHub Copilot)
 
+## Test Execution Strategy
+
+**This project uses TWO separate Surefire executions** to isolate SLF4J logger bindings with different classpaths:
+- **unit-tests**: Excludes Logback, runs with MockLogger
+- **logback-tests**: Excludes MockLogger, runs with real Logback
+
+### Run ALL Tests
+```powershell
+.\mvnw clean compile test
+```
+
+### Run Specific Class or Method
+
+**For classes in `org.usefultoys.slf4j.logback`:**
+```powershell
+.\mvnw clean compile test '-Dskip.unit.tests=true' -Dtest=MessageHighlightConverterTest
+.\mvnw clean compile test '-Dskip.unit.tests=true' '-Dtest=MessageHighlightConverterTest#testMsgStartMarker'
+```
+
+**For classes in ANY OTHER package:**
+```powershell
+.\mvnw clean compile test '-Dskip.logback.tests=true' -Dtest=MeterLifeCycleTest
+.\mvnw clean compile test '-Dskip.logback.tests=true' '-Dtest=MeterLifeCycleTest#shouldCreateMeterWithLoggerInitialState'
+```
+
+**Summary:**
+- Always use `.\mvnw clean compile test` as the base command
+- Use `-Dskip.logback.tests=true` to run only MockLogger tests (unit-tests execution)
+- Use `-Dskip.unit.tests=true` to run only Logback tests (logback-tests execution)
+- Add `-Dtest=ClassName` or `-Dtest=ClassName#methodName` to target specific tests
+- The Maven lifecycle (`compile-test` phase) is automatically respected
+
 ## Testing Standards
 
 ### Test Structure & Organization
