@@ -223,7 +223,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter m(final String message) {
-        if (!MeterValidator.validateMCallArguments(this, message)) {
+        if (!MeterValidator.validateMPrecondition(this) || !MeterValidator.validateMCallArguments(this, message)) {
             return this;
         }
         description = message;
@@ -239,6 +239,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter m(final String format, final Object... args) {
+        if (!MeterValidator.validateMPrecondition(this)) {
+            return this;
+        }
         description = MeterValidator.validateAndFormatMCallArguments(this, format, args);
         return this;
     }
