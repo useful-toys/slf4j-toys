@@ -104,23 +104,36 @@ public interface MeterAnalysis {
 
     /**
      * Calculates the iterations per second for the operation.
+     * <p>
+     * Returns {@code 0.0} if the operation has no iterations, has not started,
+     * or was auto-corrected (duration is zero).
      *
-     * @return The rate of iterations per second, or 0.0 if the operation has not started or has no iterations.
+     * @return The rate of iterations per second, or {@code 0.0} if not available.
      */
     default double getIterationsPerSecond() {
         if (getCurrentIteration() == 0 || getStartTime() == 0) {
             return 0.0d;
-        } else if (getStopTime() == 0) {
-            return ((double) getCurrentIteration()) / (getLastCurrentTime() - getStartTime()) * 1000000000;
         }
-        return ((double) getCurrentIteration()) / (getStopTime() - getStartTime()) * 1000000000;
+        
+        final long duration = getStopTime() == 0
+            ? (getLastCurrentTime() - getStartTime())
+            : (getStopTime() - getStartTime());
+        
+        if (duration == 0) {
+            return 0.0d;  // Auto-corrected or instantaneous
+        }
+        
+        return ((double) getCurrentIteration()) / duration * 1000000000;
     }
 
     /**
      * Returns the execution time of the operation.
+     * <p>
+     * Returns {@code 0} if the operation has not started, or if it was auto-corrected
+     * (terminated without explicit start call).
      *
      * @return The duration from {@code startTime} to {@code stopTime} (if stopped) or to {@code lastCurrentTime} (if
-     * ongoing), in nanoseconds.
+     * ongoing), in nanoseconds. Returns {@code 0} if not available.
      */
     default long getExecutionTime() {
         if (getStartTime() == 0) {

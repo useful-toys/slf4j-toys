@@ -62,7 +62,7 @@ import org.usefultoys.test.WithLocale;
 class MeterLifeCycleTest {
 
     @Slf4jMock
-    private Logger logger;
+    Logger logger;
 
     enum TestEnum {
         VALUE1, VALUE2
@@ -672,6 +672,469 @@ class MeterLifeCycleTest {
             assertEquals("test-session-123", meter.getContext().get("session"));
             assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
             AssertLogger.assertEventCount(logger, 0);
+        }
+    }
+
+    @Nested
+    @DisplayName("Group 3: Pre-Start Termination (⚠️ Tier 3 - State-Correcting)")
+    class PreStartTermination {
+        // ============================================================================
+        // OK without starting (Created → OK)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition to OK when ok() called without start()")
+        void shouldTransitionToOkWhenOkCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+
+            // When: ok() is called without start()
+            meter.ok();
+
+            // Then: meter transitions to OK state despite missing start()
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_OK + INFO completion report
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with String path when ok(String) called without start()")
+        void shouldTransitionToOkWithStringPathWhenOkStringCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+
+            // When: ok("success_path") is called without start()
+            meter.ok("success_path");
+
+            // Then: meter transitions to OK state with path
+            assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_OK + INFO completion report
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with Enum path when ok(Enum) called without start()")
+        void shouldTransitionToOkWithEnumPathWhenOkEnumCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+
+            // When: ok(Enum) is called without start()
+            meter.ok(TestEnum.VALUE1);
+
+            // Then: meter transitions to OK state with enum toString as path
+            assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_OK + INFO completion report
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with Throwable path when ok(Throwable) called without start()")
+        void shouldTransitionToOkWithThrowablePathWhenOkThrowableCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            final RuntimeException exception = new RuntimeException("test cause");
+
+            // When: ok(Throwable) is called without start()
+            meter.ok(exception);
+
+            /* Then: meter transitions to OK state with throwable simple class name as path */
+            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_OK + INFO completion report
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with Object path when ok(Object) called without start()")
+        void shouldTransitionToOkWithObjectPathWhenOkObjectCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            final TestObject testObject = new TestObject();
+
+            // When: ok(Object) is called without start()
+            meter.ok(testObject);
+
+            // Then: meter transitions to OK state with object toString as path
+            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_OK + INFO completion report
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // Reject without starting (Created → Rejected)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition to Rejected when reject(String) called without start()")
+        void shouldTransitionToRejectedWhenRejectStringCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+
+            // When: reject("business_error") is called without start()
+            meter.reject("business_error");
+
+            // Then: meter transitions to Rejected state despite missing start()
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected with Enum cause when reject(Enum) called without start()")
+        void shouldTransitionToRejectedWithEnumCauseWhenRejectEnumCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+
+            // When: reject(Enum) is called without start()
+            meter.reject(TestEnum.VALUE2);
+
+            // Then: meter transitions to Rejected state with enum toString as cause
+            assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected with Throwable cause when reject(Throwable) called without start()")
+        void shouldTransitionToRejectedWithThrowableCauseWhenRejectThrowableCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            final IllegalArgumentException exception = new IllegalArgumentException("invalid input");
+
+            // When: reject(Throwable) is called without start()
+            meter.reject(exception);
+
+            /* Then: meter transitions to Rejected state with throwable simple class name as cause */
+            assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected with Object cause when reject(Object) called without start()")
+        void shouldTransitionToRejectedWithObjectCauseWhenRejectObjectCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            final TestObject testObject = new TestObject();
+
+            // When: reject(Object) is called without start()
+            meter.reject(testObject);
+
+            /* Then: meter transitions to Rejected state with object toString as cause */
+            assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        // ============================================================================
+        // Fail without starting (Created → Failed)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition to Failed when fail(String) called without start()")
+        void shouldTransitionToFailedWhenFailStringCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+
+            // When: fail("technical_error") is called without start()
+            meter.fail("technical_error");
+
+            /* Then: meter transitions to Failed state (failMessage null for non-Throwable) */
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_FAIL + ERROR failure report
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed with Enum cause when fail(Enum) called without start()")
+        void shouldTransitionToFailedWithEnumCauseWhenFailEnumCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+
+            // When: fail(Enum) is called without start()
+            meter.fail(TestEnum.VALUE1);
+
+            /* Then: meter transitions to Failed state (failMessage null for non-Throwable) */
+            assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_FAIL + ERROR failure report
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed with Throwable cause when fail(Throwable) called without start()")
+        void shouldTransitionToFailedWithThrowableCauseWhenFailThrowableCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            final Exception exception = new Exception("connection timeout");
+
+            // When: fail(Throwable) is called without start()
+            meter.fail(exception);
+
+            /* Then: meter transitions to Failed state with throwable full class name as path and message as failMessage */
+            assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_FAIL + ERROR failure report
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed with Object cause when fail(Object) called without start()")
+        void shouldTransitionToFailedWithObjectCauseWhenFailObjectCalledWithoutStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            final TestObject testObject = new TestObject();
+
+            // When: fail(Object) is called without start()
+            meter.fail(testObject);
+
+            /* Then: meter transitions to Failed state (failMessage null for non-Throwable) */
+            assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_FAIL + ERROR failure report
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        // ============================================================================
+        // Pre-configured attributes preserved on self-correcting termination
+        // ============================================================================
+
+        @Test
+        @DisplayName("should preserve pre-configured attributes when ok() called without start()")
+        void shouldPreservePreConfiguredAttributesWhenOkCalledWithoutStart() {
+            // Given: a new Meter with pre-configured attributes
+            final Meter meter = new Meter(logger);
+            meter.iterations(100);
+            meter.limitMilliseconds(5000);
+            meter.m("operation description");
+
+            // When: ok() is called without start()
+            meter.ok();
+
+            // Then: all pre-configured attributes are preserved in terminal state
+            assertMeterState(meter, true, true, null, null, null, null, 0, 100, 5000);
+            assertEquals("operation description", meter.getDescription());
+            
+            // Then: logs INCONSISTENT_OK + INFO completion report (with attributes)
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "operation description");
+        }
+
+        @Test
+        @DisplayName("should preserve pre-configured attributes when reject() called without start()")
+        void shouldPreservePreConfiguredAttributesWhenRejectCalledWithoutStart() {
+            // Given: a new Meter with pre-configured attributes
+            final Meter meter = new Meter(logger);
+            meter.iterations(50);
+            meter.limitMilliseconds(3000);
+            meter.m("validation check");
+
+            // When: reject() is called without start()
+            meter.reject("validation_error");
+
+            /* Then: all pre-configured attributes are preserved in terminal state */
+            assertMeterState(meter, true, true, null, "validation_error", null, null, 0, 50, 3000);
+            assertEquals("validation check", meter.getDescription());
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report (with attributes) */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "validation check");
+        }
+
+        @Test
+        @DisplayName("should preserve pre-configured attributes when fail() called without start()")
+        void shouldPreservePreConfiguredAttributesWhenFailCalledWithoutStart() {
+            // Given: a new Meter with pre-configured attributes
+            final Meter meter = new Meter(logger);
+            meter.iterations(200);
+            meter.limitMilliseconds(10000);
+            meter.m("database operation");
+
+            // When: fail() is called without start()
+            meter.fail("connection_error");
+
+            /* Then: all pre-configured attributes are preserved (failMessage null for String) */
+            assertMeterState(meter, true, true, null, null, "connection_error", null, 0, 200, 10000);
+            assertEquals("database operation", meter.getDescription());
+            
+            // Then: logs INCONSISTENT_FAIL + ERROR failure report (with attributes)
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "database operation");
+        }
+
+        // ============================================================================
+        // Context preserved on self-correcting termination
+        // ============================================================================
+
+        @Test
+        @DisplayName("should preserve context when ok() called without start()")
+        void shouldPreserveContextWhenOkCalledWithoutStart() {
+            // Given: a new Meter with context
+            final Meter meter = new Meter(logger);
+            meter.ctx("user", "alice");
+            meter.ctx("action", "import");
+
+            // When: ok() is called without start()
+            meter.ok();
+
+            // Then: context is preserved in terminal state
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_OK + INFO completion report (with context)
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "user", "alice");
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "action", "import");
+        }
+
+        @Test
+        @DisplayName("should preserve context when reject() called without start()")
+        void shouldPreserveContextWhenRejectCalledWithoutStart() {
+            // Given: a new Meter with context
+            final Meter meter = new Meter(logger);
+            meter.ctx("user", "bob");
+            meter.ctx("action", "export");
+
+            // When: reject() is called without start()
+            meter.reject("validation_error");
+
+            /* Then: context is preserved in terminal state */
+            assertMeterState(meter, true, true, null, "validation_error", null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report (with context) */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "user", "bob");
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "action", "export");
+        }
+
+        @Test
+        @DisplayName("should preserve context when fail() called without start()")
+        void shouldPreserveContextWhenFailCalledWithoutStart() {
+            // Given: a new Meter with context
+            final Meter meter = new Meter(logger);
+            meter.ctx("user", "charlie");
+            meter.ctx("action", "delete");
+
+            // When: fail() is called without start()
+            meter.fail("permission_error");
+
+            /* Then: context is preserved (failMessage null for String) */
+            assertMeterState(meter, true, true, null, null, "permission_error", null, 0, 0, 0);
+            
+            // Then: logs INCONSISTENT_FAIL + ERROR failure report (with context)
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "user", "charlie");
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "action", "delete");
+        }
+
+        // ============================================================================
+        // Path set before starting (rejected, then termination)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject path() before start() then transition to OK")
+        void shouldRejectPathBeforeStartThenTransitionToOk() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: path() is called before start(), then ok() is called
+            meter.path("custom_path");
+            meter.ok();
+
+            // Then: path() was rejected (ILLEGAL), okPath remains undefined after ok()
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            
+            // Then: logs ILLEGAL (path before start) + INCONSISTENT_OK + INFO completion
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should reject path() before start() then transition to Rejected")
+        void shouldRejectPathBeforeStartThenTransitionToRejected() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: path() is called before start(), then reject() is called
+            meter.path("custom_path");
+            meter.reject("business_error");
+
+            /* Then: path() was rejected (ILLEGAL), meter still reaches Rejected state */
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            
+            /* Then: logs ILLEGAL (path before start) + INCONSISTENT_REJECT + INFO rejection */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should reject path() before start() then transition to Failed")
+        void shouldRejectPathBeforeStartThenTransitionToFailed() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: path() is called before start(), then fail() is called
+            meter.path("custom_path");
+            meter.fail("technical_error");
+
+            /* Then: path() was rejected (ILLEGAL), meter reaches Failed (failMessage null for String) */
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            
+            // Then: logs ILLEGAL (path before start) + INCONSISTENT_FAIL + ERROR failure
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
         }
     }
 
@@ -1632,7 +2095,7 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Group 5: Post-Stop Configuration (❌ Tier 4 - Invalid State-Preserving)")
+    @DisplayName("Group 6: Post-Stop Configuration (❌ Tier 4 - Invalid State-Preserving)")
     class PostStopConfigurationOKState {
         // ============================================================================
         // Update description after stop (OK state)
@@ -3238,6 +3701,305 @@ class MeterLifeCycleTest {
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        // ============================================================================
+        // Try-with-resources WITHOUT start() (⚠️ Tier 3 - State-Correcting)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition to Failed via try-with-resources without start() - implicit close()")
+        void shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose() {
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                /* When: block executes without calling start(), ok(), reject(), or fail()
+                 * (meter auto-closes with implicit fail) */
+            }
+
+            /* Then: logs INCONSISTENT_CLOSE + ERROR for implicit failure */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_CLOSE);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "try-with-resources");
+        }
+
+        @Test
+        @DisplayName("should transition to OK via try-with-resources without start() - explicit ok()")
+        void shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok() is called without start() */
+                m.ok();
+            }
+
+            /* Then: meter transitions to OK state despite missing start() */
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with path via try-with-resources without start() - explicit ok(String)")
+        void shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok("success_path") is called without start() */
+                m.ok("success_path");
+            }
+
+            /* Then: meter transitions to OK state with path */
+            assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with Enum via try-with-resources without start() - explicit ok(Enum)")
+        void shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok(Enum) is called without start() */
+                m.ok(TestEnum.VALUE1);
+            }
+
+            /* Then: meter transitions to OK state with enum toString as path */
+            assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with Throwable via try-with-resources without start() - explicit ok(Throwable)")
+        void shouldTransitionToOkWithThrowableViaTryWithResourcesWithoutStartExplicitOkThrowable() {
+            Meter meter = null;
+            final RuntimeException exception = new RuntimeException("test cause");
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok(Throwable) is called without start() */
+                m.ok(exception);
+            }
+
+            /* Then: meter transitions to OK state with throwable simple class name as path */
+            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with Object via try-with-resources without start() - explicit ok(Object)")
+        void shouldTransitionToOkWithObjectViaTryWithResourcesWithoutStartExplicitOkObject() {
+            Meter meter = null;
+            final TestObject testObject = new TestObject();
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok(Object) is called without start() */
+                m.ok(testObject);
+            }
+
+            /* Then: meter transitions to OK state with object toString as path */
+            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected via try-with-resources without start() - explicit reject(String)")
+        void shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: reject("business_error") is called without start() */
+                m.reject("business_error");
+            }
+
+            /* Then: meter transitions to Rejected state with rejectPath */
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected with Enum via try-with-resources without start() - explicit reject(Enum)")
+        void shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: reject(Enum) is called without start() */
+                m.reject(TestEnum.VALUE2);
+            }
+
+            /* Then: meter transitions to Rejected state with enum toString as cause */
+            assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected with Throwable via try-with-resources without start() - explicit reject(Throwable)")
+        void shouldTransitionToRejectedWithThrowableViaTryWithResourcesWithoutStartExplicitRejectThrowable() {
+            Meter meter = null;
+            final IllegalArgumentException exception = new IllegalArgumentException("invalid input");
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: reject(Throwable) is called without start() */
+                m.reject(exception);
+            }
+
+            /* Then: meter transitions to Rejected state with throwable simple class name as cause */
+            assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected with Object via try-with-resources without start() - explicit reject(Object)")
+        void shouldTransitionToRejectedWithObjectViaTryWithResourcesWithoutStartExplicitRejectObject() {
+            Meter meter = null;
+            final TestObject testObject = new TestObject();
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: reject(Object) is called without start() */
+                m.reject(testObject);
+            }
+
+            /* Then: meter transitions to Rejected state with object toString as cause */
+            assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed via try-with-resources without start() - explicit fail(String)")
+        void shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: fail("technical_error") is called without start() */
+                m.fail("technical_error");
+            }
+
+            /* Then: meter transitions to Failed state with failPath (failMessage null for non-Throwable) */
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed with Enum via try-with-resources without start() - explicit fail(Enum)")
+        void shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: fail(Enum) is called without start() */
+                m.fail(TestEnum.VALUE1);
+            }
+
+            /* Then: meter transitions to Failed state with enum toString as cause (failMessage null) */
+            assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed with Throwable via try-with-resources without start() - explicit fail(Throwable)")
+        void shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable() {
+            Meter meter = null;
+            final Exception exception = new Exception("connection timeout");
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: fail(Throwable) is called without start() */
+                m.fail(exception);
+            }
+
+            /* Then: meter transitions to Failed state with throwable full class name as path and message as failMessage */
+            assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed with Object via try-with-resources without start() - explicit fail(Object)")
+        void shouldTransitionToFailedWithObjectViaTryWithResourcesWithoutStartExplicitFailObject() {
+            Meter meter = null;
+            final TestObject testObject = new TestObject();
+            /* Given: Meter created in try-with-resources without start() */
+            try (Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: fail(Object) is called without start() */
+                m.fail(testObject);
+            }
+
+            /* Then: meter transitions to Failed state with object toString as cause (failMessage null) */
+            assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
+            
+            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
         }
     }
 
