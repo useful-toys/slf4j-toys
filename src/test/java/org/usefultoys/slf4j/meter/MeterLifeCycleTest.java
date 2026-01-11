@@ -263,6 +263,8 @@ class MeterLifeCycleTest {
         }
     }
 
+    
+
     @Nested
     @DisplayName("Group 2: Pre-Start Configuration (Tier 2 - Valid Non-State-Changing)")
     class PreStartConfiguration {
