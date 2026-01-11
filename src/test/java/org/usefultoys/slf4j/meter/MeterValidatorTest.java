@@ -541,6 +541,34 @@ public class MeterValidatorTest {
     }
 
     @Nested
+    @DisplayName("Context Precondition Tests")
+    class ContextPreconditionTests {
+
+        @Test
+        @DisplayName("should validate context precondition when not stopped")
+        void shouldValidateContextPreconditionWhenNotStopped() {
+            // Given: meter is not stopped
+            when(meter.getStopTime()).thenReturn(0L);
+            // When: validateContextPrecondition is called
+            // Then: should return true
+            assertTrue(MeterValidator.validateContextPrecondition(meter), "should accept when meter not stopped");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject context precondition when already stopped")
+        void shouldValidateContextPreconditionWhenStopped() {
+            // Given: meter is already stopped
+            when(meter.getStopTime()).thenReturn(12345L);
+            // When: validateContextPrecondition is called
+            // Then: should return false and log illegal precondition error
+            assertFalse(MeterValidator.validateContextPrecondition(meter), "should reject when meter already stopped");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL, "Meter putContext but already stopped; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+    }
+
+    @Nested
     @DisplayName("Error Logging Tests")
     class ErrorLoggingTests {
 
