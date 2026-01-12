@@ -42,12 +42,13 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
     ```
   - **PowerShell Parameter Escaping**: When Maven/Java parameters contain special characters (`-D`, `@`, `#`, `=`), wrap them in single quotes to prevent PowerShell from interpreting them as delimiters:
     ```powershell
-    # ✅ CORRECT: Single quotes protect special characters
-    .\mvnw clean compile test '-Dskip.logback.tests=true' -Dtest=ClassName
-    .\mvnw 'surefire:test@unit-tests'
+    # ✅ CORRECT: Single quotes protect special characters and profile combinations
+    .\mvnw test -P slf4j-2.0,with-logback -Dtest=MessageHighlightConverterTest
+    .\mvnw test -P slf4j-2.0,with-logback '-Dtest=MeterLifeCycleTest#shouldCreateMeterWithLoggerInitialState'
     
-    # ❌ WRONG: Without quotes, PowerShell misinterprets the parameters
-    .\mvnw clean compile test -Dskip.logback.tests=true    # Error: "Unknown lifecycle phase '.logback.tests=true'"
+    # ❌ WRONG: Without quotes on test filter with #, PowerShell interprets # as comment start
+    .\mvnw test -P slf4j-2.0,with-logback -Dtest=MeterLifeCycleTest#shouldCreateMeterWithLoggerInitialState
+    # Result: Maven receives only "MeterLifeCycleTest" and ignores method name after #
     ```
   - **Command Availability on PowerShell**: Always use PowerShell-native commands, not Unix/Linux/bash equivalents that don't exist on Windows:
     ```powershell
@@ -76,6 +77,15 @@ and Watcher (monitoring) capabilities. The project is built with Maven and uses 
 **JDK Compatibility Profiles**:
 - **jdk-8**: Activates automatically on JDK 8, uses Mockito 4.11.0 and skips enforcer. Used for testing backward compatibility
   - Activate: `mvnw.cmd -P jdk-8 test` (or omit on JDK 8)
+
+**Test Scope Profiles**:
+- **with-logback**: Adds Logback integration tests (~84 tests) on top of default core tests (~1441 tests)
+  - Activate: `mvnw.cmd test -P slf4j-2.0,with-logback`
+  - **Default build** (without profile): Runs only core tests with MockLogger (IDE-friendly)
+  - **With profile**: Adds Logback-specific tests with real Logback implementation
+  - **IDE Support**: Core tests ✅ (full IDE support) | Logback tests ❌ (Maven-only, no IDE)
+  - **Purpose**: Keeps IDE environment clean while ensuring complete test coverage in CI/CD
+  - **See**: `doc/TDR-0031-ide-friendly-build-with-optional-logback-testing.md` for details
 
 **Task-Specific Profiles**:
 - **release**: Generates Javadoc JAR, sources JAR, signs artifacts, and deploys to Maven Central
