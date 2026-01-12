@@ -59,6 +59,113 @@
         <url>git@github.com/useful-toys/slf4j-toys.git</url>
     </scm>
 
+    <!--
+        ================================================================================
+        BUILD STRATEGY: IDE-Friendly Default + Profile-Based Logback Testing
+        ================================================================================
+
+        This project uses a two-tier testing strategy to provide an optimal development
+        experience in IDEs while maintaining comprehensive test coverage in CI/CD.
+
+        THE CHALLENGE:
+        ==============
+        - Core tests (Meter, Watcher, Reporter) require slf4j-test-mock (MockLogger)
+        - Logback integration tests require logback-classic (real Logback Logger)
+        - SLF4J ServiceLoader can only bind ONE implementation at runtime
+        - Having both on classpath causes runtime ClassCastException
+        - IDEs (especially IntelliJ) struggle with dual build configurations
+
+        THE SOLUTION:
+        =============
+
+        1️⃣  DEFAULT BUILD - IDE-Friendly (No Profile Needed)
+        ────────────────────────────────────────────────────
+        What:    Standard Maven build or IDE import
+        Tests:   Meter, Watcher, Reporter + support classes (~1441 tests)
+        Runtime: slf4j-test-mock (MockLogger)
+        Exclude: logback-classic dependency
+        Exclude: **/logback/**/*Test.java test classes
+        Exclude: src/logback-main/java source directory
+        Exclude: src/logback-test/java test directory
+
+        IDE Support: ✅ Full support (run, debug, code coverage, refactoring)
+
+        Command: mvn clean test                      # or just run tests in IDE
+        Result:  1441 tests pass
+
+        2️⃣  WITH-LOGBACK PROFILE - Maven-Only CI/CD Testing
+        ────────────────────────────────────────────────────
+        What:    Additional Maven profile for complete coverage
+        Tests:   Logback converters and integration tests (~84 tests)
+        Runtime: logback-classic (real Logback Logger)
+        Exclude: slf4j-test-mock dependency
+        Include: **/logback/**/*Test.java test classes only
+        Include: src/logback-main/java (Logback converters - production code)
+        Include: src/logback-test/java (Logback integration tests)
+
+        IDE Support: ❌ No IDE support for running/debugging these tests
+
+        Command: mvn clean test -P slf4j-2.0,with-logback
+        Result:  1525 tests pass (1441 + 84)
+
+        WHY THIS APPROACH?
+        ==================
+        ✅ IDEs import the default configuration → clean project structure
+        ✅ 99% of development work uses standard build → no complexity
+        ✅ Logback tests verified in CI/CD → complete coverage guaranteed
+        ✅ No SLF4J binding conflicts during development
+        ✅ No IDE confusion with multiple source roots
+        ✅ Developers can run/debug tests directly in IDE
+        ✅ Build matrix in CI/CD covers all combinations
+
+        HOW IT WORKS (Technical Details):
+        ==================================
+        - Maven Surefire plugin has TWO executions:
+          1. "default-test" (always active) → runs core tests
+          2. "logback-tests" (profile-activated) → runs logback tests
+
+        - Classpath isolation via <classpathDependencyExcludes>:
+          * default-test: excludes logback-classic
+          * logback-tests: excludes slf4j-test-mock
+
+        - Source directories added conditionally:
+          * with-logback profile uses build-helper-maven-plugin
+          * Adds src/logback-main/java and src/logback-test/java
+          * Only during Maven build, NOT imported by IDE
+
+        ALTERNATIVE APPROACHES CONSIDERED (AND REJECTED):
+        ==================================================
+        ❌ Separate module (slf4j-toys-logback): Too much POM duplication
+        ❌ Multiple IDE profiles: IDEs don't handle profile switching well
+        ❌ JUnit tags: Cannot remove dependencies from classpath
+        ❌ Conditional dependencies: Maven lacks runtime classpath isolation
+        ❌ Both dependencies in classpath: ClassCastException at runtime
+
+        IMPORTANT NOTES FOR DEVELOPERS:
+        ================================
+        📌 When working on logback converters (src/logback-main/java):
+           - Edit files with any text editor or IDE (they're just not imported)
+           - Build with Maven to compile and test: mvn test -P with-logback
+           - Cannot run/debug these tests from IDE
+
+        📌 When working on core features (Meter, Watcher, Reporter):
+           - Full IDE support - run, debug, refactor as usual
+           - No logback complexity - just pure SLF4J + MockLogger
+           - This is 99% of development work
+
+        📌 CI/CD Build Matrix:
+           - Tests with slf4j-1.7 + javax.servlet (Java 8+)
+           - Tests with slf4j-2.0 + javax.servlet (Java 11+)
+           - Tests with slf4j-2.0 + jakarta.servlet (Java 11+)
+           - All combinations run with and without logback profile
+
+        For more details, see the inline comments in the <build> and <profiles> sections.
+
+        Technical Decision Record:
+        📄 doc/TDR-0031-ide-friendly-build-with-optional-logback-testing.md
+        ================================================================================
+    -->
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -184,30 +291,15 @@
     <build>
         <plugins>
             <!--
-                Multiple Surefire Executions for Classpath Isolation
-                =====================================================
+                Surefire Test Execution Configuration
+                ======================================
+                See detailed explanation at the top of this POM file.
 
-                Problem:
-                - Unit tests require slf4j-test-mock (MockLogger implementation)
-                - Logback tests require logback-classic (Logback Logger implementation)
-                - SLF4J ServiceLoader can only bind ONE implementation at runtime
-                - Having both on classpath causes: "ClassCastException: ch.qos.logback.classic.Logger
-                  cannot be cast to org.slf4j.impl.MockLogger"
+                Summary:
+                - default-test execution: Core tests with MockLogger (always active)
+                - logback-tests execution: Logback tests with real Logback (profile-activated)
 
-                Solution:
-                - Use multiple executions with isolated classpaths
-                - Execution 1 (unit-tests): Excludes logback-classic → runs with MockLogger (1441 tests)
-                - Execution 2 (logback-tests): Excludes slf4j-test-mock → runs with Logback (84 tests)
-                  * Controlled by skip.logback.tests property (true by default)
-                  * Activated by with-logback profile (sets skip.logback.tests=false)
-                - Default execution is disabled to prevent conflicts
-
-                Total: 1525 tests (1441 + 84)
-
-                Alternative approaches considered and rejected:
-                - Separate module (slf4j-toys-logback-tests): Adds complexity, requires extra POM maintenance
-                - Maven profiles: Cannot isolate classpath within same build
-                - JUnit tags: Cannot remove dependencies from classpath
+                Classpath isolation prevents SLF4J binding conflicts.
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -217,7 +309,7 @@
                     <!-- Disable default test execution -->
                 </configuration>
                 <executions>
-                    <!-- Default execution: Run all tests except logback-specific ones -->
+                    <!-- DEFAULT EXECUTION: IDE-Friendly Main Tests (Always Active) -->
                     <execution>
                         <id>default-test</id>
                         <phase>test</phase>
@@ -226,7 +318,7 @@
                         </goals>
                         <configuration>
                             <skip>false</skip>
-                            <!-- Exclude Logback-specific tests -->
+                            <!-- Exclude Logback-specific tests (only run with with-logback profile) -->
                             <excludes>
                                 <exclude>**/logback/**/*Test.java</exclude>
                             </excludes>
@@ -553,12 +645,22 @@
                 </plugins>
             </build>
         </profile>
+        <!--
+            WITH-LOGBACK PROFILE: Maven-Only Logback Integration Testing
+            =============================================================
+            See detailed explanation at the top of this POM file.
+
+            Quick Reference:
+            - Activation: mvn test -P slf4j-2.0,with-logback
+            - Adds: logback-classic dependency (provided, optional)
+            - Adds: src/logback-main/java source directory
+            - Adds: src/logback-test/java test directory
+            - Adds: logback-tests Surefire execution
+            - Tests: 84 Logback integration tests
+            - IDE: ❌ Not visible in IDE (Maven-only build)
+        -->
         <profile>
             <id>with-logback</id>
-            <properties>
-                <!-- Enable logback-tests execution when this profile is active -->
-                <skip.logback.tests>false</skip.logback.tests>
-            </properties>
             <dependencies>
                 <dependency>
                     <groupId>ch.qos.logback</groupId>
@@ -606,7 +708,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>${maven-surefire-plugin.version}</version>
                         <executions>
-                            <!-- Logback tests execution: Only runs when with-logback profile is active -->
+                            <!-- LOGBACK TESTS EXECUTION: Maven-Only (No IDE Support) -->
                             <execution>
                                 <id>logback-tests</id>
                                 <phase>test</phase>
