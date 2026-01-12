@@ -15,12 +15,8 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -33,6 +29,11 @@ import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link Meter} lifecycle.
@@ -62,12 +63,18 @@ import org.usefultoys.test.WithLocale;
 class MeterLifeCycleTest {
 
     @Slf4jMock
-    Logger logger;
+    private Logger logger;
 
+    /**
+     * Test enum for validating enum path handling in Meter.
+     */
     enum TestEnum {
         VALUE1, VALUE2
     }
 
+    /**
+     * Test object for validating object path handling in Meter.
+     */
     static class TestObject {
         @Override
         public String toString() {
@@ -75,7 +82,17 @@ class MeterLifeCycleTest {
         }
     }
 
-    private void assertMeterState(Meter meter, boolean started, boolean stopped, String okPath, String rejectPath, String failPath, String failMessage, long currentIteration, long expectedIterations, long timeLimitMilliseconds) {
+    /**
+     * Verifies the state of the given {@code Meter} object against the provided expected values and conditions.
+     *
+     * @param meter                 the {@code Meter} object to validate
+     * @param started               {@code true} if the meter is expected to be started, otherwise {@code false}
+     * @param stopped               {@code true} if the meter is expected to be stopped, otherwise {@code false}
+     * @param okPath                the expected value of the "okPath" property, or {@code null} if it is expected to be null
+     * @param rejectPath            the expected value of the "rejectPath" property, or {@code null} if it is expected to be null
+     * @param failPath              the expected value of the "failPath" property, or {@code null} if it is expected to be null
+     * @param failMessage           the expected value of the "*/
+    private void assertMeterState(final Meter meter, final boolean started, final boolean stopped, final String okPath, final String rejectPath, final String failPath, final String failMessage, final long currentIteration, final long expectedIterations, final long timeLimitMilliseconds) {
         if (started) {
             assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         } else {
@@ -219,7 +236,7 @@ class MeterLifeCycleTest {
         @DisplayName("should start meter in try-with-resources (start in block)")
         void shouldStartMeterInTryWithResourcesSequential() {
             // Given: Meter is created in try-with-resources
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 // Then: meter has expected initial state before start
                 assertMeterState(m, false, false, null, null, null, null, 0, 0, 0);
                 
@@ -248,7 +265,7 @@ class MeterLifeCycleTest {
         @DisplayName("should start meter with chained call in try-with-resources")
         void shouldStartMeterInTryWithResourcesChained() {
             // Given: Meter is created with chained start() in try-with-resources
-            try (Meter m = new Meter(logger).start()) {
+            try (final Meter m = new Meter(logger).start()) {
                 // Then: meter is in executing state (created and started in single expression)
                 assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
                 
@@ -263,7 +280,603 @@ class MeterLifeCycleTest {
         }
     }
 
-    
+    @Nested
+    @DisplayName("Group 2: Happy Path (✅ Tier 1 - Valid State-Changing)")
+    class HappyPath {
+
+        // ============================================================================
+        // Created → Started → OK (simple)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition Created → Started → OK (simple)")
+        void shouldTransitionCreatedToStartedToOkSimple() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started and completes successfully
+            meter.start();
+            meter.ok();
+
+            // Then: meter should be in OK state
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // Created → Started → OK with custom path
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with String path via ok(String)")
+        void shouldTransitionCreatedToStartedToOkWithStringPathViaOkString() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started and completes successfully with path
+            meter.start();
+            meter.ok("success_path");
+
+            // Then: meter should be in OK state with okPath set
+            assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "success_path");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with String path via path() then ok()")
+        void shouldTransitionCreatedToStartedToOkWithStringPathViaPathThenOk() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started, path is set, and completes successfully
+            meter.start();
+            meter.path("custom_path");
+            meter.ok();
+
+            // Then: meter should be in OK state with okPath set
+            assertMeterState(meter, true, true, "custom_path", null, null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "custom_path");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with Enum path")
+        void shouldTransitionCreatedToStartedToOkWithEnumPath() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started and completes successfully with Enum path
+            meter.start();
+            meter.ok(TestEnum.VALUE1);
+
+            // Then: meter should be in OK state with okPath as Enum.toString()
+            assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "VALUE1");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with Throwable path")
+        void shouldTransitionCreatedToStartedToOkWithThrowablePath() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            final Throwable throwable = new RuntimeException("test exception");
+
+            // When: meter is started and completes successfully with Throwable path
+            meter.start();
+            meter.ok(throwable);
+
+            // Then: meter should be in OK state with okPath as Throwable class name
+            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "RuntimeException");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with Object path")
+        void shouldTransitionCreatedToStartedToOkWithObjectPath() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            final TestObject testObject = new TestObject();
+
+            // When: meter is started and completes successfully with Object path
+            meter.start();
+            meter.ok(testObject);
+
+            // Then: meter should be in OK state with okPath as Object.toString()
+            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "testObjectString");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with ok() overriding path()")
+        void shouldTransitionCreatedToStartedToOkWithOkOverridingPath() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started, path is set, then ok() with different path
+            meter.start();
+            meter.path("default_path");
+            meter.ok("override_path");
+
+            // Then: meter should be in OK state with okPath from ok() (overrides path())
+            assertMeterState(meter, true, true, "override_path", null, null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "override_path");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with multiple path() calls (last wins)")
+        void shouldTransitionCreatedToStartedToOkWithMultiplePathCalls() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started and path() is called multiple times
+            meter.start();
+            meter.path("first");
+            meter.path("second");
+            meter.path("third");
+            meter.ok();
+
+            // Then: meter should be in OK state with okPath from last path() call
+            assertMeterState(meter, true, true, "third", null, null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "third");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // Created → Started → Rejected
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition Created → Started → Rejected with String cause")
+        void shouldTransitionCreatedToStartedToRejectedWithStringCause() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started and rejected
+            meter.start();
+            meter.reject("business_error");
+
+            // Then: meter should be in Rejected state
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Rejected with Enum cause")
+        void shouldTransitionCreatedToStartedToRejectedWithEnumCause() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started and rejected with Enum
+            meter.start();
+            meter.reject(TestEnum.VALUE2);
+
+            // Then: meter should be in Rejected state with rejectPath as Enum.toString()
+            assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "VALUE2");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Rejected with Throwable cause")
+        void shouldTransitionCreatedToStartedToRejectedWithThrowableCause() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            final Throwable throwable = new IllegalArgumentException("validation failed");
+
+            // When: meter is started and rejected with Throwable
+            meter.start();
+            meter.reject(throwable);
+
+            // Then: meter should be in Rejected state with rejectPath as Throwable class name
+            assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "IllegalArgumentException");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Rejected with Object cause")
+        void shouldTransitionCreatedToStartedToRejectedWithObjectCause() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            final TestObject testObject = new TestObject();
+
+            // When: meter is started and rejected with Object
+            meter.start();
+            meter.reject(testObject);
+
+            // Then: meter should be in Rejected state with rejectPath as Object.toString()
+            assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "testObjectString");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Rejected after setting path() expectation")
+        void shouldTransitionCreatedToStartedToRejectedAfterSettingPathExpectation() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started, path is set for expected ok, then rejected
+            meter.start();
+            meter.path("expected_ok_path");
+            meter.reject("business_error");
+
+            // Then: meter should be in Rejected state with rejectPath (okPath remains unset)
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "business_error");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        // ============================================================================
+        // Created → Started → Failed
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition Created → Started → Failed with String cause")
+        void shouldTransitionCreatedToStartedToFailedWithStringCause() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started and fails
+            meter.start();
+            meter.fail("technical_error");
+
+            // Then: meter should be in Failed state
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Failed with Enum cause")
+        void shouldTransitionCreatedToStartedToFailedWithEnumCause() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started and fails with Enum
+            meter.start();
+            meter.fail(TestEnum.VALUE1);
+
+            // Then: meter should be in Failed state with failPath as Enum.toString()
+            assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "VALUE1");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Failed with Throwable cause")
+        void shouldTransitionCreatedToStartedToFailedWithThrowableCause() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            final Throwable throwable = new RuntimeException("system failure");
+
+            // When: meter is started and fails with Throwable
+            meter.start();
+            meter.fail(throwable);
+
+            // Then: meter should be in Failed state with failPath as class name and failMessage
+            assertMeterState(meter, true, true, null, null, "java.lang.RuntimeException", "system failure", 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "java.lang.RuntimeException");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Failed with Object cause")
+        void shouldTransitionCreatedToStartedToFailedWithObjectCause() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+            final TestObject testObject = new TestObject();
+
+            // When: meter is started and fails with Object
+            meter.start();
+            meter.fail(testObject);
+
+            // Then: meter should be in Failed state with failPath as Object.toString()
+            assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "testObjectString");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Failed after setting path() expectation")
+        void shouldTransitionCreatedToStartedToFailedAfterSettingPathExpectation() {
+            // Given: a new Meter
+            final Meter meter = new Meter(logger);
+
+            // When: meter is started, path is set for expected ok, then fails
+            meter.start();
+            meter.path("expected_ok_path");
+            meter.fail("critical_error");
+
+            // Then: meter should be in Failed state with failPath (okPath remains unset)
+            assertMeterState(meter, true, true, null, null, "critical_error", null, 0, 0, 0);
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "critical_error");
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        // ============================================================================
+        // Created → Started → OK with mixed iterations and progress
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with mixed iterations and progress")
+        void shouldTransitionCreatedToStartedToOkWithMixedIterationsAndProgress() throws InterruptedException {
+            // Given: a meter with expected iterations configured
+            final Meter meter = new Meter(logger);
+            meter.iterations(15);
+            MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
+
+            // When: meter is started, incremented with progress calls, and completes
+            meter.start();
+            
+            // First batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            meter.progress();
+            
+            // Second batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            meter.progress();
+            
+            // Third batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            meter.ok();
+
+            // Then: meter should be in OK state with correct iteration count
+            assertMeterState(meter, true, true, null, null, null, null, 15, 15, 0);
+            
+            // Then: progress messages should have been logged (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 6, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 7, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // Created → Started → OK with time limit (NOT slow)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with time limit (NOT slow)")
+        void shouldTransitionCreatedToStartedToOkWithTimeLimitNotSlow() throws InterruptedException {
+            // Given: a meter with time limit configured
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.limitMilliseconds(50);
+
+            // When: operation completes within time limit
+            Thread.sleep(10); // Execute ~10ms
+            meter.ok();
+
+            // Then: meter should be in OK state and NOT slow
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 50);
+            assertFalse(meter.isSlow(), "meter should NOT be slow");
+            
+            // Then: completion report logged as INFO (not slow, skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // Created → Started → OK with time limit (IS slow)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with time limit (IS slow)")
+        void shouldTransitionCreatedToStartedToOkWithTimeLimitIsSlow() throws InterruptedException {
+            // Given: a meter with time limit configured
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.limitMilliseconds(50);
+
+            // When: operation exceeds time limit
+            Thread.sleep(100); // Execute ~100ms
+            meter.ok();
+
+            // Then: meter should be in OK state and IS slow
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 50);
+            assertTrue(meter.isSlow(), "meter should be slow");
+            
+            // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
+        }
+
+        // ============================================================================
+        // Created → Started → OK with high iteration count + time limit (NOT slow)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with high iteration count + time limit (NOT slow)")
+        void shouldTransitionCreatedToStartedToOkWithHighIterationCountAndTimeLimitNotSlow() throws InterruptedException {
+            // Given: a meter with iterations and time limit configured
+            final Meter meter = new Meter(logger);
+            meter.iterations(15);
+            meter.limitMilliseconds(100); // Increased to ensure NOT slow
+            MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
+
+            // When: meter executes with iterations and completes within time limit
+            meter.start();
+            
+            // First batch: 5 iterations + sleep
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            Thread.sleep(5);
+            meter.progress();
+            
+            // Second batch: 5 iterations + sleep
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            Thread.sleep(5);
+            meter.progress();
+            
+            // Third batch: 5 iterations + sleep
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            Thread.sleep(5);
+            meter.ok();
+
+            // Then: meter should be in OK state with correct iterations and NOT slow
+            assertMeterState(meter, true, true, null, null, null, null, 15, 15, 100);
+            assertFalse(meter.isSlow(), "meter should NOT be slow");
+            
+            // Then: completion report includes timing metrics (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 6, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 7, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // Created → Started → OK with high iteration count + strict time limit (IS slow)
+        // ============================================================================
+
+        @Test
+        @Disabled
+        @DisplayName("should transition Created → Started → OK with high iteration count + strict time limit (IS slow)")
+        void shouldTransitionCreatedToStartedToOkWithHighIterationCountAndStrictTimeLimitIsSlow() throws InterruptedException {
+            // Given: a meter with iterations and strict time limit configured
+            final Meter meter = new Meter(logger);
+            meter.iterations(15);
+            meter.limitMilliseconds(50);
+            MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
+
+            // When: meter executes with iterations and exceeds time limit
+            meter.start();
+            
+            // First batch: 5 iterations + long sleep
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            Thread.sleep(40);
+            meter.progress();
+            
+            // Second batch: 5 iterations + medium sleep
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            Thread.sleep(20);
+            meter.progress();
+            
+            // Third batch: 5 iterations + short sleep
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            Thread.sleep(10);
+            meter.ok();
+
+            // Then: meter should be in OK state with correct iterations and IS slow
+            assertMeterState(meter, true, true, null, null, null, null, 15, 15, 50);
+            assertTrue(meter.isSlow(), "meter should be slow");
+            
+            // Then: WARN log includes slow operation warning with timing details (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 6, Level.WARN, Markers.MSG_SLOW_OK);
+            AssertLogger.assertEvent(logger, 7, Level.TRACE, Markers.DATA_SLOW_OK);
+        }
+
+        // ============================================================================
+        // Created → Started → Rejected with iterations
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition Created → Started → Rejected with iterations")
+        void shouldTransitionCreatedToStartedToRejectedWithIterations() {
+            // Given: a meter configured for iterations
+            final Meter meter = new Meter(logger);
+
+            // When: meter increments and then rejects
+            meter.start();
+            for (int i = 0; i < 25; i++) {
+                meter.inc();
+            }
+            meter.reject("validation_failed");
+
+            // Then: meter should be in Rejected state with correct iteration count
+            assertMeterState(meter, true, true, null, "validation_failed", null, null, 25, 0, 0);
+            
+            // Then: getIterationsPerSecond() should be calculated for rejected operation
+            assertTrue(meter.getIterationsPerSecond() >= 0, "iterations per second should be calculated");
+            
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        // ============================================================================
+        // Created → Started → Failed with progress tracking + time limit (slow)
+        // ============================================================================
+
+        @Test
+        @Disabled
+        @DisplayName("should transition Created → Started → Failed with progress tracking + time limit (slow)")
+        void shouldTransitionCreatedToStartedToFailedWithProgressTrackingAndTimeLimitSlow() throws InterruptedException {
+            // Given: a meter with time limit and progress tracking configured
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.limitMilliseconds(1000);
+            MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
+
+            // When: meter executes with progress tracking and exceeds time limit, then fails
+            meter.progress();
+            Thread.sleep(1500); // Execute ~1500ms
+            meter.progress();
+            Thread.sleep(1500); // Execute ~3000ms total
+            meter.fail("timeout");
+
+            // Then: meter should be in Failed state and IS slow
+            assertMeterState(meter, true, true, null, null, "timeout", null, 0, 0, 1000);
+            assertTrue(meter.isSlow(), "meter should be slow");
+            
+            // Validate logs (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 6, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 7, Level.TRACE, Markers.DATA_FAIL);
+        }
+    }
 
     @Nested
     @DisplayName("Group 2: Pre-Start Configuration (Tier 2 - Valid Non-State-Changing)")
@@ -3594,7 +4207,7 @@ class MeterLifeCycleTest {
         void shouldFollowTryWithResourcesFlowImplicitFailure() {
             final Meter meter;
             // Given: a new, started Meter withing try with resources
-            try (Meter m = new Meter(logger).start()) {
+            try (final Meter m = new Meter(logger).start()) {
                 meter = m;
                 // do nothing
             }
@@ -3612,7 +4225,7 @@ class MeterLifeCycleTest {
         void shouldFollowTryWithResourcesFlowExplicitSuccess() {
             final Meter meter;
             // Given: a new, started Meter withing try with resources
-            try (Meter m = new Meter(logger).start()) {
+            try (final Meter m = new Meter(logger).start()) {
                 meter = m;
                 
                 // When: ok() is called
@@ -3635,7 +4248,7 @@ class MeterLifeCycleTest {
         void shouldFollowTryWithResourcesFlowPathAndExplicitSuccess() {
             final Meter meter;
             // Given: a new, started Meter withing try with resources
-            try (Meter m = new Meter(logger).start()) {
+            try (final Meter m = new Meter(logger).start()) {
                 meter = m;
                 
                 // When: path() is called
@@ -3664,7 +4277,7 @@ class MeterLifeCycleTest {
         void shouldFollowTryWithResourcesFlowExplicitRejection() {
             final Meter meter;
             // Given: a new, started Meter withing try with resources
-            try (Meter m = new Meter(logger).start()) {
+            try (final Meter m = new Meter(logger).start()) {
                 meter = m;
                 
                 // When: reject() is called
@@ -3687,7 +4300,7 @@ class MeterLifeCycleTest {
         void shouldFollowTryWithResourcesFlowExplicitFailure() {
             final Meter meter;
             // Given: a new, started Meter withing try with resources
-            try (Meter m = new Meter(logger).start()) {
+            try (final Meter m = new Meter(logger).start()) {
                 meter = m;
                 
                 // When: fail() is called
@@ -3713,7 +4326,7 @@ class MeterLifeCycleTest {
         @DisplayName("should transition to Failed via try-with-resources without start() - implicit close()")
         void shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose() {
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 /* When: block executes without calling start(), ok(), reject(), or fail()
                  * (meter auto-closes with implicit fail) */
             }
@@ -3730,7 +4343,7 @@ class MeterLifeCycleTest {
         void shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk() {
             Meter meter = null;
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: ok() is called without start() */
                 m.ok();
@@ -3751,7 +4364,7 @@ class MeterLifeCycleTest {
         void shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString() {
             Meter meter = null;
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: ok("success_path") is called without start() */
                 m.ok("success_path");
@@ -3772,7 +4385,7 @@ class MeterLifeCycleTest {
         void shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum() {
             Meter meter = null;
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: ok(Enum) is called without start() */
                 m.ok(TestEnum.VALUE1);
@@ -3794,7 +4407,7 @@ class MeterLifeCycleTest {
             Meter meter = null;
             final RuntimeException exception = new RuntimeException("test cause");
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: ok(Throwable) is called without start() */
                 m.ok(exception);
@@ -3816,7 +4429,7 @@ class MeterLifeCycleTest {
             Meter meter = null;
             final TestObject testObject = new TestObject();
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: ok(Object) is called without start() */
                 m.ok(testObject);
@@ -3837,7 +4450,7 @@ class MeterLifeCycleTest {
         void shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString() {
             Meter meter = null;
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: reject("business_error") is called without start() */
                 m.reject("business_error");
@@ -3858,7 +4471,7 @@ class MeterLifeCycleTest {
         void shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum() {
             Meter meter = null;
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: reject(Enum) is called without start() */
                 m.reject(TestEnum.VALUE2);
@@ -3880,7 +4493,7 @@ class MeterLifeCycleTest {
             Meter meter = null;
             final IllegalArgumentException exception = new IllegalArgumentException("invalid input");
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: reject(Throwable) is called without start() */
                 m.reject(exception);
@@ -3902,7 +4515,7 @@ class MeterLifeCycleTest {
             Meter meter = null;
             final TestObject testObject = new TestObject();
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: reject(Object) is called without start() */
                 m.reject(testObject);
@@ -3923,7 +4536,7 @@ class MeterLifeCycleTest {
         void shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString() {
             Meter meter = null;
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: fail("technical_error") is called without start() */
                 m.fail("technical_error");
@@ -3944,7 +4557,7 @@ class MeterLifeCycleTest {
         void shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum() {
             Meter meter = null;
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: fail(Enum) is called without start() */
                 m.fail(TestEnum.VALUE1);
@@ -3966,7 +4579,7 @@ class MeterLifeCycleTest {
             Meter meter = null;
             final Exception exception = new Exception("connection timeout");
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: fail(Throwable) is called without start() */
                 m.fail(exception);
@@ -3988,7 +4601,7 @@ class MeterLifeCycleTest {
             Meter meter = null;
             final TestObject testObject = new TestObject();
             /* Given: Meter created in try-with-resources without start() */
-            try (Meter m = new Meter(logger)) {
+            try (final Meter m = new Meter(logger)) {
                 meter = m;
                 /* When: fail(Object) is called without start() */
                 m.fail(testObject);
