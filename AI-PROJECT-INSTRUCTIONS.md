@@ -2,37 +2,66 @@
 
 ## Test Execution Strategy
 
-**This project uses TWO separate Surefire executions** to isolate SLF4J logger bindings with different classpaths:
-- **unit-tests**: Excludes Logback, runs with MockLogger
-- **logback-tests**: Excludes MockLogger, runs with real Logback
+**This project uses a TWO-TIER testing strategy** to provide IDE-friendly development while maintaining complete test coverage:
 
-### Run ALL Tests
+### 1. Default Build (IDE-Friendly) - ~1441 Core Tests
+- **What**: Core tests (Meter, Watcher, Reporter) with MockLogger
+- **IDE Support**: ✅ Full support (run, debug, coverage)
+- **Source dirs**: `src/main/java` + `src/test/java`
+- **Excludes**: Logback integration tests (`**/logback/**/*Test.java`)
+- **Excludes**: Logback source code (`src/logback-main/java`, `src/logback-test/java`)
+
+### 2. With-Logback Profile (Maven-Only) - +84 Logback Tests
+- **What**: Logback integration tests with real Logback implementation
+- **IDE Support**: ❌ No IDE support (Maven-only workflow)
+- **Source dirs**: Adds `src/logback-main/java` + `src/logback-test/java`
+- **Includes**: Only Logback tests (`**/logback/**/*Test.java`)
+
+**See**: `doc/TDR-0031-ide-friendly-build-with-optional-logback-testing.md` for complete rationale.
+
+---
+
+### Run ALL Tests (Default Only)
 ```powershell
 .\mvnw test
+# Runs ~1441 core tests with MockLogger
 ```
 
-### Run Specific Class or Method
-
-**For classes in `org.usefultoys.slf4j.logback`:**
+### Run ALL Tests (Default + Logback)
 ```powershell
-.\mvnw test '-Dskip.unit.tests=true' -Dtest=MessageHighlightConverterTest
-.\mvnw test '-Dskip.unit.tests=true' '-Dtest=MessageHighlightConverterTest#testMsgStartMarker'
+.\mvnw test -P slf4j-2.0,with-logback
+# Runs all 1525 tests (1441 core + 84 logback)
 ```
 
-**For classes in ANY OTHER package:**
+### Run Specific Test Class or Method
+
+**For Logback tests** (classes in `src/logback-test/java/org/usefultoys/slf4j/logback/`):
 ```powershell
-.\mvnw test '-Dskip.logback.tests=true' -Dtest=MeterLifeCycleTest
-.\mvnw test '-Dskip.logback.tests=true' '-Dtest=MeterLifeCycleTest#shouldCreateMeterWithLoggerInitialState'
+# Run entire test class
+.\mvnw test -P slf4j-2.0 -Dtest=MessageHighlightConverterTest
+
+# Run specific test method
+.\mvnw test -P slf4j-2.0 '-Dtest=MessageHighlightConverterTest#testMsgStartMarker'
 ```
 
 **Summary:**
-- Always use `.\mvnw test` as the base command (Maven recompiles automatically under demand)
+- Always use `.\mvnw test` as the base command (Maven recompiles automatically on demand)
 - **⚠️ AVOID `clean`**: Do not use `clean` unless explicitly clearing the build is necessary
 - Maven handles incremental compilation efficiently; trust the build cache
-- Use `-Dskip.logback.tests=true` to run only MockLogger tests (unit-tests execution)
-- Use `-Dskip.unit.tests=true` to run only Logback tests (logback-tests execution)
+- **Default tests**: Run without profile (IDE can also run these)
+- **Logback tests**: Require `-P slf4j-2.0,with-logback` profile (Maven-only, IDE cannot run)
 - Add `-Dtest=ClassName` or `-Dtest=ClassName#methodName` to target specific tests
-- The Maven lifecycle (`compile-test` phase) is automatically respected
+- The Maven lifecycle (`test-compile` phase) is automatically respected
+
+**PowerShell Escaping Note:**
+When test filters include special characters like `#` (method separator) or `@`, wrap the entire `-Dtest=...` parameter in single quotes:
+```powershell
+# ✅ CORRECT: Quotes protect # from being interpreted as comment
+.\mvnw test '-Dtest=MeterLifeCycleTest#shouldCreateMeter'
+
+# ❌ WRONG: PowerShell treats # as comment start, Maven never sees method name
+.\mvnw test -Dtest=MeterLifeCycleTest#shouldCreateMeter
+```
 
 ## Testing Standards
 
@@ -189,8 +218,8 @@ class MeterOperationTest {
     void shouldCreateAndCloseMeter() {
         // Given: no active meter on thread-local stack
         // When: meter is created and used
-        Meter meter = new Meter(logger);
-        try (Meter m = meter) {
+        final Meter meter = new Meter(logger);
+        try (final Meter m = meter) {
             m.start();
             m.ok();
         }
