@@ -2,6 +2,12 @@
 
 This document describes the lifecycle states and transitions for the `Meter` class, based on the attributes defined in `MeterData`.
 
+**Related Documentation:**
+- [Meter Lifecycle Tests](meter-lifecycle-tests.md) - Test strategy covering all state transitions
+- [TDR-0019](TDR-0019-immutable-lifecycle-transitions.md) - Immutable lifecycle transitions
+- [TDR-0020](TDR-0020-three-outcome-types-ok-reject-fail.md) - Three outcome types
+- [TDR-0029](TDR-0029-resilient-state-transitions-with-chained-api.md) - Resilient state transitions
+
 ## Class Hierarchy
 
 ```mermaid
@@ -127,11 +133,11 @@ stateDiagram-v2
 
 The following table details all state-related method calls for `Meter`.
 
-**Legend:**
-- ✅ **Valid state-changing (expected flow):** A valid call that changes the lifecycle in the normal sequence (typically `Created → Started → (OK | Rejected | Failed)`), by updating state-driving attributes.
-- ☑️ **Valid non-state-changing (expected flow):** A valid call used while the meter is in a normal state for that call. It does not change the lifecycle classification, but may update supporting attributes.
-- ⚠️ **State-correcting (outside expected flow):** The call violates the expected API contract, but is accepted and applied to correct the state to a valid configuration while maintaining resilience. It may change the lifecycle state and/or update attributes. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
-- ❌ **State-preserving (invalid flow):** Preconditions and/or arguments are not met, so the call is ignored to preserve the current valid state. No transition/attribute change is applied for that call. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
+**Legend (Resilience Tiers):**
+- ✅ **Tier 1 - Valid state-changing (expected flow):** A valid call that changes the lifecycle in the normal sequence (typically `Created → Started → (OK | Rejected | Failed)`), by updating state-driving attributes.
+- ☑️ **Tier 2 - Valid non-state-changing (expected flow):** A valid call used while the meter is in a normal state for that call. It does not change the lifecycle classification, but may update supporting attributes.
+- ⚠️ **Tier 3 - State-correcting (outside expected flow):** The call violates the expected API contract, but is accepted and applied to correct the state to a valid configuration while maintaining resilience. It may change the lifecycle state and/or update attributes. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
+- ❌ **Tier 4 - State-preserving (invalid flow):** Preconditions and/or arguments are not met, so the call is ignored to preserve the current valid state. No transition/attribute change is applied for that call. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
 
 **Definitions:**
 - **Lifecycle classification:** The state returned by `isStarted()`, `isStopped()`, `isOK()`, `isReject()`, `isFail()`, and `isSlow()`, based on `MeterData` attributes.
