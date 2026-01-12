@@ -5,10 +5,15 @@
 # Comprehensive validation strategy:
 # 1. Runs full test suite across all supported JDK/SLF4J combinations
 #    (JDK 8, 11, 17, 21 with SLF4J 1.7.x and 2.0.x)
-# 2. Only proceeds to deployment if all tests pass
-# 3. Builds, signs with GPG, and deploys to Maven Central
-# 4. Creates GitHub Release with auto-generated notes
-# 5. Uploads compiled JAR artifacts to release
+# 2. Always uses with-logback profile for complete test coverage (1525 tests)
+#    - Core tests with MockLogger (~1441 tests)
+#    - Logback integration tests (~84 tests)
+# 3. Only proceeds to deployment if all tests pass
+# 4. Builds, signs with GPG, and deploys to Maven Central
+# 5. Creates GitHub Release with auto-generated notes
+# 6. Uploads compiled JAR artifacts to release
+#
+# For details, see: doc/TDR-0031-ide-friendly-build-with-optional-logback-testing.md
 
 name: Release and Deploy Version
 
@@ -47,8 +52,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Test with JDK ${{ matrix.java-version }} and ${{ matrix.slf4j-profile }}
-        run: sh mvnw clean verify -P ${{ matrix.slf4j-profile }} --batch-mode -Dmaven.enforcer.skip=true
+      - name: Test with JDK ${{ matrix.java-version }} and ${{ matrix.slf4j-profile }} + Logback
+        run: sh mvnw clean verify -P ${{ matrix.slf4j-profile }},with-logback --batch-mode -Dmaven.enforcer.skip=true
 
   # Deploy only after all tests pass
   build-release-deploy:
