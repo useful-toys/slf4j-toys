@@ -106,8 +106,6 @@
         <!-- Enforcer defaults to enabled for JDK 21, skipped for other JDKs -->
         <maven.enforcer.skip>false</maven.enforcer.skip>
         <slf4j-legacy.version>1.7.36</slf4j-legacy.version>
-        <!-- Skip logback tests by default; enabled by with-logback profile -->
-        <skip.logback.tests>true</skip.logback.tests>
     </properties>
 
     <dependencies>
@@ -235,26 +233,6 @@
                             <!-- Remove Logback from classpath to avoid SLF4J binding conflict -->
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>ch.qos.logback:logback-classic</classpathDependencyExclude>
-                            </classpathDependencyExcludes>
-                        </configuration>
-                    </execution>
-                    <!-- Logback tests execution: Only runs when with-logback profile is active -->
-                    <execution>
-                        <id>logback-tests</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Skipped by default; activated by with-logback profile via property -->
-                            <skip>${skip.logback.tests}</skip>
-                            <!-- Include only Logback-specific tests -->
-                            <includes>
-                                <include>**/logback/**/*Test.java</include>
-                            </includes>
-                            <!-- Exclude MockLogger from classpath to use real Logback implementation -->
-                            <classpathDependencyExcludes>
-                                <classpathDependencyExclude>org.usefultoys:slf4j-test-mock</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                         </configuration>
                     </execution>
@@ -619,6 +597,31 @@
                                     <sources>
                                         <source>src/logback-test/java</source>
                                     </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${maven-surefire-plugin.version}</version>
+                        <executions>
+                            <!-- Logback tests execution: Only runs when with-logback profile is active -->
+                            <execution>
+                                <id>logback-tests</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Include only Logback-specific tests -->
+                                    <includes>
+                                        <include>**/logback/**/*Test.java</include>
+                                    </includes>
+                                    <!-- Exclude MockLogger from classpath to use real Logback implementation -->
+                                    <classpathDependencyExcludes>
+                                        <classpathDependencyExclude>org.usefultoys:slf4j-test-mock</classpathDependencyExclude>
+                                    </classpathDependencyExcludes>
                                 </configuration>
                             </execution>
                         </executions>
