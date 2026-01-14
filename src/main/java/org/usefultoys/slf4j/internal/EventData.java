@@ -104,7 +104,7 @@ public class EventData implements Serializable {
      * Updates the {@code lastCurrentTime} with the current time from the configured time source.
      * <p>
      * By default, this delegates to {@link SystemTimeSource#INSTANCE}, which uses {@link System#nanoTime()}.
-     * In tests, a custom {@link TimeSource} can be set via {@link #setTimeSource(TimeSource)}
+     * In tests, a custom {@link TimeSource} can be set on the {@link #timeSource} field
      * to enable deterministic time-based testing.
      *
      * @return The updated {@code lastCurrentTime} in nanoseconds.
