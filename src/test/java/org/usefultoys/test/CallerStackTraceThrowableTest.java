@@ -43,7 +43,7 @@ public class CallerStackTraceThrowableTest {
         // Verification: The top of the stack should be this exact method.
         // This test is expected to FAIL with the original implementation because the test package
         // also starts with "org.usefultoys.slf4j".
-        assertEquals(this.getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of methods the method that instantiated CallerStackTraceThrowable");
+        assertEquals(getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of methods the method that instantiated CallerStackTraceThrowable");
         assertEquals("testDirectCall", stack[0].getMethodName(), "Stack trace should point to the method that instantiated CallerStackTraceThrowable");
     }
 
@@ -56,7 +56,7 @@ public class CallerStackTraceThrowableTest {
 
         // Verification: The top of the stack should be this test method,
         // not the helper method from the library package.
-        assertEquals(this.getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of the method that actually called LibraryHelper.create()");
+        assertEquals(getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of the method that actually called LibraryHelper.create()");
         assertEquals("testIndirectCall", stack[0].getMethodName(), "Stack trace should point to the method that actually called LibraryHelper.create()");
     }
 
@@ -68,7 +68,7 @@ public class CallerStackTraceThrowableTest {
         final StackTraceElement[] stack = t.getStackTrace();
 
         // Verification: The top of the stack should be the innermost method that created the throwable.
-        assertEquals(this.getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of the inner method that actually called LibraryHelper.create()");
+        assertEquals(getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of the inner method that actually called LibraryHelper.create()");
         assertEquals("innerMethod", stack[0].getMethodName(), "Stack trace should point to the inner method that actually called LibraryHelper.create()");
     }
 
@@ -84,7 +84,7 @@ public class CallerStackTraceThrowableTest {
         assertSame(cause, t.getCause(), "The original cause should be preserved");
 
         // Verification 2: The stack trace must still point to the caller.
-        assertEquals(this.getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of methods the method that instantiated CallerStackTraceThrowable");
+        assertEquals(getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of methods the method that instantiated CallerStackTraceThrowable");
         assertEquals("testDirectCallWithCause", stack[0].getMethodName(), "Stack trace should point to the method that instantiated CallerStackTraceThrowable");
     }
 
@@ -100,7 +100,7 @@ public class CallerStackTraceThrowableTest {
         assertSame(cause, t.getCause(), "The original cause should be preserved");
 
         // Verification: The top of the stack should be the innermost method that created the throwable.
-        assertEquals(this.getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of the inner method that actually called LibraryHelper.create()");
+        assertEquals(getClass().getName(), stack[0].getClassName(), "Stack trace should point to the correct class of the inner method that actually called LibraryHelper.create()");
         assertEquals("innerMethodWithCause", stack[0].getMethodName(), "Stack trace should point to the inner method that actually called LibraryHelper.create()");
     }
 
@@ -116,15 +116,15 @@ public class CallerStackTraceThrowableTest {
         return new CallerStackTraceThrowable();
     }
 
-    private Throwable outerMethodWithCause(Exception cause) {
+    private Throwable outerMethodWithCause(final Exception cause) {
         return middleMethodWithCause(cause);
     }
 
-    private Throwable middleMethodWithCause(Exception cause) {
+    private Throwable middleMethodWithCause(final Exception cause) {
         return innerMethodWithCause(cause);
     }
 
-    private Throwable innerMethodWithCause(Exception cause) {
+    private Throwable innerMethodWithCause(final Exception cause) {
         return new CallerStackTraceThrowable(cause);
     }
 }

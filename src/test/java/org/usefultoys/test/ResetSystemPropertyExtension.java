@@ -48,7 +48,7 @@ public class ResetSystemPropertyExtension implements BeforeEachCallback, AfterEa
      * @param context the current extension context
      */
     @Override
-    public void beforeEach(ExtensionContext context) {
+    public void beforeEach(final ExtensionContext context) {
         // Clear method-level annotated properties
         context.getTestMethod().ifPresent(method -> {
             final ResetSystemProperty[] annotations = method.getAnnotationsByType(ResetSystemProperty.class);
@@ -75,7 +75,7 @@ public class ResetSystemPropertyExtension implements BeforeEachCallback, AfterEa
      * @param context the current extension context
      */
     @Override
-    public void afterEach(ExtensionContext context) {
+    public void afterEach(final ExtensionContext context) {
         // Clear method-level annotated properties
         context.getTestMethod().ifPresent(method -> {
             final ResetSystemProperty[] annotations = method.getAnnotationsByType(ResetSystemProperty.class);
