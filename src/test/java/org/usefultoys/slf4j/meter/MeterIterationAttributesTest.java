@@ -50,6 +50,7 @@ import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_INCREMENT;
  * @author Daniel Felix Ferber
  * @author Co-authored-by: GitHub Copilot using Gemini 3 Flash (Preview)
  */
+@SuppressWarnings("NonConstantLogger")
 @ValidateCharset
 @ResetMeterConfig
 @WithMockLogger

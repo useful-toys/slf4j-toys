@@ -63,6 +63,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvent;
  *   <li><b>Property Filtering:</b> Ensures sensitive information is properly handled according to configuration</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportJdbcConnection")
 @ValidateCharset
 @ResetReporterConfig

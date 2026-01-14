@@ -30,7 +30,6 @@ import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
-import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 
 /**
  * Unit tests for {@link ReportSystemProperties}.
@@ -46,6 +45,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
  *   <li><b>Non-Matching Regex:</b> Ensures properties are not censored when regex doesn't match</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportSystemProperties")
 @ValidateCharset
 @ResetReporterConfig

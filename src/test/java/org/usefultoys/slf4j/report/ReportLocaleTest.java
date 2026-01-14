@@ -40,6 +40,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
  *   <li><b>Locale Information Reporting:</b> Verifies logging of default locale, language, country, variant, and available locales</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportLocale")
 @ValidateCharset
 @ResetReporterConfig

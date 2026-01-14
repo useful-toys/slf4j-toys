@@ -43,6 +43,7 @@ import static org.mockito.Mockito.mock;
  *   <li><b>Report Configuration:</b> Tests selective enabling of specific reports (VM report) while disabling others to validate configuration-driven behavior</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportContextListener")
 @ValidateCharset
 @ResetReporterConfig

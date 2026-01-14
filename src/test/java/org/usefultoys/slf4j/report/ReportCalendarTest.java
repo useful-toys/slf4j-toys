@@ -45,6 +45,7 @@ import java.util.TimeZone;
  *
  * @author Co-authored-by: GitHub Copilot using gpt-4o
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportCalendar")
 @ValidateCharset
 @ResetReporterConfig

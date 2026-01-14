@@ -39,6 +39,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
  *   <li><b>JVM Information Reporting:</b> Verifies logging of JVM vendor, version, and installation directory</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportVM")
 @ValidateCharset
 @ResetReporterConfig

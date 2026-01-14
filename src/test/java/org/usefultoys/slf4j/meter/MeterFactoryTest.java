@@ -53,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Co-authored-by: GitHub Copilot using GPT-5.2
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("MeterFactory")
 @ValidateCharset
 @ResetMeterConfig

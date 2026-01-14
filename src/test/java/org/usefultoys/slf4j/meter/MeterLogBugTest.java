@@ -31,8 +31,12 @@ import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.slf4j.impl.MockLoggerEvent.Level;
 
 /**
@@ -51,11 +55,12 @@ import static org.slf4j.impl.MockLoggerEvent.Level;
  *     <li><b>close() method:</b> Verifies that exceptions during close() trigger logBug()</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @ValidateCharset
 @ResetMeterConfig
 @WithLocale("en")
 @WithMockLogger
-@ValidateCleanMeter()
+@ValidateCleanMeter
 @DisplayName("MeterValidator.logBug() - Meter method exceptions")
 class MeterLogBugTest {
 
@@ -73,7 +78,7 @@ class MeterLogBugTest {
             final Meter meter = new Meter(logger);
             final Meter result;
             
-            try (MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
+            try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenThrow(new RuntimeException("Validation failed"));
                 // Allow logBug() to execute normally
@@ -107,7 +112,7 @@ class MeterLogBugTest {
             final Meter meter;
             final Meter result;
             
-            try (MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
+            try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);  // Allow start() to succeed
                 mockedValidator.when(() -> MeterValidator.validateProgressPrecondition(any()))
@@ -141,7 +146,7 @@ class MeterLogBugTest {
             // Given: MeterValidator.validateStopPrecondition() mocked to throw exception
             final Meter result;
             
-            try (MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
+            try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_OK)))
@@ -170,7 +175,7 @@ class MeterLogBugTest {
             // Given: MeterValidator mocked to throw exception in validatePathArgument
             final Meter result;
             
-            try (MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
+            try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validatePathArgument(any(), anyString(), any()))
@@ -205,7 +210,7 @@ class MeterLogBugTest {
             // Given: MeterValidator mocked to throw exception
             final Meter result;
             
-            try (MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
+            try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validatePathArgument(any(), anyString(), any()))
@@ -241,7 +246,7 @@ class MeterLogBugTest {
             // Given: MeterValidator mocked to throw exception
             final Meter result;
             
-            try (MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
+            try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validatePathArgument(any(), anyString(), any()))
@@ -272,7 +277,7 @@ class MeterLogBugTest {
             // Given: MeterValidator mocked to throw exception
             final Meter result;
             
-            try (MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
+            try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validatePathArgument(any(), anyString(), any()))
@@ -308,7 +313,7 @@ class MeterLogBugTest {
             // Given: MeterValidator mocked to throw exception
             final Meter meter;
             
-            try (MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
+            try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_CLOSE)))
