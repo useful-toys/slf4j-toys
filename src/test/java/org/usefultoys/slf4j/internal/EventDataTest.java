@@ -198,7 +198,7 @@ class EventDataTest {
         final EventData event = new EventData();
 
         // When: custom time source is set and collectCurrentTime is called
-        event.withTimeSource(testTimeSource);
+        event.setTimeSource(testTimeSource);
         final long collectedTime = event.collectCurrentTime();
 
         // Then: collected time should match custom time source
@@ -207,26 +207,12 @@ class EventDataTest {
     }
 
     @Test
-    @DisplayName("should return this instance for method chaining with withTimeSource")
-    void testWithTimeSourceChaining() {
-        // Given: EventData instance
-        final EventData event = new EventData();
-        final TestTimeSource testTimeSource = new TestTimeSource();
-
-        // When: withTimeSource is called
-        final EventData result = event.withTimeSource(testTimeSource);
-
-        // Then: same instance should be returned for chaining
-        assertEquals(event, result, "withTimeSource should return the same instance for method chaining");
-    }
-
-    @Test
     @DisplayName("should collect deterministic times with controllable time source")
     void testDeterministicTimeCollection() {
         // Given: EventData with controllable time source
         final TestTimeSource testTimeSource = new TestTimeSource();
         final EventData event = new EventData();
-        event.withTimeSource(testTimeSource);
+        event.setTimeSource(testTimeSource);
 
         // When: time is advanced in controlled steps
         testTimeSource.setNanoTime(100L);
@@ -237,7 +223,7 @@ class EventDataTest {
         event.collectCurrentTime();
         final long time2 = event.getLastCurrentTime();
 
-        testTimeSource.setNanoTime(350L);
+        testTimeSource.advanceMiliseconds(150L);
         event.collectCurrentTime();
         final long time3 = event.getLastCurrentTime();
 
@@ -247,19 +233,4 @@ class EventDataTest {
         assertEquals(350L, time3, "Third collected time should be 350L");
     }
 
-    /**
-     * Test implementation of TimeSource for deterministic testing.
-     */
-    private static class TestTimeSource implements TimeSource {
-        private long currentNanoTime = 0;
-
-        public void setNanoTime(final long nanoTime) {
-            currentNanoTime = nanoTime;
-        }
-
-        @Override
-        public long nanoTime() {
-            return currentNanoTime;
-        }
-    }
 }

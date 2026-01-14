@@ -25,12 +25,14 @@ package org.usefultoys.slf4j.internal;
  * <p>
  * The default implementation uses {@link System#nanoTime()}, but tests can provide
  * custom implementations with controllable time progression.
+ * <p>
+ * This abstraction follows the Clock Abstraction Pattern as documented in
+ * TDR-0032: Clock Abstraction Pattern for Deterministic Time-Based Testing.
  *
  * @author Daniel Felix Ferber
  * @author Co-authored-by: GitHub Copilot using gpt-4o
  * @see SystemTimeSource
- * @see EventData#withTimeSource(TimeSource)
- * @see org.usefultoys.slf4j.meter.Meter#withTimeSource(TimeSource)
+ * @see EventData#setTimeSource(TimeSource)
  */
 public interface TimeSource {
 

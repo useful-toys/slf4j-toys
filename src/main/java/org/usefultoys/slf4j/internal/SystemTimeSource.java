@@ -22,7 +22,11 @@ package org.usefultoys.slf4j.internal;
  * of the library. It provides actual system monotonic time suitable for measuring
  * elapsed durations and detecting slow operations.
  * <p>
- * This implementation is immutable and thread-safe.
+ * This implementation is immutable and thread-safe. It follows the Singleton pattern
+ * with a public static {@link #INSTANCE} field.
+ * <p>
+ * For more details on the design rationale, see TDR-0032: Clock Abstraction Pattern
+ * for Deterministic Time-Based Testing.
  *
  * @author Daniel Felix Ferber
  * @author Co-authored-by: GitHub Copilot using gpt-4o

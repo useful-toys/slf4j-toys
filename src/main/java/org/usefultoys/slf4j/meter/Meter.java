@@ -134,6 +134,33 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     }
 
     /**
+     * Sets a custom time source for this meter instance.
+     * <p>
+     * This method is intended primarily for testing purposes to enable deterministic time-based testing.
+     * By replacing the default {@link org.usefultoys.slf4j.internal.SystemTimeSource} with a controllable implementation,
+     * tests can verify time-dependent behavior (such as slowness detection, progress throttling,
+     * and duration calculations) without depending on actual system time or thread delays.
+     * <p>
+     * This method should be called immediately after constructing the meter and before calling
+     * any lifecycle methods ({@link #start()}, {@link #progress()}, {@link #ok()}, etc.).
+     * <p>
+     * <b>Thread Safety:</b> This method should be called before the meter is used in concurrent
+     * scenarios, as the time source field is not volatile.
+     * <p>
+     * For more details on the design rationale, see TDR-0032: Clock Abstraction Pattern
+     * for Deterministic Time-Based Testing.
+     *
+     * @param timeSource The time source to use for collecting timestamps.
+     * @return This Meter instance for method chaining.
+     * @see TimeSource
+     * @see org.usefultoys.slf4j.internal.SystemTimeSource
+     */
+    final Meter withTimeSource(final TimeSource timeSource) {
+        this.timeSource = timeSource;
+        return this;
+    }
+
+    /**
      * Extracts and increments the next sequential position for a given operation. This ensures a unique, time-ordered
      * ID for each operation execution.
      *
@@ -273,25 +300,6 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             return this;
         }
         this.expectedIterations = expectedIterations;
-        return this;
-    }
-
-    /**
-     * Sets a custom time source for this meter instance.
-     * This method is intended for testing purposes to enable deterministic time-based testing
-     * without depending on actual system time or thread delays.
-     * <p>
-     * <b>Precondition:</b> This method must be called before {@link #start()}.
-     * Calling it after starting will log an error and have no effect.
-     * <p>
-     * <b>Thread Safety:</b> This method should be called before the meter is used
-     * in concurrent scenarios.
-     *
-     * @param timeSource The time source to use for collecting timestamps.
-     * @return Reference to this `Meter` instance, for method chaining.
-     */
-    public Meter withTimeSource(final TimeSource timeSource) {
-        super.withTimeSource(timeSource);
         return this;
     }
 
