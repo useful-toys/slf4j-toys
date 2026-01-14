@@ -892,6 +892,16 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - `start() → path("configured") → fail("error") → reject("business")` → logs ILLEGAL, state remains Failed
    - `start() → path("configured") → fail("error") → fail("another")` → logs ILLEGAL, failPath remains "error"
 
+#### 3. **Attempt to Restart After Termination**
+   - `start() → ok() → start()` → logs ILLEGAL (already stopped), meter remains stopped
+   - `start() → ok("path") → start()` → logs ILLEGAL, meter remains stopped with okPath
+   - `start() → reject("error") → start()` → logs ILLEGAL, meter remains stopped with rejectPath
+   - `start() → fail("error") → start()` → logs ILLEGAL, meter remains stopped with failPath
+   - `start() → path("configured") → ok() → start()` → logs ILLEGAL, meter remains stopped
+   - `start() → path("configured") → ok("path") → start()` → logs ILLEGAL, meter remains stopped
+   - `start() → path("configured") → reject("error") → start()` → logs ILLEGAL, meter remains stopped
+   - `start() → path("configured") → fail("error") → start()` → logs ILLEGAL, meter remains stopped
+
 ---
 
 
