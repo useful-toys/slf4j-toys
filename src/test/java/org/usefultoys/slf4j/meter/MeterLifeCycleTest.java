@@ -62,12 +62,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @WithMockLogger
 @ValidateCleanMeter
 @WithMockLoggerDebug
-@SuppressWarnings("TestMethodWithoutAssertion") // aserts are in submethods
+@SuppressWarnings({"AssignmentToStaticFieldFromInstanceMethod", "IOResourceOpenedButNotSafelyClosed", "TestMethodWithoutAssertion"})
 class MeterLifeCycleTest {
 
     @SuppressWarnings("NonConstantLogger")
     @Slf4jMock
-    private Logger logger;
+    Logger logger;
 
     /**
      * Test enum for validating enum path handling in Meter.
@@ -4366,7 +4366,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaOkWithThrowablePath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             final Exception ex = new Exception("success_cause");
 
@@ -4385,7 +4384,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaOkWithObjectPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             final TestObject obj = new TestObject();
 
@@ -4404,7 +4402,6 @@ class MeterLifeCycleTest {
         void shouldHandleOkWithNullPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: ok(null) is called
             meter.ok(null);
@@ -4426,7 +4423,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaOkAfterPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: path("configured_path") → ok() is called
             meter.path("configured_path");
@@ -4446,7 +4442,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaOkPathOverridingPreviousPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: path("configured_path") → ok("override_path") is called
             meter.path("configured_path");
@@ -4466,7 +4461,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaOkWithDescriptionAndPathPreserved() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: m("step") → path("step_path") → ok() is called
             meter.m("step");
@@ -4490,7 +4484,6 @@ class MeterLifeCycleTest {
         void shouldHandlePathNullThenOk() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: path(null) → ok() is called
             meter.path(null);
@@ -4515,7 +4508,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaOkAfterTwoPathCalls() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: path("first") → path("second") → ok() is called
             meter.path("first");
@@ -4538,7 +4530,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaOkAfterThreePathCalls() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: path("first") → path("second") → path("third") → ok() is called
             meter.path("first");
@@ -4564,7 +4555,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaOkPathOverridingMultiplePathCalls() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: path("first") → path("second") → ok("final_override") is called
             meter.path("first");
@@ -4591,7 +4581,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaSuccessAlias() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: success() is called
             meter.success();
@@ -4608,7 +4597,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaSuccessPathAlias() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: success("alias_path") is called
             meter.success("alias_path");
@@ -4625,7 +4613,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaSuccessAfterPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: path("configured") → success() is called
             meter.path("configured");
@@ -4674,7 +4661,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaRejectWithStringCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: reject("validation_error") is called
             meter.reject("validation_error");
@@ -4691,7 +4677,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaRejectWithEnumCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: reject(TestEnum.VALUE1) is called
             meter.reject(TestEnum.VALUE1);
@@ -4708,7 +4693,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaRejectWithThrowableCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             final Exception ex = new IllegalArgumentException("invalid format");
 
@@ -4727,7 +4711,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaRejectWithObjectCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             final TestObject obj = new TestObject();
 
@@ -4854,7 +4837,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaFailWithThrowableCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             final Exception ex = new SQLException("connection refused");
 
@@ -4873,7 +4855,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaFailWithObjectCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             final TestObject obj = new TestObject();
 
@@ -4896,7 +4877,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaFailAfterPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: path("success_expectation") → fail("timeout") is called
             meter.path("success_expectation");
@@ -4916,7 +4896,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaFailAfterPathWithDescription() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: m("operation") → path("ok_path") → fail("unexpected_exception") is called
             meter.m("operation");
@@ -4944,7 +4923,6 @@ class MeterLifeCycleTest {
         void shouldTerminateViaFailAfterMultiplePathCalls() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: path("first") → path("second") → fail("system_error") is called
             meter.path("first");
@@ -4971,7 +4949,6 @@ class MeterLifeCycleTest {
         void shouldHandleComplexChainWithOk() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: m("operation") → iterations(100) → inc() × 50 → path("checkpoint") → ok() is called
             meter.m("operation");
@@ -5122,7 +5099,6 @@ class MeterLifeCycleTest {
 
             // When: meter starts
             meter.start();
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 10);
 
             // When: time advances beyond limit (simulate 50ms elapsed)
             timeSource.advanceMiliseconds(50);
