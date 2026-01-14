@@ -24,8 +24,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.SystemConfig;
-import org.usefultoys.slf4j.meter.MeterConfig;
-import org.usefultoys.slf4j.meter.MeterData;
 import org.usefultoys.test.ValidateCleanMeter;
 
 import java.nio.charset.Charset;

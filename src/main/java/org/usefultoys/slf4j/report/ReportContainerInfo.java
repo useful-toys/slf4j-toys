@@ -23,7 +23,11 @@ import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,7 +66,7 @@ public class ReportContainerInfo implements Runnable {
         ps.printf(" - Hostname: %s%n", getEnvironmentVariables().getOrDefault("HOSTNAME", UNKNOWN));
 
         // 2. Container ID from /proc/self/cgroup (Linux-specific)
-        String containerId = getContainerIdFromCgroup();
+        final String containerId = getContainerIdFromCgroup();
         ps.printf(" - Container ID (cgroup): %s%n", containerId);
 
         // 3. Kubernetes-specific environment variables
@@ -99,38 +103,38 @@ public class ReportContainerInfo implements Runnable {
      * @return The content of the first line of the file, or null if the file does not exist or cannot be read.
      * @throws IOException If an I/O error occurs.
      */
-    protected String readFileContent(String path) throws IOException {
-        File file = new File(path);
+    protected String readFileContent(final String path) throws IOException {
+        final File file = new File(path);
         if (!file.exists() || !file.canRead()) {
             return null;
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (final BufferedReader reader = new BufferedReader(new FileReader(file))) {
             return reader.readLine();
         }
     }
 
     private String getContainerIdFromCgroup() {
         try {
-            String cgroupLine = readFileContent("/proc/self/cgroup");
+            final String cgroupLine = readFileContent("/proc/self/cgroup");
             if (cgroupLine == null) {
                 return "Not available (not in Linux container or no read access)";
             }
-            Matcher matcher = CGROUP_CONTAINER_ID_PATTERN.matcher(cgroupLine);
+            final Matcher matcher = CGROUP_CONTAINER_ID_PATTERN.matcher(cgroupLine);
             if (matcher.matches()) {
                 return matcher.group(1); // Docker container ID
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             logger.warn("Failed to read /proc/self/cgroup: {}", e.getMessage());
             return "Error reading cgroup file";
         }
         return "Not found in cgroup (not a Docker container?)";
     }
 
-    private void reportMemoryLimits(PrintStream ps) {
+    private void reportMemoryLimits(final PrintStream ps) {
         try {
-            String limitStr = readFileContent("/sys/fs/cgroup/memory/memory.limit_in_bytes");
+            final String limitStr = readFileContent("/sys/fs/cgroup/memory/memory.limit_in_bytes");
             if (limitStr != null) {
-                long limit = Long.parseLong(limitStr.trim());
+                final long limit = Long.parseLong(limitStr.trim());
                 if (limit < Long.MAX_VALUE / 2) { // Avoid reporting "no limit" as a huge number
                     ps.printf(" - Memory Limit: %s%n", UnitFormatter.bytes(limit));
                 } else {
@@ -139,23 +143,23 @@ public class ReportContainerInfo implements Runnable {
             } else {
                 ps.println(" - Memory Limit: Not available (not in Linux container or no read access)");
             }
-        } catch (IOException | NumberFormatException e) {
+        } catch (final IOException | NumberFormatException e) {
             logger.warn("Failed to read memory limit from cgroup: {}", e.getMessage());
             ps.println(" - Memory Limit: Error reading");
         }
     }
 
-    private void reportCpuLimits(PrintStream ps) {
+    private void reportCpuLimits(final PrintStream ps) {
         try {
-            String cpuQuotaStr = readFileContent("/sys/fs/cgroup/cpu/cpu.cfs_quota_us");
-            String cpuPeriodStr = readFileContent("/sys/fs/cgroup/cpu/cpu.cfs_period_us");
+            final String cpuQuotaStr = readFileContent("/sys/fs/cgroup/cpu/cpu.cfs_quota_us");
+            final String cpuPeriodStr = readFileContent("/sys/fs/cgroup/cpu/cpu.cfs_period_us");
 
             if (cpuQuotaStr != null && cpuPeriodStr != null) {
-                long quota = Long.parseLong(cpuQuotaStr.trim());
-                long period = Long.parseLong(cpuPeriodStr.trim());
+                final long quota = Long.parseLong(cpuQuotaStr.trim());
+                final long period = Long.parseLong(cpuPeriodStr.trim());
 
                 if (quota > 0 && period > 0) {
-                    double cpuShares = (double) quota / period;
+                    final double cpuShares = (double) quota / period;
                     ps.printf(" - CPU Limit: %.2f cores%n", cpuShares);
                 } else {
                     ps.println(" - CPU Limit: No limit set");
@@ -163,7 +167,7 @@ public class ReportContainerInfo implements Runnable {
             } else {
                 ps.println(" - CPU Limit: Not available (not in Linux container or no read access)");
             }
-        } catch (IOException | NumberFormatException e) {
+        } catch (final IOException | NumberFormatException e) {
             logger.warn("Failed to read CPU limit from cgroup: {}", e.getMessage());
             ps.println(" - CPU Limit: Error reading");
         }
