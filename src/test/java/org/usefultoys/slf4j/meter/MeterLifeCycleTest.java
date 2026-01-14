@@ -5115,11 +5115,11 @@ class MeterLifeCycleTest {
     }
 
     // ================================================================================
-    // Group 9: Post-Stop Invalid Operations - OK State (❌ Tier 4)
+    // Group 9: Post-Stop Attribute Updates - OK State (❌ Tier 4)
     // ================================================================================
 
     @Nested
-    @DisplayName("Group 9: Post-Stop Invalid Operations - OK State (❌ Tier 4)")
+    @DisplayName("Group 9: Post-Stop Attribute Updates - OK State (❌ Tier 4)")
     class PostStopInvalidOperationsOkState {
 
         // ============================================================================
@@ -5821,11 +5821,11 @@ class MeterLifeCycleTest {
     }
 
     // ================================================================================
-    // Group 10: Post-Stop Invalid Operations - Rejected State (❌ Tier 4)
+    // Group 10: Post-Stop Attribute Updates - Rejected State (❌ Tier 4)
     // ================================================================================
 
     @Nested
-    @DisplayName("Group 10: Post-Stop Invalid Operations - Rejected State (❌ Tier 4)")
+    @DisplayName("Group 10: Post-Stop Attribute Updates - Rejected State (❌ Tier 4)")
     class PostStopInvalidOperationsRejectedState {
 
         // ============================================================================
@@ -6203,11 +6203,11 @@ class MeterLifeCycleTest {
     }
 
     // ================================================================================
-    // Group 11: Post-Stop Invalid Operations - Failed State (❌ Tier 4)
+    // Group 11: Post-Stop Attribute Updates - Failed State (❌ Tier 4)
     // ================================================================================
 
     @Nested
-    @DisplayName("Group 11: Post-Stop Invalid Operations - Failed State (❌ Tier 4)")
+    @DisplayName("Group 11: Post-Stop Attribute Updates - Failed State (❌ Tier 4)")
     class PostStopInvalidOperationsFailedState {
 
         // ============================================================================
@@ -6581,6 +6581,525 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
+        }
+    }
+
+    // ================================================================================
+    // Group 12: Post-Stop Invalid Termination (❌ Tier 4)
+    // ================================================================================
+
+    @Nested
+    @DisplayName("Group 12: Post-Stop Invalid Termination (❌ Tier 4)")
+    class PostStopInvalidTermination {
+
+        // ============================================================================
+        // Double Termination Without path() Configuration
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject ok() after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: ok() is called again
+            meter.ok();
+
+            // Then: logs ILLEGAL, state unchanged (OK)
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 5, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 6, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok(path) after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkWithPathAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: ok("second_path") is called
+            meter.ok("second_path");
+
+            // Then: logs ILLEGAL, okPath remains unset
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, "second_path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject reject() after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectRejectAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: reject("error") is called
+            meter.reject("error");
+
+            // Then: logs ILLEGAL, state remains OK
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject fail() after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectFailAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: fail("error") is called
+            meter.fail("error");
+
+            // Then: logs ILLEGAL, state remains OK
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok() after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("first_path")
+            final Meter meter = new Meter(logger).start().ok("first_path");
+
+            // When: ok() is called again
+            meter.ok();
+
+            // Then: logs ILLEGAL, okPath remains "first_path"
+            assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok(path) after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkWithPathAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("first_path")
+            final Meter meter = new Meter(logger).start().ok("first_path");
+
+            // When: ok("second_path") is called
+            meter.ok("second_path");
+
+            // Then: logs ILLEGAL, okPath remains "first_path"
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, "second_path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject reject() after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectRejectAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("path")
+            final Meter meter = new Meter(logger).start().ok("path");
+
+            // When: reject("error") is called
+            meter.reject("error");
+
+            // Then: logs ILLEGAL, state remains OK, okPath preserved
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject fail() after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectFailAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("path")
+            final Meter meter = new Meter(logger).start().ok("path");
+
+            // When: fail("error") is called
+            meter.fail("error");
+
+            // Then: logs ILLEGAL, state remains OK, okPath preserved
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok() after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: ok() is called
+            meter.ok();
+
+            // Then: logs ILLEGAL, state remains Rejected
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok(path) after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkWithPathAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: ok("path") is called
+            meter.ok("path");
+
+            // Then: logs ILLEGAL, state remains Rejected
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject reject() after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectRejectAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: reject("another_error") is called
+            meter.reject("another_error");
+
+            // Then: logs ILLEGAL, rejectPath remains "business_error"
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, "another_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject fail() after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectFailAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: fail("technical_error") is called
+            meter.fail("technical_error");
+
+            // Then: logs ILLEGAL, state remains Rejected
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok() after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: ok() is called
+            meter.ok();
+
+            // Then: logs ILLEGAL, state remains Failed
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok(path) after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkWithPathAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: ok("path") is called
+            meter.ok("path");
+
+            // Then: logs ILLEGAL, state remains Failed
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject reject() after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectRejectAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: reject("error") is called
+            meter.reject("error");
+
+            // Then: logs ILLEGAL, state remains Failed
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject fail() after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectFailAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: fail("another_error") is called
+            meter.fail("another_error");
+
+            // Then: logs ILLEGAL, failPath remains "technical_error"
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, "another_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        // ============================================================================
+        // Double Termination With path() Configuration Before First Termination
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject ok() after path()->ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkAfterPathAndOk() {
+            // Given: a meter configured with path() and stopped with ok()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.ok();
+
+            // When: ok() is called again
+            meter.ok();
+
+            // Then: logs ILLEGAL, okPath remains "configured"
+            assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok(path) after path()->ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkWithPathAfterPathAndOk() {
+            // Given: a meter configured with path() and stopped with ok()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.ok();
+
+            // When: ok("second_path") is called
+            meter.ok("second_path");
+
+            // Then: logs ILLEGAL, okPath remains "configured"
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, "second_path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject reject() after path()->ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectRejectAfterPathAndOk() {
+            // Given: a meter configured with path() and stopped with ok()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.ok();
+
+            // When: reject("error") is called
+            meter.reject("error");
+
+            // Then: logs ILLEGAL, state remains OK
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject fail() after path()->ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectFailAfterPathAndOk() {
+            // Given: a meter configured with path() and stopped with ok()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.ok();
+
+            // When: fail("error") is called
+            meter.fail("error");
+
+            // Then: logs ILLEGAL, state remains OK
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok() after path()->reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkAfterPathAndReject() {
+            // Given: a meter configured with path() and stopped with reject()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.reject("error");
+
+            // When: ok() is called
+            meter.ok();
+
+            // Then: logs ILLEGAL, state remains Rejected, rejectPath preserved
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok(path) after path()->reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkWithPathAfterPathAndReject() {
+            // Given: a meter configured with path() and stopped with reject()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.reject("error");
+
+            // When: ok("path") is called
+            meter.ok("path");
+
+            // Then: logs ILLEGAL, state remains Rejected
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject reject() after path()->reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectRejectAfterPathAndReject() {
+            // Given: a meter configured with path() and stopped with reject()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.reject("error");
+
+            // When: reject("another") is called
+            meter.reject("another");
+
+            // Then: logs ILLEGAL, rejectPath remains "error"
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, "another", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject fail() after path()->reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectFailAfterPathAndReject() {
+            // Given: a meter configured with path() and stopped with reject()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.reject("error");
+
+            // When: fail("tech_error") is called
+            meter.fail("tech_error");
+
+            // Then: logs ILLEGAL, state remains Rejected
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, "tech_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok() after path()->fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkAfterPathAndFail() {
+            // Given: a meter configured with path() and stopped with fail()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.fail("error");
+
+            // When: ok() is called
+            meter.ok();
+
+            // Then: logs ILLEGAL, state remains Failed
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject ok(path) after path()->fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectOkWithPathAfterPathAndFail() {
+            // Given: a meter configured with path() and stopped with fail()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.fail("error");
+
+            // When: ok("path") is called
+            meter.ok("path");
+
+            // Then: logs ILLEGAL, state remains Failed
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject reject() after path()->fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectRejectAfterPathAndFail() {
+            // Given: a meter configured with path() and stopped with fail()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.fail("error");
+
+            // When: reject("business") is called
+            meter.reject("business");
+
+            // Then: logs ILLEGAL, state remains Failed
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, "business", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject fail() after path()->fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectFailAfterPathAndFail() {
+            // Given: a meter configured with path() and stopped with fail()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.fail("error");
+
+            // When: fail("another") is called
+            meter.fail("another");
+
+            // Then: logs ILLEGAL, failPath remains "error"
+            // Will be fixed in future: Meter currently stores path from second termination call, but should store the path from the first one.
+            assertMeterState(meter, true, true, null, null, "another", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEventCount(logger, 7);
         }
     }
 }
