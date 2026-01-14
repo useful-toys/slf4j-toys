@@ -62,7 +62,7 @@ public class CharsetConsistencyExtension implements BeforeAllCallback {
      * @throws AssertionError if the default charset doesn't match SessionConfig.charset
      */
     @Override
-    public void beforeAll(ExtensionContext context) {
+    public void beforeAll(final ExtensionContext context) {
         // Fail fast if charset mismatch detected - prevents unreliable test results
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset,
                 "Test requires SessionConfig.charset = default charset");

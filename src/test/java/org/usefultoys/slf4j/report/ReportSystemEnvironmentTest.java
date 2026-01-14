@@ -59,7 +59,7 @@ class ReportSystemEnvironmentTest {
 
 
     // Helper method to create a ReportSystemEnvironment instance with a mocked environment
-    private ReportSystemEnvironment createReportSystemEnvironment(Map<String, String> envMap) {
+    private ReportSystemEnvironment createReportSystemEnvironment(final Map<String, String> envMap) {
         return new ReportSystemEnvironment(logger) {
             @Override
             protected Map<String, String> getEnvironmentVariables() {
@@ -72,7 +72,7 @@ class ReportSystemEnvironmentTest {
     @DisplayName("should censor sensitive environment variables with default regex")
     void shouldCensorSensitiveEnvironmentVariablesWithDefaultRegex() {
         // Given: environment variables with sensitive and normal values
-        Map<String, String> testEnv = new HashMap<>();
+        final Map<String, String> testEnv = new HashMap<>();
         testEnv.put("TEST_PASSWORD", "mysecretpassword");
         testEnv.put("TEST_SECRET", "anothersecret");
         testEnv.put("TEST_NORMAL", "normalvalue");
@@ -95,7 +95,7 @@ class ReportSystemEnvironmentTest {
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*CUSTOM.*");
         ReporterConfig.init(); // Reinitialize to apply custom regex
 
-        Map<String, String> testEnv = new HashMap<>();
+        final Map<String, String> testEnv = new HashMap<>();
         testEnv.put("TEST_CUSTOM_KEY", "customvalue");
         testEnv.put("TEST_NORMAL", "normalvalue");
 
@@ -116,7 +116,7 @@ class ReportSystemEnvironmentTest {
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "");
         ReporterConfig.init(); // Reinitialize to apply empty regex
 
-        Map<String, String> testEnv = new HashMap<>();
+        final Map<String, String> testEnv = new HashMap<>();
         testEnv.put("TEST_PASSWORD", "mysecretpassword");
         testEnv.put("TEST_SECRET", "anothersecret");
 
@@ -137,7 +137,7 @@ class ReportSystemEnvironmentTest {
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, ".*NONEXISTENT.*");
         ReporterConfig.init(); // Reinitialize to apply non-matching regex
 
-        Map<String, String> testEnv = new HashMap<>();
+        final Map<String, String> testEnv = new HashMap<>();
         testEnv.put("TEST_PASSWORD", "mysecretpassword");
         testEnv.put("TEST_SECRET", "anothersecret");
 
