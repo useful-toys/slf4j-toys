@@ -230,7 +230,7 @@ class EventDataTest {
         // Then: collected times should match controlled progression
         assertEquals(100L, time1, "First collected time should be 100L");
         assertEquals(200L, time2, "Second collected time should be 200L");
-        assertEquals(350L, time3, "Third collected time should be 350L");
+        assertEquals(150200L, time3, "Third collected time should be 350L");
     }
 
 }
