@@ -109,9 +109,9 @@ public class ReportNetworkInterface implements Runnable {
             } else if (inetAddress instanceof Inet6Address) {
                 ps.printf(" - NET address (IPV6): %s%n", inetAddress.getHostAddress());
             }
-            String hostName = inetAddress.getHostName();
+            final String hostName = inetAddress.getHostName();
             ps.printf("      host name: %s%n", hostName != null ? hostName : "n/a");
-            String canonicalHostName = inetAddress.getCanonicalHostName();
+            final String canonicalHostName = inetAddress.getCanonicalHostName();
             ps.printf("      canonical host name : %s%n", canonicalHostName != null ? canonicalHostName : "n/a");
             ps.print("      properties: ");
             if (inetAddress.isLoopbackAddress()) {
