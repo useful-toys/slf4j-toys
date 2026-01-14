@@ -29,9 +29,27 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.slf4j.impl.MockLoggerEvent.Level.*;
-import static org.usefultoys.slf4j.meter.Markers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.slf4j.impl.MockLoggerEvent.Level.DEBUG;
+import static org.slf4j.impl.MockLoggerEvent.Level.ERROR;
+import static org.slf4j.impl.MockLoggerEvent.Level.INFO;
+import static org.slf4j.impl.MockLoggerEvent.Level.TRACE;
+import static org.usefultoys.slf4j.meter.Markers.DATA_FAIL;
+import static org.usefultoys.slf4j.meter.Markers.DATA_OK;
+import static org.usefultoys.slf4j.meter.Markers.DATA_REJECT;
+import static org.usefultoys.slf4j.meter.Markers.DATA_START;
+import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_EXCEPTION;
+import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_START;
+import static org.usefultoys.slf4j.meter.Markers.MSG_FAIL;
+import static org.usefultoys.slf4j.meter.Markers.MSG_OK;
+import static org.usefultoys.slf4j.meter.Markers.MSG_REJECT;
+import static org.usefultoys.slf4j.meter.Markers.MSG_START;
 
 /**
  * Unit tests demonstrating the MeterExecutor interface functionality.
@@ -313,8 +331,8 @@ class MeterExecutorTest {
             }, RuntimeException.class);
             fail("Should have thrown RuntimeException");
         } catch (final Exception e) {
-            assertEquals(RuntimeException.class, e.getClass(), "Exception class should be RuntimeException");
-            assertTrue(e.getCause() instanceof IOException, "Cause should be IOException");
+            assertSame(RuntimeException.class, e.getClass(), "Exception class should be RuntimeException");
+            assertInstanceOf(IOException.class, e.getCause(), "Cause should be IOException");
             assertEquals("test reject exception", e.getCause().getMessage(), "Exception message should match");
         }
         
@@ -346,7 +364,7 @@ class MeterExecutorTest {
             }, IOException.class);
             fail("Should have thrown IllegalArgumentException");
         } catch (final Exception e) {
-            assertEquals(IllegalArgumentException.class, e.getClass(), "Exception class should be IllegalArgumentException");
+            assertSame(IllegalArgumentException.class, e.getClass(), "Exception class should be IllegalArgumentException");
             assertEquals("test fail exception", e.getMessage(), "Exception message should match");
         }
         
@@ -412,7 +430,7 @@ class MeterExecutorTest {
             }, IOException.class, IllegalStateException.class, RuntimeException.class);
             fail("Should have thrown IllegalStateException");
         } catch (final Exception e) {
-            assertEquals(IllegalStateException.class, e.getClass(), "Exception class should be IllegalStateException");
+            assertSame(IllegalStateException.class, e.getClass(), "Exception class should be IllegalStateException");
             assertEquals("test multiple reject", e.getMessage(), "Exception message should match");
         }
         
@@ -435,14 +453,11 @@ class MeterExecutorTest {
         final Meter meter = new Meter(logger, "testSafeCallWithStartAndOk").start();
         final boolean[] executed = {false};
         
-        final Object result = meter.safeCall(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
-                executed[0] = true;
-                meter.ok();
-                return null;
-            }
+        final Object result = meter.safeCall((Callable<Void>) () -> {
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.ok();
+            return null;
         });
         
         assertTrue(executed[0], "Callable should have been executed");
@@ -463,14 +478,11 @@ class MeterExecutorTest {
         final Meter meter = new Meter(logger, "testSafeCallWithReturn").start();
         final boolean[] executed = {false};
         
-        final Object result = meter.safeCall(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
-                executed[0] = true;
-                meter.ok();
-                return 1000;
-            }
+        final Object result = meter.safeCall(() -> {
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.ok();
+            return 1000;
         });
         
         assertTrue(executed[0], "Callable should have been executed");
@@ -491,15 +503,12 @@ class MeterExecutorTest {
         final Meter meter = new Meter(logger, "testSafeCallWithExcessiveStart").start();
         final boolean[] executed = {false};
         
-        final Object result = meter.safeCall(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                meter.start(); // Excessive call to start() - should generate error log
-                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
-                executed[0] = true;
-                meter.ok();
-                return 1000;
-            }
+        final Object result = meter.safeCall(() -> {
+            meter.start(); // Excessive call to start() - should generate error log
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.ok();
+            return 1000;
         });
         
         assertTrue(executed[0], "Callable should have been executed");
@@ -524,13 +533,10 @@ class MeterExecutorTest {
         final Meter meter = new Meter(logger, "testSafeCallAutoOk");
         final boolean[] executed = {false};
         
-        final Object result = meter.safeCall(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
-                executed[0] = true;
-                return 1000;
-            }
+        final Object result = meter.safeCall(() -> {
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            return 1000;
         });
         
         assertTrue(executed[0], "Callable should have been executed");
@@ -551,14 +557,11 @@ class MeterExecutorTest {
         final Meter meter = new Meter(logger, "testSafeCallReject");
         final boolean[] executed = {false};
         
-        final Object result = meter.safeCall(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
-                executed[0] = true;
-                meter.reject("test rejection");
-                return null;
-            }
+        final Object result = meter.safeCall((Callable<Void>) () -> {
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.reject("test rejection");
+            return null;
         });
         
         assertTrue(executed[0], "Callable should have been executed");
@@ -579,14 +582,11 @@ class MeterExecutorTest {
         final Meter meter = new Meter(logger, "testSafeCallFail");
         final boolean[] executed = {false};
         
-        final Object result = meter.safeCall(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
-                executed[0] = true;
-                meter.fail("test failure");
-                return null;
-            }
+        final Object result = meter.safeCall((Callable<Void>) () -> {
+            assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+            executed[0] = true;
+            meter.fail("test failure");
+            return null;
         });
         
         assertTrue(executed[0], "Callable should have been executed");
@@ -608,13 +608,10 @@ class MeterExecutorTest {
         final boolean[] executed = {false};
         
         try {
-            meter.safeCall(new Callable<Void>() {
-                @Override
-                public Void call() throws Exception {
-                    assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
-                    executed[0] = true;
-                    throw new IllegalArgumentException("test runtime exception");
-                }
+            meter.safeCall((Callable<Void>) () -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IllegalArgumentException("test runtime exception");
             });
         } catch (final RuntimeException e) {
             assertSame(IllegalArgumentException.class, e.getClass(), "Exception class should be IllegalArgumentException");
@@ -639,13 +636,10 @@ class MeterExecutorTest {
         final boolean[] executed = {false};
         
         try {
-            meter.safeCall(new Callable<Void>() {
-                @Override
-                public Void call() throws Exception {
-                    assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
-                    executed[0] = true;
-                    throw new IOException("test checked exception");
-                }
+            meter.safeCall((Callable<Void>) () -> {
+                assertEquals(meter, Meter.getCurrentInstance(), "Current instance should be the same meter");
+                executed[0] = true;
+                throw new IOException("test checked exception");
             });
         } catch (final RuntimeException e) {
             assertEquals("MeterExecutor.safeCall wrapped exception.", e.getMessage(), "Wrapper exception message should match");
@@ -731,7 +725,7 @@ class MeterExecutorTest {
             });
             fail("Should have thrown IOException");
         } catch (final Exception e) {
-            assertEquals(IOException.class, e.getClass(), "Exception class should be IOException");
+            assertSame(IOException.class, e.getClass(), "Exception class should be IOException");
             assertEquals("test exception", e.getMessage(), "Exception message should match");
         }
         
@@ -1023,7 +1017,7 @@ class MeterExecutorTest {
             });
             fail("Should have thrown IOException");
         } catch (final Exception e) {
-            assertEquals(IOException.class, e.getClass(), "Exception class should be IOException");
+            assertSame(IOException.class, e.getClass(), "Exception class should be IOException");
             assertEquals("test rejection", e.getMessage(), "Exception message should match");
         }
         
@@ -1054,7 +1048,7 @@ class MeterExecutorTest {
             });
             fail("Should have thrown IOException");
         } catch (final Exception e) {
-            assertEquals(IOException.class, e.getClass(), "Exception class should be IOException");
+            assertSame(IOException.class, e.getClass(), "Exception class should be IOException");
             assertEquals("test exception", e.getMessage(), "Exception message should match");
         }
         
@@ -1200,8 +1194,8 @@ class MeterExecutorTest {
             });
             fail("Should have thrown RuntimeException");
         } catch (final RuntimeException e) {
-            assertEquals(RuntimeException.class, e.getClass(), "Exception class should be RuntimeException");
-            assertEquals(IOException.class, e.getCause().getClass(), "Cause should be IOException");
+            assertSame(RuntimeException.class, e.getClass(), "Exception class should be RuntimeException");
+            assertSame(IOException.class, e.getCause().getClass(), "Cause should be IOException");
             assertEquals("test exception", e.getCause().getMessage(), "Cause message should match");
         }
         
@@ -1265,7 +1259,7 @@ class MeterExecutorTest {
             }
             
             // Adding a different constructor to make sure it doesn't match
-            public CustomRuntimeException(String message) {
+            public CustomRuntimeException(final String message) {
                 super(message);
             }
         }
@@ -1279,8 +1273,8 @@ class MeterExecutorTest {
             fail("Should have thrown RuntimeException");
         } catch (final RuntimeException e) {
             // Should fall back to plain RuntimeException when CustomRuntimeException can't be instantiated
-            assertEquals(RuntimeException.class, e.getClass(), "Exception class should be RuntimeException (fallback)");
-            assertEquals(IOException.class, e.getCause().getClass(), "Cause should be IOException");
+            assertSame(RuntimeException.class, e.getClass(), "Exception class should be RuntimeException (fallback)");
+            assertSame(IOException.class, e.getCause().getClass(), "Cause should be IOException");
             assertEquals("test checked exception", e.getCause().getMessage(), "Cause message should match");
         }
         
