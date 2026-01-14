@@ -47,7 +47,7 @@ class NullLoggerTest {
         // Given: NullLogger instance
         // When: getName() is called
         // Then: should not throw exception
-        assertDoesNotThrow(() -> nullLogger.getName());
+        assertDoesNotThrow(nullLogger::getName);
     }
 
     @Test

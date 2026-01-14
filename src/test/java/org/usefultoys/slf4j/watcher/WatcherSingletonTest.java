@@ -81,7 +81,7 @@ class WatcherSingletonTest {
         assertNull(WatcherSingleton.scheduledDefaultWatcher, "scheduledDefaultWatcher should be null before start");
 
         // When: starting the default watcher executor
-        assertDoesNotThrow(() -> WatcherSingleton.startDefaultWatcherExecutor(), "should start executor without throwing");
+        assertDoesNotThrow(WatcherSingleton::startDefaultWatcherExecutor, "should start executor without throwing");
 
         // Then: executor and watcher should be initialized
         assertNotNull(WatcherSingleton.defaultWatcherExecutor, "defaultWatcherExecutor should be initialized");
@@ -91,7 +91,7 @@ class WatcherSingletonTest {
         final ScheduledFuture<?> watcher = WatcherSingleton.scheduledDefaultWatcher;
 
         // When: starting the executor multiple times
-        assertDoesNotThrow(() -> WatcherSingleton.startDefaultWatcherExecutor(), "should support calling start multiple times");
+        assertDoesNotThrow(WatcherSingleton::startDefaultWatcherExecutor, "should support calling start multiple times");
 
         // Then: same executor and watcher instances should be reused
         assertEquals(executor, WatcherSingleton.defaultWatcherExecutor, "should reuse same executor instance");
@@ -107,14 +107,14 @@ class WatcherSingletonTest {
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "Memory:");
 
         // When: stopping the executor
-        assertDoesNotThrow(() -> WatcherSingleton.stopDefaultWatcherExecutor(), "should stop executor without throwing");
+        assertDoesNotThrow(WatcherSingleton::stopDefaultWatcherExecutor, "should stop executor without throwing");
 
         // Then: executor and watcher should be cleared
         assertNull(WatcherSingleton.defaultWatcherExecutor, "defaultWatcherExecutor should be null after stop");
         assertNull(WatcherSingleton.scheduledDefaultWatcher, "scheduledDefaultWatcher should be null after stop");
 
         // When: stopping the executor multiple times
-        assertDoesNotThrow(() -> WatcherSingleton.stopDefaultWatcherExecutor(), "should support calling stop multiple times");
+        assertDoesNotThrow(WatcherSingleton::stopDefaultWatcherExecutor, "should support calling stop multiple times");
 
         // Then: should remain null
         assertNull(WatcherSingleton.defaultWatcherExecutor, "defaultWatcherExecutor should remain null");
@@ -134,7 +134,7 @@ class WatcherSingletonTest {
         assertNull(WatcherSingleton.defaultWatcherTask, "defaultWatcherTask should be null before start");
 
         // When: starting the default watcher timer
-        assertDoesNotThrow(() -> WatcherSingleton.startDefaultWatcherTimer(), "should start timer without throwing");
+        assertDoesNotThrow(WatcherSingleton::startDefaultWatcherTimer, "should start timer without throwing");
 
         // Then: timer and task should be initialized
         assertNotNull(WatcherSingleton.defaultWatcherTimer, "defaultWatcherTimer should be initialized");
@@ -144,7 +144,7 @@ class WatcherSingletonTest {
         final TimerTask timerTask = WatcherSingleton.defaultWatcherTask;
 
         // When: starting the timer multiple times
-        assertDoesNotThrow(() -> WatcherSingleton.startDefaultWatcherTimer(), "should support calling start multiple times");
+        assertDoesNotThrow(WatcherSingleton::startDefaultWatcherTimer, "should support calling start multiple times");
 
         // Then: same timer and task instances should be reused
         assertEquals(timer, WatcherSingleton.defaultWatcherTimer, "should reuse same timer instance");
@@ -160,14 +160,14 @@ class WatcherSingletonTest {
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "Memory:");
 
         // When: stopping the timer
-        assertDoesNotThrow(() -> WatcherSingleton.stopDefaultWatcherTimer(), "should stop timer without throwing");
+        assertDoesNotThrow(WatcherSingleton::stopDefaultWatcherTimer, "should stop timer without throwing");
 
         // Then: timer and task should be cleared
         assertNull(WatcherSingleton.defaultWatcherTimer, "defaultWatcherTimer should be null after stop");
         assertNull(WatcherSingleton.defaultWatcherTask, "defaultWatcherTask should be null after stop");
 
         // When: stopping the timer multiple times
-        assertDoesNotThrow(() -> WatcherSingleton.stopDefaultWatcherTimer(), "should support calling stop multiple times");
+        assertDoesNotThrow(WatcherSingleton::stopDefaultWatcherTimer, "should support calling stop multiple times");
 
         // Then: should remain null
         assertNull(WatcherSingleton.defaultWatcherTimer, "defaultWatcherTimer should remain null");
