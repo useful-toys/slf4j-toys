@@ -33,10 +33,9 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 | **6** | Pre-Start Invalid Operations | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations before start |
 | **7** | Post-Start Attribute Updates | ☑️ Tier 2 | None | Attribute updates during execution |
 | **8** | Post-Start Termination | ✅ Tier 1 | Normal | Termination via ok/reject/fail with path variations |
-| **9** | Post-Stop Invalid Operations (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
-| **10** | Post-Stop Invalid Operations (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
-| **11** | Post-Stop Invalid Operations (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
-| **14** | Bad Arguments | ❌ Tier 4b | ILLEGAL | Invalid argument values |
+| **9** | Post-Stop Attribute Updates (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
+| **10** | Post-Stop Attribute Updates (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
+| **11** | Post-Stop Attribute Updates (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
 | **15** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
 | **16** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
 | **17** | Complex Scenarios | All | Varies | Realistic workflows |
@@ -706,7 +705,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 9: Post-Stop Invalid Operations - OK State (❌ Tier 4 - State-Preserving)**
+### **Group 9: Post-Stop Attribute Updates - OK State (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that operations on terminated meters (OK state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped) and do not change state or outcome attributes.
 
@@ -769,7 +768,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 10: Post-Stop Invalid Operations - Rejected State (❌ Tier 4 - State-Preserving)**
+### **Group 10: Post-Stop Attribute Updates - Rejected State (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that operations on rejected meters (Rejected state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with rejection) and do not change state or outcome attributes.
 
@@ -812,7 +811,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 11: Post-Stop Invalid Operations - Failed State (❌ Tier 4 - State-Preserving)**
+### **Group 11: Post-Stop Attribute Updates - Failed State (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that operations on failed meters (Failed state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with failure) and do not change state or outcome attributes.
 
@@ -855,49 +854,46 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
+### **Group 12: Post-Stop Invalid Termination (❌ Tier 4 - State-Preserving)**
 
+**Purpose:** Validate that attempts to terminate an already-stopped meter are rejected and logged as errors. These tests verify that once a meter has reached a terminal state (OK, Rejected, or Failed), subsequent termination calls are properly rejected without changing the meter's state.
 
-## Implementation Guidelines
+**Test Scenarios:**
 
-### Test Isolation with Group 1
+#### 1. **Double Termination Without path() Configuration**
+   - `start() → ok() → ok()` → logs ILLEGAL (already stopped with ok), state unchanged (OK)
+   - `start() → ok() → ok("second_path")` → logs ILLEGAL, okPath remains unset, state unchanged (OK)
+   - `start() → ok() → reject("error")` → logs ILLEGAL, state remains OK, rejectPath not set
+   - `start() → ok() → fail("error")` → logs ILLEGAL, state remains OK, failPath not set
+   - `start() → ok("first_path") → ok()` → logs ILLEGAL, okPath remains "first_path", state unchanged (OK)
+   - `start() → ok("first_path") → ok("second_path")` → logs ILLEGAL, okPath remains "first_path"
+   - `start() → ok("path") → reject("error")` → logs ILLEGAL, state remains OK, okPath preserved
+   - `start() → ok("path") → fail("error")` → logs ILLEGAL, state remains OK, okPath preserved
+   - `start() → reject("business_error") → ok()` → logs ILLEGAL, state remains Rejected
+   - `start() → reject("business_error") → ok("path")` → logs ILLEGAL, state remains Rejected
+   - `start() → reject("business_error") → reject("another_error")` → logs ILLEGAL, rejectPath remains "business_error"
+   - `start() → reject("business_error") → fail("technical_error")` → logs ILLEGAL, state remains Rejected
+   - `start() → fail("technical_error") → ok()` → logs ILLEGAL, state remains Failed
+   - `start() → fail("technical_error") → ok("path")` → logs ILLEGAL, state remains Failed
+   - `start() → fail("technical_error") → reject("error")` → logs ILLEGAL, state remains Failed
+   - `start() → fail("technical_error") → fail("another_error")` → logs ILLEGAL, failPath remains "technical_error"
 
-Each test in Groups 2-15 should:
-1. **Assume** Group 1 guarantees have been validated
-2. **Trust** that `new Meter(logger).start()` works correctly
-3. **Skip** redundant initialization checks
-4. **Focus** exclusively on the group's primary concern
+#### 2. **Double Termination With path() Configuration Before First Termination**
+   - `start() → path("configured") → ok() → ok()` → logs ILLEGAL, okPath remains "configured", state unchanged (OK)
+   - `start() → path("configured") → ok() → ok("second_path")` → logs ILLEGAL, okPath remains "configured"
+   - `start() → path("configured") → ok() → reject("error")` → logs ILLEGAL, state remains OK
+   - `start() → path("configured") → ok() → fail("error")` → logs ILLEGAL, state remains OK
+   - `start() → path("configured") → reject("error") → ok()` → logs ILLEGAL, state remains Rejected, rejectPath preserved
+   - `start() → path("configured") → reject("error") → ok("path")` → logs ILLEGAL, state remains Rejected
+   - `start() → path("configured") → reject("error") → reject("another")` → logs ILLEGAL, rejectPath remains "error"
+   - `start() → path("configured") → reject("error") → fail("tech_error")` → logs ILLEGAL, state remains Rejected
+   - `start() → path("configured") → fail("error") → ok()` → logs ILLEGAL, state remains Failed
+   - `start() → path("configured") → fail("error") → ok("path")` → logs ILLEGAL, state remains Failed
+   - `start() → path("configured") → fail("error") → reject("business")` → logs ILLEGAL, state remains Failed
+   - `start() → path("configured") → fail("error") → fail("another")` → logs ILLEGAL, failPath remains "error"
 
-### Error Log Validation
+---
 
-Use `AssertLogger` for all log validation:
-```java
-// ✅ CORRECT: Semantic assertion
-AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.WARN,
-    "INCONSISTENT_INCREMENT");
-
-// ❌ WRONG: Direct MockLogger assertion
-assertEquals(1, mockLogger.getEventCount());
-```
-
-### Configuration Annotations
-
-All test classes should use:
-```java
-@ValidateCharset
-@ResetMeterConfig
-@WithLocale("en")
-@WithMockLogger
-@ValidateCleanMeter
-@SuppressWarnings({"AssignmentToStaticFieldFromInstanceMethod", "IOResourceOpenedButNotSafelyClosed", "TestMethodWithoutAssertion"})
-class MeterLifeCycleTest { ... }
-```
-
-This ensures:
-- Consistent charset across environments
-- Clean configuration state for each test
-- Consistent locale for string comparisons
-- MockLogger for output validation
-- Clean meter stack verification
 
 ---
 
