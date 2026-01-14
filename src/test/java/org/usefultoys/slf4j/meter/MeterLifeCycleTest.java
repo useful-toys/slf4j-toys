@@ -30,6 +30,8 @@ import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -60,8 +62,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @WithMockLogger
 @ValidateCleanMeter
 @WithMockLoggerDebug
+@SuppressWarnings("TestMethodWithoutAssertion") // aserts are in submethods
 class MeterLifeCycleTest {
 
+    @SuppressWarnings("NonConstantLogger")
     @Slf4jMock
     private Logger logger;
 
@@ -92,7 +96,7 @@ class MeterLifeCycleTest {
      * @param rejectPath            the expected value of the "rejectPath" property, or {@code null} if it is expected to be null
      * @param failPath              the expected value of the "failPath" property, or {@code null} if it is expected to be null
      * @param failMessage           the expected value of the "*/
-    void assertMeterState(final Meter meter, final boolean started, final boolean stopped, final String okPath, final String rejectPath, final String failPath, final String failMessage, final long currentIteration, final long expectedIterations, final long timeLimitMilliseconds) {
+    static void assertMeterState(final Meter meter, final boolean started, final boolean stopped, final String okPath, final String rejectPath, final String failPath, final String failMessage, final long currentIteration, final long expectedIterations, final long timeLimitMilliseconds) {
         if (started) {
             assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         } else {
@@ -4251,640 +4255,886 @@ class MeterLifeCycleTest {
         }
     }
 
+    // ================================================================================
+    // Group 8: Post-Start Termination (✅ Tier 1 - Valid State-Changing)
+    // ================================================================================
+
     @Nested
-    @DisplayName("Success Flow")
-    class SuccessFlow {
+    @DisplayName("Group 8: Post-Start Termination (✅ Tier 1)")
+    class PostStartTermination {
+
+        // ============================================================================
+        // Termination via ok() - No Path Configuration
+        // ============================================================================
+
         @Test
-        @DisplayName("should follow normal success flow")
-        void shouldFollowNormalSuccessFlow() {
+        @DisplayName("should terminate via ok() without path")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkWithoutPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
 
             // When: ok() is called
             meter.ok();
 
-            // Then: Meter is in stopped state
+            // Then: meter transitions to OK state, okPath unset, INFO log
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
-        @DisplayName("should follow success flow with path (String)")
-        void shouldFollowSuccessFlowWithPathString() {
+        @DisplayName("should terminate via ok() with description preserved")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkWithDescriptionPreserved() {
+            // Given: a new, started Meter with description
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("operation") is called
+            meter.m("operation");
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: ok() is called
+            meter.ok();
+
+            // Then: description preserved, okPath unset, INFO log
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            assertEquals("operation", meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should terminate via ok() with iterations preserved")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkWithIterationsPreserved() {
+            // Given: a new, started Meter with iterations
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() is called 5 times
+            meter.inc().inc().inc().inc().inc();
+            assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+
+            // When: ok() is called
+            meter.ok();
+
+            // Then: currentIteration = 5 preserved, INFO log with metrics
+            assertMeterState(meter, true, true, null, null, null, null, 5, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // Termination via ok(path) with Path Type Variations
+        // ============================================================================
+
+        @Test
+        @DisplayName("should terminate via ok(String path)")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkWithStringPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
 
-            // When: ok("customPath") is called
-            meter.ok("customPath");
+            // When: ok("success_outcome") is called
+            meter.ok("success_outcome");
 
-            // Then: Meter is in stopped state with path set
-            assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
+            // Then: okPath = "success_outcome", INFO log
+            assertMeterState(meter, true, true, "success_outcome", null, null, null, 0, 0, 0);
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
-        @DisplayName("should follow success flow with path (Enum)")
-        void shouldFollowSuccessFlowWithPathEnum() {
+        @DisplayName("should terminate via ok(Enum path)")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkWithEnumPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
 
             // When: ok(TestEnum.VALUE1) is called
             meter.ok(TestEnum.VALUE1);
 
-            // Then: Meter is in stopped state with enum path
+            // Then: okPath = enum toString(), INFO log
             assertMeterState(meter, true, true, TestEnum.VALUE1.name(), null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
-        @DisplayName("should follow success flow with path (Throwable)")
-        void shouldFollowSuccessFlowWithPathThrowable() {
+        @DisplayName("should terminate via ok(Throwable path)")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkWithThrowablePath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            final Exception ex = new Exception("success_cause");
 
             // When: ok(exception) is called
-            final Exception ex = new RuntimeException("error");
             meter.ok(ex);
 
-            // Then: Meter is in stopped state with exception class as path
+            // Then: okPath = exception class name, INFO log
             assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
-        @DisplayName("should follow success flow with path (Object)")
-        void shouldFollowSuccessFlowWithPathObject() {
+        @DisplayName("should terminate via ok(Object path)")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkWithObjectPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            final TestObject obj = new TestObject();
 
             // When: ok(object) is called
-            final TestObject obj = new TestObject();
             meter.ok(obj);
 
-            // Then: Meter is in stopped state with object toString as path
+            // Then: okPath = object toString(), INFO log
             assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
-        @DisplayName("should follow success flow with path() method (String)")
-        void shouldFollowSuccessFlowWithPathMethodString() {
+        @DisplayName("should handle ok(null) - logs ILLEGAL but completes")
+        @ValidateCleanMeter
+        void shouldHandleOkWithNullPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // When: path("predefinedPath") is called
-            meter.path("predefinedPath");
-
-            // Then: path is set
-            assertMeterState(meter, true, false, "predefinedPath", null, null, null, 0, 0, 0);
-
-            // When: ok() is called
-            meter.ok();
-
-            // Then: Meter is in stopped state with path preserved
-            assertMeterState(meter, true, true, "predefinedPath", null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should follow success flow with path() method (Enum)")
-        void shouldFollowSuccessFlowWithPathMethodEnum() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path(TestEnum.VALUE2) is called
-            meter.path(TestEnum.VALUE2);
-
-            // Then: enum path is set
-            assertMeterState(meter, true, false, TestEnum.VALUE2.name(), null, null, null, 0, 0, 0);
-
-            // When: ok() is called
-            meter.ok();
-
-            // Then: Meter is in stopped state with enum path preserved
-            assertMeterState(meter, true, true, TestEnum.VALUE2.name(), null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should follow success flow with path() method (Throwable)")
-        void shouldFollowSuccessFlowWithPathMethodThrowable() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path(exception) is called
-            final Exception ex = new IllegalArgumentException("invalid");
-            meter.path(ex);
-
-            // Then: exception class is set as path
-            assertMeterState(meter, true, false, ex.getClass().getSimpleName(), null, null, null, 0, 0, 0);
-
-            // When: ok() is called
-            meter.ok();
-
-            // Then: Meter is in stopped state with exception path preserved
-            assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should follow success flow with path() method (Object)")
-        void shouldFollowSuccessFlowWithPathMethodObject() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path(object) is called
-            final TestObject obj = new TestObject();
-            meter.path(obj);
-
-            // Then: object toString is set as path
-            assertMeterState(meter, true, false, obj.toString(), null, null, null, 0, 0, 0);
-
-            // When: ok() is called
-            meter.ok();
-
-            // Then: Meter is in stopped state with object path preserved
-            assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should follow success flow with path override")
-        void shouldFollowSuccessFlowWithPathOverride() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path("initialPath") is called
-            meter.path("initialPath");
-
-            // Then: initial path is set
-            assertMeterState(meter, true, false, "initialPath", null, null, null, 0, 0, 0);
-
-            // When: ok("finalPath") is called (overriding initialPath)
-            meter.ok("finalPath");
-
-            // Then: final path overrides initial path
-            assertMeterState(meter, true, true, "finalPath", null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should override path when path() is called twice")
-        void shouldOverridePathWhenPathCalledTwice() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path("firstPath") is called
-            meter.path("firstPath");
-
-            // Then: first path is set
-            assertMeterState(meter, true, false, "firstPath", null, null, null, 0, 0, 0);
-
-            // When: path("secondPath") is called (should override firstPath)
-            meter.path("secondPath");
-
-            // Then: second path overrides first path
-            assertMeterState(meter, true, false, "secondPath", null, null, null, 0, 0, 0);
-
-            // When: ok() is called
-            meter.ok();
-
-            // Then: Meter is in stopped state with second path preserved
-            assertMeterState(meter, true, true, "secondPath", null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should log error and keep previous path when path(non-null) then path(null)")
-        void shouldKeepPreviousPathWhenPathNullAfterNonNull() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path("validPath") is called
-            meter.path("validPath");
-
-            // Then: path is set
-            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
-
-            // When: path(null) is called (should log error and ignore, keeping previous path)
-            meter.path(null);
-
-            // Then: path is kept as "validPath" (null argument ignored)
-            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
-
-            // When: ok() is called
-            meter.ok();
-
-            // Then: Meter is in stopped state with okPath="validPath"
-            assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should complete with set path when ok(null) is called")
-        void shouldCompleteWithPathWhenOkNullAfterPathNonNull() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path("validPath") is called
-            meter.path("validPath");
-
-            // Then: path is set
-            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
-
-            // When: ok(null) is called (should complete with validPath preserved)
+            // When: ok(null) is called
             meter.ok(null);
 
-            // Then: Meter is in stopped state with validPath preserved
-            assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
+            // Then: okPath remains unset, logs ILLEGAL, completes with INFO log
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
         }
 
+        // ============================================================================
+        // Termination via ok() after Single path() Call
+        // ============================================================================
+
         @Test
-        @DisplayName("should follow success flow using success() alias")
-        void shouldFollowSuccessFlowUsingSuccessAlias() {
+        @DisplayName("should terminate via ok() after path() - path sets default")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkAfterPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path("configured_path") → ok() is called
+            meter.path("configured_path");
+            assertMeterState(meter, true, false, "configured_path", null, null, null, 0, 0, 0);
+
+            meter.ok();
+
+            // Then: okPath = "configured_path", INFO log
+            assertMeterState(meter, true, true, "configured_path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should terminate via ok(path) overriding previous path()")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkPathOverridingPreviousPath() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path("configured_path") → ok("override_path") is called
+            meter.path("configured_path");
+            assertMeterState(meter, true, false, "configured_path", null, null, null, 0, 0, 0);
+
+            meter.ok("override_path");
+
+            // Then: okPath = "override_path" (ok(path) overrides path())
+            assertMeterState(meter, true, true, "override_path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should terminate via ok() with description and path preserved")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkWithDescriptionAndPathPreserved() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: m("step") → path("step_path") → ok() is called
+            meter.m("step");
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            meter.path("step_path");
+            assertMeterState(meter, true, false, "step_path", null, null, null, 0, 0, 0);
+
+            meter.ok();
+
+            // Then: okPath = "step_path", description and path both preserved
+            assertMeterState(meter, true, true, "step_path", null, null, null, 0, 0, 0);
+            assertEquals("step", meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should handle path(null) then ok() - path rejects null")
+        @ValidateCleanMeter
+        void shouldHandlePathNullThenOk() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path(null) → ok() is called
+            meter.path(null);
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            meter.ok();
+
+            // Then: path rejects null (ILLEGAL), okPath = null, INFO log for ok()
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // Termination via ok() after Multiple path() Calls (Last Wins)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should terminate via ok() after two path() calls - last wins")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkAfterTwoPathCalls() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path("first") → path("second") → ok() is called
+            meter.path("first");
+            assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
+
+            meter.path("second");
+            assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+
+            meter.ok();
+
+            // Then: okPath = "second" (last wins)
+            assertMeterState(meter, true, true, "second", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should terminate via ok() after three path() calls - last wins")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkAfterThreePathCalls() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path("first") → path("second") → path("third") → ok() is called
+            meter.path("first");
+            assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
+
+            meter.path("second");
+            assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+
+            meter.path("third");
+            assertMeterState(meter, true, false, "third", null, null, null, 0, 0, 0);
+
+            meter.ok();
+
+            // Then: okPath = "third" (last wins)
+            assertMeterState(meter, true, true, "third", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should terminate via ok(path) overriding multiple path() calls")
+        @ValidateCleanMeter
+        void shouldTerminateViaOkPathOverridingMultiplePathCalls() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path("first") → path("second") → ok("final_override") is called
+            meter.path("first");
+            assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
+
+            meter.path("second");
+            assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+
+            meter.ok("final_override");
+
+            // Then: okPath = "final_override" (ok() overrides last path())
+            assertMeterState(meter, true, true, "final_override", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // Termination via ok() with success() Alias
+        // ============================================================================
+
+        @Test
+        @DisplayName("should terminate via success() alias")
+        @ValidateCleanMeter
+        void shouldTerminateViaSuccessAlias() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: success() is called
             meter.success();
 
-            // Then: Meter is in stopped state
+            // Then: meter transitions to OK state, okPath unset, INFO log
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
-        @DisplayName("should follow success flow using success(path) alias")
-        void shouldFollowSuccessFlowUsingSuccessPathAlias() {
+        @DisplayName("should terminate via success(path) alias")
+        @ValidateCleanMeter
+        void shouldTerminateViaSuccessPathAlias() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
-
-            // When: success("aliasPath") is called
-            meter.success("aliasPath");
-
-            // Then: Meter is in stopped state with path set
-            assertMeterState(meter, true, true, "aliasPath", null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should log error and continue when path(null) is called")
-        void shouldLogErrorAndContinueWhenPathNullIsCalled() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path(null) is called (should log error but not throw)
-            meter.path(null);
-
-            // Then: path remains null
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // When: ok() is called after null path
-            meter.ok();
+            // When: success("alias_path") is called
+            meter.success("alias_path");
 
-            // Then: Meter is in stopped state
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
+            // Then: okPath = "alias_path", INFO log
+            assertMeterState(meter, true, true, "alias_path", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
         }
 
         @Test
-        @DisplayName("should complete successfully when ok(null) is called")
-        void shouldLogErrorAndContinueWhenOkNullIsCalled() {
+        @DisplayName("should terminate via success() after path() - path sets default")
+        @ValidateCleanMeter
+        void shouldTerminateViaSuccessAfterPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // When: ok(null) is called (should complete operation without path)
+            // When: path("configured") → success() is called
+            meter.path("configured");
+            assertMeterState(meter, true, false, "configured", null, null, null, 0, 0, 0);
+
+            meter.success();
+
+            // Then: okPath = "configured", INFO log
+            assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        // ============================================================================
+        // ok(null) vs path(null) Semantics
+        // ============================================================================
+
+        @Test
+        @DisplayName("should handle path(validPath) then ok(null) - ok ignores null, path preserved")
+        @ValidateCleanMeter
+        void shouldHandlePathValidThenOkNull() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path("validPath") → ok(null) is called
+            meter.path("validPath");
+            assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
+
             meter.ok(null);
 
-            // Then: Meter is in stopped state with no path set
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
+            // Then: ok() ignores null (ILLEGAL), okPath = "validPath" preserved
+            assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0, 0);
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_OK);
         }
 
-        @Test
-        @DisplayName("should log slow operation when limit is exceeded")
-        void shouldLogSlowOperationWhenLimitIsExceeded() throws InterruptedException {
-            // Given: a new Meter
-            final Meter meter = new Meter(logger);
-            
-            // Then: meter has expected initial state
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
-            
-            // When: limitMilliseconds(1) is called
-            meter.limitMilliseconds(1);
-            
-            // Then: time limit is set
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 1);
-            
-            // When: start() is called
-            meter.start();
-            
-            // Then: meter is in executing state with time limit
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 1);
-
-            // When: operation takes longer than limit
-            Thread.sleep(10);
-            meter.ok();
-
-            // Then: Meter is in stopped state with time limit preserved
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 1);
-
-            // Then: MSG_SLOW_OK (WARN) should be logged instead of MSG_OK (INFO)
-            AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
-        }
-    }
-
-    @Nested
-    @DisplayName("Created State Path Calls")
-    class CreatedStatePathCallTests {
-        @Test
-        @DisplayName("should NOT modify okPath when path(String) is called before start()")
-        void shouldNotModifyPathWhenPathStringBeforeStart() {
-            // Given: a new, not yet started Meter
-            final Meter meter = new Meter(logger);
-
-            // When: path("pathId") is called before start()
-            meter.path("pathId");
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but not started");
-        }
+        // ============================================================================
+        // Termination via reject(path) with Path Type Variations
+        // ============================================================================
 
         @Test
-        @DisplayName("should NOT modify okPath when path(Enum) is called before start()")
-        void shouldNotModifyPathWhenPathEnumBeforeStart() {
-            // Given: a new, not yet started Meter
-            final Meter meter = new Meter(logger);
-
-            // When: path(TestEnum.VALUE1) is called before start()
-            meter.path(TestEnum.VALUE1);
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but not started");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Throwable) is called before start()")
-        void shouldNotModifyPathWhenPathThrowableBeforeStart() {
-            // Given: a new, not yet started Meter
-            final Meter meter = new Meter(logger);
-
-            // When: path(new Exception()) is called before start()
-            meter.path(new RuntimeException("test"));
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but not started");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Object) is called before start()")
-        void shouldNotModifyPathWhenPathObjectBeforeStart() {
-            // Given: a new, not yet started Meter
-            final Meter meter = new Meter(logger);
-
-            // When: path(new TestObject()) is called before start()
-            meter.path(new TestObject());
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but not started");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(null) is called before start()")
-        void shouldNotModifyPathWhenPathNullBeforeStart() {
-            // Given: a new, not yet started Meter
-            final Meter meter = new Meter(logger);
-
-            // When: path(null) is called before start() (null argument)
-            meter.path(null);
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker for null argument
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL,
-                "Null argument");
-        }
-    }
-
-    @Nested
-    @DisplayName("Rejection Flow")
-    class RejectionFlow {
-        @Test
-        @DisplayName("should follow rejection flow (String)")
-        void shouldFollowRejectionFlowString() {
+        @DisplayName("should terminate via reject(String cause)")
+        @ValidateCleanMeter
+        void shouldTerminateViaRejectWithStringCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // When: reject("businessRule") is called
-            meter.reject("businessRule");
+            // When: reject("validation_error") is called
+            meter.reject("validation_error");
 
-            // Then: Meter is in stopped state with reject path set
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
+            // Then: rejectPath = "validation_error", INFO log
+            assertMeterState(meter, true, true, null, "validation_error", null, null, 0, 0, 0);
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
         }
 
         @Test
-        @DisplayName("should follow rejection flow (Enum)")
-        void shouldFollowRejectionFlowEnum() {
+        @DisplayName("should terminate via reject(Enum cause)")
+        @ValidateCleanMeter
+        void shouldTerminateViaRejectWithEnumCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: reject(TestEnum.VALUE1) is called
             meter.reject(TestEnum.VALUE1);
 
-            // Then: Meter is in stopped state with enum reject path
+            // Then: rejectPath = enum toString(), INFO log
             assertMeterState(meter, true, true, null, TestEnum.VALUE1.name(), null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
         }
 
         @Test
-        @DisplayName("should follow rejection flow (Throwable)")
-        void shouldFollowRejectionFlowThrowable() {
+        @DisplayName("should terminate via reject(Throwable cause)")
+        @ValidateCleanMeter
+        void shouldTerminateViaRejectWithThrowableCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            final Exception ex = new IllegalArgumentException("invalid format");
 
             // When: reject(exception) is called
-            final Exception ex = new RuntimeException("rejected");
             meter.reject(ex);
 
-            // Then: Meter is in stopped state with exception class as reject path
+            // Then: rejectPath = exception class name, INFO log
             assertMeterState(meter, true, true, null, ex.getClass().getSimpleName(), null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
         }
 
         @Test
-        @DisplayName("should follow rejection flow (Object)")
-        void shouldFollowRejectionFlowObject() {
+        @DisplayName("should terminate via reject(Object cause)")
+        @ValidateCleanMeter
+        void shouldTerminateViaRejectWithObjectCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            final TestObject obj = new TestObject();
 
             // When: reject(object) is called
-            final TestObject obj = new TestObject();
             meter.reject(obj);
 
-            // Then: Meter is in stopped state with object toString as reject path
+            // Then: rejectPath = object toString(), INFO log
             assertMeterState(meter, true, true, null, obj.toString(), null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
         }
-    }
 
-    @Nested
-    @DisplayName("Failure Flow")
-    class FailureFlow {
+        // ============================================================================
+        // Termination via reject(path) after path() Call
+        // ============================================================================
+
         @Test
-        @DisplayName("should follow failure flow (Throwable)")
-        void shouldFollowFailureFlowThrowable() {
+        @DisplayName("should terminate via reject() after path() - reject path independent")
+        @ValidateCleanMeter
+        void shouldTerminateViaRejectAfterPath() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
 
-            // When: fail(exception) is called
-            final Exception ex = new RuntimeException("technical error");
-            meter.fail(ex);
+            // When: path("ok_path") → reject("business_error") is called
+            meter.path("ok_path");
+            assertMeterState(meter, true, false, "ok_path", null, null, null, 0, 0, 0);
 
-            // Then: Meter is in stopped state with exception details in fail path
-            assertMeterState(meter, true, true, null, null, ex.getClass().getName(), ex.getMessage(), 0, 0, 0);
+            meter.reject("business_error");
 
-            // Then: all log messages recorded correctly
+            // Then: rejectPath = "business_error", okPath remains unset
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should terminate via reject() after path() with description")
+        @ValidateCleanMeter
+        void shouldTerminateViaRejectAfterPathWithDescription() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("step") → path("ok_expectation") → reject("precondition_failed") is called
+            meter.m("step");
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            meter.path("ok_expectation");
+            assertMeterState(meter, true, false, "ok_expectation", null, null, null, 0, 0, 0);
+
+            meter.reject("precondition_failed");
+
+            // Then: rejectPath = "precondition_failed", okPath unset
+            assertMeterState(meter, true, true, null, "precondition_failed", null, null, 0, 0, 0);
+            assertEquals("step", meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        // ============================================================================
+        // Termination via reject(path) after Multiple path() Calls
+        // ============================================================================
+
+        @Test
+        @DisplayName("should terminate via reject() after multiple path() calls")
+        @ValidateCleanMeter
+        void shouldTerminateViaRejectAfterMultiplePathCalls() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: path("first") → path("second") → reject("business_rule") is called
+            meter.path("first");
+            assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
+
+            meter.path("second");
+            assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+
+            meter.reject("business_rule");
+
+            // Then: rejectPath = "business_rule", okPath unset
+            assertMeterState(meter, true, true, null, "business_rule", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        // ============================================================================
+        // Termination via fail(path) with Path Type Variations
+        // ============================================================================
+
+        @Test
+        @DisplayName("should terminate via fail(String cause)")
+        @ValidateCleanMeter
+        void shouldTerminateViaFailWithStringCause() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: fail("critical_error") is called
+            meter.fail("critical_error");
+
+            // Then: failPath = "critical_error", failMessage = null, ERROR log
+            assertMeterState(meter, true, true, null, null, "critical_error", null, 0, 0, 0);
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
         }
 
         @Test
-        @DisplayName("should follow failure flow (String)")
-        void shouldFollowFailureFlowString() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: fail("technical error") is called
-            meter.fail("technical error");
-
-            // Then: Meter is in stopped state with failure message
-            assertMeterState(meter, true, true, null, null, "technical error", null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
-        }
-
-        @Test
-        @DisplayName("should follow failure flow (Enum)")
-        void shouldFollowFailureFlowEnum() {
+        @DisplayName("should terminate via fail(Enum cause)")
+        @ValidateCleanMeter
+        void shouldTerminateViaFailWithEnumCause() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
 
             // When: fail(TestEnum.VALUE2) is called
             meter.fail(TestEnum.VALUE2);
 
-            // Then: Meter is in stopped state with enum fail path
+            // Then: failPath = enum toString(), failMessage = null, ERROR log
             assertMeterState(meter, true, true, null, null, TestEnum.VALUE2.name(), null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
         }
 
         @Test
-        @DisplayName("should follow failure flow (Object)")
-        void shouldFollowFailureFlowObject() {
+        @DisplayName("should terminate via fail(Throwable cause) - stores className and message separately")
+        @ValidateCleanMeter
+        void shouldTerminateViaFailWithThrowableCause() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            final Exception ex = new SQLException("connection refused");
+
+            // When: fail(exception) is called
+            meter.fail(ex);
+
+            // Then: failPath = className, failMessage = message (separated), ERROR log
+            assertMeterState(meter, true, true, null, null, ex.getClass().getName(), ex.getMessage(), 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should terminate via fail(Object cause)")
+        @ValidateCleanMeter
+        void shouldTerminateViaFailWithObjectCause() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            final TestObject obj = new TestObject();
+
+            // When: fail(object) is called
+            meter.fail(obj);
+
+            // Then: failPath = object toString(), failMessage = null, ERROR log
+            assertMeterState(meter, true, true, null, null, obj.toString(), null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        // ============================================================================
+        // Termination via fail(path) after path() Call
+        // ============================================================================
+
+        @Test
+        @DisplayName("should terminate via fail() after path() - fail path independent")
+        @ValidateCleanMeter
+        void shouldTerminateViaFailAfterPath() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path("success_expectation") → fail("timeout") is called
+            meter.path("success_expectation");
+            assertMeterState(meter, true, false, "success_expectation", null, null, null, 0, 0, 0);
+
+            meter.fail("timeout");
+
+            // Then: failPath = "timeout", okPath remains unset, ERROR log
+            assertMeterState(meter, true, true, null, null, "timeout", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should terminate via fail() after path() with description")
+        @ValidateCleanMeter
+        void shouldTerminateViaFailAfterPathWithDescription() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: m("operation") → path("ok_path") → fail("unexpected_exception") is called
+            meter.m("operation");
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            meter.path("ok_path");
+            assertMeterState(meter, true, false, "ok_path", null, null, null, 0, 0, 0);
+
+            meter.fail("unexpected_exception");
+
+            // Then: failPath = "unexpected_exception", okPath unset, ERROR log
+            assertMeterState(meter, true, true, null, null, "unexpected_exception", null, 0, 0, 0);
+            assertEquals("operation", meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        // ============================================================================
+        // Termination via fail(path) after Multiple path() Calls
+        // ============================================================================
+
+        @Test
+        @DisplayName("should terminate via fail() after multiple path() calls")
+        @ValidateCleanMeter
+        void shouldTerminateViaFailAfterMultiplePathCalls() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path("first") → path("second") → fail("system_error") is called
+            meter.path("first");
+            assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
+
+            meter.path("second");
+            assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+
+            meter.fail("system_error");
+
+            // Then: failPath = "system_error", okPath unset, ERROR log
+            assertMeterState(meter, true, true, null, null, "system_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        // ============================================================================
+        // Complex Chains with Attributes + Termination
+        // ============================================================================
+
+        @Test
+        @DisplayName("should handle complex chain: description + iterations + path + ok()")
+        @ValidateCleanMeter
+        void shouldHandleComplexChainWithOk() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: m("operation") → iterations(100) → inc() × 50 → path("checkpoint") → ok() is called
+            meter.m("operation");
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            meter.iterations(100);
+            assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
+
+            for (int i = 0; i < 50; i++) {
+                meter.inc();
+            }
+            assertMeterState(meter, true, false, null, null, null, null, 50, 100, 0);
+
+            meter.path("checkpoint");
+            assertMeterState(meter, true, false, "checkpoint", null, null, null, 50, 100, 0);
+
+            meter.ok();
+
+            // Then: description, iterations, okPath all preserved, INFO log
+            assertMeterState(meter, true, true, "checkpoint", null, null, null, 50, 100, 0);
+            assertEquals("operation", meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should handle complex chain: timeLimit + iterations + path + reject()")
+        @ValidateCleanMeter
+        void shouldHandleComplexChainWithReject() {
             // Given: a new, started Meter
             final Meter meter = new Meter(logger).start();
 
-            // When: fail(object) is called
-            final TestObject obj = new TestObject();
-            meter.fail(obj);
+            // When: limitMilliseconds(5000) → inc() × 25 → path("expected") → reject("performance") is called
+            meter.limitMilliseconds(5000);
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
 
-            // Then: Meter is in stopped state with object toString as fail path
-            assertMeterState(meter, true, true, null, null, obj.toString(), null, 0, 0, 0);
+            for (int i = 0; i < 25; i++) {
+                meter.inc();
+            }
+            assertMeterState(meter, true, false, null, null, null, null, 25, 0, 5000);
 
-            // Then: all log messages recorded correctly
+            meter.path("expected");
+            assertMeterState(meter, true, false, "expected", null, null, null, 25, 0, 5000);
+
+            meter.reject("performance_degradation");
+
+            // Then: timeLimit, iterations, rejectPath all correct, INFO log
+            assertMeterState(meter, true, true, null, "performance_degradation", null, null, 25, 0, 5000);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should handle complex chain: description + context + iterations + fail()")
+        @ValidateCleanMeter
+        void shouldHandleComplexChainWithFail() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("critical") → ctx("user", "admin") → inc() × 10 → fail("auth_failure") is called
+            meter.m("critical");
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            meter.ctx("user", "admin");
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            assertEquals("admin", meter.getContext().get("user"));
+
+            for (int i = 0; i < 10; i++) {
+                meter.inc();
+            }
+            assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
+
+            meter.fail("auth_failure");
+
+            // Then: description, iterations, failPath all preserved, ERROR log (context is cleared after emission)
+            assertMeterState(meter, true, true, null, null, "auth_failure", null, 10, 0, 0);
+            assertEquals("critical", meter.getDescription());
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        // ============================================================================
+        // Termination after No Operations (Minimal Meter)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should handle minimal meter: start() then ok()")
+        @ValidateCleanMeter
+        void shouldHandleMinimalMeterOk() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: ok() is called
+            meter.ok();
+
+            // Then: clean transition with no additional attributes, INFO log
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should handle minimal meter: start() then reject()")
+        @ValidateCleanMeter
+        void shouldHandleMinimalMeterReject() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: reject("no_work_done") is called
+            meter.reject("no_work_done");
+
+            // Then: rejectPath captured, INFO log
+            assertMeterState(meter, true, true, null, "no_work_done", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should handle minimal meter: start() then fail()")
+        @ValidateCleanMeter
+        void shouldHandleMinimalMeterFail() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: fail("no_work_done") is called
+            meter.fail("no_work_done");
+
+            // Then: failPath captured, ERROR log
+            assertMeterState(meter, true, true, null, null, "no_work_done", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        // ============================================================================
+        // Slow Operation Detection - Marker and Level Changes
+        // ============================================================================
+
+        @Test
+        @DisplayName("should detect slow operation for ok() - marker changes to MSG_SLOW_OK, level to WARN")
+        @ValidateCleanMeter
+        void shouldDetectSlowOperationForOk() {
+            // Given: a controllable time source with initial time (DAY1)
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+
+            // Given: a new Meter with time limit
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
+            meter.limitMilliseconds(10);
+
+            // When: meter starts
+            meter.start();
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 10);
+
+            // When: time advances beyond limit (simulate 50ms elapsed)
+            timeSource.advanceMiliseconds(50);
+
+            // When: ok() is called
+            meter.ok();
+
+            // Then: isSlow() = true, WARN log with MSG_SLOW_OK marker (not MSG_OK)
+            assertTrue(meter.isSlow());
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 10);
+            AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
         }
     }
 }
