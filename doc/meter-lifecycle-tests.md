@@ -36,8 +36,6 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 | **9** | Post-Stop Invalid Operations (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
 | **10** | Post-Stop Invalid Operations (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
 | **11** | Post-Stop Invalid Operations (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
-| **12** | State-Correcting Transitions | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
-| **13** | Bad Preconditions | ❌ Tier 4a | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
 | **14** | Bad Arguments | ❌ Tier 4b | ILLEGAL | Invalid argument values |
 | **15** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
 | **16** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
@@ -869,19 +867,6 @@ Each test in Groups 2-15 should:
 3. **Skip** redundant initialization checks
 4. **Focus** exclusively on the group's primary concern
 
-### Assertion Strategy
-
-- **Group 1-2**: All assertions pass without logs (valid operations)
-- **Group 3**: Assert state change + INCONSISTENT_* log (pre-start termination with self-correction)
-- **Group 4**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (pre-start invalid)
-- **Group 5**: All assertions pass without logs (post-start valid)
-- **Group 6-8**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (post-stop invalid)
-- **Group 9**: Assert terminal attributes preserved + no state change (happy path)
-- **Group 10**: Assert state changes + error logs (state-correcting)
-- **Group 11-12**: Assert state unchanged + ILLEGAL/INCONSISTENT_* log (invalid flow)
-- **Group 13**: Assert thread-local references correct + stack cleaned
-- **Group 14-15**: Assert combined behavior matches specification
-
 ### Error Log Validation
 
 Use `AssertLogger` for all log validation:
@@ -903,6 +888,7 @@ All test classes should use:
 @WithLocale("en")
 @WithMockLogger
 @ValidateCleanMeter
+@SuppressWarnings({"AssignmentToStaticFieldFromInstanceMethod", "IOResourceOpenedButNotSafelyClosed", "TestMethodWithoutAssertion"})
 class MeterLifeCycleTest { ... }
 ```
 
