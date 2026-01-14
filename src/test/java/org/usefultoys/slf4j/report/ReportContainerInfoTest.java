@@ -54,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li><b>Edge Cases:</b> Covers zero quota/period values and various error conditions in container detection</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportContainerInfo")
 @ValidateCharset
 @ResetReporterConfig

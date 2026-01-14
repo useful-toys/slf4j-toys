@@ -44,6 +44,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
  * Tests verify that ReportJvmArguments correctly reports JVM arguments
  * and censors sensitive arguments based on configurable regex patterns.
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportJvmArguments")
 @ValidateCharset
 @ResetReporterConfig

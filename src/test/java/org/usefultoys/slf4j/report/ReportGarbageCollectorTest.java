@@ -54,6 +54,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
  *   <li><b>Memory Pool Names:</b> Ensures memory pool names associated with each garbage collector are correctly listed and formatted</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportGarbageCollector")
 @ValidateCharset
 @ResetReporterConfig

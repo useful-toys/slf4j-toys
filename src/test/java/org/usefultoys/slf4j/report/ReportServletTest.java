@@ -16,6 +16,8 @@
 
 package org.usefultoys.slf4j.report;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,8 +31,6 @@ import org.usefultoys.test.ResetReporterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -56,6 +56,7 @@ import static org.mockito.Mockito.when;
  *   <li><b>Logger Integration:</b> Ensures reports are logged using the correct logger instances</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportServlet")
 @ValidateCharset
 @ResetReporterConfig

@@ -39,6 +39,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
  * when the servlet context is initialized, and performs no operations when context is destroyed.
  * Uses javax.servlet API (Servlet 3.x).
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportJavaxContextListener")
 @ValidateCharset
 @ResetReporterConfig

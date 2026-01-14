@@ -62,6 +62,7 @@ import static org.mockito.Mockito.when;
  *   <li><b>Configuration Integration:</b> Verifies integration with ReporterConfig for enabling/disabling specific report types</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("Reporter")
 @ValidateCharset
 @ResetReporterConfig

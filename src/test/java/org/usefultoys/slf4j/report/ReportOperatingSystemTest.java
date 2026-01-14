@@ -39,6 +39,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
  *   <li><b>Operating System Information Reporting:</b> Verifies logging of OS architecture, name, version, and separators (file, path, line)</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportOperatingSystem")
 @ValidateCharset
 @ResetReporterConfig

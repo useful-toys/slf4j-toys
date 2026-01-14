@@ -47,6 +47,7 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
  *   <li><b>Non-Matching Regex:</b> Ensures variables are not censored when regex doesn't match</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportSystemEnvironment")
 @ValidateCharset
 @ResetReporterConfig

@@ -57,6 +57,7 @@ import static org.mockito.Mockito.when;
  *   <li><b>Null Host Names Handling:</b> Verifies handling of addresses with null host names</li>
  * </ul>
  */
+@SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportNetworkInterface")
 @ValidateCharset
 @ResetReporterConfig
@@ -71,7 +72,7 @@ class ReportNetworkInterfaceTest {
     @DisplayName("should report loopback interface")
     void shouldReportLoopbackInterface() throws Exception {
         // Given: loopback network interface
-        NetworkInterface mockNif = mock(NetworkInterface.class);
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
         when(mockNif.getName()).thenReturn("lo");
         when(mockNif.getDisplayName()).thenReturn("Loopback");
         when(mockNif.getMTU()).thenReturn(65536);
@@ -101,7 +102,7 @@ class ReportNetworkInterfaceTest {
     @DisplayName("should report physical interface with addresses")
     void shouldReportPhysicalInterfaceWithAddresses() throws Exception {
         // Given: physical interface with IPv4 and IPv6 addresses
-        Inet4Address mockIpv4 = mock(Inet4Address.class);
+        final Inet4Address mockIpv4 = mock(Inet4Address.class);
         when(mockIpv4.getHostAddress()).thenReturn("192.168.1.100");
         when(mockIpv4.getHostName()).thenReturn("host.local");
         when(mockIpv4.getCanonicalHostName()).thenReturn("host.local");
@@ -112,7 +113,7 @@ class ReportNetworkInterfaceTest {
         when(mockIpv4.isMulticastAddress()).thenReturn(false);
         when(mockIpv4.isReachable(5000)).thenReturn(true);
 
-        Inet6Address mockIpv6 = mock(Inet6Address.class);
+        final Inet6Address mockIpv6 = mock(Inet6Address.class);
         when(mockIpv6.getHostAddress()).thenReturn("fe80::1");
         when(mockIpv6.getHostName()).thenReturn("host6.local");
         when(mockIpv6.getCanonicalHostName()).thenReturn("host6.local");
@@ -123,7 +124,7 @@ class ReportNetworkInterfaceTest {
         when(mockIpv6.isMulticastAddress()).thenReturn(false);
         when(mockIpv6.isReachable(5000)).thenReturn(false); // Not reachable
 
-        NetworkInterface mockNif = mock(NetworkInterface.class);
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
         when(mockNif.getName()).thenReturn("eth0");
         when(mockNif.getDisplayName()).thenReturn("Ethernet");
         when(mockNif.getMTU()).thenReturn(1500);
@@ -160,7 +161,7 @@ class ReportNetworkInterfaceTest {
     @DisplayName("should report virtual interface")
     void shouldReportVirtualInterface() throws Exception {
         // Given: virtual network interface
-        NetworkInterface mockNif = mock(NetworkInterface.class);
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
         when(mockNif.getName()).thenReturn("virbr0");
         when(mockNif.getDisplayName()).thenReturn("Virtual Bridge");
         when(mockNif.getMTU()).thenReturn(1500);
@@ -186,7 +187,7 @@ class ReportNetworkInterfaceTest {
     @DisplayName("should report interface with null hardware address")
     void shouldReportInterfaceWithNullHardwareAddress() throws Exception {
         // Given: interface with null hardware address
-        NetworkInterface mockNif = mock(NetworkInterface.class);
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
         when(mockNif.getName()).thenReturn("no_mac");
         when(mockNif.getDisplayName()).thenReturn("No MAC");
         when(mockNif.getMTU()).thenReturn(1500);
@@ -211,7 +212,7 @@ class ReportNetworkInterfaceTest {
     @DisplayName("should handle IO exception on interface property")
     void shouldHandleIOExceptionOnInterfaceProperty() throws Exception {
         // Given: interface that throws SocketException on getMTU
-        NetworkInterface mockNif = mock(NetworkInterface.class);
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
         when(mockNif.getName()).thenReturn("error_nif");
         when(mockNif.getDisplayName()).thenReturn("Error NIF");
         when(mockNif.getMTU()).thenThrow(new SocketException("Mock MTU exception")); // Simulate IOException
@@ -230,7 +231,7 @@ class ReportNetworkInterfaceTest {
     @DisplayName("should handle IO exception on address reachable")
     void shouldHandleIOExceptionOnAddressReachable() throws Exception {
         // Given: interface with address that throws IOException on isReachable
-        Inet4Address mockIpv4 = mock(Inet4Address.class);
+        final Inet4Address mockIpv4 = mock(Inet4Address.class);
         when(mockIpv4.getHostAddress()).thenReturn("127.0.0.1");
         when(mockIpv4.getHostName()).thenReturn("localhost");
         when(mockIpv4.getCanonicalHostName()).thenReturn("localhost");
@@ -241,7 +242,7 @@ class ReportNetworkInterfaceTest {
         when(mockIpv4.isMulticastAddress()).thenReturn(false);
         when(mockIpv4.isReachable(5000)).thenThrow(new IOException("Mock reachable exception")); // Simulate IOException
 
-        NetworkInterface mockNif = mock(NetworkInterface.class);
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
         when(mockNif.getName()).thenReturn("lo_err");
         when(mockNif.getDisplayName()).thenReturn("Loopback Error");
         when(mockNif.getMTU()).thenReturn(65536);
@@ -267,7 +268,7 @@ class ReportNetworkInterfaceTest {
     @DisplayName("should report IPv4 address with all properties")
     void shouldReportIPv4AddressWithAllProperties() throws Exception {
         // Given: IPv4 address with all property flags enabled
-        Inet4Address mockIpv4 = mock(Inet4Address.class);
+        final Inet4Address mockIpv4 = mock(Inet4Address.class);
         when(mockIpv4.getHostAddress()).thenReturn("10.0.0.1");
         when(mockIpv4.getHostName()).thenReturn("internal-host");
         when(mockIpv4.getCanonicalHostName()).thenReturn("internal-host.domain.com");
@@ -278,7 +279,7 @@ class ReportNetworkInterfaceTest {
         when(mockIpv4.isMulticastAddress()).thenReturn(true); // Multicast
         when(mockIpv4.isReachable(5000)).thenReturn(true); // Reachable
 
-        NetworkInterface mockNif = mock(NetworkInterface.class);
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
         when(mockNif.getName()).thenReturn("eth1");
         when(mockNif.getDisplayName()).thenReturn("Internal Network");
         when(mockNif.getMTU()).thenReturn(9000);
@@ -308,7 +309,7 @@ class ReportNetworkInterfaceTest {
     @DisplayName("should report IPv6 address with all properties")
     void shouldReportIPv6AddressWithAllProperties() throws Exception {
         // Given: IPv6 address with all property flags enabled
-        Inet6Address mockIpv6 = mock(Inet6Address.class);
+        final Inet6Address mockIpv6 = mock(Inet6Address.class);
         when(mockIpv6.getHostAddress()).thenReturn("fe80::abcd:1234:5678:90ef");
         when(mockIpv6.getHostName()).thenReturn("ipv6-host");
         when(mockIpv6.getCanonicalHostName()).thenReturn("ipv6-host.domain.com");
@@ -319,7 +320,7 @@ class ReportNetworkInterfaceTest {
         when(mockIpv6.isMulticastAddress()).thenReturn(true); // Multicast
         when(mockIpv6.isReachable(5000)).thenReturn(true); // Reachable
 
-        NetworkInterface mockNif = mock(NetworkInterface.class);
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
         when(mockNif.getName()).thenReturn("eth2");
         when(mockNif.getDisplayName()).thenReturn("IPv6 Network");
         when(mockNif.getMTU()).thenReturn(1500);
@@ -349,7 +350,7 @@ class ReportNetworkInterfaceTest {
     @DisplayName("should report address with null host names")
     void shouldReportAddressWithNullHostNames() throws Exception {
         // Given: address with null host names
-        Inet4Address mockIpv4 = mock(Inet4Address.class);
+        final Inet4Address mockIpv4 = mock(Inet4Address.class);
         when(mockIpv4.getHostAddress()).thenReturn("127.0.0.1");
         when(mockIpv4.getHostName()).thenReturn(null); // Simulate null host name
         when(mockIpv4.getCanonicalHostName()).thenReturn(null); // Simulate null canonical host name
@@ -360,7 +361,7 @@ class ReportNetworkInterfaceTest {
         when(mockIpv4.isMulticastAddress()).thenReturn(false);
         when(mockIpv4.isReachable(5000)).thenReturn(true);
 
-        NetworkInterface mockNif = mock(NetworkInterface.class);
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
         when(mockNif.getName()).thenReturn("lo_null_host");
         when(mockNif.getDisplayName()).thenReturn("Loopback Null Host");
         when(mockNif.getMTU()).thenReturn(65536);
