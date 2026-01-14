@@ -56,9 +56,10 @@ class ReportCalendarTest {
     @Test
     @DisplayName("should log default calendar information")
     void shouldLogDefaultCalendarInformation() {
-        // Given: a calendar info provider with fixed date and default timezone
+        // Given: a calendar info provider with fixed date, timezone, and available IDs
         final Date fixedCurrentDate = new Date(1678886400000L); // March 15, 2023 00:00:00 GMT
-        final TimeZone defaultTimeZone = TimeZone.getDefault();
+        final TimeZone fixedTimeZone = TimeZone.getTimeZone("America/Sao_Paulo");
+        final String[] fixedAvailableIDs = {"America/Sao_Paulo", "UTC", "Europe/London"};
 
         final ReportCalendar.CalendarInfoProvider provider = new ReportCalendar.CalendarInfoProvider() {
             @Override
@@ -68,12 +69,12 @@ class ReportCalendarTest {
 
             @Override
             public TimeZone getDefaultTimeZone() {
-                return TimeZone.getDefault();
+                return fixedTimeZone;
             }
 
             @Override
             public String[] getAvailableTimeZoneIDs() {
-                return TimeZone.getAvailableIDs();
+                return fixedAvailableIDs;
             }
         };
 
@@ -87,19 +88,19 @@ class ReportCalendarTest {
         // When: report is executed
         report.run();
 
-        // Then: should log calendar information with default timezone details
+        // Then: should log calendar information with fixed timezone details
         final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-        df.setTimeZone(defaultTimeZone);
+        df.setTimeZone(fixedTimeZone);
         final String expectedDateString = df.format(fixedCurrentDate);
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Calendar",
             " - current date/time: " + expectedDateString,
-            " - default timezone: " + defaultTimeZone.getDisplayName() + " (" + defaultTimeZone.getID() + ")",
-            "; DST=" + (defaultTimeZone.getDSTSavings() / 60000) + "min",
-            "; observesDST=" + defaultTimeZone.observesDaylightTime(),
-            "; useDST=" + defaultTimeZone.useDaylightTime(),
-            "; inDST=" + defaultTimeZone.inDaylightTime(fixedCurrentDate),
-            "; offset=" + (defaultTimeZone.getRawOffset() / 60000) + "min",
+            " - default timezone: " + fixedTimeZone.getDisplayName() + " (" + fixedTimeZone.getID() + ")",
+            "; DST=" + (fixedTimeZone.getDSTSavings() / 60000) + "min",
+            "; observesDST=" + fixedTimeZone.observesDaylightTime(),
+            "; useDST=" + fixedTimeZone.useDaylightTime(),
+            "; inDST=" + fixedTimeZone.inDaylightTime(fixedCurrentDate),
+            "; offset=" + (fixedTimeZone.getRawOffset() / 60000) + "min",
             " - available IDs:",
             "America/Sao_Paulo; ",
             "UTC; ");
