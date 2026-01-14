@@ -52,7 +52,7 @@ public class Reporter implements Serializable {
      * An {@link Executor} implementation that runs tasks synchronously on the current thread.
      * This is useful for environments where multithreading is restricted or undesired, or for simple applications.
      */
-    public static final Executor sameThreadExecutor = command -> command.run();
+    public static final Executor sameThreadExecutor = Runnable::run;
 
     /**
      * Runs all reports enabled in {@link ReporterConfig} synchronously on the current thread.
