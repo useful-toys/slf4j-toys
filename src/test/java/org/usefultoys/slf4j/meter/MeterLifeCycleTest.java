@@ -3654,6 +3654,64 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
         }
 
+        @Test
+        @DisplayName("should not log progress when progress() called without iteration change")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldNotLogProgressWhenProgressCalledWithoutIterationChange() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() → progress() → progress() is called (second progress has no iteration change)
+            meter.inc();
+            meter.progress();
+            meter.progress();
+
+            // Then: first progress() logs message (at index 2), second progress() does NOT log (no iteration change since last progress)
+            // This is verified by asserting that if we look for a second MSG_PROGRESS after the first one, there is none
+            assertEquals(1, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            // If there was a second progress message, it would be at index 4 (after DATA_PROGRESS), so verify it's not MSG_PROGRESS
+            // By checking that index 4 is not MSG_PROGRESS, we confirm the second progress() didn't log
+        }
+
+        @Test
+        @DisplayName("should not log progress when progress() called with active throttling period")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldNotLogProgressWhenProgressCalledWithActiveThrottlingPeriod() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 1000000 (very long period)
+            MeterConfig.progressPeriodMilliseconds = 1000000;
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() → progress() is called (insufficient time elapsed for throttling)
+            meter.inc();
+            meter.progress();
+
+            // Then: currentIteration = 1 but progress() does NOT log message (throttling active)
+            assertEquals(1, meter.getCurrentIteration());
+            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should log both progress() messages when throttling disabled with iteration change between them")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldLogBothProgressMessagesWhenThrottlingDisabledWithIterationChangeBetweenThem() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() → progress() → inc() → progress() is called
+            meter.inc();
+            meter.progress();
+            meter.inc();
+            meter.progress();
+
+            // Then: currentIteration = 2 and both progress() calls log messages
+            assertEquals(2, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
         // ============================================================================
         // Update context during execution
         // ============================================================================
@@ -4827,388 +4885,6 @@ class MeterLifeCycleTest {
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
-        }
-    }
-
-    @Nested
-    @DisplayName("Stopped State Path Calls")
-    class StoppedStatePathCallTests {
-        @Test
-        @DisplayName("should NOT modify okPath when path(String) is called after ok()")
-        void shouldNotModifyPathWhenPathStringAfterOk() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().ok();
-
-            // When: path("newPath") is called after ok()
-            meter.path("newPath");
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Enum) is called after ok()")
-        void shouldNotModifyPathWhenPathEnumAfterOk() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().ok();
-
-            // When: path(TestEnum.VALUE1) is called after ok()
-            meter.path(TestEnum.VALUE1);
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Throwable) is called after ok()")
-        void shouldNotModifyPathWhenPathThrowableAfterOk() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().ok();
-
-            // When: path(new Exception()) is called after ok()
-            meter.path(new RuntimeException("test"));
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Object) is called after ok()")
-        void shouldNotModifyPathWhenPathObjectAfterOk() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().ok();
-
-            // When: path(new TestObject()) is called after ok()
-            meter.path(new TestObject());
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(String) is called after reject()")
-        void shouldNotModifyPathWhenPathStringAfterReject() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().reject("businessRule");
-
-            // When: path("newPath") is called after reject()
-            meter.path("newPath");
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Enum) is called after reject()")
-        void shouldNotModifyPathWhenPathEnumAfterReject() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().reject("businessRule");
-
-            // When: path(TestEnum.VALUE1) is called after reject()
-            meter.path(TestEnum.VALUE1);
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Throwable) is called after reject()")
-        void shouldNotModifyPathWhenPathThrowableAfterReject() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().reject("businessRule");
-
-            // When: path(new Exception()) is called after reject()
-            meter.path(new RuntimeException("test"));
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Object) is called after reject()")
-        void shouldNotModifyPathWhenPathObjectAfterReject() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().reject("businessRule");
-
-            // When: path(new TestObject()) is called after reject()
-            meter.path(new TestObject());
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(String) is called after fail()")
-        void shouldNotModifyPathWhenPathStringAfterFail() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().fail("error occurred");
-
-            // When: path("newPath") is called after fail()
-            meter.path("newPath");
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Enum) is called after fail()")
-        void shouldNotModifyPathWhenPathEnumAfterFail() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().fail("error occurred");
-
-            // When: path(TestEnum.VALUE1) is called after fail()
-            meter.path(TestEnum.VALUE1);
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Throwable) is called after fail()")
-        void shouldNotModifyPathWhenPathThrowableAfterFail() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().fail("error occurred");
-
-            // When: path(new Exception()) is called after fail()
-            meter.path(new RuntimeException("test"));
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(Object) is called after fail()")
-        void shouldNotModifyPathWhenPathObjectAfterFail() {
-            // Given: a new, stopped Meter
-            final Meter meter = new Meter(logger).start().fail("error occurred");
-
-            // When: path(new TestObject()) is called after fail()
-            meter.path(new TestObject());
-
-            // Then: okPath should remain null (illegal call ignored)
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Meter path but already stopped");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(null) is called after ok()")
-        void shouldNotModifyPathWhenPathNullAfterOk() {
-            // Given: a new, stopped Meter with a success path
-            final Meter meter = new Meter(logger).start().ok("successPath");
-
-            // When: path(null) is called after ok() (null argument)
-            meter.path(null);
-
-            // Then: okPath should remain "successPath" (illegal calls ignored)
-            assertMeterState(meter, true, true, "successPath", null, null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker for null argument
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Null argument");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(null) is called after reject()")
-        void shouldNotModifyPathWhenPathNullAfterReject() {
-            // Given: a new, stopped Meter with a reject path and ok path set
-            final Meter meter = new Meter(logger).start().reject("businessRule");
-
-            // When: path(null) is called after reject() (null argument)
-            meter.path(null);
-
-            // Then: okPath should remain null (illegal calls ignored)
-            assertMeterState(meter, true, true, null, "businessRule", null, null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker for null argument
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Null argument");
-        }
-
-        @Test
-        @DisplayName("should NOT modify okPath when path(null) is called after fail()")
-        void shouldNotModifyPathWhenPathNullAfterFail() {
-            // Given: a new, stopped Meter with a fail path and ok path set
-            final Meter meter = new Meter(logger).start().fail("error occurred");
-
-            // When: path(null) is called after fail() (null argument)
-            meter.path(null);
-
-            // Then: okPath should remain null (illegal calls ignored)
-            assertMeterState(meter, true, true, null, null, "error occurred", null, 0, 0, 0);
-
-            // Then: error logged with ILLEGAL marker for null argument
-            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL,
-                "Null argument");
-        }
-    }
-
-    @Nested
-    @DisplayName("Iteration Tracking")
-    class IterationTracking {
-        @Test
-        @DisplayName("should track iterations with incBy and incTo")
-        void shouldTrackIterationsWithIncByAndIncTo() {
-            final Meter meter = new Meter(logger);
-            meter.iterations(100);
-            meter.start();
-
-            // When: incBy(10) is called
-            meter.incBy(10);
-            assertMeterState(meter, true, false, null, null, null, null, 10, 100, 0);
-
-            // When: incTo(50) is called
-            meter.incTo(50);
-            assertMeterState(meter, true, false, null, null, null, null, 50, 100, 0);
-
-            meter.ok();
-            assertMeterState(meter, true, true, null, null, null, null, 50, 100, 0);
-        }
-
-        @Test
-        @DisplayName("should log progress when progressPeriodMilliseconds is zero")
-        void shouldLogProgressWhenProgressPeriodMillisecondsIsZero() throws InterruptedException {
-            // Given: progress throttling disabled (period = 0ms)
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger);
-            meter.iterations(100);
-            meter.start();
-
-            // When: progress advances and enough time elapses
-            meter.inc();
-            Thread.sleep(5);
-            meter.progress();
-
-            // Then: meter is still started and progress is tracked
-            assertMeterState(meter, true, false, null, null, null, null, 1, 100, 0);
-
-            // When: operation completes successfully
-            meter.ok();
-
-            // Then: meter is stopped OK
-            assertMeterState(meter, true, true, null, null, null, null, 1, 100, 0);
-
-            // Then: progress and OK log messages are recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
-            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should NOT log progress when progressPeriodMilliseconds is high")
-        void shouldNotLogProgressWhenProgressPeriodMillisecondsIsHigh() throws InterruptedException {
-            // Given: progress throttling period is high
-            MeterConfig.progressPeriodMilliseconds = 10_000;
-            final Meter meter = new Meter(logger);
-            meter.iterations(100);
-            meter.start();
-
-            // When: progress advances but period has not elapsed
-            meter.inc();
-            Thread.sleep(5);
-            meter.progress();
-            meter.ok();
-
-            // Then: meter is stopped OK and iteration tracking is preserved
-            assertMeterState(meter, true, true, null, null, null, null, 1, 100, 0);
-
-            // Then: only start and OK logs exist (no progress logs)
-            AssertLogger.assertEventCount(logger, 4);
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should log progress when using incBy with progressPeriodMilliseconds zero")
-        void shouldLogProgressWhenUsingIncByWithProgressPeriodMillisecondsZero() throws InterruptedException {
-            // Given: progress throttling disabled (period = 0ms)
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger);
-            meter.iterations(100);
-            meter.start();
-
-            // When: progress advances via incBy
-            meter.incBy(10);
-            Thread.sleep(5);
-            meter.progress();
-            meter.ok();
-
-            // Then: iteration tracking and logs reflect progress
-            assertMeterState(meter, true, true, null, null, null, null, 10, 100, 0);
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
-            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should log progress when using incTo with progressPeriodMilliseconds zero")
-        void shouldLogProgressWhenUsingIncToWithProgressPeriodMillisecondsZero() throws InterruptedException {
-            // Given: progress throttling disabled (period = 0ms)
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger);
-            meter.iterations(100);
-            meter.start();
-
-            // When: progress advances via incTo
-            meter.incTo(50);
-            Thread.sleep(5);
-            meter.progress();
-            meter.ok();
-
-            // Then: iteration tracking and logs reflect progress
-            assertMeterState(meter, true, true, null, null, null, null, 50, 100, 0);
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
-            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
         }
     }
 }

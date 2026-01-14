@@ -32,15 +32,16 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 | **5** | Pre-Start Termination | ⚠️ Tier 3 | INCONSISTENT_* | Termination without start (self-correcting) |
 | **6** | Pre-Start Invalid Operations | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations before start |
 | **7** | Post-Start Attribute Updates | ☑️ Tier 2 | None | Attribute updates during execution |
-| **8** | Post-Stop Invalid Operations (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
-| **9** | Post-Stop Invalid Operations (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
-| **10** | Post-Stop Invalid Operations (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
-| **11** | State-Correcting Transitions | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
-| **12** | Bad Preconditions | ❌ Tier 4a | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
-| **13** | Bad Arguments | ❌ Tier 4b | ILLEGAL | Invalid argument values |
-| **14** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
-| **15** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
-| **16** | Complex Scenarios | All | Varies | Realistic workflows |
+| **8** | Post-Start Termination | ✅ Tier 1 | Normal | Termination via ok/reject/fail with path variations |
+| **9** | Post-Stop Invalid Operations (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
+| **10** | Post-Stop Invalid Operations (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
+| **11** | Post-Stop Invalid Operations (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
+| **12** | State-Correcting Transitions | ⚠️ Tier 3 | INCONSISTENT_* | Violations that self-correct |
+| **13** | Bad Preconditions | ❌ Tier 4a | ILLEGAL/INCONSISTENT_* | Invalid call sequences |
+| **14** | Bad Arguments | ❌ Tier 4b | ILLEGAL | Invalid argument values |
+| **15** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
+| **16** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
+| **17** | Complex Scenarios | All | Varies | Realistic workflows |
 
 ---
 
@@ -138,17 +139,37 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 5. **Created → Started → OK with mixed iterations and progress**
    - `new Meter() → iterations(15) → start() → inc() × 5 → progress() → inc() × 5 → progress() → inc() x 5 → ok()`
    - Verify currentIteration incremented on each `inc()` call
-   - Verify `progress()` calls logged periodically during execution (throttled)
+   - Verify `progress()` calls logged periodically during execution (not throttled)
    - Verify progress does not change lifecycle state (remains Started)
    - Verify final currentIteration = 15
    - Verify `getIterationsPerSecond()` calculated correctly
    - Verify INFO log with completion report including iteration and progress metrics
    - Verify progress calls interleaved correctly with iteration increments
+   - 
+5. **Created → Started → OK with mixed iterations and consecutive progress**
+    - `new Meter() → iterations(15) → start() → inc() × 5 → progress() → progress() → inc() x 5 → ok()`
+    - Verify currentIteration incremented on each `inc()` call
+    - Verify `progress()` calls logged periodically during execution (not throttled)
+    - Verify progress does not change lifecycle state (remains Started)
+    - Verify final currentIteration = 15
+    - Verify `getIterationsPerSecond()` calculated correctly
+    - Verify INFO log with completion report including iteration and progress metrics
+    - Verify progress calls interleaved correctly with iteration increments
 
+6. **Created → Started → OK with mixed iterations and progress with throttling **
+    - `new Meter() → iterations(15) → start() → inc() × 5 → progress() → inc() × 5 → progress() → inc() x 5 → ok()`
+    - Verify currentIteration incremented on each `inc()` call
+    - Verify `progress()` calls logged periodically during execution (throttled)
+    - Verify progress does not change lifecycle state (remains Started)
+    - Verify final currentIteration = 15
+    - Verify `getIterationsPerSecond()` calculated correctly
+    - Verify INFO log with completion report including iteration and progress metrics
+    - Verify progress calls interleaved
+    - 
 7. **Created → Started → OK with time limit (NOT slow)**
     - `new Meter().start() → limitMilliseconds(50) → [execute ~10ms] → ok()`
     - Verify `timeLimit = 50`
-    - Verify `executionTime < timeLimit` (e.g. 100 < 50)
+    - Verify `executionTime < timeLimit`
     - Verify `isSlow() = false`
     - Verify no slow operation warnings in INFO log
     - Verify completion report includes timing metrics
@@ -156,10 +177,17 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 8. **Created → Started → OK with time limit (IS slow)**
     - `new Meter().start() → limitMilliseconds(50) → [execute ~100ms] → ok()`
     - Verify `timeLimit = 50`
-    - Verify `executionTime < timeLimit` (e.g. 100 < 50)
+    - Verify `executionTime > timeLimit`
     - Verify `isSlow() = true`
     - Verify slow operation warning included in INFO log
     - Verify completion report highlights slow timing
+
+8. **Created → Started → Reject with time limit (IS slow)**
+    - `new Meter().start() → limitMilliseconds(50) → [execute ~100ms] → ok()`
+    - Verify `timeLimit = 50`
+   - Verify `executionTime > timeLimit`
+    - Verify `isSlow() = true`
+    - Verify no slow operation warning included in INFO log
 
 9. **Created → Started → OK with high iteration count + time limit (NOT slow)**
    - `new Meter() → iterations(15) → limitMilliseconds(50) → start() → inc() × 5 -> sleep(5) → progress() → inc() × 5 -> sleep(5) → progress() → inc() x 5 -> sleep(5) → ok()`
@@ -181,6 +209,13 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
     - Verify INFO log includes slow operation warning with timing details
 
 11. **Created → Started → Rejected with iterations**
+    - `new Meter().start() → inc() × 25 → reject("validation_failed")`
+    - Verify currentIteration = 25 before rejection
+    - Verify rejectPath = "validation_failed"
+    - Verify WARN log with rejection report including iteration count
+    - Verify `getIterationsPerSecond()` calculated for rejected operation
+
+11. **Created → Started → Failed with iterations**
     - `new Meter().start() → inc() × 25 → reject("validation_failed")`
     - Verify currentIteration = 25 before rejection
     - Verify rejectPath = "validation_failed"
@@ -529,6 +564,9 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - `start() → incTo(-5) → progress()` → verify negative target rejected (logs ILLEGAL), currentIteration unchanged (0), progress message still logged
    - `start() → incTo(0) → progress()` → verify zero target rejected (logs ILLEGAL), currentIteration unchanged (0), progress message still logged
    - `start() → inc() → incBy(-1) → incTo(0) → inc() → progress()` → verify invalid attempts skipped, valid ones succeed, progress message logged
+   - `start() → inc() → progress() → progress()` → verify second progress() does NOT generate message (no iteration change), currentIteration = 1 (requires `MeterConfig.progressPeriodMilliseconds=0`)
+   - `start() → inc() → progress()` with `MeterConfig.progressPeriodMilliseconds=1000000` → verify progress() does NOT generate message (throttling active, insufficient time elapsed)
+   - `start() → inc() → progress() → inc() → progress()` with `MeterConfig.progressPeriodMilliseconds=0` → verify both progress() calls generate messages (no throttling, iteration changed between them)
 
    **Note:** To observe progress messages in test assertions, set `MeterConfig.progressPeriodMilliseconds = 0` before starting the meter. This eliminates the throttling delay and allows immediate progress reporting on each call to `progress()`, making message validation possible in unit tests.
 
@@ -576,7 +614,101 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 8: Post-Stop Invalid Operations - OK State (❌ Tier 4 - State-Preserving)**
+### **Group 8: Post-Start Termination (✅ Tier 1 - Valid State-Changing)**
+
+**Purpose:** Validate that meters started with various attribute combinations can be terminated via all four paths (ok, ok(path), reject(path), fail(path)) with different path type variations and path() call sequences. Tests verify correct state transitions, appropriate log levels, and outcome attribute storage.
+
+**Test Scenarios:**
+
+#### 1. **Termination via ok() - No Path Configuration**
+   - `start() → ok()` → verify meter transitions to OK state, okPath unset, INFO log
+   - `start() → m("operation") → ok()` → verify description preserved, okPath unset, INFO log
+   - `start() → inc() × 5 → ok()` → verify currentIteration = 5 preserved, INFO log with metrics
+
+#### 2. **Termination via ok(path) with Path Type Variations - Direct Path Argument**
+   - **String path**: `start() → ok("success_outcome")` → verify okPath = "success_outcome", INFO log
+   - **Enum path**: `start() → ok(OutcomeType.SUCCESS)` → verify okPath = enum toString(), INFO log
+   - **Throwable path**: `start() → ok(new Exception("success_cause"))` → verify okPath = exception class name, INFO log
+   - **Object path**: `start() → ok(new OutcomeObject())` → verify okPath = object toString(), INFO log
+   - **Null path**: `start() → ok(null)` → verify okPath remains unset, logs ILLEGAL, completes with INFO log
+
+#### 3. **Termination via ok() after Single path() Call**
+   - `start() → path("configured_path") → ok()` → verify okPath = "configured_path", INFO log (path() sets default for ok())
+   - `start() → path("configured_path") → ok("override_path")` → verify okPath = "override_path", INFO log (ok(path) overrides path())
+   - `start() → m("step") → path("step_path") → ok()` → verify okPath = "step_path", description and path both preserved, INFO log
+
+#### 4. **Termination via ok() after Multiple path() Calls (Last Wins)**
+   - `start() → path("first") → path("second") → ok()` → verify okPath = "second", INFO log
+   - `start() → path("first") → path("second") → path("third") → ok()` → verify okPath = "third", INFO log
+   - `start() → path("first") → path("second") → ok("final_override")` → verify okPath = "final_override", INFO log (ok() overrides last path())
+
+#### 5. **Termination via reject(path) with Path Type Variations**
+   - **String cause**: `start() → reject("validation_error")` → verify rejectPath = "validation_error", INFO log
+   - **Enum cause**: `start() → reject(RejectionReason.INVALID_INPUT)` → verify rejectPath = enum toString(), INFO log
+   - **Throwable cause**: `start() → reject(new IllegalArgumentException("invalid format"))` → verify rejectPath = exception class name, INFO log
+   - **Object cause**: `start() → reject(new ValidationError())` → verify rejectPath = object toString(), INFO log
+
+#### 6. **Termination via reject(path) after Single path() Call**
+   - `start() → path("ok_path") → reject("business_error")` → verify rejectPath = "business_error", okPath remains unset, INFO log
+   - `start() → m("step") → path("ok_expectation") → reject("precondition_failed")` → verify rejectPath = "precondition_failed", okPath unset, INFO log
+   - Verify reject() path is independent from path() call (path() doesn't affect reject outcome)
+
+#### 7. **Termination via reject(path) after Multiple path() Calls**
+   - `start() → path("first") → path("second") → reject("business_rule")` → verify rejectPath = "business_rule", okPath unset, INFO log
+   - `start() → path("configured") → path("updated") → reject("validation_failed")` → verify rejectPath = "validation_failed", INFO log
+   - Verify multiple path() calls don't affect reject() outcome
+
+#### 8. **Termination via fail(path) with Path Type Variations**
+   - **String cause**: `start() → fail("critical_error")` → verify failPath = "critical_error", ERROR log
+   - **Enum cause**: `start() → fail(ErrorType.DATABASE_FAILURE)` → verify failPath = enum toString(), ERROR log
+   - **Throwable cause**: `start() → fail(new SQLException("connection refused"))` → verify failPath = exception details, ERROR log
+   - **Object cause**: `start() → fail(new SystemError())` → verify failPath = object toString(), ERROR log
+
+#### 9. **Termination via fail(path) after Single path() Call**
+   - `start() → path("success_expectation") → fail("timeout")` → verify failPath = "timeout", okPath remains unset, ERROR log
+   - `start() → m("operation") → path("ok_path") → fail("unexpected_exception")` → verify failPath = "unexpected_exception", okPath unset, ERROR log
+   - Verify fail() path is independent from path() call
+
+#### 10. **Termination via fail(path) after Multiple path() Calls**
+   - `start() → path("first") → path("second") → fail("system_error")` → verify failPath = "system_error", okPath unset, ERROR log
+   - `start() → path("configured") → path("updated") → fail("critical_failure")` → verify failPath = "critical_failure", ERROR log
+   - Verify multiple path() calls don't affect fail() outcome
+
+#### 11. **Termination via ok() with success() Alias**
+   - `start() → success()` → alias for ok(), verify meter transitions to OK state, okPath unset, INFO log
+   - `start() → success("alias_path")` → verify okPath = "alias_path", INFO log
+   - `start() → path("configured") → success()` → verify okPath = "configured", INFO log (path() sets default for success())
+
+#### 12. **ok(null) vs path(null) Semantics - Different Behaviors**
+   - `start() → path(null) → ok()` → verify path rejects null (logs ILLEGAL), okPath = null, INFO log for ok()
+   - `start() → path("validPath") → ok(null)` → verify ok() ignores null (logs ILLEGAL), okPath = "validPath" preserved, INFO log (ok() does not overwrite with null)
+   - `start() → ok(null)` → verify okPath = null, ILLEGAL logged, completes with INFO log
+   - **Key difference**: ok(null) attempts completion with null, path(null) rejects null but path() can still proceed to ok()
+
+#### 13. **fail(Throwable) with Separate className and message**
+   - `start() → fail(new SQLException("connection refused"))` → verify failPath = "SQLException" (className), failMessage = "connection refused" (message), ERROR log
+   - `start() → fail(new RuntimeException("null pointer"))` → verify failPath = "RuntimeException", failMessage = "null pointer" (separated), ERROR log
+   - **Important**: Throwable cause captures className and message as separate attributes, not combined in failPath
+
+#### 14. **Complex Chains with Attributes + Termination**
+   - `start() → m("operation") → iterations(100) → inc() × 50 → path("checkpoint") → ok()` → verify description, iterations, okPath all preserved, INFO log
+   - `start() → limitMilliseconds(5000) → inc() × 25 → path("expected") → reject("performance_degradation")` → verify timeLimit, iterations, rejectPath all correct, INFO log
+   - `start() → m("critical") → ctx("user", "admin") → inc() × 10 → fail("auth_failure")` → verify description, context, iterations, failPath all preserved, ERROR log
+
+#### 17. **Termination after No Operations (Minimal Meter)**
+   - `start() → ok()` → verify clean transition with no additional attributes, INFO log
+   - `start() → reject("no_work_done")` → verify rejectPath captured, INFO log
+   - `start() → fail("no_work_done")` → verify failPath captured, ERROR log
+
+#### 18. **Slow Operation Detection - Marker and Level Changes**
+   - **ok() with slow**: `start() → limitMilliseconds(10) → [simulate 100ms] → ok()` → verify isSlow() = true, WARN log with MSG_SLOW_OK marker (not MSG_OK)
+   - **reject() with slow**: `start() → limitMilliseconds(10) → [simulate 100ms] → reject("timeout")` → verify isSlow() = true, INFO log (normal level, may have MSG_SLOW_REJECT)
+   - **fail() with slow**: `start() → limitMilliseconds(10) → [simulate 100ms] → fail("timeout")` → verify isSlow() = true, ERROR log with slow indication
+   - **Important**: Slow detection changes log marker from MSG_* to MSG_SLOW_* for ok()
+
+---
+
+### **Group 9: Post-Stop Invalid Operations - OK State (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that operations on terminated meters (OK state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped) and do not change state or outcome attributes.
 
@@ -639,7 +771,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 9: Post-Stop Invalid Operations - Rejected State (❌ Tier 4 - State-Preserving)**
+### **Group 10: Post-Stop Invalid Operations - Rejected State (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that operations on rejected meters (Rejected state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with rejection) and do not change state or outcome attributes.
 
@@ -682,7 +814,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 10: Post-Stop Invalid Operations - Failed State (❌ Tier 4 - State-Preserving)**
+### **Group 11: Post-Stop Invalid Operations - Failed State (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that operations on failed meters (Failed state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with failure) and do not change state or outcome attributes.
 
@@ -725,160 +857,6 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 11: State-Correcting Transitions (⚠️ Tier 3 - State-Correcting)**
-
-**Purpose:** Validate that Meter handles violations of expected flow gracefully by self-correcting. These calls violate the API contract but achieve valid state with error logs.
-
-**Test Scenarios:**
-
-1. **Multiple termination attempts (first-termination-wins immutability)**
-   - `start() → ok() → ok()` → second ok ignored, state unchanged
-   - `start() → ok() → reject("cause")` → reject ignored
-   - `start() → ok() → fail("cause")` → fail ignored
-   - `start() → reject("cause1") → fail("cause2")` → fail ignored
-   - `start() → fail("cause") → ok()` → ok ignored
-   - Verify INCONSISTENT_* logs for extra attempts
-
-2. **Start after already started**
-   - `start() → start()` → second start ignored, logs ILLEGAL
-   - Verify startTime unchanged
-   - Verify meter remains in Started state
-
----
-
-### **Group 12: Bad Preconditions (❌ Tier 4a - State-Preserving)**
-
-**Purpose:** Validate that Meter rejects calls with invalid preconditions by preserving current state and logging errors.
-
-**Test Scenarios:**
-
-1. **Increment without starting**
-   - `new Meter() → inc()` → logs INCONSISTENT_INCREMENT
-   - `new Meter() → incBy(5)` → logs INCONSISTENT_INCREMENT
-   - `new Meter() → incTo(10)` → logs INCONSISTENT_INCREMENT
-   - Verify currentIteration unchanged
-
-2. **Progress without starting**
-   - `new Meter() → progress()` → logs INCONSISTENT_PROGRESS
-   - Verify state unchanged
-
-3. **Set path before starting**
-   - `new Meter() → path("some_path")` → logs ILLEGAL
-   - Verify okPath not defined
-
-4. **Start twice**
-   - `new Meter() → start() → start()` → second start ignored, logs ILLEGAL
-   - Verify startTime unchanged
-
-5. **Thread-local inconsistency**
-   - Create Meter m1, create Meter m2, call `m1.ok()` when m2 is current
-   - Logs INCONSISTENT_* for wrong thread-local context
-
----
-
-### **Group 13: Bad Arguments (❌ Tier 4b - State-Preserving)**
-
-**Purpose:** Validate that Meter rejects calls with invalid arguments by preserving current state and logging errors.
-
-**Test Scenarios:**
-
-1. **Invalid values before starting**
-   - `iterations(0)`, `iterations(-1)` → logs ILLEGAL
-   - `limitMilliseconds(0)`, `limitMilliseconds(-1)` → logs ILLEGAL
-   - `m(null)` when message required → logs ILLEGAL
-   - `m("format", ...)` with null/invalid format → logs ILLEGAL
-
-2. **Invalid values while started**
-   - `incBy(0)`, `incBy(-1)` → logs ILLEGAL
-   - `incTo(n)` where n <= currentIteration → logs ILLEGAL
-   - `ok(null)` if path required → logs ILLEGAL
-   - `reject(null)`, `fail(null)` → logs ILLEGAL
-   - `path(null)` → logs ILLEGAL
-
-3. **Invalid values on terminated meter**
-   - `ok() → ok()`, `ok() → reject()`, `ok() → fail()` → logs INCONSISTENT_*
-   - `ok() → inc()`, `ok() → progress()` → logs INCONSISTENT_*
-
-4. **Invalid constructor arguments**
-   - `new Meter(null)` → throws exception (@NonNull validation)
-
----
-
-### **Group 14: Terminal Immutability (❌ Tier 4 - State-Preserving)**
-
-**Purpose:** Validate that operations on terminal states do not alter core outcome attributes, preserving the first-termination-wins guarantee.
-
-**Test Scenarios:**
-
-1. **On OK state**
-   - `ok() → path("new_path")` → ignored
-   - `ok() → iterations(100)` → ignored
-   - `ok() → inc()` → ignored
-   - Verify original outcome path preserved
-
-2. **On Rejected state**
-   - `reject() → path("new_path")` → ignored
-   - `reject() → iterations(100)` → ignored
-   - `reject() → inc()` → ignored
-   - Verify original rejectPath preserved
-
-3. **On Failed state**
-   - `fail() → path("new_path")` → ignored
-   - `fail() → iterations(100)` → ignored
-   - `fail() → inc()` → ignored
-   - Verify original failPath preserved
-
----
-
-### **Group 15: Thread-Local Stack Management (Mixed Tiers)**
-
-**Purpose:** Validate correct behavior of thread-local Meter stack for single and nested Meters.
-
-**Test Scenarios:**
-
-1. **Single Meter (no nesting)**
-   - `Meter m → start() → getCurrentInstance() returns m`
-   - `m → ok() → getCurrentInstance() returns "unknown"`
-   - Verify stack cleaned after test
-
-2. **Nested Meters (parent-child)**
-   - `Meter m1 → start() → Meter m2 → start() → m2.ok() → m1.ok()`
-   - Verify m1 becomes current again after m2 terminates
-   - Verify parent-child relationship maintained
-   - Verify stack cleaned after test
-
-3. **@ValidateCleanMeter validation**
-   - Verify each test leaves stack clean
-   - Test fails if non-unknown Meter left on stack
-   - Provides descriptive error message for abandoned Meters
-
----
-
-### **Group 16: Complex Combined Scenarios (All Tiers)**
-
-**Purpose:** Validate realistic, complex flows that combine multiple aspects of Meter behavior.
-
-**Test Scenarios:**
-
-1. **Operation with progress and context**
-   - `start() → m("starting") → iterations(100) → [loop: inc() → progress() throttled] → m("complete") → ok("done")`
-   - Verify context, progress, and iterations captured
-
-2. **Slow operation with timeLimit**
-   - `start() → limitMilliseconds(100) → [operation >100ms] → ok()`
-   - Verify `isSlow() == true`
-   - Verify log changes from INFO to WARN
-
-3. **Sub-operations**
-   - `start() → sub("subtask1") → progress() → sub("subtask2") → ok()`
-   - Verify sub-operations generate separate entries
-   - Verify parent-child relationships
-
-4. **Error recovery with state-correcting**
-   - `start() → [business error] → ok() [called incorrectly] → verify terminates despite error`
-   - Simulates real scenario where business code calls ok() out of order
-
----
 
 
 ## Implementation Guidelines
