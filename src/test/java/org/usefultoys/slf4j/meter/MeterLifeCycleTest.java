@@ -15,12 +15,12 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent.Level;
+import org.usefultoys.slf4j.internal.TestTimeSource;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -92,7 +92,7 @@ class MeterLifeCycleTest {
      * @param rejectPath            the expected value of the "rejectPath" property, or {@code null} if it is expected to be null
      * @param failPath              the expected value of the "failPath" property, or {@code null} if it is expected to be null
      * @param failMessage           the expected value of the "*/
-    private void assertMeterState(final Meter meter, final boolean started, final boolean stopped, final String okPath, final String rejectPath, final String failPath, final String failMessage, final long currentIteration, final long expectedIterations, final long timeLimitMilliseconds) {
+    void assertMeterState(final Meter meter, final boolean started, final boolean stopped, final String okPath, final String rejectPath, final String failPath, final String failMessage, final long currentIteration, final long expectedIterations, final long timeLimitMilliseconds) {
         if (started) {
             assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         } else {
@@ -281,7 +281,7 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Group 2: Happy Path (✅ Tier 1 - Valid State-Changing)")
+    @DisplayName("Group 2: Happy Path (✅ Tier 1)")
     class HappyPath {
 
         // ============================================================================
@@ -627,7 +627,8 @@ class MeterLifeCycleTest {
         @DisplayName("should transition Created → Started → OK with mixed iterations and progress")
         void shouldTransitionCreatedToStartedToOkWithMixedIterationsAndProgress() throws InterruptedException {
             // Given: a meter with expected iterations configured
-            final Meter meter = new Meter(logger);
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
             meter.iterations(15);
             MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
 
@@ -638,18 +639,21 @@ class MeterLifeCycleTest {
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
             
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
             
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.ok();
 
             // Then: meter should be in OK state with correct iteration count
@@ -664,6 +668,131 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 7, Level.TRACE, Markers.DATA_OK);
         }
 
+        @Test
+        @DisplayName("Created → Started → OK with mixed iterations and consecutive progress")
+        void shouldTransitionCreatedToStartedToOkWithMixedIterationsAndProgress2() throws InterruptedException {
+            // Given: a meter with expected iterations configured
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
+            meter.iterations(15);
+            MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
+
+            // When: meter is started, incremented with progress calls, and completes
+            meter.start();
+
+            // First batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
+            meter.progress();
+
+            // Second batch: no iterations
+            meter.progress(); // won't print log with no more iterations
+
+            // Third batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
+            meter.ok();
+
+            // Then: meter should be in OK state with correct iteration count
+            assertMeterState(meter, true, true, null, null, null, null, 10, 15, 0);
+
+            // Then: progress messages should have been logged (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with mixed iterations and progress (no time advance)")
+        void shouldTransitionCreatedToStartedToOkWithMixedIterationsAndProgress3() throws InterruptedException {
+            // Given: a meter with expected iterations configured
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
+            meter.iterations(15);
+            MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
+
+            // When: meter is started, incremented with progress calls, and completes
+            meter.start();
+
+            // First batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
+            meter.progress();
+
+            // Second batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(0); // Execute 0ms
+            meter.progress(); // won't print log since no time has passed
+
+            // Third batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
+            meter.ok();
+
+            // Then: meter should be in OK state with correct iteration count
+            assertMeterState(meter, true, true, null, null, null, null, 15, 15, 0);
+
+            // Then: progress messages should have been logged (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → OK with mixed iterations and progress (with throttling)")
+        void shouldTransitionCreatedToStartedToOkWithMixedIterationsAndProgress4() throws InterruptedException {
+            // Given: a meter with expected iterations configured
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
+            meter.iterations(15);
+            MeterConfig.progressPeriodMilliseconds = 50; // Enable throttling for test
+
+            // When: meter is started, incremented with progress calls, and completes
+            meter.start();
+
+            // First batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
+            meter.progress(); // won't log due to throttling (40 < 50)
+
+            // Second batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
+            meter.progress();
+
+            // Third batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
+            meter.ok();
+
+            // Then: meter should be in OK state with correct iteration count
+            assertMeterState(meter, true, true, null, null, null, null, 15, 15, 0);
+
+            // Then: progress messages should have been logged (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
+        }
+
         // ============================================================================
         // Created → Started → OK with time limit (NOT slow)
         // ============================================================================
@@ -671,13 +800,14 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should transition Created → Started → OK with time limit (NOT slow)")
         void shouldTransitionCreatedToStartedToOkWithTimeLimitNotSlow() throws InterruptedException {
-            // Given: a meter with time limit configured
-            final Meter meter = new Meter(logger);
-            meter.start();
+            // Given: a started meter with time limit configured
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
             meter.limitMilliseconds(50);
+            meter.start();
 
             // When: operation completes within time limit
-            Thread.sleep(10); // Execute ~10ms
+            timeSource.advanceMiliseconds(10);
             meter.ok();
 
             // Then: meter should be in OK state and NOT slow
@@ -696,13 +826,14 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should transition Created → Started → OK with time limit (IS slow)")
         void shouldTransitionCreatedToStartedToOkWithTimeLimitIsSlow() throws InterruptedException {
-            // Given: a meter with time limit configured
-            final Meter meter = new Meter(logger);
-            meter.start();
+            // Given: a started meter with time limit configured
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
             meter.limitMilliseconds(50);
+            meter.start();
 
             // When: operation exceeds time limit
-            Thread.sleep(100); // Execute ~100ms
+            timeSource.advanceMiliseconds(100); // Execute ~100ms
             meter.ok();
 
             // Then: meter should be in OK state and IS slow
@@ -714,6 +845,50 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
         }
 
+        @Test
+        @DisplayName("should transition Created → Started → Reject with time limit (IS slow)")
+        void shouldTransitionCreatedToStartedToRejectWithTimeLimitIsSlow() throws InterruptedException {
+            // Given: a started meter with time limit configured
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
+            meter.limitMilliseconds(50);
+            meter.start();
+
+            // When: operation exceeds time limit
+            timeSource.advanceMiliseconds(100); // Execute ~100ms
+            meter.reject("business_error");
+
+            // Then: meter should be in OK state and IS slow
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 50);
+            assertTrue(meter.isSlow(), "meter should be slow");
+
+            // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Fail with time limit (IS slow)")
+        void shouldTransitionCreatedToStartedToFailWithTimeLimitIsSlow() throws InterruptedException {
+            // Given: a started meter with time limit configured
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
+            meter.limitMilliseconds(50);
+            meter.start();
+
+            // When: operation exceeds time limit
+            timeSource.advanceMiliseconds(100); // Execute ~100ms
+            meter.fail("business_error");
+
+            // Then: meter should be in OK state and IS slow
+            assertMeterState(meter, true, true, null, null, "business_error", null, 0, 0, 50);
+            assertTrue(meter.isSlow(), "meter should be slow");
+
+            // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
         // ============================================================================
         // Created → Started → OK with high iteration count + time limit (NOT slow)
         // ============================================================================
@@ -722,7 +897,8 @@ class MeterLifeCycleTest {
         @DisplayName("should transition Created → Started → OK with high iteration count + time limit (NOT slow)")
         void shouldTransitionCreatedToStartedToOkWithHighIterationCountAndTimeLimitNotSlow() throws InterruptedException {
             // Given: a meter with iterations and time limit configured
-            final Meter meter = new Meter(logger);
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
             meter.iterations(15);
             meter.limitMilliseconds(100); // Increased to ensure NOT slow
             MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
@@ -730,32 +906,32 @@ class MeterLifeCycleTest {
             // When: meter executes with iterations and completes within time limit
             meter.start();
             
-            // First batch: 5 iterations + sleep
+            // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
-            Thread.sleep(5);
+            timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
             
-            // Second batch: 5 iterations + sleep
+            // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
-            Thread.sleep(5);
+            timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
             
-            // Third batch: 5 iterations + sleep
+            // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
-            Thread.sleep(5);
+            timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.ok();
 
-            // Then: meter should be in OK state with correct iterations and NOT slow
+            // Then: meter should be in OK state with correct iterations and NOT slow (15 < 100)
             assertMeterState(meter, true, true, null, null, null, null, 15, 15, 100);
             assertFalse(meter.isSlow(), "meter should NOT be slow");
             
-            // Then: completion report includes timing metrics (skip indices 0 and 1 from start())
+            // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
@@ -769,11 +945,11 @@ class MeterLifeCycleTest {
         // ============================================================================
 
         @Test
-        @Disabled
         @DisplayName("should transition Created → Started → OK with high iteration count + strict time limit (IS slow)")
         void shouldTransitionCreatedToStartedToOkWithHighIterationCountAndStrictTimeLimitIsSlow() throws InterruptedException {
             // Given: a meter with iterations and strict time limit configured
-            final Meter meter = new Meter(logger);
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
             meter.iterations(15);
             meter.limitMilliseconds(50);
             MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
@@ -781,25 +957,26 @@ class MeterLifeCycleTest {
             // When: meter executes with iterations and exceeds time limit
             meter.start();
             
-            // First batch: 5 iterations + long sleep
+            // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
-            Thread.sleep(40);
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
             
-            // Second batch: 5 iterations + medium sleep
+            // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
-            Thread.sleep(20);
+            timeSource.advanceMiliseconds(40); // Execute ~40ms (total ~80ms), exceeds 50ms limit
             meter.progress();
+            assertTrue(meter.isSlow(), "meter should be slow");
             
-            // Third batch: 5 iterations + short sleep
+            // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
-            Thread.sleep(10);
+            timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.ok();
 
             // Then: meter should be in OK state with correct iterations and IS slow
@@ -810,7 +987,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
-            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_SLOW_PROGRESS);
             AssertLogger.assertEvent(logger, 6, Level.WARN, Markers.MSG_SLOW_OK);
             AssertLogger.assertEvent(logger, 7, Level.TRACE, Markers.DATA_SLOW_OK);
         }
@@ -818,57 +995,92 @@ class MeterLifeCycleTest {
         // ============================================================================
         // Created → Started → Rejected with iterations
         // ============================================================================
-
         @Test
         @DisplayName("should transition Created → Started → Rejected with iterations")
         void shouldTransitionCreatedToStartedToRejectedWithIterations() {
-            // Given: a meter configured for iterations
-            final Meter meter = new Meter(logger);
-
-            // When: meter increments and then rejects
-            meter.start();
-            for (int i = 0; i < 25; i++) {
-                meter.inc();
-            }
-            meter.reject("validation_failed");
-
-            // Then: meter should be in Rejected state with correct iteration count
-            assertMeterState(meter, true, true, null, "validation_failed", null, null, 25, 0, 0);
-            
-            // Then: getIterationsPerSecond() should be calculated for rejected operation
-            assertTrue(meter.getIterationsPerSecond() >= 0, "iterations per second should be calculated");
-            
-            // Validate logs (skip indices 0 and 1 from start())
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
-        }
-
-        // ============================================================================
-        // Created → Started → Failed with progress tracking + time limit (slow)
-        // ============================================================================
-
-        @Test
-        @Disabled
-        @DisplayName("should transition Created → Started → Failed with progress tracking + time limit (slow)")
-        void shouldTransitionCreatedToStartedToFailedWithProgressTrackingAndTimeLimitSlow() throws InterruptedException {
-            // Given: a meter with time limit and progress tracking configured
-            final Meter meter = new Meter(logger);
-            meter.start();
-            meter.limitMilliseconds(1000);
+            // Given: a meter with iterations and time limit configured
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
+            meter.iterations(15);
+            meter.limitMilliseconds(100); // Increased to ensure NOT slow
             MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
 
-            // When: meter executes with progress tracking and exceeds time limit, then fails
-            meter.progress();
-            Thread.sleep(1500); // Execute ~1500ms
-            meter.progress();
-            Thread.sleep(1500); // Execute ~3000ms total
-            meter.fail("timeout");
+            // When: meter executes with iterations and completes within time limit
+            meter.start();
 
-            // Then: meter should be in Failed state and IS slow
-            assertMeterState(meter, true, true, null, null, "timeout", null, 0, 0, 1000);
-            assertTrue(meter.isSlow(), "meter should be slow");
-            
-            // Validate logs (skip indices 0 and 1 from start())
+            // First batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(5); // Execute ~5ms
+            meter.progress();
+
+            // Second batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(5); // Execute ~5ms
+            meter.progress();
+
+            // Third batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(5); // Execute ~5ms
+            meter.reject("validation_failed");
+
+            // Then: meter should be in OK state with correct iterations and NOT slow (15 < 100)
+            assertMeterState(meter, true, true, null, "validation_failed", null, null, 15, 15, 100);
+            assertFalse(meter.isSlow(), "meter should NOT be slow");
+
+            // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_PROGRESS);
+            AssertLogger.assertEvent(logger, 6, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 7, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should transition Created → Started → Rejected with iterations")
+        void shouldTransitionCreatedToStartedToFailedWithIterations() {
+            // Given: a meter with iterations and time limit configured
+            final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+            final Meter meter = new Meter(logger).withTimeSource(timeSource);
+            meter.iterations(15);
+            meter.limitMilliseconds(100); // Increased to ensure NOT slow
+            MeterConfig.progressPeriodMilliseconds = 0; // Disable throttling for test
+
+            // When: meter executes with iterations and completes within time limit
+            meter.start();
+
+            // First batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(5); // Execute ~5ms
+            meter.progress();
+
+            // Second batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(5); // Execute ~5ms
+            meter.progress();
+
+            // Third batch: 5 iterations
+            for (int i = 0; i < 5; i++) {
+                meter.inc();
+            }
+            timeSource.advanceMiliseconds(5); // Execute ~5ms
+            meter.fail("validation_failed");
+
+            // Then: meter should be in OK state with correct iterations and NOT slow (15 < 100)
+            assertMeterState(meter, true, true, null, null, "validation_failed",null, 15, 15, 100);
+            assertFalse(meter.isSlow(), "meter should NOT be slow");
+
+            // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
@@ -879,7 +1091,426 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Group 2: Pre-Start Configuration (Tier 2 - Valid Non-State-Changing)")
+    @DisplayName("Group 3: Try-With-Resources (✅ Tier 1 + ⚠️ Tier 3")
+    class TryWithResources {
+        @Test
+        @DisplayName("should follow try-with-resources flow (implicit failure)")
+        void shouldFollowTryWithResourcesFlowImplicitFailure() {
+            final Meter meter;
+            // Given: a new, started Meter withing try with resources
+            try (final Meter m = new Meter(logger).start()) {
+                meter = m;
+                // do nothing
+            }
+
+            // Then: it should be automatically failed on close()
+            assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        @Test
+        @DisplayName("should follow try-with-resources flow (explicit success)")
+        void shouldFollowTryWithResourcesFlowExplicitSuccess() {
+            final Meter meter;
+            // Given: a new, started Meter withing try with resources
+            try (final Meter m = new Meter(logger).start()) {
+                meter = m;
+
+                // When: ok() is called
+                m.ok();
+
+                // Then: Meter is in stopped state
+                assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            }
+
+            // Then: it should remain in success state after close()
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should follow try-with-resources flow (path and explicit success)")
+        void shouldFollowTryWithResourcesFlowPathAndExplicitSuccess() {
+            final Meter meter;
+            // Given: a new, started Meter withing try with resources
+            try (final Meter m = new Meter(logger).start()) {
+                meter = m;
+
+                // When: path() is called
+                m.path("customPath");
+
+                // Then: path is set
+                assertMeterState(meter, true, false, "customPath", null, null, null, 0, 0, 0);
+
+                // When: ok() is called
+                m.ok();
+
+                // Then: Meter is in stopped state with path preserved
+                assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
+            }
+
+            // Then: it should remain in success state after close()
+            assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+        }
+
+        @Test
+        @DisplayName("should follow try-with-resources flow (explicit rejection)")
+        void shouldFollowTryWithResourcesFlowExplicitRejection() {
+            final Meter meter;
+            // Given: a new, started Meter withing try with resources
+            try (final Meter m = new Meter(logger).start()) {
+                meter = m;
+
+                // When: reject() is called
+                m.reject("rejected");
+
+                // Then: Meter is in stopped state with reject path set
+                assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
+            }
+
+            // Then: it should remain in rejection state after close()
+            assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+        }
+
+        @Test
+        @DisplayName("should follow try-with-resources flow (explicit failure)")
+        void shouldFollowTryWithResourcesFlowExplicitFailure() {
+            final Meter meter;
+            // Given: a new, started Meter withing try with resources
+            try (final Meter m = new Meter(logger).start()) {
+                meter = m;
+
+                // When: fail() is called
+                m.fail("failed");
+
+                // Then: Meter is in stopped state with failure message
+                assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
+            }
+
+            // Then: it should remain in failure state after close()
+            assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
+
+            // Then: all log messages recorded correctly
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+        }
+
+        // ============================================================================
+        // Try-with-resources WITHOUT start() (⚠️ Tier 3 - State-Correcting)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should transition to Failed via try-with-resources without start() - implicit close()")
+        void shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose() {
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                /* When: block executes without calling start(), ok(), reject(), or fail()
+                 * (meter auto-closes with implicit fail) */
+            }
+
+            /* Then: logs INCONSISTENT_CLOSE + ERROR for implicit failure */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_CLOSE);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, "try-with-resources");
+        }
+
+        @Test
+        @DisplayName("should transition to OK via try-with-resources without start() - explicit ok()")
+        void shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok() is called without start() */
+                m.ok();
+            }
+
+            /* Then: meter transitions to OK state despite missing start() */
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with path via try-with-resources without start() - explicit ok(String)")
+        void shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok("success_path") is called without start() */
+                m.ok("success_path");
+            }
+
+            /* Then: meter transitions to OK state with path */
+            assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with Enum via try-with-resources without start() - explicit ok(Enum)")
+        void shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok(Enum) is called without start() */
+                m.ok(TestEnum.VALUE1);
+            }
+
+            /* Then: meter transitions to OK state with enum toString as path */
+            assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with Throwable via try-with-resources without start() - explicit ok(Throwable)")
+        void shouldTransitionToOkWithThrowableViaTryWithResourcesWithoutStartExplicitOkThrowable() {
+            Meter meter = null;
+            final RuntimeException exception = new RuntimeException("test cause");
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok(Throwable) is called without start() */
+                m.ok(exception);
+            }
+
+            /* Then: meter transitions to OK state with throwable simple class name as path */
+            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to OK with Object via try-with-resources without start() - explicit ok(Object)")
+        void shouldTransitionToOkWithObjectViaTryWithResourcesWithoutStartExplicitOkObject() {
+            Meter meter = null;
+            final TestObject testObject = new TestObject();
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: ok(Object) is called without start() */
+                m.ok(testObject);
+            }
+
+            /* Then: meter transitions to OK state with object toString as path */
+            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected via try-with-resources without start() - explicit reject(String)")
+        void shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: reject("business_error") is called without start() */
+                m.reject("business_error");
+            }
+
+            /* Then: meter transitions to Rejected state with rejectPath */
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected with Enum via try-with-resources without start() - explicit reject(Enum)")
+        void shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: reject(Enum) is called without start() */
+                m.reject(TestEnum.VALUE2);
+            }
+
+            /* Then: meter transitions to Rejected state with enum toString as cause */
+            assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected with Throwable via try-with-resources without start() - explicit reject(Throwable)")
+        void shouldTransitionToRejectedWithThrowableViaTryWithResourcesWithoutStartExplicitRejectThrowable() {
+            Meter meter = null;
+            final IllegalArgumentException exception = new IllegalArgumentException("invalid input");
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: reject(Throwable) is called without start() */
+                m.reject(exception);
+            }
+
+            /* Then: meter transitions to Rejected state with throwable simple class name as cause */
+            assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Rejected with Object via try-with-resources without start() - explicit reject(Object)")
+        void shouldTransitionToRejectedWithObjectViaTryWithResourcesWithoutStartExplicitRejectObject() {
+            Meter meter = null;
+            final TestObject testObject = new TestObject();
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: reject(Object) is called without start() */
+                m.reject(testObject);
+            }
+
+            /* Then: meter transitions to Rejected state with object toString as cause */
+            assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
+            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed via try-with-resources without start() - explicit fail(String)")
+        void shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: fail("technical_error") is called without start() */
+                m.fail("technical_error");
+            }
+
+            /* Then: meter transitions to Failed state with failPath (failMessage null for non-Throwable) */
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed with Enum via try-with-resources without start() - explicit fail(Enum)")
+        void shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum() {
+            Meter meter = null;
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: fail(Enum) is called without start() */
+                m.fail(TestEnum.VALUE1);
+            }
+
+            /* Then: meter transitions to Failed state with enum toString as cause (failMessage null) */
+            assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed with Throwable via try-with-resources without start() - explicit fail(Throwable)")
+        void shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable() {
+            Meter meter = null;
+            final Exception exception = new Exception("connection timeout");
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: fail(Throwable) is called without start() */
+                m.fail(exception);
+            }
+
+            /* Then: meter transitions to Failed state with throwable full class name as path and message as failMessage */
+            assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should transition to Failed with Object via try-with-resources without start() - explicit fail(Object)")
+        void shouldTransitionToFailedWithObjectViaTryWithResourcesWithoutStartExplicitFailObject() {
+            Meter meter = null;
+            final TestObject testObject = new TestObject();
+            /* Given: Meter created in try-with-resources without start() */
+            try (final Meter m = new Meter(logger)) {
+                meter = m;
+                /* When: fail(Object) is called without start() */
+                m.fail(testObject);
+            }
+
+            /* Then: meter transitions to Failed state with object toString as cause (failMessage null) */
+            assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
+
+            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+    }
+
+    @Nested
+    @DisplayName("Group 4: Pre-Start Attribute Updates (☑️ Tier 2)")
     class PreStartConfiguration {
         // ============================================================================
         // Set time limit
@@ -1291,7 +1922,7 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Group 3: Pre-Start Termination (⚠️ Tier 3 - State-Correcting)")
+    @DisplayName("Group 5: Pre-Start Termination (⚠️ Tier 3)")
     class PreStartTermination {
         // ============================================================================
         // OK without starting (Created → OK)
@@ -1754,963 +2385,7 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Group 4: Post-Start Configuration (☑️ Tier 2 - Valid Non-State-Changing)")
-    class PostStartConfiguration {
-        // ============================================================================
-        // Update description with valid and invalid values
-        // ============================================================================
-
-        @Test
-        @DisplayName("should set description after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSetDescriptionAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m("step 1") is called after start()
-            meter.m("step 1");
-
-            // Then: description attribute is stored correctly and meter remains in Started state
-            assertEquals("step 1", meter.getDescription());
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should override description when m() is called multiple times after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldOverrideDescriptionWhenMCalledMultipleTimesAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m() is called multiple times
-            meter.m("step 1");
-            meter.m("step 2");
-
-            // Then: last value wins and meter remains in Started state
-            assertEquals("step 2", meter.getDescription());
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should preserve valid message when null value attempted after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldPreserveValidMessageWhenNullValueAttemptedAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m("valid") is called, then m(null) is attempted
-            meter.m("valid");
-            meter.m(null);
-
-            // Then: null rejected (logs ILLEGAL), "valid" is preserved
-            assertEquals("valid", meter.getDescription());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should set formatted message after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSetFormattedMessageAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m(format, args) is called after start()
-            meter.m("step %d", 1);
-
-            // Then: description attribute is formatted and stored correctly
-            assertEquals("step 1", meter.getDescription());
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should override formatted message when m() is called multiple times after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldOverrideFormattedMessageWhenMCalledMultipleTimesAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m(format, args) is called multiple times
-            meter.m("step %d", 1);
-            meter.m("step %d", 2);
-
-            // Then: last value wins
-            assertEquals("step 2", meter.getDescription());
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should preserve valid formatted message when null format attempted after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldPreserveValidFormattedMessageWhenNullFormatAttemptedAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m("valid: %s", "arg") is called, then m(null, "arg") is attempted
-            meter.m("valid: %s", "arg");
-            meter.m(null, "arg");
-
-            // Then: null format rejected (logs ILLEGAL), previous description is lost
-            assertNull(meter.getDescription());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should log ILLEGAL when invalid format string attempted after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldLogIllegalWhenInvalidFormatStringAttemptedAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m("invalid format %z", "arg") is called (invalid format specifier)
-            meter.m("invalid format %z", "arg");
-
-            // Then: description remains null and meter remains in Started state
-            assertNull(meter.getDescription());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should skip invalid m() call in chained configuration after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSkipInvalidMCallInChainedConfigurationAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m("valid") → m(null) → m("final") is chained
-            meter.m("valid");
-            meter.m(null);
-            meter.m("final");
-
-            // Then: invalid attempt skipped, final overwrites valid
-            assertEquals("final", meter.getDescription());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        // ============================================================================
-        // Update iteration counters with valid and invalid values
-        // Note: progressPeriodMilliseconds must be set to 0 to observe progress messages
-        // ============================================================================
-
-        @Test
-        @DisplayName("should increment iteration counter with inc() after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldIncrementIterationCounterWithIncAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: inc() → progress() is called
-            meter.inc();
-            meter.progress();
-
-            // Then: currentIteration = 1 and progress message is logged
-            assertEquals(1, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should double increment iteration counter with inc() twice after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldDoubleIncrementIterationCounterWithIncTwiceAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: inc() → inc() → progress() is called
-            meter.inc();
-            meter.inc();
-            meter.progress();
-
-            // Then: currentIteration = 2 and progress message is logged at correct index
-            assertEquals(2, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should increment by specific amount with incBy() after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldIncrementBySpecificAmountWithIncByAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incBy(5) → progress() is called
-            meter.incBy(5);
-            meter.progress();
-
-            // Then: currentIteration = 5 and progress message is logged
-            assertEquals(5, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should accumulate increments with multiple incBy() calls after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldAccumulateIncrementsWithMultipleIncByCallsAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incBy(5) → incBy(3) → progress() is called
-            meter.incBy(5);
-            meter.incBy(3);
-            meter.progress();
-
-            // Then: currentIteration = 8 and progress message is logged at correct index
-            assertEquals(8, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should set absolute iteration counter with incTo() after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSetAbsoluteIterationCounterWithIncToAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incTo(10) → progress() is called
-            meter.incTo(10);
-            meter.progress();
-
-            // Then: currentIteration = 10 and progress message is logged
-            assertEquals(10, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should update absolute iteration counter with incTo() multiple times after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldUpdateAbsoluteIterationCounterWithIncToMultipleTimesAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incTo(10) → incTo(50) → progress() is called
-            meter.incTo(10);
-            meter.incTo(50);
-            meter.progress();
-
-            // Then: currentIteration = 50 and progress message is logged at index 2 (after DATA_START)
-            assertEquals(50, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should preserve forward movement when backward incTo() attempted after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldPreserveForwardMovementWhenBackwardIncToAttemptedAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incTo(100) → incTo(50) → progress() is called (backward attempt)
-            meter.incTo(100);
-            meter.incTo(50);
-            meter.progress();
-
-            // Then: currentIteration = 100 (backward rejected), progress message still logged
-            assertEquals(100, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should reject zero value with incBy() after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectZeroValueWithIncByAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incBy(5) → incBy(0) → progress() is called
-            meter.incBy(5);
-            meter.incBy(0);
-            meter.progress();
-
-            // Then: zero rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
-            assertEquals(5, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should reject negative value with incBy() after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectNegativeValueWithIncByAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incBy(5) → incBy(-3) → progress() is called
-            meter.incBy(5);
-            meter.incBy(-3);
-            meter.progress();
-
-            // Then: negative rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
-            assertEquals(5, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should reject negative incBy() when starting from zero after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectNegativeIncByWhenStartingFromZeroAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incBy(-5) → progress() is called
-            meter.incBy(-5);
-            meter.progress();
-
-            // Then: negative rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
-            // progress() is called but does NOT log because no iteration advanced
-            assertEquals(0, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should reject zero incBy() when starting from zero after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectZeroIncByWhenStartingFromZeroAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incBy(0) → progress() is called
-            meter.incBy(0);
-            meter.progress();
-
-            // Then: zero rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
-            // progress() is called but does NOT log because no iteration advanced
-            assertEquals(0, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should reject backward incTo() after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectBackwardIncToAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incTo(10) → incTo(3) → progress() is called
-            meter.incTo(10);
-            meter.incTo(3);
-            meter.progress();
-
-            // Then: backward rejected (logs ILLEGAL), currentIteration = 10, progress message still logged
-            assertEquals(10, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should reject negative incTo() after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectNegativeIncToAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incTo(-5) → progress() is called
-            meter.incTo(-5);
-            meter.progress();
-
-            // Then: negative rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
-            // progress() is called but does NOT log because no iteration advanced
-            assertEquals(0, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should reject zero incTo() after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectZeroIncToAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: incTo(0) → progress() is called
-            meter.incTo(0);
-            meter.progress();
-
-            // Then: zero rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
-            // progress() is called but does NOT log because no iteration advanced
-            assertEquals(0, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        @Test
-        @DisplayName("should skip invalid iteration calls in chained sequence after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSkipInvalidIterationCallsInChainedSequenceAfterStart() {
-            // Given: a new, started Meter with progressPeriodMilliseconds = 0
-            MeterConfig.progressPeriodMilliseconds = 0;
-            final Meter meter = new Meter(logger).start();
-
-            // When: inc() → incBy(-1) → incTo(0) → inc() → progress() is chained
-            meter.inc();
-            meter.incBy(-1);
-            meter.incTo(0);
-            meter.inc();
-            meter.progress();
-
-            // Then: invalid attempts skipped, valid ones succeed (currentIteration = 2)
-            assertEquals(2, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
-        }
-
-        // ============================================================================
-        // Update context during execution
-        // ============================================================================
-
-        @Test
-        @DisplayName("should add context key-value pair after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldAddContextKeyValuePairAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: ctx("key1", "value1") is called after start()
-            meter.ctx("key1", "value1");
-
-            // Then: context contains the key-value pair and meter remains in Started state
-            assertEquals("value1", meter.getContext().get("key1"));
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should override context value when same key set multiple times after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldOverrideContextValueWhenSameKeySetMultipleTimesAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: ctx() is called twice with the same key
-            meter.ctx("key", "val1");
-            meter.ctx("key", "val2");
-
-            // Then: last value wins and meter remains in Started state
-            assertEquals("val2", meter.getContext().get("key"));
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should replace context value with null after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldReplaceContextValueWithNullAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: ctx("key", "valid") is called, then ctx("key", null) is called
-            meter.ctx("key", "valid");
-            meter.ctx("key", (String)null);
-
-            // Then: null value is stored as "<null>" placeholder
-            assertEquals("<null>", meter.getContext().get("key"));
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should store multiple different context key-value pairs after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldStoreMultipleDifferentContextKeyValuePairsAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: ctx() is called multiple times with different keys
-            meter.ctx("key1", "value1");
-            meter.ctx("key2", "value2");
-            meter.ctx("key3", "value3");
-
-            // Then: all context key-value pairs are stored and meter remains in Started state
-            assertEquals("value1", meter.getContext().get("key1"));
-            assertEquals("value2", meter.getContext().get("key2"));
-            assertEquals("value3", meter.getContext().get("key3"));
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should handle null key in context after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldHandleNullKeyInContextAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: ctx(null, null) is called (null key with null String value)
-            meter.ctx(null, (String)null);
-
-            // Then: stores with "null" key and null value
-            assertNull(meter.getContext().get("null"));
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-        }
-
-        // ============================================================================
-        // Set path with valid values
-        // ============================================================================
-
-        @Test
-        @DisplayName("should set path after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSetPathAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path("custom_ok_path") is called
-            meter.path("custom_ok_path");
-
-            // Then: okPath = "custom_ok_path" and meter remains in Started state
-            assertEquals("custom_ok_path", meter.getOkPath());
-            assertMeterState(meter, true, false, "custom_ok_path", null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should override path when path() is called multiple times after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldOverridePathWhenPathCalledMultipleTimesAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path("path1") → path("path2") is called
-            meter.path("path1");
-            meter.path("path2");
-
-            // Then: last path wins (okPath = "path2")
-            assertEquals("path2", meter.getOkPath());
-            assertMeterState(meter, true, false, "path2", null, null, null, 0, 0, 0);
-        }
-
-        @Test
-        @DisplayName("should preserve valid path when path(null) attempted after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldPreserveValidPathWhenPathNullAttemptedAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path("valid") → path(null) is called
-            meter.path("valid");
-            meter.path(null);
-
-            // Then: null rejected (logs ILLEGAL), "valid" is preserved
-            assertEquals("valid", meter.getOkPath());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should reject path(null) when no previous path after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectPathNullWhenNoPreviousPathAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path(null) is called without setting a previous path
-            meter.path(null);
-
-            // Then: null rejected (logs ILLEGAL), okPath remains undefined
-            assertNull(meter.getOkPath());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should reject null then accept valid path after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectNullThenAcceptValidPathAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path(null) → path("valid") is called
-            meter.path(null);
-            meter.path("valid");
-
-            // Then: null rejected (logs ILLEGAL), then valid accepted (okPath = "valid")
-            assertEquals("valid", meter.getOkPath());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should support various path types after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSupportVariousPathTypesAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path() is called with different types
-            // String
-            meter.path("stringPath");
-            assertEquals("stringPath", meter.getOkPath());
-
-            // Then: Enum
-            meter.path(TestEnum.VALUE1);
-            assertEquals(TestEnum.VALUE1.name(), meter.getOkPath());
-
-            // Then: Throwable
-            final Exception ex = new IllegalArgumentException("test");
-            meter.path(ex);
-            assertEquals(ex.getClass().getSimpleName(), meter.getOkPath());
-
-            // Then: Object
-            final TestObject obj = new TestObject();
-            meter.path(obj);
-            assertEquals(obj.toString(), meter.getOkPath());
-        }
-
-        // ============================================================================
-        // Update time limit with valid and invalid values
-        // ============================================================================
-
-        @Test
-        @DisplayName("should set time limit after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSetTimeLimitAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: limitMilliseconds(5000) is called after start()
-            meter.limitMilliseconds(5000);
-
-            // Then: timeLimit = 5000 and meter remains in Started state
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
-        }
-
-        @Test
-        @DisplayName("should override time limit when limitMilliseconds() called multiple times after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldOverrideTimeLimitWhenLimitMillisecondsCalledMultipleTimesAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: limitMilliseconds(100) → limitMilliseconds(5000) is called
-            meter.limitMilliseconds(100);
-            meter.limitMilliseconds(5000);
-
-            // Then: last value wins (timeLimit = 5000)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
-        }
-
-        @Test
-        @DisplayName("should update time limit to lower value after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldUpdateTimeLimitToLowerValueAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: limitMilliseconds(5000) → limitMilliseconds(100) is called
-            meter.limitMilliseconds(5000);
-            meter.limitMilliseconds(100);
-
-            // Then: last value wins (timeLimit = 100)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 100);
-        }
-
-        @Test
-        @DisplayName("should preserve valid time limit when invalid value attempted after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldPreserveValidTimeLimitWhenInvalidValueAttemptedAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: limitMilliseconds(5000) → limitMilliseconds(0) is called
-            meter.limitMilliseconds(5000);
-            meter.limitMilliseconds(0);
-
-            // Then: zero rejected (logs ILLEGAL), timeLimit = 5000
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should preserve valid time limit when negative value attempted after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldPreserveValidTimeLimitWhenNegativeValueAttemptedAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: limitMilliseconds(5000) → limitMilliseconds(-1) is called
-            meter.limitMilliseconds(5000);
-            meter.limitMilliseconds(-1);
-
-            // Then: negative rejected (logs ILLEGAL), timeLimit = 5000
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should reject zero time limit when no previous value after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectZeroTimeLimitWhenNoPreviousValueAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: limitMilliseconds(0) is called
-            meter.limitMilliseconds(0);
-
-            // Then: zero rejected (logs ILLEGAL), timeLimit = 0 (unchanged)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should reject negative time limit when no previous value after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectNegativeTimeLimitWhenNoPreviousValueAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: limitMilliseconds(-5) is called
-            meter.limitMilliseconds(-5);
-
-            // Then: negative rejected (logs ILLEGAL), timeLimit = 0 (unchanged)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        // ============================================================================
-        // Update expected iterations with valid and invalid values
-        // ============================================================================
-
-        @Test
-        @DisplayName("should set expected iterations after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSetExpectedIterationsAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: iterations(100) is called after start()
-            meter.iterations(100);
-
-            // Then: expectedIterations = 100 and meter remains in Started state
-            assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
-        }
-
-        @Test
-        @DisplayName("should override expected iterations when iterations() called multiple times after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldOverrideExpectedIterationsWhenIterationsCalledMultipleTimesAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: iterations(50) → iterations(100) is called
-            meter.iterations(50);
-            meter.iterations(100);
-
-            // Then: last value wins (expectedIterations = 100)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
-        }
-
-        @Test
-        @DisplayName("should update expected iterations to lower value after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldUpdateExpectedIterationsToLowerValueAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: iterations(100) → iterations(50) is called
-            meter.iterations(100);
-            meter.iterations(50);
-
-            // Then: last value wins (expectedIterations = 50)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 50, 0);
-        }
-
-        @Test
-        @DisplayName("should preserve valid iterations when invalid value attempted after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldPreserveValidIterationsWhenInvalidValueAttemptedAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: iterations(100) → iterations(0) is called
-            meter.iterations(100);
-            meter.iterations(0);
-
-            // Then: zero rejected (logs ILLEGAL), expectedIterations = 100
-            assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should preserve valid iterations when negative value attempted after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldPreserveValidIterationsWhenNegativeValueAttemptedAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: iterations(100) → iterations(-5) is called
-            meter.iterations(100);
-            meter.iterations(-5);
-
-            // Then: negative rejected (logs ILLEGAL), expectedIterations = 100
-            assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should reject zero iterations when no previous value after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectZeroIterationsWhenNoPreviousValueAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: iterations(0) is called
-            meter.iterations(0);
-
-            // Then: zero rejected (logs ILLEGAL), expectedIterations = 0 (unchanged)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should reject negative iterations when no previous value after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldRejectNegativeIterationsWhenNoPreviousValueAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: iterations(-5) is called
-            meter.iterations(-5);
-
-            // Then: negative rejected (logs ILLEGAL), expectedIterations = 0 (unchanged)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        // ============================================================================
-        // Chain operations mixing valid and invalid values
-        // ============================================================================
-
-        @Test
-        @DisplayName("should chain multiple valid operations after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldChainMultipleValidOperationsAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m("op1") → ctx("user", "alice") → iterations(100) → inc() is chained
-            meter.m("op1")
-                 .ctx("user", "alice")
-                 .iterations(100)
-                 .inc();
-
-            // Then: all valid, all succeed
-            assertEquals("op1", meter.getDescription());
-            assertEquals("alice", meter.getContext().get("user"));
-            assertEquals(100, meter.getExpectedIterations());
-            assertEquals(1, meter.getCurrentIteration());
-        }
-
-        @Test
-        @DisplayName("should chain multiple config methods after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldChainMultipleConfigMethodsAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: limitMilliseconds(5000) → m("valid") → path("custom") → inc() is chained
-            meter.limitMilliseconds(5000)
-                 .m("valid")
-                 .path("custom")
-                 .inc();
-
-            // Then: all valid, all succeed
-            assertMeterState(meter, true, false, "custom", null, null, null, 1, 0, 5000);
-            assertEquals("valid", meter.getDescription());
-        }
-
-        @Test
-        @DisplayName("should skip invalid call in chained operations after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSkipInvalidCallInChainedOperationsAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m("valid") → m(null) → ctx("key", "val") → inc() is chained
-            meter.m("valid");
-            meter.m(null);
-            meter.ctx("key", "val");
-            meter.inc();
-
-            // Then: one invalid (m(null)), others succeed; m(null) is rejected, "valid" stays
-            assertEquals("valid", meter.getDescription());
-            assertEquals("val", meter.getContext().get("key"));
-            assertEquals(1, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should skip multiple invalid calls in chained operations after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldSkipMultipleInvalidCallsInChainedOperationsAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: iterations(100) → iterations(-1) → inc() → incBy(0) → inc() is chained
-            meter.iterations(100);
-            meter.iterations(-1);
-            meter.inc();
-            meter.incBy(0);
-            meter.inc();
-
-            // Then: two invalid, valid ones succeed (expectedIterations = 100, currentIteration = 2)
-            assertEquals(100, meter.getExpectedIterations());
-            assertEquals(2, meter.getCurrentIteration());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should handle mixed valid and invalid in path and increment operations after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldHandleMixedValidAndInvalidInPathAndIncrementOperationsAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: path("path1") → incBy(5) → m("step") → path(null) → incBy(3) is chained
-            meter.path("path1");
-            meter.incBy(5);
-            meter.m("step");
-            meter.path(null);
-            meter.incBy(3);
-
-            // Then: mixed valid/invalid, verify correct ones apply
-            assertEquals("path1", meter.getOkPath());
-            assertEquals(8, meter.getCurrentIteration());
-            assertEquals("step", meter.getDescription());
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-        }
-
-        @Test
-        @DisplayName("should handle invalid then valid in message updates after start()")
-        @ValidateCleanMeter(expectDirtyStack = true)
-        void shouldHandleInvalidThenValidInMessageUpdatesAfterStart() {
-            // Given: a new, started Meter
-            final Meter meter = new Meter(logger).start();
-
-            // When: m(null) → m("step1") → limitMilliseconds(-1) → limitMilliseconds(5000) is chained
-            meter.m(null);
-            meter.m("step1");
-            meter.limitMilliseconds(-1);
-            meter.limitMilliseconds(5000);
-
-            // Then: invalid calls skipped, final values correct
-            assertEquals("step1", meter.getDescription());
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
-            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
-        }
-    }
-
-    @Nested
-    @DisplayName("Group 6: Post-Stop Configuration (❌ Tier 4 - Invalid State-Preserving)")
+    @DisplayName("Group 6: Pre-Start Invalid Operations (❌ Tier 4)")
     class PostStopConfigurationOKState {
         // ============================================================================
         // Update description after stop (OK state)
@@ -3563,6 +3238,962 @@ class MeterLifeCycleTest {
     }
 
     @Nested
+    @DisplayName("Group 7: Post-Start Attribute Updates (☑️ Tier 2)")
+    class PostStartConfiguration {
+        // ============================================================================
+        // Update description with valid and invalid values
+        // ============================================================================
+
+        @Test
+        @DisplayName("should set description after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSetDescriptionAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("step 1") is called after start()
+            meter.m("step 1");
+
+            // Then: description attribute is stored correctly and meter remains in Started state
+            assertEquals("step 1", meter.getDescription());
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should override description when m() is called multiple times after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldOverrideDescriptionWhenMCalledMultipleTimesAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m() is called multiple times
+            meter.m("step 1");
+            meter.m("step 2");
+
+            // Then: last value wins and meter remains in Started state
+            assertEquals("step 2", meter.getDescription());
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should preserve valid message when null value attempted after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldPreserveValidMessageWhenNullValueAttemptedAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("valid") is called, then m(null) is attempted
+            meter.m("valid");
+            meter.m(null);
+
+            // Then: null rejected (logs ILLEGAL), "valid" is preserved
+            assertEquals("valid", meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should set formatted message after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSetFormattedMessageAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m(format, args) is called after start()
+            meter.m("step %d", 1);
+
+            // Then: description attribute is formatted and stored correctly
+            assertEquals("step 1", meter.getDescription());
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should override formatted message when m() is called multiple times after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldOverrideFormattedMessageWhenMCalledMultipleTimesAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m(format, args) is called multiple times
+            meter.m("step %d", 1);
+            meter.m("step %d", 2);
+
+            // Then: last value wins
+            assertEquals("step 2", meter.getDescription());
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should preserve valid formatted message when null format attempted after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldPreserveValidFormattedMessageWhenNullFormatAttemptedAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("valid: %s", "arg") is called, then m(null, "arg") is attempted
+            meter.m("valid: %s", "arg");
+            meter.m(null, "arg");
+
+            // Then: null format rejected (logs ILLEGAL), previous description is lost
+            assertNull(meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should log ILLEGAL when invalid format string attempted after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldLogIllegalWhenInvalidFormatStringAttemptedAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("invalid format %z", "arg") is called (invalid format specifier)
+            meter.m("invalid format %z", "arg");
+
+            // Then: description remains null and meter remains in Started state
+            assertNull(meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should skip invalid m() call in chained configuration after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSkipInvalidMCallInChainedConfigurationAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("valid") → m(null) → m("final") is chained
+            meter.m("valid");
+            meter.m(null);
+            meter.m("final");
+
+            // Then: invalid attempt skipped, final overwrites valid
+            assertEquals("final", meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Update iteration counters with valid and invalid values
+        // Note: progressPeriodMilliseconds must be set to 0 to observe progress messages
+        // ============================================================================
+
+        @Test
+        @DisplayName("should increment iteration counter with inc() after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldIncrementIterationCounterWithIncAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() → progress() is called
+            meter.inc();
+            meter.progress();
+
+            // Then: currentIteration = 1 and progress message is logged
+            assertEquals(1, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should double increment iteration counter with inc() twice after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldDoubleIncrementIterationCounterWithIncTwiceAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() → inc() → progress() is called
+            meter.inc();
+            meter.inc();
+            meter.progress();
+
+            // Then: currentIteration = 2 and progress message is logged at correct index
+            assertEquals(2, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should increment by specific amount with incBy() after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldIncrementBySpecificAmountWithIncByAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incBy(5) → progress() is called
+            meter.incBy(5);
+            meter.progress();
+
+            // Then: currentIteration = 5 and progress message is logged
+            assertEquals(5, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should accumulate increments with multiple incBy() calls after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldAccumulateIncrementsWithMultipleIncByCallsAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incBy(5) → incBy(3) → progress() is called
+            meter.incBy(5);
+            meter.incBy(3);
+            meter.progress();
+
+            // Then: currentIteration = 8 and progress message is logged at correct index
+            assertEquals(8, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should set absolute iteration counter with incTo() after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSetAbsoluteIterationCounterWithIncToAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incTo(10) → progress() is called
+            meter.incTo(10);
+            meter.progress();
+
+            // Then: currentIteration = 10 and progress message is logged
+            assertEquals(10, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should update absolute iteration counter with incTo() multiple times after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldUpdateAbsoluteIterationCounterWithIncToMultipleTimesAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incTo(10) → incTo(50) → progress() is called
+            meter.incTo(10);
+            meter.incTo(50);
+            meter.progress();
+
+            // Then: currentIteration = 50 and progress message is logged at index 2 (after DATA_START)
+            assertEquals(50, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should preserve forward movement when backward incTo() attempted after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldPreserveForwardMovementWhenBackwardIncToAttemptedAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incTo(100) → incTo(50) → progress() is called (backward attempt)
+            meter.incTo(100);
+            meter.incTo(50);
+            meter.progress();
+
+            // Then: currentIteration = 100 (backward rejected), progress message still logged
+            assertEquals(100, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should reject zero value with incBy() after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectZeroValueWithIncByAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incBy(5) → incBy(0) → progress() is called
+            meter.incBy(5);
+            meter.incBy(0);
+            meter.progress();
+
+            // Then: zero rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
+            assertEquals(5, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should reject negative value with incBy() after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectNegativeValueWithIncByAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incBy(5) → incBy(-3) → progress() is called
+            meter.incBy(5);
+            meter.incBy(-3);
+            meter.progress();
+
+            // Then: negative rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
+            assertEquals(5, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should reject negative incBy() when starting from zero after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectNegativeIncByWhenStartingFromZeroAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incBy(-5) → progress() is called
+            meter.incBy(-5);
+            meter.progress();
+
+            // Then: negative rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
+            // progress() is called but does NOT log because no iteration advanced
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should reject zero incBy() when starting from zero after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectZeroIncByWhenStartingFromZeroAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incBy(0) → progress() is called
+            meter.incBy(0);
+            meter.progress();
+
+            // Then: zero rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
+            // progress() is called but does NOT log because no iteration advanced
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should reject backward incTo() after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectBackwardIncToAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incTo(10) → incTo(3) → progress() is called
+            meter.incTo(10);
+            meter.incTo(3);
+            meter.progress();
+
+            // Then: backward rejected (logs ILLEGAL), currentIteration = 10, progress message still logged
+            assertEquals(10, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should reject negative incTo() after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectNegativeIncToAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incTo(-5) → progress() is called
+            meter.incTo(-5);
+            meter.progress();
+
+            // Then: negative rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
+            // progress() is called but does NOT log because no iteration advanced
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should reject zero incTo() after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectZeroIncToAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: incTo(0) → progress() is called
+            meter.incTo(0);
+            meter.progress();
+
+            // Then: zero rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
+            // progress() is called but does NOT log because no iteration advanced
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("should skip invalid iteration calls in chained sequence after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSkipInvalidIterationCallsInChainedSequenceAfterStart() {
+            // Given: a new, started Meter with progressPeriodMilliseconds = 0
+            MeterConfig.progressPeriodMilliseconds = 0;
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() → incBy(-1) → incTo(0) → inc() → progress() is chained
+            meter.inc();
+            meter.incBy(-1);
+            meter.incTo(0);
+            meter.inc();
+            meter.progress();
+
+            // Then: invalid attempts skipped, valid ones succeed (currentIteration = 2)
+            assertEquals(2, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
+        }
+
+        // ============================================================================
+        // Update context during execution
+        // ============================================================================
+
+        @Test
+        @DisplayName("should add context key-value pair after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldAddContextKeyValuePairAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: ctx("key1", "value1") is called after start()
+            meter.ctx("key1", "value1");
+
+            // Then: context contains the key-value pair and meter remains in Started state
+            assertEquals("value1", meter.getContext().get("key1"));
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should override context value when same key set multiple times after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldOverrideContextValueWhenSameKeySetMultipleTimesAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: ctx() is called twice with the same key
+            meter.ctx("key", "val1");
+            meter.ctx("key", "val2");
+
+            // Then: last value wins and meter remains in Started state
+            assertEquals("val2", meter.getContext().get("key"));
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should replace context value with null after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldReplaceContextValueWithNullAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: ctx("key", "valid") is called, then ctx("key", null) is called
+            meter.ctx("key", "valid");
+            meter.ctx("key", (String)null);
+
+            // Then: null value is stored as "<null>" placeholder
+            assertEquals("<null>", meter.getContext().get("key"));
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should store multiple different context key-value pairs after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldStoreMultipleDifferentContextKeyValuePairsAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: ctx() is called multiple times with different keys
+            meter.ctx("key1", "value1");
+            meter.ctx("key2", "value2");
+            meter.ctx("key3", "value3");
+
+            // Then: all context key-value pairs are stored and meter remains in Started state
+            assertEquals("value1", meter.getContext().get("key1"));
+            assertEquals("value2", meter.getContext().get("key2"));
+            assertEquals("value3", meter.getContext().get("key3"));
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should handle null key in context after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldHandleNullKeyInContextAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: ctx(null, null) is called (null key with null String value)
+            meter.ctx(null, (String)null);
+
+            // Then: stores with "null" key and null value
+            assertNull(meter.getContext().get("null"));
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        }
+
+        // ============================================================================
+        // Set path with valid values
+        // ============================================================================
+
+        @Test
+        @DisplayName("should set path after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSetPathAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: path("custom_ok_path") is called
+            meter.path("custom_ok_path");
+
+            // Then: okPath = "custom_ok_path" and meter remains in Started state
+            assertEquals("custom_ok_path", meter.getOkPath());
+            assertMeterState(meter, true, false, "custom_ok_path", null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should override path when path() is called multiple times after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldOverridePathWhenPathCalledMultipleTimesAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: path("path1") → path("path2") is called
+            meter.path("path1");
+            meter.path("path2");
+
+            // Then: last path wins (okPath = "path2")
+            assertEquals("path2", meter.getOkPath());
+            assertMeterState(meter, true, false, "path2", null, null, null, 0, 0, 0);
+        }
+
+        @Test
+        @DisplayName("should preserve valid path when path(null) attempted after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldPreserveValidPathWhenPathNullAttemptedAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: path("valid") → path(null) is called
+            meter.path("valid");
+            meter.path(null);
+
+            // Then: null rejected (logs ILLEGAL), "valid" is preserved
+            assertEquals("valid", meter.getOkPath());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject path(null) when no previous path after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectPathNullWhenNoPreviousPathAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: path(null) is called without setting a previous path
+            meter.path(null);
+
+            // Then: null rejected (logs ILLEGAL), okPath remains undefined
+            assertNull(meter.getOkPath());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject null then accept valid path after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectNullThenAcceptValidPathAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: path(null) → path("valid") is called
+            meter.path(null);
+            meter.path("valid");
+
+            // Then: null rejected (logs ILLEGAL), then valid accepted (okPath = "valid")
+            assertEquals("valid", meter.getOkPath());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should support various path types after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSupportVariousPathTypesAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: path() is called with different types
+            // String
+            meter.path("stringPath");
+            assertEquals("stringPath", meter.getOkPath());
+
+            // Then: Enum
+            meter.path(TestEnum.VALUE1);
+            assertEquals(TestEnum.VALUE1.name(), meter.getOkPath());
+
+            // Then: Throwable
+            final Exception ex = new IllegalArgumentException("test");
+            meter.path(ex);
+            assertEquals(ex.getClass().getSimpleName(), meter.getOkPath());
+
+            // Then: Object
+            final TestObject obj = new TestObject();
+            meter.path(obj);
+            assertEquals(obj.toString(), meter.getOkPath());
+        }
+
+        // ============================================================================
+        // Update time limit with valid and invalid values
+        // ============================================================================
+
+        @Test
+        @DisplayName("should set time limit after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSetTimeLimitAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: limitMilliseconds(5000) is called after start()
+            meter.limitMilliseconds(5000);
+
+            // Then: timeLimit = 5000 and meter remains in Started state
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
+        }
+
+        @Test
+        @DisplayName("should override time limit when limitMilliseconds() called multiple times after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldOverrideTimeLimitWhenLimitMillisecondsCalledMultipleTimesAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: limitMilliseconds(100) → limitMilliseconds(5000) is called
+            meter.limitMilliseconds(100);
+            meter.limitMilliseconds(5000);
+
+            // Then: last value wins (timeLimit = 5000)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
+        }
+
+        @Test
+        @DisplayName("should update time limit to lower value after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldUpdateTimeLimitToLowerValueAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: limitMilliseconds(5000) → limitMilliseconds(100) is called
+            meter.limitMilliseconds(5000);
+            meter.limitMilliseconds(100);
+
+            // Then: last value wins (timeLimit = 100)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 100);
+        }
+
+        @Test
+        @DisplayName("should preserve valid time limit when invalid value attempted after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldPreserveValidTimeLimitWhenInvalidValueAttemptedAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: limitMilliseconds(5000) → limitMilliseconds(0) is called
+            meter.limitMilliseconds(5000);
+            meter.limitMilliseconds(0);
+
+            // Then: zero rejected (logs ILLEGAL), timeLimit = 5000
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should preserve valid time limit when negative value attempted after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldPreserveValidTimeLimitWhenNegativeValueAttemptedAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: limitMilliseconds(5000) → limitMilliseconds(-1) is called
+            meter.limitMilliseconds(5000);
+            meter.limitMilliseconds(-1);
+
+            // Then: negative rejected (logs ILLEGAL), timeLimit = 5000
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject zero time limit when no previous value after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectZeroTimeLimitWhenNoPreviousValueAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: limitMilliseconds(0) is called
+            meter.limitMilliseconds(0);
+
+            // Then: zero rejected (logs ILLEGAL), timeLimit = 0 (unchanged)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject negative time limit when no previous value after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectNegativeTimeLimitWhenNoPreviousValueAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: limitMilliseconds(-5) is called
+            meter.limitMilliseconds(-5);
+
+            // Then: negative rejected (logs ILLEGAL), timeLimit = 0 (unchanged)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Update expected iterations with valid and invalid values
+        // ============================================================================
+
+        @Test
+        @DisplayName("should set expected iterations after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSetExpectedIterationsAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: iterations(100) is called after start()
+            meter.iterations(100);
+
+            // Then: expectedIterations = 100 and meter remains in Started state
+            assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
+        }
+
+        @Test
+        @DisplayName("should override expected iterations when iterations() called multiple times after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldOverrideExpectedIterationsWhenIterationsCalledMultipleTimesAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: iterations(50) → iterations(100) is called
+            meter.iterations(50);
+            meter.iterations(100);
+
+            // Then: last value wins (expectedIterations = 100)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
+        }
+
+        @Test
+        @DisplayName("should update expected iterations to lower value after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldUpdateExpectedIterationsToLowerValueAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: iterations(100) → iterations(50) is called
+            meter.iterations(100);
+            meter.iterations(50);
+
+            // Then: last value wins (expectedIterations = 50)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 50, 0);
+        }
+
+        @Test
+        @DisplayName("should preserve valid iterations when invalid value attempted after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldPreserveValidIterationsWhenInvalidValueAttemptedAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: iterations(100) → iterations(0) is called
+            meter.iterations(100);
+            meter.iterations(0);
+
+            // Then: zero rejected (logs ILLEGAL), expectedIterations = 100
+            assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should preserve valid iterations when negative value attempted after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldPreserveValidIterationsWhenNegativeValueAttemptedAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: iterations(100) → iterations(-5) is called
+            meter.iterations(100);
+            meter.iterations(-5);
+
+            // Then: negative rejected (logs ILLEGAL), expectedIterations = 100
+            assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject zero iterations when no previous value after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectZeroIterationsWhenNoPreviousValueAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: iterations(0) is called
+            meter.iterations(0);
+
+            // Then: zero rejected (logs ILLEGAL), expectedIterations = 0 (unchanged)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject negative iterations when no previous value after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectNegativeIterationsWhenNoPreviousValueAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: iterations(-5) is called
+            meter.iterations(-5);
+
+            // Then: negative rejected (logs ILLEGAL), expectedIterations = 0 (unchanged)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Chain operations mixing valid and invalid values
+        // ============================================================================
+
+        @Test
+        @DisplayName("should chain multiple valid operations after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldChainMultipleValidOperationsAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("op1") → ctx("user", "alice") → iterations(100) → inc() is chained
+            meter.m("op1")
+                    .ctx("user", "alice")
+                    .iterations(100)
+                    .inc();
+
+            // Then: all valid, all succeed
+            assertEquals("op1", meter.getDescription());
+            assertEquals("alice", meter.getContext().get("user"));
+            assertEquals(100, meter.getExpectedIterations());
+            assertEquals(1, meter.getCurrentIteration());
+        }
+
+        @Test
+        @DisplayName("should chain multiple config methods after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldChainMultipleConfigMethodsAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: limitMilliseconds(5000) → m("valid") → path("custom") → inc() is chained
+            meter.limitMilliseconds(5000)
+                    .m("valid")
+                    .path("custom")
+                    .inc();
+
+            // Then: all valid, all succeed
+            assertMeterState(meter, true, false, "custom", null, null, null, 1, 0, 5000);
+            assertEquals("valid", meter.getDescription());
+        }
+
+        @Test
+        @DisplayName("should skip invalid call in chained operations after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSkipInvalidCallInChainedOperationsAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m("valid") → m(null) → ctx("key", "val") → inc() is chained
+            meter.m("valid");
+            meter.m(null);
+            meter.ctx("key", "val");
+            meter.inc();
+
+            // Then: one invalid (m(null)), others succeed; m(null) is rejected, "valid" stays
+            assertEquals("valid", meter.getDescription());
+            assertEquals("val", meter.getContext().get("key"));
+            assertEquals(1, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should skip multiple invalid calls in chained operations after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldSkipMultipleInvalidCallsInChainedOperationsAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: iterations(100) → iterations(-1) → inc() → incBy(0) → inc() is chained
+            meter.iterations(100);
+            meter.iterations(-1);
+            meter.inc();
+            meter.incBy(0);
+            meter.inc();
+
+            // Then: two invalid, valid ones succeed (expectedIterations = 100, currentIteration = 2)
+            assertEquals(100, meter.getExpectedIterations());
+            assertEquals(2, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should handle mixed valid and invalid in path and increment operations after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldHandleMixedValidAndInvalidInPathAndIncrementOperationsAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: path("path1") → incBy(5) → m("step") → path(null) → incBy(3) is chained
+            meter.path("path1");
+            meter.incBy(5);
+            meter.m("step");
+            meter.path(null);
+            meter.incBy(3);
+
+            // Then: mixed valid/invalid, verify correct ones apply
+            assertEquals("path1", meter.getOkPath());
+            assertEquals(8, meter.getCurrentIteration());
+            assertEquals("step", meter.getDescription());
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should handle invalid then valid in message updates after start()")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldHandleInvalidThenValidInMessageUpdatesAfterStart() {
+            // Given: a new, started Meter
+            final Meter meter = new Meter(logger).start();
+
+            // When: m(null) → m("step1") → limitMilliseconds(-1) → limitMilliseconds(5000) is chained
+            meter.m(null);
+            meter.m("step1");
+            meter.limitMilliseconds(-1);
+            meter.limitMilliseconds(5000);
+
+            // Then: invalid calls skipped, final values correct
+            assertEquals("step1", meter.getDescription());
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+        }
+    }
+
+    @Nested
     @DisplayName("Success Flow")
     class SuccessFlow {
         @Test
@@ -4196,425 +4827,6 @@ class MeterLifeCycleTest {
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
-        }
-    }
-
-    @Nested
-    @DisplayName("Try-With-Resources")
-    class TryWithResources {
-        @Test
-        @DisplayName("should follow try-with-resources flow (implicit failure)")
-        void shouldFollowTryWithResourcesFlowImplicitFailure() {
-            final Meter meter;
-            // Given: a new, started Meter withing try with resources
-            try (final Meter m = new Meter(logger).start()) {
-                meter = m;
-                // do nothing
-            }
-
-            // Then: it should be automatically failed on close()
-            assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
-        }
-
-        @Test
-        @DisplayName("should follow try-with-resources flow (explicit success)")
-        void shouldFollowTryWithResourcesFlowExplicitSuccess() {
-            final Meter meter;
-            // Given: a new, started Meter withing try with resources
-            try (final Meter m = new Meter(logger).start()) {
-                meter = m;
-                
-                // When: ok() is called
-                m.ok();
-                
-                // Then: Meter is in stopped state
-                assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            }
-
-            // Then: it should remain in success state after close()
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should follow try-with-resources flow (path and explicit success)")
-        void shouldFollowTryWithResourcesFlowPathAndExplicitSuccess() {
-            final Meter meter;
-            // Given: a new, started Meter withing try with resources
-            try (final Meter m = new Meter(logger).start()) {
-                meter = m;
-                
-                // When: path() is called
-                m.path("customPath");
-                
-                // Then: path is set
-                assertMeterState(meter, true, false, "customPath", null, null, null, 0, 0, 0);
-                
-                // When: ok() is called
-                m.ok();
-                
-                // Then: Meter is in stopped state with path preserved
-                assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
-            }
-
-            // Then: it should remain in success state after close()
-            assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
-        }
-
-        @Test
-        @DisplayName("should follow try-with-resources flow (explicit rejection)")
-        void shouldFollowTryWithResourcesFlowExplicitRejection() {
-            final Meter meter;
-            // Given: a new, started Meter withing try with resources
-            try (final Meter m = new Meter(logger).start()) {
-                meter = m;
-                
-                // When: reject() is called
-                m.reject("rejected");
-                
-                // Then: Meter is in stopped state with reject path set
-                assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
-            }
-
-            // Then: it should remain in rejection state after close()
-            assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
-        }
-
-        @Test
-        @DisplayName("should follow try-with-resources flow (explicit failure)")
-        void shouldFollowTryWithResourcesFlowExplicitFailure() {
-            final Meter meter;
-            // Given: a new, started Meter withing try with resources
-            try (final Meter m = new Meter(logger).start()) {
-                meter = m;
-                
-                // When: fail() is called
-                m.fail("failed");
-                
-                // Then: Meter is in stopped state with failure message
-                assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
-            }
-
-            // Then: it should remain in failure state after close()
-            assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
-
-            // Then: all log messages recorded correctly
-            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
-        }
-
-        // ============================================================================
-        // Try-with-resources WITHOUT start() (⚠️ Tier 3 - State-Correcting)
-        // ============================================================================
-
-        @Test
-        @DisplayName("should transition to Failed via try-with-resources without start() - implicit close()")
-        void shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose() {
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                /* When: block executes without calling start(), ok(), reject(), or fail()
-                 * (meter auto-closes with implicit fail) */
-            }
-
-            /* Then: logs INCONSISTENT_CLOSE + ERROR for implicit failure */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_CLOSE);
-            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, "try-with-resources");
-        }
-
-        @Test
-        @DisplayName("should transition to OK via try-with-resources without start() - explicit ok()")
-        void shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk() {
-            Meter meter = null;
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: ok() is called without start() */
-                m.ok();
-            }
-
-            /* Then: meter transitions to OK state despite missing start() */
-            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
-            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to OK with path via try-with-resources without start() - explicit ok(String)")
-        void shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString() {
-            Meter meter = null;
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: ok("success_path") is called without start() */
-                m.ok("success_path");
-            }
-
-            /* Then: meter transitions to OK state with path */
-            assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
-            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to OK with Enum via try-with-resources without start() - explicit ok(Enum)")
-        void shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum() {
-            Meter meter = null;
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: ok(Enum) is called without start() */
-                m.ok(TestEnum.VALUE1);
-            }
-
-            /* Then: meter transitions to OK state with enum toString as path */
-            assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
-            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to OK with Throwable via try-with-resources without start() - explicit ok(Throwable)")
-        void shouldTransitionToOkWithThrowableViaTryWithResourcesWithoutStartExplicitOkThrowable() {
-            Meter meter = null;
-            final RuntimeException exception = new RuntimeException("test cause");
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: ok(Throwable) is called without start() */
-                m.ok(exception);
-            }
-
-            /* Then: meter transitions to OK state with throwable simple class name as path */
-            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
-            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to OK with Object via try-with-resources without start() - explicit ok(Object)")
-        void shouldTransitionToOkWithObjectViaTryWithResourcesWithoutStartExplicitOkObject() {
-            Meter meter = null;
-            final TestObject testObject = new TestObject();
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: ok(Object) is called without start() */
-                m.ok(testObject);
-            }
-
-            /* Then: meter transitions to OK state with object toString as path */
-            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
-            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to Rejected via try-with-resources without start() - explicit reject(String)")
-        void shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString() {
-            Meter meter = null;
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: reject("business_error") is called without start() */
-                m.reject("business_error");
-            }
-
-            /* Then: meter transitions to Rejected state with rejectPath */
-            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
-            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to Rejected with Enum via try-with-resources without start() - explicit reject(Enum)")
-        void shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum() {
-            Meter meter = null;
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: reject(Enum) is called without start() */
-                m.reject(TestEnum.VALUE2);
-            }
-
-            /* Then: meter transitions to Rejected state with enum toString as cause */
-            assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
-            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to Rejected with Throwable via try-with-resources without start() - explicit reject(Throwable)")
-        void shouldTransitionToRejectedWithThrowableViaTryWithResourcesWithoutStartExplicitRejectThrowable() {
-            Meter meter = null;
-            final IllegalArgumentException exception = new IllegalArgumentException("invalid input");
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: reject(Throwable) is called without start() */
-                m.reject(exception);
-            }
-
-            /* Then: meter transitions to Rejected state with throwable simple class name as cause */
-            assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
-            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to Rejected with Object via try-with-resources without start() - explicit reject(Object)")
-        void shouldTransitionToRejectedWithObjectViaTryWithResourcesWithoutStartExplicitRejectObject() {
-            Meter meter = null;
-            final TestObject testObject = new TestObject();
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: reject(Object) is called without start() */
-                m.reject(testObject);
-            }
-
-            /* Then: meter transitions to Rejected state with object toString as cause */
-            assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
-            AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to Failed via try-with-resources without start() - explicit fail(String)")
-        void shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString() {
-            Meter meter = null;
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: fail("technical_error") is called without start() */
-                m.fail("technical_error");
-            }
-
-            /* Then: meter transitions to Failed state with failPath (failMessage null for non-Throwable) */
-            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
-            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to Failed with Enum via try-with-resources without start() - explicit fail(Enum)")
-        void shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum() {
-            Meter meter = null;
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: fail(Enum) is called without start() */
-                m.fail(TestEnum.VALUE1);
-            }
-
-            /* Then: meter transitions to Failed state with enum toString as cause (failMessage null) */
-            assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
-            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to Failed with Throwable via try-with-resources without start() - explicit fail(Throwable)")
-        void shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable() {
-            Meter meter = null;
-            final Exception exception = new Exception("connection timeout");
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: fail(Throwable) is called without start() */
-                m.fail(exception);
-            }
-
-            /* Then: meter transitions to Failed state with throwable full class name as path and message as failMessage */
-            assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
-            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
-            AssertLogger.assertEventCount(logger, 3);
-        }
-
-        @Test
-        @DisplayName("should transition to Failed with Object via try-with-resources without start() - explicit fail(Object)")
-        void shouldTransitionToFailedWithObjectViaTryWithResourcesWithoutStartExplicitFailObject() {
-            Meter meter = null;
-            final TestObject testObject = new TestObject();
-            /* Given: Meter created in try-with-resources without start() */
-            try (final Meter m = new Meter(logger)) {
-                meter = m;
-                /* When: fail(Object) is called without start() */
-                m.fail(testObject);
-            }
-
-            /* Then: meter transitions to Failed state with object toString as cause (failMessage null) */
-            assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
-            
-            /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
-            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
-            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
-            AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
-            AssertLogger.assertEventCount(logger, 3);
         }
     }
 

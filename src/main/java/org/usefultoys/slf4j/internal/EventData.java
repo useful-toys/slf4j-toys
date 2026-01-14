@@ -18,6 +18,7 @@ package org.usefultoys.slf4j.internal;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -45,13 +46,26 @@ public class EventData implements Serializable {
     /**
      * The timestamp (in nanoseconds) when the event data was collected.
      */
+    @Setter(AccessLevel.PROTECTED) // To support unit test cases
     long lastCurrentTime = 0; // Changed from protected to package-private
 
     /**
      * The time source used for collecting timestamps.
-     * Defaults to {@link SystemTimeSource#INSTANCE}.
+     * <p>
+     * Defaults to {@link SystemTimeSource#INSTANCE}, which uses {@link System#nanoTime()}.
+     * Can be replaced with a custom implementation for deterministic testing.
+     * <p>
+     * This field is transient because time sources are not meant to be serialized.
+     * After deserialization, the default system time source will be used.
+     * <p>
+     * For more details on the design rationale, see TDR-0032: Clock Abstraction Pattern
+     * for Deterministic Time-Based Testing.
+     *
+     * @see TimeSource
+     * @see SystemTimeSource
      */
-    private transient TimeSource timeSource = SystemTimeSource.INSTANCE;
+    @Setter(AccessLevel.PROTECTED) // To support unit test cases
+    protected transient TimeSource timeSource = SystemTimeSource.INSTANCE;
 
     /**
      * Constructs an EventData instance with a specified session UUID.
@@ -87,27 +101,17 @@ public class EventData implements Serializable {
     }
 
     /**
-     * Updates the {@code lastCurrentTime} with the current system's high-resolution time.
+     * Updates the {@code lastCurrentTime} with the current time from the configured time source.
+     * <p>
+     * By default, this delegates to {@link SystemTimeSource#INSTANCE}, which uses {@link System#nanoTime()}.
+     * In tests, a custom {@link TimeSource} can be set via {@link #setTimeSource(TimeSource)}
+     * to enable deterministic time-based testing.
      *
      * @return The updated {@code lastCurrentTime} in nanoseconds.
+     * @see TimeSource#nanoTime()
      */
     protected final long collectCurrentTime() {
         return lastCurrentTime = timeSource.nanoTime();
-    }
-
-    /**
-     * Sets a custom time source for this event data instance.
-     * This method is intended for testing purposes to enable deterministic time-based testing.
-     * <p>
-     * <b>Thread Safety:</b> This method should be called before the event data is used
-     * in concurrent scenarios, as the time source is not volatile.
-     *
-     * @param timeSource The time source to use for collecting timestamps.
-     * @return This EventData instance for method chaining.
-     */
-    public EventData withTimeSource(final TimeSource timeSource) {
-        this.timeSource = timeSource;
-        return this;
     }
 
 
