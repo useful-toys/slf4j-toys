@@ -7101,5 +7101,177 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEventCount(logger, 7);
         }
+
+        // ============================================================================
+        // Attempt to Restart After Termination
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject start() after ok() - logs INCONSISTENT_START")
+        @ValidateCleanMeter
+        void shouldRejectStartAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: start() is called again
+            meter.start();
+
+            // Then: logs INCONSISTENT_START
+            // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+            // Cannot use assertMeterState because Meter is in an inconsistent state (startTime > stopTime)
+            assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
+            assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
+            assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject start() after ok(path) - logs INCONSISTENT_START")
+        @ValidateCleanMeter
+        void shouldRejectStartAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("path")
+            final Meter meter = new Meter(logger).start().ok("path");
+
+            // When: start() is called again
+            meter.start();
+
+            // Then: logs INCONSISTENT_START, okPath preserved
+            // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+            assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
+            assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
+            assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+            assertEquals("path", meter.getOkPath(), "okPath should be preserved");
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject start() after reject() - logs INCONSISTENT_START")
+        @ValidateCleanMeter
+        void shouldRejectStartAfterReject() {
+            // Given: a meter that has been stopped with reject("error")
+            final Meter meter = new Meter(logger).start().reject("error");
+
+            // When: start() is called again
+            meter.start();
+
+            // Then: logs INCONSISTENT_START, rejectPath preserved
+            // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+            assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
+            assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
+            assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+            assertEquals("error", meter.getRejectPath(), "rejectPath should be preserved");
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject start() after fail() - logs INCONSISTENT_START")
+        @ValidateCleanMeter
+        void shouldRejectStartAfterFail() {
+            // Given: a meter that has been stopped with fail("error")
+            final Meter meter = new Meter(logger).start().fail("error");
+
+            // When: start() is called again
+            meter.start();
+
+            // Then: logs INCONSISTENT_START, failPath preserved
+            // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+            assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
+            assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
+            assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+            assertEquals("error", meter.getFailPath(), "failPath should be preserved");
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject start() after path()->ok() - logs INCONSISTENT_START")
+        @ValidateCleanMeter
+        void shouldRejectStartAfterPathAndOk() {
+            // Given: a meter configured with path() and stopped with ok()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.ok();
+
+            // When: start() is called again
+            meter.start();
+
+            // Then: logs INCONSISTENT_START, okPath preserved
+            // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+            assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
+            assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
+            assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+            assertEquals("configured", meter.getOkPath(), "okPath should be preserved");
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject start() after path()->ok(path) - logs INCONSISTENT_START")
+        @ValidateCleanMeter
+        void shouldRejectStartAfterPathAndOkWithPath() {
+            // Given: a meter configured with path() and stopped with ok("path")
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.ok("path");
+
+            // When: start() is called again
+            meter.start();
+
+            // Then: logs INCONSISTENT_START, okPath preserved
+            // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+            assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
+            assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
+            assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+            assertEquals("path", meter.getOkPath(), "okPath should be preserved");
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject start() after path()->reject() - logs INCONSISTENT_START")
+        @ValidateCleanMeter
+        void shouldRejectStartAfterPathAndReject() {
+            // Given: a meter configured with path() and stopped with reject()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.reject("error");
+
+            // When: start() is called again
+            meter.start();
+
+            // Then: logs INCONSISTENT_START, rejectPath preserved
+            // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+            assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
+            assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
+            assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+            assertEquals("error", meter.getRejectPath(), "rejectPath should be preserved");
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEventCount(logger, 7);
+        }
+
+        @Test
+        @DisplayName("should reject start() after path()->fail() - logs INCONSISTENT_START")
+        @ValidateCleanMeter
+        void shouldRejectStartAfterPathAndFail() {
+            // Given: a meter configured with path() and stopped with fail()
+            final Meter meter = new Meter(logger).start();
+            meter.path("configured");
+            meter.fail("error");
+
+            // When: start() is called again
+            meter.start();
+
+            // Then: logs INCONSISTENT_START, failPath preserved
+            // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+            assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
+            assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
+            assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+            assertEquals("error", meter.getFailPath(), "failPath should be preserved");
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEventCount(logger, 7);
+        }
     }
 }
