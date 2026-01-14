@@ -215,7 +215,7 @@ class MeterLifeCycleTest {
         void shouldStartMeterSuccessfully() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-            
+
             // Then: before start(), getCurrentInstance() returns unknown meter
             final Meter currentBeforeStart = Meter.getCurrentInstance();
             assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
@@ -226,7 +226,7 @@ class MeterLifeCycleTest {
 
             // Then: Meter transitions from Created to Started
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-            
+
             // Then: after start(), meter becomes current in thread-local and is returned by getCurrentInstance()
             final Meter currentAfterStart = Meter.getCurrentInstance();
             assertEquals(meter, currentAfterStart, "after start(), meter should be current in thread-local");
@@ -243,18 +243,18 @@ class MeterLifeCycleTest {
             try (final Meter m = new Meter(logger)) {
                 // Then: meter has expected initial state before start
                 assertMeterState(m, false, false, null, null, null, null, 0, 0, 0);
-                
+
                 // Then: before start(), getCurrentInstance() returns unknown meter
                 final Meter currentBeforeStart = Meter.getCurrentInstance();
                 assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
                     "before start(), getCurrentInstance() should return unknown meter");
-                
+
                 // When: start() is called in the block
                 m.start();
-                
+
                 // Then: meter is transitioned to executing state
                 assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
-                
+
                 // Then: after start(), meter becomes current in thread-local
                 final Meter currentAfterStart = Meter.getCurrentInstance();
                 assertEquals(m, currentAfterStart, "after start(), meter should be current in thread-local");
@@ -272,7 +272,7 @@ class MeterLifeCycleTest {
             try (final Meter m = new Meter(logger).start()) {
                 // Then: meter is in executing state (created and started in single expression)
                 assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
-                
+
                 // Then: meter becomes current in thread-local after start()
                 final Meter currentAfterStart = Meter.getCurrentInstance();
                 assertEquals(m, currentAfterStart, "after start(), meter should be current in thread-local");
@@ -638,21 +638,21 @@ class MeterLifeCycleTest {
 
             // When: meter is started, incremented with progress calls, and completes
             meter.start();
-            
+
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
-            
+
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
-            
+
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
@@ -662,7 +662,7 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in OK state with correct iteration count
             assertMeterState(meter, true, true, null, null, null, null, 15, 15, 0);
-            
+
             // Then: progress messages should have been logged (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
@@ -817,7 +817,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state and NOT slow
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 50);
             assertFalse(meter.isSlow(), "meter should NOT be slow");
-            
+
             // Then: completion report logged as INFO (not slow, skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
@@ -843,7 +843,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state and IS slow
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 50);
             assertTrue(meter.isSlow(), "meter should be slow");
-            
+
             // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
@@ -909,21 +909,21 @@ class MeterLifeCycleTest {
 
             // When: meter executes with iterations and completes within time limit
             meter.start();
-            
+
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
-            
+
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
-            
+
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
@@ -934,7 +934,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with correct iterations and NOT slow (15 < 100)
             assertMeterState(meter, true, true, null, null, null, null, 15, 15, 100);
             assertFalse(meter.isSlow(), "meter should NOT be slow");
-            
+
             // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
@@ -960,14 +960,14 @@ class MeterLifeCycleTest {
 
             // When: meter executes with iterations and exceeds time limit
             meter.start();
-            
+
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
-            
+
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
@@ -975,7 +975,7 @@ class MeterLifeCycleTest {
             timeSource.advanceMiliseconds(40); // Execute ~40ms (total ~80ms), exceeds 50ms limit
             meter.progress();
             assertTrue(meter.isSlow(), "meter should be slow");
-            
+
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
@@ -986,7 +986,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with correct iterations and IS slow
             assertMeterState(meter, true, true, null, null, null, null, 15, 15, 50);
             assertTrue(meter.isSlow(), "meter should be slow");
-            
+
             // Then: WARN log includes slow operation warning with timing details (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
@@ -1519,7 +1519,7 @@ class MeterLifeCycleTest {
         // ============================================================================
         // Set time limit
         // ============================================================================
-        
+
         @Test
         @DisplayName("should set time limit before start()")
         void shouldSetTimeLimitBeforeStart() {
@@ -1581,7 +1581,7 @@ class MeterLifeCycleTest {
         // ============================================================================
         // Set expected iterations
         // ============================================================================
-        
+
         @Test
         @DisplayName("should set expected iterations before start()")
         void shouldSetExpectedIterationsBeforeStart() {
@@ -1643,7 +1643,7 @@ class MeterLifeCycleTest {
         // ============================================================================
         // Add descriptive message
         // ============================================================================
-        
+
         @Test
         @DisplayName("should add descriptive message before start()")
         void shouldAddDescriptiveMessageBeforeStart() {
@@ -1709,7 +1709,7 @@ class MeterLifeCycleTest {
         // ============================================================================
         // Add formatted descriptive message
         // ============================================================================
-        
+
         @Test
         @DisplayName("should add formatted descriptive message before start()")
         void shouldAddFormattedDescriptiveMessageBeforeStart() {
@@ -1775,7 +1775,7 @@ class MeterLifeCycleTest {
         // ============================================================================
         // Add context key-value pairs
         // ============================================================================
-        
+
         @Test
         @DisplayName("should add context key-value pair before start()")
         void shouldAddContextKeyValuePairBeforeStart() {
@@ -1845,7 +1845,7 @@ class MeterLifeCycleTest {
         // ============================================================================
         // Chain multiple configurations
         // ============================================================================
-        
+
         @Test
         @DisplayName("should chain multiple valid configurations before start()")
         void shouldChainMultipleValidConfigurationsBeforeStart() {
@@ -1943,7 +1943,7 @@ class MeterLifeCycleTest {
 
             // Then: meter transitions to OK state despite missing start()
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_OK + INFO completion report
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
@@ -1961,7 +1961,7 @@ class MeterLifeCycleTest {
 
             // Then: meter transitions to OK state with path
             assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_OK + INFO completion report
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
@@ -1979,7 +1979,7 @@ class MeterLifeCycleTest {
 
             // Then: meter transitions to OK state with enum toString as path
             assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_OK + INFO completion report
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
@@ -1998,7 +1998,7 @@ class MeterLifeCycleTest {
 
             /* Then: meter transitions to OK state with throwable simple class name as path */
             assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_OK + INFO completion report
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
@@ -2017,7 +2017,7 @@ class MeterLifeCycleTest {
 
             // Then: meter transitions to OK state with object toString as path
             assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_OK + INFO completion report
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
@@ -2039,7 +2039,7 @@ class MeterLifeCycleTest {
 
             // Then: meter transitions to Rejected state despite missing start()
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
-            
+
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report */
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
@@ -2057,7 +2057,7 @@ class MeterLifeCycleTest {
 
             // Then: meter transitions to Rejected state with enum toString as cause
             assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
-            
+
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report */
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
@@ -2076,7 +2076,7 @@ class MeterLifeCycleTest {
 
             /* Then: meter transitions to Rejected state with throwable simple class name as cause */
             assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
-            
+
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report */
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
@@ -2095,7 +2095,7 @@ class MeterLifeCycleTest {
 
             /* Then: meter transitions to Rejected state with object toString as cause */
             assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
-            
+
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report */
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
@@ -2117,7 +2117,7 @@ class MeterLifeCycleTest {
 
             /* Then: meter transitions to Failed state (failMessage null for non-Throwable) */
             assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_FAIL + ERROR failure report
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
@@ -2135,7 +2135,7 @@ class MeterLifeCycleTest {
 
             /* Then: meter transitions to Failed state (failMessage null for non-Throwable) */
             assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_FAIL + ERROR failure report
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
@@ -2154,7 +2154,7 @@ class MeterLifeCycleTest {
 
             /* Then: meter transitions to Failed state with throwable full class name as path and message as failMessage */
             assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_FAIL + ERROR failure report
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
@@ -2173,7 +2173,7 @@ class MeterLifeCycleTest {
 
             /* Then: meter transitions to Failed state (failMessage null for non-Throwable) */
             assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_FAIL + ERROR failure report
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
@@ -2199,7 +2199,7 @@ class MeterLifeCycleTest {
             // Then: all pre-configured attributes are preserved in terminal state
             assertMeterState(meter, true, true, null, null, null, null, 0, 100, 5000);
             assertEquals("operation description", meter.getDescription());
-            
+
             // Then: logs INCONSISTENT_OK + INFO completion report (with attributes)
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
@@ -2222,7 +2222,7 @@ class MeterLifeCycleTest {
             /* Then: all pre-configured attributes are preserved in terminal state */
             assertMeterState(meter, true, true, null, "validation_error", null, null, 0, 50, 3000);
             assertEquals("validation check", meter.getDescription());
-            
+
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report (with attributes) */
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
@@ -2245,7 +2245,7 @@ class MeterLifeCycleTest {
             /* Then: all pre-configured attributes are preserved (failMessage null for String) */
             assertMeterState(meter, true, true, null, null, "connection_error", null, 0, 200, 10000);
             assertEquals("database operation", meter.getDescription());
-            
+
             // Then: logs INCONSISTENT_FAIL + ERROR failure report (with attributes)
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
@@ -2270,7 +2270,7 @@ class MeterLifeCycleTest {
 
             // Then: context is preserved in terminal state
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_OK + INFO completion report (with context)
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
@@ -2292,7 +2292,7 @@ class MeterLifeCycleTest {
 
             /* Then: context is preserved in terminal state */
             assertMeterState(meter, true, true, null, "validation_error", null, null, 0, 0, 0);
-            
+
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report (with context) */
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
@@ -2314,7 +2314,7 @@ class MeterLifeCycleTest {
 
             /* Then: context is preserved (failMessage null for String) */
             assertMeterState(meter, true, true, null, null, "permission_error", null, 0, 0, 0);
-            
+
             // Then: logs INCONSISTENT_FAIL + ERROR failure report (with context)
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
@@ -2339,7 +2339,7 @@ class MeterLifeCycleTest {
 
             // Then: path() was rejected (ILLEGAL), okPath remains undefined after ok()
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            
+
             // Then: logs ILLEGAL (path before start) + INCONSISTENT_OK + INFO completion
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_OK);
@@ -2359,7 +2359,7 @@ class MeterLifeCycleTest {
 
             /* Then: path() was rejected (ILLEGAL), meter still reaches Rejected state */
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
-            
+
             /* Then: logs ILLEGAL (path before start) + INCONSISTENT_REJECT + INFO rejection */
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_REJECT);
@@ -2379,7 +2379,7 @@ class MeterLifeCycleTest {
 
             /* Then: path() was rejected (ILLEGAL), meter reaches Failed (failMessage null for String) */
             assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
-            
+
             // Then: logs ILLEGAL (path before start) + INCONSISTENT_FAIL + ERROR failure
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_FAIL);
@@ -5111,6 +5111,1476 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 10);
             AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
+        }
+    }
+
+    // ================================================================================
+    // Group 9: Post-Stop Invalid Operations - OK State (❌ Tier 4)
+    // ================================================================================
+
+    @Nested
+    @DisplayName("Group 9: Post-Stop Invalid Operations - OK State (❌ Tier 4)")
+    class PostStopInvalidOperationsOkState {
+
+        // ============================================================================
+        // Update description after stop (OK state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject m(String) after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectDescriptionAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: m("step 1") is called after stop
+            meter.m("step 1");
+
+            // Then: logs ILLEGAL, description unchanged (null)
+            assertNull(meter.getDescription());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject m(String, Object...) after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectDescriptionWithArgsAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: m("step %d", 1) is called after stop
+            meter.m("step %d", 1);
+
+            // Then: logs ILLEGAL, description unchanged (null)
+            assertNull(meter.getDescription());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject m(null) after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNullDescriptionAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: m(null) is called after stop
+            meter.m(null);
+
+            // Then: logs ILLEGAL, description unchanged (null)
+            assertNull(meter.getDescription());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject m(String) after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectDescriptionAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: m("step 1") is called after stop
+            meter.m("step 1");
+
+            // Then: logs ILLEGAL, description unchanged (null)
+            assertNull(meter.getDescription());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject m(String, Object...) after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectDescriptionWithArgsAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: m("step %d", 1) is called after stop
+            meter.m("step %d", 1);
+
+            // Then: logs ILLEGAL, description unchanged (null)
+            assertNull(meter.getDescription());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject m(null) after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNullDescriptionAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: m(null) is called after stop
+            meter.m(null);
+
+            // Then: logs ILLEGAL, description unchanged (null)
+            assertNull(meter.getDescription());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Increment operations after stop (OK state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject inc() after ok() - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: inc() is called after stop
+            meter.inc();
+
+            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject incBy(5) after ok() - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncByAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: incBy(5) is called after stop
+            meter.incBy(5);
+
+            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject incTo(10) after ok() - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncToAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: incTo(10) is called after stop
+            meter.incTo(10);
+
+            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject inc() after ok(path) - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: inc() is called after stop
+            meter.inc();
+
+            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject incBy(5) after ok(path) - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncByAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: incBy(5) is called after stop
+            meter.incBy(5);
+
+            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject incTo(10) after ok(path) - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncToAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: incTo(10) is called after stop
+            meter.incTo(10);
+
+            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            assertEquals(0, meter.getCurrentIteration());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Progress after stop (OK state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject progress() after ok() - logs INCONSISTENT_PROGRESS")
+        @ValidateCleanMeter
+        void shouldRejectProgressAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: progress() is called after stop
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS, no progress message
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject progress() after ok() with inc - logs INCONSISTENT_PROGRESS")
+        @ValidateCleanMeter
+        void shouldRejectProgressAfterOkWithInc() {
+            // Given: a meter that has been stopped with ok() after inc()
+            final Meter meter = new Meter(logger).start();
+            meter.inc();
+            meter.ok();
+
+            // When: progress() is called after stop
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS, no further progress logged
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject progress() after ok(path) - logs INCONSISTENT_PROGRESS")
+        @ValidateCleanMeter
+        void shouldRejectProgressAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: progress() is called after stop
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS, no progress message
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject progress() after ok(path) with inc - logs INCONSISTENT_PROGRESS")
+        @ValidateCleanMeter
+        void shouldRejectProgressAfterOkWithPathAndInc() {
+            // Given: a meter that has been stopped with ok("completion_path") after inc()
+            final Meter meter = new Meter(logger).start();
+            meter.inc();
+            meter.ok("completion_path");
+
+            // When: progress() is called after stop
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS, no further progress logged
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Update context after stop (OK state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject ctx() after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectContextAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: ctx("key1", "value1") is called after stop
+            meter.ctx("key1", "value1");
+
+            // Then: logs ILLEGAL, context unchanged
+            assertFalse(meter.getContext().containsKey("key1"));
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject ctx() after ok() with existing context - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectContextUpdateAfterOk() {
+            // Given: a meter with context, stopped with ok()
+            final Meter meter = new Meter(logger).start();
+            meter.ctx("key", "val");
+            meter.ok();
+
+            // When: ctx("key", "val2") is called after stop
+            meter.ctx("key", "val2");
+
+            // Then: logs ILLEGAL, context preserves original value (note: context cleared after emission)
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject ctx() after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectContextAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: ctx("key1", "value1") is called after stop
+            meter.ctx("key1", "value1");
+
+            // Then: logs ILLEGAL, context unchanged
+            assertFalse(meter.getContext().containsKey("key1"));
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject ctx() after ok(path) with existing context - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectContextUpdateAfterOkWithPath() {
+            // Given: a meter with context, stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start();
+            meter.ctx("key", "val");
+            meter.ok("completion_path");
+
+            // When: ctx("key", "val2") is called after stop
+            meter.ctx("key", "val2");
+
+            // Then: logs ILLEGAL, context preserves original value (note: context cleared after emission)
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Set path after stop (OK state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject path() after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectPathAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: path("new_path") is called after stop
+            meter.path("new_path");
+
+            // Then: logs ILLEGAL, okPath unchanged (null)
+            assertNull(meter.getOkPath());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject path() after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectPathAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("original_path")
+            final Meter meter = new Meter(logger).start().ok("original_path");
+
+            // When: path("new_path") is called after stop
+            meter.path("new_path");
+
+            // Then: logs ILLEGAL, okPath remains "original_path"
+            assertEquals("original_path", meter.getOkPath());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject path(null) after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNullPathAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: path(null) is called after stop
+            meter.path(null);
+
+            // Then: logs ILLEGAL, okPath unchanged (null)
+            assertNull(meter.getOkPath());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject path() after ok(completion_path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectPathAfterOkWithCompletionPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: path("new_path") is called after stop
+            meter.path("new_path");
+
+            // Then: logs ILLEGAL, okPath remains "completion_path"
+            assertEquals("completion_path", meter.getOkPath());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject path(null) after ok(completion_path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNullPathAfterOkWithCompletionPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: path(null) is called after stop
+            meter.path(null);
+
+            // Then: logs ILLEGAL, okPath unchanged
+            assertEquals("completion_path", meter.getOkPath());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Update time limit after stop (OK state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject limitMilliseconds() after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectTimeLimitAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: limitMilliseconds(5000) is called after stop
+            meter.limitMilliseconds(5000);
+
+            // Then: logs ILLEGAL, timeLimit unchanged (0)
+            assertEquals(0, meter.getTimeLimit());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds() after ok() with existing limit - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectTimeLimitUpdateAfterOk() {
+            // Given: a meter with timeLimit, stopped with ok()
+            final Meter meter = new Meter(logger).start();
+            meter.limitMilliseconds(100);
+            meter.ok();
+
+            // When: limitMilliseconds(5000) is called after stop
+            meter.limitMilliseconds(5000);
+
+            // Then: logs ILLEGAL, timeLimit remains 100ms (100,000,000 ns)
+            assertEquals(100_000_000L, meter.getTimeLimit());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(0) after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectZeroTimeLimitAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: limitMilliseconds(0) is called after stop
+            meter.limitMilliseconds(0);
+
+            // Then: logs ILLEGAL, timeLimit unchanged (0)
+            assertEquals(0, meter.getTimeLimit());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(-1) after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNegativeTimeLimitAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: limitMilliseconds(-1) is called after stop
+            meter.limitMilliseconds(-1);
+
+            // Then: logs ILLEGAL (stopped meter) only
+            assertEquals(0, meter.getTimeLimit());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds() after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectTimeLimitAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: limitMilliseconds(5000) is called after stop
+            meter.limitMilliseconds(5000);
+
+            // Then: logs ILLEGAL, timeLimit unchanged (0)
+            assertEquals(0, meter.getTimeLimit());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds() after ok(path) with existing limit - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectTimeLimitUpdateAfterOkWithPath() {
+            // Given: a meter with timeLimit, stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start();
+            meter.limitMilliseconds(100);
+            meter.ok("completion_path");
+
+            // When: limitMilliseconds(5000) is called after stop
+            meter.limitMilliseconds(5000);
+
+            // Then: logs ILLEGAL, timeLimit remains 100ms (100,000,000 ns)
+            assertEquals(100_000_000L, meter.getTimeLimit());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(0) after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectZeroTimeLimitAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: limitMilliseconds(0) is called after stop
+            meter.limitMilliseconds(0);
+
+            // Then: logs ILLEGAL, timeLimit unchanged (0)
+            assertEquals(0, meter.getTimeLimit());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(-1) after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNegativeTimeLimitAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: limitMilliseconds(-1) is called after stop
+            meter.limitMilliseconds(-1);
+
+            // Then: logs ILLEGAL (stopped meter) only
+            assertEquals(0, meter.getTimeLimit());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Update expected iterations after stop (OK state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject iterations() after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectIterationsAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: iterations(100) is called after stop
+            meter.iterations(100);
+
+            // Then: logs ILLEGAL, expectedIterations unchanged (0)
+            assertEquals(0, meter.getExpectedIterations());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations() after ok() with existing iterations - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectIterationsUpdateAfterOk() {
+            // Given: a meter with expectedIterations, stopped with ok()
+            final Meter meter = new Meter(logger).start();
+            meter.iterations(50);
+            meter.ok();
+
+            // When: iterations(100) is called after stop
+            meter.iterations(100);
+
+            // Then: logs ILLEGAL, expectedIterations remains 50
+            assertEquals(50, meter.getExpectedIterations());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(0) after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectZeroIterationsAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: iterations(0) is called after stop
+            meter.iterations(0);
+
+            // Then: logs ILLEGAL, expectedIterations unchanged (0)
+            assertEquals(0, meter.getExpectedIterations());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(-5) after ok() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNegativeIterationsAfterOk() {
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+
+            // When: iterations(-5) is called after stop
+            meter.iterations(-5);
+
+            // Then: logs ILLEGAL (stopped meter) only
+            assertEquals(0, meter.getExpectedIterations());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations() after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectIterationsAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: iterations(100) is called after stop
+            meter.iterations(100);
+
+            // Then: logs ILLEGAL, expectedIterations unchanged (0)
+            assertEquals(0, meter.getExpectedIterations());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations() after ok(path) with existing iterations - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectIterationsUpdateAfterOkWithPath() {
+            // Given: a meter with expectedIterations, stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start();
+            meter.iterations(50);
+            meter.ok("completion_path");
+
+            // When: iterations(100) is called after stop
+            meter.iterations(100);
+
+            // Then: logs ILLEGAL, expectedIterations remains 50
+            assertEquals(50, meter.getExpectedIterations());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(0) after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectZeroIterationsAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: iterations(0) is called after stop
+            meter.iterations(0);
+
+            // Then: logs ILLEGAL, expectedIterations unchanged (0)
+            assertEquals(0, meter.getExpectedIterations());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(-5) after ok(path) - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNegativeIterationsAfterOkWithPath() {
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+
+            // When: iterations(-5) is called after stop
+            meter.iterations(-5);
+
+            // Then: logs ILLEGAL (stopped meter) only
+            assertEquals(0, meter.getExpectedIterations());
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+    }
+
+    // ================================================================================
+    // Group 10: Post-Stop Invalid Operations - Rejected State (❌ Tier 4)
+    // ================================================================================
+
+    @Nested
+    @DisplayName("Group 10: Post-Stop Invalid Operations - Rejected State (❌ Tier 4)")
+    class PostStopInvalidOperationsRejectedState {
+
+        // ============================================================================
+        // Update description after reject (Rejected state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject m(String) after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectDescriptionAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: m("step 1") is called after stop
+            meter.m("step 1");
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject m(String, Object...) after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectDescriptionWithArgsAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: m("step %d", 1) is called after stop
+            meter.m("step %d", 1);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject m(null) after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNullDescriptionAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: m(null) is called after stop
+            meter.m(null);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Increment operations after reject (Rejected state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject inc() after reject() - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: inc() is called after stop
+            meter.inc();
+
+            // Then: logs INCONSISTENT_INCREMENT, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject incBy(5) after reject() - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncByAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: incBy(5) is called after stop
+            meter.incBy(5);
+
+            // Then: logs INCONSISTENT_INCREMENT, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject incTo(10) after reject() - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncToAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: incTo(10) is called after stop
+            meter.incTo(10);
+
+            // Then: logs INCONSISTENT_INCREMENT, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Progress after reject (Rejected state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject progress() after reject() - logs INCONSISTENT_PROGRESS")
+        @ValidateCleanMeter
+        void shouldRejectProgressAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: progress() is called after stop
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject progress() after inc() and reject() - logs INCONSISTENT_PROGRESS")
+        @ValidateCleanMeter
+        void shouldRejectProgressAfterIncAndReject() {
+            // Given: a meter with inc() that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start();
+            meter.inc();
+            meter.reject("business_error");
+
+            // When: progress() is called after stop
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 1, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Update context after reject (Rejected state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject ctx() after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectContextAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: ctx("key1", "value1") is called after stop
+            meter.ctx("key1", "value1");
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            assertFalse(meter.getContext().containsKey("key1"));
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject ctx() update after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectContextUpdateAfterReject() {
+            // Given: a meter with context that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start();
+            meter.ctx("key", "val");
+            meter.reject("business_error");
+
+            // When: ctx("key", "val2") is called after stop
+            meter.ctx("key", "val2");
+
+            // Then: logs ILLEGAL, meter state and context unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Set path after reject (Rejected state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject path() after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectPathAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: path("new_path") is called after stop
+            meter.path("new_path");
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject path() update after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectPathUpdateAfterReject() {
+            // Given: a meter that has been stopped with reject("original_error")
+            final Meter meter = new Meter(logger).start().reject("original_error");
+
+            // When: path("new_path") is called after stop
+            meter.path("new_path");
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "original_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject path(null) after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNullPathAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: path(null) is called after stop
+            meter.path(null);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Update time limit after reject (Rejected state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject limitMilliseconds() after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectLimitAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: limitMilliseconds(5000) is called after stop
+            meter.limitMilliseconds(5000);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds() update after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectLimitUpdateAfterReject() {
+            // Given: a meter with timeLimit that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start();
+            meter.limitMilliseconds(100);
+            meter.reject("business_error");
+
+            // When: limitMilliseconds(5000) is called after stop
+            meter.limitMilliseconds(5000);
+
+            // Then: logs ILLEGAL, meter state unchanged (timeLimit remains 100)
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 100);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(0) after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectZeroLimitAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: limitMilliseconds(0) is called after stop
+            meter.limitMilliseconds(0);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(-1) after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNegativeLimitAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: limitMilliseconds(-1) is called after stop
+            meter.limitMilliseconds(-1);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Update expected iterations after reject (Rejected state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject iterations() after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectIterationsAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: iterations(100) is called after stop
+            meter.iterations(100);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations() update after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectIterationsUpdateAfterReject() {
+            // Given: a meter with expectedIterations that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start();
+            meter.iterations(50);
+            meter.reject("business_error");
+
+            // When: iterations(100) is called after stop
+            meter.iterations(100);
+
+            // Then: logs ILLEGAL, meter state unchanged (expectedIterations remains 50)
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 50, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(0) after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectZeroIterationsAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: iterations(0) is called after stop
+            meter.iterations(0);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(-5) after reject() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNegativeIterationsAfterReject() {
+            // Given: a meter that has been stopped with reject("business_error")
+            final Meter meter = new Meter(logger).start().reject("business_error");
+
+            // When: iterations(-5) is called after stop
+            meter.iterations(-5);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+    }
+
+    // ================================================================================
+    // Group 11: Post-Stop Invalid Operations - Failed State (❌ Tier 4)
+    // ================================================================================
+
+    @Nested
+    @DisplayName("Group 11: Post-Stop Invalid Operations - Failed State (❌ Tier 4)")
+    class PostStopInvalidOperationsFailedState {
+
+        // ============================================================================
+        // Update description after fail (Failed state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject m(String) after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectDescriptionAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: m("step 1") is called after stop
+            meter.m("step 1");
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject m(String, Object...) after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectDescriptionWithArgsAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: m("step %d", 1) is called after stop
+            meter.m("step %d", 1);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject m(null) after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNullDescriptionAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: m(null) is called after stop
+            meter.m(null);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Increment operations after fail (Failed state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject inc() after fail() - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: inc() is called after stop
+            meter.inc();
+
+            // Then: logs INCONSISTENT_INCREMENT, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject incBy(5) after fail() - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncByAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: incBy(5) is called after stop
+            meter.incBy(5);
+
+            // Then: logs INCONSISTENT_INCREMENT, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject incTo(10) after fail() - logs INCONSISTENT_INCREMENT")
+        @ValidateCleanMeter
+        void shouldRejectIncToAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: incTo(10) is called after stop
+            meter.incTo(10);
+
+            // Then: logs INCONSISTENT_INCREMENT, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Progress after fail (Failed state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject progress() after fail() - logs INCONSISTENT_PROGRESS")
+        @ValidateCleanMeter
+        void shouldRejectProgressAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: progress() is called after stop
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject progress() after inc() and fail() - logs INCONSISTENT_PROGRESS")
+        @ValidateCleanMeter
+        void shouldRejectProgressAfterIncAndFail() {
+            // Given: a meter with inc() that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start();
+            meter.inc();
+            meter.fail("technical_error");
+
+            // When: progress() is called after stop
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 1, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Update context after fail (Failed state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject ctx() after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectContextAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: ctx("key1", "value1") is called after stop
+            meter.ctx("key1", "value1");
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            assertFalse(meter.getContext().containsKey("key1"));
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject ctx() update after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectContextUpdateAfterFail() {
+            // Given: a meter with context that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start();
+            meter.ctx("key", "val");
+            meter.fail("technical_error");
+
+            // When: ctx("key", "val2") is called after stop
+            meter.ctx("key", "val2");
+
+            // Then: logs ILLEGAL, meter state and context unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Set path after fail (Failed state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject path() after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectPathAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: path("new_path") is called after stop
+            meter.path("new_path");
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject path() update after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectPathUpdateAfterFail() {
+            // Given: a meter that has been stopped with fail("original_error")
+            final Meter meter = new Meter(logger).start().fail("original_error");
+
+            // When: path("new_path") is called after stop
+            meter.path("new_path");
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "original_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject path(null) after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNullPathAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: path(null) is called after stop
+            meter.path(null);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Update time limit after fail (Failed state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject limitMilliseconds() after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectLimitAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: limitMilliseconds(5000) is called after stop
+            meter.limitMilliseconds(5000);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds() update after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectLimitUpdateAfterFail() {
+            // Given: a meter with timeLimit that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start();
+            meter.limitMilliseconds(100);
+            meter.fail("technical_error");
+
+            // When: limitMilliseconds(5000) is called after stop
+            meter.limitMilliseconds(5000);
+
+            // Then: logs ILLEGAL, meter state unchanged (timeLimit remains 100)
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 100);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(0) after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectZeroLimitAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: limitMilliseconds(0) is called after stop
+            meter.limitMilliseconds(0);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(-1) after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNegativeLimitAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: limitMilliseconds(-1) is called after stop
+            meter.limitMilliseconds(-1);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        // ============================================================================
+        // Update expected iterations after fail (Failed state)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject iterations() after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectIterationsAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: iterations(100) is called after stop
+            meter.iterations(100);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations() update after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectIterationsUpdateAfterFail() {
+            // Given: a meter with expectedIterations that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start();
+            meter.iterations(50);
+            meter.fail("technical_error");
+
+            // When: iterations(100) is called after stop
+            meter.iterations(100);
+
+            // Then: logs ILLEGAL, meter state unchanged (expectedIterations remains 50)
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 50, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(0) after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectZeroIterationsAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: iterations(0) is called after stop
+            meter.iterations(0);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(-5) after fail() - logs ILLEGAL")
+        @ValidateCleanMeter
+        void shouldRejectNegativeIterationsAfterFail() {
+            // Given: a meter that has been stopped with fail("technical_error")
+            final Meter meter = new Meter(logger).start().fail("technical_error");
+
+            // When: iterations(-5) is called after stop
+            meter.iterations(-5);
+
+            // Then: logs ILLEGAL, meter state unchanged
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
     }
 }
