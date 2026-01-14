@@ -42,6 +42,8 @@ import java.util.TimeZone;
  *   <li><b>Default Calendar Information:</b> Verifies logging of calendar information with default timezone details</li>
  *   <li><b>Custom Calendar Information:</b> Tests reporting with custom timezone and date settings</li>
  * </ul>
+ *
+ * @author Co-authored-by: GitHub Copilot using gpt-4o
  */
 @DisplayName("ReportCalendar")
 @ValidateCharset

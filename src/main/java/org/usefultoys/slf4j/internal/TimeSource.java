@@ -32,7 +32,7 @@ package org.usefultoys.slf4j.internal;
  * @author Daniel Felix Ferber
  * @author Co-authored-by: GitHub Copilot using gpt-4o
  * @see SystemTimeSource
- * @see EventData#setTimeSource(TimeSource)
+ * @see EventData#timeSource
  */
 public interface TimeSource {
 
