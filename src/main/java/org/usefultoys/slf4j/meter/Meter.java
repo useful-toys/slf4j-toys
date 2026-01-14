@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.internal.SystemMetrics;
+import org.usefultoys.slf4j.internal.TimeSource;
 
 import java.io.Closeable;
 import java.lang.ref.WeakReference;
@@ -29,8 +30,6 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static org.usefultoys.slf4j.meter.MeterConfig.*;
 
 /**
  * The `Meter` is a core component of `slf4j-toys` designed to track the **lifecycle** of application operations.
@@ -80,7 +79,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * Timestamp (in nanoseconds) when progress was last reported. Zero if progress has not been reported yet. Used to
      * control the frequency of progress messages and avoid flooding the log.
      */
-    @Getter(value = AccessLevel.PACKAGE) // for tests
+    @Getter(AccessLevel.PACKAGE) // for tests
     private transient long lastProgressTime = 0;
     /**
      * Iteration count when progress was last reported. Zero if progress has not been reported yet. Used to control the
@@ -130,8 +129,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 extractNextPosition(logger.getName(), operation),
                 logger.getName(), operation, parent);
         createTime = collectCurrentTime();
-        messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + logger.getName() + messageSuffix);
-        dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + logger.getName() + dataSuffix);
+        messageLogger = org.slf4j.LoggerFactory.getLogger(MeterConfig.messagePrefix + logger.getName() + MeterConfig.messageSuffix);
+        dataLogger = org.slf4j.LoggerFactory.getLogger(MeterConfig.dataPrefix + logger.getName() + MeterConfig.dataSuffix);
     }
 
     /**
@@ -172,7 +171,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @param useSimpleClassNameForThrowable If true, uses {@link Class#getSimpleName()} for Throwables; otherwise, uses {@link Class#getName()}.
      * @return The string representation.
      */
-    private static String toPath(Object o, boolean useSimpleClassNameForThrowable) {
+    private static String toPath(final Object o, final boolean useSimpleClassNameForThrowable) {
         if (o == null) {
             return null;
         }
@@ -200,12 +199,12 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter sub(final String suboperationName) {
         MeterValidator.validateSubCallArguments(this, suboperationName);
         String subOperation = null;
-        if (this.operation == null) {
+        if (operation == null) {
             subOperation = suboperationName;
         } else if (suboperationName == null) {
-            subOperation = this.operation;
+            subOperation = operation;
         } else {
-            subOperation = this.operation + "/" + suboperationName;
+            subOperation = operation + "/" + suboperationName;
         }
         final Meter m = new Meter(messageLogger, subOperation, getFullID());
         if (context != null) {
@@ -274,6 +273,25 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             return this;
         }
         this.expectedIterations = expectedIterations;
+        return this;
+    }
+
+    /**
+     * Sets a custom time source for this meter instance.
+     * This method is intended for testing purposes to enable deterministic time-based testing
+     * without depending on actual system time or thread delays.
+     * <p>
+     * <b>Precondition:</b> This method must be called before {@link #start()}.
+     * Calling it after starting will log an error and have no effect.
+     * <p>
+     * <b>Thread Safety:</b> This method should be called before the meter is used
+     * in concurrent scenarios.
+     *
+     * @param timeSource The time source to use for collecting timestamps.
+     * @return Reference to this `Meter` instance, for method chaining.
+     */
+    public Meter withTimeSource(final TimeSource timeSource) {
+        super.withTimeSource(timeSource);
         return this;
     }
 

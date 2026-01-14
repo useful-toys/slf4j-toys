@@ -171,4 +171,95 @@ class EventDataTest {
         assertEquals(event.getPosition(), event2.getPosition(), "Position should be preserved");
         assertEquals(event.getLastCurrentTime(), event2.getLastCurrentTime(), "Last current time should be preserved");
     }
+
+    @Test
+    @DisplayName("should use default SystemTimeSource by default")
+    void testDefaultTimeSource() {
+        // Given: EventData with default time source
+        final EventData event = new EventData();
+        final long startTime = System.nanoTime();
+
+        // When: collectCurrentTime is called
+        final long collectedTime = event.collectCurrentTime();
+        final long endTime = System.nanoTime();
+
+        // Then: collected time should be within system time window
+        assertTrue(collectedTime >= startTime, "Collected time should be >= start time");
+        assertTrue(collectedTime <= endTime, "Collected time should be <= end time");
+        assertEquals(collectedTime, event.getLastCurrentTime(), "Last current time should match collected time");
+    }
+
+    @Test
+    @DisplayName("should use custom TimeSource when set via withTimeSource")
+    void testCustomTimeSource() {
+        // Given: EventData with custom time source
+        final TestTimeSource testTimeSource = new TestTimeSource();
+        testTimeSource.setNanoTime(1000L);
+        final EventData event = new EventData();
+
+        // When: custom time source is set and collectCurrentTime is called
+        event.withTimeSource(testTimeSource);
+        final long collectedTime = event.collectCurrentTime();
+
+        // Then: collected time should match custom time source
+        assertEquals(1000L, collectedTime, "Collected time should match custom time source value");
+        assertEquals(1000L, event.getLastCurrentTime(), "Last current time should match custom time source value");
+    }
+
+    @Test
+    @DisplayName("should return this instance for method chaining with withTimeSource")
+    void testWithTimeSourceChaining() {
+        // Given: EventData instance
+        final EventData event = new EventData();
+        final TestTimeSource testTimeSource = new TestTimeSource();
+
+        // When: withTimeSource is called
+        final EventData result = event.withTimeSource(testTimeSource);
+
+        // Then: same instance should be returned for chaining
+        assertEquals(event, result, "withTimeSource should return the same instance for method chaining");
+    }
+
+    @Test
+    @DisplayName("should collect deterministic times with controllable time source")
+    void testDeterministicTimeCollection() {
+        // Given: EventData with controllable time source
+        final TestTimeSource testTimeSource = new TestTimeSource();
+        final EventData event = new EventData();
+        event.withTimeSource(testTimeSource);
+
+        // When: time is advanced in controlled steps
+        testTimeSource.setNanoTime(100L);
+        event.collectCurrentTime();
+        final long time1 = event.getLastCurrentTime();
+
+        testTimeSource.setNanoTime(200L);
+        event.collectCurrentTime();
+        final long time2 = event.getLastCurrentTime();
+
+        testTimeSource.setNanoTime(350L);
+        event.collectCurrentTime();
+        final long time3 = event.getLastCurrentTime();
+
+        // Then: collected times should match controlled progression
+        assertEquals(100L, time1, "First collected time should be 100L");
+        assertEquals(200L, time2, "Second collected time should be 200L");
+        assertEquals(350L, time3, "Third collected time should be 350L");
+    }
+
+    /**
+     * Test implementation of TimeSource for deterministic testing.
+     */
+    private static class TestTimeSource implements TimeSource {
+        private long currentNanoTime = 0;
+
+        public void setNanoTime(final long nanoTime) {
+            currentNanoTime = nanoTime;
+        }
+
+        @Override
+        public long nanoTime() {
+            return currentNanoTime;
+        }
+    }
 }

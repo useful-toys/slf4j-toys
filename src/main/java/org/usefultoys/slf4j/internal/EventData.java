@@ -16,7 +16,6 @@
 package org.usefultoys.slf4j.internal;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,7 +29,6 @@ import java.io.Serializable;
  * @author Daniel Felix Ferber
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED) // for tests only
 @Getter
 public class EventData implements Serializable {
 
@@ -48,6 +46,12 @@ public class EventData implements Serializable {
      * The timestamp (in nanoseconds) when the event data was collected.
      */
     long lastCurrentTime = 0; // Changed from protected to package-private
+
+    /**
+     * The time source used for collecting timestamps.
+     * Defaults to {@link SystemTimeSource#INSTANCE}.
+     */
+    private transient TimeSource timeSource = SystemTimeSource.INSTANCE;
 
     /**
      * Constructs an EventData instance with a specified session UUID.
@@ -70,12 +74,40 @@ public class EventData implements Serializable {
     }
 
     /**
+     * Constructs an EventData instance with all fields specified (for testing).
+     *
+     * @param sessionUuid The unique identifier for the JVM session.
+     * @param position The time-ordered sequential position of the event.
+     * @param lastCurrentTime The timestamp when the event was collected.
+     */
+    protected EventData(final String sessionUuid, final long position, final long lastCurrentTime) {
+        this.sessionUuid = sessionUuid;
+        this.position = position;
+        this.lastCurrentTime = lastCurrentTime;
+    }
+
+    /**
      * Updates the {@code lastCurrentTime} with the current system's high-resolution time.
      *
      * @return The updated {@code lastCurrentTime} in nanoseconds.
      */
     protected final long collectCurrentTime() {
-        return lastCurrentTime = System.nanoTime();
+        return lastCurrentTime = timeSource.nanoTime();
+    }
+
+    /**
+     * Sets a custom time source for this event data instance.
+     * This method is intended for testing purposes to enable deterministic time-based testing.
+     * <p>
+     * <b>Thread Safety:</b> This method should be called before the event data is used
+     * in concurrent scenarios, as the time source is not volatile.
+     *
+     * @param timeSource The time source to use for collecting timestamps.
+     * @return This EventData instance for method chaining.
+     */
+    public EventData withTimeSource(final TimeSource timeSource) {
+        this.timeSource = timeSource;
+        return this;
     }
 
 
