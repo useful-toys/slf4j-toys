@@ -173,6 +173,13 @@ class MeterLifeCycleTest {
      *       <li>Total log event count with {@code AssertLogger.assertEventCount()}.</li>
      *     </ul>
      *   </li>
+     *   <li><b>Log validation structure:</b>
+     *     <ul>
+     *       <li>Log validation (events and total count) must be in a separate block.</li>
+     *       <li>Start the log validation block with a {@code // Then:} comment explaining what is being validated.</li>
+     *       <li>Example: {@code // Then: verify start log events}</li>
+     *     </ul>
+     *   </li>
      *   <li><b>For try-with-resources blocks:</b>
      *     <ul>
      *       <li>Use an external variable to hold the meter reference at the start of the try block.</li>
@@ -182,7 +189,7 @@ class MeterLifeCycleTest {
      *   </li>
      *   <li><b>Special annotations:</b>
      *     <ul>
-     *       <li>Use <code>@ValidateCleanMeter(expectDirtyStack = true)</code> for tests that call {@code start()}
+     *       <li>Use {@code @ValidateCleanMeter(expectDirtyStack = true)} for tests that call {@code start()}
      *           without a corresponding termination (ok(), reject(), fail(), or implicit close()).</li>
      *     </ul>
      *   </li>
@@ -373,7 +380,7 @@ class MeterLifeCycleTest {
      *   <li><b>DO NOT validate:</b>
      *     <ul>
      *       <li>Log events at indices 0 and 1 (from start()). Assume these are correct as tested in Group 1.</li>
-     *       <li>Meter state after <code>new Meter()</code> and {@code meter.start()}. Assume these are correct.</li>
+     *       <li>Meter state after {@code new Meter()} and {@code meter.start()}. Assume these are correct.</li>
      *     </ul>
      *   </li>
      *   <li><b>DO validate:</b>
@@ -382,6 +389,13 @@ class MeterLifeCycleTest {
      *       <li>All log events from the termination operation onwards (indices 2+).</li>
      *       <li>Path values with different types: String, Enum, Throwable, and Object paths.</li>
      *       <li>Total log event count with {@code AssertLogger.assertEventCount()}.</li>
+     *     </ul>
+     *   </li>
+     *   <li><b>Log validation structure:</b>
+     *     <ul>
+     *       <li>Log validation (events and total count) must be in a separate block.</li>
+     *       <li>Start the log validation block with a {@code // Then:} comment explaining what is being validated.</li>
+     *       <li>Example: {@code // Then: verify termination log events}</li>
      *     </ul>
      *   </li>
      *   <li><b>For time-based validations:</b> (isSlow, progress throttling)
@@ -414,9 +428,9 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in OK state
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         // ============================================================================
@@ -435,9 +449,9 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in OK state with okPath set
             assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "success_path");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
