@@ -131,14 +131,20 @@ public void ok() {
         // Ignored: do nothing
         validateStopPrecondition(this, Markers.INCONSISTENT_OK);
         // ... log warning but do not change state ...
-        return;
     }
 }
 ```
 
-### Atomicity and Thread Safety
+### Immutability and First-Write-Wins Strategy
 
-Since `stopTime` is a `volatile long`, the first call to `ok()`, `reject()`, or `fail()` wins atomically. Subsequent calls detect `stopTime != 0` and are classified as Tier 4 (ignored).
+This resilience model rigidly enforces the **Immutable Lifecycle Transitions** defined in [TDR-0019](TDR-0019-immutable-lifecycle-transitions.md).
+
+*   **Logic**: The `stopTime` attribute acts as a "write-once" barrier.
+*   **First-Write-Wins**: The first call to any terminal method (`ok()`, `reject()`, or `fail()`) sets `stopTime` to a non-zero value.
+*   **Immutability**: Once `stopTime != 0`, the categorical state of the meter (OK/Rejected/Failed) and its outcome path (`okPath`, `rejectPath`, `failPath`) become **immutable**.
+*   **Thread Safety**: Since `stopTime` is a `volatile long` (or accessed via synchronized/atomic means where applicable), concurrent termination attempts are handled atomically. The winner sets the state; losers fall into **Tier 4** (State-Preserving) and are ignored (with a warning log).
+
+This ensures that a Meter reported as "OK" cannot later change to "Failed" due to a subsequent exception handler or finally block.
 
 ### Logging and Diagnostics
 
