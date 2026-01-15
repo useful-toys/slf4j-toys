@@ -36,9 +36,9 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 | **9** | Post-Stop Attribute Updates (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
 | **10** | Post-Stop Attribute Updates (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
 | **11** | Post-Stop Attribute Updates (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
-| **15** | Terminal Immutability | ❌ Tier 4 | None | Preserve terminal state |
-| **16** | Thread-Local Stack | Mixed | Varies | Nesting & cleanup |
-| **17** | Complex Scenarios | All | Varies | Realistic workflows |
+| **12** | Post-Stop Invalid Termination | ❌ Tier 4 | ILLEGAL | Attempts to terminate already-stopped meters |
+| **13** | Pre-Start Terminated, Post-Stop Invalid Termination | ❌ Tier 4 | INCONSISTENT_*/ILLEGAL | Termination chains without start() call |
+
 
 ---
 
@@ -901,6 +901,56 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - `start() → path("configured") → ok("path") → start()` → logs ILLEGAL, meter remains stopped
    - `start() → path("configured") → reject("error") → start()` → logs ILLEGAL, meter remains stopped
    - `start() → path("configured") → fail("error") → start()` → logs ILLEGAL, meter remains stopped
+
+---
+
+### **Group 13: Pre-Start Terminated, Post-Stop Invalid Termination (❌ Tier 4 - State-Preserving)**
+
+**Purpose:** Validate that termination chains without calling `start()` are handled correctly. These tests mirror Group 12 scenarios but omit the initial `start()` call, verifying that the system correctly handles cases where a developer forgets to start the meter before attempting termination operations. The first termination call should log INCONSISTENT (pre-start termination), and subsequent termination attempts should log ILLEGAL (already stopped).
+
+**Test Scenarios:**
+
+#### 1. **Double Termination Without path() Configuration (No start())**
+   - `ok() → ok()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL (already stopped with ok), state OK
+   - `ok() → ok("second_path")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, okPath remains unset, state OK
+   - `ok() → reject("error")` → first logs INCONSISTENT_STOP_WITHOUT_START (ok without start), second logs ILLEGAL, state remains OK, rejectPath not set
+   - `ok() → fail("error")` → first logs INCONSISTENT_STOP_WITHOUT_START (ok without start), second logs ILLEGAL, state remains OK, failPath not set
+   - `ok("first_path") → ok()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, okPath remains "first_path", state OK
+   - `ok("first_path") → ok("second_path")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, okPath remains "first_path"
+   - `ok("path") → reject("error")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains OK, okPath preserved
+   - `ok("path") → fail("error")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains OK, okPath preserved
+   - `reject("business_error") → ok()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Rejected
+   - `reject("business_error") → ok("path")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Rejected
+   - `reject("business_error") → reject("another_error")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, rejectPath remains "business_error"
+   - `reject("business_error") → fail("technical_error")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Rejected
+   - `fail("technical_error") → ok()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Failed
+   - `fail("technical_error") → ok("path")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Failed
+   - `fail("technical_error") → reject("error")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Failed
+   - `fail("technical_error") → fail("another_error")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, failPath remains "technical_error"
+
+#### 2. **Double Termination With path() Configuration Before First Termination (No start())**
+   - `path("configured") → ok() → ok()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, okPath remains "configured", state OK
+   - `path("configured") → ok() → ok("second_path")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, okPath remains "configured"
+   - `path("configured") → ok() → reject("error")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains OK
+   - `path("configured") → ok() → fail("error")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains OK
+   - `path("configured") → reject("error") → ok()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Rejected, rejectPath preserved
+   - `path("configured") → reject("error") → ok("path")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Rejected
+   - `path("configured") → reject("error") → reject("another")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, rejectPath remains "error"
+   - `path("configured") → reject("error") → fail("tech_error")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Rejected
+   - `path("configured") → fail("error") → ok()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Failed
+   - `path("configured") → fail("error") → ok("path")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Failed
+   - `path("configured") → fail("error") → reject("business")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, state remains Failed
+   - `path("configured") → fail("error") → fail("another")` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, failPath remains "error"
+
+#### 3. **Attempt to Start After Pre-Start Termination**
+   - `ok() → start()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL (already stopped), meter remains stopped
+   - `ok("path") → start()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, meter remains stopped with okPath
+   - `reject("error") → start()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, meter remains stopped with rejectPath
+   - `fail("error") → start()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, meter remains stopped with failPath
+   - `path("configured") → ok() → start()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, meter remains stopped
+   - `path("configured") → ok("path") → start()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, meter remains stopped
+   - `path("configured") → reject("error") → start()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, meter remains stopped
+   - `path("configured") → fail("error") → start()` → first logs INCONSISTENT_STOP_WITHOUT_START, second logs ILLEGAL, meter remains stopped
 
 ---
 
