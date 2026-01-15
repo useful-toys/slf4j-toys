@@ -2237,7 +2237,7 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Group 5: Pre-Start Termination (⚠️ Tier 3)")
+    @DisplayName("Group 5: Pre-Start Termination (Tier 3)")
     class PreStartTermination {
         // ============================================================================
         // OK without starting (Created → OK)
@@ -2259,6 +2259,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2277,6 +2278,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2295,6 +2297,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2314,6 +2317,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2333,6 +2337,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -2355,6 +2360,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2373,6 +2379,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2392,6 +2399,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2411,6 +2419,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -2433,6 +2442,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2451,6 +2461,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2470,6 +2481,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2489,6 +2501,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -2516,6 +2529,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "operation description");
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2539,6 +2553,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 1, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "validation check");
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2562,6 +2577,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "database operation");
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -2588,6 +2604,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "user", "alice");
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "action", "import");
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2610,6 +2627,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_REJECT);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "user", "bob");
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "action", "export");
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -2632,6 +2650,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "user", "charlie");
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "action", "delete");
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -2656,6 +2675,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_OK);
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -2676,6 +2696,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_REJECT);
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -2696,6 +2717,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 4);
         }
     }
 

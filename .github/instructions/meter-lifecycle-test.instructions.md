@@ -15,6 +15,10 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
     - Focus on these attributes: `startTime`, `stopTime`, `okPath`, `rejectPath`, `failPath`, `failMessage`, `currentIteration`, `expectedIterations`, `timeLimitMilliseconds`, `lastCurrentTime`, `createTime`.
     - Prefer `assertMeterState()` to validate these attributes.
     - Only use JUnit asserts to validate conditions that cannot be checked with `assertMeterState()`.
+    - **For attributes NOT covered by `assertMeterState()` (e.g., `description`, `context`):**
+      - Use `assertEquals()` to validate `description` when it's set via `m()` method: `assertEquals("expected description", meter.getDescription())`
+      - Use `assertEquals()` to validate individual context entries: `assertEquals("expectedValue", meter.getContext().get("key"))`
+      - These validations should appear in the same `// Then:` block as `assertMeterState()` when validating meter state
     - Validate initial state after `new Meter()` using `assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0)`.
     - Validate state state transitions using `assertMeterState()`.
     - Validate analysis methods (`isSlow()`, `isStarted()`, `isStopped()`) when relevant to the test scenario.
@@ -80,6 +84,11 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
 
 - **Log events validations:**
     - Validate log events, checking Marker and Level. Only validate message and parameters when relevant to the test scenario.
+    - **Validate message content when it contains relevant information:**
+      - When logs include meter attributes (description, context), validate they appear in the log events
+      - Example for description in logs: `AssertLogger.assertEvent(logger, 2, Level.TRACE, "operation description")`
+      - Example for context in logs: `AssertLogger.assertEvent(logger, 2, Level.TRACE, "user", "alice")` and `AssertLogger.assertEvent(logger, 2, Level.TRACE, "action", "import")`
+      - This ensures that configured attributes are properly logged in DATA_OK, DATA_REJECT, and DATA_FAIL events
     - Validate total log event count with `AssertLogger.assertEventCount()`.
     - Validate log count as zero (`AssertLogger.assertEventCount(logger, 0)`) when no events are expected.
     - Log validation (events and total count) must be in a separate block.
