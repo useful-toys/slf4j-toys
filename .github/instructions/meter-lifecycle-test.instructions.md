@@ -60,6 +60,7 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
     - Validate log count as zero (`AssertLogger.assertEventCount(logger, 0)`) when no events are expected.
     - Log validation (events and total count) must be in a separate block.
     - Start the log validation block with a `// Then:` comment explaining what is being validated.
+    - **Always add a blank line before the log validation block** to separate it from state validations.
 
 - **Test structure with comments:**
     - Use separate `// Then:` comment blocks for different types of validations (e.g., state validation, log validation, getCurrentInstance validation).

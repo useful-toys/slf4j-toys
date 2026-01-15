@@ -339,6 +339,8 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in OK state
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: validate logs
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -360,6 +362,8 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in OK state with okPath set
             assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
+
+            // Then: validate logs (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "success_path");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -370,17 +374,23 @@ class MeterLifeCycleTest {
         void shouldTransitionCreatedToStartedToOkWithStringPathViaPathThenOk() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-
-            // When: meter is started, path is set, and completes successfully
             meter.start();
+
+            // When: path is set
             meter.path("custom_path");
+            // Then: path was applied (pedagogical validation)
+            assertMeterState(meter, true, false, "custom_path", null, null, null, 0, 0, 0);
+
+            // When: meter completes successfully
             meter.ok();
 
             // Then: meter should be in OK state with okPath set
             assertMeterState(meter, true, true, "custom_path", null, null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: validate logs (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "custom_path");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -395,9 +405,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in OK state with okPath as Enum.toString()
             assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: validate logs (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "VALUE1");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -413,9 +425,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in OK state with okPath as Throwable class name
             assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: validate logs (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "RuntimeException");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -431,9 +445,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in OK state with okPath as Object.toString()
             assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: validate logs (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "testObjectString");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -441,17 +457,23 @@ class MeterLifeCycleTest {
         void shouldTransitionCreatedToStartedToOkWithOkOverridingPath() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-
-            // When: meter is started, path is set, then ok() with different path
             meter.start();
+
+            // When: initial path is set
             meter.path("default_path");
+            // Then: okPath = "default_path" (pedagogical validation)
+            assertMeterState(meter, true, false, "default_path", null, null, null, 0, 0, 0);
+
+            // When: ok() overrides path
             meter.ok("override_path");
 
             // Then: meter should be in OK state with okPath from ok() (overrides path())
             assertMeterState(meter, true, true, "override_path", null, null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: validate logs (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "override_path");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -459,19 +481,33 @@ class MeterLifeCycleTest {
         void shouldTransitionCreatedToStartedToOkWithMultiplePathCalls() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-
-            // When: meter is started and path() is called multiple times
             meter.start();
+
+            // When: first path is set
             meter.path("first");
+            // Then: okPath = "first" (pedagogical validation)
+            assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
+
+            // When: path is overridden
             meter.path("second");
+            // Then: okPath = "second" (pedagogical validation)
+            assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+
+            // When: path is overridden again
             meter.path("third");
+            // Then: okPath = "third" (last wins)
+            assertMeterState(meter, true, false, "third", null, null, null, 0, 0, 0);
+
+            // When: meter completes
             meter.ok();
 
             // Then: meter should be in OK state with okPath from last path() call
             assertMeterState(meter, true, true, "third", null, null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: validate logs (skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "third");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         // ============================================================================
@@ -561,13 +597,17 @@ class MeterLifeCycleTest {
         void shouldTransitionCreatedToStartedToRejectedAfterSettingPathExpectation() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-
-            // When: meter is started, path is set for expected ok, then rejected
             meter.start();
+
+            // When: path is set for expected ok
             meter.path("expected_ok_path");
+            // Then: okPath = "expected_ok_path" (pedagogical validation)
+            assertMeterState(meter, true, false, "expected_ok_path", null, null, null, 0, 0, 0);
+
+            // When: meter is rejected instead
             meter.reject("business_error");
 
-            // Then: meter should be in Rejected state with rejectPath (okPath remains unset)
+            // Then: meter should be in Rejected state with rejectPath (okPath cleared, rejection overrides expectation)
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
 
             // Then: verify rejection log events
@@ -663,13 +703,17 @@ class MeterLifeCycleTest {
         void shouldTransitionCreatedToStartedToFailedAfterSettingPathExpectation() {
             // Given: a new Meter
             final Meter meter = new Meter(logger);
-
-            // When: meter is started, path is set for expected ok, then fails
             meter.start();
+
+            // When: path is set for expected ok
             meter.path("expected_ok_path");
+            // Then: okPath = "expected_ok_path" (pedagogical validation)
+            assertMeterState(meter, true, false, "expected_ok_path", null, null, null, 0, 0, 0);
+
+            // When: meter fails instead
             meter.fail("critical_error");
 
-            // Then: meter should be in Failed state with failPath (okPath remains unset)
+            // Then: meter should be in Failed state with failPath (okPath cleared, failure overrides expectation)
             assertMeterState(meter, true, true, null, null, "critical_error", null, 0, 0, 0);
 
             // Then: verify failure log events
@@ -725,6 +769,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 6, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 7, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 8);
         }
 
         @Test
@@ -764,6 +809,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 6);
         }
 
         @Test
@@ -807,6 +853,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 6);
         }
 
         @Test
@@ -850,6 +897,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 6);
         }
 
         // ============================================================================
@@ -876,6 +924,7 @@ class MeterLifeCycleTest {
             // Then: completion report logged as INFO (not slow, skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         // ============================================================================
@@ -902,6 +951,7 @@ class MeterLifeCycleTest {
             // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -924,6 +974,7 @@ class MeterLifeCycleTest {
             // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -946,6 +997,7 @@ class MeterLifeCycleTest {
             // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         // ============================================================================
