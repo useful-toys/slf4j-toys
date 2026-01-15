@@ -1304,7 +1304,7 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Group 3: Try-With-Resources (✅ Tier 1 + ⚠️ Tier 3")
+    @DisplayName("Group 3: Try-With-Resources (Tier 1 + Tier 3)")
     class TryWithResources {
         @Test
         @DisplayName("should follow try-with-resources flow (implicit failure)")
@@ -1322,6 +1322,7 @@ class MeterLifeCycleTest {
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -1345,6 +1346,7 @@ class MeterLifeCycleTest {
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -1374,6 +1376,7 @@ class MeterLifeCycleTest {
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -1397,6 +1400,7 @@ class MeterLifeCycleTest {
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -1420,10 +1424,11 @@ class MeterLifeCycleTest {
             // Then: all log messages recorded correctly
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         // ============================================================================
-        // Try-with-resources WITHOUT start() (⚠️ Tier 3 - State-Correcting)
+        // Try-with-resources WITHOUT start() (Tier 3 - State-Correcting)
         // ============================================================================
 
         @Test
@@ -1440,6 +1445,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, Markers.DATA_FAIL);
             AssertLogger.assertEvent(logger, 2, Level.TRACE, "try-with-resources");
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -1451,9 +1457,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: ok() is called without start() */
                 m.ok();
+
+                /* Then: Meter is in stopped state (pedagogical validation) */
+                assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to OK state despite missing start() */
+            /* Then: meter remains in OK state after close() */
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
@@ -1472,9 +1481,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: ok("success_path") is called without start() */
                 m.ok("success_path");
+
+                /* Then: Meter is in stopped state with path (pedagogical validation) */
+                assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to OK state with path */
+            /* Then: meter remains in OK state with path after close() */
             assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
@@ -1493,9 +1505,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: ok(Enum) is called without start() */
                 m.ok(TestEnum.VALUE1);
+
+                /* Then: Meter is in stopped state with enum path (pedagogical validation) */
+                assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to OK state with enum toString as path */
+            /* Then: meter remains in OK state with enum path after close() */
             assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
@@ -1515,9 +1530,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: ok(Throwable) is called without start() */
                 m.ok(exception);
+
+                /* Then: Meter is in stopped state with throwable path (pedagogical validation) */
+                assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to OK state with throwable simple class name as path */
+            /* Then: meter remains in OK state with throwable path after close() */
             assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
@@ -1537,9 +1555,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: ok(Object) is called without start() */
                 m.ok(testObject);
+
+                /* Then: Meter is in stopped state with object path (pedagogical validation) */
+                assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to OK state with object toString as path */
+            /* Then: meter remains in OK state with object path after close() */
             assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
@@ -1558,9 +1579,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: reject("business_error") is called without start() */
                 m.reject("business_error");
+
+                /* Then: Meter is in stopped state with rejectPath (pedagogical validation) */
+                assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to Rejected state with rejectPath */
+            /* Then: meter remains in Rejected state after close() */
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
@@ -1579,9 +1603,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: reject(Enum) is called without start() */
                 m.reject(TestEnum.VALUE2);
+
+                /* Then: Meter is in stopped state with enum rejectPath (pedagogical validation) */
+                assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to Rejected state with enum toString as cause */
+            /* Then: meter remains in Rejected state with enum cause after close() */
             assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
@@ -1601,9 +1628,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: reject(Throwable) is called without start() */
                 m.reject(exception);
+
+                /* Then: Meter is in stopped state with throwable rejectPath (pedagogical validation) */
+                assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to Rejected state with throwable simple class name as cause */
+            /* Then: meter remains in Rejected state with throwable cause after close() */
             assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
@@ -1623,9 +1653,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: reject(Object) is called without start() */
                 m.reject(testObject);
+
+                /* Then: Meter is in stopped state with object rejectPath (pedagogical validation) */
+                assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to Rejected state with object toString as cause */
+            /* Then: meter remains in Rejected state with object cause after close() */
             assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
@@ -1644,9 +1677,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: fail("technical_error") is called without start() */
                 m.fail("technical_error");
+
+                /* Then: Meter is in stopped state with failPath (pedagogical validation) */
+                assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to Failed state with failPath (failMessage null for non-Throwable) */
+            /* Then: meter remains in Failed state after close() */
             assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
@@ -1665,9 +1701,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: fail(Enum) is called without start() */
                 m.fail(TestEnum.VALUE1);
+
+                /* Then: Meter is in stopped state with enum failPath (pedagogical validation) */
+                assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to Failed state with enum toString as cause (failMessage null) */
+            /* Then: meter remains in Failed state with enum cause after close() */
             assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
@@ -1687,9 +1726,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: fail(Throwable) is called without start() */
                 m.fail(exception);
+
+                /* Then: Meter is in stopped state with throwable failPath and failMessage (pedagogical validation) */
+                assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
             }
 
-            /* Then: meter transitions to Failed state with throwable full class name as path and message as failMessage */
+            /* Then: meter remains in Failed state with throwable details after close() */
             assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
 
             /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
@@ -1709,9 +1751,12 @@ class MeterLifeCycleTest {
                 meter = m;
                 /* When: fail(Object) is called without start() */
                 m.fail(testObject);
+
+                /* Then: Meter is in stopped state with object failPath (pedagogical validation) */
+                assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
             }
 
-            /* Then: meter transitions to Failed state with object toString as cause (failMessage null) */
+            /* Then: meter remains in Failed state with object cause after close() */
             assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
 
             /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */

@@ -196,11 +196,21 @@ Tests validate normal lifecycle transitions without errors. These are the expect
 
 # Group 3 specific instructions
 
-- **Meter State validateion:**
-    - When using expected new Meter() -> start() flow, DO NOT validate meter state after `new Meter()` and `meter.start()`. Assume these are correct.
+This instructions override General instructions for Group 3 tests.
+
+## Group 3: Try-With-Resources (Tier 1 + Tier 3)
+
+Tests validate Meter behavior within try-with-resources blocks, including both normal flows (Tier 1: with start()) and state-correcting flows (Tier 3: without start()).
+
+- **Meter State validation:**
+    - When using expected new Meter() -> start() flow (Tier 1), DO NOT validate meter state after `new Meter()` and `meter.start()`. Assume these are correct.
+    - **Validation before try block:** Only validate meter state before entering the try block if there are configuration calls before the try block (e.g., `iterations()`, `limitMilliseconds()`). If meter is created directly in the try-with-resources statement, no pre-try validation is needed.
+    - **Intermediate validations within try block:** Apply the same pedagogical validation rules as non-try-with-resources tests:
+      - Validate state after intermediate operations that are the focus of the test (e.g., after `path()` call)
+      - Validate state after termination calls (ok(), reject(), fail()) when called within the try block
+      - These intermediate validations serve the same pedagogical purpose: documenting expected behavior at each step
+    - **Validation after try block:** Always validate final state after try-with-resources implicit close() using the external meter reference.
 
 - **Log events validations:**
-    - When using expected new Meter() -> start() flow, DO NOT validate events at indices 0 and 1 (from `start()`). Assume these are correct as tested in Group 1.
-
-- **For try-with-resources block validations:**
-    - DO NOT validate meter state at the beginning of the try block (initial state). Assume this is correct as tested in Group 1.
+    - When using expected new Meter() -> start() flow (Tier 1), DO NOT validate events at indices 0 and 1 (from `start()`). Assume these are correct as tested in Group 1.
+    - When testing state-correcting flows (Tier 3: without start()), validate all log events starting from index 0 (INCONSISTENT_* markers).
