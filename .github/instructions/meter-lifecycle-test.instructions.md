@@ -21,7 +21,9 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
 
 - **For try-with-resources block validations:**
     - Use an external variable to hold the meter reference at the start of the try block.
-    - After the try block exits, validate the final meter state using the external variable.
+    - Use `assertMeterState()` to validate the meter state at the beginning of the try block (initial state).
+    - Use `assertMeterState()` to validate the meter state at the end of the try block (before the try block exits).
+    - Use `assertMeterState()` to validate the meter state at the end of the try block (after the try block exits, using the external variable).
     - Validate final state after try-with-resources implicit close().
     - Verify that auto-fail via implicit close() occurred with correct logs.
   
