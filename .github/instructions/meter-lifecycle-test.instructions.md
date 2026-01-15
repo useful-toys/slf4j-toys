@@ -26,9 +26,14 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
     - Verify that auto-fail via implicit close() occurred with correct logs.
   
 - **For time-based validations:** (`isSlow`, progress throttling)
-    - Create Meter with a TestTimeSource to mock the clock: `new Meter(logger, timeSource)`.
-    - Advance time using TestTimeSource API to simulate execution delays.
-    - For progress throttling tests: set `MeterConfig.progressPeriodMilliseconds` before creating the meter.
+    - Create Meter with TestTimeSource: `new Meter(logger).withTimeSource(timeSource)` where `timeSource = new TestTimeSource(TestTimeSource.DAY1)`.
+    - Advance time during test execution using `timeSource.advanceMiliseconds(N)` to simulate elapsed time between operations.
+    - Configure `MeterConfig.progressPeriodMilliseconds` before meter creation:
+      - Set to `0` to disable throttling (all progress() calls will log)
+      - Set to positive value (e.g., `50`) to enable throttling (progress() only logs if time elapsed >= threshold)
+    - Validate `isSlow()` when testing time limits:
+      - `assertTrue(meter.isSlow())` when execution time > time limit
+      - `assertFalse(meter.isSlow())` when execution time < time limit
 
 - **Log events validations:**
     - Validate log events, checking Marker and Level. Only validate message and parameters when relevant to the test scenario.
@@ -69,7 +74,13 @@ Tests validate normal lifecycle transitions without errors. These are the expect
     - DO NOT validate meter state after `new Meter()` and `meter.start()`. Assume these are correct.
     - Explore path values with different types: String, Enum, Throwable, and Object paths.
     - Explore setting path and then overriding the path with another path type before termination.
-    - Explore setting path and then overriding the path with termination (ok, reject, fail).
+    - Explore setting path and then overriding the path with termination (ok, reject, fail). Also validate failMessage when applicable.
+    - Explore multiple iterations with correct expected iterations.
+    - Explore try-with-resources implicit close() with successful completion.
+    - Explore progress throttling with zero and nonzero `MeterConfig.progressPeriodMilliseconds` and mocked execution time to test progress log throttling (will produce logs only when time elapsed >= progressPeriodMilliseconds).
+    - Explore progress throttling with zero and nonzero elapsed time increments to test progress log throttling (will produce logs only when time increments happended since last progress call).
+   - Explore progress throttling with zero and nonzero iteration increments to test progress log throttling (will produce logs only when increment happended since last progress call).
+    - Explore meter execution with time limits and mocked execution time to test slow meter detection.
 
 - **Log events validations:**
     - DO NOT validate events at indices 0 and 1 (from `start()`). Assume these are correct as tested in Group 1.
