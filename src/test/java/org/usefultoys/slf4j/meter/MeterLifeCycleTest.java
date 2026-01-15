@@ -372,7 +372,7 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should transition Created → Started → OK with String path via path() then ok()")
         void shouldTransitionCreatedToStartedToOkWithStringPathViaPathThenOk() {
-            // Given: a new Meter
+            // Given: a new, started Meter
             final Meter meter = new Meter(logger);
             meter.start();
 
@@ -455,7 +455,7 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should transition Created → Started → OK with ok() overriding path()")
         void shouldTransitionCreatedToStartedToOkWithOkOverridingPath() {
-            // Given: a new Meter
+            // Given: a new, started Meter
             final Meter meter = new Meter(logger);
             meter.start();
 
@@ -479,7 +479,7 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should transition Created → Started → OK with multiple path() calls (last wins)")
         void shouldTransitionCreatedToStartedToOkWithMultiplePathCalls() {
-            // Given: a new Meter
+            // Given: a new, started Meter
             final Meter meter = new Meter(logger);
             meter.start();
 
@@ -595,7 +595,7 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should transition Created → Started → Rejected after setting path() expectation")
         void shouldTransitionCreatedToStartedToRejectedAfterSettingPathExpectation() {
-            // Given: a new Meter
+            // Given: a new, started Meter
             final Meter meter = new Meter(logger);
             meter.start();
 
@@ -701,7 +701,7 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should transition Created → Started → Failed after setting path() expectation")
         void shouldTransitionCreatedToStartedToFailedAfterSettingPathExpectation() {
-            // Given: a new Meter
+            // Given: a new, started Meter
             final Meter meter = new Meter(logger);
             meter.start();
 
@@ -737,25 +737,37 @@ class MeterLifeCycleTest {
 
             // When: meter is started, incremented with progress calls, and completes
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 15, 0);
 
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after first batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
 
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after second batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
 
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after third batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 15, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.ok();
 
@@ -783,21 +795,31 @@ class MeterLifeCycleTest {
 
             // When: meter is started, incremented with progress calls, and completes
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 15, 0);
 
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after first batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
 
             // Second batch: no iterations
             meter.progress(); // won't print log with no more iterations
+            // Then: validate state after progress() with no new iterations (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
 
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after third batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.ok();
 
@@ -823,25 +845,37 @@ class MeterLifeCycleTest {
 
             // When: meter is started, incremented with progress calls, and completes
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 15, 0);
 
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after first batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
 
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after second batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
             timeSource.advanceMiliseconds(0); // Execute 0ms
             meter.progress(); // won't print log since no time has passed
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
 
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after third batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 15, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.ok();
 
@@ -867,25 +901,37 @@ class MeterLifeCycleTest {
 
             // When: meter is started, incremented with progress calls, and completes
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 15, 0);
 
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after first batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress(); // won't log due to throttling (40 < 50)
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
 
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after second batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
 
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after third batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 15, 15, 0);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.ok();
 
@@ -912,6 +958,8 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).withTimeSource(timeSource);
             meter.limitMilliseconds(50);
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 50);
 
             // When: operation completes within time limit
             timeSource.advanceMiliseconds(10);
@@ -939,6 +987,8 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).withTimeSource(timeSource);
             meter.limitMilliseconds(50);
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 50);
 
             // When: operation exceeds time limit
             timeSource.advanceMiliseconds(100); // Execute ~100ms
@@ -962,6 +1012,8 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).withTimeSource(timeSource);
             meter.limitMilliseconds(50);
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 50);
 
             // When: operation exceeds time limit
             timeSource.advanceMiliseconds(100); // Execute ~100ms
@@ -985,6 +1037,8 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).withTimeSource(timeSource);
             meter.limitMilliseconds(50);
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 50);
 
             // When: operation exceeds time limit
             timeSource.advanceMiliseconds(100); // Execute ~100ms
@@ -1016,25 +1070,37 @@ class MeterLifeCycleTest {
 
             // When: meter executes with iterations and completes within time limit
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 15, 100);
 
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after first batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 100);
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 100);
 
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after second batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 100);
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 100);
 
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after third batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 15, 15, 100);
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.ok();
 
@@ -1067,26 +1133,38 @@ class MeterLifeCycleTest {
 
             // When: meter executes with iterations and exceeds time limit
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 15, 50);
 
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after first batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 50);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 50);
 
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after second batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 50);
             timeSource.advanceMiliseconds(40); // Execute ~40ms (total ~80ms), exceeds 50ms limit
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 50);
             assertTrue(meter.isSlow(), "meter should be slow");
 
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after third batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 15, 15, 50);
             timeSource.advanceMiliseconds(40); // Execute ~40ms
             meter.ok();
 
@@ -1118,25 +1196,37 @@ class MeterLifeCycleTest {
 
             // When: meter executes with iterations and completes within time limit
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 15, 100);
 
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after first batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 100);
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 100);
 
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after second batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 100);
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 100);
 
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after third batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 15, 15, 100);
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.reject("validation_failed");
 
@@ -1165,25 +1255,37 @@ class MeterLifeCycleTest {
 
             // When: meter executes with iterations and completes within time limit
             meter.start();
+            // Then: validate configured initial state after start()
+            assertMeterState(meter, true, false, null, null, null, null, 0, 15, 100);
 
             // First batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after first batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 100);
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 5, 15, 100);
 
             // Second batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after second batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 100);
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.progress();
+            // Then: validate state after progress() - still running (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 10, 15, 100);
 
             // Third batch: 5 iterations
             for (int i = 0; i < 5; i++) {
                 meter.inc();
             }
+            // Then: validate currentIteration after third batch (pedagogical validation)
+            assertMeterState(meter, true, false, null, null, null, null, 15, 15, 100);
             timeSource.advanceMiliseconds(5); // Execute ~5ms
             meter.fail("validation_failed");
 
