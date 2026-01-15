@@ -33,11 +33,12 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 | **6** | Pre-Start Invalid Operations | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations before start |
 | **7** | Post-Start Attribute Updates | ☑️ Tier 2 | None | Attribute updates during execution |
 | **8** | Post-Start Termination | ✅ Tier 1 | Normal | Termination via ok/reject/fail with path variations |
-| **9** | Post-Stop Attribute Updates (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
-| **10** | Post-Stop Attribute Updates (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
-| **11** | Post-Stop Attribute Updates (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
-| **12** | Post-Stop Invalid Termination | ❌ Tier 4 | ILLEGAL | Attempts to terminate already-stopped meters |
-| **13** | Pre-Start Terminated, Post-Stop Invalid Termination | ❌ Tier 4 | INCONSISTENT_*/ILLEGAL | Termination chains without start() call |
+| **9** | Post-Start Invalid Operations | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations after start |
+| **10** | Post-Stop Attribute Updates (OK) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on OK state |
+| **11** | Post-Stop Attribute Updates (Rejected) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Rejected state |
+| **12** | Post-Stop Attribute Updates (Failed) | ❌ Tier 4 | ILLEGAL/INCONSISTENT_* | Invalid operations on Failed state |
+| **13** | Post-Stop Invalid Termination | ❌ Tier 4 | ILLEGAL | Attempts to terminate already-stopped meters |
+| **14** | Pre-Start Terminated, Post-Stop Invalid Termination | ❌ Tier 4 | INCONSISTENT_*/ILLEGAL | Termination chains without start() call |
 
 
 ---
@@ -705,13 +706,89 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 9: Post-Stop Attribute Updates - OK State (❌ Tier 4 - State-Preserving)**
+### **Group 9: Post-Start Invalid Operations (❌ Tier 4 - State-Preserving)**
+
+**Purpose:** Validate that invalid operations performed on a started meter (in the Started state) are properly rejected with appropriate error logging while preserving the meter's current state. These tests focus on Tier 4 violations after `start()` is called but before the meter is terminated.
+
+**Test Scenarios:**
+
+#### 1. **Double Start (State-Correcting - ⚠️ Tier 3)**
+   - `start() → start()` → logs INCONSISTENT_START (Meter already started), resets startTime to now (state-correcting behavior)
+   - `start() → path("configured") → start()` → logs INCONSISTENT_START, okPath preserved, startTime reset
+   - `start() → inc() × 5 → start()` → logs INCONSISTENT_START, currentIteration preserved, startTime reset
+   - `start() → m("operation") → start()` → logs INCONSISTENT_START, description preserved, startTime reset
+   - **Note**: Currently implemented as ⚠️ Tier 3 (state-correcting) by resetting startTime. According to TDR-0019, this should be ❌ Tier 4 (state-preserving/rejected).
+
+#### 2. **Invalid Argument: iterations(n) with n ≤ 0**
+   - `start() → iterations(0)` → logs ILLEGAL (Non-positive argument), expectedIterations unchanged (0)
+   - `start() → iterations(-1)` → logs ILLEGAL (Non-positive argument), expectedIterations unchanged (0)
+   - `start() → iterations(-100)` → logs ILLEGAL (Non-positive argument), expectedIterations unchanged (0)
+   - `start() → iterations(10) → iterations(0)` → logs ILLEGAL, expectedIterations remains 10
+   - `start() → iterations(10) → iterations(-5)` → logs ILLEGAL, expectedIterations remains 10
+
+#### 3. **Invalid Argument: limitMilliseconds(n) with n ≤ 0**
+   - `start() → limitMilliseconds(0)` → logs ILLEGAL (Non-positive argument), timeLimit unchanged (0)
+   - `start() → limitMilliseconds(-1)` → logs ILLEGAL (Non-positive argument), timeLimit unchanged (0)
+   - `start() → limitMilliseconds(-1000)` → logs ILLEGAL (Non-positive argument), timeLimit unchanged (0)
+   - `start() → limitMilliseconds(5000) → limitMilliseconds(0)` → logs ILLEGAL, timeLimit remains 5000
+   - `start() → limitMilliseconds(5000) → limitMilliseconds(-100)` → logs ILLEGAL, timeLimit remains 5000
+
+#### 4. **Invalid Argument: path(null)**
+   - `start() → path(null)` → logs ILLEGAL (Null argument), okPath unchanged (null)
+   - `start() → path("valid") → path(null)` → logs ILLEGAL (Null argument), okPath remains "valid"
+   - `start() → path(null) → ok()` → logs ILLEGAL for path(), completes with INFO log, okPath remains null
+
+#### 5. **Invalid Argument: incBy(n) with n ≤ 0**
+   - `start() → incBy(0)` → logs ILLEGAL (Non-positive increment), currentIteration unchanged (0)
+   - `start() → incBy(-1)` → logs ILLEGAL (Non-positive increment), currentIteration unchanged (0)
+   - `start() → incBy(-10)` → logs ILLEGAL (Non-positive increment), currentIteration unchanged (0)
+   - `start() → inc() × 5 → incBy(0)` → logs ILLEGAL, currentIteration remains 5
+   - `start() → inc() × 5 → incBy(-3)` → logs ILLEGAL, currentIteration remains 5
+
+#### 6. **Invalid Argument: incTo(n) with n ≤ 0**
+   - `start() → incTo(0)` → logs ILLEGAL (Non-positive argument), currentIteration unchanged (0)
+   - `start() → incTo(-1)` → logs ILLEGAL (Non-positive argument), currentIteration unchanged (0)
+   - `start() → incTo(-50)` → logs ILLEGAL (Non-positive argument), currentIteration unchanged (0)
+
+#### 7. **Invalid Argument: incTo(n) with n ≤ currentIteration (Non-Forward Increment)**
+   - `start() → inc() × 5 → incTo(5)` → logs ILLEGAL (Non-forward increment), currentIteration remains 5
+   - `start() → inc() × 5 → incTo(3)` → logs ILLEGAL (Non-forward increment), currentIteration remains 5
+   - `start() → incTo(10) → incTo(10)` → logs ILLEGAL (Non-forward increment), currentIteration remains 10
+   - `start() → incTo(10) → incTo(5)` → logs ILLEGAL (Non-forward increment), currentIteration remains 10
+
+#### 8. **Invalid Argument: ok(null)**
+   - `start() → ok(null)` → logs ILLEGAL (Null argument), completes with INFO log, okPath remains unset
+   - `start() → path("configured") → ok(null)` → logs ILLEGAL (Null argument), completes with INFO log, okPath remains "configured"
+   - **Note**: ok(null) is invalid due to null argument, but completion still proceeds (resilient behavior)
+
+#### 9. **Invalid Argument: reject(null)**
+   - `start() → reject(null)` → logs ILLEGAL (Null argument), completes with INFO log, rejectPath remains unset (or logged as null)
+   - `start() → path("configured") → reject(null)` → logs ILLEGAL (Null argument), completes with INFO log, rejectPath unset
+   - **Note**: reject(null) is invalid due to null argument, but completion still proceeds
+
+#### 10. **Invalid Argument: fail(null)**
+   - `start() → fail(null)` → logs ILLEGAL (Null argument), completes with ERROR log, failPath remains unset (or logged as null)
+   - `start() → path("configured") → fail(null)` → logs ILLEGAL (Null argument), completes with ERROR log, failPath unset
+   - **Note**: fail(null) is invalid due to null argument, but completion still proceeds
+
+#### 11. **Combined Invalid Operations After Start**
+   - `start() → iterations(0) → limitMilliseconds(-100) → incBy(-5)` → logs ILLEGAL for each, all attributes unchanged
+   - `start() → path(null) → incTo(0) → ok(null)` → logs ILLEGAL for each invalid call, completes with INFO log
+   - `start() → iterations(-1) → inc() × 3 → incBy(0) → ok()` → logs ILLEGAL for iterations(-1) and incBy(0), currentIteration = 3, completes normally
+
+#### 12. **Multiple start() Calls in Sequence**
+   - `start() → start() → start()` → logs INCONSISTENT_START for each duplicate start(), startTime reset each time
+   - `start() → inc() × 5 → start() → inc() × 3` → logs INCONSISTENT_START on second start(), iterations preserved (8 total)
+
+---
+
+### **Group 10: Post-Stop Attribute Updates - OK State (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that operations on terminated meters (OK state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped) and do not change state or outcome attributes.
 
 **Test Scenarios:**
 
-1. **Update description after stop (OK state)**
+```
    - `start() → ok() → m("step 1")` → logs ILLEGAL (Meter already stopped), description unchanged
    - `start() → ok() → m("step %d", 1)` → logs ILLEGAL, description unchanged
    - `start() → ok() → m(null)` → logs ILLEGAL, description unchanged
@@ -768,7 +845,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 10: Post-Stop Attribute Updates - Rejected State (❌ Tier 4 - State-Preserving)**
+### **Group 11: Post-Stop Attribute Updates - Rejected State (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that operations on rejected meters (Rejected state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with rejection) and do not change state or outcome attributes.
 
@@ -811,7 +888,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 11: Post-Stop Attribute Updates - Failed State (❌ Tier 4 - State-Preserving)**
+### **Group 12: Post-Stop Attribute Updates - Failed State (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that operations on failed meters (Failed state) are rejected while preserving current state and logging errors. These calls have invalid preconditions (meter already stopped with failure) and do not change state or outcome attributes.
 
@@ -854,7 +931,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 12: Post-Stop Invalid Termination (❌ Tier 4 - State-Preserving)**
+### **Group 13: Post-Stop Invalid Termination (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that attempts to terminate an already-stopped meter are rejected and logged as errors. These tests verify that once a meter has reached a terminal state (OK, Rejected, or Failed), subsequent termination calls are properly rejected without changing the meter's state.
 
@@ -904,7 +981,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ---
 
-### **Group 13: Pre-Start Terminated, Post-Stop Invalid Termination (❌ Tier 4 - State-Preserving)**
+### **Group 14: Pre-Start Terminated, Post-Stop Invalid Termination (❌ Tier 4 - State-Preserving)**
 
 **Purpose:** Validate that termination chains without calling `start()` are handled correctly. These tests mirror Group 12 scenarios but omit the initial `start()` call, verifying that the system correctly handles cases where a developer forgets to start the meter before attempting termination operations. The first termination call should log INCONSISTENT (pre-start termination), and subsequent termination attempts should log ILLEGAL (already stopped).
 
