@@ -579,9 +579,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Rejected state
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify rejection log events
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -596,9 +598,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Rejected state with rejectPath as Enum.toString()
             assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify rejection log events
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "VALUE2");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -614,9 +618,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Rejected state with rejectPath as Throwable class name
             assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify rejection log events
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "IllegalArgumentException");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -632,9 +638,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Rejected state with rejectPath as Object.toString()
             assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify rejection log events
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "testObjectString");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -650,9 +658,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Rejected state with rejectPath (okPath remains unset)
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify rejection log events
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "business_error");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         // ============================================================================
@@ -671,9 +681,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Failed state
             assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify failure log events
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -688,9 +700,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Failed state with failPath as Enum.toString()
             assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify failure log events
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "VALUE1");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -706,9 +720,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Failed state with failPath as class name and failMessage
             assertMeterState(meter, true, true, null, null, "java.lang.RuntimeException", "system failure", 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify failure log events
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "java.lang.RuntimeException");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -724,9 +740,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Failed state with failPath as Object.toString()
             assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify failure log events
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "testObjectString");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         @Test
@@ -742,9 +760,11 @@ class MeterLifeCycleTest {
 
             // Then: meter should be in Failed state with failPath (okPath remains unset)
             assertMeterState(meter, true, true, null, null, "critical_error", null, 0, 0, 0);
-            // Validate logs (skip indices 0 and 1 from start())
+
+            // Then: verify failure log events
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "critical_error");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
+            AssertLogger.assertEventCount(logger, 4);
         }
 
         // ============================================================================
