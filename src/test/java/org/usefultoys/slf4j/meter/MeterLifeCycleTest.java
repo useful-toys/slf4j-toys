@@ -148,54 +148,6 @@ class MeterLifeCycleTest {
         }
     }
 
-    /**
-     * Group 1: Meter Initialization (Base Guarantee)
-     * <p>
-     * Tests validate that Meter is created and started correctly. This group is the foundation
-     * for all subsequent tests, ensuring initialization reliability.
-     * </p>
-     * <p>
-     * <b>AI Instructions for maintaining these tests:</b>
-     * </p>
-     * <ul>
-     *   <li><b>DO NOT validate:</b>
-     *     <ul>
-     *       <li>Meter state before {@code meter.start()} in detailed assertions beyond basic state checks.
-     *           Focus on validating the Started state transition.</li>
-     *     </ul>
-     *   </li>
-     *   <li><b>DO validate:</b>
-     *     <ul>
-     *       <li>Meter state transitions: Created → Started for each {@code start()} call.</li>
-     *       <li>Thread-local stack management: {@code Meter.getCurrentInstance()} returns the started meter.</li>
-     *       <li>All log events from {@code start()} (MSG_START at index 0, DATA_START at index 1).</li>
-     *       <li>Try-with-resources behavior: Final meter state after implicit close() call (indices 2+).</li>
-     *       <li>Total log event count with {@code AssertLogger.assertEventCount()}.</li>
-     *     </ul>
-     *   </li>
-     *   <li><b>Log validation structure:</b>
-     *     <ul>
-     *       <li>Log validation (events and total count) must be in a separate block.</li>
-     *       <li>Start the log validation block with a {@code // Then:} comment explaining what is being validated.</li>
-     *       <li>Example: {@code // Then: verify start log events}</li>
-     *     </ul>
-     *   </li>
-     *   <li><b>For try-with-resources blocks:</b>
-     *     <ul>
-     *       <li>Use an external variable to hold the meter reference at the start of the try block.</li>
-     *       <li>After the try block exits, validate the final meter state using the external variable.</li>
-     *       <li>Verify that auto-fail via implicit close() occurred with correct logs.</li>
-     *     </ul>
-     *   </li>
-     *   <li><b>Special annotations:</b>
-     *     <ul>
-     *       <li>Use {@code @ValidateCleanMeter(expectDirtyStack = true)} for tests that call {@code start()}
-     *           without a corresponding termination (ok(), reject(), fail(), or implicit close()).</li>
-     *     </ul>
-     *   </li>
-     * </ul>
-     * @author Co-authored-by: GitHub Copilot using o1
-     */
     @Nested
     @DisplayName("Group 1: Meter Initialization (Base Guarantee)")
     class MeterInitialization {
@@ -367,47 +319,6 @@ class MeterLifeCycleTest {
         }
     }
 
-    /**
-     * Group 2: Happy Path (✅ Tier 1 - Valid State-Changing)
-     * <p>
-     * Tests validate normal lifecycle transitions without errors. These are the expected,
-     * successful paths through the state machine with various path type variations.
-     * </p>
-     * <p>
-     * <b>AI Instructions for maintaining these tests:</b>
-     * </p>
-     * <ul>
-     *   <li><b>DO NOT validate:</b>
-     *     <ul>
-     *       <li>Log events at indices 0 and 1 (from start()). Assume these are correct as tested in Group 1.</li>
-     *       <li>Meter state after {@code new Meter()} and {@code meter.start()}. Assume these are correct.</li>
-     *     </ul>
-     *   </li>
-     *   <li><b>DO validate:</b>
-     *     <ul>
-     *       <li>Final meter state after termination (ok/reject/fail).</li>
-     *       <li>All log events from the termination operation onwards (indices 2+).</li>
-     *       <li>Path values with different types: String, Enum, Throwable, and Object paths.</li>
-     *       <li>Total log event count with {@code AssertLogger.assertEventCount()}.</li>
-     *     </ul>
-     *   </li>
-     *   <li><b>Log validation structure:</b>
-     *     <ul>
-     *       <li>Log validation (events and total count) must be in a separate block.</li>
-     *       <li>Start the log validation block with a {@code // Then:} comment explaining what is being validated.</li>
-     *       <li>Example: {@code // Then: verify termination log events}</li>
-     *     </ul>
-     *   </li>
-     *   <li><b>For time-based validations:</b> (isSlow, progress throttling)
-     *     <ul>
-     *       <li>Create Meter with a TestTimeSource to mock the clock: {@code new Meter(logger, timeSource)}.</li>
-     *       <li>Advance time using TestTimeSource API to simulate execution delays.</li>
-     *       <li>For progress throttling tests: set {@code MeterConfig.progressPeriodMilliseconds} before creating the meter.</li>
-     *     </ul>
-     *   </li>
-     * </ul>
-     * @author Co-authored-by: GitHub Copilot using o1
-     */
     @Nested
     @DisplayName("Group 2: Happy Path (✅ Tier 1)")
     class HappyPath {
