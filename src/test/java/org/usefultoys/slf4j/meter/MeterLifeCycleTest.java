@@ -1768,7 +1768,7 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Group 4: Pre-Start Attribute Updates (☑️ Tier 2)")
+    @DisplayName("Group 4: Pre-Start Attribute Updates (Tier 2)")
     class PreStartConfiguration {
         // ============================================================================
         // Set time limit
@@ -1785,6 +1785,8 @@ class MeterLifeCycleTest {
 
             // Then: timeLimit attribute is stored correctly and meter remains in Created state
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -1800,6 +1802,8 @@ class MeterLifeCycleTest {
 
             // Then: last value wins and meter remains in Created state
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -1815,7 +1819,10 @@ class MeterLifeCycleTest {
 
             // Then: first valid value is preserved, meter remains in Created state
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+
+            // Then: ILLEGAL event logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
         }
 
         @Test
@@ -1829,7 +1836,10 @@ class MeterLifeCycleTest {
 
             // Then: meter remains in Created state with no time limit set
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: ILLEGAL event logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
         }
 
         // ============================================================================
@@ -1847,6 +1857,8 @@ class MeterLifeCycleTest {
 
             // Then: expectedIterations attribute is stored correctly and meter remains in Created state
             assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -1862,6 +1874,8 @@ class MeterLifeCycleTest {
 
             // Then: last value wins and meter remains in Created state
             assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -1877,7 +1891,10 @@ class MeterLifeCycleTest {
 
             // Then: first valid value is preserved, meter remains in Created state
             assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+
+            // Then: ILLEGAL event logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
         }
 
         @Test
@@ -1891,7 +1908,10 @@ class MeterLifeCycleTest {
 
             // Then: meter remains in Created state with no iterations set
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: ILLEGAL event logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
         }
 
         // ============================================================================
@@ -1910,6 +1930,8 @@ class MeterLifeCycleTest {
             // Then: description attribute is stored correctly and meter remains in Created state
             assertEquals("starting operation", meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -1926,6 +1948,8 @@ class MeterLifeCycleTest {
             // Then: last value wins and meter remains in Created state
             assertEquals("step 2", meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -1942,7 +1966,10 @@ class MeterLifeCycleTest {
             // Then: first valid value is preserved, meter remains in Created state
             assertEquals("step 1", meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: ILLEGAL event logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
         }
 
         @Test
@@ -1957,7 +1984,10 @@ class MeterLifeCycleTest {
             // Then: description remains null, meter remains in Created state
             assertNull(meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: ILLEGAL event logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
         }
 
         // ============================================================================
@@ -1976,6 +2006,8 @@ class MeterLifeCycleTest {
             // Then: description attribute is formatted and stored correctly and meter remains in Created state
             assertEquals("operation doWork", meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -1992,6 +2024,8 @@ class MeterLifeCycleTest {
             // Then: last value wins and meter remains in Created state
             assertEquals("step 2", meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -2008,7 +2042,10 @@ class MeterLifeCycleTest {
             // Then: null format is rejected with ILLEGAL log, description is reset to null, meter remains in Created state
             assertNull(meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: ILLEGAL event logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
         }
 
         @Test
@@ -2023,7 +2060,10 @@ class MeterLifeCycleTest {
             // Then: meter remains in Created state with no description set
             assertNull(meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: ILLEGAL event logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
         }
 
         // ============================================================================
@@ -2042,6 +2082,8 @@ class MeterLifeCycleTest {
             // Then: context contains the key-value pair and meter remains in Created state
             assertEquals("value1", meter.getContext().get("key1"));
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -2058,6 +2100,8 @@ class MeterLifeCycleTest {
             // Then: last value wins and meter remains in Created state
             assertEquals("val2", meter.getContext().get("key"));
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -2074,6 +2118,8 @@ class MeterLifeCycleTest {
             // Then: null value is stored as "<null>" placeholder (context stores null as string literal)
             assertEquals("<null>", meter.getContext().get("key"));
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -2093,6 +2139,8 @@ class MeterLifeCycleTest {
             assertEquals("value2", meter.getContext().get("key2"));
             assertEquals("value3", meter.getContext().get("key3"));
             assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -2115,6 +2163,8 @@ class MeterLifeCycleTest {
             // Then: all attributes are set correctly and meter remains in Created state
             assertEquals("starting operation", meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -2134,6 +2184,8 @@ class MeterLifeCycleTest {
             // Then: m() last value wins, iterations and limit preserved
             assertEquals("op2", meter.getDescription());
             assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -2152,8 +2204,11 @@ class MeterLifeCycleTest {
 
             // Then: all valid values preserved, invalid attempts logged
             assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+
+            // Then: two ILLEGAL events logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 2);
         }
 
         @Test
@@ -2175,6 +2230,8 @@ class MeterLifeCycleTest {
             assertEquals("testUser", meter.getContext().get("user"));
             assertEquals("test-session-123", meter.getContext().get("session"));
             assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+
+            // Then: no log events
             AssertLogger.assertEventCount(logger, 0);
         }
     }
