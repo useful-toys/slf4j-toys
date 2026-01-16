@@ -5191,8 +5191,6 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger);
             meter.start();
             final long firstStartTime = meter.getStartTime();
-            // Then: meter is started
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
             // When: start() is called again on already started meter
             meter.start();
@@ -5202,8 +5200,11 @@ class MeterLifeCycleTest {
             assertTrue(meter.getStartTime() > firstStartTime, "startTime should be reset to a new value");
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs INCONSISTENT_START
+            // Then: logs INCONSISTENT_START + second start events
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEvent(logger, 3, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_START);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
@@ -5211,10 +5212,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldHandleMultipleStartCalls() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: meter is started
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: start() is called multiple times
             meter.start();
@@ -5226,6 +5224,7 @@ class MeterLifeCycleTest {
             // Then: logs INCONSISTENT_START for each duplicate
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_START);
             AssertLogger.assertEvent(logger, 5, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEventCount(logger, 8);
         }
 
         @Test
@@ -5233,12 +5232,13 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldHandleSecondStartAfterInc() {
             // Given: a started Meter with iterations
-            final Meter meter = new Meter(logger);
-            meter.start();
+            final Meter meter = new Meter(logger).start();
+            
+            // When: inc() is called multiple times
             meter.inc();
             meter.inc();
             meter.inc();
-            // Then: currentIteration = 3
+            // Then: currentIteration = 3 (pedagogical validation)
             assertMeterState(meter, true, false, null, null, null, null, 3, 0, 0);
 
             // When: start() is called again
@@ -5247,8 +5247,11 @@ class MeterLifeCycleTest {
             // Then: iterations preserved
             assertMeterState(meter, true, false, null, null, null, null, 3, 0, 0);
 
-            // Then: logs INCONSISTENT_START
+            // Then: logs INCONSISTENT_START + second start events
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEvent(logger, 3, Level.DEBUG, Markers.MSG_START);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_START);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         // ============================================================================
@@ -5260,10 +5263,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIterationsZeroAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: expectedIterations = 0 (default)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: iterations(0) is called after start()
             meter.iterations(0);
@@ -5273,6 +5273,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5280,10 +5281,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIterationsNegativeAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: expectedIterations = 0 (default)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: iterations(-5) is called after start()
             meter.iterations(-5);
@@ -5293,6 +5291,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5300,10 +5299,8 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIterationsNegativeAfterValidValue() {
             // Given: a started Meter with expectedIterations = 10
-            final Meter meter = new Meter(logger);
-            meter.start();
-            meter.iterations(10);
-            // Then: expectedIterations = 10
+            final Meter meter = new Meter(logger).start().iterations(10);
+            // Then: expectedIterations = 10 (pedagogical validation)
             assertMeterState(meter, true, false, null, null, null, null, 0, 10, 0);
 
             // When: iterations(-5) is called
@@ -5314,6 +5311,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -5325,10 +5323,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectLimitMillisecondsZeroAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: timeLimit = 0 (default)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: limitMilliseconds(0) is called after start()
             meter.limitMilliseconds(0);
@@ -5338,6 +5333,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5345,10 +5341,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectLimitMillisecondsNegativeAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: timeLimit = 0 (default)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: limitMilliseconds(-100) is called after start()
             meter.limitMilliseconds(-100);
@@ -5358,6 +5351,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5365,10 +5359,8 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectLimitMillisecondsNegativeAfterValidValue() {
             // Given: a started Meter with timeLimit = 5000
-            final Meter meter = new Meter(logger);
-            meter.start();
-            meter.limitMilliseconds(5000);
-            // Then: timeLimit = 5000
+            final Meter meter = new Meter(logger).start().limitMilliseconds(5000);
+            // Then: timeLimit = 5000 (pedagogical validation)
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
 
             // When: limitMilliseconds(-100) is called
@@ -5379,6 +5371,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -5390,10 +5383,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectPathNullAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: okPath = null (default)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: path(null) is called after start()
             meter.path(null);
@@ -5403,6 +5393,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5410,8 +5401,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter
         void shouldRejectPathNullThenOk() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
+            final Meter meter = new Meter(logger).start();
 
             // When: path(null) is called, then ok()
             meter.path(null);
@@ -5423,6 +5413,7 @@ class MeterLifeCycleTest {
             // Then: logs ILLEGAL for path(null), completes with INFO log
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         // ============================================================================
@@ -5434,10 +5425,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIncByZeroAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: currentIteration = 0 (default)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: incBy(0) is called after start()
             meter.incBy(0);
@@ -5447,6 +5435,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5454,10 +5443,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIncByNegativeAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: currentIteration = 0 (default)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: incBy(-3) is called after start()
             meter.incBy(-3);
@@ -5467,6 +5453,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5474,14 +5461,15 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIncByNegativeAfterValidInc() {
             // Given: a started Meter with currentIteration = 5
-            final Meter meter = new Meter(logger);
-            meter.start();
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() is called 5 times
             meter.inc();
             meter.inc();
             meter.inc();
             meter.inc();
             meter.inc();
-            // Then: currentIteration = 5
+            // Then: currentIteration = 5 (pedagogical validation)
             assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
 
             // When: incBy(-3) is called
@@ -5492,6 +5480,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -5503,10 +5492,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIncToZeroAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: currentIteration = 0 (default)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: incTo(0) is called after start()
             meter.incTo(0);
@@ -5516,6 +5502,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5523,10 +5510,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIncToNegativeAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: currentIteration = 0 (default)
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: incTo(-50) is called after start()
             meter.incTo(-50);
@@ -5536,6 +5520,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -5547,14 +5532,15 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIncToEqualToCurrentIteration() {
             // Given: a started Meter with currentIteration = 5
-            final Meter meter = new Meter(logger);
-            meter.start();
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() is called 5 times
             meter.inc();
             meter.inc();
             meter.inc();
             meter.inc();
             meter.inc();
-            // Then: currentIteration = 5
+            // Then: currentIteration = 5 (pedagogical validation)
             assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
 
             // When: incTo(5) is called (non-forward increment)
@@ -5565,6 +5551,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5572,14 +5559,15 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIncToLessThanCurrentIteration() {
             // Given: a started Meter with currentIteration = 5
-            final Meter meter = new Meter(logger);
-            meter.start();
+            final Meter meter = new Meter(logger).start();
+
+            // When: inc() is called 5 times
             meter.inc();
             meter.inc();
             meter.inc();
             meter.inc();
             meter.inc();
-            // Then: currentIteration = 5
+            // Then: currentIteration = 5 (pedagogical validation)
             assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
 
             // When: incTo(3) is called (backward increment)
@@ -5590,6 +5578,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         @Test
@@ -5597,10 +5586,8 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectIncToAfterHigherIncTo() {
             // Given: a started Meter with currentIteration = 10
-            final Meter meter = new Meter(logger);
-            meter.start();
-            meter.incTo(10);
-            // Then: currentIteration = 10
+            final Meter meter = new Meter(logger).start().incTo(10);
+            // Then: currentIteration = 10 (pedagogical validation)
             assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
 
             // When: incTo(5) is called (backward increment)
@@ -5611,6 +5598,7 @@ class MeterLifeCycleTest {
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
         }
 
         // ============================================================================
@@ -5622,8 +5610,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter
         void shouldRejectOkNull() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
+            final Meter meter = new Meter(logger).start();
 
             // When: ok(null) is called
             meter.ok(null);
@@ -5635,6 +5622,7 @@ class MeterLifeCycleTest {
             // Then: logs ILLEGAL for null argument, completes with INFO log
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
@@ -5642,8 +5630,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter
         void shouldRejectRejectNull() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
+            final Meter meter = new Meter(logger).start();
 
             // When: reject(null) is called
             meter.reject(null);
@@ -5655,6 +5642,7 @@ class MeterLifeCycleTest {
             // Then: logs ILLEGAL for null argument, completes with INFO log
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_REJECT);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
@@ -5662,8 +5650,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter
         void shouldRejectFailNull() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
+            final Meter meter = new Meter(logger).start();
 
             // When: fail(null) is called
             meter.fail(null);
@@ -5675,6 +5662,7 @@ class MeterLifeCycleTest {
             // Then: logs ILLEGAL for null argument, completes with ERROR log
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.MSG_FAIL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         // ============================================================================
@@ -5686,10 +5674,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         void shouldRejectAllInvalidOperationsAfterStart() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
-            // Then: default state
-            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            final Meter meter = new Meter(logger).start();
 
             // When: multiple invalid operations called
             meter.iterations(0);
@@ -5703,6 +5688,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
@@ -5710,8 +5696,7 @@ class MeterLifeCycleTest {
         @ValidateCleanMeter
         void shouldHandleMixedValidAndInvalidOperations() {
             // Given: a started Meter
-            final Meter meter = new Meter(logger);
-            meter.start();
+            final Meter meter = new Meter(logger).start();
 
             // When: invalid iterations(-1), valid inc() × 3, invalid incBy(0), then ok()
             meter.iterations(-1);
@@ -5728,6 +5713,7 @@ class MeterLifeCycleTest {
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
+            AssertLogger.assertEventCount(logger, 6);
         }
     }
 
