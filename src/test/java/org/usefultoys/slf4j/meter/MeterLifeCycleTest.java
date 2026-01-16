@@ -3003,7 +3003,6 @@ class MeterLifeCycleTest {
     }
 
     @Nested
-    @DisplayName("Group 7: Post-Start Attribute Updates (☑️ Tier 2)")
     @ResetMeterConfig
     class PostStartConfiguration {
         // ============================================================================
@@ -4865,157 +4864,153 @@ class MeterLifeCycleTest {
         @Test
         @DisplayName("should reject iterations() after ok()")
         void shouldRejectIterationsAfterOk() {
-            // Given: a stopped Meter
-            final Meter meter = new Meter(logger);
-            meter.start().ok();
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+            // Then: validate meter is in stopped state (pedagogical validation)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-            // When: iterations() is called on stopped meter
+            // When: iterations() is called after stop
             meter.iterations(100);
 
-            // Then: expectedIterations unchanged, logs ILLEGAL
+            // Then: expectedIterations unchanged (0), meter state unchanged
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            // Event sequence:
-            // Index 2: INFO MSG_OK (from ok())
-            // Index 3: TRACE DATA_OK (from ok())
-            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
         @DisplayName("should reject iterations() after iterations() then ok()")
         void shouldRejectIterationsAfterSetThenOk() {
-            // Given: a stopped Meter with expected iterations
-            final Meter meter = new Meter(logger);
-            meter.start().iterations(50).ok();
+            // Given: a meter that has been stopped with ok() after setting expected iterations
+            final Meter meter = new Meter(logger).start().iterations(50).ok();
+            // Then: validate meter is in stopped state with expectedIterations=50 (pedagogical validation)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 50, 0);
 
-            // When: iterations() is called on stopped meter
+            // When: iterations() is called after stop
             meter.iterations(100);
 
-            // Then: expectedIterations remains 50, logs ILLEGAL
+            // Then: expectedIterations remains 50, meter state unchanged
             assertMeterState(meter, true, true, null, null, null, null, 0, 50, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
         @DisplayName("should reject zero iterations() after ok()")
         void shouldRejectZeroIterationsAfterOk() {
-            // Given: a stopped Meter
-            final Meter meter = new Meter(logger);
-            meter.start().ok();
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+            // Then: validate meter is in stopped state (pedagogical validation)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-            // When: zero iterations() is called on stopped meter
+            // When: iterations(0) is called after stop
             meter.iterations(0);
 
-            // Then: expectedIterations unchanged, logs ILLEGAL
+            // Then: expectedIterations unchanged (0), meter state unchanged
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            // Event sequence:
-            // Index 2: INFO MSG_OK (from ok())
-            // Index 3: TRACE DATA_OK (from ok())
-            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
         @DisplayName("should reject negative iterations() after ok()")
         void shouldRejectNegativeIterationsAfterOk() {
-            // Given: a stopped Meter
-            final Meter meter = new Meter(logger);
-            meter.start().ok();
+            // Given: a meter that has been stopped with ok()
+            final Meter meter = new Meter(logger).start().ok();
+            // Then: validate meter is in stopped state (pedagogical validation)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-            // When: negative iterations() is called on stopped meter
+            // When: iterations(-5) is called after stop
             meter.iterations(-5);
 
-            // Then: expectedIterations unchanged, logs ILLEGAL
+            // Then: expectedIterations unchanged (0), meter state unchanged
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-            // Event sequence:
-            // Index 2: INFO MSG_OK (from ok())
-            // Index 3: TRACE DATA_OK (from ok())
-            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
         @DisplayName("should reject iterations() after ok(completion_path)")
         void shouldRejectIterationsAfterOkWithPath() {
-            // Given: a stopped Meter
-            final Meter meter = new Meter(logger);
-            meter.start().ok("completion_path");
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+            // Then: validate meter is in stopped state with okPath set (pedagogical validation)
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
-            // When: iterations() is called on stopped meter
+            // When: iterations() is called after stop
             meter.iterations(100);
 
-            // Then: expectedIterations unchanged, logs ILLEGAL
+            // Then: expectedIterations unchanged (0), meter state unchanged
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            // Event sequence:
-            // Index 2: INFO MSG_OK (from ok())
-            // Index 3: TRACE DATA_OK (from ok())
-            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
         @DisplayName("should reject iterations() after iterations() then ok(completion_path)")
         void shouldRejectIterationsAfterSetThenOkWithPath() {
-            // Given: a stopped Meter with expected iterations
-            final Meter meter = new Meter(logger);
-            meter.start().iterations(50).ok("completion_path");
+            // Given: a meter that has been stopped with ok("completion_path") after setting expected iterations
+            final Meter meter = new Meter(logger).start().iterations(50).ok("completion_path");
+            // Then: validate meter is in stopped state with expectedIterations=50 and okPath set (pedagogical validation)
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 50, 0);
 
-            // When: iterations() is called on stopped meter
+            // When: iterations() is called after stop
             meter.iterations(100);
 
-            // Then: expectedIterations remains 50, logs ILLEGAL
+            // Then: expectedIterations remains 50, meter state unchanged
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 50, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
         @DisplayName("should reject zero iterations() after ok(completion_path)")
         void shouldRejectZeroIterationsAfterOkWithPath() {
-            // Given: a stopped Meter
-            final Meter meter = new Meter(logger);
-            meter.start().ok("completion_path");
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+            // Then: validate meter is in stopped state with okPath set (pedagogical validation)
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
-            // When: zero iterations() is called on stopped meter
+            // When: iterations(0) is called after stop
             meter.iterations(0);
 
-            // Then: expectedIterations unchanged, logs ILLEGAL
+            // Then: expectedIterations unchanged (0), meter state unchanged
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            // Event sequence:
-            // Index 2: INFO MSG_OK (from ok())
-            // Index 3: TRACE DATA_OK (from ok())
-            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
         @DisplayName("should reject negative iterations() after ok(completion_path)")
         void shouldRejectNegativeIterationsAfterOkWithPath() {
-            // Given: a stopped Meter
-            final Meter meter = new Meter(logger);
-            meter.start().ok("completion_path");
+            // Given: a meter that has been stopped with ok("completion_path")
+            final Meter meter = new Meter(logger).start().ok("completion_path");
+            // Then: validate meter is in stopped state with okPath set (pedagogical validation)
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
-            // When: negative iterations() is called on stopped meter
+            // When: iterations(-5) is called after stop
             meter.iterations(-5);
 
-            // Then: expectedIterations unchanged, logs ILLEGAL
+            // Then: expectedIterations unchanged (0), meter state unchanged
             assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
-            // Event sequence:
-            // Index 2: INFO MSG_OK (from ok())
-            // Index 3: TRACE DATA_OK (from ok())
-            // Index 4: ERROR ILLEGAL (from rejected iterations() call)
-            AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
-            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
     }
 
