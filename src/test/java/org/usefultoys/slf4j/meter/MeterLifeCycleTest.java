@@ -3022,7 +3022,7 @@ class MeterLifeCycleTest {
             assertEquals("step 1", meter.getDescription());
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for m())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3041,7 +3041,7 @@ class MeterLifeCycleTest {
             assertEquals("step 2", meter.getDescription());
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for m())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3060,7 +3060,7 @@ class MeterLifeCycleTest {
             assertEquals("valid", meter.getDescription());
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs start events + ILLEGAL
+            // Then: logs start + ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 3);
         }
@@ -3079,7 +3079,7 @@ class MeterLifeCycleTest {
             assertEquals("step 1", meter.getDescription());
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for m())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3098,7 +3098,7 @@ class MeterLifeCycleTest {
             assertEquals("step 2", meter.getDescription());
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for m())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3117,7 +3117,7 @@ class MeterLifeCycleTest {
             assertNull(meter.getDescription());
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs start events + ILLEGAL
+            // Then: logs start + ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 3);
         }
@@ -3136,7 +3136,7 @@ class MeterLifeCycleTest {
             assertNull(meter.getDescription());
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs start events + ILLEGAL
+            // Then: logs start + ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 3);
         }
@@ -3156,8 +3156,8 @@ class MeterLifeCycleTest {
             // Then: invalid attempt skipped, final overwrites valid
             assertEquals("final", meter.getDescription());
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
-            
-            // Then: logs start events + ILLEGAL
+
+            // Then: logs start + ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 3);
         }
@@ -3182,8 +3182,9 @@ class MeterLifeCycleTest {
             // Then: currentIteration = 1 and progress message is logged
             assertMeterState(meter, true, false, null, null, null, null, 1, 0, 0);
 
-            // Then: logs start + progress + DATA_PROGRESS
+            // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 4);
         }
 
@@ -3203,8 +3204,9 @@ class MeterLifeCycleTest {
             // Then: currentIteration = 2 and progress message is logged at correct index
             assertMeterState(meter, true, false, null, null, null, null, 2, 0, 0);
 
-            // Then: logs start + progress + DATA_PROGRESS
+            // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 4);
         }
 
@@ -3223,8 +3225,9 @@ class MeterLifeCycleTest {
             // Then: currentIteration = 5 and progress message is logged
             assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
 
-            // Then: logs start + progress + DATA_PROGRESS
+            // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 4);
         }
 
@@ -3244,8 +3247,9 @@ class MeterLifeCycleTest {
             // Then: currentIteration = 8 and progress message is logged at correct index
             assertMeterState(meter, true, false, null, null, null, null, 8, 0, 0);
 
-            // Then: logs start + progress + DATA_PROGRESS
+            // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 4);
         }
 
@@ -3264,8 +3268,9 @@ class MeterLifeCycleTest {
             // Then: currentIteration = 10 and progress message is logged
             assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
 
-            // Then: logs start + progress + DATA_PROGRESS
+            // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 4);
         }
 
@@ -3285,8 +3290,9 @@ class MeterLifeCycleTest {
             // Then: currentIteration = 50 and progress message is logged at index 2 (after DATA_START)
             assertMeterState(meter, true, false, null, null, null, null, 50, 0, 0);
 
-            // Then: logs start + progress + DATA_PROGRESS
+            // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 4);
         }
 
@@ -3306,9 +3312,10 @@ class MeterLifeCycleTest {
             // Then: currentIteration = 100 (backward rejected), progress message still logged
             assertMeterState(meter, true, false, null, null, null, null, 100, 0, 0);
 
-            // Then: logs start + ILLEGAL + progress + DATA_PROGRESS
+            // Then: logs start + ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 5);
         }
 
@@ -3328,9 +3335,10 @@ class MeterLifeCycleTest {
             // Then: zero rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
             assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
 
-            // Then: logs start + ILLEGAL + progress + DATA_PROGRESS
+            // Then: logs start + ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 5);
         }
 
@@ -3350,9 +3358,10 @@ class MeterLifeCycleTest {
             // Then: negative rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
             assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
 
-            // Then: logs start + ILLEGAL + progress + DATA_PROGRESS
+            // Then: logs start + ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 5);
         }
 
@@ -3416,9 +3425,10 @@ class MeterLifeCycleTest {
             // Then: backward rejected (logs ILLEGAL), currentIteration = 10, progress message still logged
             assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
 
-            // Then: logs start + ILLEGAL + progress + DATA_PROGRESS
+            // Then: logs start + ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 4, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 5);
         }
 
@@ -3438,7 +3448,7 @@ class MeterLifeCycleTest {
             // progress() is called but does NOT log because no iteration advanced
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs start + ILLEGAL (no progress logged)
+            // Then: logs start + ILLEGAL (no MSG_PROGRESS because no iteration change)
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEventCount(logger, 3);
@@ -3460,7 +3470,7 @@ class MeterLifeCycleTest {
             // progress() is called but does NOT log because no iteration advanced
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs start + ILLEGAL (no progress logged)
+            // Then: logs start + ILLEGAL (no MSG_PROGRESS because no iteration change)
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEventCount(logger, 3);
@@ -3484,10 +3494,11 @@ class MeterLifeCycleTest {
             // Then: invalid attempts skipped, valid ones succeed (currentIteration = 2)
             assertMeterState(meter, true, false, null, null, null, null, 2, 0, 0);
 
-            // Then: logs start + 2 ILLEGAL + progress + DATA_PROGRESS
+            // Then: logs start + 2 ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 6);
         }
 
@@ -3508,8 +3519,9 @@ class MeterLifeCycleTest {
             // This is verified by asserting that if we look for a second MSG_PROGRESS after the first one, there is none
             assertMeterState(meter, true, false, null, null, null, null, 1, 0, 0);
 
-            // Then: logs start + progress + DATA_PROGRESS (second progress doesn't log)
+            // Then: logs start + MSG_PROGRESS + DATA_PROGRESS (second progress doesn't log because no iteration change)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 4);
         }
 
@@ -3528,7 +3540,7 @@ class MeterLifeCycleTest {
             // Then: currentIteration = 1 but progress() does NOT log message (throttling active)
             assertMeterState(meter, true, false, null, null, null, null, 1, 0, 0);
 
-            // Then: logs only start (progress throttled, no log)
+            // Then: logs only start (no MSG_PROGRESS because throttling active)
             AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEventCount(logger, 2);
         }
@@ -3550,9 +3562,11 @@ class MeterLifeCycleTest {
             // Then: currentIteration = 2 and both progress() calls log messages
             assertMeterState(meter, true, false, null, null, null, null, 2, 0, 0);
 
-            // Then: logs start + progress1 + DATA_PROGRESS + progress2 + DATA_PROGRESS
+            // Then: logs start + MSG_PROGRESS1 + DATA_PROGRESS + MSG_PROGRESS2 + DATA_PROGRESS
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
+            AssertLogger.assertEvent(logger, 5, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEventCount(logger, 6);
         }
 
@@ -3574,7 +3588,7 @@ class MeterLifeCycleTest {
             assertEquals("value1", meter.getContext().get("key1"));
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for ctx())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3593,7 +3607,7 @@ class MeterLifeCycleTest {
             assertEquals("val2", meter.getContext().get("key"));
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for ctx())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3612,7 +3626,7 @@ class MeterLifeCycleTest {
             assertEquals("<null>", meter.getContext().get("key"));
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for ctx())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3634,7 +3648,7 @@ class MeterLifeCycleTest {
             assertEquals("value3", meter.getContext().get("key3"));
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for ctx())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3652,7 +3666,7 @@ class MeterLifeCycleTest {
             assertEquals("<null>", meter.getContext().get("<null>"));
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for ctx())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3673,8 +3687,8 @@ class MeterLifeCycleTest {
             // Then: okPath = "custom_ok_path" and meter remains in Started state
             assertEquals("custom_ok_path", meter.getOkPath());
             assertMeterState(meter, true, false, "custom_ok_path", null, null, null, 0, 0, 0);
-            
-            // Then: logs only start events
+
+            // Then: logs only start events (no additional logging for path())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3693,7 +3707,7 @@ class MeterLifeCycleTest {
             assertEquals("path2", meter.getOkPath());
             assertMeterState(meter, true, false, "path2", null, null, null, 0, 0, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for path())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3779,7 +3793,7 @@ class MeterLifeCycleTest {
             meter.path(obj);
             assertEquals(obj.toString(), meter.getOkPath());
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for path())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3800,7 +3814,7 @@ class MeterLifeCycleTest {
             // Then: timeLimit = 5000 and meter remains in Started state
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for limitMilliseconds())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3818,7 +3832,7 @@ class MeterLifeCycleTest {
             // Then: last value wins (timeLimit = 5000)
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for limitMilliseconds())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3836,7 +3850,7 @@ class MeterLifeCycleTest {
             // Then: last value wins (timeLimit = 100)
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 100);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for limitMilliseconds())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3931,7 +3945,7 @@ class MeterLifeCycleTest {
             // Then: expectedIterations = 100 and meter remains in Started state
             assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for iterations())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3949,7 +3963,7 @@ class MeterLifeCycleTest {
             // Then: last value wins (expectedIterations = 100)
             assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for iterations())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3967,7 +3981,7 @@ class MeterLifeCycleTest {
             // Then: last value wins (expectedIterations = 50)
             assertMeterState(meter, true, false, null, null, null, null, 0, 50, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (no additional logging for iterations())
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -4067,7 +4081,7 @@ class MeterLifeCycleTest {
             assertEquals("alice", meter.getContext().get("user"));
             assertMeterState(meter, true, false, null, null, null, null, 1, 100, 0);
 
-            // Then: logs only start events
+            // Then: logs only start events (configuration methods don't log)
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -4088,7 +4102,7 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, false, "custom", null, null, null, 1, 0, 5000);
             assertEquals("valid", meter.getDescription());
 
-            // Then: logs only start events
+            // Then: logs only start events (configuration methods don't log)
             AssertLogger.assertEventCount(logger, 2);
         }
 
