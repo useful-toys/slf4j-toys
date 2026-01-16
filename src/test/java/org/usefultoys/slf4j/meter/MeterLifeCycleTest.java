@@ -165,8 +165,8 @@ class MeterLifeCycleTest {
             final Meter currentBeforeStart = Meter.getCurrentInstance();
             assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
                 "before start(), getCurrentInstance() should return unknown meter");
-            
-            // Then: no logs yet
+
+            // Then: no logs emitted before start()
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -188,7 +188,7 @@ class MeterLifeCycleTest {
             assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
                 "before start(), getCurrentInstance() should return unknown meter");
 
-            // Then: no logs yet
+            // Then: no logs emitted before start()
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -212,7 +212,7 @@ class MeterLifeCycleTest {
             assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
                 "before start(), getCurrentInstance() should return unknown meter");
 
-            // Then: no logs yet
+            // Then: no logs emitted before start()
             AssertLogger.assertEventCount(logger, 0);
         }
 
@@ -241,7 +241,7 @@ class MeterLifeCycleTest {
             final Meter currentAfterStart = Meter.getCurrentInstance();
             assertEquals(meter, currentAfterStart, "after start(), meter should be current in thread-local");
 
-            // Then: log messages recorded correctly with system status information
+            // Then: logs start events (MSG_START + DATA_START)
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
             AssertLogger.assertEventCount(logger, 2);
@@ -280,7 +280,7 @@ class MeterLifeCycleTest {
             // Then: after try-with-resources, meter is in Failed state (auto-fail via close())
             assertMeterState(meterRef, true, true, null, null, "try-with-resources", null, 0, 0, 0);
 
-            // Then: all log messages recorded correctly
+            // Then: logs start events + auto-fail events (MSG_START + DATA_START + MSG_FAIL + DATA_FAIL)
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
@@ -310,7 +310,7 @@ class MeterLifeCycleTest {
             // Then: after try-with-resources, meter is in Failed state (auto-fail via close())
             assertMeterState(meterRef, true, true, null, null, "try-with-resources", null, 0, 0, 0);
 
-            // Then: all log messages recorded correctly
+            // Then: logs start events + auto-fail events (MSG_START + DATA_START + MSG_FAIL + DATA_FAIL)
             AssertLogger.assertEvent(logger, 0, Level.DEBUG, Markers.MSG_START);
             AssertLogger.assertEvent(logger, 1, Level.TRACE, Markers.DATA_START);
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
@@ -340,7 +340,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-            // Then: validate logs
+            // Then: logs ok completion (MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -363,7 +363,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with okPath set
             assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
 
-            // Then: validate logs (skip indices 0 and 1 from start())
+            // Then: logs ok completion with path (MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "success_path");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -387,7 +387,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with okPath set
             assertMeterState(meter, true, true, "custom_path", null, null, null, 0, 0, 0);
 
-            // Then: validate logs (skip indices 0 and 1 from start())
+            // Then: logs ok completion with path (MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "custom_path");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -406,7 +406,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with okPath as Enum.toString()
             assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
 
-            // Then: validate logs (skip indices 0 and 1 from start())
+            // Then: logs ok completion with enum path (MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "VALUE1");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -426,7 +426,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with okPath as Throwable class name
             assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
 
-            // Then: validate logs (skip indices 0 and 1 from start())
+            // Then: logs ok completion with throwable path (MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "RuntimeException");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -446,7 +446,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with okPath as Object.toString()
             assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
 
-            // Then: validate logs (skip indices 0 and 1 from start())
+            // Then: logs ok completion with object path (MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "testObjectString");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -470,7 +470,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with okPath from ok() (overrides path())
             assertMeterState(meter, true, true, "override_path", null, null, null, 0, 0, 0);
 
-            // Then: validate logs (skip indices 0 and 1 from start())
+            // Then: logs ok completion with overridden path (MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "override_path");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -504,7 +504,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with okPath from last path() call
             assertMeterState(meter, true, true, "third", null, null, null, 0, 0, 0);
 
-            // Then: validate logs (skip indices 0 and 1 from start())
+            // Then: logs ok completion with last path (MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK, "third");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -527,7 +527,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Rejected state
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
 
-            // Then: verify rejection log events
+            // Then: logs rejection (MSG_REJECT + DATA_REJECT)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
             AssertLogger.assertEventCount(logger, 4);
@@ -546,7 +546,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Rejected state with rejectPath as Enum.toString()
             assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
 
-            // Then: verify rejection log events
+            // Then: logs rejection with enum cause (MSG_REJECT + DATA_REJECT)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "VALUE2");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
             AssertLogger.assertEventCount(logger, 4);
@@ -566,7 +566,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Rejected state with rejectPath as Throwable class name
             assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
 
-            // Then: verify rejection log events
+            // Then: logs rejection with throwable cause (MSG_REJECT + DATA_REJECT)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "IllegalArgumentException");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
             AssertLogger.assertEventCount(logger, 4);
@@ -586,7 +586,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Rejected state with rejectPath as Object.toString()
             assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
 
-            // Then: verify rejection log events
+            // Then: logs rejection with object cause (MSG_REJECT + DATA_REJECT)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "testObjectString");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
             AssertLogger.assertEventCount(logger, 4);
@@ -610,7 +610,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Rejected state with rejectPath (okPath cleared, rejection overrides expectation)
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
 
-            // Then: verify rejection log events
+            // Then: logs rejection overriding path expectation (MSG_REJECT + DATA_REJECT)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT, "business_error");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
             AssertLogger.assertEventCount(logger, 4);
@@ -633,7 +633,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Failed state
             assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
 
-            // Then: verify failure log events
+            // Then: logs failure (MSG_FAIL + DATA_FAIL)
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
             AssertLogger.assertEventCount(logger, 4);
@@ -652,7 +652,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Failed state with failPath as Enum.toString()
             assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
 
-            // Then: verify failure log events
+            // Then: logs failure with enum cause (MSG_FAIL + DATA_FAIL)
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "VALUE1");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
             AssertLogger.assertEventCount(logger, 4);
@@ -672,7 +672,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Failed state with failPath as class name and failMessage
             assertMeterState(meter, true, true, null, null, "java.lang.RuntimeException", "system failure", 0, 0, 0);
 
-            // Then: verify failure log events
+            // Then: logs failure with throwable cause (MSG_FAIL + DATA_FAIL)
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "java.lang.RuntimeException");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
             AssertLogger.assertEventCount(logger, 4);
@@ -692,7 +692,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Failed state with failPath as Object.toString()
             assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
 
-            // Then: verify failure log events
+            // Then: logs failure with object cause (MSG_FAIL + DATA_FAIL)
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "testObjectString");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
             AssertLogger.assertEventCount(logger, 4);
@@ -716,7 +716,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in Failed state with failPath (okPath cleared, failure overrides expectation)
             assertMeterState(meter, true, true, null, null, "critical_error", null, 0, 0, 0);
 
-            // Then: verify failure log events
+            // Then: logs failure overriding path expectation (MSG_FAIL + DATA_FAIL)
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL, "critical_error");
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
             AssertLogger.assertEventCount(logger, 4);
@@ -774,7 +774,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with correct iteration count
             assertMeterState(meter, true, true, null, null, null, null, 15, 15, 0);
 
-            // Then: progress messages should have been logged (skip indices 0 and 1 from start())
+            // Then: logs progress events + ok completion (2x MSG_PROGRESS + 2x DATA_PROGRESS + MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_PROGRESS);
@@ -826,7 +826,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with correct iteration count
             assertMeterState(meter, true, true, null, null, null, null, 10, 15, 0);
 
-            // Then: progress messages should have been logged (skip indices 0 and 1 from start())
+            // Then: logs progress event + ok completion (MSG_PROGRESS + DATA_PROGRESS + MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
@@ -938,7 +938,7 @@ class MeterLifeCycleTest {
             // Then: meter should be in OK state with correct iteration count
             assertMeterState(meter, true, true, null, null, null, null, 15, 15, 0);
 
-            // Then: progress messages should have been logged (skip indices 0 and 1 from start())
+            // Then: logs progress event + ok completion with throttling (MSG_PROGRESS + DATA_PROGRESS + MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_PROGRESS);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_PROGRESS);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
@@ -969,7 +969,7 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 50);
             assertFalse(meter.isSlow(), "meter should NOT be slow");
 
-            // Then: completion report logged as INFO (not slow, skip indices 0 and 1 from start())
+            // Then: logs ok completion (not slow, MSG_OK + DATA_OK)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -998,7 +998,7 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 50);
             assertTrue(meter.isSlow(), "meter should be slow");
 
-            // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
+            // Then: logs slow ok completion (MSG_SLOW_OK + DATA_SLOW_OK)
             AssertLogger.assertEvent(logger, 2, Level.WARN, Markers.MSG_SLOW_OK);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_SLOW_OK);
             AssertLogger.assertEventCount(logger, 4);
@@ -1023,7 +1023,7 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 50);
             assertTrue(meter.isSlow(), "meter should be slow");
 
-            // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
+            // Then: logs rejection (slow operation does not affect reject marker, MSG_REJECT + DATA_REJECT)
             AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_REJECT);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_REJECT);
             AssertLogger.assertEventCount(logger, 4);
@@ -1048,7 +1048,7 @@ class MeterLifeCycleTest {
             assertMeterState(meter, true, true, null, null, "business_error", null, 0, 0, 50);
             assertTrue(meter.isSlow(), "meter should be slow");
 
-            // Then: completion report logged as WARN (slow operation, skip indices 0 and 1 from start())
+            // Then: logs failure (slow operation does not affect fail marker, MSG_FAIL + DATA_FAIL)
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.MSG_FAIL);
             AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_FAIL);
             AssertLogger.assertEventCount(logger, 4);
