@@ -203,6 +203,73 @@ Tests validate normal lifecycle transitions without errors. These are the expect
    - As start() method is not expected to be validated with `assertMeterState()`, and since relevant validation  
 
 
+# Group 6 specific instructions
+
+This instructions override General instructions for Group 6 tests.
+
+## Group 6: Post-Stop Invalid Operations (Tier 4)
+
+Tests validate that operations after meter termination (OK, Reject, or Fail states) are properly rejected.
+
+- **Assume stopped state is correct:**
+    - **DO NOT validate meter state after termination (ok/reject/fail).** Assume the transition to stopped state was tested in previous groups.
+    - Only validate final state after the invalid operation attempt (to confirm state was unchanged).
+
+- **Use chained calls to reach stopped state:**
+    - Basic: `meter.start().ok()` or `meter.start().ok("path")`
+    - With reject: `meter.start().reject("cause")` 
+    - With fail: `meter.start().fail("reason")`
+    - With configuration: `meter.start().inc().ok()` or `meter.start().ctx("key", "val").ok()` or `meter.start().limitMilliseconds(100).ok()` or `meter.start().iterations(50).ok()`
+
+- **Given comment patterns for stopped meters:**
+    - Basic stopped meter: `// Given: a stopped Meter`
+    - With incremented iteration: `// Given: a stopped Meter with incremented iteration`
+    - With context: `// Given: a stopped Meter with context`
+    - With time limit: `// Given: a stopped Meter with time limit`
+    - With expected iterations: `// Given: a stopped Meter with expected iterations`
+
+**Example of chained calls to stopped state:**
+```java
+  @Test
+  @DisplayName("should reject m() after ok()")
+  void shouldRejectMAfterOk() {
+      // Given: a stopped Meter
+      final Meter meter = new Meter(logger);
+      meter.start().ok();
+      
+      // When: m() is called on stopped meter
+      meter.m("step 1");
+      
+      // Then: Meter state unchanged, logs ILLEGAL
+      assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+      
+      // Then: logs ILLEGAL event
+      AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+      AssertLogger.assertEventCount(logger, 5);
+  }
+```
+
+**Example with pre-configured attributes:**
+```java
+  @Test
+  @DisplayName("should reject limitMilliseconds() after limitMilliseconds() then ok()")
+  void shouldRejectLimitMillisecondsAfterSetThenOk() {
+      // Given: a stopped Meter with time limit
+      final Meter meter = new Meter(logger);
+      meter.start().limitMilliseconds(100).ok();
+      
+      // When: limitMilliseconds() is called on stopped meter
+      meter.limitMilliseconds(5000);
+      
+      // Then: timeLimit remains 100, logs ILLEGAL
+      assertMeterState(meter, true, true, null, null, null, null, 0, 0, 100);
+      
+      // Then: logs ILLEGAL event
+      AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+      AssertLogger.assertEventCount(logger, 5);
+  }
+```
+
 # Group 3 specific instructions
 
 This instructions override General instructions for Group 3 tests.
