@@ -5439,6 +5439,514 @@ class MeterLifeCycleTest {
     }
 
     @Nested
+    @DisplayName("Group 9: Post-Start Invalid Operations (❌ Tier 4)")
+    class PostStartInvalidOperations {
+
+        // ============================================================================
+        // Double Start (State-Correcting - ⚠️ Tier 3)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should handle second start() call - resets startTime (⚠️ Tier 3 state-correcting)")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldHandleSecondStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            final long firstStartTime = meter.getStartTime();
+            // Then: meter is started
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: start() is called again on already started meter
+            meter.start();
+
+            // Then: logs INCONSISTENT_START, startTime is reset (state-correcting behavior)
+            // Note: Currently implemented as ⚠️ Tier 3 (state-correcting). According to TDR-0019, should be ❌ Tier 4 (state-preserving/rejected).
+            assertTrue(meter.getStartTime() > firstStartTime, "startTime should be reset to a new value");
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_START);
+        }
+
+        @Test
+        @DisplayName("should handle multiple start() calls - resets startTime each time")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldHandleMultipleStartCalls() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: meter is started
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: start() is called multiple times
+            meter.start();
+            meter.start();
+
+            // Then: logs INCONSISTENT_START for each duplicate, startTime reset each time
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_START);
+            AssertLogger.assertEvent(logger, 5, Level.ERROR, Markers.INCONSISTENT_START);
+        }
+
+        @Test
+        @DisplayName("should handle second start() after inc() - iterations preserved")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldHandleSecondStartAfterInc() {
+            // Given: a started Meter with iterations
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            // Then: currentIteration = 3
+            assertMeterState(meter, true, false, null, null, null, null, 3, 0, 0);
+
+            // When: start() is called again
+            meter.start();
+
+            // Then: logs INCONSISTENT_START, iterations preserved (8 total after implicit reset)
+            assertMeterState(meter, true, false, null, null, null, null, 3, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_START);
+        }
+
+        // ============================================================================
+        // Invalid Argument: iterations(n) with n ≤ 0
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject iterations(0) after start() - logs ILLEGAL, expectedIterations unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIterationsZeroAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: expectedIterations = 0 (default)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: iterations(0) is called after start()
+            meter.iterations(0);
+
+            // Then: logs ILLEGAL, expectedIterations unchanged
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(-5) after start() - logs ILLEGAL, expectedIterations unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIterationsNegativeAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: expectedIterations = 0 (default)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: iterations(-5) is called after start()
+            meter.iterations(-5);
+
+            // Then: logs ILLEGAL, expectedIterations unchanged
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject iterations(-5) after valid iterations(10) - preserves first valid value")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIterationsNegativeAfterValidValue() {
+            // Given: a started Meter with expectedIterations = 10
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.iterations(10);
+            // Then: expectedIterations = 10
+            assertMeterState(meter, true, false, null, null, null, null, 0, 10, 0);
+
+            // When: iterations(-5) is called
+            meter.iterations(-5);
+
+            // Then: logs ILLEGAL, expectedIterations remains 10
+            assertMeterState(meter, true, false, null, null, null, null, 0, 10, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Invalid Argument: limitMilliseconds(n) with n ≤ 0
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(0) after start() - logs ILLEGAL, timeLimit unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectLimitMillisecondsZeroAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: timeLimit = 0 (default)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: limitMilliseconds(0) is called after start()
+            meter.limitMilliseconds(0);
+
+            // Then: logs ILLEGAL, timeLimit unchanged
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(-100) after start() - logs ILLEGAL, timeLimit unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectLimitMillisecondsNegativeAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: timeLimit = 0 (default)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: limitMilliseconds(-100) is called after start()
+            meter.limitMilliseconds(-100);
+
+            // Then: logs ILLEGAL, timeLimit unchanged
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject limitMilliseconds(-100) after valid limitMilliseconds(5000) - preserves first valid value")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectLimitMillisecondsNegativeAfterValidValue() {
+            // Given: a started Meter with timeLimit = 5000
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.limitMilliseconds(5000);
+            // Then: timeLimit = 5000
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
+
+            // When: limitMilliseconds(-100) is called
+            meter.limitMilliseconds(-100);
+
+            // Then: logs ILLEGAL, timeLimit remains 5000
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Invalid Argument: path(null)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject path(null) after start() - logs ILLEGAL, okPath unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectPathNullAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: okPath = null (default)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: path(null) is called after start()
+            meter.path(null);
+
+            // Then: logs ILLEGAL, okPath unchanged (null)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject path(null) then complete with ok() - okPath remains null")
+        @ValidateCleanMeter
+        void shouldRejectPathNullThenOk() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+
+            // When: path(null) is called, then ok()
+            meter.path(null);
+            meter.ok();
+
+            // Then: logs ILLEGAL for path(null), completes with INFO log, okPath remains null
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+        }
+
+        // ============================================================================
+        // Invalid Argument: incBy(n) with n ≤ 0
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject incBy(0) after start() - logs ILLEGAL, currentIteration unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIncByZeroAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: currentIteration = 0 (default)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: incBy(0) is called after start()
+            meter.incBy(0);
+
+            // Then: logs ILLEGAL, currentIteration unchanged
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject incBy(-3) after start() - logs ILLEGAL, currentIteration unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIncByNegativeAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: currentIteration = 0 (default)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: incBy(-3) is called after start()
+            meter.incBy(-3);
+
+            // Then: logs ILLEGAL, currentIteration unchanged
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject incBy(-3) after inc() × 5 - preserves currentIteration = 5")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIncByNegativeAfterValidInc() {
+            // Given: a started Meter with currentIteration = 5
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            // Then: currentIteration = 5
+            assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+
+            // When: incBy(-3) is called
+            meter.incBy(-3);
+
+            // Then: logs ILLEGAL, currentIteration remains 5
+            assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Invalid Argument: incTo(n) with n ≤ 0
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject incTo(0) after start() - logs ILLEGAL, currentIteration unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIncToZeroAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: currentIteration = 0 (default)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: incTo(0) is called after start()
+            meter.incTo(0);
+
+            // Then: logs ILLEGAL, currentIteration unchanged
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject incTo(-50) after start() - logs ILLEGAL, currentIteration unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIncToNegativeAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: currentIteration = 0 (default)
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: incTo(-50) is called after start()
+            meter.incTo(-50);
+
+            // Then: logs ILLEGAL, currentIteration unchanged
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Invalid Argument: incTo(n) with n ≤ currentIteration (Non-Forward Increment)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject incTo(5) when currentIteration = 5 - logs ILLEGAL, currentIteration unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIncToEqualToCurrentIteration() {
+            // Given: a started Meter with currentIteration = 5
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            // Then: currentIteration = 5
+            assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+
+            // When: incTo(5) is called (non-forward increment)
+            meter.incTo(5);
+
+            // Then: logs ILLEGAL, currentIteration remains 5
+            assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject incTo(3) when currentIteration = 5 - logs ILLEGAL, currentIteration unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIncToLessThanCurrentIteration() {
+            // Given: a started Meter with currentIteration = 5
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            // Then: currentIteration = 5
+            assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+
+            // When: incTo(3) is called (backward increment)
+            meter.incTo(3);
+
+            // Then: logs ILLEGAL, currentIteration remains 5
+            assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject incTo(5) after incTo(10) - logs ILLEGAL, currentIteration remains 10")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectIncToAfterHigherIncTo() {
+            // Given: a started Meter with currentIteration = 10
+            final Meter meter = new Meter(logger);
+            meter.start();
+            meter.incTo(10);
+            // Then: currentIteration = 10
+            assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
+
+            // When: incTo(5) is called (backward increment)
+            meter.incTo(5);
+
+            // Then: logs ILLEGAL, currentIteration remains 10
+            assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        // ============================================================================
+        // Invalid Argument: ok(null), reject(null), fail(null)
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject ok(null) - logs ILLEGAL, completes with INFO log, okPath unset")
+        @ValidateCleanMeter
+        void shouldRejectOkNull() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+
+            // When: ok(null) is called
+            meter.ok(null);
+
+            // Then: logs ILLEGAL for null argument, completes with INFO log, okPath remains unset
+            // Note: ok(null) is invalid due to null argument, but completion still proceeds (resilient behavior)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
+        }
+
+        @Test
+        @DisplayName("should reject reject(null) - logs ILLEGAL, completes with INFO log, rejectPath unset")
+        @ValidateCleanMeter
+        void shouldRejectRejectNull() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+
+            // When: reject(null) is called
+            meter.reject(null);
+
+            // Then: logs ILLEGAL for null argument, completes with INFO log, rejectPath remains unset
+            // Note: reject(null) is invalid due to null argument, but completion still proceeds
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_REJECT);
+        }
+
+        @Test
+        @DisplayName("should reject fail(null) - logs ILLEGAL, completes with ERROR log, failPath unset")
+        @ValidateCleanMeter
+        void shouldRejectFailNull() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+
+            // When: fail(null) is called
+            meter.fail(null);
+
+            // Then: logs ILLEGAL for null argument, completes with ERROR log, failPath remains unset
+            // Note: fail(null) is invalid due to null argument, but completion still proceeds
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.MSG_FAIL);
+        }
+
+        // ============================================================================
+        // Combined Invalid Operations After Start
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject all invalid operations - logs ILLEGAL for each, all attributes unchanged")
+        @ValidateCleanMeter(expectDirtyStack = true)
+        void shouldRejectAllInvalidOperationsAfterStart() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+            // Then: default state
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // When: multiple invalid operations called
+            meter.iterations(0);
+            meter.limitMilliseconds(-100);
+            meter.incBy(-5);
+
+            // Then: logs ILLEGAL for each, all attributes unchanged
+            assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+        }
+
+        @Test
+        @DisplayName("should reject invalid operations and accept valid ones - mixed scenario")
+        @ValidateCleanMeter
+        void shouldHandleMixedValidAndInvalidOperations() {
+            // Given: a started Meter
+            final Meter meter = new Meter(logger);
+            meter.start();
+
+            // When: invalid iterations(-1), valid inc() × 3, invalid incBy(0), then ok()
+            meter.iterations(-1);
+            meter.inc();
+            meter.inc();
+            meter.inc();
+            meter.incBy(0);
+            meter.ok();
+
+            // Then: logs ILLEGAL for iterations(-1) and incBy(0), currentIteration = 3, completes normally
+            assertMeterState(meter, true, true, null, null, null, null, 3, 0, 0);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
+        }
+    }
+
+    @Nested
     @DisplayName("Group 10: Post-Stop Attribute Updates - OK State (❌ Tier 4)")
     class PostStopInvalidOperationsOkState {
 
@@ -6517,7 +7025,6 @@ class MeterLifeCycleTest {
             AssertLogger.assertEventCount(logger, 5);
         }
     }
-
 
     @Nested
     @DisplayName("Group 12: Post-Stop Attribute Updates - Failed State (❌ Tier 4)")
@@ -8556,7 +9063,4 @@ class MeterLifeCycleTest {
             AssertLogger.assertEventCount(logger, 7);
         }
     }
-
-    // TODO: Criar aqui grupo 6 Pre-Start Invalid Operations | ❌ Tier 4
-
 }
