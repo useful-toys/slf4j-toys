@@ -43,6 +43,32 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
       - Example: If test calls `meter.iterations(15)` before `start()`, validate state after `start()` to confirm `expectedIterations = 15`
       - This makes the test self-documenting and clearly shows the customized initial state
 
+    - **PEDAGOGICAL VALIDATION: When test begins with a meter in stopped state:**
+      - **ALWAYS validate meter state immediately after creating a stopped meter** using `assertMeterState()`.
+      - This validation serves a pedagogical purpose: documents the expected initial stopped state before testing subsequent operations.
+      - Add a `// Then:` comment explaining this is a pedagogical validation of the stopped state.
+      - **ALWAYS validate meter state after operations** to confirm expected state changes (or that state remained unchanged for invalid operations).
+      - This dual validation (before and after) makes tests self-documenting and reinforces the operation's effect on meter state.
+      - Applies to any test where `// Given:` establishes a stopped meter, regardless of how it was stopped (ok/reject/fail) or whether it has configured attributes (iterations, timeLimit, context, etc.).
+      - **Pattern:**
+        ```java
+        // Given: a meter that has been stopped with ok("completion_path")
+        final Meter meter = new Meter(logger).start().ok("completion_path");
+        // Then: validate meter is in stopped state with okPath set (pedagogical validation)
+        assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        
+        // When: m(null) is called after stop
+        meter.m(null);
+        
+        // Then: description unchanged (null), meter state unchanged
+        assertNull(meter.getDescription());
+        assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        
+        // Then: logs ILLEGAL
+        AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+        ```
+
     - **DO validate meter state after intermediate operations when they are the focus of the test scenario**, even if this creates some redundancy with other tests. These intermediate validations serve a **pedagogical purpose** to:
       - Document the expected behavior at each step
       - Make the test self-explanatory and easier to understand
@@ -103,9 +129,18 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
       - This ensures that configured attributes are properly logged in DATA_OK, DATA_REJECT, and DATA_FAIL events
     - Validate total log event count with `AssertLogger.assertEventCount()`.
     - Validate log count as zero (`AssertLogger.assertEventCount(logger, 0)`) when no events are expected.
-    - Log validation (events and total count) must be in a separate block.
-    - Start the log validation block with a `// Then:` comment explaining what is being validated.
-    - **Always add a blank line before the log validation block** to separate it from state validations.
+    
+    - **MANDATORY log validation block structure (applies to ALL tests):**
+      - Log validation must ALWAYS be in a separate block from state validations
+      - ALWAYS add a blank line before the log validation block to separate it from state validations
+      - ALWAYS start the log validation block with a `// Then:` comment explaining what is being validated
+      - ALWAYS include at least `AssertLogger.assertEventCount(logger, N)` to validate total event count
+      - This structure applies even when there are no specific events to validate (only assertEventCount)
+    
+    - **Log validation block patterns:**
+      - **Simple tests (no error events):** State validation + blank line + `// Then: logs only start events` + `AssertLogger.assertEventCount(logger, 2)`
+      - **Error tests (with ILLEGAL, INCONSISTENT_*):** State validation + blank line + `// Then: logs start + ILLEGAL` + specific event assertions + `AssertLogger.assertEventCount(logger, N)`
+      - **Progress tests:** State validation + blank line + `// Then: logs start + progress + DATA_PROGRESS` + specific event assertions + `AssertLogger.assertEventCount(logger, N)`
 
 - **Test structure with comments:**
     - Use separate `// Then:` comment blocks for different types of validations (e.g., state validation, log validation, getCurrentInstance validation).
@@ -131,10 +166,18 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
   // Then: validate path was applied (pedagogical validation)
   assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
   
+  // Then: logs only start events
+  AssertLogger.assertEventCount(logger, 2);
+  
   // When: meter is terminated
   meter.ok();
   // Then: validate final state (mandatory validation)
   assertMeterState(meter, true, true, "first", null, null, null, 0, 0, 0);
+  
+  // Then: logs start + ok + DATA_OK
+  AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+  AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+  AssertLogger.assertEventCount(logger, 4);
 ```
 
 **Example of configured meter before start (start is NOT part of setup):**
@@ -161,16 +204,67 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
   // Then: validate path was applied (pedagogical validation)
   assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
   
+  // Then: logs only start events
+  AssertLogger.assertEventCount(logger, 2);
+  
   // When: path is overridden
   meter.path("second");
   // Then: validate path override (pedagogical validation)
   assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
   
+  // Then: logs only start events (no additional logs from path override)
+  AssertLogger.assertEventCount(logger, 2);
+  
   // When: meter is terminated
   meter.ok();
   // Then: validate final state (mandatory validation)
   assertMeterState(meter, true, true, "second", null, null, null, 0, 0, 0);
+  
+  // Then: logs start + ok + DATA_OK
+  AssertLogger.assertEvent(logger, 2, Level.INFO, Markers.MSG_OK);
+  AssertLogger.assertEvent(logger, 3, Level.TRACE, Markers.DATA_OK);
+  AssertLogger.assertEventCount(logger, 4);
   ```
+
+**Example contrasting simple test vs error test:**
+```java
+// ✅ SIMPLE TEST (no error events) - Always has blank line + comment before assertEventCount
+@Test
+@DisplayName("should set description after start()")
+void shouldSetDescriptionAfterStart() {
+    // Given: a new, started Meter
+    final Meter meter = new Meter(logger).start();
+    
+    // When: m("step 1") is called after start()
+    meter.m("step 1");
+    
+    // Then: description attribute is stored correctly and meter remains in Started state
+    assertEquals("step 1", meter.getDescription());
+    assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+    
+    // Then: logs only start events  ← MANDATORY: blank line + comment even for simple assertEventCount
+    AssertLogger.assertEventCount(logger, 2);
+}
+
+// ✅ ERROR TEST (with ILLEGAL event) - Same structure, but with specific event validations
+@Test
+@DisplayName("should preserve valid message when null value attempted after start()")
+void shouldPreserveValidMessageWhenNullValueAttemptedAfterStart() {
+    // Given: a new, started Meter
+    final Meter meter = new Meter(logger).start();
+    
+    // When: m("valid") is called, then m(null) is attempted
+    meter.m("valid");
+    meter.m(null);
+    
+    // Then: null rejected, "valid" is preserved
+    assertEquals("valid", meter.getDescription());
+    
+    // Then: logs start + ILLEGAL  ← MANDATORY: blank line + comment + specific events + assertEventCount
+    AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+    AssertLogger.assertEventCount(logger, 3);
+}
+```
 
 # Group 1 specific instructions
 
@@ -223,60 +317,36 @@ This instructions override General instructions for Group 6 tests.
 
 Tests validate that operations after meter termination (OK, Reject, or Fail states) are properly rejected.
 
-- **Assume stopped state is correct:**
-    - **DO NOT validate meter state after termination (ok/reject/fail).** Assume the transition to stopped state was tested in previous groups.
-    - Only validate final state after the invalid operation attempt (to confirm state was unchanged).
-
-- **Use chained calls to reach stopped state:**
-    - Basic: `meter.start().ok()` or `meter.start().ok("path")`
-    - With reject: `meter.start().reject("cause")` 
-    - With fail: `meter.start().fail("reason")`
-    - With configuration: `meter.start().inc().ok()` or `meter.start().ctx("key", "val").ok()` or `meter.start().limitMilliseconds(100).ok()` or `meter.start().iterations(50).ok()`
+- **Initial stopped state validation:**
+    - Follow the general "PEDAGOGICAL VALIDATION: When test begins with a meter in stopped state" rule.
+    - Use chained calls to reach stopped state: `meter.start().ok()`, `meter.start().ok("path")`, `meter.start().reject("cause")`, `meter.start().fail("reason")`
+    - With configuration: `meter.start().inc().ok()`, `meter.start().ctx("key", "val").ok()`, `meter.start().limitMilliseconds(100).ok()`, `meter.start().iterations(50).ok()`
 
 - **Given comment patterns for stopped meters:**
-    - Basic stopped meter: `// Given: a stopped Meter`
-    - With incremented iteration: `// Given: a stopped Meter with incremented iteration`
-    - With context: `// Given: a stopped Meter with context`
-    - With time limit: `// Given: a stopped Meter with time limit`
-    - With expected iterations: `// Given: a stopped Meter with expected iterations`
+    - Basic stopped meter: `// Given: a meter that has been stopped with ok()`
+    - With path: `// Given: a meter that has been stopped with ok("completion_path")`
+    - With reject: `// Given: a meter that has been stopped with reject("business_error")`
+    - With fail: `// Given: a meter that has been stopped with fail("technical_error")`
+    - With configuration: `// Given: a meter with [attribute], stopped with ok()`
 
-**Example of chained calls to stopped state:**
+**Example following general pedagogical validation rule:**
 ```java
   @Test
-  @DisplayName("should reject m() after ok()")
+  @DisplayName("should reject m() after ok() - logs ILLEGAL")
   void shouldRejectMAfterOk() {
-      // Given: a stopped Meter
-      final Meter meter = new Meter(logger);
-      meter.start().ok();
-      
-      // When: m() is called on stopped meter
-      meter.m("step 1");
-      
-      // Then: Meter state unchanged, logs ILLEGAL
+      // Given: a meter that has been stopped with ok()
+      final Meter meter = new Meter(logger).start().ok();
+      // Then: validate meter is in stopped state (pedagogical validation)
       assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
       
-      // Then: logs ILLEGAL event
-      AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
-      AssertLogger.assertEventCount(logger, 5);
-  }
-```
-
-**Example with pre-configured attributes:**
-```java
-  @Test
-  @DisplayName("should reject limitMilliseconds() after limitMilliseconds() then ok()")
-  void shouldRejectLimitMillisecondsAfterSetThenOk() {
-      // Given: a stopped Meter with time limit
-      final Meter meter = new Meter(logger);
-      meter.start().limitMilliseconds(100).ok();
+      // When: m() is called after stop
+      meter.m("step 1");
       
-      // When: limitMilliseconds() is called on stopped meter
-      meter.limitMilliseconds(5000);
+      // Then: description unchanged (null), meter state unchanged
+      assertNull(meter.getDescription());
+      assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
       
-      // Then: timeLimit remains 100, logs ILLEGAL
-      assertMeterState(meter, true, true, null, null, null, null, 0, 0, 100);
-      
-      // Then: logs ILLEGAL event
+      // Then: logs ILLEGAL
       AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
       AssertLogger.assertEventCount(logger, 5);
   }
