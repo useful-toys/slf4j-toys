@@ -2721,7 +2721,286 @@ class MeterLifeCycleTest {
         }
     }
 
-    // TODO: Criar aqui grupo 6 Pre-Start Invalid Operations | ❌ Tier 4
+    @Nested
+    @DisplayName("Group 6: Pre-Start Invalid Operations (❌ Tier 4)")
+    class PreStartInvalidOperations {
+
+        // ============================================================================
+        // Increment operations without starting
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject inc() before start() - logs INCONSISTENT_INCREMENT, currentIteration unchanged")
+        @ValidateCleanMeter
+        void shouldRejectIncBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state, currentIteration = 0
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: inc() is called before start()
+            meter.inc();
+
+            // Then: logs INCONSISTENT_INCREMENT, currentIteration remains 0, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 1);
+        }
+
+        @Test
+        @DisplayName("should reject incBy(5) before start() - logs INCONSISTENT_INCREMENT, currentIteration unchanged")
+        @ValidateCleanMeter
+        void shouldRejectIncByBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state, currentIteration = 0
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: incBy(5) is called before start()
+            meter.incBy(5);
+
+            // Then: logs INCONSISTENT_INCREMENT, currentIteration remains 0, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 1);
+        }
+
+        @Test
+        @DisplayName("should reject incTo(10) before start() - logs INCONSISTENT_INCREMENT, currentIteration unchanged")
+        @ValidateCleanMeter
+        void shouldRejectIncToBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state, currentIteration = 0
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: incTo(10) is called before start()
+            meter.incTo(10);
+
+            // Then: logs INCONSISTENT_INCREMENT, currentIteration remains 0, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 1);
+        }
+
+        @Test
+        @DisplayName("should reject multiple increment calls before start() - all rejected")
+        @ValidateCleanMeter
+        void shouldRejectMultipleIncrementsBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state, currentIteration = 0
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: multiple increment operations called before start()
+            meter.inc();
+            meter.incBy(5);
+            meter.incTo(10);
+
+            // Then: logs INCONSISTENT_INCREMENT for each, currentIteration remains 0, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        // ============================================================================
+        // Progress without starting
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject progress() before start() - logs INCONSISTENT_PROGRESS, no progress report")
+        @ValidateCleanMeter
+        void shouldRejectProgressBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: progress() is called before start()
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS, no progress report generated, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEventCount(logger, 1);
+        }
+
+        @Test
+        @DisplayName("should reject multiple progress() calls before start() - all rejected")
+        @ValidateCleanMeter
+        void shouldRejectMultipleProgressCallsBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: multiple progress() calls before start()
+            meter.progress();
+            meter.progress();
+            meter.progress();
+
+            // Then: logs INCONSISTENT_PROGRESS for each, no progress reports, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        // ============================================================================
+        // Set path before starting
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject path(String) before start() - logs ILLEGAL, okPath unset")
+        @ValidateCleanMeter
+        void shouldRejectPathStringBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state, okPath unset
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: path("some_path") is called before start()
+            meter.path("some_path");
+
+            // Then: logs ILLEGAL, okPath remains unset, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
+        }
+
+        @Test
+        @DisplayName("should reject path(Enum) before start() - logs ILLEGAL, okPath unset")
+        @ValidateCleanMeter
+        void shouldRejectPathEnumBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state, okPath unset
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: path(Enum) is called before start()
+            meter.path(TestEnum.VALUE1);
+
+            // Then: logs ILLEGAL, okPath remains unset, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
+        }
+
+        @Test
+        @DisplayName("should reject path(Throwable) before start() - logs ILLEGAL, okPath unset")
+        @ValidateCleanMeter
+        void shouldRejectPathThrowableBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            final RuntimeException exception = new RuntimeException("test cause");
+            // Then: meter in Created state, okPath unset
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: path(Throwable) is called before start()
+            meter.path(exception);
+
+            // Then: logs ILLEGAL, okPath remains unset, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
+        }
+
+        @Test
+        @DisplayName("should reject path(Object) before start() - logs ILLEGAL, okPath unset")
+        @ValidateCleanMeter
+        void shouldRejectPathObjectBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            final TestObject testObject = new TestObject();
+            // Then: meter in Created state, okPath unset
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: path(Object) is called before start()
+            meter.path(testObject);
+
+            // Then: logs ILLEGAL, okPath remains unset, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 1);
+        }
+
+        @Test
+        @DisplayName("should reject multiple path() calls before start() - all rejected")
+        @ValidateCleanMeter
+        void shouldRejectMultiplePathCallsBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state, okPath unset
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: multiple path() calls before start()
+            meter.path("first");
+            meter.path(TestEnum.VALUE1);
+            meter.path("third");
+
+            // Then: logs ILLEGAL for each, okPath remains unset, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        // ============================================================================
+        // Combined invalid operations before start
+        // ============================================================================
+
+        @Test
+        @DisplayName("should reject all invalid operations before start() - inc + progress + path")
+        @ValidateCleanMeter
+        void shouldRejectAllInvalidOperationsBeforeStart() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: multiple invalid operations before start()
+            meter.inc();
+            meter.progress();
+            meter.path("some_path");
+
+            // Then: logs errors for each, all attributes unchanged, meter remains in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+
+        @Test
+        @DisplayName("should reject invalid operations mixed with valid configuration before start()")
+        @ValidateCleanMeter
+        void shouldRejectInvalidOperationsMixedWithValidConfiguration() {
+            // Given: a new Meter without start()
+            final Meter meter = new Meter(logger);
+            // Then: meter in Created state
+            assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+            // When: mix of valid configuration and invalid operations before start()
+            meter.iterations(100);  // Valid: configuration before start
+            meter.inc();            // Invalid: increment before start
+            meter.limitMilliseconds(5000);  // Valid: configuration before start
+            meter.progress();       // Invalid: progress before start
+            meter.m("operation");   // Valid: description before start
+            meter.path("path");     // Invalid: path before start
+
+            // Then: valid configs applied, invalid operations rejected
+            assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+            assertEquals("operation", meter.getDescription());
+            AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+            AssertLogger.assertEvent(logger, 1, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+            AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 3);
+        }
+    }
 
     // TODO: Padronizar com IA
     @Nested
