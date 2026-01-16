@@ -15,6 +15,18 @@ applyTo: "*/**/meter/MeterLifeCycleTest.java
     - Focus on these attributes: `startTime`, `stopTime`, `okPath`, `rejectPath`, `failPath`, `failMessage`, `currentIteration`, `expectedIterations`, `timeLimitMilliseconds`, `lastCurrentTime`, `createTime`.
     - Prefer `assertMeterState()` to validate these attributes.
     - Only use JUnit asserts to validate conditions that cannot be checked with `assertMeterState()`.
+    - **When actual Meter behavior diverges from expected behavior:**
+      - Tests must validate the **actual observed behavior** (not the ideal expected behavior)
+      - Add a comment immediately before the assertion explaining the divergence: `// Will be fixed in future: <explanation>`
+      - The explanation should describe what the correct behavior should be and how the current behavior differs
+      - Example: If Meter currently modifies path attributes on invalid operations (when it shouldn't), the test should assert the modified value and include the comment
+      - This documents known issues while ensuring tests reflect reality and pass consistently
+      - Example pattern:
+        ```java
+        // Then: logs ILLEGAL, okPath remains unset
+        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
+        assertMeterState(meter, true, true, "second_path", null, null, null, 0, 0, 0);
+        ```
     - **For attributes NOT covered by `assertMeterState()` (e.g., `description`, `context`):**
       - Use `assertEquals()` to validate `description` when it's set via `m()` method: `assertEquals("expected description", meter.getDescription())`
       - Use `assertEquals()` to validate individual context entries: `assertEquals("expectedValue", meter.getContext().get("key"))`
