@@ -5896,10 +5896,12 @@ class MeterLifeCycleTest {
             // When: start() is called again on already started meter
             meter.start();
 
-            // Then: logs INCONSISTENT_START, startTime is reset (state-correcting behavior)
+            // Then: startTime is reset (state-correcting behavior)
             // Note: Currently implemented as ⚠️ Tier 3 (state-correcting). According to TDR-0019, should be ❌ Tier 4 (state-preserving/rejected).
             assertTrue(meter.getStartTime() > firstStartTime, "startTime should be reset to a new value");
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs INCONSISTENT_START
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_START);
         }
 
@@ -5917,8 +5919,10 @@ class MeterLifeCycleTest {
             meter.start();
             meter.start();
 
-            // Then: logs INCONSISTENT_START for each duplicate, startTime reset each time
+            // Then: startTime reset each time
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs INCONSISTENT_START for each duplicate
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_START);
             AssertLogger.assertEvent(logger, 5, Level.ERROR, Markers.INCONSISTENT_START);
         }
@@ -5939,8 +5943,10 @@ class MeterLifeCycleTest {
             // When: start() is called again
             meter.start();
 
-            // Then: logs INCONSISTENT_START, iterations preserved (8 total after implicit reset)
+            // Then: iterations preserved
             assertMeterState(meter, true, false, null, null, null, null, 3, 0, 0);
+
+            // Then: logs INCONSISTENT_START
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.INCONSISTENT_START);
         }
 
@@ -5961,8 +5967,10 @@ class MeterLifeCycleTest {
             // When: iterations(0) is called after start()
             meter.iterations(0);
 
-            // Then: logs ILLEGAL, expectedIterations unchanged
+            // Then: expectedIterations unchanged
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -5979,8 +5987,10 @@ class MeterLifeCycleTest {
             // When: iterations(-5) is called after start()
             meter.iterations(-5);
 
-            // Then: logs ILLEGAL, expectedIterations unchanged
+            // Then: expectedIterations unchanged
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -5998,8 +6008,10 @@ class MeterLifeCycleTest {
             // When: iterations(-5) is called
             meter.iterations(-5);
 
-            // Then: logs ILLEGAL, expectedIterations remains 10
+            // Then: expectedIterations remains 10
             assertMeterState(meter, true, false, null, null, null, null, 0, 10, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6020,8 +6032,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(0) is called after start()
             meter.limitMilliseconds(0);
 
-            // Then: logs ILLEGAL, timeLimit unchanged
+            // Then: timeLimit unchanged
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6038,8 +6052,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(-100) is called after start()
             meter.limitMilliseconds(-100);
 
-            // Then: logs ILLEGAL, timeLimit unchanged
+            // Then: timeLimit unchanged
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6057,8 +6073,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(-100) is called
             meter.limitMilliseconds(-100);
 
-            // Then: logs ILLEGAL, timeLimit remains 5000
+            // Then: timeLimit remains 5000
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6079,8 +6097,10 @@ class MeterLifeCycleTest {
             // When: path(null) is called after start()
             meter.path(null);
 
-            // Then: logs ILLEGAL, okPath unchanged (null)
+            // Then: okPath unchanged (null)
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6096,8 +6116,10 @@ class MeterLifeCycleTest {
             meter.path(null);
             meter.ok();
 
-            // Then: logs ILLEGAL for path(null), completes with INFO log, okPath remains null
+            // Then: okPath remains null
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL for path(null), completes with INFO log
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
         }
@@ -6119,8 +6141,10 @@ class MeterLifeCycleTest {
             // When: incBy(0) is called after start()
             meter.incBy(0);
 
-            // Then: logs ILLEGAL, currentIteration unchanged
+            // Then: currentIteration unchanged
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6137,8 +6161,10 @@ class MeterLifeCycleTest {
             // When: incBy(-3) is called after start()
             meter.incBy(-3);
 
-            // Then: logs ILLEGAL, currentIteration unchanged
+            // Then: currentIteration unchanged
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6160,8 +6186,10 @@ class MeterLifeCycleTest {
             // When: incBy(-3) is called
             meter.incBy(-3);
 
-            // Then: logs ILLEGAL, currentIteration remains 5
+            // Then: currentIteration remains 5
             assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6182,8 +6210,10 @@ class MeterLifeCycleTest {
             // When: incTo(0) is called after start()
             meter.incTo(0);
 
-            // Then: logs ILLEGAL, currentIteration unchanged
+            // Then: currentIteration unchanged
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6200,8 +6230,10 @@ class MeterLifeCycleTest {
             // When: incTo(-50) is called after start()
             meter.incTo(-50);
 
-            // Then: logs ILLEGAL, currentIteration unchanged
+            // Then: currentIteration unchanged
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6227,8 +6259,10 @@ class MeterLifeCycleTest {
             // When: incTo(5) is called (non-forward increment)
             meter.incTo(5);
 
-            // Then: logs ILLEGAL, currentIteration remains 5
+            // Then: currentIteration remains 5
             assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6250,8 +6284,10 @@ class MeterLifeCycleTest {
             // When: incTo(3) is called (backward increment)
             meter.incTo(3);
 
-            // Then: logs ILLEGAL, currentIteration remains 5
+            // Then: currentIteration remains 5
             assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6269,8 +6305,10 @@ class MeterLifeCycleTest {
             // When: incTo(5) is called (backward increment)
             meter.incTo(5);
 
-            // Then: logs ILLEGAL, currentIteration remains 10
+            // Then: currentIteration remains 10
             assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6289,9 +6327,11 @@ class MeterLifeCycleTest {
             // When: ok(null) is called
             meter.ok(null);
 
-            // Then: logs ILLEGAL for null argument, completes with INFO log, okPath remains unset
+            // Then: okPath remains unset
             // Note: ok(null) is invalid due to null argument, but completion still proceeds (resilient behavior)
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL for null argument, completes with INFO log
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_OK);
         }
@@ -6307,9 +6347,11 @@ class MeterLifeCycleTest {
             // When: reject(null) is called
             meter.reject(null);
 
-            // Then: logs ILLEGAL for null argument, completes with INFO log, rejectPath remains unset
+            // Then: rejectPath remains unset
             // Note: reject(null) is invalid due to null argument, but completion still proceeds
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL for null argument, completes with INFO log
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.INFO, Markers.MSG_REJECT);
         }
@@ -6325,9 +6367,11 @@ class MeterLifeCycleTest {
             // When: fail(null) is called
             meter.fail(null);
 
-            // Then: logs ILLEGAL for null argument, completes with ERROR log, failPath remains unset
+            // Then: failPath remains unset
             // Note: fail(null) is invalid due to null argument, but completion still proceeds
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL for null argument, completes with ERROR log
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.MSG_FAIL);
         }
@@ -6351,8 +6395,10 @@ class MeterLifeCycleTest {
             meter.limitMilliseconds(-100);
             meter.incBy(-5);
 
-            // Then: logs ILLEGAL for each, all attributes unchanged
+            // Then: all attributes unchanged
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+            // Then: logs ILLEGAL for each
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6374,8 +6420,10 @@ class MeterLifeCycleTest {
             meter.incBy(0);
             meter.ok();
 
-            // Then: logs ILLEGAL for iterations(-1) and incBy(0), currentIteration = 3, completes normally
+            // Then: currentIteration = 3, completes normally
             assertMeterState(meter, true, true, null, null, null, null, 3, 0, 0);
+
+            // Then: logs ILLEGAL for iterations(-1) and incBy(0), completes with INFO log
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 3, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEvent(logger, 4, Level.INFO, Markers.MSG_OK);
@@ -6400,8 +6448,10 @@ class MeterLifeCycleTest {
             // When: m("step 1") is called after stop
             meter.m("step 1");
 
-            // Then: logs ILLEGAL, description unchanged (null)
+            // Then: description unchanged (null)
             assertNull(meter.getDescription());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6416,8 +6466,10 @@ class MeterLifeCycleTest {
             // When: m("step %d", 1) is called after stop
             meter.m("step %d", 1);
 
-            // Then: logs ILLEGAL, description unchanged (null)
+            // Then: description unchanged (null)
             assertNull(meter.getDescription());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6432,8 +6484,10 @@ class MeterLifeCycleTest {
             // When: m(null) is called after stop
             meter.m(null);
 
-            // Then: logs ILLEGAL, description unchanged (null)
+            // Then: description unchanged (null)
             assertNull(meter.getDescription());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6448,8 +6502,10 @@ class MeterLifeCycleTest {
             // When: m("step 1") is called after stop
             meter.m("step 1");
 
-            // Then: logs ILLEGAL, description unchanged (null)
+            // Then: description unchanged (null)
             assertNull(meter.getDescription());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6464,8 +6520,10 @@ class MeterLifeCycleTest {
             // When: m("step %d", 1) is called after stop
             meter.m("step %d", 1);
 
-            // Then: logs ILLEGAL, description unchanged (null)
+            // Then: description unchanged (null)
             assertNull(meter.getDescription());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6480,8 +6538,10 @@ class MeterLifeCycleTest {
             // When: m(null) is called after stop
             meter.m(null);
 
-            // Then: logs ILLEGAL, description unchanged (null)
+            // Then: description unchanged (null)
             assertNull(meter.getDescription());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6500,8 +6560,10 @@ class MeterLifeCycleTest {
             // When: inc() is called after stop
             meter.inc();
 
-            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            // Then: currentIteration unchanged (0)
             assertEquals(0, meter.getCurrentIteration());
+
+            // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6516,8 +6578,10 @@ class MeterLifeCycleTest {
             // When: incBy(5) is called after stop
             meter.incBy(5);
 
-            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            // Then: currentIteration unchanged (0)
             assertEquals(0, meter.getCurrentIteration());
+
+            // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6532,8 +6596,10 @@ class MeterLifeCycleTest {
             // When: incTo(10) is called after stop
             meter.incTo(10);
 
-            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            // Then: currentIteration unchanged (0)
             assertEquals(0, meter.getCurrentIteration());
+
+            // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6548,8 +6614,10 @@ class MeterLifeCycleTest {
             // When: inc() is called after stop
             meter.inc();
 
-            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            // Then: currentIteration unchanged (0)
             assertEquals(0, meter.getCurrentIteration());
+
+            // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6564,8 +6632,10 @@ class MeterLifeCycleTest {
             // When: incBy(5) is called after stop
             meter.incBy(5);
 
-            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            // Then: currentIteration unchanged (0)
             assertEquals(0, meter.getCurrentIteration());
+
+            // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6580,8 +6650,10 @@ class MeterLifeCycleTest {
             // When: incTo(10) is called after stop
             meter.incTo(10);
 
-            // Then: logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+            // Then: currentIteration unchanged (0)
             assertEquals(0, meter.getCurrentIteration());
+
+            // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6672,8 +6744,10 @@ class MeterLifeCycleTest {
             // When: ctx("key1", "value1") is called after stop
             meter.ctx("key1", "value1");
 
-            // Then: logs ILLEGAL, context unchanged
+            // Then: context unchanged
             assertFalse(meter.getContext().containsKey("key1"));
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6690,7 +6764,7 @@ class MeterLifeCycleTest {
             // When: ctx("key", "val2") is called after stop
             meter.ctx("key", "val2");
 
-            // Then: logs ILLEGAL, context preserves original value (note: context cleared after emission)
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6705,8 +6779,10 @@ class MeterLifeCycleTest {
             // When: ctx("key1", "value1") is called after stop
             meter.ctx("key1", "value1");
 
-            // Then: logs ILLEGAL, context unchanged
+            // Then: context unchanged
             assertFalse(meter.getContext().containsKey("key1"));
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6723,7 +6799,7 @@ class MeterLifeCycleTest {
             // When: ctx("key", "val2") is called after stop
             meter.ctx("key", "val2");
 
-            // Then: logs ILLEGAL, context preserves original value (note: context cleared after emission)
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6742,8 +6818,10 @@ class MeterLifeCycleTest {
             // When: path("new_path") is called after stop
             meter.path("new_path");
 
-            // Then: logs ILLEGAL, okPath unchanged (null)
+            // Then: okPath unchanged (null)
             assertNull(meter.getOkPath());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6758,8 +6836,10 @@ class MeterLifeCycleTest {
             // When: path("new_path") is called after stop
             meter.path("new_path");
 
-            // Then: logs ILLEGAL, okPath remains "original_path"
+            // Then: okPath remains "original_path"
             assertEquals("original_path", meter.getOkPath());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6774,8 +6854,10 @@ class MeterLifeCycleTest {
             // When: path(null) is called after stop
             meter.path(null);
 
-            // Then: logs ILLEGAL, okPath unchanged (null)
+            // Then: okPath unchanged (null)
             assertNull(meter.getOkPath());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6790,8 +6872,10 @@ class MeterLifeCycleTest {
             // When: path("new_path") is called after stop
             meter.path("new_path");
 
-            // Then: logs ILLEGAL, okPath remains "completion_path"
+            // Then: okPath remains "completion_path"
             assertEquals("completion_path", meter.getOkPath());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6806,8 +6890,10 @@ class MeterLifeCycleTest {
             // When: path(null) is called after stop
             meter.path(null);
 
-            // Then: logs ILLEGAL, okPath unchanged
+            // Then: okPath unchanged
             assertEquals("completion_path", meter.getOkPath());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6826,8 +6912,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(5000) is called after stop
             meter.limitMilliseconds(5000);
 
-            // Then: logs ILLEGAL, timeLimit unchanged (0)
+            // Then: timeLimit unchanged (0)
             assertEquals(0, meter.getTimeLimit());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6844,8 +6932,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(5000) is called after stop
             meter.limitMilliseconds(5000);
 
-            // Then: logs ILLEGAL, timeLimit remains 100ms (100,000,000 ns)
+            // Then: timeLimit remains 100ms (100,000,000 ns)
             assertEquals(100_000_000L, meter.getTimeLimit());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6860,8 +6950,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(0) is called after stop
             meter.limitMilliseconds(0);
 
-            // Then: logs ILLEGAL, timeLimit unchanged (0)
+            // Then: timeLimit unchanged (0)
             assertEquals(0, meter.getTimeLimit());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6876,8 +6968,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(-1) is called after stop
             meter.limitMilliseconds(-1);
 
-            // Then: logs ILLEGAL (stopped meter) only
+            // Then: timeLimit unchanged (0)
             assertEquals(0, meter.getTimeLimit());
+
+            // Then: logs ILLEGAL (stopped meter) only
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6892,8 +6986,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(5000) is called after stop
             meter.limitMilliseconds(5000);
 
-            // Then: logs ILLEGAL, timeLimit unchanged (0)
+            // Then: timeLimit unchanged (0)
             assertEquals(0, meter.getTimeLimit());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6910,8 +7006,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(5000) is called after stop
             meter.limitMilliseconds(5000);
 
-            // Then: logs ILLEGAL, timeLimit remains 100ms (100,000,000 ns)
+            // Then: timeLimit remains 100ms (100,000,000 ns)
             assertEquals(100_000_000L, meter.getTimeLimit());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6926,8 +7024,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(0) is called after stop
             meter.limitMilliseconds(0);
 
-            // Then: logs ILLEGAL, timeLimit unchanged (0)
+            // Then: timeLimit unchanged (0)
             assertEquals(0, meter.getTimeLimit());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
         }
 
@@ -6941,8 +7041,10 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(-1) is called after stop
             meter.limitMilliseconds(-1);
 
-            // Then: logs ILLEGAL (stopped meter) only
+            // Then: timeLimit unchanged (0)
             assertEquals(0, meter.getTimeLimit());
+
+            // Then: logs ILLEGAL (stopped meter) only
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6961,8 +7063,10 @@ class MeterLifeCycleTest {
             // When: iterations(100) is called after stop
             meter.iterations(100);
 
-            // Then: logs ILLEGAL, expectedIterations unchanged (0)
+            // Then: expectedIterations unchanged (0)
             assertEquals(0, meter.getExpectedIterations());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6979,8 +7083,10 @@ class MeterLifeCycleTest {
             // When: iterations(100) is called after stop
             meter.iterations(100);
 
-            // Then: logs ILLEGAL, expectedIterations remains 50
+            // Then: expectedIterations remains 50
             assertEquals(50, meter.getExpectedIterations());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -6995,8 +7101,10 @@ class MeterLifeCycleTest {
             // When: iterations(0) is called after stop
             meter.iterations(0);
 
-            // Then: logs ILLEGAL, expectedIterations unchanged (0)
+            // Then: expectedIterations unchanged (0)
             assertEquals(0, meter.getExpectedIterations());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -7011,8 +7119,10 @@ class MeterLifeCycleTest {
             // When: iterations(-5) is called after stop
             meter.iterations(-5);
 
-            // Then: logs ILLEGAL (stopped meter) only
+            // Then: expectedIterations unchanged (0)
             assertEquals(0, meter.getExpectedIterations());
+
+            // Then: logs ILLEGAL (stopped meter) only
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -7027,8 +7137,10 @@ class MeterLifeCycleTest {
             // When: iterations(100) is called after stop
             meter.iterations(100);
 
-            // Then: logs ILLEGAL, expectedIterations unchanged (0)
+            // Then: expectedIterations unchanged (0)
             assertEquals(0, meter.getExpectedIterations());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -7045,8 +7157,10 @@ class MeterLifeCycleTest {
             // When: iterations(100) is called after stop
             meter.iterations(100);
 
-            // Then: logs ILLEGAL, expectedIterations remains 50
+            // Then: expectedIterations remains 50
             assertEquals(50, meter.getExpectedIterations());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -7061,8 +7175,10 @@ class MeterLifeCycleTest {
             // When: iterations(0) is called after stop
             meter.iterations(0);
 
-            // Then: logs ILLEGAL, expectedIterations unchanged (0)
+            // Then: expectedIterations unchanged (0)
             assertEquals(0, meter.getExpectedIterations());
+
+            // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
@@ -7077,8 +7193,10 @@ class MeterLifeCycleTest {
             // When: iterations(-5) is called after stop
             meter.iterations(-5);
 
-            // Then: logs ILLEGAL (stopped meter) only
+            // Then: expectedIterations unchanged (0)
             assertEquals(0, meter.getExpectedIterations());
+
+            // Then: logs ILLEGAL (stopped meter) only
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
             AssertLogger.assertEventCount(logger, 5);
         }
