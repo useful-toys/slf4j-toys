@@ -1,3 +1,7 @@
+---
+applyTo: "*/**/meter/MeterLifeCycleTest.java
+---
+
 # Meter Lifecycle Test Instructions for AI Agents
 
 > **Target File Pattern**: `*/**/meter/MeterLifeCycleTest.java`
