@@ -3637,6 +3637,8 @@ class MeterLifeCycleTest {
             // Then: stores with "<null>" key and "<null>" value as placeholders
             assertEquals("<null>", meter.getContext().get("<null>"));
             assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+            
+            // Then: logs only start events
             AssertLogger.assertEventCount(logger, 2);
         }
 
@@ -3657,6 +3659,8 @@ class MeterLifeCycleTest {
             // Then: okPath = "custom_ok_path" and meter remains in Started state
             assertEquals("custom_ok_path", meter.getOkPath());
             assertMeterState(meter, true, false, "custom_ok_path", null, null, null, 0, 0, 0);
+            
+            // Then: logs only start events
             AssertLogger.assertEventCount(logger, 2);
         }
 
