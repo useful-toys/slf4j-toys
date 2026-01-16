@@ -983,7 +983,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 
 ### **Group 14: Pre-Start Terminated, Post-Stop Invalid Termination (❌ Tier 4 - State-Preserving)**
 
-**Purpose:** Validate that termination chains without calling `start()` are handled correctly. These tests mirror Group 12 scenarios but omit the initial `start()` call, verifying that the system correctly handles cases where a developer forgets to start the meter before attempting termination operations. The first termination call should log INCONSISTENT (pre-start termination), and subsequent termination attempts should log ILLEGAL (already stopped).
+**Purpose:** Validate that termination chains without calling `start()` are handled correctly. These tests mirror Group 13 scenarios but omit the initial `start()` call, verifying that the system correctly handles cases where a developer forgets to start the meter before attempting termination operations. The first termination call should log INCONSISTENT (pre-start termination), and subsequent termination attempts should log ILLEGAL (already stopped).
 
 **Test Scenarios:**
 
