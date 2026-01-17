@@ -67,6 +67,132 @@ class SystemDataJson5Test {
                         new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
                         ""
                 ),
+                // Runtime Memory branches: test each field individually
+                Arguments.of(
+                        "Runtime Memory: only usedMemory > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0.0),
+                        ",m:[15,0,0]"
+                ),
+                Arguments.of(
+                        "Runtime Memory: only totalMemory > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0.0),
+                        ",m:[0,0,16]"
+                ),
+                Arguments.of(
+                        "Runtime Memory: only maxMemory > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0.0),
+                        ",m:[0,17,0]"
+                ),
+                // Heap branches: test each field individually
+                Arguments.of(
+                        "Heap: only heap_used > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",h:[4,0,0]"
+                ),
+                Arguments.of(
+                        "Heap: only heap_commited > 0",
+                        new TestSystemData(uuid1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",h:[0,2,0]"
+                ),
+                Arguments.of(
+                        "Heap: only heap_max > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",h:[0,0,3]"
+                ),
+                // Non-Heap branches: test each field individually
+                Arguments.of(
+                        "Non-Heap: only nonHeap_used > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",nh:[7,0,0]"
+                ),
+                Arguments.of(
+                        "Non-Heap: only nonHeap_commited > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",nh:[0,5,0]"
+                ),
+                Arguments.of(
+                        "Non-Heap: only nonHeap_max > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",nh:[0,0,6]"
+                ),
+                // Class Loading branches: test each field individually
+                Arguments.of(
+                        "Class Loading: only classLoading_loaded > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",cl:[0,9,0]"
+                ),
+                Arguments.of(
+                        "Class Loading: only classLoading_total > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",cl:[10,0,0]"
+                ),
+                Arguments.of(
+                        "Class Loading: only classLoading_unloaded > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",cl:[0,0,11]"
+                ),
+                // Additional combinations for complete branch coverage
+                Arguments.of(
+                        "Runtime Memory: usedMemory + totalMemory > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 16, 0.0),
+                        ",m:[15,16,0]"
+                ),
+                Arguments.of(
+                        "Runtime Memory: usedMemory + maxMemory > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 17, 0, 0.0),
+                        ",m:[15,0,17]"
+                ),
+                Arguments.of(
+                        "Runtime Memory: totalMemory + maxMemory > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 16, 0.0),
+                        ",m:[0,16,17]"
+                ),
+                Arguments.of(
+                        "Heap: heap_used + heap_commited > 0",
+                        new TestSystemData(uuid1, 0, 0, 2, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",h:[4,2,0]"
+                ),
+                Arguments.of(
+                        "Heap: heap_used + heap_max > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",h:[4,0,3]"
+                ),
+                Arguments.of(
+                        "Heap: heap_commited + heap_max > 0",
+                        new TestSystemData(uuid1, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",h:[0,2,3]"
+                ),
+                Arguments.of(
+                        "Non-Heap: nonHeap_used + nonHeap_commited > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 5, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",nh:[7,5,0]"
+                ),
+                Arguments.of(
+                        "Non-Heap: nonHeap_used + nonHeap_max > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",nh:[7,0,6]"
+                ),
+                Arguments.of(
+                        "Non-Heap: nonHeap_commited + nonHeap_max > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",nh:[0,5,6]"
+                ),
+                Arguments.of(
+                        "Class Loading: classLoading_loaded + classLoading_total > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10, 0, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",cl:[10,9,0]"
+                ),
+                Arguments.of(
+                        "Class Loading: classLoading_loaded + classLoading_unloaded > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 11, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",cl:[0,9,11]"
+                ),
+                Arguments.of(
+                        "Class Loading: classLoading_total + classLoading_unloaded > 0",
+                        new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 11, 0, 0, 0, 0, 0, 0, 0.0),
+                        ",cl:[10,0,11]"
+                ),
+                // Existing partial data tests
                 Arguments.of(
                         "Partial data: only garbageCollector_time",
                         new TestSystemData(uuid1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0.0),
