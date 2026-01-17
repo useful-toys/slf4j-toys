@@ -98,8 +98,6 @@ class SystemMetricsCollectorTest {
     @BeforeEach
     void setUp() {
         mockitoCloseable = MockitoAnnotations.openMocks(this);
-        SystemConfig.reset();
-        SystemConfig.init();
         collector = new TestableSystemMetricsCollector(mockSunOsBean);
         data = new SystemData() {
             // Anonymous concrete class
@@ -368,5 +366,50 @@ class SystemMetricsCollectorTest {
         assertTrue(realData.getRuntime_totalMemory() > 0, "Total memory should be greater than 0");
         assertTrue(realData.getRuntime_usedMemory() >= 0, "Used memory should be greater than or equal to 0");
         assertTrue(realData.getRuntime_totalMemory() <= realData.getRuntime_maxMemory(), "Total memory should be less than or equal to max memory");
+    }
+
+    @Test
+    @DisplayName("should not collect class loading metrics when bean is null even if config is enabled")
+    void collect_classLoadingBeanNull() {
+        // Given: class loading config enabled but bean is null
+        SystemConfig.useClassLoadingManagedBean = true;
+        final SystemMetricsCollector nullBeanCollector = new SystemMetricsCollector(null, null, null, null, null);
+
+        // When: collectManagedBeanStatus is called
+        nullBeanCollector.collectManagedBeanStatus(data);
+
+        // Then: class loading metrics should remain 0
+        assertEquals(0, data.getClassLoading_loaded());
+        assertEquals(0L, data.getClassLoading_total());
+        assertEquals(0L, data.getClassLoading_unloaded());
+    }
+
+    @Test
+    @DisplayName("should not collect compilation metrics when bean is null even if config is enabled")
+    void collect_compilationBeanNull() {
+        // Given: compilation config enabled but bean is null
+        SystemConfig.useCompilationManagedBean = true;
+        final SystemMetricsCollector nullBeanCollector = new SystemMetricsCollector(null, null, null, null, null);
+
+        // When: collectManagedBeanStatus is called
+        nullBeanCollector.collectManagedBeanStatus(data);
+
+        // Then: compilation time should remain 0
+        assertEquals(0, data.getCompilationTime());
+    }
+
+    @Test
+    @DisplayName("should not collect GC metrics when bean list is null even if config is enabled")
+    void collect_gcBeanListNull() {
+        // Given: GC config enabled but bean list is null
+        SystemConfig.useGarbageCollectionManagedBean = true;
+        final SystemMetricsCollector nullBeanCollector = new SystemMetricsCollector(null, null, null, null, null);
+
+        // When: collectManagedBeanStatus is called
+        nullBeanCollector.collectManagedBeanStatus(data);
+
+        // Then: GC metrics should remain 0
+        assertEquals(0L, data.getGarbageCollector_count());
+        assertEquals(0L, data.getGarbageCollector_time());
     }
 }
