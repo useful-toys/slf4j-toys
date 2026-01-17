@@ -5735,8 +5735,9 @@ class MeterLifeCycleTest {
             // When: m("step 1") is called after stop
             meter.m("step 1");
 
-            // Then: description unchanged (null)
-            assertNull(meter.getDescription());
+            // Then: description unchanged (null), state unchanged after invalid operation
+            assertNull(meter.getDescription(), "should not update description after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -5753,8 +5754,9 @@ class MeterLifeCycleTest {
             // When: m("step %d", 1) is called after stop
             meter.m("step %d", 1);
 
-            // Then: description unchanged (null)
-            assertNull(meter.getDescription());
+            // Then: description unchanged (null), state unchanged after invalid operation
+            assertNull(meter.getDescription(), "should not update description after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -5771,8 +5773,9 @@ class MeterLifeCycleTest {
             // When: m(null) is called after stop
             meter.m(null);
 
-            // Then: description unchanged (null)
-            assertNull(meter.getDescription());
+            // Then: description unchanged (null), state unchanged after invalid operation
+            assertNull(meter.getDescription(), "should not update description after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -5789,8 +5792,9 @@ class MeterLifeCycleTest {
             // When: m("step 1") is called after stop
             meter.m("step 1");
 
-            // Then: description unchanged (null)
-            assertNull(meter.getDescription());
+            // Then: description unchanged (null), state unchanged after invalid operation
+            assertNull(meter.getDescription(), "should not update description after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -5807,8 +5811,9 @@ class MeterLifeCycleTest {
             // When: m("step %d", 1) is called after stop
             meter.m("step %d", 1);
 
-            // Then: description unchanged (null)
-            assertNull(meter.getDescription());
+            // Then: description unchanged (null), state unchanged after invalid operation
+            assertNull(meter.getDescription(), "should not update description after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -5825,8 +5830,9 @@ class MeterLifeCycleTest {
             // When: m(null) is called after stop
             meter.m(null);
 
-            // Then: description unchanged (null)
-            assertNull(meter.getDescription());
+            // Then: description unchanged (null), state unchanged after invalid operation
+            assertNull(meter.getDescription(), "should not update description after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -5847,8 +5853,9 @@ class MeterLifeCycleTest {
             // When: inc() is called after stop
             meter.inc();
 
-            // Then: currentIteration unchanged (0)
-            assertEquals(0, meter.getCurrentIteration());
+            // Then: currentIteration unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -5865,8 +5872,9 @@ class MeterLifeCycleTest {
             // When: incBy(5) is called after stop
             meter.incBy(5);
 
-            // Then: currentIteration unchanged (0)
-            assertEquals(0, meter.getCurrentIteration());
+            // Then: currentIteration unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -5883,8 +5891,9 @@ class MeterLifeCycleTest {
             // When: incTo(10) is called after stop
             meter.incTo(10);
 
-            // Then: currentIteration unchanged (0)
-            assertEquals(0, meter.getCurrentIteration());
+            // Then: currentIteration unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -5901,8 +5910,9 @@ class MeterLifeCycleTest {
             // When: inc() is called after stop
             meter.inc();
 
-            // Then: currentIteration unchanged (0)
-            assertEquals(0, meter.getCurrentIteration());
+            // Then: currentIteration unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -5919,8 +5929,9 @@ class MeterLifeCycleTest {
             // When: incBy(5) is called after stop
             meter.incBy(5);
 
-            // Then: currentIteration unchanged (0)
-            assertEquals(0, meter.getCurrentIteration());
+            // Then: currentIteration unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -5937,8 +5948,9 @@ class MeterLifeCycleTest {
             // When: incTo(10) is called after stop
             meter.incTo(10);
 
-            // Then: currentIteration unchanged (0)
-            assertEquals(0, meter.getCurrentIteration());
+            // Then: currentIteration unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs INCONSISTENT_INCREMENT
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -5959,6 +5971,9 @@ class MeterLifeCycleTest {
             // When: progress() is called after stop
             meter.progress();
 
+            // Then: state unchanged after invalid operation
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
             // Then: logs INCONSISTENT_PROGRESS, no progress message
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
             AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
@@ -5973,9 +5988,14 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).start();
             meter.inc();
             meter.ok();
+            // Then: validate meter is in stopped state with currentIteration=1 (pedagogical validation)
+            assertMeterState(meter, true, true, null, null, null, null, 1, 0, 0);
 
             // When: progress() is called after stop
             meter.progress();
+
+            // Then: state unchanged after invalid operation
+            assertMeterState(meter, true, true, null, null, null, null, 1, 0, 0);
 
             // Then: logs INCONSISTENT_PROGRESS, no further progress logged
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
@@ -5993,6 +6013,9 @@ class MeterLifeCycleTest {
             // When: progress() is called after stop
             meter.progress();
 
+            // Then: state unchanged after invalid operation
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+
             // Then: logs INCONSISTENT_PROGRESS, no progress message
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
             AssertLogger.assertNoEvent(logger, Level.INFO, Markers.MSG_PROGRESS);
@@ -6007,9 +6030,14 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).start();
             meter.inc();
             meter.ok("completion_path");
+            // Then: validate meter is in stopped state with currentIteration=1 (pedagogical validation)
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 1, 0, 0);
 
             // When: progress() is called after stop
             meter.progress();
+
+            // Then: state unchanged after invalid operation
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 1, 0, 0);
 
             // Then: logs INCONSISTENT_PROGRESS, no further progress logged
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.INCONSISTENT_PROGRESS);
@@ -6031,8 +6059,9 @@ class MeterLifeCycleTest {
             // When: ctx("key1", "value1") is called after stop
             meter.ctx("key1", "value1");
 
-            // Then: context unchanged
-            assertFalse(meter.getContext().containsKey("key1"));
+            // Then: context unchanged, state unchanged after invalid operation
+            assertFalse(meter.getContext().containsKey("key1"), "should not add context after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6047,9 +6076,16 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).start();
             meter.ctx("key", "val");
             meter.ok();
+            // Then: validate meter is in stopped state (pedagogical validation)
+            // Note: context is cleared after ok() - this is expected behavior
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // When: ctx("key", "val2") is called after stop
             meter.ctx("key", "val2");
+
+            // Then: context still not present (was cleared by ok()), state unchanged after invalid operation
+            assertNull(meter.getContext().get("key"), "should not add context after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6066,8 +6102,9 @@ class MeterLifeCycleTest {
             // When: ctx("key1", "value1") is called after stop
             meter.ctx("key1", "value1");
 
-            // Then: context unchanged
-            assertFalse(meter.getContext().containsKey("key1"));
+            // Then: context unchanged, state unchanged after invalid operation
+            assertFalse(meter.getContext().containsKey("key1"), "should not add context after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6082,9 +6119,16 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).start();
             meter.ctx("key", "val");
             meter.ok("completion_path");
+            // Then: validate meter is in stopped state (pedagogical validation)
+            // Note: context is cleared after ok() - this is expected behavior
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // When: ctx("key", "val2") is called after stop
             meter.ctx("key", "val2");
+
+            // Then: context still not present (was cleared by ok()), state unchanged after invalid operation
+            assertNull(meter.getContext().get("key"), "should not add context after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6105,8 +6149,9 @@ class MeterLifeCycleTest {
             // When: path("new_path") is called after stop
             meter.path("new_path");
 
-            // Then: okPath unchanged (null)
-            assertNull(meter.getOkPath());
+            // Then: okPath unchanged (null), state unchanged after invalid operation
+            assertNull(meter.getOkPath(), "should not update path after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6123,8 +6168,9 @@ class MeterLifeCycleTest {
             // When: path("new_path") is called after stop
             meter.path("new_path");
 
-            // Then: okPath remains "original_path"
-            assertEquals("original_path", meter.getOkPath());
+            // Then: okPath remains "original_path", state unchanged after invalid operation
+            assertEquals("original_path", meter.getOkPath(), "should not update path after stop");
+            assertMeterState(meter, true, true, "original_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6141,8 +6187,9 @@ class MeterLifeCycleTest {
             // When: path(null) is called after stop
             meter.path(null);
 
-            // Then: okPath unchanged (null)
-            assertNull(meter.getOkPath());
+            // Then: okPath unchanged (null), state unchanged after invalid operation
+            assertNull(meter.getOkPath(), "should not update path after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6159,8 +6206,9 @@ class MeterLifeCycleTest {
             // When: path("new_path") is called after stop
             meter.path("new_path");
 
-            // Then: okPath remains "completion_path"
-            assertEquals("completion_path", meter.getOkPath());
+            // Then: okPath remains "completion_path", state unchanged after invalid operation
+            assertEquals("completion_path", meter.getOkPath(), "should not update path after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6177,8 +6225,9 @@ class MeterLifeCycleTest {
             // When: path(null) is called after stop
             meter.path(null);
 
-            // Then: okPath unchanged
-            assertEquals("completion_path", meter.getOkPath());
+            // Then: okPath unchanged, state unchanged after invalid operation
+            assertEquals("completion_path", meter.getOkPath(), "should not update path after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6199,8 +6248,9 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(5000) is called after stop
             meter.limitMilliseconds(5000);
 
-            // Then: timeLimit unchanged (0)
-            assertEquals(0, meter.getTimeLimit());
+            // Then: timeLimit unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6215,12 +6265,15 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).start();
             meter.limitMilliseconds(100);
             meter.ok();
+            // Then: validate meter is in stopped state with timeLimit (pedagogical validation)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 100);
 
             // When: limitMilliseconds(5000) is called after stop
             meter.limitMilliseconds(5000);
 
-            // Then: timeLimit remains 100ms (100,000,000 ns)
-            assertEquals(100_000_000L, meter.getTimeLimit());
+            // Then: timeLimit remains 100ms (100,000,000 ns), state unchanged after invalid operation
+            assertEquals(100_000_000L, meter.getTimeLimit(), "should not update timeLimit after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 100);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6237,8 +6290,9 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(0) is called after stop
             meter.limitMilliseconds(0);
 
-            // Then: timeLimit unchanged (0)
-            assertEquals(0, meter.getTimeLimit());
+            // Then: timeLimit unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6255,8 +6309,9 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(-1) is called after stop
             meter.limitMilliseconds(-1);
 
-            // Then: timeLimit unchanged (0)
-            assertEquals(0, meter.getTimeLimit());
+            // Then: timeLimit unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL (stopped meter) only
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6273,8 +6328,9 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(5000) is called after stop
             meter.limitMilliseconds(5000);
 
-            // Then: timeLimit unchanged (0)
-            assertEquals(0, meter.getTimeLimit());
+            // Then: timeLimit unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6289,12 +6345,15 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).start();
             meter.limitMilliseconds(100);
             meter.ok("completion_path");
+            // Then: validate meter is in stopped state with timeLimit (pedagogical validation)
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 100);
 
             // When: limitMilliseconds(5000) is called after stop
             meter.limitMilliseconds(5000);
 
-            // Then: timeLimit remains 100ms (100,000,000 ns)
-            assertEquals(100_000_000L, meter.getTimeLimit());
+            // Then: timeLimit remains 100ms (100,000,000 ns), state unchanged after invalid operation
+            assertEquals(100_000_000L, meter.getTimeLimit(), "should not update timeLimit after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 100);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6311,11 +6370,13 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(0) is called after stop
             meter.limitMilliseconds(0);
 
-            // Then: timeLimit unchanged (0)
-            assertEquals(0, meter.getTimeLimit());
+            // Then: timeLimit unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
+            AssertLogger.assertEventCount(logger, 5);
         }
 
         @Test
@@ -6328,8 +6389,9 @@ class MeterLifeCycleTest {
             // When: limitMilliseconds(-1) is called after stop
             meter.limitMilliseconds(-1);
 
-            // Then: timeLimit unchanged (0)
-            assertEquals(0, meter.getTimeLimit());
+            // Then: timeLimit unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL (stopped meter) only
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6350,8 +6412,9 @@ class MeterLifeCycleTest {
             // When: iterations(100) is called after stop
             meter.iterations(100);
 
-            // Then: expectedIterations unchanged (0)
-            assertEquals(0, meter.getExpectedIterations());
+            // Then: expectedIterations unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6366,12 +6429,15 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).start();
             meter.iterations(50);
             meter.ok();
+            // Then: validate meter is in stopped state with expectedIterations (pedagogical validation)
+            assertMeterState(meter, true, true, null, null, null, null, 0, 50, 0);
 
             // When: iterations(100) is called after stop
             meter.iterations(100);
 
-            // Then: expectedIterations remains 50
-            assertEquals(50, meter.getExpectedIterations());
+            // Then: expectedIterations remains 50, state unchanged after invalid operation
+            assertEquals(50, meter.getExpectedIterations(), "should not update expectedIterations after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 50, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6388,8 +6454,9 @@ class MeterLifeCycleTest {
             // When: iterations(0) is called after stop
             meter.iterations(0);
 
-            // Then: expectedIterations unchanged (0)
-            assertEquals(0, meter.getExpectedIterations());
+            // Then: expectedIterations unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6406,8 +6473,9 @@ class MeterLifeCycleTest {
             // When: iterations(-5) is called after stop
             meter.iterations(-5);
 
-            // Then: expectedIterations unchanged (0)
-            assertEquals(0, meter.getExpectedIterations());
+            // Then: expectedIterations unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL (stopped meter) only
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6424,8 +6492,9 @@ class MeterLifeCycleTest {
             // When: iterations(100) is called after stop
             meter.iterations(100);
 
-            // Then: expectedIterations unchanged (0)
-            assertEquals(0, meter.getExpectedIterations());
+            // Then: expectedIterations unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6440,12 +6509,15 @@ class MeterLifeCycleTest {
             final Meter meter = new Meter(logger).start();
             meter.iterations(50);
             meter.ok("completion_path");
+            // Then: validate meter is in stopped state with expectedIterations (pedagogical validation)
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 50, 0);
 
             // When: iterations(100) is called after stop
             meter.iterations(100);
 
-            // Then: expectedIterations remains 50
-            assertEquals(50, meter.getExpectedIterations());
+            // Then: expectedIterations remains 50, state unchanged after invalid operation
+            assertEquals(50, meter.getExpectedIterations(), "should not update expectedIterations after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 50, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6462,8 +6534,9 @@ class MeterLifeCycleTest {
             // When: iterations(0) is called after stop
             meter.iterations(0);
 
-            // Then: expectedIterations unchanged (0)
-            assertEquals(0, meter.getExpectedIterations());
+            // Then: expectedIterations unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
@@ -6480,8 +6553,9 @@ class MeterLifeCycleTest {
             // When: iterations(-5) is called after stop
             meter.iterations(-5);
 
-            // Then: expectedIterations unchanged (0)
-            assertEquals(0, meter.getExpectedIterations());
+            // Then: expectedIterations unchanged (0), state unchanged after invalid operation
+            assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
+            assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
 
             // Then: logs ILLEGAL (stopped meter) only
             AssertLogger.assertEvent(logger, 4, Level.ERROR, Markers.ILLEGAL);
