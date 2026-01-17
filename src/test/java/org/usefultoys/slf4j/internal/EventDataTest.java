@@ -28,7 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Unit tests for {@link EventData}.
  * <p>
  * Tests verify that EventData correctly initializes, manages, and resets event information
- * including session UUID, position, and timing data.
+ * including session UUID, position, and timing data. Tests also validate JSON5 serialization
+ * and deserialization functionality.
  * <p>
  * <b>Coverage:</b>
  * <ul>
@@ -36,6 +37,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li><b>Field Management:</b> Verifies correct setting and getting of sessionUuid, position, and timing fields</li>
  *   <li><b>Time Collection:</b> Ensures collectCurrentTime updates lastCurrentTime with current nano time</li>
  *   <li><b>Reset Functionality:</b> Tests that reset clears all fields to default values</li>
+ *   <li><b>Position Increment:</b> Tests normal increment and overflow handling at Long.MAX_VALUE</li>
+ *   <li><b>JSON5 Serialization/Deserialization:</b> Tests round-trip conversion and individual field parsing</li>
+ *   <li><b>readJson5() Method:</b> Comprehensive coverage of JSON5 parsing including:
+ *     <ul>
+ *       <li>Individual field parsing (sessionUuid, position, lastCurrentTime)</li>
+ *       <li>Complete JSON5 string parsing with all fields</li>
+ *       <li>Whitespace handling and field order independence</li>
+ *       <li>Partial field updates and preservation of existing values</li>
+ *       <li>Edge cases: zero values, large numeric values, empty JSON5, missing fields</li>
+ *       <li>Special characters in UUID and round-trip serialization</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>TimeSource Integration:</b> Tests default and custom time source implementations</li>
  * </ul>
  */
 @DisplayName("EventData")
@@ -231,6 +245,228 @@ class EventDataTest {
         assertEquals(100L, time1, "First collected time should be 100L");
         assertEquals(200L, time2, "Second collected time should be 200L");
         assertEquals(150000200L, time3, "Third collected time should be 350L");
+    }
+
+    // ============================================================================
+    // readJson5() method tests
+    // ============================================================================
+
+    @Test
+    @DisplayName("should parse sessionUuid from JSON5 string")
+    void testReadJson5_parseSessionUuid() {
+        // Given: EventData instance and JSON5 string with sessionUuid
+        final EventData event = new EventData();
+        final String json5 = "{_:abc123}";
+
+        // When: readJson5 is called
+        event.readJson5(json5);
+
+        // Then: sessionUuid should be parsed correctly
+        assertEquals("abc123", event.getSessionUuid(), "should parse sessionUuid from JSON5");
+    }
+
+    @Test
+    @DisplayName("should parse position from JSON5 string")
+    void testReadJson5_parsePosition() {
+        // Given: EventData instance and JSON5 string with position
+        final EventData event = new EventData();
+        final String json5 = "{$:42}";
+
+        // When: readJson5 is called
+        event.readJson5(json5);
+
+        // Then: position should be parsed correctly
+        assertEquals(42L, event.getPosition(), "should parse position from JSON5");
+    }
+
+    @Test
+    @DisplayName("should parse lastCurrentTime from JSON5 string")
+    void testReadJson5_parseLastCurrentTime() {
+        // Given: EventData instance and JSON5 string with time
+        final EventData event = new EventData();
+        final String json5 = "{t:9876543210}";
+
+        // When: readJson5 is called
+        event.readJson5(json5);
+
+        // Then: lastCurrentTime should be parsed correctly
+        assertEquals(9876543210L, event.getLastCurrentTime(), "should parse lastCurrentTime from JSON5");
+    }
+
+    @Test
+    @DisplayName("should parse all fields from complete JSON5 string")
+    void testReadJson5_parseAllFields() {
+        // Given: EventData instance and complete JSON5 string
+        final EventData event = new EventData();
+        final String json5 = "{_:session123,$:55,t:7777777}";
+
+        // When: readJson5 is called
+        event.readJson5(json5);
+
+        // Then: all fields should be parsed correctly
+        assertEquals("session123", event.getSessionUuid(), "should parse sessionUuid");
+        assertEquals(55L, event.getPosition(), "should parse position");
+        assertEquals(7777777L, event.getLastCurrentTime(), "should parse lastCurrentTime");
+    }
+
+    @Test
+    @DisplayName("should handle JSON5 with extra whitespace and line breaks")
+    void testReadJson5_whitespaceHandling() {
+        // Given: EventData and JSON5 with extra whitespace
+        final EventData event = new EventData();
+        final String json5 = "{ _  :  uuid_test , $ : 100 , t : 2000 }";
+
+        // When: readJson5 is called
+        event.readJson5(json5);
+
+        // Then: all fields should be parsed correctly ignoring whitespace
+        assertEquals("uuid_test", event.getSessionUuid(), "should parse sessionUuid with whitespace");
+        assertEquals(100L, event.getPosition(), "should parse position with whitespace");
+        assertEquals(2000L, event.getLastCurrentTime(), "should parse lastCurrentTime with whitespace");
+    }
+
+    @Test
+    @DisplayName("should handle JSON5 with comma-separated fields in any order")
+    void testReadJson5_differentFieldOrder() {
+        // Given: EventData and JSON5 with fields in different order
+        final EventData event = new EventData();
+        final String json5 = "{t:3000,$:77,_:ord_test}";
+
+        // When: readJson5 is called
+        event.readJson5(json5);
+
+        // Then: all fields should be parsed correctly regardless of order
+        assertEquals("ord_test", event.getSessionUuid(), "should parse sessionUuid in different order");
+        assertEquals(77L, event.getPosition(), "should parse position in different order");
+        assertEquals(3000L, event.getLastCurrentTime(), "should parse lastCurrentTime in different order");
+    }
+
+    @Test
+    @DisplayName("should preserve existing fields when JSON5 does not contain them")
+    void testReadJson5_partialFieldsParsing() {
+        // Given: EventData with existing values and partial JSON5
+        final EventData event = new EventData("existing_uuid", 999L, 5555L);
+        final String json5 = "{_:new_uuid}";
+
+        // When: readJson5 is called with only sessionUuid
+        event.readJson5(json5);
+
+        // Then: sessionUuid should be updated and others unchanged
+        assertEquals("new_uuid", event.getSessionUuid(), "should update sessionUuid");
+        assertEquals(999L, event.getPosition(), "should preserve existing position");
+        assertEquals(5555L, event.getLastCurrentTime(), "should preserve existing lastCurrentTime");
+    }
+
+    @Test
+    @DisplayName("should handle zero values correctly")
+    void testReadJson5_zeroValues() {
+        // Given: EventData and JSON5 with zero values
+        final EventData event = new EventData();
+        final String json5 = "{_:zero_uuid,$:0,t:0}";
+
+        // When: readJson5 is called
+        event.readJson5(json5);
+
+        // Then: zero values should be parsed correctly
+        assertEquals("zero_uuid", event.getSessionUuid(), "should parse sessionUuid");
+        assertEquals(0L, event.getPosition(), "should parse zero position");
+        assertEquals(0L, event.getLastCurrentTime(), "should parse zero lastCurrentTime");
+    }
+
+    @Test
+    @DisplayName("should handle large numeric values correctly")
+    void testReadJson5_largeNumericValues() {
+        // Given: EventData and JSON5 with large numeric values
+        final EventData event = new EventData();
+        final String json5 = "{_:large_uuid,$:9223372036854775807,t:9223372036854775806}";
+
+        // When: readJson5 is called
+        event.readJson5(json5);
+
+        // Then: large values should be parsed correctly
+        assertEquals("large_uuid", event.getSessionUuid(), "should parse sessionUuid");
+        assertEquals(Long.MAX_VALUE, event.getPosition(), "should parse Long.MAX_VALUE");
+        assertEquals(Long.MAX_VALUE - 1, event.getLastCurrentTime(), "should parse large lastCurrentTime");
+    }
+
+    @Test
+    @DisplayName("should handle empty JSON5 gracefully without errors")
+    void testReadJson5_emptyJson5() {
+        // Given: EventData and empty JSON5 string
+        final EventData event = new EventData("original_uuid", 42L, 100L);
+        final String json5 = "{}";
+
+        // When: readJson5 is called with empty JSON5
+        event.readJson5(json5);
+
+        // Then: fields should remain unchanged
+        assertEquals("original_uuid", event.getSessionUuid(), "should preserve sessionUuid");
+        assertEquals(42L, event.getPosition(), "should preserve position");
+        assertEquals(100L, event.getLastCurrentTime(), "should preserve lastCurrentTime");
+    }
+
+    @Test
+    @DisplayName("should handle missing fields without throwing exceptions")
+    void testReadJson5_missingFields() {
+        // Given: EventData and JSON5 missing some fields
+        final EventData event = new EventData("orig_uuid", 50L, 200L);
+        final String json5 = "{$:75}";
+
+        // When: readJson5 is called with only position field
+        event.readJson5(json5);
+
+        // Then: only present fields should be updated
+        assertEquals("orig_uuid", event.getSessionUuid(), "should preserve sessionUuid");
+        assertEquals(75L, event.getPosition(), "should update position");
+        assertEquals(200L, event.getLastCurrentTime(), "should preserve lastCurrentTime");
+    }
+
+    @Test
+    @DisplayName("should delegate to readJson5 public method correctly")
+    void testReadJson5_publicMethod() {
+        // Given: EventData and complete JSON5 data
+        final EventData event = new EventData();
+        final String json5 = "{_:public_test,$:123,t:4567}";
+
+        // When: public readJson5 method is called
+        event.readJson5(json5);
+
+        // Then: all fields should be populated correctly
+        assertEquals("public_test", event.getSessionUuid(), "should parse sessionUuid via public method");
+        assertEquals(123L, event.getPosition(), "should parse position via public method");
+        assertEquals(4567L, event.getLastCurrentTime(), "should parse lastCurrentTime via public method");
+    }
+
+    @Test
+    @DisplayName("should handle special characters in sessionUuid")
+    void testReadJson5_specialCharactersInUuid() {
+        // Given: EventData and JSON5 with special characters in UUID
+        final EventData event = new EventData();
+        final String json5 = "{_:uuid-with_special.chars123}";
+
+        // When: readJson5 is called
+        event.readJson5(json5);
+
+        // Then: UUID with special characters should be parsed correctly
+        assertEquals("uuid-with_special.chars123", event.getSessionUuid(), "should parse UUID with special characters");
+    }
+
+    @Test
+    @DisplayName("should support round-trip JSON5 serialization via public method")
+    void testReadJson5_roundTripWithPublicMethod() {
+        // Given: EventData with known values
+        final EventData original = new EventData("roundtrip_uuid", 999L, 555555L);
+        final StringBuilder sb = new StringBuilder();
+
+        // When: original is serialized, then deserialized via public method
+        EventDataJson5.write(original, sb);
+        final EventData restored = new EventData();
+        restored.readJson5("{" + sb + "}");
+
+        // Then: restored data should match original
+        assertEquals(original.getSessionUuid(), restored.getSessionUuid(), "should preserve sessionUuid in round-trip");
+        assertEquals(original.getPosition(), restored.getPosition(), "should preserve position in round-trip");
+        assertEquals(original.getLastCurrentTime(), restored.getLastCurrentTime(), "should preserve lastCurrentTime in round-trip");
     }
 
 }
