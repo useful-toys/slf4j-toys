@@ -283,186 +283,107 @@ class SystemDataTest {
         assertEquals(original.getSystemLoad(), restored.getSystemLoad(), 0.001, "should preserve systemLoad in " + scenarioName);
     }
 
-    @Test
-    @DisplayName("should initialize with uuid constructor - SystemData(String uuid)")
-    void testConstructorWithUuidOnly() {
-        // Given: a session UUID
-        final String testUuid = "test-session-uuid-123";
 
+    /**
+     * Provides test scenarios for single-parameter constructor SystemData(String uuid).
+     * Tests various UUID values including null, empty, normal, and special characters.
+     */
+    static Stream<Arguments> singleParameterConstructorScenarios() {
+        return Stream.of(
+                Arguments.of("Normal UUID", "test-session-uuid-123"),
+                Arguments.of("Null UUID", null),
+                Arguments.of("Empty string UUID", ""),
+                Arguments.of("UUID with special characters", "uuid-with-special-chars_!@#$%^&*()"),
+                Arguments.of("UUID with dashes and numbers", "uuid-with-dashes-123-456"),
+                Arguments.of("Very long UUID", "this-is-a-very-long-uuid-that-contains-many-characters-to-test-length-handling-12345678901234567890")
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("singleParameterConstructorScenarios")
+    @DisplayName("should initialize with uuid constructor - SystemData(String uuid)")
+    void testConstructorWithUuidOnly(final String scenarioName, final String testUuid) {
+        // Given: a session UUID from scenario
         // When: SystemData is created using single-parameter constructor
         final TestSystemData systemData = new TestSystemData(testUuid);
 
         // Then: sessionUuid should be set and all other fields should have default values
-        assertEquals(testUuid, systemData.getSessionUuid(), "should set sessionUuid from constructor");
-        assertEquals(0L, systemData.getPosition(), "should initialize position to 0");
-        assertEquals(0L, systemData.getLastCurrentTime(), "should initialize lastCurrentTime to 0");
-        assertEquals(0L, systemData.getHeap_commited(), "should initialize heap_commited to 0");
-        assertEquals(0L, systemData.getHeap_max(), "should initialize heap_max to 0");
-        assertEquals(0L, systemData.getHeap_used(), "should initialize heap_used to 0");
-        assertEquals(0L, systemData.getNonHeap_commited(), "should initialize nonHeap_commited to 0");
-        assertEquals(0L, systemData.getNonHeap_max(), "should initialize nonHeap_max to 0");
-        assertEquals(0L, systemData.getNonHeap_used(), "should initialize nonHeap_used to 0");
-        assertEquals(0L, systemData.getObjectPendingFinalizationCount(), "should initialize objectPendingFinalizationCount to 0");
-        assertEquals(0L, systemData.getClassLoading_loaded(), "should initialize classLoading_loaded to 0");
-        assertEquals(0L, systemData.getClassLoading_total(), "should initialize classLoading_total to 0");
-        assertEquals(0L, systemData.getClassLoading_unloaded(), "should initialize classLoading_unloaded to 0");
-        assertEquals(0L, systemData.getCompilationTime(), "should initialize compilationTime to 0");
-        assertEquals(0L, systemData.getGarbageCollector_count(), "should initialize garbageCollector_count to 0");
-        assertEquals(0L, systemData.getGarbageCollector_time(), "should initialize garbageCollector_time to 0");
-        assertEquals(0L, systemData.getRuntime_usedMemory(), "should initialize runtime_usedMemory to 0");
-        assertEquals(0L, systemData.getRuntime_maxMemory(), "should initialize runtime_maxMemory to 0");
-        assertEquals(0L, systemData.getRuntime_totalMemory(), "should initialize runtime_totalMemory to 0");
-        assertEquals(0.0, systemData.getSystemLoad(), "should initialize systemLoad to 0.0");
+        if (testUuid == null) {
+            assertNull(systemData.getSessionUuid(), "should accept null sessionUuid for " + scenarioName);
+        } else {
+            assertEquals(testUuid, systemData.getSessionUuid(), "should set sessionUuid from constructor for " + scenarioName);
+        }
+        assertEquals(0L, systemData.getPosition(), "should initialize position to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getLastCurrentTime(), "should initialize lastCurrentTime to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getHeap_commited(), "should initialize heap_commited to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getHeap_max(), "should initialize heap_max to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getHeap_used(), "should initialize heap_used to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getNonHeap_commited(), "should initialize nonHeap_commited to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getNonHeap_max(), "should initialize nonHeap_max to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getNonHeap_used(), "should initialize nonHeap_used to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getObjectPendingFinalizationCount(), "should initialize objectPendingFinalizationCount to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getClassLoading_loaded(), "should initialize classLoading_loaded to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getClassLoading_total(), "should initialize classLoading_total to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getClassLoading_unloaded(), "should initialize classLoading_unloaded to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getCompilationTime(), "should initialize compilationTime to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getGarbageCollector_count(), "should initialize garbageCollector_count to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getGarbageCollector_time(), "should initialize garbageCollector_time to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getRuntime_usedMemory(), "should initialize runtime_usedMemory to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getRuntime_maxMemory(), "should initialize runtime_maxMemory to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getRuntime_totalMemory(), "should initialize runtime_totalMemory to 0 for " + scenarioName);
+        assertEquals(0.0, systemData.getSystemLoad(), "should initialize systemLoad to 0.0 for " + scenarioName);
     }
 
-    @Test
-    @DisplayName("should initialize with uuid and timestamp constructor - SystemData(String uuid, long timestamp)")
-    void testConstructorWithUuidAndTimestamp() {
-        // Given: a session UUID and timestamp
-        final String testUuid = "test-session-uuid-456";
-        final long testTimestamp = 123456789L;
+    /**
+     * Provides test scenarios for two-parameter constructor SystemData(String uuid, long timestamp).
+     * Tests various combinations of UUID and timestamp values including edge cases.
+     */
+    static Stream<Arguments> twoParameterConstructorScenarios() {
+        return Stream.of(
+                Arguments.of("Normal values", "test-session-uuid-456", 123456789L),
+                Arguments.of("Null UUID with timestamp", null, 999888777L),
+                Arguments.of("Zero timestamp", "zero-timestamp-test", 0L),
+                Arguments.of("Negative timestamp", "negative-timestamp-test", -12345L),
+                Arguments.of("Long.MAX_VALUE timestamp", "max-timestamp-test", Long.MAX_VALUE),
+                Arguments.of("Long.MIN_VALUE timestamp", "min-timestamp-test", Long.MIN_VALUE),
+                Arguments.of("Small positive timestamp", "small-timestamp", 1L),
+                Arguments.of("Large timestamp", "large-timestamp", 9223372036854775806L),
+                Arguments.of("UUID with special chars and timestamp", "uuid-with-dashes-and-numbers-123-456-789", 555666777L)
+        );
+    }
 
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("twoParameterConstructorScenarios")
+    @DisplayName("should initialize with uuid and timestamp constructor - SystemData(String uuid, long timestamp)")
+    void testConstructorWithUuidAndTimestamp(final String scenarioName, final String testUuid, final long testTimestamp) {
+        // Given: a session UUID and timestamp from scenario
         // When: SystemData is created using two-parameter constructor
         final TestSystemData systemData = new TestSystemData(testUuid, testTimestamp);
 
-        // Then: sessionUuid and position should be set (position is set via super(uuid, position) where position parameter becomes position)
-        assertEquals(testUuid, systemData.getSessionUuid(), "should set sessionUuid from constructor");
-        assertEquals(testTimestamp, systemData.getPosition(), "should set position from timestamp parameter");
-        assertEquals(0L, systemData.getLastCurrentTime(), "should initialize lastCurrentTime to 0");
-        assertEquals(0L, systemData.getHeap_commited(), "should initialize heap_commited to 0");
-        assertEquals(0L, systemData.getHeap_max(), "should initialize heap_max to 0");
-        assertEquals(0L, systemData.getHeap_used(), "should initialize heap_used to 0");
-        assertEquals(0L, systemData.getNonHeap_commited(), "should initialize nonHeap_commited to 0");
-        assertEquals(0L, systemData.getNonHeap_max(), "should initialize nonHeap_max to 0");
-        assertEquals(0L, systemData.getNonHeap_used(), "should initialize nonHeap_used to 0");
-        assertEquals(0L, systemData.getObjectPendingFinalizationCount(), "should initialize objectPendingFinalizationCount to 0");
-        assertEquals(0L, systemData.getClassLoading_loaded(), "should initialize classLoading_loaded to 0");
-        assertEquals(0L, systemData.getClassLoading_total(), "should initialize classLoading_total to 0");
-        assertEquals(0L, systemData.getClassLoading_unloaded(), "should initialize classLoading_unloaded to 0");
-        assertEquals(0L, systemData.getCompilationTime(), "should initialize compilationTime to 0");
-        assertEquals(0L, systemData.getGarbageCollector_count(), "should initialize garbageCollector_count to 0");
-        assertEquals(0L, systemData.getGarbageCollector_time(), "should initialize garbageCollector_time to 0");
-        assertEquals(0L, systemData.getRuntime_usedMemory(), "should initialize runtime_usedMemory to 0");
-        assertEquals(0L, systemData.getRuntime_maxMemory(), "should initialize runtime_maxMemory to 0");
-        assertEquals(0L, systemData.getRuntime_totalMemory(), "should initialize runtime_totalMemory to 0");
-        assertEquals(0.0, systemData.getSystemLoad(), "should initialize systemLoad to 0.0");
-    }
-
-    @Test
-    @DisplayName("should handle null uuid in single-parameter constructor")
-    void testConstructorWithNullUuid() {
-        // Given: null uuid
-        final String nullUuid = null;
-
-        // When: SystemData is created with null uuid
-        final TestSystemData systemData = new TestSystemData(nullUuid);
-
-        // Then: sessionUuid should be null and other fields should have defaults
-        assertNull(systemData.getSessionUuid(), "should accept null sessionUuid");
-        assertEquals(0L, systemData.getPosition(), "should initialize position to 0");
-        assertEquals(0L, systemData.getLastCurrentTime(), "should initialize lastCurrentTime to 0");
-    }
-
-    @Test
-    @DisplayName("should handle null uuid in two-parameter constructor")
-    void testConstructorWithNullUuidAndTimestamp() {
-        // Given: null uuid and a timestamp
-        final String nullUuid = null;
-        final long testTimestamp = 999888777L;
-
-        // When: SystemData is created with null uuid and timestamp
-        final TestSystemData systemData = new TestSystemData(nullUuid, testTimestamp);
-
-        // Then: sessionUuid should be null, position should be set
-        assertNull(systemData.getSessionUuid(), "should accept null sessionUuid");
-        assertEquals(testTimestamp, systemData.getPosition(), "should set position from timestamp parameter");
-        assertEquals(0L, systemData.getLastCurrentTime(), "should initialize lastCurrentTime to 0");
-    }
-
-    @Test
-    @DisplayName("should handle empty string uuid in single-parameter constructor")
-    void testConstructorWithEmptyStringUuid() {
-        // Given: empty string uuid
-        final String emptyUuid = "";
-
-        // When: SystemData is created with empty uuid
-        final TestSystemData systemData = new TestSystemData(emptyUuid);
-
-        // Then: sessionUuid should be empty string
-        assertEquals("", systemData.getSessionUuid(), "should accept empty string as sessionUuid");
-        assertEquals(0L, systemData.getPosition(), "should initialize position to 0");
-    }
-
-    @Test
-    @DisplayName("should handle zero timestamp in two-parameter constructor")
-    void testConstructorWithZeroTimestamp() {
-        // Given: uuid and zero timestamp
-        final String testUuid = "zero-timestamp-test";
-        final long zeroTimestamp = 0L;
-
-        // When: SystemData is created with zero timestamp
-        final TestSystemData systemData = new TestSystemData(testUuid, zeroTimestamp);
-
-        // Then: position should be 0
-        assertEquals(testUuid, systemData.getSessionUuid(), "should set sessionUuid");
-        assertEquals(0L, systemData.getPosition(), "should accept zero as position value");
-    }
-
-    @Test
-    @DisplayName("should handle negative timestamp in two-parameter constructor")
-    void testConstructorWithNegativeTimestamp() {
-        // Given: uuid and negative timestamp
-        final String testUuid = "negative-timestamp-test";
-        final long negativeTimestamp = -12345L;
-
-        // When: SystemData is created with negative timestamp
-        final TestSystemData systemData = new TestSystemData(testUuid, negativeTimestamp);
-
-        // Then: position should be set to negative value (if semantically allowed)
-        assertEquals(testUuid, systemData.getSessionUuid(), "should set sessionUuid");
-        assertEquals(negativeTimestamp, systemData.getPosition(), "should accept negative value as position");
-    }
-
-    @Test
-    @DisplayName("should handle Long.MAX_VALUE timestamp in two-parameter constructor")
-    void testConstructorWithMaxTimestamp() {
-        // Given: uuid and maximum long timestamp
-        final String testUuid = "max-timestamp-test";
-        final long maxTimestamp = Long.MAX_VALUE;
-
-        // When: SystemData is created with max timestamp
-        final TestSystemData systemData = new TestSystemData(testUuid, maxTimestamp);
-
-        // Then: position should be set to Long.MAX_VALUE
-        assertEquals(testUuid, systemData.getSessionUuid(), "should set sessionUuid");
-        assertEquals(Long.MAX_VALUE, systemData.getPosition(), "should accept Long.MAX_VALUE as position");
-    }
-
-    @Test
-    @DisplayName("should preserve uuid after construction with single-parameter constructor")
-    void testUuidPreservationSingleParameter() {
-        // Given: special characters in uuid
-        final String complexUuid = "uuid-with-special-chars_!@#$%^&*()";
-
-        // When: SystemData is created
-        final TestSystemData systemData = new TestSystemData(complexUuid);
-
-        // Then: uuid should be preserved exactly
-        assertEquals(complexUuid, systemData.getSessionUuid(), "should preserve complex uuid exactly");
-    }
-
-    @Test
-    @DisplayName("should preserve uuid after construction with two-parameter constructor")
-    void testUuidPreservationTwoParameter() {
-        // Given: special characters in uuid
-        final String complexUuid = "uuid-with-dashes-and-numbers-123-456-789";
-        final long timestamp = 555666777L;
-
-        // When: SystemData is created
-        final TestSystemData systemData = new TestSystemData(complexUuid, timestamp);
-
-        // Then: uuid should be preserved exactly and timestamp set
-        assertEquals(complexUuid, systemData.getSessionUuid(), "should preserve complex uuid exactly");
-        assertEquals(timestamp, systemData.getPosition(), "should set position correctly");
+        // Then: sessionUuid and position should be set (position is set via super(uuid, position))
+        if (testUuid == null) {
+            assertNull(systemData.getSessionUuid(), "should accept null sessionUuid for " + scenarioName);
+        } else {
+            assertEquals(testUuid, systemData.getSessionUuid(), "should set sessionUuid from constructor for " + scenarioName);
+        }
+        assertEquals(testTimestamp, systemData.getPosition(), "should set position from timestamp parameter for " + scenarioName);
+        assertEquals(0L, systemData.getLastCurrentTime(), "should initialize lastCurrentTime to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getHeap_commited(), "should initialize heap_commited to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getHeap_max(), "should initialize heap_max to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getHeap_used(), "should initialize heap_used to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getNonHeap_commited(), "should initialize nonHeap_commited to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getNonHeap_max(), "should initialize nonHeap_max to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getNonHeap_used(), "should initialize nonHeap_used to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getObjectPendingFinalizationCount(), "should initialize objectPendingFinalizationCount to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getClassLoading_loaded(), "should initialize classLoading_loaded to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getClassLoading_total(), "should initialize classLoading_total to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getClassLoading_unloaded(), "should initialize classLoading_unloaded to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getCompilationTime(), "should initialize compilationTime to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getGarbageCollector_count(), "should initialize garbageCollector_count to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getGarbageCollector_time(), "should initialize garbageCollector_time to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getRuntime_usedMemory(), "should initialize runtime_usedMemory to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getRuntime_maxMemory(), "should initialize runtime_maxMemory to 0 for " + scenarioName);
+        assertEquals(0L, systemData.getRuntime_totalMemory(), "should initialize runtime_totalMemory to 0 for " + scenarioName);
+        assertEquals(0.0, systemData.getSystemLoad(), "should initialize systemLoad to 0.0 for " + scenarioName);
     }
 }
