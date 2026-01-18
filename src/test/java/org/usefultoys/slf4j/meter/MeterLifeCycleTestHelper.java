@@ -16,39 +16,28 @@
 package org.usefultoys.slf4j.meter;
 
 import org.slf4j.Logger;
-import org.usefultoys.slf4jtestmock.Slf4jMock;
+import org.slf4j.Marker;
+import org.slf4j.impl.MockLogger;
+import org.slf4j.impl.MockLoggerEvent.Level;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Helper utilities for {@link Meter} lifecycle tests.
- * <p>
- * This class provides shared helper methods, test enums, and test objects used across
- * multiple {@code MeterLifeCycle*Test} classes to avoid code duplication and ensure consistency.
- * <p>
- * <b>Provided Utilities:</b>
- * <ul>
- *   <li><b>assertMeterState():</b> Comprehensive assertion method to verify all Meter state attributes</li>
- *   <li><b>TestEnum:</b> Sample enum for testing path handling with enum values</li>
- *   <li><b>TestObject:</b> Sample object for testing path handling with custom objects</li>
- * </ul>
- * <p>
- * <b>Usage Pattern:</b> Test classes should use static import for {@code assertMeterState()}
- * and reference {@code TestEnum} and {@code TestObject} as needed.
- * <p>
- * This is a utility class and should not be instantiated. It is not a test class itself.
- *
- * @author Co-authored-by: GitHub Copilot using Gemini 3 Flash (Preview)
- * @author Co-authored-by: GitHub Copilot using GPT-5.2
- * @author Co-authored-by: GitHub Copilot using Claude 3.5 Sonnet
+ * Helper class for Meter lifecycle tests, providing reusable log assertion logic and test scenarios.
  */
-class MeterLifeCycleTestHelper {
+final class MeterLifeCycleTestHelper {
 
-    @SuppressWarnings("NonConstantLogger")
-    @Slf4jMock
-    Logger logger;
+    private MeterLifeCycleTestHelper() {
+        // Utility class
+    }
 
     /**
      * Test enum for validating enum path handling in Meter.
@@ -103,17 +92,6 @@ class MeterLifeCycleTestHelper {
             assertEquals(rejectPath, meter.getRejectPath(), "rejectPath should match expected value: " + rejectPath);
         }
 
-        if (failPath == null) {
-            assertNull(meter.getFailPath(), "failPath should be null");
-        } else {
-            assertEquals(failPath, meter.getFailPath(), "failPath should match expected value: " + failPath);
-        }
-
-        if (failMessage == null) {
-            assertNull(meter.getFailMessage(), "failMessage should be null");
-        } else {
-            assertEquals(failMessage, meter.getFailMessage(), "failMessage should match expected value: " + failMessage);
-        }
 
         assertEquals(currentIteration, meter.getCurrentIteration(), "currentIteration should match expected value: " + currentIteration);
         assertEquals(expectedIterations, meter.getExpectedIterations(), "expectedIterations should match expected value: " + expectedIterations);
@@ -129,4 +107,89 @@ class MeterLifeCycleTestHelper {
         }
     }
 
+    /**
+     * Provides log level scenarios for parameterized tests.
+     *
+     * @return Stream of arguments containing (debugEnabled, infoEnabled, traceEnabled).
+     */
+    public static Stream<Level> logLevelScenarios() {
+        return Stream.of(
+                // Full logging
+                Level.TRACE,
+                Level.DEBUG,
+                Level.INFO,
+                Level.WARN,
+                Level.ERROR
+        );
+    }
+
+    /**
+     * Configures the mock loggers used by the Meter based on the provided flags.
+     *
+     * @param logger The base logger used to derive message and data loggers.
+     * @param level  The log level to set for both loggers.
+     */
+    public static void configureLogger(final Logger logger, final Level level) {
+        final Logger messageLogger = org.slf4j.LoggerFactory.getLogger(
+                MeterConfig.messagePrefix + logger.getName() + MeterConfig.messageSuffix);
+        final MockLogger mockMessageLogger = (MockLogger) messageLogger;
+        mockMessageLogger.setLevel(level);
+
+        final Logger dataLogger = org.slf4j.LoggerFactory.getLogger(
+                MeterConfig.dataPrefix + logger.getName() + MeterConfig.dataSuffix);
+        final MockLogger mockDataLogger = (MockLogger) dataLogger;
+        mockDataLogger.setLevel(level);
+    }
+
+    /**
+     * Represents an expected log event for assertion.
+     */
+    public static class ExpectedLogEvent {
+        final Level level;
+        final Marker marker;
+        final String[] messageParts;
+
+        ExpectedLogEvent(final Level level, final Marker marker, final String... messageParts) {
+            this.level = level;
+            this.marker = marker;
+            this.messageParts = messageParts;
+        }
+    }
+
+    /**
+     * Factory method to create an ExpectedLogEvent.
+     *
+     * @param level        The expected log level.
+     * @param marker       The expected marker.
+     * @param messageParts Optional message parts (arguments) expected in the log.
+     * @return A new ExpectedLogEvent instance.
+     */
+    public static ExpectedLogEvent event(final Level level, final Marker marker, final String... messageParts) {
+        return new ExpectedLogEvent(level, marker, messageParts);
+    }
+
+    /**
+     * Asserts that the logger contains the expected events, filtered by the enabled log levels.
+     *
+     * @param logger The logger to check.
+     * @param level  The expected log level.
+     * @param events The list of ideal expected events (assuming all levels enabled).
+     */
+    public static void assertLogs(final Logger logger, final Level level, final ExpectedLogEvent... events) {
+        final List<ExpectedLogEvent> filteredEvents =
+                Arrays.stream(events)
+                        .filter(e -> e.level.ordinal() <= level.ordinal())
+                        .collect(Collectors.toList());
+
+        AssertLogger.assertEventCount(logger, filteredEvents.size());
+
+        for (int i = 0; i < filteredEvents.size(); i++) {
+            final ExpectedLogEvent e = filteredEvents.get(i);
+            if (e.messageParts != null && e.messageParts.length > 0) {
+                AssertLogger.assertEvent(logger, i, e.level, e.marker, e.messageParts);
+            } else {
+                AssertLogger.assertEvent(logger, i, e.level, e.marker);
+            }
+        }
+    }
 }

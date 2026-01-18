@@ -497,7 +497,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
                 SystemMetrics.getInstance().collectPlatformStatus(this);
 
-                final boolean warnSlowness = startTime != 0 && timeLimit != 0 && stopTime - startTime > timeLimit;
+                final boolean warnSlowness = isSlow();
                 final String message1 = readableMessage();
                 if (warnSlowness) {
                     messageLogger.warn(Markers.MSG_SLOW_OK, message1);
@@ -610,10 +610,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             if (messageLogger.isInfoEnabled()) {
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
                 SystemMetrics.getInstance().collectPlatformStatus(this);
-                if (messageLogger.isInfoEnabled()) {
-                    final String message1 = readableMessage();
-                    messageLogger.info(Markers.MSG_REJECT, message1);
-                }
+                final String message1 = readableMessage();
+                messageLogger.info(Markers.MSG_REJECT, message1);
                 if (dataLogger.isTraceEnabled()) {
                     final String message2 = json5Message();
                     dataLogger.trace(Markers.DATA_REJECT, message2);
