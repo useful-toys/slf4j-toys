@@ -41,9 +41,12 @@ import java.util.TimeZone;
  * <ul>
  *   <li><b>Default Calendar Information:</b> Verifies logging of calendar information with default timezone details</li>
  *   <li><b>Custom Calendar Information:</b> Tests reporting with custom timezone and date settings</li>
+ *   <li><b>Default Provider:</b> Tests the default CalendarInfoProvider implementation</li>
+ *   <li><b>Line Wrapping:</b> Tests timezone ID list wrapping when more than 8 IDs are provided</li>
  * </ul>
  *
  * @author Co-authored-by: GitHub Copilot using gpt-4o
+ * @author Co-authored-by: GitHub Copilot using Claude Opus 4.5
  */
 @SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportCalendar")
@@ -162,5 +165,68 @@ class ReportCalendarTest {
             "America/New_York; ",
             "Asia/Tokyo; ");
         AssertLogger.assertEventNot(logger, 0, MockLoggerEvent.Level.INFO, "America/Sao_Paulo; ");
+    }
+
+    @Test
+    @DisplayName("should use default CalendarInfoProvider when not overridden")
+    void shouldUseDefaultCalendarInfoProvider() {
+        // Given: a ReportCalendar with default provider (not overridden)
+        final ReportCalendar report = new ReportCalendar(logger);
+
+        // When: report is executed
+        report.run();
+
+        // Then: should log calendar information using system defaults
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Calendar",
+            " - current date/time:",
+            " - default timezone:",
+            " - available IDs:");
+    }
+
+    @Test
+    @DisplayName("should wrap timezone IDs after every 8 entries")
+    void shouldWrapTimezoneIDsAfterEvery8Entries() {
+        // Given: a calendar info provider with more than 8 timezone IDs to trigger line wrapping
+        final Date fixedCurrentDate = new Date(1678886400000L);
+        final TimeZone fixedTimeZone = TimeZone.getTimeZone("UTC");
+        final String[] manyAvailableIDs = {
+            "ID1", "ID2", "ID3", "ID4", "ID5", "ID6", "ID7", "ID8",
+            "ID9", "ID10", "ID11", "ID12", "ID13", "ID14", "ID15", "ID16"
+        };
+
+        final ReportCalendar.CalendarInfoProvider provider = new ReportCalendar.CalendarInfoProvider() {
+            @Override
+            public Date getCurrentDate() {
+                return fixedCurrentDate;
+            }
+
+            @Override
+            public TimeZone getDefaultTimeZone() {
+                return fixedTimeZone;
+            }
+
+            @Override
+            public String[] getAvailableTimeZoneIDs() {
+                return manyAvailableIDs;
+            }
+        };
+
+        final ReportCalendar report = new ReportCalendar(logger) {
+            @Override
+            protected ReportCalendar.CalendarInfoProvider getCalendarInfoProvider() {
+                return provider;
+            }
+        };
+
+        // When: report is executed
+        report.run();
+
+        // Then: should log all timezone IDs with line wrapping
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Calendar",
+            " - available IDs:",
+            "ID1; ", "ID2; ", "ID3; ", "ID4; ", "ID5; ", "ID6; ", "ID7; ",
+            "ID8; ", "ID9; ", "ID10; ", "ID11; ", "ID12; ", "ID13; ", "ID14; ", "ID15; ", "ID16; ");
     }
 }
