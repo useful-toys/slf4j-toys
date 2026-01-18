@@ -17,10 +17,10 @@
 package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
-import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.slf4j.impl.MockLoggerEvent.Level;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
@@ -28,6 +28,11 @@ import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
+
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertLogs;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.configureLogger;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.event;
 
 /**
  * Unit tests for {@link Meter} try-with-resources lifecycle patterns.
@@ -82,9 +87,12 @@ class MeterLifeCycleTryWithResourcesTest {
     @Slf4jMock
     Logger logger;
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should follow try-with-resources flow (implicit failure)")
-    void shouldFollowTryWithResourcesFlowImplicitFailure() {
+    void shouldFollowTryWithResourcesFlowImplicitFailure(final Level level) {
+        configureLogger(logger, level);
+
         final Meter meter;
         // Given: a new, started Meter withing try with resources
         try (final Meter m = new Meter(logger).start()) {
@@ -93,17 +101,23 @@ class MeterLifeCycleTryWithResourcesTest {
         }
 
         // Then: it should be automatically failed on close()
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
 
         // Then: all log messages recorded correctly
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEventCount(logger, 4);
+        assertLogs(logger, level,
+                event(Level.DEBUG, Markers.MSG_START),
+                event(Level.TRACE, Markers.DATA_START),
+                event(Level.ERROR, Markers.MSG_FAIL, "try-with-resources"),
+                event(Level.TRACE, Markers.DATA_FAIL, "try-with-resources")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should follow try-with-resources flow (explicit success)")
-    void shouldFollowTryWithResourcesFlowExplicitSuccess() {
+    void shouldFollowTryWithResourcesFlowExplicitSuccess(final Level level) {
+        configureLogger(logger, level);
+
         final Meter meter;
         // Given: a new, started Meter withing try with resources
         try (final Meter m = new Meter(logger).start()) {
@@ -113,21 +127,27 @@ class MeterLifeCycleTryWithResourcesTest {
             m.ok();
 
             // Then: Meter is in stopped state
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         }
 
         // Then: it should remain in success state after close()
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
         // Then: all log messages recorded correctly
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEventCount(logger, 4);
+        assertLogs(logger, level,
+                event(Level.DEBUG, Markers.MSG_START),
+                event(Level.TRACE, Markers.DATA_START),
+                event(Level.INFO, Markers.MSG_OK),
+                event(Level.TRACE, Markers.DATA_OK)
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should follow try-with-resources flow (path and explicit success)")
-    void shouldFollowTryWithResourcesFlowPathAndExplicitSuccess() {
+    void shouldFollowTryWithResourcesFlowPathAndExplicitSuccess(final Level level) {
+        configureLogger(logger, level);
+
         final Meter meter;
         // Given: a new, started Meter withing try with resources
         try (final Meter m = new Meter(logger).start()) {
@@ -137,27 +157,33 @@ class MeterLifeCycleTryWithResourcesTest {
             m.path("customPath");
 
             // Then: path is set
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "customPath", null, null, null, 0, 0, 0);
+            assertMeterState(meter, true, false, "customPath", null, null, null, 0, 0, 0);
 
             // When: ok() is called
             m.ok();
 
             // Then: Meter is in stopped state with path preserved
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
         }
 
         // Then: it should remain in success state after close()
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
 
         // Then: all log messages recorded correctly
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEventCount(logger, 4);
+        assertLogs(logger, level,
+                event(Level.DEBUG, Markers.MSG_START),
+                event(Level.TRACE, Markers.DATA_START),
+                event(Level.INFO, Markers.MSG_OK, "customPath"),
+                event(Level.TRACE, Markers.DATA_OK, "customPath")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should follow try-with-resources flow (explicit rejection)")
-    void shouldFollowTryWithResourcesFlowExplicitRejection() {
+    void shouldFollowTryWithResourcesFlowExplicitRejection(final Level level) {
+        configureLogger(logger, level);
+
         final Meter meter;
         // Given: a new, started Meter withing try with resources
         try (final Meter m = new Meter(logger).start()) {
@@ -167,21 +193,27 @@ class MeterLifeCycleTryWithResourcesTest {
             m.reject("rejected");
 
             // Then: Meter is in stopped state with reject path set
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
         }
 
         // Then: it should remain in rejection state after close()
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
 
         // Then: all log messages recorded correctly
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEventCount(logger, 4);
+        assertLogs(logger, level,
+                event(Level.DEBUG, Markers.MSG_START),
+                event(Level.TRACE, Markers.DATA_START),
+                event(Level.INFO, Markers.MSG_REJECT, "rejected"),
+                event(Level.TRACE, Markers.DATA_REJECT, "rejected")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should follow try-with-resources flow (explicit failure)")
-    void shouldFollowTryWithResourcesFlowExplicitFailure() {
+    void shouldFollowTryWithResourcesFlowExplicitFailure(final Level level) {
+        configureLogger(logger, level);
+
         final Meter meter;
         // Given: a new, started Meter withing try with resources
         try (final Meter m = new Meter(logger).start()) {
@@ -191,25 +223,31 @@ class MeterLifeCycleTryWithResourcesTest {
             m.fail("failed");
 
             // Then: Meter is in stopped state with failure message
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
         }
 
         // Then: it should remain in failure state after close()
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
 
         // Then: all log messages recorded correctly
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEventCount(logger, 4);
+        assertLogs(logger, level,
+                event(Level.DEBUG, Markers.MSG_START),
+                event(Level.TRACE, Markers.DATA_START),
+                event(Level.ERROR, Markers.MSG_FAIL, "failed"),
+                event(Level.TRACE, Markers.DATA_FAIL, "failed")
+        );
     }
 
     // ============================================================================
     // Try-with-resources WITHOUT start() (Tier 3 - State-Correcting)
     // ============================================================================
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to Failed via try-with-resources without start() - implicit close()")
-    void shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose() {
+    void shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
         try (final Meter m = new Meter(logger)) {
@@ -219,19 +257,22 @@ class MeterLifeCycleTryWithResourcesTest {
         }
 
         /* Then: meter is in Failed state after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_CLOSE + ERROR for implicit failure */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_CLOSE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, "try-with-resources");
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_CLOSE),
+                event(Level.ERROR, Markers.MSG_FAIL, "try-with-resources"),
+                event(Level.TRACE, Markers.DATA_FAIL, "try-with-resources")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to OK via try-with-resources without start() - explicit ok()")
-    void shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk() {
+    void shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
         try (final Meter m = new Meter(logger)) {
@@ -240,22 +281,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.ok();
 
             /* Then: Meter is in stopped state (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         }
 
         /* Then: meter remains in OK state after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                event(Level.INFO, Markers.MSG_OK),
+                event(Level.TRACE, Markers.DATA_OK)
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to OK with path via try-with-resources without start() - explicit ok(String)")
-    void shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString() {
+    void shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
         try (final Meter m = new Meter(logger)) {
@@ -264,22 +309,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.ok("success_path");
 
             /* Then: Meter is in stopped state with path (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
         }
 
         /* Then: meter remains in OK state with path after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                event(Level.INFO, Markers.MSG_OK),
+                event(Level.TRACE, Markers.DATA_OK)
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to OK with Enum via try-with-resources without start() - explicit ok(Enum)")
-    void shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum() {
+    void shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
         try (final Meter m = new Meter(logger)) {
@@ -288,22 +337,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.ok(MeterLifeCycleTestHelper.TestEnum.VALUE1);
 
             /* Then: Meter is in stopped state with enum path (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
         }
 
         /* Then: meter remains in OK state with enum path after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                event(Level.INFO, Markers.MSG_OK),
+                event(Level.TRACE, Markers.DATA_OK)
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to OK with Throwable via try-with-resources without start() - explicit ok(Throwable)")
-    void shouldTransitionToOkWithThrowableViaTryWithResourcesWithoutStartExplicitOkThrowable() {
+    void shouldTransitionToOkWithThrowableViaTryWithResourcesWithoutStartExplicitOkThrowable(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         final RuntimeException exception = new RuntimeException("test cause");
         /* Given: Meter created in try-with-resources without start() */
@@ -313,22 +366,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.ok(exception);
 
             /* Then: Meter is in stopped state with throwable path (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
         }
 
         /* Then: meter remains in OK state with throwable path after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                event(Level.INFO, Markers.MSG_OK),
+                event(Level.TRACE, Markers.DATA_OK)
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to OK with Object via try-with-resources without start() - explicit ok(Object)")
-    void shouldTransitionToOkWithObjectViaTryWithResourcesWithoutStartExplicitOkObject() {
+    void shouldTransitionToOkWithObjectViaTryWithResourcesWithoutStartExplicitOkObject(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         final MeterLifeCycleTestHelper.TestObject testObject = new MeterLifeCycleTestHelper.TestObject();
         /* Given: Meter created in try-with-resources without start() */
@@ -338,22 +395,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.ok(testObject);
 
             /* Then: Meter is in stopped state with object path (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
         }
 
         /* Then: meter remains in OK state with object path after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                event(Level.INFO, Markers.MSG_OK),
+                event(Level.TRACE, Markers.DATA_OK)
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to Rejected via try-with-resources without start() - explicit reject(String)")
-    void shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString() {
+    void shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
         try (final Meter m = new Meter(logger)) {
@@ -362,22 +423,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.reject("business_error");
 
             /* Then: Meter is in stopped state with rejectPath (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         }
 
         /* Then: meter remains in Rejected state after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_REJECT),
+                event(Level.INFO, Markers.MSG_REJECT, "business_error"),
+                event(Level.TRACE, Markers.DATA_REJECT, "business_error")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to Rejected with Enum via try-with-resources without start() - explicit reject(Enum)")
-    void shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum() {
+    void shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
         try (final Meter m = new Meter(logger)) {
@@ -386,22 +451,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.reject(MeterLifeCycleTestHelper.TestEnum.VALUE2);
 
             /* Then: Meter is in stopped state with enum rejectPath (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
         }
 
         /* Then: meter remains in Rejected state with enum cause after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_REJECT),
+                event(Level.INFO, Markers.MSG_REJECT, "VALUE2"),
+                event(Level.TRACE, Markers.DATA_REJECT, "VALUE2")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to Rejected with Throwable via try-with-resources without start() - explicit reject(Throwable)")
-    void shouldTransitionToRejectedWithThrowableViaTryWithResourcesWithoutStartExplicitRejectThrowable() {
+    void shouldTransitionToRejectedWithThrowableViaTryWithResourcesWithoutStartExplicitRejectThrowable(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         final IllegalArgumentException exception = new IllegalArgumentException("invalid input");
         /* Given: Meter created in try-with-resources without start() */
@@ -411,22 +480,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.reject(exception);
 
             /* Then: Meter is in stopped state with throwable rejectPath (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
         }
 
         /* Then: meter remains in Rejected state with throwable cause after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_REJECT),
+                event(Level.INFO, Markers.MSG_REJECT, "IllegalArgumentException"),
+                event(Level.TRACE, Markers.DATA_REJECT, "IllegalArgumentException")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to Rejected with Object via try-with-resources without start() - explicit reject(Object)")
-    void shouldTransitionToRejectedWithObjectViaTryWithResourcesWithoutStartExplicitRejectObject() {
+    void shouldTransitionToRejectedWithObjectViaTryWithResourcesWithoutStartExplicitRejectObject(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         final MeterLifeCycleTestHelper.TestObject testObject = new MeterLifeCycleTestHelper.TestObject();
         /* Given: Meter created in try-with-resources without start() */
@@ -436,22 +509,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.reject(testObject);
 
             /* Then: Meter is in stopped state with object rejectPath (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
         }
 
         /* Then: meter remains in Rejected state with object cause after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_REJECT),
+                event(Level.INFO, Markers.MSG_REJECT, "testObjectString"),
+                event(Level.TRACE, Markers.DATA_REJECT, "testObjectString")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to Failed via try-with-resources without start() - explicit fail(String)")
-    void shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString() {
+    void shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
         try (final Meter m = new Meter(logger)) {
@@ -460,22 +537,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.fail("technical_error");
 
             /* Then: Meter is in stopped state with failPath (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         }
 
         /* Then: meter remains in Failed state after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_FAIL),
+                event(Level.ERROR, Markers.MSG_FAIL, "technical_error"),
+                event(Level.TRACE, Markers.DATA_FAIL, "technical_error")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to Failed with Enum via try-with-resources without start() - explicit fail(Enum)")
-    void shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum() {
+    void shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
         try (final Meter m = new Meter(logger)) {
@@ -484,22 +565,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.fail(MeterLifeCycleTestHelper.TestEnum.VALUE1);
 
             /* Then: Meter is in stopped state with enum failPath (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
         }
 
         /* Then: meter remains in Failed state with enum cause after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_FAIL),
+                event(Level.ERROR, Markers.MSG_FAIL, "VALUE1"),
+                event(Level.TRACE, Markers.DATA_FAIL, "VALUE1")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to Failed with Throwable via try-with-resources without start() - explicit fail(Throwable)")
-    void shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable() {
+    void shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         final Exception exception = new Exception("connection timeout");
         /* Given: Meter created in try-with-resources without start() */
@@ -509,22 +594,26 @@ class MeterLifeCycleTryWithResourcesTest {
             m.fail(exception);
 
             /* Then: Meter is in stopped state with throwable failPath and failMessage (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
+            assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
         }
 
         /* Then: meter remains in Failed state with throwable details after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
+        assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_FAIL),
+                event(Level.ERROR, Markers.MSG_FAIL, "java.lang.Exception"),
+                event(Level.TRACE, Markers.DATA_FAIL, "java.lang.Exception")
+        );
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper#logLevelScenarios")
     @DisplayName("should transition to Failed with Object via try-with-resources without start() - explicit fail(Object)")
-    void shouldTransitionToFailedWithObjectViaTryWithResourcesWithoutStartExplicitFailObject() {
+    void shouldTransitionToFailedWithObjectViaTryWithResourcesWithoutStartExplicitFailObject(final Level level) {
+        configureLogger(logger, level);
+
         Meter meter = null;
         final MeterLifeCycleTestHelper.TestObject testObject = new MeterLifeCycleTestHelper.TestObject();
         /* Given: Meter created in try-with-resources without start() */
@@ -534,16 +623,17 @@ class MeterLifeCycleTryWithResourcesTest {
             m.fail(testObject);
 
             /* Then: Meter is in stopped state with object failPath (pedagogical validation) */
-            MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
+            assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
         }
 
         /* Then: meter remains in Failed state with object cause after close() */
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEventCount(logger, 3);
+        assertLogs(logger, level,
+                event(Level.ERROR, Markers.INCONSISTENT_FAIL),
+                event(Level.ERROR, Markers.MSG_FAIL, "testObjectString"),
+                event(Level.TRACE, Markers.DATA_FAIL, "testObjectString")
+        );
     }
 }

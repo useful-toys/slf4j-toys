@@ -119,7 +119,9 @@ final class MeterLifeCycleTestHelper {
                 Level.DEBUG,
                 Level.INFO,
                 Level.WARN,
-                Level.ERROR
+                Level.ERROR,
+                // No logging
+                Level.NONE
         );
     }
 
