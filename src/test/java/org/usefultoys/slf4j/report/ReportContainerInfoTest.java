@@ -51,8 +51,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li><b>CPU Limit Parsing:</b> Verifies CPU limit calculation from cgroup quota and period values, handling parsing errors</li>
  *   <li><b>Container ID Pattern Matching:</b> Ensures proper extraction of container IDs from cgroup paths, handling non-matching patterns</li>
  *   <li><b>Unlimited Resource Limits:</b> Tests reporting when memory or CPU limits are not set (unlimited)</li>
- *   <li><b>Edge Cases:</b> Covers zero quota/period values and various error conditions in container detection</li>
+ *   <li><b>Edge Cases:</b> Covers zero quota/period values, null quota with valid period, and various error conditions in container detection</li>
+ *   <li><b>Default Provider:</b> Tests the default provider implementations</li>
  * </ul>
+ *
+ * @author Co-authored-by: GitHub Copilot using Claude Opus 4.5
  */
 @SuppressWarnings("NonConstantLogger")
 @DisplayName("ReportContainerInfo")
@@ -355,5 +358,64 @@ class ReportContainerInfoTest {
             " - CPU Limit: No limit set");
         AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
         assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    @DisplayName("should report when CPU quota is null but period is not")
+    void testCpuLimitQuotaNullPeriodNotNull() {
+        // Given: environment with null CPU quota but valid period
+        final Map<String, String> env = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
+        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", null);
+        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", "100000");
+
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
+        reporter.run();
+
+        // Then: should log CPU limit not available
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - CPU Limit: Not available (not in Linux container or no read access)");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    @DisplayName("should report when CPU period is null but quota is not")
+    void testCpuLimitPeriodNullQuotaNotNull() {
+        // Given: environment with valid CPU quota but null period
+        final Map<String, String> env = new HashMap<>();
+        final Map<String, String> fileContent = new HashMap<>();
+        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", "100000");
+        fileContent.put("/sys/fs/cgroup/cpu/cpu.cfs_period_us", null);
+
+        final ReportContainerInfo reporter = createReportContainerInfo(env, fileContent);
+
+        // When: report is executed
+        reporter.run();
+
+        // Then: should log CPU limit not available
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - CPU Limit: Not available (not in Linux container or no read access)");
+        AssertLogger.assertEventCountByLevel(logger, MockLoggerEvent.Level.WARN, 0);
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
+    @DisplayName("should use default providers when not overridden")
+    void testDefaultProviders() {
+        // Given: a ReportContainerInfo with default providers (not overridden)
+        final ReportContainerInfo report = new ReportContainerInfo(logger);
+
+        // When: report is executed
+        report.run();
+
+        // Then: should log container information using system defaults (no exception thrown)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+            "Container Info:",
+            " - Hostname:");
     }
 }
