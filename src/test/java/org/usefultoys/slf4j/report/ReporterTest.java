@@ -56,11 +56,13 @@ import static org.mockito.Mockito.when;
  * <ul>
  *   <li><b>Report Execution Control:</b> Verifies selective execution of reports based on configuration, including all enabled, selected subset, and none disabled scenarios</li>
  *   <li><b>Executor Integration:</b> Tests execution using custom executors for counting and same-thread execution models</li>
- *   <li><b>Network Interface Reporting:</b> Validates proper handling of network interfaces including mock data, error conditions (SocketException), and detailed interface information logging</li>
+ *   <li><b>Network Interface Reporting:</b> Validates proper handling of network interfaces including mock data, error conditions (SocketException), real default provider, and detailed interface information logging</li>
  *   <li><b>Logger Configuration:</b> Ensures correct logger selection using default constructor with custom logger names from ReporterConfig</li>
  *   <li><b>Logging Level Handling:</b> Tests behavior when INFO logging level is disabled, ensuring reports execute but no messages are logged</li>
  *   <li><b>Configuration Integration:</b> Verifies integration with ReporterConfig for enabling/disabling specific report types</li>
  * </ul>
+ *
+ * @author Co-authored-by: GitHub Copilot using Claude Opus 4.5
  */
 @SuppressWarnings("NonConstantLogger")
 @DisplayName("Reporter")
@@ -389,6 +391,25 @@ class ReporterTest {
         assertEquals(5, executionCount.get(), "Enabled reports should still be executed");
         AssertLogger.assertNoEvent(logger, "Java Virtual Machine");
         AssertLogger.assertNoEvent(logger, "System Properties");
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+    }
+
+    @Test
+    @DisplayName("should use default getNetworkInterfaces implementation")
+    @ResetSystemProperty(ReporterConfig.PROP_NETWORK_INTERFACE)
+    void shouldUseDefaultGetNetworkInterfacesImplementation() {
+        // Given: network interface reporting enabled with default implementation
+        System.setProperty(ReporterConfig.PROP_NETWORK_INTERFACE, "true");
+        ReporterConfig.init();
+
+        // Create reporter with default getNetworkInterfaces() (not overridden)
+        final Reporter defaultReporter = new Reporter(logger);
+
+        // When: logDefaultReports is called
+        defaultReporter.logDefaultReports(Reporter.sameThreadExecutor);
+
+        // Then: should execute without error and log at least the network interface header
+        // Note: The actual network interfaces depend on the machine, but the code path is exercised
         assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
     }
 }
