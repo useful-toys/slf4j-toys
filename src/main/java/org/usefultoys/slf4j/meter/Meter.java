@@ -429,7 +429,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                     messageLogger.info(Markers.MSG_PROGRESS, readableMessage());
                     if (dataLogger.isTraceEnabled()) {
                         final String message2 = json5Message();
-                        if (startTime != 0 && timeLimit != 0 && (now - startTime) > timeLimit) {
+                        if (isSlow()) {
                             dataLogger.trace(Markers.DATA_SLOW_PROGRESS, message2);
                         } else if (dataLogger.isTraceEnabled()) {
                             dataLogger.trace(Markers.DATA_PROGRESS, message2);
