@@ -719,5 +719,175 @@ class MeterFactoryTest {
             assertEquals(Meter.UNKNOWN_LOGGER_NAME, sub.getCategory(), "should inherit fallback category");
             assertEquals("child", sub.getOperation(), "should use sub name as operation when parent has no operation");
         }
+
+        @Test
+        @DisplayName("should inherit context from parent meter when parent has context")
+        void shouldInheritContextFromParentMeterWhenParentHasContext() {
+            // Given: a started parent meter with context entries
+            final Meter parent = new Meter(testLogger, "parent");
+            parent.start();
+            parent.ctx("key1", "value1");
+            parent.ctx("key2", 42);
+            parent.ctx("key3", true);
+
+            // When: a sub meter is created from current meter
+            final Meter sub = MeterFactory.getCurrentSubMeter("child");
+
+            // Then: the sub meter should inherit all context entries from the parent
+            assertNotNull(sub, "should create non-null sub meter");
+            assertNotNull(sub.getContext(), "should have non-null context");
+            assertEquals(3, sub.getContext().size(), "should inherit all context entries from parent");
+            assertEquals("value1", sub.getContext().get("key1"), "should inherit key1 from parent context");
+            assertEquals("42", sub.getContext().get("key2"), "should inherit key2 from parent context (as String)");
+            assertEquals("true", sub.getContext().get("key3"), "should inherit key3 from parent context (as String)");
+
+            parent.ok();
+        }
+
+        @Test
+        @DisplayName("should have empty context when parent has no context")
+        void shouldHaveEmptyContextWhenParentHasNoContext() {
+            // Given: a started parent meter without context
+            final Meter parent = new Meter(testLogger, "parent");
+            parent.start();
+
+            // When: a sub meter is created from current meter
+            final Meter sub = MeterFactory.getCurrentSubMeter("child");
+
+            // Then: the sub meter should have empty context
+            assertNotNull(sub, "should create non-null sub meter");
+            assertNotNull(sub.getContext(), "should have non-null context");
+            assertTrue(sub.getContext().isEmpty(), "should have empty context when parent has no context");
+
+            parent.ok();
+        }
+
+        @Test
+        @DisplayName("should create independent context copy from parent")
+        void shouldCreateIndependentContextCopyFromParent() {
+            // Given: a started parent meter with context
+            final Meter parent = new Meter(testLogger, "parent");
+            parent.start();
+            parent.ctx("shared", "parent-value");
+
+            // When: a sub meter is created and modifies context
+            final Meter sub = MeterFactory.getCurrentSubMeter("child");
+            sub.ctx("shared", "child-value");
+            sub.ctx("child-only", "exclusive");
+
+            // Then: parent context should remain unchanged
+            assertEquals("parent-value", parent.getContext().get("shared"), "should preserve parent's original context value");
+            assertNull(parent.getContext().get("child-only"), "should not have child-only context key");
+
+            // And: sub meter should have its own modified context
+            assertEquals("child-value", sub.getContext().get("shared"), "should have modified context value");
+            assertEquals("exclusive", sub.getContext().get("child-only"), "should have child-only context key");
+
+            parent.ok();
+        }
+
+        @Test
+        @DisplayName("should inherit context through multiple nesting levels")
+        void shouldInheritContextThroughMultipleNestingLevels() {
+            // Given: a parent meter with context
+            final Meter parent = new Meter(testLogger, "parent");
+            parent.start();
+            parent.ctx("common", "inherited");
+
+            // When: creating first level sub meter
+            final Meter firstLevel = MeterFactory.getCurrentSubMeter("level1");
+            // Note: firstLevel inherits context from parent at creation time
+            assertEquals("inherited", firstLevel.getContext().get("common"), "should inherit common key at first level creation");
+            
+            // When: starting first level and adding its own context
+            firstLevel.start();
+            firstLevel.ctx("common", "inherited"); // re-add after start() clears
+            firstLevel.ctx("firstLevel", "data");
+
+            // When: creating second level sub meter
+            final Meter secondLevel = MeterFactory.getCurrentSubMeter("level2");
+            // Note: secondLevel inherits context from firstLevel at creation time
+            assertEquals("inherited", secondLevel.getContext().get("common"), "should inherit common key at second level creation");
+            assertEquals("data", secondLevel.getContext().get("firstLevel"), "should inherit firstLevel key at second level creation");
+            
+            secondLevel.start();
+            secondLevel.ctx("common", "inherited"); // re-add after start() clears
+            secondLevel.ctx("firstLevel", "data"); // re-add after start() clears
+            secondLevel.ctx("secondLevel", "moredata");
+
+            // Then: verify final context state
+            assertEquals("inherited", firstLevel.getContext().get("common"), "should have common key at first level");
+            assertEquals("data", firstLevel.getContext().get("firstLevel"), "should have firstLevel key");
+
+            assertEquals("inherited", secondLevel.getContext().get("common"), "should have common key at second level");
+            assertEquals("data", secondLevel.getContext().get("firstLevel"), "should have firstLevel key at second level");
+            assertEquals("moredata", secondLevel.getContext().get("secondLevel"), "should have secondLevel key");
+
+            // And: parent context should remain unchanged
+            assertEquals("inherited", parent.getContext().get("common"), "should preserve parent's common key");
+
+            secondLevel.ok();
+            firstLevel.ok();
+            parent.ok();
+        }
+
+        @Test
+        @DisplayName("should preserve parent operation when sub operation name is null")
+        void shouldPreserveParentOperationWhenSubOperationNameIsNull() {
+            // Given: a started parent meter with operation
+            final Meter parent = new Meter(testLogger, "parent");
+            parent.start();
+
+            // When: a sub meter is created with null suboperation name
+            final Meter sub = parent.sub(null);
+
+            // Then: the sub meter should preserve the parent's operation without concatenation
+            assertNotNull(sub, "should create non-null sub meter");
+            assertEquals(TEST_CATEGORY, sub.getCategory(), "should inherit category from parent");
+            assertEquals("parent", sub.getOperation(), "should preserve parent operation when suboperation is null");
+            assertEquals(parent.getFullID(), sub.getParent(), "should set parent to parent's full ID");
+
+            parent.ok();
+        }
+
+        @Test
+        @DisplayName("should use sub operation name when parent operation is null and sub operation is null")
+        void shouldUseSubOperationNameWhenParentOperationIsNullAndSubOperationIsNull() {
+            // Given: a started parent meter without operation
+            final Meter parent = new Meter(testLogger, null);
+            parent.start();
+
+            // When: a sub meter is created with null suboperation name
+            final Meter sub = parent.sub(null);
+
+            // Then: the sub meter should have null operation
+            assertNotNull(sub, "should create non-null sub meter");
+            assertEquals(TEST_CATEGORY, sub.getCategory(), "should inherit category from parent");
+            assertNull(sub.getOperation(), "should have null operation when both parent and sub operations are null");
+            assertEquals(parent.getFullID(), sub.getParent(), "should set parent to parent's full ID");
+
+            parent.ok();
+        }
+
+        @Test
+        @DisplayName("should inherit context when creating sub meter with null operation name")
+        void shouldInheritContextWhenCreatingSubMeterWithNullOperationName() {
+            // Given: a started parent meter with operation and context
+            final Meter parent = new Meter(testLogger, "parent");
+            parent.start();
+            parent.ctx("contextKey", "contextValue");
+
+            // When: a sub meter is created with null suboperation name
+            final Meter sub = parent.sub(null);
+
+            // Then: the sub meter should inherit context even with null suboperation
+            assertNotNull(sub, "should create non-null sub meter");
+            assertEquals("parent", sub.getOperation(), "should preserve parent operation");
+            assertNotNull(sub.getContext(), "should have non-null context");
+            assertEquals(1, sub.getContext().size(), "should inherit context from parent");
+            assertEquals("contextValue", sub.getContext().get("contextKey"), "should inherit context value from parent");
+
+            parent.ok();
+        }
     }
 }
