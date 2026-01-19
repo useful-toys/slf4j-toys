@@ -32,9 +32,6 @@ public interface MeterAnalysis {
 
     long getLastCurrentTime();
 
-    String getCategory();
-    String getOperation();
-    String getParent();
     long getCreateTime();
     long getStartTime();
     long getStopTime();
