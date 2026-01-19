@@ -349,9 +349,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_START, json5Message());
                 }
-                if (context != null) {
-                    context.clear();
-                }
+                clearContext();
             }
 
         } catch (final Exception t) {
@@ -435,9 +433,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                             dataLogger.trace(Markers.DATA_PROGRESS, message2);
                         }
                     }
-                    if (context != null) {
-                        context.clear();
-                    }
+                    clearContext();
                 }
             }
         } catch (final Exception t) {
@@ -512,9 +508,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                         dataLogger.trace(Markers.DATA_OK, message2);
                     }
                 }
-                if (context != null) {
-                    context.clear();
-                }
+                clearContext();
             }
         } catch (final Exception t) {
             MeterValidator.logBug(this, "ok(...)", t);
@@ -616,9 +610,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                     final String message2 = json5Message();
                     dataLogger.trace(Markers.DATA_REJECT, message2);
                 }
-                if (context != null) {
-                    context.clear();
-                }
+                clearContext();
             }
         } catch (final Exception t) {
             MeterValidator.logBug(this, "reject(cause)", t);
@@ -663,9 +655,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_FAIL, json5Message());
                 }
-                if (context != null) {
-                    context.clear();
-                }
+                clearContext();
             }
         } catch (final Exception t) {
             MeterValidator.logBug(this, "fail(cause)", t);
@@ -722,9 +712,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_FAIL, json5Message());
                 }
-                if (context != null) {
-                    context.clear();
-                }
+                clearContext();
             }
         } catch (final Exception t) {
             MeterValidator.logBug(this, "close()", t);
