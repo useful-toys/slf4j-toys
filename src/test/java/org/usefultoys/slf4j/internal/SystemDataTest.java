@@ -251,7 +251,7 @@ class SystemDataTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("roundTripSerializationScenarios")
     @DisplayName("should support round-trip JSON5 serialization and deserialization")
-    void testReadJson5_roundTripSerialization(final String scenarioName, final TestSystemData original) {
+    void testWriteReadJson5_roundTripSerialization(final String scenarioName, final TestSystemData original) {
         // Given: SystemData with specific values from scenario
         final StringBuilder sb = new StringBuilder(512);
 
