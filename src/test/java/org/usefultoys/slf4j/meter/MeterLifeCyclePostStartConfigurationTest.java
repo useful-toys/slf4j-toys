@@ -742,6 +742,335 @@ class MeterLifeCyclePostStartConfigurationTest {
         AssertLogger.assertEventCount(logger, 2);
     }
 
+    @Test
+    @DisplayName("should add context with primitive int value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithPrimitiveIntValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("count", 42) is called after start()
+        meter.ctx("count", 42);
+
+        // Then: context contains the key-value pair with int converted to string
+        assertEquals("42", meter.getContext().get("count"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with primitive long value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithPrimitiveLongValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("timestamp", 123456789L) is called after start()
+        meter.ctx("timestamp", 123456789L);
+
+        // Then: context contains the key-value pair with long converted to string
+        assertEquals("123456789", meter.getContext().get("timestamp"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with primitive boolean value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithPrimitiveBooleanValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("enabled", true) is called after start()
+        meter.ctx("enabled", true);
+
+        // Then: context contains the key-value pair with boolean converted to string
+        assertEquals("true", meter.getContext().get("enabled"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with primitive float value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithPrimitiveFloatValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("rate", 3.14f) is called after start()
+        meter.ctx("rate", 3.14f);
+
+        // Then: context contains the key-value pair with float converted to string
+        assertEquals("3.14", meter.getContext().get("rate"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with primitive double value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithPrimitiveDoubleValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("price", 99.99) is called after start()
+        meter.ctx("price", 99.99);
+
+        // Then: context contains the key-value pair with double converted to string
+        assertEquals("99.99", meter.getContext().get("price"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with Integer wrapper value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithIntegerWrapperValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("id", Integer.valueOf(100)) is called after start()
+        meter.ctx("id", Integer.valueOf(100));
+
+        // Then: context contains the key-value pair with Integer converted to string
+        assertEquals("100", meter.getContext().get("id"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with null Integer wrapper value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithNullIntegerWrapperValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("id", (Integer) null) is called after start()
+        meter.ctx("id", (Integer) null);
+
+        // Then: null Integer is stored as "<null>" placeholder
+        assertEquals("<null>", meter.getContext().get("id"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with Long wrapper value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithLongWrapperValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("bytes", Long.valueOf(1024L)) is called after start()
+        meter.ctx("bytes", Long.valueOf(1024L));
+
+        // Then: context contains the key-value pair with Long converted to string
+        assertEquals("1024", meter.getContext().get("bytes"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with Boolean wrapper value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithBooleanWrapperValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("active", Boolean.TRUE) is called after start()
+        meter.ctx("active", Boolean.TRUE);
+
+        // Then: context contains the key-value pair with Boolean converted to string
+        assertEquals("true", meter.getContext().get("active"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with Float wrapper value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithFloatWrapperValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("temperature", Float.valueOf(36.6f)) is called after start()
+        meter.ctx("temperature", Float.valueOf(36.6f));
+
+        // Then: context contains the key-value pair with Float converted to string
+        assertEquals("36.6", meter.getContext().get("temperature"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with Double wrapper value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithDoubleWrapperValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("balance", Double.valueOf(1000.50)) is called after start()
+        meter.ctx("balance", Double.valueOf(1000.50));
+
+        // Then: context contains the key-value pair with Double converted to string
+        assertEquals("1000.5", meter.getContext().get("balance"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with formatted message after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithFormattedMessageAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("status", "User %s has %d points", "Alice", 150) is called after start()
+        meter.ctx("status", "User %s has %d points", "Alice", 150);
+
+        // Then: context contains the formatted message
+        assertEquals("User Alice has 150 points", meter.getContext().get("status"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with generic Object value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithGenericObjectValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("obj", new TestObject()) is called after start()
+        final MeterLifeCycleTestHelper.TestObject testObj = new MeterLifeCycleTestHelper.TestObject();
+        meter.ctx("obj", (Object) testObj);
+
+        // Then: context contains the object's toString() representation
+        assertEquals(testObj.toString(), meter.getContext().get("obj"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with null Object value after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithNullObjectValueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("obj", (Object) null) is called after start()
+        meter.ctx("obj", (Object) null);
+
+        // Then: null Object is stored as "<null>" placeholder
+        assertEquals("<null>", meter.getContext().get("obj"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with key-only marker after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithKeyOnlyMarkerAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx("flag") is called after start()
+        meter.ctx("flag");
+
+        // Then: context contains the key-only marker (value is null)
+        assertEquals(null, meter.getContext().get("flag"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with conditional key-only when true after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithConditionalKeyOnlyWhenTrueAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx(true, "success") is called after start()
+        meter.ctx(true, "success");
+
+        // Then: context contains the trueName key (value is null)
+        assertEquals(null, meter.getContext().get("success"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should not add context with conditional key-only when false after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldNotAddContextWithConditionalKeyOnlyWhenFalseAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx(false, "success") is called after start()
+        meter.ctx(false, "success");
+
+        // Then: context does not contain the trueName key
+        assertEquals(null, meter.getContext().get("success"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
+    @Test
+    @DisplayName("should add context with conditional key-only trueName or falseName after start()")
+    @ValidateCleanMeter(expectDirtyStack = true)
+    void shouldAddContextWithConditionalKeyOnlyTrueNameOrFalseNameAfterStart() {
+        // Given: a new, started Meter
+        final Meter meter = new Meter(logger).start();
+
+        // When: ctx(true, "ok", "fail") and ctx(false, "success", "error") are called after start()
+        meter.ctx(true, "ok", "fail");
+        meter.ctx(false, "success", "error");
+
+        // Then: context contains "ok" (true condition) and "error" (false condition), both with null values
+        assertEquals(null, meter.getContext().get("ok"));
+        assertEquals(null, meter.getContext().get("fail"));
+        assertEquals(null, meter.getContext().get("success"));
+        assertEquals(null, meter.getContext().get("error"));
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+
+        // Then: logs only start events (no additional logging for ctx())
+        AssertLogger.assertEventCount(logger, 2);
+    }
+
     // ============================================================================
     // Set path with valid values
     // ============================================================================
