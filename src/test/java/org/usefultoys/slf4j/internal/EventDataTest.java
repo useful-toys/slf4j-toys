@@ -173,24 +173,6 @@ class EventDataTest {
     }
 
     @Test
-    @DisplayName("should preserve event data during JSON5 write/read round-trip")
-    void testReadWriteJson5() {
-        // Given: EventData with all fields set
-        final EventData event = new EventData(FIXED_UUID, 123L, 456L);
-        final StringBuilder sb = new StringBuilder();
-
-        // When: data is serialized to JSON5 and deserialized
-        EventDataJson5.write(event, sb);
-        final EventData event2 = new EventData();
-        EventDataJson5.read(event2, "{" + sb + "}");
-
-        // Then: deserialized data should match original
-        assertEquals(event.getSessionUuid(), event2.getSessionUuid(), "Session UUID should be preserved");
-        assertEquals(event.getPosition(), event2.getPosition(), "Position should be preserved");
-        assertEquals(event.getLastCurrentTime(), event2.getLastCurrentTime(), "Last current time should be preserved");
-    }
-
-    @Test
     @DisplayName("should use default SystemTimeSource by default")
     void testDefaultTimeSource() {
         // Given: EventData with default time source
@@ -387,7 +369,7 @@ class EventDataTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("roundTripSerializationScenarios")
     @DisplayName("should support round-trip JSON5 serialization and deserialization")
-    void testReadJson5_roundTripSerialization(final String scenarioName, final EventData original) {
+    void testWriteReadJson5_roundTripSerialization(final String scenarioName, final EventData original) {
         // Given: EventData with specific values from scenario
         final StringBuilder sb = new StringBuilder(128);
 
