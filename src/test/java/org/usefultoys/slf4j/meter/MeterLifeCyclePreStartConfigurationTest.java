@@ -451,6 +451,257 @@ class MeterLifeCyclePreStartConfigurationTest {
     }
 
     // ============================================================================
+    // Add context with primitive values
+    // ============================================================================
+
+    @Test
+    @DisplayName("should add context with int value before start()")
+    void shouldAddContextWithIntValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", 42) is called before start()
+        meter.ctx("key", 42);
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("42", meter.getContext().get("key"), "should store int value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with long value before start()")
+    void shouldAddContextWithLongValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", 42L) is called before start()
+        meter.ctx("key", 42L);
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("42", meter.getContext().get("key"), "should store long value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with boolean value before start()")
+    void shouldAddContextWithBooleanValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", true) is called before start()
+        meter.ctx("key", true);
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("true", meter.getContext().get("key"), "should store boolean value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with float value before start()")
+    void shouldAddContextWithFloatValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", 3.14f) is called before start()
+        meter.ctx("key", 3.14f);
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("3.14", meter.getContext().get("key"), "should store float value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with double value before start()")
+    void shouldAddContextWithDoubleValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", 3.14) is called before start()
+        meter.ctx("key", 3.14);
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("3.14", meter.getContext().get("key"), "should store double value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    // ============================================================================
+    // Add context with wrapper values
+    // ============================================================================
+
+    @Test
+    @DisplayName("should add context with Integer wrapper value before start()")
+    void shouldAddContextWithIntegerWrapperValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", Integer.valueOf(42)) is called before start()
+        meter.ctx("key", Integer.valueOf(42));
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("42", meter.getContext().get("key"), "should store Integer value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with Long wrapper value before start()")
+    void shouldAddContextWithLongWrapperValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", Long.valueOf(42L)) is called before start()
+        meter.ctx("key", Long.valueOf(42L));
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("42", meter.getContext().get("key"), "should store Long value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with Boolean wrapper value before start()")
+    void shouldAddContextWithBooleanWrapperValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", Boolean.TRUE) is called before start()
+        meter.ctx("key", Boolean.TRUE);
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("true", meter.getContext().get("key"), "should store Boolean value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with Float wrapper value before start()")
+    void shouldAddContextWithFloatWrapperValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", Float.valueOf(3.14f)) is called before start()
+        meter.ctx("key", Float.valueOf(3.14f));
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("3.14", meter.getContext().get("key"), "should store Float value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with Double wrapper value before start()")
+    void shouldAddContextWithDoubleWrapperValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", Double.valueOf(3.14)) is called before start()
+        meter.ctx("key", Double.valueOf(3.14));
+
+        // Then: context contains the key-value pair and meter remains in Created state
+        assertEquals("3.14", meter.getContext().get("key"), "should store Double value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with null Integer wrapper value before start()")
+    void shouldAddContextWithNullIntegerWrapperValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", (Integer) null) is called before start()
+        meter.ctx("key", (Integer) null);
+
+        // Then: context contains the key-value pair with null representation and meter remains in Created state
+        assertEquals("<null>", meter.getContext().get("key"), "should store null Integer as <null>");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    // ============================================================================
+    // Add context with formatted/object values
+    // ============================================================================
+
+    @Test
+    @DisplayName("should add context with formatted value before start()")
+    void shouldAddContextWithFormattedValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", "value %d", 42) is called before start()
+        meter.ctx("key", "value %d", 42);
+
+        // Then: context contains the formatted key-value pair and meter remains in Created state
+        assertEquals("value 42", meter.getContext().get("key"), "should store formatted value as string");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with Object value before start()")
+    void shouldAddContextWithObjectValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+        final Object testObject = new Object();
+
+        // When: ctx("key", testObject) is called before start()
+        meter.ctx("key", testObject);
+
+        // Then: context contains the Object's toString() representation and meter remains in Created state
+        assertEquals(testObject.toString(), meter.getContext().get("key"), "should store Object toString() value");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    @Test
+    @DisplayName("should add context with null Object value before start()")
+    void shouldAddContextWithNullObjectValueBeforeStart() {
+        // Given: a new Meter
+        final Meter meter = new Meter(logger);
+
+        // When: ctx("key", (Object) null) is called before start()
+        meter.ctx("key", (Object) null);
+
+        // Then: context contains the key-value pair with null representation and meter remains in Created state
+        assertEquals("<null>", meter.getContext().get("key"), "should store null Object as <null>");
+        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+
+        // Then: no log events
+        AssertLogger.assertEventCount(logger, 0);
+    }
+
+    // ============================================================================
     // Chain multiple configurations
     // ============================================================================
 
