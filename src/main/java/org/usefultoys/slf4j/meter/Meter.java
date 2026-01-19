@@ -168,7 +168,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @param operationName The name of the operation.
      * @return The next sequential position for the operation.
      */
-    private static long extractNextPosition(final String eventCategory, final String operationName) {
+    static long extractNextPosition(final String eventCategory, final String operationName) {
         final String key = operationName == null ? eventCategory : eventCategory + "/" + operationName;
         EVENT_COUNTER.putIfAbsent(key, new AtomicLong(0));
         final AtomicLong atomicLong = EVENT_COUNTER.get(key);
@@ -198,7 +198,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @param useSimpleClassNameForThrowable If true, uses {@link Class#getSimpleName()} for Throwables; otherwise, uses {@link Class#getName()}.
      * @return The string representation.
      */
-    private static String toPath(final Object o, final boolean useSimpleClassNameForThrowable) {
+    static String toPath(final Object o, final boolean useSimpleClassNameForThrowable) {
         if (o == null) {
             return null;
         }
