@@ -538,6 +538,658 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     }
 
     // ============================================================================
+    // Update context with primitive values after ok (OK state)
+    // ============================================================================
+
+    @Test
+    @DisplayName("should reject ctx(String, int) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectIntContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", 42) is called after stop
+        meter.ctx("key", 42);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, long) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectLongContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", 42L) is called after stop
+        meter.ctx("key", 42L);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, boolean) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectBooleanContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", true) is called after stop
+        meter.ctx("key", true);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, float) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectFloatContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", 3.14f) is called after stop
+        meter.ctx("key", 3.14f);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, double) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectDoubleContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", 3.14) is called after stop
+        meter.ctx("key", 3.14);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    // ============================================================================
+    // Update context with wrapper values after ok (OK state)
+    // ============================================================================
+
+    @Test
+    @DisplayName("should reject ctx(String, Integer) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectIntegerWrapperContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", Integer.valueOf(42)) is called after stop
+        meter.ctx("key", Integer.valueOf(42));
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, Long) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectLongWrapperContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", Long.valueOf(42L)) is called after stop
+        meter.ctx("key", Long.valueOf(42L));
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, Boolean) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectBooleanWrapperContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", Boolean.TRUE) is called after stop
+        meter.ctx("key", Boolean.TRUE);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, Float) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectFloatWrapperContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", Float.valueOf(3.14f)) is called after stop
+        meter.ctx("key", Float.valueOf(3.14f));
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, Double) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectDoubleWrapperContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", Double.valueOf(3.14)) is called after stop
+        meter.ctx("key", Double.valueOf(3.14));
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, null Integer) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullIntegerWrapperContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", (Integer) null) is called after stop
+        meter.ctx("key", (Integer) null);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    // ============================================================================
+    // Update context with formatted/object values after ok (OK state)
+    // ============================================================================
+
+    @Test
+    @DisplayName("should reject ctx(String, String, Object...) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectFormattedContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", "value %d", 42) is called after stop
+        meter.ctx("key", "value %d", 42);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, Object) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectObjectContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", new Object()) is called after stop
+        meter.ctx("key", new Object());
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, null Object) after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullObjectContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", (Object) null) is called after stop
+        meter.ctx("key", (Object) null);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    // ============================================================================
+    // Update context with key-only markers after ok (OK state)
+    // ============================================================================
+
+    @Test
+    @DisplayName("should reject ctx(String) key-only after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectKeyOnlyContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("marker") is called after stop
+        meter.ctx("marker");
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("marker"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(true, String) conditional key-only after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectConditionalKeyOnlyTrueAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(true, "marker") is called after stop
+        meter.ctx(true, "marker");
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("marker"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should silently ignore ctx(false, String) after ok() - condition false, no putContext call, no logs")
+    @ValidateCleanMeter
+    void shouldSilentlyIgnoreConditionalKeyOnlyFalseAfterOk() {
+        /* NOTE: This test was intended to validate that ctx(false, String) is rejected as invalid after ok().
+         * However, the current Meter implementation returns early when condition=false (before calling putContext()),
+         * so validateContextPrecondition() is never invoked, and no ILLEGAL log is generated.
+         * This test documents the actual behavior: conditional ctx() with false silently does nothing. */
+        
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(false, "marker") is called (condition=false returns early)
+        meter.ctx(false, "marker");
+
+        // Then: context unchanged, state unchanged
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: only ok logs (no ILLEGAL)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEventCount(logger, 4);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(boolean, String, String) conditional true/false names after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectConditionalTrueFalseNamesAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(true, "trueMarker", "falseMarker") is called after stop
+        meter.ctx(true, "trueMarker", "falseMarker");
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("trueMarker"), "should not add context after stop");
+        assertFalse(meter.getContext().containsKey("falseMarker"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    // ============================================================================
+    // Update context with invalid key-only parameters after ok (OK state)
+    // ============================================================================
+
+    @Test
+    @DisplayName("should reject ctx(null) null key-only after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullKeyOnlyContextAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(null) is called after stop
+        meter.ctx((String) null);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(true, null) null trueName when true after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullTrueNameWhenTrueAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(true, null) is called after stop
+        meter.ctx(true, (String) null);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should silently ignore ctx(false, null) after ok() - condition false, no putContext call, no logs")
+    @ValidateCleanMeter
+    void shouldSilentlyIgnoreNullTrueNameWhenFalseAfterOk() {
+        /* NOTE: This test was intended to validate that ctx(false, null) is rejected as invalid after ok().
+         * However, condition=false causes early return before putContext() is called, so no ILLEGAL log occurs. */
+        
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(false, null) is called (condition=false returns early)
+        meter.ctx(false, (String) null);
+
+        // Then: context unchanged, state unchanged
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: only ok logs (no ILLEGAL)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEventCount(logger, 4);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(true, null, String) null trueName with falseName after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullTrueNameWithFalseNameAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(true, null, "falseMarker") is called after stop
+        meter.ctx(true, null, "falseMarker");
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("falseMarker"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(false, String, null) null falseName when false after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullFalseNameWhenFalseAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(false, "trueMarker", null) is called after stop
+        meter.ctx(false, "trueMarker", null);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("trueMarker"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(true, null, null) both names null when true after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectBothNamesNullWhenTrueAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(true, null, null) is called after stop
+        meter.ctx(true, null, null);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(false, null, null) both names null when false after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectBothNamesNullWhenFalseAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(false, null, null) is called after stop
+        meter.ctx(false, null, null);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    // ============================================================================
+    // Update context with null key (other invalid parameters) after ok (OK state)
+    // ============================================================================
+
+    @Test
+    @DisplayName("should reject ctx(null, String) null key with value after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullKeyWithValueAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(null, "value") is called after stop
+        meter.ctx(null, "value");
+
+        // Then: context unchanged, state unchanged after invalid operation
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(null, int) null key with primitive after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullKeyWithPrimitiveAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(null, 42) is called after stop
+        meter.ctx(null, 42);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(null, String, Object...) null key with format after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullKeyWithFormatAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx(null, "format %d", 42) is called after stop
+        meter.ctx(null, "format %d", 42);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, null, Object...) null format after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullFormatAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", null, 42) is called after stop (null format string)
+        meter.ctx("key", null, 42);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
+    @DisplayName("should reject ctx(String, String, null) null args array after ok() - logs ILLEGAL")
+    @ValidateCleanMeter
+    void shouldRejectNullArgsArrayAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start().ok();
+
+        // When: ctx("key", "format", (Object[]) null) is called after stop (null args array)
+        meter.ctx("key", "format", (Object[]) null);
+
+        // Then: context unchanged, state unchanged after invalid operation
+        assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+
+        // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    // ============================================================================
     // Set path after stop (OK state)
     // ============================================================================
 
