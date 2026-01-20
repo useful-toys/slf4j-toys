@@ -335,10 +335,14 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter start() {
         try {
-            if (MeterValidator.validateStartPrecondition(this)) {
-                previousInstance = localThreadInstance.get();
-                localThreadInstance.set(new WeakReference<>(this));
+            /* Guard Clause: If precondition fails (e.g., meter already started),
+               return early without modifying state. The validator logs INCONSISTENT_START. */
+            if (!MeterValidator.validateStartPrecondition(this)) {
+                return this;
             }
+
+            previousInstance = localThreadInstance.get();
+            localThreadInstance.set(new WeakReference<>(this));
 
             lastProgressTime = startTime = collectCurrentTime();
 

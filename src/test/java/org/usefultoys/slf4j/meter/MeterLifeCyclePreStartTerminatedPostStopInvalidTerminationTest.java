@@ -863,18 +863,17 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: start() is called on stopped meter
         meter.start();
-        // Then: meter remains stopped, logs ILLEGAL
-        // Will be fixed in future: Meter currently modifies startTime on invalid start(), causing startTime > stopTime
+        // Then: Guard Clause prevents re-execution; meter remains stopped
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0");
+        assertTrue(meter.isStopped(), "meter should remain stopped");
         assertNull(meter.getOkPath(), "okPath should remain null");
         assertNull(meter.getRejectPath(), "rejectPath should remain null");
         assertNull(meter.getFailPath(), "failPath should remain null");
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (start)
+        // Then: logs INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 4 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -891,18 +890,17 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: start() is called on stopped meter
         meter.start();
-        // Then: meter remains stopped with okPath, logs ILLEGAL
-        // Will be fixed in future: Meter currently modifies startTime on invalid start(), causing startTime > stopTime
+        // Then: Guard Clause prevents re-execution; meter remains stopped with okPath preserved
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0");
+        assertTrue(meter.isStopped(), "meter should remain stopped");
         assertEquals("path", meter.getOkPath(), "okPath should remain path");
         assertNull(meter.getRejectPath(), "rejectPath should remain null");
         assertNull(meter.getFailPath(), "failPath should remain null");
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (start)
+        // Then: logs INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 4 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -919,18 +917,17 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: start() is called on stopped meter
         meter.start();
-        // Then: meter remains stopped with rejectPath, logs ILLEGAL
-        // Will be fixed in future: Meter currently modifies startTime on invalid start(), causing startTime > stopTime
+        // Then: Guard Clause prevents re-execution; meter remains stopped with rejectPath preserved
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0");
+        assertTrue(meter.isStopped(), "meter should remain stopped");
         assertNull(meter.getOkPath(), "okPath should remain null");
         assertEquals("error", meter.getRejectPath(), "rejectPath should remain error");
         assertNull(meter.getFailPath(), "failPath should remain null");
 
-        // Then: logs INCONSISTENT_REJECT (first) + ILLEGAL (start)
+        // Then: logs INCONSISTENT_REJECT (2 events) + INCONSISTENT_START (2 events) = 4 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -947,18 +944,17 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: start() is called on stopped meter
         meter.start();
-        // Then: meter remains stopped with failPath, logs ILLEGAL
-        // Will be fixed in future: Meter currently modifies startTime on invalid start(), causing startTime > stopTime
+        // Then: Guard Clause prevents re-execution; meter remains stopped with failPath preserved
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0");
+        assertTrue(meter.isStopped(), "meter should remain stopped");
         assertNull(meter.getOkPath(), "okPath should remain null");
         assertNull(meter.getRejectPath(), "rejectPath should remain null");
         assertEquals("error", meter.getFailPath(), "failPath should remain error");
 
-        // Then: logs INCONSISTENT_FAIL (first) + ILLEGAL (start)
+        // Then: logs INCONSISTENT_FAIL (2 events) + INCONSISTENT_START (2 events) = 4 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -980,19 +976,18 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: start() is called on stopped meter
         meter.start();
-        // Then: meter remains stopped, logs ILLEGAL
-        // Will be fixed in future: Meter currently modifies startTime on invalid start(), causing startTime > stopTime
+        // Then: Guard Clause prevents re-execution; meter remains stopped
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0");
+        assertTrue(meter.isStopped(), "meter should remain stopped");
         assertNull(meter.getOkPath(), "okPath should remain null");
         assertNull(meter.getRejectPath(), "rejectPath should remain null");
         assertNull(meter.getFailPath(), "failPath should remain null");
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_OK + ILLEGAL (start)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 5 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -1014,19 +1009,18 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: start() is called on stopped meter
         meter.start();
-        // Then: meter remains stopped, logs ILLEGAL
-        // Will be fixed in future: Meter currently modifies startTime on invalid start(), causing startTime > stopTime
+        // Then: Guard Clause prevents re-execution; meter remains stopped with okPath preserved
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0");
+        assertTrue(meter.isStopped(), "meter should remain stopped");
         assertEquals("path", meter.getOkPath(), "okPath should remain path");
         assertNull(meter.getRejectPath(), "rejectPath should remain null");
         assertNull(meter.getFailPath(), "failPath should remain null");
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_OK + ILLEGAL (start)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 5 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -1048,23 +1042,23 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: start() is called on stopped meter
         meter.start();
-        // Then: meter remains stopped, logs ILLEGAL
-        // Will be fixed in future: Meter currently modifies startTime on invalid start(), causing startTime > stopTime
+        // Then: Guard Clause prevents re-execution; meter remains stopped with rejectPath preserved
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0");
+        assertTrue(meter.isStopped(), "meter should remain stopped");
         assertNull(meter.getOkPath(), "okPath should remain null");
         assertEquals("error", meter.getRejectPath(), "rejectPath should remain error");
         assertNull(meter.getFailPath(), "failPath should remain null");
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT + ILLEGAL (start)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (2 events) + INCONSISTENT_START (2 events) = 5 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
     @DisplayName("should reject start() after path() then fail() without initial start()")
+    @ValidateCleanMeter
     void shouldRejectStartAfterPathThenFailWithoutInitialStart() {
         // Given: a new Meter
         final Meter meter = new Meter(logger);
@@ -1081,18 +1075,17 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: start() is called on stopped meter
         meter.start();
-        // Then: meter remains stopped, logs ILLEGAL
-        // Will be fixed in future: Meter currently modifies startTime on invalid start(), causing startTime > stopTime
+        // Then: Guard Clause prevents re-execution; meter remains stopped with failPath preserved
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0");
+        assertTrue(meter.isStopped(), "meter should remain stopped");
         assertNull(meter.getOkPath(), "okPath should remain null");
         assertNull(meter.getRejectPath(), "rejectPath should remain null");
         assertEquals("error", meter.getFailPath(), "failPath should remain error");
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL + ILLEGAL (start)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (2 events) + INCONSISTENT_START (2 events) = 5 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 }

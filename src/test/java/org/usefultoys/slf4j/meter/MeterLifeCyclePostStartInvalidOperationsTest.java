@@ -29,6 +29,7 @@ import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -93,16 +94,14 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         // When: start() is called again on already started meter
         meter.start();
 
-        // Then: startTime is reset (state-correcting behavior)
-        // Note: Currently implemented as ⚠️ Tier 3 (state-correcting). According to TDR-0019, should be ❌ Tier 4 (state-preserving/rejected).
-        assertTrue(meter.getStartTime() > firstStartTime, "startTime should be reset to a new value");
+        // Then: Guard Clause prevents re-execution - startTime is NOT reset
+        // Note: Previously (⚠️ Tier 3) allowed state-correcting re-start. Now (❌ Tier 4) rejects early per Guard Clause pattern.
+        assertEquals(firstStartTime, meter.getStartTime(), "startTime should NOT change due to Guard Clause preventing re-execution");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_START + second start events
+        // Then: logs INCONSISTENT_START only (Guard Clause prevents MSG_START and DATA_START)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 5);
+        AssertLogger.assertEventCount(logger, 3);
     }
 
     @Test
@@ -116,13 +115,13 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         meter.start();
         meter.start();
 
-        // Then: startTime reset each time
+        // Then: startTime NOT reset (Guard Clause prevents execution)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_START for each duplicate
+        // Then: logs INCONSISTENT_START for each duplicate start attempt (no MSG_START/DATA_START)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEventCount(logger, 8);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -142,14 +141,12 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         // When: start() is called again
         meter.start();
 
-        // Then: iterations preserved
+        // Then: iterations preserved (state unchanged)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 3, 0, 0);
 
-        // Then: logs INCONSISTENT_START + second start events
+        // Then: logs INCONSISTENT_START only (Guard Clause prevents MSG_START and DATA_START)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 5);
+        AssertLogger.assertEventCount(logger, 3);
     }
 
     // ============================================================================
