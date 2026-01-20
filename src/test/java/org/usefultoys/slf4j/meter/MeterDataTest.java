@@ -584,21 +584,292 @@ class MeterDataTest {
         assertEquals("ok_old", meterData.getOkPath(), "should preserve okPath");
     }
 
+    // ============================================================================
+    // equals() and hashCode() Tests
+    // ============================================================================
+
+    /**
+     * Provides test scenarios for equals() method testing.
+     * Each scenario contains a pair of MeterData instances with specific differences to test.
+     */
+    static Stream<Arguments> equalsTestScenarios() {
+        return Stream.of(
+                // Scenario 1: Identical data - should be equal
+                Arguments.of(
+                        "Identical instances",
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        true,
+                        "identical instances should be equal"
+                ),
+
+                // Scenario 2: Different category - should not be equal
+                Arguments.of(
+                        "Different category",
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat2", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        false,
+                        "different category should not be equal"
+                ),
+
+                // Scenario 3: Different operation - should not be equal
+                Arguments.of(
+                        "Different operation",
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op2", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        false,
+                        "different operation should not be equal"
+                ),
+
+                // Scenario 4: Different position - should not be equal
+                Arguments.of(
+                        "Different position",
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        false,
+                        "different position should not be equal"
+                ),
+
+                // Scenario 5: Different sessionUuid - should not be equal
+                Arguments.of(
+                        "Different sessionUuid",
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid2", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        false,
+                        "different sessionUuid should not be equal"
+                ),
+
+                // Scenario 6: Both have null category - should be equal (if all other fields match)
+                Arguments.of(
+                        "Both null category",
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                null, "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                null, "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        true,
+                        "both null categories should be equal"
+                ),
+
+                // Scenario 7: One null category - should not be equal
+                Arguments.of(
+                        "One null category",
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                null, "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        false,
+                        "one null category should not be equal"
+                ),
+
+                // Scenario 8: Both have null operation - should be equal (if all other fields match)
+                Arguments.of(
+                        "Both null operation",
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", null, null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", null, null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        true,
+                        "both null operations should be equal"
+                ),
+
+                // Scenario 9: One null operation - should not be equal
+                Arguments.of(
+                        "One null operation",
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", null, null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        false,
+                        "one null operation should not be equal"
+                ),
+
+                // Scenario 10: Both have null sessionUuid - should be equal (if all other fields match)
+                Arguments.of(
+                        "Both null sessionUuid",
+                        new MeterData(null, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData(null, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        true,
+                        "both null sessionUuids should be equal"
+                ),
+
+                // Scenario 11: One null sessionUuid - should not be equal
+                Arguments.of(
+                        "One null sessionUuid",
+                        new MeterData(null, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        false,
+                        "one null sessionUuid should not be equal"
+                ),
+
+                // Scenario 12: Different system data fields but same key fields - should be equal
+                Arguments.of(
+                        "Different system fields, same key fields",
+                        new MeterData("uuid1", 1, 100, 10, 20, 15, 5, 10, 7, 1, 100, 200, 10, 500, 5, 1000, 64, 128, 96, 0.5,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        new MeterData("uuid1", 1, 200, 20, 40, 30, 10, 20, 14, 2, 200, 400, 20, 1000, 10, 2000, 128, 256, 192, 1.0,
+                                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null),
+                        true,
+                        "different system fields but same key fields should be equal"
+                )
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("equalsTestScenarios")
+    @DisplayName("should correctly compare MeterData instances for equality")
+    void testEquals(final String scenarioName, final MeterData data1, final MeterData data2,
+                    final boolean expectedEqual, final String message) {
+        // Given: two MeterData instances with specific characteristics
+        // When: comparing instances for equality
+        final boolean actualEqual = data1.equals(data2);
+
+        // Then: equality should match the expected result
+        assertEquals(expectedEqual, actualEqual, message + " in scenario: " + scenarioName);
+    }
+
     @Test
-    @DisplayName("should implement equals and hashCode correctly")
-    void testEqualsAndHashCode() {
-        // Given: three MeterData instances - two identical and one different
-        final MeterData data1 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
-        final MeterData data2 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
-        final MeterData data3 = new MeterData("uuid2", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, "cat2", "op2", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+    @DisplayName("should return false when comparing with null")
+    void testEquals_withNull() {
+        // Given: a MeterData instance and null reference
+        final MeterData data = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
 
-        // When: comparing the instances for equality
-        // Then: identical instances should be equal, different instances should not be equal
-        assertEquals(data1, data2, "should be equal when all fields are identical");
-        assertNotEquals(data1, data3, "should not be equal when fields differ");
+        // When: comparing with null
+        // Then: should return false
+        assertNotEquals(data, null, "should not be equal to null");
+        assertFalse(data.equals(null), "equals(null) should return false");
+    }
 
-        // And: hash codes should be consistent with equality
-        assertEquals(data1.hashCode(), data2.hashCode(), "hash codes should be equal when objects are equal");
-        assertNotEquals(data1.hashCode(), data3.hashCode(), "hash codes should differ when objects are not equal");
+    @Test
+    @DisplayName("should return true when comparing with self")
+    void testEquals_withSelf() {
+        // Given: a MeterData instance
+        final MeterData data = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+
+        // When: comparing with itself
+        // Then: should return true
+        assertEquals(data, data, "should be equal to itself");
+        assertTrue(data.equals(data), "equals(self) should return true");
+    }
+
+    @Test
+    @DisplayName("should return false when comparing with different class type")
+    void testEquals_withDifferentClass() {
+        // Given: a MeterData instance and a different type object
+        final MeterData data = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+        final Object differentType = "not a MeterData";
+
+        // When: comparing with different type
+        // Then: should return false
+        assertNotEquals(data, differentType, "should not be equal to different type");
+        assertFalse(data.equals(differentType), "equals(different type) should return false");
+    }
+
+    /**
+     * Provides test scenarios for hashCode() method testing.
+     * Each scenario contains MeterData instances to verify hash code consistency.
+     */
+    static Stream<Arguments> hashCodeTestScenarios() {
+        final MeterData identical1 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+        final MeterData identical2 = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+
+        final MeterData different1 = new MeterData("uuid2", 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                "cat2", "op2", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+
+        return Stream.of(
+                // Scenario 1: Equal objects must have equal hash codes
+                Arguments.of(
+                        "Equal objects have equal hash codes",
+                        identical1,
+                        identical2,
+                        true,
+                        "equal objects should have equal hash codes"
+                ),
+
+                // Scenario 2: Different objects likely have different hash codes
+                Arguments.of(
+                        "Different objects likely have different hash codes",
+                        identical1,
+                        different1,
+                        false,
+                        "different objects should likely have different hash codes"
+                )
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("hashCodeTestScenarios")
+    @DisplayName("should produce consistent hash codes for equal objects")
+    void testHashCode(final String scenarioName, final MeterData data1, final MeterData data2,
+                      final boolean expectedHashCodeEqual, final String message) {
+        // Given: two MeterData instances
+        // When: computing hash codes
+        final int hash1 = data1.hashCode();
+        final int hash2 = data2.hashCode();
+
+        // Then: hash codes should follow equality contract
+        if (data1.equals(data2)) {
+            assertEquals(hash1, hash2, "equal objects must have equal hash codes in " + scenarioName);
+        }
+        if (expectedHashCodeEqual) {
+            assertEquals(hash1, hash2, message + " in " + scenarioName);
+        }
+    }
+
+    @Test
+    @DisplayName("should handle null fields in hashCode calculation")
+    void testHashCode_withNullFields() {
+        // Given: MeterData instances with null fields
+        final MeterData nullCategory = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                null, "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+        final MeterData nullOperation = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                "cat1", null, null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+        final MeterData nullUuid = new MeterData(null, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+
+        // When: computing hash codes with null fields
+        final int hash1 = nullCategory.hashCode();
+        final int hash2 = nullOperation.hashCode();
+        final int hash3 = nullUuid.hashCode();
+
+        // Then: hash codes should be computed without throwing exceptions
+        assertNotNull(hash1, "hash code with null category should not be null");
+        assertNotNull(hash2, "hash code with null operation should not be null");
+        assertNotNull(hash3, "hash code with null uuid should not be null");
+    }
+
+    @Test
+    @DisplayName("should produce consistent hash codes across multiple invocations")
+    void testHashCode_consistency() {
+        // Given: a MeterData instance
+        final MeterData data = new MeterData("uuid1", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0,
+                "cat1", "op1", null, null, 0, 0, 0, 0, 0, 0, null, null, null, null, null);
+
+        // When: computing hash code multiple times
+        final int hash1 = data.hashCode();
+        final int hash2 = data.hashCode();
+        final int hash3 = data.hashCode();
+
+        // Then: all invocations should return the same value
+        assertEquals(hash1, hash2, "hash code should be consistent across invocations");
+        assertEquals(hash2, hash3, "hash code should remain consistent");
     }
 }
