@@ -95,12 +95,7 @@ public class ReportCalendar implements Runnable {
         ps.printf(" - current date/time: %s%n", dateTimeInstance.format(currentDate));
         ps.printf(" - default timezone: %s (%s)%n", tz.getDisplayName(), tz.getID());
         ps.printf("; DST=%dmin", tz.getDSTSavings() / 60000);
-        //noinspection ErrorNotRethrown
-        try {
-            ps.printf("; observesDST=%s", tz.observesDaylightTime());
-        } catch (final NoSuchMethodError ignored) {
-            // Ignore property that exists only from Java 1.7 on.
-        }
+        ps.printf("; observesDST=%s", tz.observesDaylightTime());
         ps.printf("; useDST=%s", tz.useDaylightTime());
         ps.printf("; inDST=%s", tz.inDaylightTime(currentDate));
         ps.printf("; offset=%dmin%n", tz.getRawOffset() / 60000);
