@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -106,7 +108,7 @@ public class ReportJavaxServlet extends HttpServlet {
 
         if (pathinfo == null) {
             log.warn("No report path provided.");
-            writeErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, "No report path provided.");
+            writeResponse(response, HttpServletResponse.SC_NOT_FOUND, "No report path provided.");
             return;
         }
 
@@ -164,25 +166,24 @@ public class ReportJavaxServlet extends HttpServlet {
             new ReportContainerInfo(logger).run();
         } else {
             log.warn("Unrecognized report path: {}", pathinfo);
-            writeErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, 
+            writeResponse(response, HttpServletResponse.SC_NOT_FOUND, 
                 String.format("Unknown report path: %s", pathinfo));
             return;
         }
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("text/plain");
-        writeSuccessResponse(response, String.format("Report logged for: %s", pathinfo));
+        writeResponse(response, HttpServletResponse.SC_OK, String.format("Report logged for: %s", pathinfo));
     }
 
     /*
-     * Writes an error response to the client with appropriate status code.
+     * Writes a response to the client with appropriate status code and message.
+     * Automatically sets content type to plain text.
      * Handles IOException gracefully if client disconnects before response is sent.
      *
      * @param response The HTTP response object.
      * @param statusCode The HTTP status code to set.
-     * @param message The error message to write.
+     * @param message The response message to write.
      */
-    private void writeErrorResponse(final HttpServletResponse response, final int statusCode, final String message) {
+    private void writeResponse(final HttpServletResponse response, final int statusCode, final String message) {
         response.setStatus(statusCode);
         response.setContentType("text/plain");
         try {
@@ -191,26 +192,7 @@ public class ReportJavaxServlet extends HttpServlet {
             /* IOException when writing response is expected when client disconnects.
                Log at debug level to avoid noise in production logs. */
             if (log.isDebugEnabled()) {
-                log.debug("Cannot write error response to client: {}", e.getMessage());
-            }
-        }
-    }
-
-    /*
-     * Writes a success response to the client.
-     * Handles IOException gracefully if client disconnects before response is sent.
-     *
-     * @param response The HTTP response object.
-     * @param message The success message to write.
-     */
-    private void writeSuccessResponse(final HttpServletResponse response, final String message) {
-        try {
-            response.getWriter().write(message);
-        } catch (final IOException e) {
-            /* IOException when writing response is expected when client disconnects.
-               Log at debug level to avoid noise in production logs. */
-            if (log.isDebugEnabled()) {
-                log.debug("Cannot write success response to client: {}", e.getMessage());
+                log.debug("Cannot write response to client: {}", e.getMessage());
             }
         }
     }
