@@ -184,6 +184,32 @@ class ReportNetworkInterfaceTest {
     }
 
     @Test
+    @DisplayName("should report point-to-point interface")
+    void shouldReportPointToPointInterface() throws Exception {
+        // Given: point-to-point network interface (e.g., PPP, VPN)
+        final NetworkInterface mockNif = mock(NetworkInterface.class);
+        when(mockNif.getName()).thenReturn("ppp0");
+        when(mockNif.getDisplayName()).thenReturn("PPP Connection");
+        when(mockNif.getMTU()).thenReturn(1500);
+        when(mockNif.isLoopback()).thenReturn(false);
+        when(mockNif.isPointToPoint()).thenReturn(true); // Point-to-point interface
+        when(mockNif.isUp()).thenReturn(true);
+        when(mockNif.isVirtual()).thenReturn(false);
+        when(mockNif.supportsMulticast()).thenReturn(false);
+        when(mockNif.getHardwareAddress()).thenReturn(null);
+        when(mockNif.getInetAddresses()).thenReturn(Collections.emptyEnumeration());
+
+        // When: report is executed
+        final ReportNetworkInterface report = new ReportNetworkInterface(logger, mockNif);
+        report.run();
+
+        // Then: should log point-to-point interface marker
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "Network Interface ppp0:",
+                "point-to-point;");
+    }
+
+    @Test
     @DisplayName("should report interface with null hardware address")
     void shouldReportInterfaceWithNullHardwareAddress() throws Exception {
         // Given: interface with null hardware address
