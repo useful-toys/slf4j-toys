@@ -144,4 +144,67 @@ class ReportJvmArgumentsTest {
         // Then: should log that no arguments were found
         assertHasEvent(logger, " - No JVM arguments found.");
     }
+
+    @Test
+    @DisplayName("should not censor JVM argument with equals sign at position 2 (-D=value)")
+    void shouldNotCensorJvmArgumentWithEqualsAtPosition2() {
+        // Given: JVM argument with equals sign at position 2 (not a valid key=value pair)
+        setupManagedFactory();
+        final List<String> jvmArgs = Arrays.asList("-D=value");
+        when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
+
+        // When: report is executed
+        new ReportJvmArguments(logger).run();
+
+        // Then: argument should be logged as-is (not censored because equalsIndex is not > 2)
+        assertHasEvent(logger, " - -D=value");
+    }
+
+    @Test
+    @DisplayName("should not censor JVM argument without equals sign (-Dvalue)")
+    void shouldNotCensorJvmArgumentWithoutEqualsSign() {
+        // Given: JVM argument without equals sign (not a valid key=value pair)
+        setupManagedFactory();
+        final List<String> jvmArgs = Arrays.asList("-Dvalue");
+        when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
+
+        // When: report is executed
+        new ReportJvmArguments(logger).run();
+
+        // Then: argument should be logged as-is (not censored because equals not found)
+        assertHasEvent(logger, " - -Dvalue");
+    }
+
+    @Test
+    @DisplayName("should not censor JVM argument with only -D flag")
+    void shouldNotCensorJvmArgumentWithOnlyDFlag() {
+        // Given: JVM argument with only -D flag (not a valid key=value pair)
+        setupManagedFactory();
+        final List<String> jvmArgs = Arrays.asList("-D");
+        when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
+
+        // When: report is executed
+        new ReportJvmArguments(logger).run();
+
+        // Then: argument should be logged as-is (not censored because equals not found)
+        assertHasEvent(logger, " - -D");
+    }
+
+    @Test
+    @DisplayName("should censor JVM argument with single-character key (-Dk=value)")
+    void shouldCensorJvmArgumentWithSingleCharacterKey() {
+        // Given: JVM argument with single-character key matching forbidden pattern
+        setupManagedFactory();
+        System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "k"); // Single character pattern
+        ReporterConfig.init();
+
+        final List<String> jvmArgs = Arrays.asList("-Dk=secret");
+        when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
+
+        // When: report is executed
+        new ReportJvmArguments(logger).run();
+
+        // Then: argument should be censored (equalsIndex=3 > 2, key matches forbidden pattern)
+        assertHasEvent(logger, " - -Dk=********");
+    }
 }
