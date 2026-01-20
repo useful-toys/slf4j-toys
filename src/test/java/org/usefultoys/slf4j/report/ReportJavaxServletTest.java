@@ -357,18 +357,25 @@ class ReportJavaxServletTest {
     }
 
     @Test
-    @DisplayName("should generate garbage collector report")
-    void shouldGenerateGarbageCollectorReport() throws IOException {
-        // Given: request for garbage collector report
-        when(request.getPathInfo()).thenReturn("/GarbageCollector");
+    @DisplayName("should handle network interface exception")
+    void shouldHandleNetworkInterfaceException() throws IOException {
+        // Given: request for network interface report but provider throws SocketException
+        when(request.getPathInfo()).thenReturn("/NetworkInterface");
+
+        // Create a servlet instance and inject a provider that throws SocketException
+        final ReportJavaxServlet testServlet = new ReportJavaxServlet();
+        testServlet.networkInterfaceProvider = () -> {
+            throw new java.net.SocketException("Test exception: Network interfaces unavailable");
+        };
 
         // When: servlet processes GET request
-        servlet.doGet(request, response);
+        testServlet.doGet(request, response);
 
-        // Then: should return success and log garbage collector report
+        // Then: should return success but log the warning about the exception
         verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertTrue(responseWriter.toString().contains("Report logged for: garbagecollector"));
-        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Garbage Collectors:");
+        assertTrue(responseWriter.toString().contains("Report logged for: networkinterface"));
+        AssertLogger.assertEvent(servletLogger, 0, MockLoggerEvent.Level.WARN, 
+            "Cannot report network interface: Test exception: Network interfaces unavailable");
     }
 
     @Test
