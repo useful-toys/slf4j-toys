@@ -98,7 +98,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject());
         assertFalse(meter.isFail());
         assertFalse(meter.isSlow());
-        assertEquals(4, logger.getEventCount());
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK);
@@ -123,14 +123,12 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
-        AssertLogger.assertEvent(logger, 3, DEBUG, MSG_START); // Duplicate start message
-        AssertLogger.assertEvent(logger, 4, TRACE, DATA_START); // Duplicate start data
-        AssertLogger.assertEvent(logger, 5, INFO, MSG_OK);
-        AssertLogger.assertEvent(logger, 6, TRACE, DATA_OK);
+        AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
+        AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
 
     @Test
@@ -150,7 +148,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject());
         assertFalse(meter.isFail());
         assertFalse(meter.isSlow());
-        assertEquals(4, logger.getEventCount());
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK);
@@ -173,7 +171,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK);
@@ -197,7 +195,7 @@ class MeterExecutorTest {
         assertTrue(meter.isReject(), "Meter should be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_REJECT);
@@ -221,7 +219,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertTrue(meter.isFail(), "Meter should be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);
@@ -251,7 +249,7 @@ class MeterExecutorTest {
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("java.lang.IllegalArgumentException", meter.failPath, "Fail path should match exception class");
         assertEquals("test exception", meter.failMessage, "Fail message should match exception message");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);
@@ -280,7 +278,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK);
@@ -308,7 +306,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK);
@@ -342,7 +340,7 @@ class MeterExecutorTest {
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("RuntimeException", meter.getRejectPath(), "Reject path should match exception class");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_REJECT);
@@ -375,7 +373,7 @@ class MeterExecutorTest {
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("java.lang.IllegalArgumentException", meter.getFailPath(), "Fail path should match exception class");
         assertEquals("test fail exception", meter.getFailMessage(), "Fail message should match exception message");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);
@@ -405,14 +403,12 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
-        AssertLogger.assertEvent(logger, 3, DEBUG, MSG_START); // Duplicate start message
-        AssertLogger.assertEvent(logger, 4, TRACE, DATA_START); // Duplicate start data
-        AssertLogger.assertEvent(logger, 5, INFO, MSG_OK);
-        AssertLogger.assertEvent(logger, 6, TRACE, DATA_OK);
+        AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
+        AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
 
     @Test
@@ -440,7 +436,7 @@ class MeterExecutorTest {
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("IllegalStateException", meter.getRejectPath(), "Reject path should match exception class");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_REJECT);
@@ -517,14 +513,12 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
-        AssertLogger.assertEvent(logger, 3, DEBUG, MSG_START); // Duplicate start message
-        AssertLogger.assertEvent(logger, 4, TRACE, DATA_START); // Duplicate start data
-        AssertLogger.assertEvent(logger, 5, INFO, MSG_OK);
-        AssertLogger.assertEvent(logger, 6, TRACE, DATA_OK);
+        AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
+        AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
 
     @Test
@@ -701,14 +695,12 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
-        AssertLogger.assertEvent(logger, 3, DEBUG, MSG_START); // Duplicate start message
-        AssertLogger.assertEvent(logger, 4, TRACE, DATA_START); // Duplicate start data
-        AssertLogger.assertEvent(logger, 5, INFO, MSG_OK);
-        AssertLogger.assertEvent(logger, 6, TRACE, DATA_OK);
+        AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
+        AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
 
     @Test
@@ -736,7 +728,7 @@ class MeterExecutorTest {
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("java.io.IOException", meter.getFailPath(), "Fail path should match exception class");
         assertEquals("test exception", meter.getFailMessage(), "Fail message should match exception message");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);
@@ -764,7 +756,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK);
@@ -791,7 +783,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK, "result=Success");
@@ -821,7 +813,7 @@ class MeterExecutorTest {
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("IllegalArgumentException", meter.getRejectPath(), "Reject path should match exception class");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_REJECT);
@@ -852,7 +844,7 @@ class MeterExecutorTest {
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("java.lang.IllegalArgumentException", meter.getFailPath(), "Fail path should match exception class");
         assertEquals("test exception", meter.getFailMessage(), "Fail message should match exception message");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);
@@ -881,14 +873,12 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
-        AssertLogger.assertEvent(logger, 3, DEBUG, MSG_START); // Duplicate start message
-        AssertLogger.assertEvent(logger, 4, TRACE, DATA_START); // Duplicate start data
-        AssertLogger.assertEvent(logger, 5, INFO, MSG_OK);
-        AssertLogger.assertEvent(logger, 6, TRACE, DATA_OK);
+        AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
+        AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
 
     @Test
@@ -912,7 +902,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK);
@@ -940,14 +930,12 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
-        AssertLogger.assertEvent(logger, 3, DEBUG, MSG_START); // Duplicate start message
-        AssertLogger.assertEvent(logger, 4, TRACE, DATA_START); // Duplicate start data
-        AssertLogger.assertEvent(logger, 5, INFO, MSG_OK);
-        AssertLogger.assertEvent(logger, 6, TRACE, DATA_OK);
+        AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
+        AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
 
     @Test
@@ -970,7 +958,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK);
@@ -996,7 +984,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK, "result=Auto OK");
@@ -1027,7 +1015,7 @@ class MeterExecutorTest {
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("IOException", meter.getRejectPath(), "Reject path should match exception class");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_REJECT);
@@ -1058,7 +1046,7 @@ class MeterExecutorTest {
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("IOException", meter.getRejectPath(), "Reject path should match exception class");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_REJECT);
@@ -1089,7 +1077,7 @@ class MeterExecutorTest {
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("java.lang.IllegalArgumentException", meter.getFailPath(), "Fail path should match exception class");
         assertEquals("test runtime exception", meter.getFailMessage(), "Fail message should match exception message");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);
@@ -1117,14 +1105,12 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(7, logger.getEventCount(), "Should have 7 log events (4 normal + 3 from excessive start)");
+        AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
-        AssertLogger.assertEvent(logger, 3, DEBUG, MSG_START); // Duplicate start message
-        AssertLogger.assertEvent(logger, 4, TRACE, DATA_START); // Duplicate start data
-        AssertLogger.assertEvent(logger, 5, INFO, MSG_OK);
-        AssertLogger.assertEvent(logger, 6, TRACE, DATA_OK);
+        AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
+        AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
 
     @Test
@@ -1147,7 +1133,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK);
@@ -1173,7 +1159,7 @@ class MeterExecutorTest {
         assertFalse(meter.isReject(), "Meter should not be in reject state");
         assertFalse(meter.isFail(), "Meter should not be in fail state");
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, INFO, MSG_OK, "result=Auto Safe Success");
@@ -1206,7 +1192,7 @@ class MeterExecutorTest {
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("java.io.IOException", meter.getFailPath(), "Fail path should match original exception class");
         assertEquals("test exception", meter.getFailMessage(), "Fail message should match original exception message");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);
@@ -1237,7 +1223,7 @@ class MeterExecutorTest {
         assertFalse(meter.isSlow(), "Meter should not be in slow state");
         assertEquals("java.lang.IllegalArgumentException", meter.getFailPath(), "Fail path should match exception class");
         assertEquals("test exception", meter.getFailMessage(), "Fail message should match exception message");
-        assertEquals(4, logger.getEventCount(), "Should have exactly 4 log events");
+        AssertLogger.assertEventCount(logger, 4);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);
@@ -1287,7 +1273,7 @@ class MeterExecutorTest {
         assertEquals("test checked exception", meter.getFailMessage(), "Fail message should match original exception message");
         
         // Should have 5 log events: 4 normal + 1 error from convertException fallback
-        assertEquals(5, logger.getEventCount(), "Should have exactly 5 log events (4 normal + 1 from convertException)");
+        AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);

@@ -775,20 +775,16 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // When: start() is called again
         meter.start();
 
-        // Then: Meter enters inconsistent state (startTime > stopTime)
-        // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
-        // Cannot use assertMeterState because Meter is in an inconsistent state (startTime > stopTime)
+        // Then: Guard Clause prevents restart - state remains unchanged, second start is rejected early
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
 
-        // Then: logs start + ok + INCONSISTENT_START + start events
+        // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 6, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -801,20 +797,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // When: start() is called again
         meter.start();
 
-        // Then: Meter enters inconsistent state but okPath is preserved
-        // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+        // Then: Guard Clause prevents restart - okPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("path", meter.getOkPath(), "okPath should be preserved");
 
-        // Then: logs start + ok + INCONSISTENT_START + start events
+        // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 6, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -827,20 +820,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // When: start() is called again
         meter.start();
 
-        // Then: Meter enters inconsistent state but rejectPath is preserved
-        // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+        // Then: Guard Clause prevents restart - rejectPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("error", meter.getRejectPath(), "rejectPath should be preserved");
 
-        // Then: logs start + reject + INCONSISTENT_START + start events
+        // Then: logs start + reject + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 6, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -853,20 +843,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // When: start() is called again
         meter.start();
 
-        // Then: Meter enters inconsistent state but failPath is preserved
-        // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+        // Then: Guard Clause prevents restart - failPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("error", meter.getFailPath(), "failPath should be preserved");
 
-        // Then: logs start + fail + INCONSISTENT_START + start events
+        // Then: logs start + fail + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 6, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -881,20 +868,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // When: start() is called again
         meter.start();
 
-        // Then: Meter enters inconsistent state but okPath is preserved
-        // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+        // Then: Guard Clause prevents restart - okPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("configured", meter.getOkPath(), "okPath should be preserved");
 
-        // Then: logs start + ok + INCONSISTENT_START + start events
+        // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 6, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -909,20 +893,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // When: start() is called again
         meter.start();
 
-        // Then: Meter enters inconsistent state but okPath is preserved
-        // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+        // Then: Guard Clause prevents restart - okPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("path", meter.getOkPath(), "okPath should be preserved");
 
-        // Then: logs start + ok + INCONSISTENT_START + start events
+        // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 6, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -937,20 +918,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // When: start() is called again
         meter.start();
 
-        // Then: Meter enters inconsistent state but rejectPath is preserved
-        // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+        // Then: Guard Clause prevents restart - rejectPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("error", meter.getRejectPath(), "rejectPath should be preserved");
 
-        // Then: logs start + reject + INCONSISTENT_START + start events
+        // Then: logs start + reject + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 6, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -965,19 +943,16 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // When: start() is called again
         meter.start();
 
-        // Then: Meter enters inconsistent state but failPath is preserved
-        // Will be fixed in future: Meter currently allows restart (startTime > stopTime), but should reject it.
+        // Then: Guard Clause prevents restart - failPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStartTime() > meter.getStopTime(), "startTime > stopTime due to restart bug");
+        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("error", meter.getFailPath(), "failPath should be preserved");
 
-        // Then: logs start + fail + INCONSISTENT_START + start events
+        // Then: logs start + fail + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 6, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 }
