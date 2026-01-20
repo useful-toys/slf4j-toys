@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -106,13 +108,7 @@ public class ReportServlet extends HttpServlet {
 
         if (pathinfo == null) {
             log.warn("No report path provided.");
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.setContentType("text/plain");
-            try {
-                response.getWriter().write("No report path provided.");
-            } catch (final Exception ignored) {
-                // no-op
-            }
+            writeResponse(response, HttpServletResponse.SC_NOT_FOUND, "No report path provided.");
             return;
         }
 
@@ -170,22 +166,34 @@ public class ReportServlet extends HttpServlet {
             new ReportContainerInfo(logger).run();
         } else {
             log.warn("Unrecognized report path: {}", pathinfo);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.setContentType("text/plain");
-            try {
-                response.getWriter().write(String.format("Unknown report path: %s", pathinfo));
-            } catch (final Exception ignored) {
-                // no-op
-            }
+            writeResponse(response, HttpServletResponse.SC_NOT_FOUND, 
+                String.format("Unknown report path: %s", pathinfo));
             return;
         }
 
-        response.setStatus(HttpServletResponse.SC_OK);
+        writeResponse(response, HttpServletResponse.SC_OK, String.format("Report logged for: %s", pathinfo));
+    }
+
+    /*
+     * Writes a response to the client with appropriate status code and message.
+     * Automatically sets content type to plain text.
+     * Handles IOException gracefully if client disconnects before response is sent.
+     *
+     * @param response The HTTP response object.
+     * @param statusCode The HTTP status code to set.
+     * @param message The response message to write.
+     */
+    private void writeResponse(final HttpServletResponse response, final int statusCode, final String message) {
+        response.setStatus(statusCode);
         response.setContentType("text/plain");
         try {
-            response.getWriter().write(String.format("Report logged for: %s", pathinfo));
-        } catch (final Exception ignored) {
-            // no-op
+            response.getWriter().write(message);
+        } catch (final IOException e) {
+            /* IOException when writing response is expected when client disconnects.
+               Log at debug level to avoid noise in production logs. */
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot write response to client: {}", e.getMessage());
+            }
         }
     }
 
