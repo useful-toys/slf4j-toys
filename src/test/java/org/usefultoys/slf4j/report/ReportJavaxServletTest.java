@@ -370,4 +370,34 @@ class ReportJavaxServletTest {
         assertTrue(responseWriter.toString().contains("Report logged for: garbagecollector"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Garbage Collectors:");
     }
+
+    @Test
+    @DisplayName("should generate security providers report")
+    void shouldGenerateSecurityProvidersReport() throws IOException {
+        // Given: request for security providers report
+        when(request.getPathInfo()).thenReturn("/SecurityProviders");
+
+        // When: servlet processes GET request
+        servlet.doGet(request, response);
+
+        // Then: should return success and log security providers report
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: securityproviders"));
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Security Providers:");
+    }
+
+    @Test
+    @DisplayName("should generate container info report")
+    void shouldGenerateContainerInfoReport() throws IOException {
+        // Given: request for container info report
+        when(request.getPathInfo()).thenReturn("/ContainerInfo");
+
+        // When: servlet processes GET request
+        servlet.doGet(request, response);
+
+        // Then: should return success and log container info report
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: containerinfo"));
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Container Info");
+    }
 }
