@@ -191,9 +191,7 @@ public class ReportServlet extends HttpServlet {
         } catch (final IOException e) {
             /* IOException when writing response is expected when client disconnects.
                Log at debug level to avoid noise in production logs. */
-            if (log.isDebugEnabled()) {
-                log.debug("Cannot write response to client: {}", e.getMessage());
-            }
+            log.debug("Cannot write response to client: {}", e.getMessage());
         }
     }
 
