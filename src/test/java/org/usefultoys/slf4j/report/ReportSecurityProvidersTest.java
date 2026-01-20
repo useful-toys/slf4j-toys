@@ -123,4 +123,28 @@ class ReportSecurityProvidersTest {
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "Security Providers:", " - No security providers found.");
         assertTrue(ConfigParser.isInitializationOK());
     }
+
+    @Test
+    @DisplayName("should handle security provider with no services")
+    void shouldHandleSecurityProviderWithNoServices() {
+        // Given: security provider with no services (empty services map)
+        Provider provider = mock(Provider.class);
+        when(provider.getName()).thenReturn("EMPTY");
+        when(provider.getVersion()).thenReturn(1.0);
+        when(provider.getInfo()).thenReturn("Provider with no services");
+        when(provider.entrySet()).thenReturn(Collections.emptySet());
+
+        when(Security.getProviders()).thenReturn(new Provider[]{provider});
+
+        // When: report is executed
+        new ReportSecurityProviders(logger).run();
+
+        // Then: should log provider info without services section (sortedServices.isEmpty() is true)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
+                "Security Providers:",
+                " - Provider 1: EMPTY (Version: 1.000000)",
+                "   Info: Provider with no services"
+        );
+        assertTrue(ConfigParser.isInitializationOK());
+    }
 }
