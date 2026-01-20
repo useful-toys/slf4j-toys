@@ -87,6 +87,12 @@ public class ReportJavaxServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    /*
+     * Provides network interfaces for reporting.
+     * Can be overridden in tests to simulate exceptions or control behavior.
+     */
+    protected NetworkInterfaceProvider networkInterfaceProvider = NetworkInterface::getNetworkInterfaces;
+
     /**
      * Handles HTTP GET requests by triggering the appropriate report module based on the URL path.
      * The report is logged, and a response indicating success or failure is sent.
@@ -136,7 +142,7 @@ public class ReportJavaxServlet extends HttpServlet {
             new ReportCharset(logger).run();
         } else if ("networkinterface".equalsIgnoreCase(pathinfo)) {
             try {
-                final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                final Enumeration<NetworkInterface> interfaces = this.getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
                     final NetworkInterface nif = interfaces.nextElement();
                     new ReportNetworkInterface(logger, nif).run();
@@ -181,5 +187,31 @@ public class ReportJavaxServlet extends HttpServlet {
         } catch (final Exception ignored) {
             // no-op
         }
+    }
+
+    /*
+     * Retrieves the enumeration of network interfaces.
+     * Protected to allow override in tests for dependency injection.
+     *
+     * @return Enumeration of available network interfaces.
+     * @throws SocketException If an I/O error occurs.
+     */
+    protected Enumeration<NetworkInterface> getNetworkInterfaces() throws SocketException {
+        return this.networkInterfaceProvider.getNetworkInterfaces();
+    }
+
+    /*
+     * Functional interface for providing network interfaces.
+     * Allows injection of mock implementations in tests.
+     */
+    @FunctionalInterface
+    protected interface NetworkInterfaceProvider {
+        /*
+         * Gets the enumeration of network interfaces.
+         *
+         * @return Enumeration of available network interfaces.
+         * @throws SocketException If an I/O error occurs.
+         */
+        Enumeration<NetworkInterface> getNetworkInterfaces() throws SocketException;
     }
 }
