@@ -219,6 +219,34 @@ class ReportJdbcConnectionTest {
     }
 
     @Test
+    @DisplayName("should report connection with transaction isolation read uncommitted")
+    void shouldReportConnectionWithTransactionIsolationReadUncommitted() throws SQLException {
+        // Given: connection with read uncommitted transaction isolation
+        when(mockConnection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_READ_UNCOMMITTED);
+
+        // When: report is executed
+        final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
+        report.run();
+
+        // Then: should log read-uncommitted transaction level
+        assertHasEvent(logger, "transaction=read-uncommitted; ");
+    }
+
+    @Test
+    @DisplayName("should report connection with transaction isolation repeatable read")
+    void shouldReportConnectionWithTransactionIsolationRepeatableRead() throws SQLException {
+        // Given: connection with repeatable read transaction isolation
+        when(mockConnection.getTransactionIsolation()).thenReturn(Connection.TRANSACTION_REPEATABLE_READ);
+
+        // When: report is executed
+        final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
+        report.run();
+
+        // Then: should log repeatable-read transaction level
+        assertHasEvent(logger, "transaction=repeatable-read; ");
+    }
+
+    @Test
     @DisplayName("should report connection with transaction isolation none")
     void shouldReportConnectionWithTransactionIsolationNone() throws SQLException {
         // Given: connection with no transaction isolation
@@ -389,6 +417,59 @@ class ReportJdbcConnectionTest {
 
         // Then: should not log type map
         assertNoEvent(logger, " - type map:");
+    }
+
+    @Test
+    @DisplayName("should wrap type map entries with line break at 3-entry intervals")
+    void shouldWrapTypeMapEntriesWithLineBreakAt3EntryIntervals() throws SQLException {
+        // Given: connection with multiple type map entries (more than 3) to trigger line wrapping
+        final Map<String, Class<?>> typeMap = new HashMap<>();
+        typeMap.put("type_1", String.class);
+        typeMap.put("type_2", Integer.class);
+        typeMap.put("type_3", Long.class);
+        typeMap.put("type_4", Double.class);
+        when(mockConnection.getTypeMap()).thenReturn(typeMap);
+
+        // When: report is executed with type map printing enabled
+        final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection)
+                .printTypeMap(true);
+        report.run();
+
+        // Then: should log all type map entries with line wrapping after 3rd entry (i++ % 3 == 0)
+        // The 4th entry should appear on a new line with indentation
+        assertHasEvent(logger, " - type map: ");
+        assertHasEvent(logger, "->String; ");
+        assertHasEvent(logger, "->Integer; ");
+        assertHasEvent(logger, "->Long; ");
+        assertHasEvent(logger, "->Double;");
+    }
+
+    @Test
+    @DisplayName("should wrap client info entries with line break at 5-entry intervals")
+    void shouldWrapClientInfoEntriesWithLineBreakAt5EntryIntervals() throws SQLException {
+        // Given: connection with multiple client info entries (more than 5) to trigger line wrapping
+        final Properties clientInfo = new Properties();
+        clientInfo.setProperty("Property1", "value1");
+        clientInfo.setProperty("Property2", "value2");
+        clientInfo.setProperty("Property3", "value3");
+        clientInfo.setProperty("Property4", "value4");
+        clientInfo.setProperty("Property5", "value5");
+        clientInfo.setProperty("Property6", "value6");
+        when(mockConnection.getClientInfo()).thenReturn(clientInfo);
+
+        // When: report is executed
+        final ReportJdbcConnection report = new ReportJdbcConnection(logger, mockConnection);
+        report.run();
+
+        // Then: should log all client info entries with line wrapping after 5th entry (i++ % 5 == 0)
+        // The 6th entry should appear on a new line with indentation
+        assertHasEvent(logger, " - client info: ");
+        assertHasEvent(logger, "Property1=value1; ");
+        assertHasEvent(logger, "Property2=value2; ");
+        assertHasEvent(logger, "Property3=value3; ");
+        assertHasEvent(logger, "Property4=value4; ");
+        assertHasEvent(logger, "Property5=value5; ");
+        assertHasEvent(logger, "Property6=value6;");
     }
 
     @Test
