@@ -106,13 +106,7 @@ public class ReportJavaxServlet extends HttpServlet {
 
         if (pathinfo == null) {
             log.warn("No report path provided.");
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.setContentType("text/plain");
-            try {
-                response.getWriter().write("No report path provided.");
-            } catch (final Exception ignored) {
-                // no-op
-            }
+            writeErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, "No report path provided.");
             return;
         }
 
@@ -170,22 +164,54 @@ public class ReportJavaxServlet extends HttpServlet {
             new ReportContainerInfo(logger).run();
         } else {
             log.warn("Unrecognized report path: {}", pathinfo);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.setContentType("text/plain");
-            try {
-                response.getWriter().write(String.format("Unknown report path: %s", pathinfo));
-            } catch (final Exception ignored) {
-                // no-op
-            }
+            writeErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, 
+                String.format("Unknown report path: %s", pathinfo));
             return;
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("text/plain");
+        writeSuccessResponse(response, String.format("Report logged for: %s", pathinfo));
+    }
+
+    /*
+     * Writes an error response to the client with appropriate status code.
+     * Handles IOException gracefully if client disconnects before response is sent.
+     *
+     * @param response The HTTP response object.
+     * @param statusCode The HTTP status code to set.
+     * @param message The error message to write.
+     */
+    private void writeErrorResponse(final HttpServletResponse response, final int statusCode, final String message) {
+        response.setStatus(statusCode);
+        response.setContentType("text/plain");
         try {
-            response.getWriter().write(String.format("Report logged for: %s", pathinfo));
-        } catch (final Exception ignored) {
-            // no-op
+            response.getWriter().write(message);
+        } catch (final IOException e) {
+            /* IOException when writing response is expected when client disconnects.
+               Log at debug level to avoid noise in production logs. */
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot write error response to client: {}", e.getMessage());
+            }
+        }
+    }
+
+    /*
+     * Writes a success response to the client.
+     * Handles IOException gracefully if client disconnects before response is sent.
+     *
+     * @param response The HTTP response object.
+     * @param message The success message to write.
+     */
+    private void writeSuccessResponse(final HttpServletResponse response, final String message) {
+        try {
+            response.getWriter().write(message);
+        } catch (final IOException e) {
+            /* IOException when writing response is expected when client disconnects.
+               Log at debug level to avoid noise in production logs. */
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot write success response to client: {}", e.getMessage());
+            }
         }
     }
 
