@@ -123,13 +123,10 @@ public class ReportJdbcConnection implements Runnable {
                 default:
                     ps.print("unknown; ");
             }
-            //noinspection ErrorNotRethrown
-            try {
-                ps.printf("timeout=%dms; ", connection.getNetworkTimeout());
-            } catch (final NoSuchMethodError ignore) {
-                // only since 1.7
-                ps.print("n/a; "); // Added this line
-            }
+            /* getNetworkTimeout() has been available since Java 7.
+               As this library requires Java >= 8, NoSuchMethodError will never occur.
+               Therefore, no try-catch handling is necessary. */
+            ps.printf("timeout=%dms; ", connection.getNetworkTimeout());
             ps.print("transaction=");
             switch (connection.getTransactionIsolation()) {
                 case Connection.TRANSACTION_READ_UNCOMMITTED:
