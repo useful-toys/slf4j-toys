@@ -377,6 +377,21 @@ class ReportJavaxServletTest {
     }
 
     @Test
+    @DisplayName("should generate garbage collector report")
+    void shouldGenerateGarbageCollectorReport() throws IOException {
+        // Given: request for garbage collector report
+        when(request.getPathInfo()).thenReturn("/GarbageCollector");
+
+        // When: servlet processes GET request
+        servlet.doGet(request, response);
+
+        // Then: should return success and log garbage collector report
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: garbagecollector"));
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Garbage Collectors:");
+    }
+
+    @Test
     @DisplayName("should handle network interface exception")
     void shouldHandleNetworkInterfaceException() throws IOException {
         // Given: request for network interface report but provider throws SocketException
