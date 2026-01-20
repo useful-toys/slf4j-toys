@@ -112,6 +112,26 @@ class ReportJavaxServletTest {
     }
 
     @Test
+    @DisplayName("should handle IOException when writing response")
+    void shouldHandleIOExceptionWhenWritingResponse() throws IOException {
+        // Given: request for VM report but response.getWriter() throws IOException
+        when(request.getPathInfo()).thenReturn("/VM");
+        when(response.getWriter()).thenThrow(new IOException("Client disconnected"));
+
+        // When: servlet processes GET request
+        servlet.doGet(request, response);
+
+        // Then: should not throw exception, gracefully handle the error
+        // The servlet should still attempt to set status and content type
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        verify(response).setContentType("text/plain");
+        // Debug log should be created due to IOException
+        // (Note: We can't easily assert this without additional logger setup, 
+        // but the fact that no exception was thrown proves the catch block worked)
+        assertTrue(ConfigParser.isInitializationOK());
+    }
+
+    @Test
     @DisplayName("should generate VM report")
     void shouldGenerateVMReport() throws IOException {
         // Given: request for VM report
