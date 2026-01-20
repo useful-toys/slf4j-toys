@@ -380,4 +380,56 @@ class ReportServletTest {
         assertTrue(responseWriter.toString().contains("Report logged for: garbagecollector"));
         AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Garbage Collectors:");
     }
+
+    @Test
+    @DisplayName("should handle network interface exception")
+    void shouldHandleNetworkInterfaceException() throws IOException {
+        // Given: request for network interface report but provider throws SocketException
+        when(request.getPathInfo()).thenReturn("/NetworkInterface");
+
+        // Create a servlet instance and inject a provider that throws SocketException
+        final ReportServlet testServlet = new ReportServlet();
+        testServlet.networkInterfaceProvider = () -> {
+            throw new java.net.SocketException("Test exception: Network interfaces unavailable");
+        };
+
+        // When: servlet processes GET request
+        testServlet.doGet(request, response);
+
+        // Then: should return success but log the warning about the exception
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: networkinterface"));
+        AssertLogger.assertEvent(servletLogger, 0, MockLoggerEvent.Level.WARN, 
+            "Cannot report network interface: Test exception: Network interfaces unavailable");
+    }
+
+    @Test
+    @DisplayName("should generate security providers report")
+    void shouldGenerateSecurityProvidersReport() throws IOException {
+        // Given: request for security providers report
+        when(request.getPathInfo()).thenReturn("/SecurityProviders");
+
+        // When: servlet processes GET request
+        servlet.doGet(request, response);
+
+        // Then: should return success and log security providers report
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: securityproviders"));
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Security Providers:");
+    }
+
+    @Test
+    @DisplayName("should generate container info report")
+    void shouldGenerateContainerInfoReport() throws IOException {
+        // Given: request for container info report
+        when(request.getPathInfo()).thenReturn("/ContainerInfo");
+
+        // When: servlet processes GET request
+        servlet.doGet(request, response);
+
+        // Then: should return success and log container info report
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertTrue(responseWriter.toString().contains("Report logged for: containerinfo"));
+        AssertLogger.assertEvent(reportLogger, 0, MockLoggerEvent.Level.INFO, "Container Info");
+    }
 }
