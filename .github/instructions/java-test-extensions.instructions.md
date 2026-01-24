@@ -1,111 +1,11 @@
-# Instructions for AI Assistants (Gemini & GitHub Copilot)
-
-## Test Execution Strategy
-
-**This project uses a TWO-TIER testing strategy** to provide IDE-friendly development while maintaining complete test coverage:
-
-### 1. Default Build (IDE-Friendly) - ~1441 Core Tests
-- **What**: Core tests (Meter, Watcher, Reporter) with MockLogger
-- **IDE Support**: ✅ Full support (run, debug, coverage)
-- **Source dirs**: `src/main/java` + `src/test/java`
-- **Excludes**: Logback integration tests (`**/logback/**/*Test.java`)
-- **Excludes**: Logback source code (`src/logback-main/java`, `src/logback-test/java`)
-
-### 2. With-Logback Profile (Maven-Only) - +84 Logback Tests
-- **What**: Logback integration tests with real Logback implementation
-- **IDE Support**: ❌ No IDE support (Maven-only workflow)
-- **Source dirs**: Adds `src/logback-main/java` + `src/logback-test/java`
-- **Includes**: Only Logback tests (`**/logback/**/*Test.java`)
-
-**See**: `doc/TDR-0031-ide-friendly-build-with-optional-logback-testing.md` for complete rationale.
-
+---
+description: 'Additional coding conventions and standards specifically for Java test code in the slf4j-toys project.'
+applyTo: '**/*Test.java'
 ---
 
-### Run ALL Tests (Default Only)
-```powershell
-.\mvnw test
-# Runs ~1441 core tests with MockLogger
-```
+# Additional Java Testing Standards
 
-### Run ALL Tests (Default + Logback)
-```powershell
-.\mvnw test -P slf4j-2.0,with-logback
-# Runs all 1525 tests (1441 core + 84 logback)
-```
-
-### Run Specific Test Class or Method
-
-**For Logback tests** (classes in `src/logback-test/java/org/usefultoys/slf4j/logback/`):
-```powershell
-# Run entire test class
-.\mvnw test -P slf4j-2.0 -Dtest=MessageHighlightConverterTest
-
-# Run specific test method
-.\mvnw test -P slf4j-2.0 '-Dtest=MessageHighlightConverterTest#testMsgStartMarker'
-```
-
-**Summary:**
-- Always use `.\mvnw test` as the base command (Maven recompiles automatically on demand)
-- **⚠️ AVOID `clean`**: Do not use `clean` unless explicitly clearing the build is necessary
-- Maven handles incremental compilation efficiently; trust the build cache
-- **Default tests**: Run without profile (IDE can also run these)
-- **Logback tests**: Require `-P slf4j-2.0,with-logback` profile (Maven-only, IDE cannot run)
-- Add `-Dtest=ClassName` or `-Dtest=ClassName#methodName` to target specific tests
-- The Maven lifecycle (`test-compile` phase) is automatically respected
-
-**PowerShell Escaping Note:**
-When test filters include special characters like `#` (method separator) or `@`, wrap the entire `-Dtest=...` parameter in single quotes:
-```powershell
-# ✅ CORRECT: Quotes protect # from being interpreted as comment
-.\mvnw test '-Dtest=MeterLifeCycleTest#shouldCreateMeter'
-
-# ❌ WRONG: PowerShell treats # as comment start, Maven never sees method name
-.\mvnw test -Dtest=MeterLifeCycleTest#shouldCreateMeter
-```
-
-## Testing Standards
-
-### Test Structure & Organization
-- Test method names should be descriptive and follow the pattern `shouldDoSomethingWhenCondition`
-- **Use Given-When-Then structure in test comments** for clarity and documentation:
-  ```java
-  @Test
-  @DisplayName("should do something when condition is met")
-  void shouldDoSomethingWhenConditionIsMet() {
-      // Given: initial setup describing the test preconditions
-      // When: the action being tested
-      // Then: the expected outcome or assertion
-      assertEquals(expected, actual, "should match expected value");
-  }
-  ```
-  This structure makes tests self-documenting and easier to understand and maintain.
-
-### Test Validation - Charset Consistency
-
-**All test classes must declare `@ValidateCharset`** to ensure the test runs with the expected default charset. This annotation automatically validates that `SessionConfig.charset` matches `Charset.defaultCharset()`.
-
-**Important**: When using `@ValidateCharset`, **do NOT include manual charset validation assertions** like:
-```java
-// ❌ WRONG: Redundant when @ValidateCharset is present
-@ValidateCharset
-class MyTest {
-    @BeforeAll
-    static void validateCharset() {
-        assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, 
-            "Test requires SessionConfig.charset = default charset");
-    }
-}
-
-// ✅ CORRECT: Just use the annotation
-@ValidateCharset
-class MyTest {
-    // No manual charset validation needed - @ValidateCharset handles it
-}
-```
-
-**When adjusting legacy tests**: Remove any manual charset validation methods or assertions that check `SessionConfig.charset == Charset.defaultCharset()` if `@ValidateCharset` is already present on the class.
-
-### Test Annotation Imports
+## Test Annotation Imports
 
 **All test annotations require correct imports. Use these imports in your test classes:**
 
@@ -139,7 +39,8 @@ import org.usefultoys.slf4jtestmock.AssertLogger;
 - **Configuration & Validation**: `org.usefultoys.test.*`
 - **MockLogger & Assertions**: `org.usefultoys.slf4jtestmock.*`
 
-### Configuration Reset in Tests
+## Configuration Reset in Tests
+
 If a test uses a configuration class (e.g., `SessionConfig`), the test class must include the appropriate reset annotation:
 - Use `@ResetSystemConfig` for tests modifying `SystemConfig`
 - Use `@ResetSessionConfig` for tests modifying `SessionConfig`
@@ -150,7 +51,8 @@ If a test uses a configuration class (e.g., `SessionConfig`), the test class mus
 
 This eliminates the need for `@BeforeAll` and `@AfterAll` methods that reset the configuration. This applies to all configuration sources, including `SystemConfig`, `MeterConfig`, `WatcherConfig`, and `ReporterConfig`.
 
-### System Property Reset in Tests
+## System Property Reset in Tests
+
 **If a test class uses `System.setProperty()` to set system properties that are NOT part of `SystemConfig`, `SessionConfig`, `ReporterConfig`, `MeterConfig`, or `WatcherConfig`, the test class must declare a `@ResetSystemProperty` annotation for each custom property being set.**
 
 Note: If the test class already uses `@ResetSystemConfig`, `@ResetSessionConfig`, `@ResetReporterConfig`, `@ResetMeterConfig`, or `@ResetWatcherConfig`, then `@ResetSystemProperty` is NOT needed for properties belonging to those configuration classes, as the reset is already covered.
@@ -191,10 +93,11 @@ class SessionConfigTest {
 }
 ```
 
-### Charset Validation in Tests
+## Charset Validation in Tests
+
 **All test classes must declare the `@ValidateCharset` annotation** to ensure the JVM uses the expected charset.
 
-### Meter Stack Validation in Tests
+## Meter Stack Validation in Tests
 
 **All test classes in the `org.usefultoys.slf4j.meter` package must declare the `@ValidateCleanMeter` annotation** to ensure the Meter thread-local stack is clean before and after each test.
 
@@ -234,7 +137,8 @@ class MeterOperationTest {
 - Provides a descriptive error message indicating which Meter was left behind
 - Should be used on **all** test classes in the `org.usefultoys.slf4j.meter` package
 
-### Locale-Sensitive Tests
+## Locale-Sensitive Tests
+
 **Test classes that perform string comparisons involving number formatting or date formatting must use `@WithLocale("en")`** to ensure consistent behavior across different environments and operating systems.
 This is especially important for:
 - Numbers with decimal places (e.g., "123.45" vs "123,45" in different locales)
@@ -258,11 +162,11 @@ class NumberFormattingTest {
 }
 ```
 
-### Replace Legacy extensions
+## Replace Legacy extensions
 -  If you find `@ExtendWith(FeaturedExtension.class)` in test code, replace it with `@Featured` for consistency and clarity.
 - Example: If you find `@ExtendWith(CharsetConsistencyExtension.class)` in test code, replace it with `@ValidateCharset`.
 
-### Test Assertions with MockLogger - Anti-Patterns
+## Test Assertions with MockLogger
 
 **Never make assertions directly on MockLogger attributes or methods.** This is considered an anti-pattern. Instead, **always use `AssertLogger` methods** to validate logging behavior.
 
@@ -300,8 +204,7 @@ AssertLogger.assertEventCount(mockLogger, 1);  // Asserts exactly 1 event
 - **More maintainable**: Changes to MockLogger don't require test updates
 - **Better separation of concerns**: Tests focus on behavior, not implementation
 
-
-### MockLogger for Log Output Validation
+## MockLogger for Log Output Validation
 
 **Test classes that validate logger output must use `MockLogger` via the `@Slf4jMock` annotation and `MockLoggerExtension`.** This eliminates the need for manual MockLogger management.
 
