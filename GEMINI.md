@@ -1,12 +1,8 @@
 # Instructions for Gemini
 
-> **Note**: This file contains Gemini-specific instructions. For general project instructions shared between all AI assistants (Gemini, GitHub Copilot, etc.), please refer to [AI-INSTRUCTIONS.md](AI-INSTRUCTIONS.md).
+Follow all guidelines specified in  [AGENTS.md](AGENTS.md).
 
-## General Instructions
-
-Please follow all guidelines specified in [AI-INSTRUCTIONS.md](AI-INSTRUCTIONS.md).
-
-## Gemini-Specific Notes
+## Attribution Override
 
 - If code is adjusted, generated, or altered by Gemini, the class must include a Javadoc `@author` tag: `@author Co-authored-by: Google Gemini using <model name>`
 - If an AI co-authorship `@author` tag already exists for a different model or AI, it must be preserved, and a new `@author` tag for the current AI and model must be added.
