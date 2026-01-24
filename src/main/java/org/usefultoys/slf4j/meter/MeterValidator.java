@@ -90,15 +90,18 @@ public class MeterValidator {
      *
      * @param meter  The Meter instance to validate.
      * @param marker The SLF4J marker to use for the log message in case of inconsistency.
+     * @return {@code true} if the meter can proceed to stop (even with warnings), {@code false} if the meter is already stopped.
      */
-    public void validateStopPrecondition(final Meter meter, final Marker marker) {
+    public boolean validateStopPrecondition(final Meter meter, final Marker marker) {
         if (meter.getStopTime() != 0) {
             logIllegalPrecondition(meter, marker, "Meter already stopped");
+            return false;
         } else if (meter.getStartTime() == 0) {
             logIllegalPrecondition(meter, marker, "Meter stopped but not started");
         } else if (meter.checkCurrentInstance()) {
             logIllegalPrecondition(meter, marker, "Meter out of order");
         }
+        return true;
     }
 
     /**
