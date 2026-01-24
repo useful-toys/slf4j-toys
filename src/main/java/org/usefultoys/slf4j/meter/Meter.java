@@ -478,7 +478,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     Meter commonOk(final Object pathId) {
         try {
-            MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_OK);
+            if (!MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_OK)) {
+                return this;
+            }
 
             stopTime = collectCurrentTime();
             /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
@@ -592,7 +594,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter reject(final Object cause) {
         try {
             MeterValidator.validatePathArgument(this, "reject(cause)", cause);
-            MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_REJECT);
+            if (!MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_REJECT)) {
+                return this;
+            }
 
             stopTime = collectCurrentTime();
             /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
@@ -637,7 +641,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter fail(final Object cause) {
         try {
             MeterValidator.validatePathArgument(this, "fail(cause)", cause);
-            MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_FAIL);
+            if (!MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_FAIL)) {
+                return this;
+            }
 
             stopTime = collectCurrentTime();
             /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */

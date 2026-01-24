@@ -111,14 +111,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: second ok() is called
         meter.ok();
-        // Then: state unchanged, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
+        // Then: state unchanged - first termination wins
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -135,14 +134,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("second_path") is called
         meter.ok("second_path");
-        // Then: state unchanged, okPath remains unset, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "second_path", null, null, null, 0, 0, 0);
+        // Then: state unchanged, okPath remains unset - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -159,14 +157,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called
         meter.reject("error");
-        // Then: state remains OK, rejectPath not set, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+        // Then: state remains OK, rejectPath not set - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_REJECT (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -183,14 +180,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("error") is called
         meter.fail("error");
-        // Then: state remains OK, failPath not set, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+        // Then: state remains OK, failPath not set - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_FAIL (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -207,14 +203,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: second ok() is called
         meter.ok();
-        // Then: state unchanged, okPath preserved, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
+        // Then: state unchanged, okPath preserved - first termination wins
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -231,14 +226,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("second_path") is called
         meter.ok("second_path");
-        // Then: state unchanged, okPath remains "first_path", logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "second_path", null, null, null, 0, 0, 0);
+        // Then: state unchanged, okPath remains "first_path" - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -255,14 +249,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called
         meter.reject("error");
-        // Then: state remains OK, okPath preserved, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+        // Then: state remains OK, okPath preserved - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_REJECT (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -279,14 +272,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("error") is called
         meter.fail("error");
-        // Then: state remains OK, okPath preserved, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+        // Then: state remains OK, okPath preserved - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_OK (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_FAIL (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -303,14 +295,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called
         meter.ok();
-        // Then: state remains Rejected, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        // Then: state remains Rejected - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_REJECT (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -327,14 +318,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("path") is called
         meter.ok("path");
-        // Then: state remains Rejected, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+        // Then: state remains Rejected - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_REJECT (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -351,14 +341,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("another_error") is called
         meter.reject("another_error");
-        // Then: state unchanged, rejectPath remains "business_error", logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "another_error", null, null, 0, 0, 0);
+        // Then: state unchanged, rejectPath remains "business_error" - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_REJECT (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_REJECT (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -375,14 +364,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("technical_error") is called
         meter.fail("technical_error");
-        // Then: state remains Rejected, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        // Then: state remains Rejected - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_REJECT (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_FAIL (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -399,14 +387,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called
         meter.ok();
-        // Then: state remains Failed, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        // Then: state remains Failed - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_FAIL (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -423,14 +410,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("path") is called
         meter.ok("path");
-        // Then: state remains Failed, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+        // Then: state remains Failed - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_FAIL (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -447,14 +433,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called
         meter.reject("error");
-        // Then: state remains Failed, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+        // Then: state remains Failed - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_FAIL (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_REJECT (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
@@ -471,14 +456,13 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("another_error") is called
         meter.fail("another_error");
-        // Then: state unchanged, failPath remains "technical_error", logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "another_error", null, 0, 0, 0);
+        // Then: state unchanged, failPath remains "technical_error" - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
 
-        // Then: logs INCONSISTENT_FAIL (first) + ILLEGAL (second)
+        // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_FAIL (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEventCount(logger, 6);
+        AssertLogger.assertEventCount(logger, 4);
     }
 
     // ============================================================================
@@ -504,15 +488,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: second ok() is called
         meter.ok();
-        // Then: state unchanged, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
+        // Then: state unchanged - first termination wins
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first ok) + ILLEGAL (second ok)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first ok) + INCONSISTENT_OK (second ok, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -534,15 +517,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("second_path") is called
         meter.ok("second_path");
-        // Then: state unchanged, okPath remains null, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "second_path", null, null, null, 0, 0, 0);
+        // Then: state unchanged, okPath remains null - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first) + ILLEGAL (second)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -564,15 +546,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called
         meter.reject("error");
-        // Then: state remains OK, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+        // Then: state remains OK - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first) + ILLEGAL (reject)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first) + INCONSISTENT_REJECT (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -594,15 +575,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("error") is called
         meter.fail("error");
-        // Then: state remains OK, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+        // Then: state remains OK - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first) + ILLEGAL (fail)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first) + INCONSISTENT_FAIL (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -624,15 +604,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called
         meter.ok();
-        // Then: state remains Rejected, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        // Then: state remains Rejected - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + ILLEGAL (ok)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -654,15 +633,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("path") is called
         meter.ok("path");
-        // Then: state remains Rejected, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+        // Then: state remains Rejected - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + ILLEGAL (ok)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -684,15 +662,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("another") is called
         meter.reject("another");
-        // Then: state unchanged, rejectPath remains "error", logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "another", null, null, 0, 0, 0);
+        // Then: state unchanged, rejectPath remains "error" - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + ILLEGAL (second)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_REJECT (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -714,15 +691,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("tech_error") is called
         meter.fail("tech_error");
-        // Then: state remains Rejected, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "tech_error", null, 0, 0, 0);
+        // Then: state remains Rejected - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + ILLEGAL (fail)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_FAIL (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -744,15 +720,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called
         meter.ok();
-        // Then: state remains Failed, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        // Then: state remains Failed - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "tech", null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + ILLEGAL (ok)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -774,15 +749,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("path") is called
         meter.ok("path");
-        // Then: state remains Failed, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+        // Then: state remains Failed - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + ILLEGAL (ok)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -804,15 +778,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("business") is called
         meter.reject("business");
-        // Then: state remains Failed, logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business", null, null, 0, 0, 0);
+        // Then: state remains Failed - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + ILLEGAL (reject)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_REJECT (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
@@ -834,15 +807,14 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("another") is called
         meter.fail("another");
-        // Then: state unchanged, failPath remains "error", logs ILLEGAL
-        // Will be fixed in future: Meter currently stores path from second termination call, but should preserve the path from the first termination.
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "another", null, 0, 0, 0);
+        // Then: state unchanged, failPath remains "error" - first termination wins
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
 
-        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + ILLEGAL (second)
+        // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_FAIL (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEventCount(logger, 7);
+        AssertLogger.assertEventCount(logger, 5);
     }
 
     // ============================================================================

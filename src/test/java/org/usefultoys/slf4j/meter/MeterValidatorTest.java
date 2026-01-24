@@ -113,8 +113,9 @@ public class MeterValidatorTest {
             when(meter.getStartTime()).thenReturn(1L);
             when(meter.checkCurrentInstance()).thenReturn(false);
             // When: validateStopPrecondition is called
-            // Then: should not log any events
-            MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            final boolean result = MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            // Then: should return true and not log any events
+            assertTrue(result, "should return true when meter can proceed to stop");
             assertNoEvents(logger);
         }
 
@@ -124,8 +125,9 @@ public class MeterValidatorTest {
             // Given: meter has already been stopped (stop time = 1L)
             when(meter.getStopTime()).thenReturn(1L);
             // When: validateStopPrecondition is called
-            // Then: should log error event
-            MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            final boolean result = MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            // Then: should return false and log error event
+            assertFalse(result, "should return false when meter is already stopped");
             assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
@@ -137,8 +139,9 @@ public class MeterValidatorTest {
             when(meter.getStopTime()).thenReturn(0L);
             when(meter.getStartTime()).thenReturn(0L);
             // When: validateStopPrecondition is called
-            // Then: should log error event
-            MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            final boolean result = MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            // Then: should return true (warning only, not blocker) and log error event
+            assertTrue(result, "should return true even with warning (not started is not a blocker)");
             assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
@@ -151,8 +154,9 @@ public class MeterValidatorTest {
             when(meter.getStartTime()).thenReturn(1L);
             when(meter.checkCurrentInstance()).thenReturn(true);
             // When: validateStopPrecondition is called
-            // Then: should log error event
-            MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            final boolean result = MeterValidator.validateStopPrecondition(meter, Markers.INCONSISTENT_OK);
+            // Then: should return true (warning only, not blocker) and log error event
+            assertTrue(result, "should return true even with warning (out of order is not a blocker)");
             assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter out of order; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
