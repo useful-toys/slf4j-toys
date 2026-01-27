@@ -21,10 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertLogs;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTimeWindow;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopWithWindow;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterTime;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.configureLogger;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.event;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordWithWindow;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTimeWindow;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,6 +35,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent.Level;
 import org.usefultoys.slf4j.internal.TestTimeSource;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
@@ -104,21 +108,15 @@ class MeterLifeCycleHappyPathTest {
 
         // Given: a new started Meter
         final Meter meter = new Meter(logger).start();
-        final long expectedCreateTime = meter.getCreateTime();
-        final long expectedStartTime = meter.getLastCurrentTime();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: meter completes successfully
-        final long beforeStopTime = System.nanoTime();
-        meter.ok();
-        final long afterStopTime = System.nanoTime();
-        final long expectedStopTime = meter.getLastCurrentTime();
+        recordWithWindow(tr, () -> meter.ok());
 
         // Then: meter should be in OK state
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-        // Then: meter should preserve create/start time and set stop time
-        assertMeterTime(meter, expectedCreateTime, expectedStartTime, expectedStopTime);
-        // Then: meter stop time is within expected window
-        assertMeterStopTimeWindow(meter, beforeStopTime, afterStopTime);
+        // Then: meter should preserve create/start time and set stop time within time windows
+        assertMeterStopWithWindow(meter, tr);
 
         // Then: logs ok completion (MSG_OK + DATA_OK)
         assertLogs(logger, level,
@@ -141,21 +139,15 @@ class MeterLifeCycleHappyPathTest {
 
         // Given: a new started Meter
         final Meter meter = new Meter(logger).start();
-        final long expectedCreateTime = meter.getCreateTime();
-        final long expectedStartTime = meter.getLastCurrentTime();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: meter completes successfully with path
-        final long beforeStopTime = System.nanoTime();
-        meter.ok("success_path");
-        final long afterStopTime = System.nanoTime();
-        final long expectedStopTime = meter.getLastCurrentTime();
+        recordWithWindow(tr, () -> meter.ok("success_path"));
 
         // Then: meter should be in OK state with okPath set
         assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
-        // Then: meter should preserve create/start time and set stop time
-        assertMeterTime(meter, expectedCreateTime, expectedStartTime, expectedStopTime);
-        // Then: meter stop time is within expected window
-        assertMeterStopTimeWindow(meter, beforeStopTime, afterStopTime);
+        // Then: meter should preserve create/start time and set stop time within time windows
+        assertMeterStopWithWindow(meter, tr);
 
         // Then: logs ok completion with path (MSG_OK + DATA_OK)
         assertLogs(logger, level,

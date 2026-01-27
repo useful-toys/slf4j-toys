@@ -21,8 +21,11 @@ import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent.Level;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 
+import lombok.SneakyThrows;
+
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -144,7 +147,9 @@ final class MeterLifeCycleTestHelper {
         if (maxCreateTime != -1) assertTrue(meter.getCreateTime() <= maxCreateTime, "createTime should be <= " + maxCreateTime);
     }
 
-    static class TimeValidation {
+    static class TimeRecord {
+        long beforeCreate = -1;
+        long afterCreate = -1;
         long beforeStart = -1;
         long afterStart = -1;
         long beforeStop = -1;
@@ -157,13 +162,47 @@ final class MeterLifeCycleTestHelper {
         long expectedLastCurrentTime = -1;
     }
 
-    TimeValidation fromStarted(final Meter meter) {
-        final TimeValidation tv = new TimeValidation();
+    static TimeRecord fromStarted(final Meter meter) {
+        final TimeRecord tv = new TimeRecord();
         tv.expectedCreateTime = meter.getCreateTime();
         tv.expectedStartTime = meter.getLastCurrentTime();
         return tv;
     }
 
+    @SneakyThrows
+    static void recordWithWindow(final TimeRecord tv, final Callable<Meter> stopAction) {
+        tv.beforeStop = System.nanoTime();
+        Meter meter = stopAction.call();
+        tv.afterStop = System.nanoTime();
+        tv.expectedStopTime = meter.getLastCurrentTime();
+    }
+
+    @SneakyThrows
+    static void validateStop(final TimeRecord tv, final Callable<Meter> stopAction) {
+        Meter meter = stopAction.call();
+        tv.expectedStopTime = meter.getLastCurrentTime();
+    }
+
+    static void assertMeterTime(final Meter meter, final TimeRecord tv){
+        assertMeterTime(meter, tv.expectedCreateTime, tv.expectedStartTime, tv.expectedStopTime);
+    }
+
+    static void assertMeterStartTimeWindow(final Meter meter, final TimeRecord tv){
+        assertMeterStartTimeWindow(meter, tv.beforeStart, tv.afterStart);
+    }
+
+    static void assertMeterStopWithWindow(final Meter meter, final TimeRecord tv){
+        assertMeterTime(meter, tv.expectedCreateTime, tv.expectedStartTime, tv.expectedStopTime);
+        assertMeterStopTimeWindow(meter, tv.beforeStop, tv.afterStop);
+    }
+
+    static void assertMeterCreateTimeWindow(final Meter meter, final TimeRecord tv){
+        assertMeterCreateTimeWindow(meter, tv.beforeCreate, tv.afterCreate);
+    }
+
+    static void assertMeterStartTimePreserved(final Meter meter, final TimeRecord tv){
+        assertMeterTime(meter, tv.expectedCreateTime, tv.expectedStartTime, 0);
+    }
 
     /**
      * Provides log level scenarios for parameterized tests.
