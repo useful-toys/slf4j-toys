@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -31,6 +32,7 @@ import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
 
 /**
  * Unit tests for {@link Meter} configuration after start().
@@ -86,6 +88,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldSetDescriptionAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("step 1") is called after start()
         meter.m("step 1");
@@ -93,6 +96,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: description attribute is stored correctly and meter remains in Started state
         assertEquals("step 1", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for m())
         AssertLogger.assertEventCount(logger, 2);
@@ -104,6 +108,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldOverrideDescriptionWhenMCalledMultipleTimesAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m() is called multiple times
         meter.m("step 1");
@@ -112,6 +117,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: last value wins and meter remains in Started state
         assertEquals("step 2", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for m())
         AssertLogger.assertEventCount(logger, 2);
@@ -123,6 +129,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldPreserveValidMessageWhenNullValueAttemptedAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("valid") is called, then m(null) is attempted
         meter.m("valid");
@@ -131,6 +138,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: null rejected (logs ILLEGAL), "valid" is preserved
         assertEquals("valid", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -143,6 +151,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldSetFormattedMessageAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m(format, args) is called after start()
         meter.m("step %d", 1);
@@ -150,6 +159,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: description attribute is formatted and stored correctly
         assertEquals("step 1", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for m())
         AssertLogger.assertEventCount(logger, 2);
@@ -161,6 +171,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldOverrideFormattedMessageWhenMCalledMultipleTimesAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m(format, args) is called multiple times
         meter.m("step %d", 1);
@@ -169,6 +180,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: last value wins
         assertEquals("step 2", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for m())
         AssertLogger.assertEventCount(logger, 2);
@@ -180,6 +192,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldPreserveValidFormattedMessageWhenNullFormatAttemptedAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("valid: %s", "arg") is called, then m(null, "arg") is attempted
         meter.m("valid: %s", "arg");
@@ -188,6 +201,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: null format rejected (logs ILLEGAL), previous description is lost
         assertNull(meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -200,6 +214,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldLogIllegalWhenInvalidFormatStringAttemptedAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("invalid format %z", "arg") is called (invalid format specifier)
         meter.m("invalid format %z", "arg");
@@ -207,6 +222,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: description remains null and meter remains in Started state
         assertNull(meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -219,6 +235,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldSkipInvalidMCallInChainedConfigurationAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("valid") → m(null) → m("final") is chained
         meter.m("valid");
@@ -228,6 +245,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: invalid attempt skipped, final overwrites valid
         assertEquals("final", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -246,13 +264,16 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() → progress() is called
         meter.inc();
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: currentIteration = 1 and progress message is logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 1, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -267,14 +288,18 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() → inc() → progress() is called
         meter.inc();
         meter.inc();
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: currentIteration = 2 and progress message is logged at correct index
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 2, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -289,13 +314,17 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incBy(5) → progress() is called
         meter.incBy(5);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: currentIteration = 5 and progress message is logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -310,14 +339,18 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incBy(5) → incBy(3) → progress() is called
         meter.incBy(5);
         meter.incBy(3);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: currentIteration = 8 and progress message is logged at correct index
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 8, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -332,13 +365,17 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incTo(10) → progress() is called
         meter.incTo(10);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: currentIteration = 10 and progress message is logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -353,14 +390,18 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incTo(10) → incTo(50) → progress() is called
         meter.incTo(10);
         meter.incTo(50);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: currentIteration = 50 and progress message is logged at index 2 (after DATA_START)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 50, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -375,14 +416,18 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incTo(100) → incTo(50) → progress() is called (backward attempt)
         meter.incTo(100);
         meter.incTo(50);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: currentIteration = 100 (backward rejected), progress message still logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 100, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -398,14 +443,18 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incBy(5) → incBy(0) → progress() is called
         meter.incBy(5);
         meter.incBy(0);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: zero rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -421,14 +470,18 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incBy(5) → incBy(-3) → progress() is called
         meter.incBy(5);
         meter.incBy(-3);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: negative rejected (logs ILLEGAL), currentIteration = 5, progress message still logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -444,14 +497,18 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incBy(-5) → progress() is called
         meter.incBy(-5);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: negative rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
         // progress() is called but does NOT log because no iteration advanced
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL (no progress logged)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -466,14 +523,18 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incBy(0) → progress() is called
         meter.incBy(0);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: zero rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
         // progress() is called but does NOT log because no iteration advanced
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL (no progress logged)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -488,14 +549,17 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incTo(10) → incTo(3) → progress() is called
         meter.incTo(10);
         meter.incTo(3);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: backward rejected (logs ILLEGAL), currentIteration = 10, progress message still logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -511,14 +575,17 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incTo(-5) → progress() is called
         meter.incTo(-5);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: negative rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
         // progress() is called but does NOT log because no iteration advanced
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL (no MSG_PROGRESS because no iteration change)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -533,14 +600,17 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incTo(0) → progress() is called
         meter.incTo(0);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: zero rejected (logs ILLEGAL), currentIteration = 0 (unchanged)
         // progress() is called but does NOT log because no iteration advanced
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + ILLEGAL (no MSG_PROGRESS because no iteration change)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -555,6 +625,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() → incBy(-1) → incTo(0) → inc() → progress() is chained
         meter.inc();
@@ -562,9 +633,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.incTo(0);
         meter.inc();
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: invalid attempts skipped, valid ones succeed (currentIteration = 2)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 2, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + 2 ILLEGAL + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -581,15 +654,19 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() → progress() → progress() is called (second progress has no iteration change)
         meter.inc();
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: first progress() logs message (at index 2), second progress() does NOT log (no iteration change since last progress)
         // This is verified by asserting that if we look for a second MSG_PROGRESS after the first one, there is none
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 1, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS (second progress doesn't log because no iteration change)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -604,13 +681,16 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 1000000 (very long period)
         MeterConfig.progressPeriodMilliseconds = 1000000;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() → progress() is called (insufficient time elapsed for throttling)
         meter.inc();
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: currentIteration = 1 but progress() does NOT log message (throttling active)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 1, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start (no MSG_PROGRESS because throttling active)
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -624,15 +704,19 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Given: a new, started Meter with progressPeriodMilliseconds = 0
         MeterConfig.progressPeriodMilliseconds = 0;
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() → progress() → inc() → progress() is called
         meter.inc();
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
         meter.inc();
         meter.progress();
+        MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
         // Then: currentIteration = 2 and both progress() calls log messages
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 2, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS1 + DATA_PROGRESS + MSG_PROGRESS2 + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -652,6 +736,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextKeyValuePairAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("key1", "value1") is called after start()
         meter.ctx("key1", "value1");
@@ -659,6 +744,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair and meter remains in Started state
         assertEquals("value1", meter.getContext().get("key1"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -670,6 +756,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldOverrideContextValueWhenSameKeySetMultipleTimesAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx() is called twice with the same key
         meter.ctx("key", "val1");
@@ -678,6 +765,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: last value wins and meter remains in Started state
         assertEquals("val2", meter.getContext().get("key"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -689,6 +777,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldReplaceContextValueWithNullAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("key", "valid") is called, then ctx("key", null) is called
         meter.ctx("key", "valid");
@@ -697,6 +786,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: null value is stored as "<null>" placeholder
         assertEquals("<null>", meter.getContext().get("key"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -708,6 +798,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldStoreMultipleDifferentContextKeyValuePairsAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx() is called multiple times with different keys
         meter.ctx("key1", "value1");
@@ -719,6 +810,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         assertEquals("value2", meter.getContext().get("key2"));
         assertEquals("value3", meter.getContext().get("key3"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -730,6 +822,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldStoreNullKeyAsNullPlaceholderInContext() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx(null, (String)null) is called (null key with null String value)
         meter.ctx(null, (String) null);
@@ -737,6 +830,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: stores with "<null>" key and "<null>" value as placeholders
         assertEquals("<null>", meter.getContext().get("<null>"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -748,6 +842,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithPrimitiveIntValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("count", 42) is called after start()
         meter.ctx("count", 42);
@@ -755,6 +850,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with int converted to string
         assertEquals("42", meter.getContext().get("count"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -766,6 +862,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithPrimitiveLongValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("timestamp", 123456789L) is called after start()
         meter.ctx("timestamp", 123456789L);
@@ -773,6 +870,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with long converted to string
         assertEquals("123456789", meter.getContext().get("timestamp"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -784,6 +882,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithPrimitiveBooleanValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("enabled", true) is called after start()
         meter.ctx("enabled", true);
@@ -791,6 +890,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with boolean converted to string
         assertEquals("true", meter.getContext().get("enabled"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -802,6 +902,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithPrimitiveFloatValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("rate", 3.14f) is called after start()
         meter.ctx("rate", 3.14f);
@@ -809,6 +910,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with float converted to string
         assertEquals("3.14", meter.getContext().get("rate"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -820,6 +922,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithPrimitiveDoubleValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("price", 99.99) is called after start()
         meter.ctx("price", 99.99);
@@ -827,6 +930,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with double converted to string
         assertEquals("99.99", meter.getContext().get("price"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -838,6 +942,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithIntegerWrapperValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("id", Integer.valueOf(100)) is called after start()
         meter.ctx("id", Integer.valueOf(100));
@@ -845,6 +950,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with Integer converted to string
         assertEquals("100", meter.getContext().get("id"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -856,6 +962,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithNullIntegerWrapperValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("id", (Integer) null) is called after start()
         meter.ctx("id", (Integer) null);
@@ -863,6 +970,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: null Integer is stored as "<null>" placeholder
         assertEquals("<null>", meter.getContext().get("id"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -874,6 +982,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithLongWrapperValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("bytes", Long.valueOf(1024L)) is called after start()
         meter.ctx("bytes", Long.valueOf(1024L));
@@ -881,6 +990,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with Long converted to string
         assertEquals("1024", meter.getContext().get("bytes"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -892,6 +1002,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithBooleanWrapperValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("active", Boolean.TRUE) is called after start()
         meter.ctx("active", Boolean.TRUE);
@@ -899,6 +1010,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with Boolean converted to string
         assertEquals("true", meter.getContext().get("active"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -910,6 +1022,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithFloatWrapperValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("temperature", Float.valueOf(36.6f)) is called after start()
         meter.ctx("temperature", Float.valueOf(36.6f));
@@ -917,6 +1030,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with Float converted to string
         assertEquals("36.6", meter.getContext().get("temperature"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -928,6 +1042,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithDoubleWrapperValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("balance", Double.valueOf(1000.50)) is called after start()
         meter.ctx("balance", Double.valueOf(1000.50));
@@ -935,6 +1050,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the key-value pair with Double converted to string
         assertEquals("1000.5", meter.getContext().get("balance"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -946,6 +1062,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithFormattedMessageAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("status", "User %s has %d points", "Alice", 150) is called after start()
         meter.ctx("status", "User %s has %d points", "Alice", 150);
@@ -953,6 +1070,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the formatted message
         assertEquals("User Alice has 150 points", meter.getContext().get("status"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -964,6 +1082,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithGenericObjectValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("obj", new TestObject()) is called after start()
         final MeterLifeCycleTestHelper.TestObject testObj = new MeterLifeCycleTestHelper.TestObject();
@@ -972,6 +1091,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: context contains the object's toString() representation
         assertEquals(testObj.toString(), meter.getContext().get("obj"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -983,6 +1103,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithNullObjectValueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("obj", (Object) null) is called after start()
         meter.ctx("obj", (Object) null);
@@ -990,6 +1111,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: null Object is stored as "<null>" placeholder
         assertEquals("<null>", meter.getContext().get("obj"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs only start events (no additional logging for ctx())
         AssertLogger.assertEventCount(logger, 2);
@@ -1001,6 +1123,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithKeyOnlyMarkerAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("flag") is called after start()
         meter.ctx("flag");
@@ -1019,6 +1142,7 @@ class MeterLifeCyclePostStartConfigurationTest {
     void shouldAddContextWithConditionalKeyOnlyWhenTrueAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx(true, "success") is called after start()
         meter.ctx(true, "success");

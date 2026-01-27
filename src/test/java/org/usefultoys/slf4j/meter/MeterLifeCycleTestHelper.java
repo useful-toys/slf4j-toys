@@ -226,7 +226,8 @@ final class MeterLifeCycleTestHelper {
 
     static void assertMeterProgressTime(final Meter meter, final TimeRecord tv, final long expectedElapsedMilliseconds){
         final long expectedProgressTime = tv.expectedStartTime + expectedElapsedMilliseconds * 1_000_000;
-        assertEquals(expectedProgressTime, meter.getLastCurrentTime(), "progress time should be start time + " + expectedElapsedMilliseconds + "ms");
+        if (expectedElapsedMilliseconds != -1)
+            assertEquals(expectedProgressTime, meter.getLastCurrentTime(), "progress time should be start time + " + expectedElapsedMilliseconds + "ms");
         assertMeterTime(meter, tv.expectedCreateTime, tv.expectedStartTime, 0);
     }
 
