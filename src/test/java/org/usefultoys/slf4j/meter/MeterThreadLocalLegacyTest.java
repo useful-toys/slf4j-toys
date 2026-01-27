@@ -226,7 +226,7 @@ public class MeterThreadLocalLegacyTest {
         m1.start();
         assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be the active Meter after m1.start()");
 
-        try (Meter m2 = MeterFactory.getMeter(loggerOther).start()) {
+        try (final Meter m2 = MeterFactory.getMeter(loggerOther).start()) {
             assertEquals(meterOther, Meter.getCurrentInstance().getCategory(), "m2 should be the active Meter inside try-with-resources");
         } // m2.close() is called automatically here
 

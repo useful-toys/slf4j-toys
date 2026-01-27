@@ -60,9 +60,9 @@ public class MeterTimeAttributesLegacyTest {
      * Helper method to assert time attributes at different stages. This method asserts the *stored* time attributes of
      * the Meter. Dynamic "collected" times are asserted separately due to their nature.
      */
-    private void assertStoredTimeAttributes(Meter m, long expectedCreateTime, long expectedStartTime, long expectedStopTime,
-                                            long expectedWaitingTime, long expectedExecutionTime, long expectedLastProgressTime,
-                                            String stage) {
+    private void assertStoredTimeAttributes(final Meter m, final long expectedCreateTime, final long expectedStartTime, final long expectedStopTime,
+                                            final long expectedWaitingTime, final long expectedExecutionTime, final long expectedLastProgressTime,
+                                            final String stage) {
         assertEquals(expectedCreateTime, m.getCreateTime(), stage + ": createTime should match expected");
         assertEquals(expectedStartTime, m.getStartTime(), stage + ": startTime should match expected");
         assertEquals(expectedStopTime, m.getStopTime(), stage + ": stopTime should match expected");
@@ -216,7 +216,7 @@ public class MeterTimeAttributesLegacyTest {
     @DisplayName("Should correctly update time attributes on start and close() via try-with-resources")
     public void shouldHandleCloseViaTryWithResources() {
         final long now0 = System.nanoTime();
-        Meter m = new Meter(logger);
+        final Meter m = new Meter(logger);
         final long createTime = m.getCreateTime();
 
         // After creation, before start()
@@ -235,7 +235,7 @@ public class MeterTimeAttributesLegacyTest {
         assertTrue(m.collectCurrentExecutionTime() > 0, "collectedExecutionTime should be positive if started but not stopped");
 
         final long now2 = System.nanoTime();
-        try (Meter meterToClose = m) {
+        try (final Meter meterToClose = m) {
             // Meter is already 'm', so just let it close
         }
         final long stopTime = m.getStopTime();
@@ -393,7 +393,7 @@ public class MeterTimeAttributesLegacyTest {
     @DisplayName("Should correctly update time attributes on start, progress(), and close() via try-with-resources")
     public void shouldUpdateTimesOnProgressAndClose() throws InterruptedException {
         final long now0 = System.nanoTime();
-        Meter m = new Meter(logger).iterations(100); // Set iterations for progress
+        final Meter m = new Meter(logger).iterations(100); // Set iterations for progress
         final long createTime = m.getCreateTime();
 
         // After creation, before start()
@@ -424,7 +424,7 @@ public class MeterTimeAttributesLegacyTest {
 
         Thread.sleep(10); // Small delay before final stop
         final long now3 = System.nanoTime();
-        try (Meter meterToClose = m) {
+        try (final Meter meterToClose = m) {
             // Meter is already 'm', so just let it close
         }
         final long stopTime = m.getStopTime();

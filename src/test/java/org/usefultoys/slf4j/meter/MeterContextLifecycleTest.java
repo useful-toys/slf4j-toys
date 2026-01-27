@@ -29,7 +29,7 @@ import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link Meter} context lifecycle behavior.
@@ -212,7 +212,7 @@ class MeterContextLifecycleTest {
 
             @Test
             @DisplayName("should accumulate context: create-ctx-start-ctx-ok")
-            void shouldAccumulateContextWhenStartDoesNotEmit(@Slf4jMock(debugEnabled = false) Logger logger) {
+            void shouldAccumulateContextWhenStartDoesNotEmit(@Slf4jMock(debugEnabled = false) final Logger logger) {
                 // Given: a meter with empty context
                 final Meter meter = new Meter(logger, "test-operation");
                 // Then: new meter has empty context
@@ -249,7 +249,7 @@ class MeterContextLifecycleTest {
 
             @Test
             @DisplayName("should accumulate then clear: create-ctx-start-ctx-progress-ctx-ok")
-            void shouldAccumulateUntilProgressThenClear(@Slf4jMock(debugEnabled = false) Logger logger) {
+            void shouldAccumulateUntilProgressThenClear(@Slf4jMock(debugEnabled = false) final Logger logger) {
                 // Given: a meter with empty context
                 final Meter meter = new Meter(logger, "test-operation");
                 // Then: new meter has empty context
@@ -443,7 +443,7 @@ class MeterContextLifecycleTest {
 
             @Test
             @DisplayName("should accumulate context: create-ctx-start-ctx-reject")
-            void shouldAccumulateContextWhenStartDoesNotEmit(@Slf4jMock(debugEnabled = false) Logger logger) {
+            void shouldAccumulateContextWhenStartDoesNotEmit(@Slf4jMock(debugEnabled = false) final Logger logger) {
                 // Given: a meter with empty context
                 final Meter meter = new Meter(logger, "test-operation");
                 // Then: new meter has empty context
@@ -479,7 +479,7 @@ class MeterContextLifecycleTest {
 
             @Test
             @DisplayName("should accumulate then clear: create-ctx-start-ctx-progress-ctx-reject")
-            void shouldAccumulateUntilProgressThenClear(@Slf4jMock(debugEnabled = false) Logger logger) {
+            void shouldAccumulateUntilProgressThenClear(@Slf4jMock(debugEnabled = false) final Logger logger) {
                 // Given: a meter with empty context
                 final Meter meter = new Meter(logger, "test-operation");
                 // Then: new meter has empty context
@@ -672,7 +672,7 @@ class MeterContextLifecycleTest {
 
             @Test
             @DisplayName("should accumulate context: create-ctx-start-ctx-fail")
-            void shouldAccumulateContextWhenStartDoesNotEmit(@Slf4jMock(debugEnabled = false) Logger logger) {
+            void shouldAccumulateContextWhenStartDoesNotEmit(@Slf4jMock(debugEnabled = false) final Logger logger) {
                 // Given: a meter with empty context
                 final Meter meter = new Meter(logger, "test-operation");
                 // Then: new meter has empty context
@@ -708,7 +708,7 @@ class MeterContextLifecycleTest {
 
             @Test
             @DisplayName("should accumulate then clear: create-ctx-start-ctx-progress-ctx-fail")
-            void shouldAccumulateUntilProgressThenClear(@Slf4jMock(debugEnabled = false) Logger logger) {
+            void shouldAccumulateUntilProgressThenClear(@Slf4jMock(debugEnabled = false) final Logger logger) {
                 // Given: a meter with empty context
                 final Meter meter = new Meter(logger, "test-operation");
                 // Then: new meter has empty context

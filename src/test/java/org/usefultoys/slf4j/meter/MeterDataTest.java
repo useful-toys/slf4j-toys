@@ -20,21 +20,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.usefultoys.slf4j.SessionConfig;
-import org.usefultoys.slf4j.SystemConfig;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ResetSessionConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
-import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link MeterData}.
@@ -751,7 +752,7 @@ class MeterDataTest {
         // When: comparing with null
         // Then: should return false
         assertNotEquals(data, null, "should not be equal to null");
-        assertFalse(data.equals(null), "equals(null) should return false");
+        assertNotEquals(null, data, "equals(null) should return false");
     }
 
     @Test
@@ -764,7 +765,7 @@ class MeterDataTest {
         // When: comparing with itself
         // Then: should return true
         assertEquals(data, data, "should be equal to itself");
-        assertTrue(data.equals(data), "equals(self) should return true");
+        assertEquals(data, data, "equals(self) should return true");
     }
 
     @Test
@@ -778,7 +779,7 @@ class MeterDataTest {
         // When: comparing with different type
         // Then: should return false
         assertNotEquals(data, differentType, "should not be equal to different type");
-        assertFalse(data.equals(differentType), "equals(different type) should return false");
+        assertNotEquals(differentType, data, "equals(different type) should return false");
     }
 
     /**

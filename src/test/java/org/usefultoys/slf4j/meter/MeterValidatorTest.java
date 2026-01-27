@@ -30,10 +30,15 @@ import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
-import static org.usefultoys.slf4jtestmock.AssertLogger.*;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEventWithThrowable;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvents;
 
 /**
  * Unit tests for {@link MeterValidator}.
@@ -580,7 +585,7 @@ public class MeterValidatorTest {
         @DisplayName("should log bug when exception is thrown")
         void shouldLogBugWhenExceptionThrown() {
             // Given: a throwable exception from a meter method
-            Throwable t = new RuntimeException("bug");
+            final Throwable t = new RuntimeException("bug");
             // When: logBug is called
             // Then: should log bug marker with exception information
             MeterValidator.logBug(meter, "testMethod", t);

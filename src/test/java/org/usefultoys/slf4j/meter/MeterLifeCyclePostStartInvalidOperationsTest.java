@@ -31,10 +31,7 @@ import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
-
-import java.sql.Time;
 
 /**
  * Unit tests for invalid {@link Meter} operations after start().
@@ -92,7 +89,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldHandleSecondStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
         final long firstStartTime = meter.getStartTime();
 
         // When: start() is called again on already started meter
@@ -115,7 +112,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldHandleMultipleStartCalls() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: start() is called multiple times
         meter.start();
@@ -137,7 +134,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldHandleSecondStartAfterInc() {
         // Given: a started Meter with iterations
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() is called multiple times
         meter.inc();
@@ -169,7 +166,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIterationsZeroAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: iterations(0) is called after start()
         meter.iterations(0);
@@ -189,7 +186,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIterationsNegativeAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: iterations(-5) is called after start()
         meter.iterations(-5);
@@ -209,7 +206,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIterationsNegativeAfterValidValue() {
         // Given: a started Meter with expectedIterations = 10
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
         meter.iterations(10);
 
         // Then: expectedIterations = 10 (pedagogical validation)
@@ -238,7 +235,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectLimitMillisecondsZeroAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: limitMilliseconds(0) is called after start()
         meter.limitMilliseconds(0);
@@ -258,7 +255,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectLimitMillisecondsNegativeAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: limitMilliseconds(-100) is called after start()
         meter.limitMilliseconds(-100);
@@ -278,7 +275,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectLimitMillisecondsNegativeAfterValidValue() {
         // Given: a started Meter with timeLimit = 5000
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
         meter.limitMilliseconds(5000);
 
         // Then: timeLimit = 5000 (pedagogical validation)
@@ -307,7 +304,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectPathNullAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path(null) is called after start()
         meter.path(null);
@@ -327,7 +324,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectPathNullThenOk() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path(null) is called, then ok()
         meter.path(null);
@@ -335,6 +332,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
 
         // Then: okPath remains null
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for path(null), completes with INFO log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -352,7 +350,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldSilentlyAcceptCtxNullKeyWithValueAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx(null, "value") is called after start()
         meter.ctx(null, "value");
@@ -373,7 +371,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldSilentlyAcceptCtxNullKeyWithPrimitiveAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx(null, 42) is called after start()
         meter.ctx(null, 42);
@@ -392,7 +390,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldSilentlyAcceptCtxNullKeyWithFormatAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx(null, "format %d", 42) is called after start()
         meter.ctx(null, "format %d", 42);
@@ -411,7 +409,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldSilentlyAcceptCtxNullFormatAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("key", null, 42) is called after start()
         meter.ctx("key", null, 42);
@@ -430,7 +428,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldSilentlyAcceptCtxNullArgsArrayAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ctx("key", "format", (Object[]) null) is called after start()
         meter.ctx("key", "format", (Object[]) null);
@@ -453,7 +451,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIncByZeroAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incBy(0) is called after start()
         meter.incBy(0);
@@ -473,7 +471,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIncByNegativeAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incBy(-3) is called after start()
         meter.incBy(-3);
@@ -493,7 +491,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIncByNegativeAfterValidInc() {
         // Given: a started Meter with currentIteration = 5
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() is called 5 times
         meter.inc();
@@ -527,7 +525,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIncToZeroAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incTo(0) is called after start()
         meter.incTo(0);
@@ -547,7 +545,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIncToNegativeAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: incTo(-50) is called after start()
         meter.incTo(-50);
@@ -571,7 +569,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIncToEqualToCurrentIteration() {
         // Given: a started Meter with currentIteration = 5
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() is called 5 times
         meter.inc();
@@ -601,7 +599,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIncToLessThanCurrentIteration() {
         // Given: a started Meter with currentIteration = 5
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() is called 5 times
         meter.inc();
@@ -631,7 +629,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectIncToAfterHigherIncTo() {
         // Given: a started Meter with currentIteration = 10
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
         meter.incTo(10);
 
         // Then: currentIteration = 10 (pedagogical validation)
@@ -660,7 +658,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectOkNull() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ok(null) is called
         meter.ok(null);
@@ -668,6 +666,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         // Then: okPath remains unset
         // Note: ok(null) is invalid due to null argument, but completion still proceeds (resilient behavior)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for null argument, completes with INFO log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -681,7 +680,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectRejectNull() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: reject(null) is called
         meter.reject(null);
@@ -689,6 +688,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         // Then: rejectPath remains unset
         // Note: reject(null) is invalid due to null argument, but completion still proceeds
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for null argument, completes with INFO log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -702,7 +702,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectFailNull() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: fail(null) is called
         meter.fail(null);
@@ -710,6 +710,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         // Then: failPath remains unset
         // Note: fail(null) is invalid due to null argument, but completion still proceeds
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for null argument, completes with ERROR log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -727,7 +728,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldRejectAllInvalidOperationsAfterStart() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: multiple invalid operations called
         meter.iterations(0);
@@ -751,7 +752,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     void shouldHandleMixedValidAndInvalidOperations() {
         // Given: a started Meter
         final Meter meter = new Meter(logger).start();
-        TimeRecord tr = fromStarted(meter);
+        final TimeRecord tr = fromStarted(meter);
 
         // When: invalid iterations(-1), valid inc() × 3, invalid incBy(0), then ok()
         meter.iterations(-1);
@@ -763,6 +764,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
 
         // Then: currentIteration = 3, completes normally
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 3, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for iterations(-1) and incBy(0), completes with INFO log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);

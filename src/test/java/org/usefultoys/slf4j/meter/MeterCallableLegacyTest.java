@@ -15,20 +15,39 @@
  */
 package org.usefultoys.slf4j.meter;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
-import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4j.meter.Meter;
-import org.usefultoys.slf4j.meter.MeterConfig;
-import org.usefultoys.slf4jtestmock.*;
-import org.usefultoys.test.*;
+import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4jtestmock.Slf4jMock;
+import org.usefultoys.slf4jtestmock.WithMockLogger;
+import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
+import org.usefultoys.test.ResetMeterConfig;
+import org.usefultoys.test.ValidateCharset;
+import org.usefultoys.test.ValidateCleanMeter;
+import org.usefultoys.test.WithLocale;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.slf4j.impl.MockLoggerEvent.Level.*;
-import static org.usefultoys.slf4j.meter.Markers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.slf4j.impl.MockLoggerEvent.Level.DEBUG;
+import static org.slf4j.impl.MockLoggerEvent.Level.ERROR;
+import static org.slf4j.impl.MockLoggerEvent.Level.INFO;
+import static org.slf4j.impl.MockLoggerEvent.Level.TRACE;
+import static org.usefultoys.slf4j.meter.Markers.DATA_FAIL;
+import static org.usefultoys.slf4j.meter.Markers.DATA_OK;
+import static org.usefultoys.slf4j.meter.Markers.DATA_REJECT;
+import static org.usefultoys.slf4j.meter.Markers.DATA_START;
+import static org.usefultoys.slf4j.meter.Markers.MSG_FAIL;
+import static org.usefultoys.slf4j.meter.Markers.MSG_OK;
+import static org.usefultoys.slf4j.meter.Markers.MSG_REJECT;
+import static org.usefultoys.slf4j.meter.Markers.MSG_START;
 
 /**
  * Unit tests for {@link Meter#call(Callable)} method.

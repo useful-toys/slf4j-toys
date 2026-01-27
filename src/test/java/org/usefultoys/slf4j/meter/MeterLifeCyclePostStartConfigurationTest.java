@@ -1086,7 +1086,7 @@ class MeterLifeCyclePostStartConfigurationTest {
 
         // When: ctx("obj", new TestObject()) is called after start()
         final MeterLifeCycleTestHelper.TestObject testObj = new MeterLifeCycleTestHelper.TestObject();
-        meter.ctx("obj", (Object) testObj);
+        meter.ctx("obj", testObj);
 
         // Then: context contains the object's toString() representation
         assertEquals(testObj.toString(), meter.getContext().get("obj"));
@@ -1129,7 +1129,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.ctx("flag");
 
         // Then: context contains the key-only marker (value is null)
-        assertEquals(null, meter.getContext().get("flag"));
+        assertNull(meter.getContext().get("flag"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
         // Then: logs only start events (no additional logging for ctx())
@@ -1148,7 +1148,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.ctx(true, "success");
 
         // Then: context contains the trueName key (value is null)
-        assertEquals(null, meter.getContext().get("success"));
+        assertNull(meter.getContext().get("success"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
         // Then: logs only start events (no additional logging for ctx())
@@ -1166,7 +1166,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.ctx(false, "success");
 
         // Then: context does not contain the trueName key
-        assertEquals(null, meter.getContext().get("success"));
+        assertNull(meter.getContext().get("success"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
         // Then: logs only start events (no additional logging for ctx())
@@ -1185,10 +1185,10 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.ctx(false, "success", "error");
 
         // Then: context contains "ok" (true condition) and "error" (false condition), both with null values
-        assertEquals(null, meter.getContext().get("ok"));
-        assertEquals(null, meter.getContext().get("fail"));
-        assertEquals(null, meter.getContext().get("success"));
-        assertEquals(null, meter.getContext().get("error"));
+        assertNull(meter.getContext().get("ok"));
+        assertNull(meter.getContext().get("fail"));
+        assertNull(meter.getContext().get("success"));
+        assertNull(meter.getContext().get("error"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
         // Then: logs only start events (no additional logging for ctx())

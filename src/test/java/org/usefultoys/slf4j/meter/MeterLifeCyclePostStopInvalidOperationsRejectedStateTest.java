@@ -727,7 +727,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         final Meter meter = new Meter(logger).start().reject("business_error");
 
         // When: ctx(null) is called after stop
-        meter.ctx((String) null);
+        meter.ctx(null);
 
         // Then: context unchanged, state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
@@ -747,7 +747,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         final Meter meter = new Meter(logger).start().reject("business_error");
 
         // When: ctx(true, null) is called after stop
-        meter.ctx(true, (String) null);
+        meter.ctx(true, null);
 
         // Then: context unchanged, state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
@@ -770,7 +770,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         final Meter meter = new Meter(logger).start().reject("business_error");
 
         // When: ctx(false, null) is called (condition=false returns early)
-        meter.ctx(false, (String) null);
+        meter.ctx(false, null);
 
         // Then: context unchanged, state unchanged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);

@@ -64,7 +64,6 @@ class MeterDataJson5Test {
          * Default constructor.
          */
         TestMeterData() {
-            super();
         }
 
         /**

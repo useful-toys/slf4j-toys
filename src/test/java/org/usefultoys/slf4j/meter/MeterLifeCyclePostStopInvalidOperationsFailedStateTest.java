@@ -723,7 +723,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         final Meter meter = new Meter(logger).start().fail("technical_error");
 
         // When: ctx(null) is called after stop
-        meter.ctx((String) null);
+        meter.ctx(null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
@@ -743,7 +743,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         final Meter meter = new Meter(logger).start().fail("technical_error");
 
         // When: ctx(true, null) is called after stop
-        meter.ctx(true, (String) null);
+        meter.ctx(true, null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
@@ -766,7 +766,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         final Meter meter = new Meter(logger).start().fail("technical_error");
 
         // When: ctx(false, null) is called (condition=false returns early)
-        meter.ctx(false, (String) null);
+        meter.ctx(false, null);
 
         // Then: context unchanged, state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
