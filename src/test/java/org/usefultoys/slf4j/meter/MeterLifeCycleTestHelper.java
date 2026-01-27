@@ -144,6 +144,26 @@ final class MeterLifeCycleTestHelper {
         if (maxCreateTime != -1) assertTrue(meter.getCreateTime() <= maxCreateTime, "createTime should be <= " + maxCreateTime);
     }
 
+    static class TimeValidation {
+        long beforeStart = -1;
+        long afterStart = -1;
+        long beforeStop = -1;
+        long afterStop = -1;
+        long beforeProgress = -1;
+        long afterProgress = -1;
+        long expectedCreateTime = -1;
+        long expectedStartTime = -1;
+        long expectedStopTime = -1;
+        long expectedLastCurrentTime = -1;
+    }
+
+    TimeValidation fromStarted(final Meter meter) {
+        final TimeValidation tv = new TimeValidation();
+        tv.expectedCreateTime = meter.getCreateTime();
+        tv.expectedStartTime = meter.getLastCurrentTime();
+        return tv;
+    }
+
 
     /**
      * Provides log level scenarios for parameterized tests.
