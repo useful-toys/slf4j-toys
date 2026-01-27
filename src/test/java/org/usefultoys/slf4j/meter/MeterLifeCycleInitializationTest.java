@@ -30,6 +30,8 @@ import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterCreateTimeWindow;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterTime;
 
 /**
  * Unit tests for {@link Meter} initialization and construction.
@@ -77,10 +79,18 @@ class MeterLifeCycleInitializationTest {
     @DisplayName("should create meter with logger - initial state")
     void shouldCreateMeterWithLoggerInitialState() {
         // Given: a new Meter with logger only
+        final long t1 = System.nanoTime();
         final Meter meter = new Meter(logger);
+        final long t2 = System.nanoTime();
+        final long expectedCreateTime = meter.getLastCurrentTime();
 
         // Then: meter has expected initial state (startTime = 0, stopTime = 0)
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        // Then: meter should preserve create time and zero start/stop times
+        assertEquals(expectedCreateTime, meter.getCreateTime());
+        assertMeterTime(meter, 0,0);
+        // Then: meter create time is within expected window
+        assertMeterCreateTimeWindow(meter, t1, t2);
 
         // Then: before start(), getCurrentInstance() returns unknown meter
         final Meter currentBeforeStart = Meter.getCurrentInstance();
@@ -96,10 +106,18 @@ class MeterLifeCycleInitializationTest {
     void shouldCreateMeterWithOperationName() {
         // Given: a new Meter with logger and operationName
         final String operationName = "testOperation";
+        final long t1 = System.nanoTime();
         final Meter meter = new Meter(logger, operationName);
+        final long t2 = System.nanoTime();
+        final long expectedCreateTime = meter.getLastCurrentTime();
 
         // Then: meter has expected initial state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        // Then: meter should preserve create time and zero start/stop times
+        assertEquals(expectedCreateTime, meter.getCreateTime());
+        assertMeterTime(meter, 0, 0);
+        // Then: meter create time is within expected window
+        assertMeterCreateTimeWindow(meter, t1, t2);
 
         // Then: operationName is captured correctly
         assertEquals(operationName, meter.getOperation(), "operation name should match");
@@ -119,10 +137,18 @@ class MeterLifeCycleInitializationTest {
         // Given: a new Meter with logger, operationName, and parent
         final String operationName = "childOperation";
         final String parentId = "parent-meter-id";
+        final long t1 = System.nanoTime();
         final Meter meter = new Meter(logger, operationName, parentId);
+        final long t2 = System.nanoTime();
+        final long expectedCreateTime = meter.getLastCurrentTime();
 
         // Then: meter has expected initial state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        // Then: meter should preserve create time and zero start/stop times
+        assertEquals(expectedCreateTime, meter.getCreateTime());
+        assertMeterTime(meter, 0, 0);
+        // Then: meter create time is within expected window
+        assertMeterCreateTimeWindow(meter, t1, t2);
 
         // Then: operationName and parent are captured correctly
         assertEquals(operationName, meter.getOperation(), "operation name should match");

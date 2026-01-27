@@ -138,6 +138,12 @@ final class MeterLifeCycleTestHelper {
         if (maxStopTime != -1) assertTrue(meter.getStopTime() <= maxStopTime, "stopTime should be <= " + maxStopTime);
     }
 
+    static void assertMeterCreateTimeWindow(final Meter meter, final long minCreateTime, final long maxCreateTime){
+        if (minCreateTime != -1) assertTrue(meter.getCreateTime() >= minCreateTime, "createTime should be >= " + minCreateTime);
+        if (maxCreateTime != -1) assertTrue(meter.getCreateTime() <= maxCreateTime, "createTime should be <= " + maxCreateTime);
+    }
+
+
     /**
      * Provides log level scenarios for parameterized tests.
      *
