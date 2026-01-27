@@ -170,7 +170,7 @@ final class MeterLifeCycleTestHelper {
     }
 
     @SneakyThrows
-    static void recordWithWindow(final TimeRecord tv, final Callable<Meter> stopAction) {
+    static void recordStopWithWindow(final TimeRecord tv, final Callable<Meter> stopAction) {
         tv.beforeStop = System.nanoTime();
         Meter meter = stopAction.call();
         tv.afterStop = System.nanoTime();
@@ -178,7 +178,7 @@ final class MeterLifeCycleTestHelper {
     }
 
     @SneakyThrows
-    static void validateStop(final TimeRecord tv, final Callable<Meter> stopAction) {
+    static void recordStop(final TimeRecord tv, final Callable<Meter> stopAction) {
         Meter meter = stopAction.call();
         tv.expectedStopTime = meter.getLastCurrentTime();
     }
@@ -191,7 +191,7 @@ final class MeterLifeCycleTestHelper {
         assertMeterStartTimeWindow(meter, tv.beforeStart, tv.afterStart);
     }
 
-    static void assertMeterStopWithWindow(final Meter meter, final TimeRecord tv){
+    static void assertMeterStop(final Meter meter, final TimeRecord tv){
         assertMeterTime(meter, tv.expectedCreateTime, tv.expectedStartTime, tv.expectedStopTime);
         assertMeterStopTimeWindow(meter, tv.beforeStop, tv.afterStop);
     }
@@ -201,6 +201,12 @@ final class MeterLifeCycleTestHelper {
     }
 
     static void assertMeterStartTimePreserved(final Meter meter, final TimeRecord tv){
+        assertMeterTime(meter, tv.expectedCreateTime, tv.expectedStartTime, 0);
+    }
+
+    static void assertMeterProgressTime(final Meter meter, final TimeRecord tv, final long expectedElapsedMilliseconds){
+        long expectedProgressTime = tv.expectedStartTime + expectedElapsedMilliseconds * 1_000_000;
+        assertEquals(expectedProgressTime, meter.getLastCurrentTime(), "progress time should be start time + " + expectedElapsedMilliseconds + "ms");
         assertMeterTime(meter, tv.expectedCreateTime, tv.expectedStartTime, 0);
     }
 
