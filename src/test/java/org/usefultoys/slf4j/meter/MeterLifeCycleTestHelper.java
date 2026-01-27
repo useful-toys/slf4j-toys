@@ -67,19 +67,35 @@ final class MeterLifeCycleTestHelper {
      * @param failPath              the expected value of the "failPath" property, or {@code null} if it is expected to be null
      * @param failMessage           the expected value of the "*/
     static void assertMeterState(final Meter meter, final boolean started, final boolean stopped, final String okPath, final String rejectPath, final String failPath, final String failMessage, final long currentIteration, final long expectedIterations, final long timeLimitMilliseconds) {
+        /* Validate createTime is always set */
+        assertTrue(meter.getCreateTime() > 0, "createTime should be > 0");
+
+        /* Validate startTime state */
         if (started) {
             assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         } else {
             assertEquals(0, meter.getStartTime(), "startTime should be 0");
         }
 
+        /* Validate stopTime state */
         if (stopped) {
             assertTrue(meter.getStopTime() > 0, "stopTime should be > 0");
-            assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime");
         } else {
             assertEquals(0, meter.getStopTime(), "stopTime should be 0");
         }
 
+        /* Validate temporal ordering: createTime <= startTime <= stopTime */
+        if (started && stopped) {
+            assertTrue(meter.getCreateTime() <= meter.getStartTime(), 
+                "createTime should be <= startTime");
+            assertTrue(meter.getStartTime() <= meter.getStopTime(), 
+                "startTime should be <= stopTime");
+        } else if (started) {
+            assertTrue(meter.getCreateTime() <= meter.getStartTime(), 
+                "createTime should be <= startTime");
+        }
+
+        /* Validate outcome paths */
         if (okPath == null) {
             assertNull(meter.getOkPath(), "okPath should be null");
         } else {
@@ -92,12 +108,12 @@ final class MeterLifeCycleTestHelper {
             assertEquals(rejectPath, meter.getRejectPath(), "rejectPath should match expected value: " + rejectPath);
         }
 
-
+        /* Validate iteration and time limit configuration */
         assertEquals(currentIteration, meter.getCurrentIteration(), "currentIteration should match expected value: " + currentIteration);
         assertEquals(expectedIterations, meter.getExpectedIterations(), "expectedIterations should match expected value: " + expectedIterations);
         assertEquals(timeLimitMilliseconds * 1000 * 1000, meter.getTimeLimit(), "timeLimit should match expected value: " + timeLimitMilliseconds + "ms");
 
-        assertTrue(meter.getCreateTime() > 0, "createTime should be > 0");
+        /* Validate lastCurrentTime consistency */
         if (stopped) {
             assertTrue(meter.getLastCurrentTime() >= meter.getStopTime(), "lastCurrentTime should be >= stopTime");
         } else if (started) {
@@ -105,6 +121,21 @@ final class MeterLifeCycleTestHelper {
         } else {
             assertEquals(meter.getCreateTime(), meter.getLastCurrentTime(), "lastCurrentTime should be equal to createTime");
         }
+    }
+
+    static void assertMeterTime(final Meter meter, final long expectedStartTime, final long expectedStopTime){
+        if (expectedStartTime != -1) assertEquals(expectedStartTime, meter.getStartTime(), "startTime should match expected value: " + expectedStartTime);
+        if (expectedStopTime != -1) assertEquals(expectedStopTime, meter.getStopTime(), "stopTime should match expected value: " + expectedStopTime);
+    }
+
+    static void assertMeterStartTimeWindow(final Meter meter, final long minStartTime, final long maxStartTime){
+        if (minStartTime != -1) assertTrue(meter.getStartTime() >= minStartTime, "startTime should be >= " + minStartTime);
+        if (maxStartTime != -1) assertTrue(meter.getStartTime() <= maxStartTime, "startTime should be <= " + maxStartTime);
+    }
+
+    static void assertMeterStopTimeWindow(final Meter meter, final long minStopTime, final long maxStopTime){
+        if (minStopTime != -1) assertTrue(meter.getStopTime() >= minStopTime, "stopTime should be >= " + minStopTime);
+        if (maxStopTime != -1) assertTrue(meter.getStopTime() <= maxStopTime, "stopTime should be <= " + maxStopTime);
     }
 
     /**

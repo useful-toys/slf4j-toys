@@ -34,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertLogs;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTimeWindow;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterTime;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.configureLogger;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.event;
 
@@ -101,12 +103,20 @@ class MeterLifeCycleHappyPathTest {
 
         // Given: a new started Meter
         final Meter meter = new Meter(logger).start();
+        final long expectedStartTime = meter.getLastCurrentTime();
 
         // When: meter completes successfully
+        final long t1 = System.nanoTime();
         meter.ok();
+        final long t2 = System.nanoTime();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
+        // Then: meter stop time is within expected window
+        assertMeterStopTimeWindow(meter, t1, t2);
 
         // Then: logs ok completion (MSG_OK + DATA_OK)
         assertLogs(logger, level,
