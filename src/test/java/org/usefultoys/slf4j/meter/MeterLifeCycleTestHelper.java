@@ -123,7 +123,8 @@ final class MeterLifeCycleTestHelper {
         }
     }
 
-    static void assertMeterTime(final Meter meter, final long expectedStartTime, final long expectedStopTime){
+    static void assertMeterTime(final Meter meter, final long expectedCreateTime, final long expectedStartTime, final long expectedStopTime){
+        if (expectedCreateTime != -1) assertEquals(expectedCreateTime, meter.getCreateTime(), "createTime should match expected value: " + expectedCreateTime);
         if (expectedStartTime != -1) assertEquals(expectedStartTime, meter.getStartTime(), "startTime should match expected value: " + expectedStartTime);
         if (expectedStopTime != -1) assertEquals(expectedStopTime, meter.getStopTime(), "stopTime should match expected value: " + expectedStopTime);
     }

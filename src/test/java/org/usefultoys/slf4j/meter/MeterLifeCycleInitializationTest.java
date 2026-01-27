@@ -88,7 +88,7 @@ class MeterLifeCycleInitializationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         // Then: meter should preserve create time and zero start/stop times
         assertEquals(expectedCreateTime, meter.getCreateTime());
-        assertMeterTime(meter, 0,0);
+        assertMeterTime(meter, expectedCreateTime, 0, 0);
         // Then: meter create time is within expected window
         assertMeterCreateTimeWindow(meter, t1, t2);
 
@@ -115,7 +115,7 @@ class MeterLifeCycleInitializationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         // Then: meter should preserve create time and zero start/stop times
         assertEquals(expectedCreateTime, meter.getCreateTime());
-        assertMeterTime(meter, 0, 0);
+        assertMeterTime(meter, expectedCreateTime, 0, 0);
         // Then: meter create time is within expected window
         assertMeterCreateTimeWindow(meter, t1, t2);
 
@@ -146,7 +146,7 @@ class MeterLifeCycleInitializationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         // Then: meter should preserve create time and zero start/stop times
         assertEquals(expectedCreateTime, meter.getCreateTime());
-        assertMeterTime(meter, 0, 0);
+        assertMeterTime(meter, expectedCreateTime, 0, 0);
         // Then: meter create time is within expected window
         assertMeterCreateTimeWindow(meter, t1, t2);
 
