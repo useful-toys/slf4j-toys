@@ -30,6 +30,7 @@ import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertLogs;
@@ -177,6 +178,8 @@ class MeterLifeCycleHappyPathTest {
         meter.path("custom_path");
         // Then: path was applied (pedagogical validation)
         assertMeterState(meter, true, false, "custom_path", null, null, null, 0, 0, 0);
+        // Then: meter should preserve start time have no stop time
+        assertMeterTime(meter, expectedStartTime, 0);
 
         // When: meter completes successfully
         final long t1 = System.nanoTime();
@@ -312,6 +315,8 @@ class MeterLifeCycleHappyPathTest {
         meter.path("default_path");
         // Then: okPath = "default_path" (pedagogical validation)
         assertMeterState(meter, true, false, "default_path", null, null, null, 0, 0, 0);
+        // Then: meter should preserve start time have no stop time
+        assertMeterTime(meter, expectedStartTime, 0);
 
         // When: ok() overrides path
         final long t1 = System.nanoTime();
@@ -349,16 +354,22 @@ class MeterLifeCycleHappyPathTest {
         meter.path("first");
         // Then: okPath = "first" (pedagogical validation)
         assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
+        // Then: meter should preserve start time have no stop time
+        assertMeterTime(meter, expectedStartTime, 0);
 
         // When: path is overridden
         meter.path("second");
         // Then: okPath = "second" (pedagogical validation)
         assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+        // Then: meter should preserve start time have no stop time
+        assertMeterTime(meter, expectedStartTime, 0);
 
         // When: path is overridden again
         meter.path("third");
         // Then: okPath = "third" (last wins)
         assertMeterState(meter, true, false, "third", null, null, null, 0, 0, 0);
+        // Then: meter should preserve start time have no stop time
+        assertMeterTime(meter, expectedStartTime, 0);
 
         // When: meter completes
         final long t1 = System.nanoTime();
@@ -524,17 +535,27 @@ class MeterLifeCycleHappyPathTest {
 
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final long expectedStartTime = meter.getLastCurrentTime();
 
         // When: path is set for expected ok
         meter.path("expected_ok_path");
         // Then: okPath = "expected_ok_path" (pedagogical validation)
         assertMeterState(meter, true, false, "expected_ok_path", null, null, null, 0, 0, 0);
+        // Then: meter should preserve start time have no stop time
+        assertMeterTime(meter, expectedStartTime, 0);
 
         // When: meter is rejected instead
+        final long t1 = System.nanoTime();
         meter.reject("business_error");
+        final long t2 = System.nanoTime();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in Rejected state with rejectPath (okPath cleared, rejection overrides expectation)
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
+        // Then: meter stop time is within expected window
+        assertMeterStopTimeWindow(meter, t1, t2);
 
         // Then: logs rejection overriding path expectation (MSG_REJECT + DATA_REJECT)
         assertLogs(logger, level,
@@ -693,6 +714,8 @@ class MeterLifeCycleHappyPathTest {
         meter.path("expected_ok_path");
         // Then: okPath = "expected_ok_path" (pedagogical validation)
         assertMeterState(meter, true, false, "expected_ok_path", null, null, null, 0, 0, 0);
+        // Then: meter should preserve start time have no stop time
+        assertMeterTime(meter, expectedStartTime, 0);
 
         // When: meter fails instead
         final long t1 = System.nanoTime();
@@ -734,6 +757,7 @@ class MeterLifeCycleHappyPathTest {
 
         // When: meter is started, incremented with progress calls, and completes
         meter.start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 15, 0);
 
@@ -745,8 +769,12 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.progress();
+        final long expectedProgressTime1 = meter.getLastCurrentTime();
+
         // Then: validate state after progress() - still running (pedagogical validation)
         assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
+        // Then: validate exact progress time
+        assertEquals(expectedStartTime + 40_000_000, expectedProgressTime1, "progress time should be start time + 40ms");
 
         // Second batch: 5 iterations
         for (int i = 0; i < 5; i++) {
@@ -756,8 +784,11 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.progress();
+        final long expectedProgressTime2 = meter.getLastCurrentTime();
         // Then: validate state after progress() - still running (pedagogical validation)
         assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
+        // Then: validate exact second progress time
+        assertEquals(expectedProgressTime1 + 40_000_000, expectedProgressTime2, "second progress time should be first progress time + 40ms");
 
         // Third batch: 5 iterations
         for (int i = 0; i < 5; i++) {
@@ -767,9 +798,12 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 15, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.ok();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state with correct iteration count
         assertMeterState(meter, true, true, null, null, null, null, 15, 15, 0);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
 
         // Then: logs progress events + ok completion (2x MSG_PROGRESS + 2x DATA_PROGRESS + MSG_OK + DATA_OK)
         assertLogs(logger, level,
@@ -798,6 +832,7 @@ class MeterLifeCycleHappyPathTest {
 
         // When: meter is started, incremented with progress calls, and completes
         meter.start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 15, 0);
 
@@ -809,13 +844,19 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.progress();
+        final long expectedProgressTime1 = meter.getLastCurrentTime();
         // Then: validate state after progress() - still running (pedagogical validation)
         assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
+        // Then: validate exact progress time
+        assertEquals(expectedStartTime + 40_000_000, expectedProgressTime1, "progress time should be start time + 40ms");
 
         // Second batch: no iterations
         meter.progress(); // won't print log with no more iterations
+        final long expectedProgressTime2 = meter.getLastCurrentTime();
         // Then: validate state after progress() with no new iterations (pedagogical validation)
         assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
+        // Then: validate exact second progress time (no time advanced)
+        assertEquals(expectedProgressTime1, expectedProgressTime2, "second progress time should equal first progress time (no time advance)");
 
         // Third batch: 5 iterations
         for (int i = 0; i < 5; i++) {
@@ -825,9 +866,12 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.ok();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state with correct iteration count
         assertMeterState(meter, true, true, null, null, null, null, 10, 15, 0);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
 
         // Then: logs progress event + ok completion (MSG_PROGRESS + DATA_PROGRESS + MSG_OK + DATA_OK)
         assertLogs(logger, level,
@@ -854,6 +898,7 @@ class MeterLifeCycleHappyPathTest {
 
         // When: meter is started, incremented with progress calls, and completes
         meter.start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 15, 0);
 
@@ -865,8 +910,11 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.progress();
+        final long expectedProgressTime1 = meter.getLastCurrentTime();
         // Then: validate state after progress() - still running (pedagogical validation)
         assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
+        // Then: validate exact progress time
+        assertEquals(expectedStartTime + 40_000_000, expectedProgressTime1, "progress time should be start time + 40ms");
 
         // Second batch: 5 iterations
         for (int i = 0; i < 5; i++) {
@@ -876,8 +924,11 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
         timeSource.advanceMiliseconds(0); // Execute 0ms
         meter.progress(); // won't print log since no time has passed
+        final long expectedProgressTime2 = meter.getLastCurrentTime();
         // Then: validate state after progress() - still running (pedagogical validation)
         assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
+        // Then: validate exact second progress time (0ms advanced)
+        assertEquals(expectedProgressTime1, expectedProgressTime2, "second progress time should equal first progress time (0ms advance)");
 
         // Third batch: 5 iterations
         for (int i = 0; i < 5; i++) {
@@ -887,9 +938,12 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 15, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.ok();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state with correct iteration count
         assertMeterState(meter, true, true, null, null, null, null, 15, 15, 0);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
 
         // Then: progress messages should have been logged (skip indices 0 and 1 from start())
         assertLogs(logger, level,
@@ -916,6 +970,7 @@ class MeterLifeCycleHappyPathTest {
 
         // When: meter is started, incremented with progress calls, and completes
         meter.start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 15, 0);
 
@@ -927,8 +982,11 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.progress(); // won't log due to throttling (40 < 50)
+        final long expectedProgressTime1 = meter.getLastCurrentTime();
         // Then: validate state after progress() - still running (pedagogical validation)
         assertMeterState(meter, true, false, null, null, null, null, 5, 15, 0);
+        // Then: validate exact progress time
+        assertEquals(expectedStartTime + 40_000_000, expectedProgressTime1, "progress time should be start time + 40ms");
 
         // Second batch: 5 iterations
         for (int i = 0; i < 5; i++) {
@@ -938,8 +996,11 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.progress();
+        final long expectedProgressTime2 = meter.getLastCurrentTime();
         // Then: validate state after progress() - still running (pedagogical validation)
         assertMeterState(meter, true, false, null, null, null, null, 10, 15, 0);
+        // Then: validate exact second progress time
+        assertEquals(expectedProgressTime1 + 40_000_000, expectedProgressTime2, "second progress time should be first progress time + 40ms");
 
         // Third batch: 5 iterations
         for (int i = 0; i < 5; i++) {
@@ -949,9 +1010,12 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 15, 15, 0);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.ok();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state with correct iteration count
         assertMeterState(meter, true, true, null, null, null, null, 15, 15, 0);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
 
         // Then: logs progress event + ok completion with throttling (MSG_PROGRESS + DATA_PROGRESS + MSG_OK + DATA_OK)
         assertLogs(logger, level,
@@ -980,6 +1044,7 @@ class MeterLifeCycleHappyPathTest {
                 .withTimeSource(timeSource)
                 .limitMilliseconds(50)
                 .start();
+        final long expectedStartTime = meter.getLastCurrentTime();
 
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 0, 50);
@@ -987,9 +1052,12 @@ class MeterLifeCycleHappyPathTest {
         // When: operation completes within time limit
         timeSource.advanceMiliseconds(10);
         meter.ok();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state and NOT slow
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 50);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
         assertFalse(meter.isSlow(), "meter should NOT be slow");
 
         // Then: logs ok completion (not slow, MSG_OK + DATA_OK)
@@ -1017,15 +1085,19 @@ class MeterLifeCycleHappyPathTest {
                 .withTimeSource(timeSource)
                 .limitMilliseconds(50)
                 .start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 0, 50);
 
         // When: operation exceeds time limit
         timeSource.advanceMiliseconds(100); // Execute ~100ms
         meter.ok();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state and IS slow
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 50);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
         assertTrue(meter.isSlow(), "meter should be slow");
 
         // Then: logs slow ok completion (MSG_SLOW_OK + DATA_SLOW_OK)
@@ -1049,15 +1121,19 @@ class MeterLifeCycleHappyPathTest {
                 .withTimeSource(timeSource)
                 .limitMilliseconds(50)
                 .start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 0, 50);
 
         // When: operation exceeds time limit
         timeSource.advanceMiliseconds(100); // Execute ~100ms
         meter.reject("business_error");
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state and IS slow
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 50);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
         assertTrue(meter.isSlow(), "meter should be slow");
 
         // Then: logs rejection (slow operation does not affect reject marker, MSG_REJECT + DATA_REJECT)
@@ -1081,15 +1157,19 @@ class MeterLifeCycleHappyPathTest {
                 .withTimeSource(timeSource)
                 .limitMilliseconds(50)
                 .start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 0, 50);
 
         // When: operation exceeds time limit
         timeSource.advanceMiliseconds(100); // Execute ~100ms
         meter.fail("business_error");
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state and IS slow
         assertMeterState(meter, true, true, null, null, "business_error", null, 0, 0, 50);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
         assertTrue(meter.isSlow(), "meter should be slow");
 
         // Then: logs failure (slow operation does not affect fail marker, MSG_FAIL + DATA_FAIL)
@@ -1121,6 +1201,7 @@ class MeterLifeCycleHappyPathTest {
 
         // When: meter executes with iterations and completes within time limit
         meter.start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 15, 100);
 
@@ -1154,9 +1235,12 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 15, 15, 100);
         timeSource.advanceMiliseconds(5); // Execute ~5ms
         meter.ok();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state with correct iterations and NOT slow (15 < 100)
         assertMeterState(meter, true, true, null, null, null, null, 15, 15, 100);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
         assertFalse(meter.isSlow(), "meter should NOT be slow");
 
         // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
@@ -1192,6 +1276,7 @@ class MeterLifeCycleHappyPathTest {
 
         // When: meter executes with iterations and exceeds time limit
         meter.start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 15, 50);
 
@@ -1226,9 +1311,12 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 15, 15, 50);
         timeSource.advanceMiliseconds(40); // Execute ~40ms
         meter.ok();
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state with correct iterations and IS slow
         assertMeterState(meter, true, true, null, null, null, null, 15, 15, 50);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
         assertTrue(meter.isSlow(), "meter should be slow");
 
         // Then: WARN log includes slow operation warning with timing details (skip indices 0 and 1 from start())
@@ -1263,6 +1351,7 @@ class MeterLifeCycleHappyPathTest {
 
         // When: meter executes with iterations and completes within time limit
         meter.start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 15, 100);
 
@@ -1296,9 +1385,12 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 15, 15, 100);
         timeSource.advanceMiliseconds(5); // Execute ~5ms
         meter.reject("validation_failed");
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state with correct iterations and NOT slow (15 < 100)
         assertMeterState(meter, true, true, null, "validation_failed", null, null, 15, 15, 100);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
         assertFalse(meter.isSlow(), "meter should NOT be slow");
 
         // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
@@ -1330,6 +1422,7 @@ class MeterLifeCycleHappyPathTest {
 
         // When: meter executes with iterations and completes within time limit
         meter.start();
+        final long expectedStartTime = meter.getLastCurrentTime();
         // Then: validate configured initial state after start()
         assertMeterState(meter, true, false, null, null, null, null, 0, 15, 100);
 
@@ -1363,9 +1456,12 @@ class MeterLifeCycleHappyPathTest {
         assertMeterState(meter, true, false, null, null, null, null, 15, 15, 100);
         timeSource.advanceMiliseconds(5); // Execute ~5ms
         meter.fail("validation_failed");
+        final long expectedStopTime = meter.getLastCurrentTime();
 
         // Then: meter should be in OK state with correct iterations and NOT slow (15 < 100)
         assertMeterState(meter, true, true, null, null, "validation_failed",null, 15, 15, 100);
+        // Then: meter should preserve start time and set stop time
+        assertMeterTime(meter, expectedStartTime, expectedStopTime);
         assertFalse(meter.isSlow(), "meter should NOT be slow");
 
         // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
