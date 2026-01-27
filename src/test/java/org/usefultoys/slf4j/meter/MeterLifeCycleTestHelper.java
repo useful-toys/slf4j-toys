@@ -191,7 +191,7 @@ final class MeterLifeCycleTestHelper {
         assertMeterStartTimeWindow(meter, tv.beforeStart, tv.afterStart);
     }
 
-    static void assertMeterStop(final Meter meter, final TimeRecord tv){
+    static void assertMeterStopTime(final Meter meter, final TimeRecord tv){
         assertMeterTime(meter, tv.expectedCreateTime, tv.expectedStartTime, tv.expectedStopTime);
         assertMeterStopTimeWindow(meter, tv.beforeStop, tv.afterStop);
     }
