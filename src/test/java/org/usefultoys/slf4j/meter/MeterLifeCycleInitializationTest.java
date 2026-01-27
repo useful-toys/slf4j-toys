@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -30,8 +31,11 @@ import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterCreateTimeWindow;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterCreateTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStartTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStartTimePreserved;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordCreateWithWindow;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStartWithWindow;
 
 /**
  * Unit tests for {@link Meter} initialization and construction.
@@ -79,18 +83,13 @@ class MeterLifeCycleInitializationTest {
     @DisplayName("should create meter with logger - initial state")
     void shouldCreateMeterWithLoggerInitialState() {
         // Given: a new Meter with logger only
-        final long t1 = System.nanoTime();
-        final Meter meter = new Meter(logger);
-        final long t2 = System.nanoTime();
-        final long expectedCreateTime = meter.getLastCurrentTime();
+        final TimeRecord tv = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tv, ()->new Meter(logger));
 
         // Then: meter has expected initial state (startTime = 0, stopTime = 0)
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         // Then: meter should preserve create time and zero start/stop times
-        assertEquals(expectedCreateTime, meter.getCreateTime());
-        assertMeterTime(meter, expectedCreateTime, 0, 0);
-        // Then: meter create time is within expected window
-        assertMeterCreateTimeWindow(meter, t1, t2);
+        assertMeterCreateTime(meter, tv);
 
         // Then: before start(), getCurrentInstance() returns unknown meter
         final Meter currentBeforeStart = Meter.getCurrentInstance();
@@ -106,18 +105,13 @@ class MeterLifeCycleInitializationTest {
     void shouldCreateMeterWithOperationName() {
         // Given: a new Meter with logger and operationName
         final String operationName = "testOperation";
-        final long t1 = System.nanoTime();
-        final Meter meter = new Meter(logger, operationName);
-        final long t2 = System.nanoTime();
-        final long expectedCreateTime = meter.getLastCurrentTime();
+        final TimeRecord tv = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tv, () -> new Meter(logger, operationName));
 
         // Then: meter has expected initial state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         // Then: meter should preserve create time and zero start/stop times
-        assertEquals(expectedCreateTime, meter.getCreateTime());
-        assertMeterTime(meter, expectedCreateTime, 0, 0);
-        // Then: meter create time is within expected window
-        assertMeterCreateTimeWindow(meter, t1, t2);
+        assertMeterCreateTime(meter, tv);
 
         // Then: operationName is captured correctly
         assertEquals(operationName, meter.getOperation(), "operation name should match");
@@ -137,18 +131,13 @@ class MeterLifeCycleInitializationTest {
         // Given: a new Meter with logger, operationName, and parent
         final String operationName = "childOperation";
         final String parentId = "parent-meter-id";
-        final long t1 = System.nanoTime();
-        final Meter meter = new Meter(logger, operationName, parentId);
-        final long t2 = System.nanoTime();
-        final long expectedCreateTime = meter.getLastCurrentTime();
+        final TimeRecord tv = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tv, () -> new Meter(logger, operationName, parentId));
 
         // Then: meter has expected initial state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         // Then: meter should preserve create time and zero start/stop times
-        assertEquals(expectedCreateTime, meter.getCreateTime());
-        assertMeterTime(meter, expectedCreateTime, 0, 0);
-        // Then: meter create time is within expected window
-        assertMeterCreateTimeWindow(meter, t1, t2);
+        assertMeterCreateTime(meter, tv);
 
         // Then: operationName and parent are captured correctly
         assertEquals(operationName, meter.getOperation(), "operation name should match");
@@ -168,10 +157,13 @@ class MeterLifeCycleInitializationTest {
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldStartMeterSuccessfully() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // Then: meter has expected initial state (Created state)
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        // Then: meter should preserve create time and zero start/stop times
+        assertMeterCreateTime(meter, tr);
 
         // Then: before start(), getCurrentInstance() returns unknown meter
         final Meter currentBeforeStart = Meter.getCurrentInstance();
@@ -179,10 +171,12 @@ class MeterLifeCycleInitializationTest {
                 "before start(), getCurrentInstance() should return unknown meter");
 
         // When: start() is called
-        meter.start();
+        MeterLifeCycleTestHelper.recordStartWithWindow(tr, () -> meter.start());
 
         // Then: Meter transitions from Created to Started
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        // Then: meter should have valid create time and start time with zero stop time
+        MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: after start(), meter becomes current in thread-local and is returned by getCurrentInstance()
         final Meter currentAfterStart = Meter.getCurrentInstance();
@@ -197,27 +191,30 @@ class MeterLifeCycleInitializationTest {
     @Test
     @DisplayName("should start meter in try-with-resources (start in block)")
     void shouldStartMeterInTryWithResourcesSequential() {
-        // Given: external variable to hold meter reference after try-with-resources
+        final TimeRecord tr = new TimeRecord();
         final Meter meterRef;
 
-        // Given: Meter is created in try-with-resources
-        try (final Meter m = new Meter(logger)) {
-            // Then: save meter reference to external variable
+        // Given: Meter is created in try-with-resources (capture create time)
+        try (final Meter m = recordCreateWithWindow(tr, () -> new Meter(logger))) {
             meterRef = m;
 
             // Then: meter has expected initial state before start (Created state)
             MeterLifeCycleTestHelper.assertMeterState(m, false, false, null, null, null, null, 0, 0, 0);
+            // Then: meter should preserve create time and zero start/stop times
+            assertMeterCreateTime(m, tr);
 
             // Then: before start(), getCurrentInstance() returns unknown meter
             final Meter currentBeforeStart = Meter.getCurrentInstance();
             assertEquals(Meter.UNKNOWN_LOGGER_NAME, currentBeforeStart.getCategory(),
                     "before start(), getCurrentInstance() should return unknown meter");
 
-            // When: start() is called in the block
-            m.start();
+            // When: start() is called in the block (capture start time)
+            recordStartWithWindow(tr, m::start);
 
             // Then: meter is transitioned to executing state (Started state)
             MeterLifeCycleTestHelper.assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
+            // Then: meter should preserve create time and have valid start time with zero stop time
+            assertMeterStartTime(m, tr);
 
             // Then: after start(), meter becomes current in thread-local
             final Meter currentAfterStart = Meter.getCurrentInstance();
@@ -226,6 +223,7 @@ class MeterLifeCycleInitializationTest {
 
         // Then: after try-with-resources, meter is in Failed state (auto-fail via close())
         MeterLifeCycleTestHelper.assertMeterState(meterRef, true, true, null, null, "try-with-resources", null, 0, 0, 0);
+        assertMeterStartTimePreserved(meterRef, tr);
 
         // Then: logs start events + auto-fail events (MSG_START + DATA_START + MSG_FAIL + DATA_FAIL)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
@@ -238,16 +236,17 @@ class MeterLifeCycleInitializationTest {
     @Test
     @DisplayName("should start meter with chained call in try-with-resources")
     void shouldStartMeterInTryWithResourcesChained() {
-        // Given: external variable to hold meter reference after try-with-resources
+        final TimeRecord tr = new TimeRecord();
         final Meter meterRef;
 
-        // Given: Meter is created with chained start() in try-with-resources
-        try (final Meter m = new Meter(logger).start()) {
-            // Then: save meter reference to external variable
+        // Given: Meter is created and started with chained call in try-with-resources (capture create/start time)
+        try (final Meter m = recordStartWithWindow(tr, ()-> recordCreateWithWindow(tr, () -> new Meter(logger)).start())) {
             meterRef = m;
 
             // Then: meter is in executing state (created and started in single expression - Started state)
             MeterLifeCycleTestHelper.assertMeterState(m, true, false, null, null, null, null, 0, 0, 0);
+            // Then: meter should preserve create time and have valid start time with zero stop time'
+            MeterLifeCycleTestHelper.assertMeterStartTime(m, tr);
 
             // Then: meter becomes current in thread-local after start()
             final Meter currentAfterStart = Meter.getCurrentInstance();
@@ -256,6 +255,8 @@ class MeterLifeCycleInitializationTest {
 
         // Then: after try-with-resources, meter is in Failed state (auto-fail via close())
         MeterLifeCycleTestHelper.assertMeterState(meterRef, true, true, null, null, "try-with-resources", null, 0, 0, 0);
+        // Then: meter should preserve create time and start time
+        assertMeterStartTimePreserved(meterRef, tr);
 
         // Then: logs start events + auto-fail events (MSG_START + DATA_START + MSG_FAIL + DATA_FAIL)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);

@@ -16,21 +16,6 @@
 
 package org.usefultoys.slf4j.meter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertLogs;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTime;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterTime;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.configureLogger;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.event;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWithWindow;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStop;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterProgressTime;
-import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStartTimePreserved;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -45,6 +30,19 @@ import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertLogs;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterProgressTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStartTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.configureLogger;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.event;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStop;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWithWindow;
 
 /**
  * Unit tests for {@link Meter} happy path lifecycle - successful operation completion.
@@ -175,7 +173,7 @@ class MeterLifeCycleHappyPathTest {
         // Then: path was applied (pedagogical validation)
         assertMeterState(meter, true, false, "custom_path", null, null, null, 0, 0, 0);
         // Then: meter should preserve create/start time have no stop time
-        assertMeterStartTimePreserved(meter, tr);
+        assertMeterStartTime(meter, tr);
 
         // When: meter completes successfully
         recordStopWithWindow(tr, () -> meter.ok());
@@ -292,7 +290,7 @@ class MeterLifeCycleHappyPathTest {
         // Then: okPath = "default_path" (pedagogical validation)
         assertMeterState(meter, true, false, "default_path", null, null, null, 0, 0, 0);
         // Then: meter should preserve create/start time have no stop time
-        assertMeterStartTimePreserved(meter, tr);
+        assertMeterStartTime(meter, tr);
 
         // When: ok() overrides path
         recordStopWithWindow(tr, () -> meter.ok("override_path"));
@@ -326,21 +324,21 @@ class MeterLifeCycleHappyPathTest {
         // Then: okPath = "first" (pedagogical validation)
         assertMeterState(meter, true, false, "first", null, null, null, 0, 0, 0);
         // Then: meter should preserve create/start time have no stop time
-        assertMeterStartTimePreserved(meter, tr);
+        assertMeterStartTime(meter, tr);
 
         // When: path is overridden
         meter.path("second");
         // Then: okPath = "second" (pedagogical validation)
         assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
         // Then: meter should preserve create/start time have no stop time
-        assertMeterStartTimePreserved(meter, tr);
+        assertMeterStartTime(meter, tr);
 
         // When: path is overridden again
         meter.path("third");
         // Then: okPath = "third" (last wins)
         assertMeterState(meter, true, false, "third", null, null, null, 0, 0, 0);
         // Then: meter should preserve create/start time have no stop time
-        assertMeterStartTimePreserved(meter, tr);
+        assertMeterStartTime(meter, tr);
 
         // When: meter completes
         recordStopWithWindow(tr, () -> meter.ok());
@@ -488,7 +486,7 @@ class MeterLifeCycleHappyPathTest {
         // Then: okPath = "expected_ok_path" (pedagogical validation)
         assertMeterState(meter, true, false, "expected_ok_path", null, null, null, 0, 0, 0);
         // Then: meter should preserve create/start time have no stop time
-        assertMeterStartTimePreserved(meter, tr);
+        assertMeterStartTime(meter, tr);
 
         // When: meter is rejected instead
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
@@ -636,7 +634,7 @@ class MeterLifeCycleHappyPathTest {
         // Then: okPath = "expected_ok_path" (pedagogical validation)
         assertMeterState(meter, true, false, "expected_ok_path", null, null, null, 0, 0, 0);
         // Then: meter should preserve create/start time have no stop time
-        assertMeterStartTimePreserved(meter, tr);
+        assertMeterStartTime(meter, tr);
 
         // When: meter fails instead
         recordStopWithWindow(tr, () -> meter.fail("critical_error"));
