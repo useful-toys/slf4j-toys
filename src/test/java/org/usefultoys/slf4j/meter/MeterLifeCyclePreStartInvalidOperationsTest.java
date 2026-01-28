@@ -27,9 +27,12 @@ import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterCreateTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordCreateWithWindow;
 
 /**
  * Unit tests for invalid {@link Meter} operations before start().
@@ -84,13 +87,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectIncBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: inc() is called before start()
         meter.inc();
 
         // Then: currentIteration remains 0, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -102,13 +107,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectIncByBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: incBy(5) is called before start()
         meter.incBy(5);
 
         // Then: currentIteration remains 0, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -120,13 +127,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectIncToBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: incTo(10) is called before start()
         meter.incTo(10);
 
         // Then: currentIteration remains 0, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -138,7 +147,8 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectMultipleIncrementsBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: multiple increment operations called before start()
         meter.inc();
@@ -147,6 +157,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
 
         // Then: currentIteration remains 0, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs 3x INCONSISTENT_INCREMENT
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -164,13 +175,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectProgressBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: progress() is called before start()
         meter.progress();
 
         // Then: no progress report generated, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_PROGRESS
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
@@ -182,7 +195,8 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectMultipleProgressCallsBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: multiple progress() calls before start()
         meter.progress();
@@ -191,6 +205,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
 
         // Then: no progress reports generated, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs 3x INCONSISTENT_PROGRESS
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
@@ -212,15 +227,17 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
          * MeterContext default methods do not validate null parameters - they delegate to putContext(),
          * which converts null to NULL_VALUE ("<null>") instead of logging ILLEGAL.
          * This test documents the actual behavior: null parameters are tolerated, not rejected. */
-        
+
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx(null, "value") is called before start()
         meter.ctx(null, "value");
 
         // Then: operation succeeds silently (MeterContext default methods don't validate)
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no logs (ctx with null parameters doesn't trigger validation)
         AssertLogger.assertEventCount(logger, 0);
@@ -232,15 +249,17 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     void shouldSilentlyAcceptNullKeyWithPrimitiveBeforeStart() {
         /* NOTE: This test was intended to validate that ctx(null, 42) is rejected as invalid.
          * However, the current Meter implementation accepts null key silently (converts to "<null>"). */
-        
+
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx(null, 42) is called before start()
         meter.ctx(null, 42);
 
         // Then: operation succeeds silently
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no logs
         AssertLogger.assertEventCount(logger, 0);
@@ -252,15 +271,17 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     void shouldSilentlyAcceptNullKeyWithFormatBeforeStart() {
         /* NOTE: This test was intended to validate that ctx(null, format, args) is rejected as invalid.
          * However, the current Meter implementation accepts null key silently (converts to "<null>"). */
-        
+
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx(null, "format %d", 42) is called before start()
         meter.ctx(null, "format %d", 42);
 
         // Then: operation succeeds silently
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no logs
         AssertLogger.assertEventCount(logger, 0);
@@ -272,15 +293,17 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     void shouldSilentlyAcceptNullFormatBeforeStart() {
         /* NOTE: This test was intended to validate that ctx(key, null, args) is rejected as invalid.
          * However, the current Meter implementation accepts null format silently (converts to "<null>"). */
-        
+
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", null, 42) is called before start()
         meter.ctx("key", null, 42);
 
         // Then: operation succeeds silently
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no logs
         AssertLogger.assertEventCount(logger, 0);
@@ -292,15 +315,17 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     void shouldSilentlyAcceptNullArgsArrayBeforeStart() {
         /* NOTE: This test was intended to validate that ctx(key, format, null array) is rejected as invalid.
          * However, the current Meter implementation accepts null args array silently. */
-        
+
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", "format", (Object[]) null) is called before start()
         meter.ctx("key", "format", (Object[]) null);
 
         // Then: operation succeeds silently
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no logs
         AssertLogger.assertEventCount(logger, 0);
@@ -315,13 +340,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectPathStringBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: path("some_path") is called before start()
         meter.path("some_path");
 
         // Then: okPath remains unset, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -333,13 +360,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectPathEnumBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: path(Enum) is called before start()
         meter.path(MeterLifeCycleTestHelper.TestEnum.VALUE1);
 
         // Then: okPath remains unset, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -351,7 +380,8 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectPathThrowableBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
         final RuntimeException exception = new RuntimeException("test cause");
 
         // When: path(Throwable) is called before start()
@@ -359,6 +389,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
 
         // Then: okPath remains unset, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -370,7 +401,8 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectPathObjectBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
         final MeterLifeCycleTestHelper.TestObject testObject = new MeterLifeCycleTestHelper.TestObject();
 
         // When: path(Object) is called before start()
@@ -378,6 +410,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
 
         // Then: okPath remains unset, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -389,7 +422,8 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectMultiplePathCallsBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: multiple path() calls before start()
         meter.path("first");
@@ -398,6 +432,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
 
         // Then: okPath remains unset, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs 3x ILLEGAL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -415,7 +450,8 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectAllInvalidOperationsBeforeStart() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: multiple invalid operations before start()
         meter.inc();
@@ -424,6 +460,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
 
         // Then: all attributes unchanged, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT + INCONSISTENT_PROGRESS + ILLEGAL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
@@ -437,7 +474,8 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     @ValidateCleanMeter
     void shouldRejectInvalidOperationsMixedWithValidConfiguration() {
         // Given: a new Meter without start()
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: mix of valid configuration and invalid operations before start()
         meter.iterations(100);  // Valid: configuration before start
@@ -450,6 +488,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         // Then: valid configs applied, invalid operations rejected, meter remains in Created state
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
         assertEquals("operation", meter.getDescription());
+        assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT + INCONSISTENT_PROGRESS + ILLEGAL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
