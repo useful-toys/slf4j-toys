@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -32,6 +33,9 @@ import org.usefultoys.test.WithLocale;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWithWindow;
 
 /**
  * Unit tests for invalid {@link Meter} termination after stop.
@@ -70,6 +74,7 @@ import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterSta
  * </ul>
  *
  * @author Co-authored-by: GitHub Copilot using Claude 3.5 Sonnet
+ * @author Co-authored-by: Google Gemini using <model name>
  */
 @ValidateCharset
 @ResetMeterConfig
@@ -94,13 +99,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok() is called again
         meter.ok();
 
         // Then: state unchanged (OK) - first termination wins
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_OK (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -114,13 +124,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok("second_path") is called
         meter.ok("second_path");
 
         // Then: okPath remains unset - first termination wins
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -134,13 +149,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectRejectAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: reject("error") is called
         meter.reject("error");
 
         // Then: state should remain OK - first termination wins
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -154,13 +174,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectFailAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: fail("error") is called
         meter.fail("error");
 
         // Then: state should remain OK - first termination wins
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -174,13 +199,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("first_path")
-        final Meter meter = new Meter(logger).start().ok("first_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("first_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok() is called again
         meter.ok();
 
         // Then: okPath remains "first_path" - first termination wins
         assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -194,13 +224,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("first_path")
-        final Meter meter = new Meter(logger).start().ok("first_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("first_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok("second_path") is called
         meter.ok("second_path");
 
         // Then: okPath remains "first_path" - first termination wins
         assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -214,13 +249,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectRejectAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("path")
-        final Meter meter = new Meter(logger).start().ok("path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: reject("error") is called
         meter.reject("error");
 
         // Then: state remains OK with okPath - first termination wins
         assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -234,13 +274,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectFailAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("path")
-        final Meter meter = new Meter(logger).start().ok("path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: fail("error") is called
         meter.fail("error");
 
         // Then: state remains OK with okPath - first termination wins
         assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -254,13 +299,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok() is called
         meter.ok();
 
         // Then: state remains Rejected - first termination wins
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -274,13 +324,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok("path") is called
         meter.ok("path");
 
         // Then: state remains Rejected - first termination wins
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -294,13 +349,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectRejectAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: reject("another_error") is called
         meter.reject("another_error");
 
         // Then: rejectPath remains "business_error" - first termination wins
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INCONSISTENT_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -314,13 +374,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectFailAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: fail("technical_error") is called
         meter.fail("technical_error");
 
         // Then: state remains Rejected - first termination wins
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INCONSISTENT_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -334,13 +399,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok() is called
         meter.ok();
 
         // Then: state remains Failed - first termination wins
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -354,13 +424,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok("path") is called
         meter.ok("path");
 
         // Then: state remains Failed - first termination wins
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -374,13 +449,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectRejectAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: reject("error") is called
         meter.reject("error");
 
         // Then: state remains Failed - first termination wins
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INCONSISTENT_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -394,13 +474,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectFailAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: fail("another_error") is called
         meter.fail("another_error");
 
         // Then: failPath remains "technical_error" - first termination wins
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INCONSISTENT_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -419,14 +504,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectOkAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.ok();
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok() is called again
         meter.ok();
 
         // Then: okPath remains "configured" - first termination wins
         assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -441,14 +530,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectOkWithPathAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.ok();
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok("second_path") is called
         meter.ok("second_path");
 
         // Then: okPath remains "configured" - first termination wins
         assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -463,14 +556,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectRejectAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.ok();
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: reject("error") is called
         meter.reject("error");
 
         // Then: state remains OK with okPath - first termination wins
         assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -485,14 +582,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectFailAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.ok();
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: fail("error") is called
         meter.fail("error");
 
         // Then: state remains OK with okPath - first termination wins
         assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INCONSISTENT_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -507,14 +608,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectOkAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.reject("error");
+        recordStopWithWindow(tr, () -> meter.reject("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok() is called
         meter.ok();
 
         // Then: state remains Rejected with rejectPath - first termination wins
         assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -529,14 +634,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectOkWithPathAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.reject("error");
+        recordStopWithWindow(tr, () -> meter.reject("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok("path") is called
         meter.ok("path");
 
         // Then: state remains Rejected - first termination wins
         assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -551,14 +660,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectRejectAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.reject("error");
+        recordStopWithWindow(tr, () -> meter.reject("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: reject("another") is called
         meter.reject("another");
 
         // Then: rejectPath remains "error" - first termination wins
         assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INCONSISTENT_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -573,14 +686,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectFailAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.reject("error");
+        recordStopWithWindow(tr, () -> meter.reject("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: fail("tech_error") is called
         meter.fail("tech_error");
 
         // Then: state remains Rejected - first termination wins
         assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INCONSISTENT_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -595,14 +712,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectOkAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.fail("error");
+        recordStopWithWindow(tr, () -> meter.fail("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok() is called
         meter.ok();
 
         // Then: state remains Failed with failPath - first termination wins
         assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -617,14 +738,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectOkWithPathAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.fail("error");
+        recordStopWithWindow(tr, () -> meter.fail("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ok("path") is called
         meter.ok("path");
 
         // Then: state remains Failed - first termination wins
         assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INCONSISTENT_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -639,14 +764,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectRejectAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.fail("error");
+        recordStopWithWindow(tr, () -> meter.fail("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: reject("business") is called
         meter.reject("business");
 
         // Then: state remains Failed - first termination wins
         assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INCONSISTENT_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -661,14 +790,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectFailAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.fail("error");
+        recordStopWithWindow(tr, () -> meter.fail("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: fail("another") is called
         meter.fail("another");
 
         // Then: failPath remains "error" - first termination wins
         assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INCONSISTENT_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -686,15 +819,18 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectStartAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: start() is called again
         meter.start();
 
         // Then: Guard Clause prevents restart - state remains unchanged, second start is rejected early
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -708,16 +844,19 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectStartAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("path")
-        final Meter meter = new Meter(logger).start().ok("path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: start() is called again
         meter.start();
 
         // Then: Guard Clause prevents restart - okPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("path", meter.getOkPath(), "okPath should be preserved");
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -731,16 +870,19 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectStartAfterReject() {
         // Given: a meter that has been stopped with reject("error")
-        final Meter meter = new Meter(logger).start().reject("error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: start() is called again
         meter.start();
 
         // Then: Guard Clause prevents restart - rejectPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("error", meter.getRejectPath(), "rejectPath should be preserved");
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -754,16 +896,19 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectStartAfterFail() {
         // Given: a meter that has been stopped with fail("error")
-        final Meter meter = new Meter(logger).start().fail("error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.fail("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: start() is called again
         meter.start();
 
         // Then: Guard Clause prevents restart - failPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("error", meter.getFailPath(), "failPath should be preserved");
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -778,17 +923,19 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectStartAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.ok();
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: start() is called again
         meter.start();
 
         // Then: Guard Clause prevents restart - okPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("configured", meter.getOkPath(), "okPath should be preserved");
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -803,17 +950,19 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectStartAfterPathAndOkWithPath() {
         // Given: a meter configured with path() and stopped with ok("path")
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.ok("path");
+        recordStopWithWindow(tr, () -> meter.ok("path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: start() is called again
         meter.start();
 
         // Then: Guard Clause prevents restart - okPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("path", meter.getOkPath(), "okPath should be preserved");
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -828,17 +977,19 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectStartAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.reject("error");
+        recordStopWithWindow(tr, () -> meter.reject("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: start() is called again
         meter.start();
 
         // Then: Guard Clause prevents restart - rejectPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("error", meter.getRejectPath(), "rejectPath should be preserved");
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -853,17 +1004,19 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     void shouldRejectStartAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.path("configured");
-        meter.fail("error");
+        recordStopWithWindow(tr, () -> meter.fail("error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: start() is called again
         meter.start();
 
         // Then: Guard Clause prevents restart - failPath is preserved, state remains unchanged
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
-        assertTrue(meter.getStopTime() > 0, "stopTime should be > 0 (from first termination)");
-        assertTrue(meter.getStopTime() >= meter.getStartTime(), "stopTime should be >= startTime (start is rejected, not executed)");
         assertEquals("error", meter.getFailPath(), "failPath should be preserved");
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + INCONSISTENT_START (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
