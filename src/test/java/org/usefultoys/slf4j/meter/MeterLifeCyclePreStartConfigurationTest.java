@@ -20,7 +20,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
-import org.usefultoys.slf4jtestmock.AssertLogger;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEventCount;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
@@ -31,6 +33,9 @@ import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterCreateTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordCreateWithWindow;
 
 /**
  * Unit tests for {@link Meter} configuration before start().
@@ -84,68 +89,76 @@ class MeterLifeCyclePreStartConfigurationTest {
     @DisplayName("should set time limit before start()")
     void shouldSetTimeLimitBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: limitMilliseconds(5000) is called before start()
         meter.limitMilliseconds(5000);
 
         // Then: timeLimit attribute is stored correctly and meter remains in Created state
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should override time limit when set multiple times")
     void shouldOverrideTimeLimitWhenSetMultipleTimes() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: limitMilliseconds() is called twice
         meter.limitMilliseconds(100);
         meter.limitMilliseconds(5000);
 
         // Then: last value wins and meter remains in Created state
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should preserve valid time limit when invalid value attempted")
     void shouldPreserveValidTimeLimitWhenInvalidValueAttempted() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: limitMilliseconds(5000) is called, then limitMilliseconds(0) is attempted
         meter.limitMilliseconds(5000);
         meter.limitMilliseconds(0);
 
         // Then: first valid value is preserved, meter remains in Created state
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
+        assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEventCount(logger, 1);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEventCount(logger, 1);
     }
 
     @Test
     @DisplayName("should log ILLEGAL when negative time limit attempted")
     void shouldLogIllegalWhenNegativeTimeLimitAttempted() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: limitMilliseconds(-1) is called
         meter.limitMilliseconds(-1);
 
         // Then: meter remains in Created state with no time limit set
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEventCount(logger, 1);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEventCount(logger, 1);
     }
 
     // ============================================================================
@@ -156,68 +169,76 @@ class MeterLifeCyclePreStartConfigurationTest {
     @DisplayName("should set expected iterations before start()")
     void shouldSetExpectedIterationsBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: iterations(100) is called before start()
         meter.iterations(100);
 
         // Then: expectedIterations attribute is stored correctly and meter remains in Created state
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should override expected iterations when set multiple times")
     void shouldOverrideExpectedIterationsWhenSetMultipleTimes() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: iterations() is called twice
         meter.iterations(50);
         meter.iterations(100);
 
         // Then: last value wins and meter remains in Created state
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should preserve valid iterations when invalid value attempted")
     void shouldPreserveValidIterationsWhenInvalidValueAttempted() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: iterations(100) is called, then iterations(0) is attempted
         meter.iterations(100);
         meter.iterations(0);
 
         // Then: first valid value is preserved, meter remains in Created state
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEventCount(logger, 1);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEventCount(logger, 1);
     }
 
     @Test
     @DisplayName("should log ILLEGAL when negative iterations attempted")
     void shouldLogIllegalWhenNegativeIterationsAttempted() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: iterations(-5) is called
         meter.iterations(-5);
 
         // Then: meter remains in Created state with no iterations set
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEventCount(logger, 1);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEventCount(logger, 1);
     }
 
     // ============================================================================
@@ -228,24 +249,27 @@ class MeterLifeCyclePreStartConfigurationTest {
     @DisplayName("should add descriptive message before start()")
     void shouldAddDescriptiveMessageBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m(String) is called before start()
         meter.m("starting operation");
 
         // Then: description attribute is stored correctly and meter remains in Created state
         assertEquals("starting operation", meter.getDescription(), "should store description correctly");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should override description when m() is called multiple times")
     void shouldOverrideDescriptionWhenMCalledMultipleTimes() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m() is called multiple times
         meter.m("step 1");
@@ -253,17 +277,19 @@ class MeterLifeCyclePreStartConfigurationTest {
 
         // Then: last value wins and meter remains in Created state
         assertEquals("step 2", meter.getDescription(), "should override with last value");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should preserve valid message when null value attempted")
     void shouldPreserveValidMessageWhenNullValueAttempted() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m("step 1") is called, then m(null) is attempted
         meter.m("step 1");
@@ -271,29 +297,32 @@ class MeterLifeCyclePreStartConfigurationTest {
 
         // Then: first valid value is preserved, meter remains in Created state
         assertEquals("step 1", meter.getDescription(), "should preserve first valid value");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEventCount(logger, 1);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEventCount(logger, 1);
     }
 
     @Test
     @DisplayName("should log ILLEGAL when null message attempted before any valid message")
     void shouldLogIllegalWhenNullMessageAttemptedBeforeAnyValidMessage() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m(null) is called without setting a previous message
         meter.m(null);
 
         // Then: description remains null, meter remains in Created state
         assertNull(meter.getDescription(), "should remain null when null attempted");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEventCount(logger, 1);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEventCount(logger, 1);
     }
 
     // ============================================================================
@@ -304,24 +333,27 @@ class MeterLifeCyclePreStartConfigurationTest {
     @DisplayName("should add formatted descriptive message before start()")
     void shouldAddFormattedDescriptiveMessageBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m(format, args) is called before start()
         meter.m("operation %s", "doWork");
 
         // Then: description attribute is formatted and stored correctly and meter remains in Created state
         assertEquals("operation doWork", meter.getDescription(), "should format description correctly");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should override formatted message when m() is called multiple times")
     void shouldOverrideFormattedMessageWhenMCalledMultipleTimes() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m(format, args) is called multiple times
         meter.m("step %d", 1);
@@ -329,17 +361,19 @@ class MeterLifeCyclePreStartConfigurationTest {
 
         // Then: last value wins and meter remains in Created state
         assertEquals("step 2", meter.getDescription(), "should override with last formatted value");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should preserve valid formatted message when null format attempted")
     void shouldPreserveValidFormattedMessageWhenNullFormatAttempted() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m("valid: %s", "arg") is called, then m(null, "arg") is attempted
         meter.m("valid: %s", "arg");
@@ -347,29 +381,32 @@ class MeterLifeCyclePreStartConfigurationTest {
 
         // Then: null format is rejected with ILLEGAL log, description is reset to null, meter remains in Created state
         assertNull(meter.getDescription(), "should reset description to null when null format attempted");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEventCount(logger, 1);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEventCount(logger, 1);
     }
 
     @Test
     @DisplayName("should log ILLEGAL when invalid format string attempted")
     void shouldLogIllegalWhenInvalidFormatStringAttempted() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m("invalid format %z", "arg") is called (invalid format specifier)
         meter.m("invalid format %z", "arg");
 
         // Then: meter remains in Created state with no description set
         assertNull(meter.getDescription(), "should remain null when invalid format attempted");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEventCount(logger, 1);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEventCount(logger, 1);
     }
 
     // ============================================================================
@@ -380,24 +417,27 @@ class MeterLifeCyclePreStartConfigurationTest {
     @DisplayName("should add context key-value pair before start()")
     void shouldAddContextKeyValuePairBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key1", "value1") is called before start()
         meter.ctx("key1", "value1");
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("value1", meter.getContext().get("key1"), "should store context value correctly");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should override context value when same key set multiple times")
     void shouldOverrideContextValueWhenSameKeySetMultipleTimes() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx() is called twice with the same key
         meter.ctx("key", "val1");
@@ -405,17 +445,19 @@ class MeterLifeCyclePreStartConfigurationTest {
 
         // Then: last value wins and meter remains in Created state
         assertEquals("val2", meter.getContext().get("key"), "should override context with last value");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should replace context value when null value set")
     void shouldReplaceContextValueWhenNullValueSet() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", "valid") is called, then ctx("key", null) is called
         meter.ctx("key", "valid");
@@ -423,17 +465,19 @@ class MeterLifeCyclePreStartConfigurationTest {
 
         // Then: null value is stored as "<null>" placeholder (context stores null as string literal)
         assertEquals("<null>", meter.getContext().get("key"), "should store null as <null> placeholder");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should store multiple different context key-value pairs")
     void shouldStoreMultipleDifferentContextKeyValuePairs() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx() is called multiple times with different keys
         meter.ctx("key1", "value1");
@@ -444,10 +488,11 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertEquals("value1", meter.getContext().get("key1"), "should store key1 context value");
         assertEquals("value2", meter.getContext().get("key2"), "should store key2 context value");
         assertEquals("value3", meter.getContext().get("key3"), "should store key3 context value");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     // ============================================================================
@@ -458,85 +503,95 @@ class MeterLifeCyclePreStartConfigurationTest {
     @DisplayName("should add context with int value before start()")
     void shouldAddContextWithIntValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", 42) is called before start()
         meter.ctx("key", 42);
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("42", meter.getContext().get("key"), "should store int value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with long value before start()")
     void shouldAddContextWithLongValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", 42L) is called before start()
         meter.ctx("key", 42L);
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("42", meter.getContext().get("key"), "should store long value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with boolean value before start()")
     void shouldAddContextWithBooleanValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", true) is called before start()
         meter.ctx("key", true);
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("true", meter.getContext().get("key"), "should store boolean value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with float value before start()")
     void shouldAddContextWithFloatValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", 3.14f) is called before start()
         meter.ctx("key", 3.14f);
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("3.14", meter.getContext().get("key"), "should store float value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with double value before start()")
     void shouldAddContextWithDoubleValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", 3.14) is called before start()
         meter.ctx("key", 3.14);
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("3.14", meter.getContext().get("key"), "should store double value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     // ============================================================================
@@ -547,102 +602,114 @@ class MeterLifeCyclePreStartConfigurationTest {
     @DisplayName("should add context with Integer wrapper value before start()")
     void shouldAddContextWithIntegerWrapperValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", Integer.valueOf(42)) is called before start()
         meter.ctx("key", Integer.valueOf(42));
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("42", meter.getContext().get("key"), "should store Integer value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with Long wrapper value before start()")
     void shouldAddContextWithLongWrapperValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", Long.valueOf(42L)) is called before start()
         meter.ctx("key", Long.valueOf(42L));
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("42", meter.getContext().get("key"), "should store Long value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with Boolean wrapper value before start()")
     void shouldAddContextWithBooleanWrapperValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", Boolean.TRUE) is called before start()
         meter.ctx("key", Boolean.TRUE);
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("true", meter.getContext().get("key"), "should store Boolean value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with Float wrapper value before start()")
     void shouldAddContextWithFloatWrapperValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", Float.valueOf(3.14f)) is called before start()
         meter.ctx("key", Float.valueOf(3.14f));
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("3.14", meter.getContext().get("key"), "should store Float value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with Double wrapper value before start()")
     void shouldAddContextWithDoubleWrapperValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", Double.valueOf(3.14)) is called before start()
         meter.ctx("key", Double.valueOf(3.14));
 
         // Then: context contains the key-value pair and meter remains in Created state
         assertEquals("3.14", meter.getContext().get("key"), "should store Double value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with null Integer wrapper value before start()")
     void shouldAddContextWithNullIntegerWrapperValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", (Integer) null) is called before start()
         meter.ctx("key", (Integer) null);
 
         // Then: context contains the key-value pair with null representation and meter remains in Created state
         assertEquals("<null>", meter.getContext().get("key"), "should store null Integer as <null>");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     // ============================================================================
@@ -653,24 +720,27 @@ class MeterLifeCyclePreStartConfigurationTest {
     @DisplayName("should add context with formatted value before start()")
     void shouldAddContextWithFormattedValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", "value %d", 42) is called before start()
         meter.ctx("key", "value %d", 42);
 
         // Then: context contains the formatted key-value pair and meter remains in Created state
         assertEquals("value 42", meter.getContext().get("key"), "should store formatted value as string");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with Object value before start()")
     void shouldAddContextWithObjectValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
         final Object testObject = new Object();
 
         // When: ctx("key", testObject) is called before start()
@@ -678,27 +748,30 @@ class MeterLifeCyclePreStartConfigurationTest {
 
         // Then: context contains the Object's toString() representation and meter remains in Created state
         assertEquals(testObject.toString(), meter.getContext().get("key"), "should store Object toString() value");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should add context with null Object value before start()")
     void shouldAddContextWithNullObjectValueBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ctx("key", (Object) null) is called before start()
         meter.ctx("key", (Object) null);
 
         // Then: context contains the key-value pair with null representation and meter remains in Created state
         assertEquals("<null>", meter.getContext().get("key"), "should store null Object as <null>");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     // ============================================================================
@@ -709,7 +782,8 @@ class MeterLifeCyclePreStartConfigurationTest {
     @DisplayName("should chain multiple valid configurations before start()")
     void shouldChainMultipleValidConfigurationsBeforeStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: multiple configuration methods are chained
         meter
@@ -719,17 +793,19 @@ class MeterLifeCyclePreStartConfigurationTest {
 
         // Then: all attributes are set correctly and meter remains in Created state
         assertEquals("starting operation", meter.getDescription(), "should store description from chain");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should handle chained configuration with last m() value winning")
     void shouldHandleChainedConfigurationWithLastMValueWinning() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: multiple configuration methods are chained with m() called multiple times
         meter
@@ -740,17 +816,19 @@ class MeterLifeCyclePreStartConfigurationTest {
 
         // Then: m() last value wins, iterations and limit preserved
         assertEquals("op2", meter.getDescription(), "should override description with last m() value");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
     @DisplayName("should ignore invalid values in chained configuration")
     void shouldIgnoreInvalidValuesInChainedConfiguration() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: chained configuration includes invalid values after valid values
         meter
@@ -760,19 +838,21 @@ class MeterLifeCyclePreStartConfigurationTest {
                 .iterations(-1);           // Invalid: -1
 
         // Then: all valid values preserved, invalid attempts logged
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+        assertMeterCreateTime(meter, tr);
 
         // Then: two ILLEGAL events logged
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEventCount(logger, 2);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEventCount(logger, 2);
     }
 
     @Test
     @DisplayName("should chain configuration with context operations")
     void shouldChainConfigurationWithContextOperations() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
+        final TimeRecord tr = new TimeRecord();
+        final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: configuration is chained with context operations
         meter
@@ -786,9 +866,10 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertEquals("starting operation", meter.getDescription(), "should store description from chain");
         assertEquals("testUser", meter.getContext().get("user"), "should store user context value");
         assertEquals("test-session-123", meter.getContext().get("session"), "should store session context value");
-        MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+        assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
+        assertMeterCreateTime(meter, tr);
 
         // Then: no log events
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 }
