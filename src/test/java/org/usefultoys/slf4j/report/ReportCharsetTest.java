@@ -28,7 +28,14 @@ import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
 import java.nio.charset.Charset;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Unit tests for {@link ReportCharset}.
@@ -72,18 +79,18 @@ class ReportCharsetTest {
             "; name=" + defaultCharset.name(),
             "; canEncode=" + defaultCharset.canEncode(),
             " - available charsets: ",
-            Charset.forName("UTF-8").displayName() + "; ",
-            Charset.forName("ISO-8859-1").displayName() + "; ");
+            StandardCharsets.UTF_8.displayName() + "; ",
+            StandardCharsets.ISO_8859_1.displayName() + "; ");
     }
 
     @Test
     @DisplayName("should log custom charset information")
     void shouldLogCustomCharsetInformation() {
         // Given: a charset info provider with custom default and available charsets
-        final Charset customDefaultCharset = Charset.forName("UTF-16");
+        final Charset customDefaultCharset = StandardCharsets.UTF_16;
         final Map<String, Charset> customAvailableCharsets = new LinkedHashMap<>();
-        customAvailableCharsets.put("UTF-16", Charset.forName("UTF-16"));
-        customAvailableCharsets.put("US-ASCII", Charset.forName("US-ASCII"));
+        customAvailableCharsets.put("UTF-16", StandardCharsets.UTF_16);
+        customAvailableCharsets.put("US-ASCII", StandardCharsets.US_ASCII);
 
         final ReportCharset.CharsetInfoProvider provider = new ReportCharset.CharsetInfoProvider() {
             @Override
@@ -114,16 +121,16 @@ class ReportCharsetTest {
             "; name=" + customDefaultCharset.name(),
             "; canEncode=" + customDefaultCharset.canEncode(),
             " - available charsets: ",
-            Charset.forName("UTF-16").displayName() + "; ",
-            Charset.forName("US-ASCII").displayName() + "; ");
-        AssertLogger.assertEventNot(logger, 0, MockLoggerEvent.Level.INFO, Charset.forName("ISO-8859-1").displayName());
+            StandardCharsets.UTF_16.displayName() + "; ",
+            StandardCharsets.US_ASCII.displayName() + "; ");
+        AssertLogger.assertEventNot(logger, 0, MockLoggerEvent.Level.INFO, StandardCharsets.ISO_8859_1.displayName());
     }
 
     @Test
     @DisplayName("should log empty available charsets")
     void shouldLogEmptyAvailableCharsets() {
         // Given: a charset info provider with empty available charsets map
-        final Charset customDefaultCharset = Charset.forName("UTF-8");
+        final Charset customDefaultCharset = StandardCharsets.UTF_8;
         final Map<String, Charset> customAvailableCharsets = Collections.emptyMap();
 
         final ReportCharset.CharsetInfoProvider provider = new ReportCharset.CharsetInfoProvider() {
@@ -155,7 +162,7 @@ class ReportCharsetTest {
             "; name=" + customDefaultCharset.name(),
             "; canEncode=" + customDefaultCharset.canEncode(),
             " - available charsets: ");
-        AssertLogger.assertEventNot(logger, 0, MockLoggerEvent.Level.INFO, Charset.forName("UTF-16").displayName());
+        AssertLogger.assertEventNot(logger, 0, MockLoggerEvent.Level.INFO, StandardCharsets.UTF_16.displayName());
     }
 
     @Test
@@ -180,9 +187,9 @@ class ReportCharsetTest {
      *
      * @param count the number of random charsets to generate and test
      */
-    private void testWithRandomCharsets(int count) {
+    private void testWithRandomCharsets(final int count) {
         // Given: a charset info provider with 'count' random charsets
-        final Charset customDefaultCharset = Charset.forName("UTF-8");
+        final Charset customDefaultCharset = StandardCharsets.UTF_8;
         final Map<String, Charset> randomCharsets = generateRandomCharsets(count);
 
         final ReportCharset.CharsetInfoProvider provider = new ReportCharset.CharsetInfoProvider() {
@@ -226,7 +233,7 @@ class ReportCharsetTest {
      * @param count the number of random charsets to select
      * @return a LinkedHashMap with randomly selected charsets
      */
-    private Map<String, Charset> generateRandomCharsets(int count) {
+    private Map<String, Charset> generateRandomCharsets(final int count) {
         final List<Charset> allAvailable = new ArrayList<>(Charset.availableCharsets().values());
         Collections.shuffle(allAvailable, random);
 

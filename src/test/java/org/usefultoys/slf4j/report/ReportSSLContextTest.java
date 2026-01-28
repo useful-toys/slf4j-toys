@@ -36,7 +36,9 @@ import java.security.Provider;
 import java.util.Properties;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ReportSSLContext}.
@@ -65,7 +67,7 @@ class ReportSSLContextTest {
     @DisplayName("should report SSL context with full details")
     void shouldReportSSLContextWithFullDetails() throws Exception {
         // Given: fully configured SSL context with all properties
-        try (MockedStatic<SSLContext> mockedStatic = mockStatic(SSLContext.class)) {
+        try (final MockedStatic<SSLContext> mockedStatic = mockStatic(SSLContext.class)) {
             final SSLContext mockSslContext = mock(SSLContext.class);
             final Provider mockProvider = mock(Provider.class);
             final SSLSocketFactory mockSocketFactory = mock(SSLSocketFactory.class);
@@ -77,8 +79,8 @@ class ReportSSLContextTest {
 
             when(mockSslContext.getProtocol()).thenReturn("TLSv1.2");
             when(mockSslContext.getProvider()).thenReturn(mockProvider);
-            Properties props = new Properties();
-            props.put("Provider.id name", "SunJSSE");
+            final Properties props = new Properties();
+            props.setProperty("Provider.id name", "SunJSSE");
             when(mockProvider.entrySet()).thenReturn(props.entrySet());
             when(mockSslContext.getSocketFactory()).thenReturn(mockSocketFactory);
             when(mockSocketFactory.getDefaultCipherSuites()).thenReturn(new String[]{"TLS_DHE_DSS_WITH_AES_128_CBC_SHA"});
@@ -135,7 +137,7 @@ class ReportSSLContextTest {
     @DisplayName("should handle SSL context not available")
     void shouldHandleSSLContextNotAvailable() throws Exception {
         // Given: SSLContext.getInstance throws exception for unavailable protocol
-        try (MockedStatic<SSLContext> mockedStatic = mockStatic(SSLContext.class)) {
+        try (final MockedStatic<SSLContext> mockedStatic = mockStatic(SSLContext.class)) {
             mockedStatic.when(() -> SSLContext.getInstance("SSLv2")).thenThrow(new java.security.NoSuchAlgorithmException("SSLv2 not available"));
 
             // When: report is executed

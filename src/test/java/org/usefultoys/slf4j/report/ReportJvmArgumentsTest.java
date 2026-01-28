@@ -150,7 +150,7 @@ class ReportJvmArgumentsTest {
     void shouldNotCensorJvmArgumentWithEqualsAtPosition2() {
         // Given: JVM argument with equals sign at position 2 (not a valid key=value pair)
         setupManagedFactory();
-        final List<String> jvmArgs = Arrays.asList("-D=value");
+        final List<String> jvmArgs = Collections.singletonList("-D=value");
         when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
 
         // When: report is executed
@@ -165,7 +165,7 @@ class ReportJvmArgumentsTest {
     void shouldNotCensorJvmArgumentWithoutEqualsSign() {
         // Given: JVM argument without equals sign (not a valid key=value pair)
         setupManagedFactory();
-        final List<String> jvmArgs = Arrays.asList("-Dvalue");
+        final List<String> jvmArgs = Collections.singletonList("-Dvalue");
         when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
 
         // When: report is executed
@@ -180,7 +180,7 @@ class ReportJvmArgumentsTest {
     void shouldNotCensorJvmArgumentWithOnlyDFlag() {
         // Given: JVM argument with only -D flag (not a valid key=value pair)
         setupManagedFactory();
-        final List<String> jvmArgs = Arrays.asList("-D");
+        final List<String> jvmArgs = Collections.singletonList("-D");
         when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
 
         // When: report is executed
@@ -198,7 +198,7 @@ class ReportJvmArgumentsTest {
         System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "k"); // Single character pattern
         ReporterConfig.init();
 
-        final List<String> jvmArgs = Arrays.asList("-Dk=secret");
+        final List<String> jvmArgs = Collections.singletonList("-Dk=secret");
         when(mockRuntimeMXBean.getInputArguments()).thenReturn(jvmArgs);
 
         // When: report is executed

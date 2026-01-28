@@ -78,13 +78,13 @@ class ReportSecurityProvidersTest {
     @DisplayName("should report security providers with services")
     void shouldReportSecurityProvidersWithServices() {
         // Given: two security providers with services configured
-        Provider provider1 = mock(Provider.class);
+        final Provider provider1 = mock(Provider.class);
         when(provider1.getName()).thenReturn("SUN");
         when(provider1.getVersion()).thenReturn(1.8);
         when(provider1.getInfo()).thenReturn("SUN security provider");
         when(provider1.entrySet()).thenReturn(Collections.singletonMap((Object)"Signature.SHA1withDSA", (Object)"SUN provider").entrySet());
 
-        Provider provider2 = mock(Provider.class);
+        final Provider provider2 = mock(Provider.class);
         when(provider2.getName()).thenReturn("BC");
         when(provider2.getVersion()).thenReturn(1.68);
         when(provider2.getInfo()).thenReturn("Bouncy Castle security provider");
@@ -128,7 +128,7 @@ class ReportSecurityProvidersTest {
     @DisplayName("should handle security provider with no services")
     void shouldHandleSecurityProviderWithNoServices() {
         // Given: security provider with no services (empty services map)
-        Provider provider = mock(Provider.class);
+        final Provider provider = mock(Provider.class);
         when(provider.getName()).thenReturn("EMPTY");
         when(provider.getVersion()).thenReturn(1.0);
         when(provider.getInfo()).thenReturn("Provider with no services");

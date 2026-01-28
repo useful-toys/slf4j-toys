@@ -37,7 +37,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertHasEvent;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvent;
 
@@ -69,7 +72,7 @@ class ReportDefaultTrustKeyStoreTest {
     @DisplayName("should report trust keystore with certificate information")
     void shouldReportTrustKeystoreWithCertificateInformation() throws Exception {
         // Given: TrustManagerFactory with mock trust manager and certificate
-        try (MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
+        try (final MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
             final TrustManagerFactory mockTmf = mock(TrustManagerFactory.class);
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenReturn(mockTmf);
 
@@ -105,7 +108,7 @@ class ReportDefaultTrustKeyStoreTest {
     @DisplayName("should report trust keystore when no trust managers")
     void shouldReportTrustKeystoreWhenNoTrustManagers() throws Exception {
         // Given: TrustManagerFactory with no trust managers
-        try (MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
+        try (final MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
             final TrustManagerFactory mockTmf = mock(TrustManagerFactory.class);
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenReturn(mockTmf);
             when(mockTmf.getTrustManagers()).thenReturn(new TrustManager[0]);
@@ -124,7 +127,7 @@ class ReportDefaultTrustKeyStoreTest {
     @DisplayName("should report error when KeyStore exception occurs")
     void shouldReportErrorWhenKeyStoreException() throws Exception {
         // Given: TrustManagerFactory that throws KeyStoreException on init
-        try (MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
+        try (final MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
             final TrustManagerFactory mockTmf = mock(TrustManagerFactory.class);
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenReturn(mockTmf);
             doThrow(new KeyStoreException("Test KeyStore Exception")).when(mockTmf).init((KeyStore) null);
@@ -142,7 +145,7 @@ class ReportDefaultTrustKeyStoreTest {
     @DisplayName("should report error when NoSuchAlgorithm exception occurs")
     void shouldReportErrorWhenNoSuchAlgorithmException() throws Exception {
         // Given: TrustManagerFactory that throws NoSuchAlgorithmException
-        try (MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
+        try (final MockedStatic<TrustManagerFactory> mockedStatic = mockStatic(TrustManagerFactory.class)) {
             mockedStatic.when(() -> TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())).thenThrow(new NoSuchAlgorithmException("Test Algorithm Exception"));
 
             // When: report is executed
