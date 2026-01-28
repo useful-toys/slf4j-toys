@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.internal.TestTimeSource;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -34,6 +35,11 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStartTimePreserved;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStop;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWithWindow;
 
 /**
  * Unit tests for {@link Meter} termination after start().
@@ -95,12 +101,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkWithoutPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ok() is called
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: meter transitions to OK state, okPath unset, INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -114,16 +122,19 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkWithDescriptionPreserved() {
         // Given: a new, started Meter with description
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("operation") is called
         meter.m("operation");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
         // When: ok() is called
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: description preserved, okPath unset, INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         assertEquals("operation", meter.getDescription());
 
         // Then: logs start + ok + DATA_OK
@@ -138,16 +149,19 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkWithIterationsPreserved() {
         // Given: a new, started Meter with iterations
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: inc() is called 5 times
         meter.inc().inc().inc().inc().inc();
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
         // When: ok() is called
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: currentIteration = 5 preserved, INFO log with metrics
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 5, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -165,12 +179,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkWithStringPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ok("success_outcome") is called
-        meter.ok("success_outcome");
+        recordStopWithWindow(tr, () -> meter.ok("success_outcome"));
 
         // Then: okPath = "success_outcome", INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "success_outcome", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -184,12 +200,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkWithEnumPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ok(TestEnum.VALUE1) is called
-        meter.ok(MeterLifeCycleTestHelper.TestEnum.VALUE1);
+        recordStopWithWindow(tr, () -> meter.ok(MeterLifeCycleTestHelper.TestEnum.VALUE1));
 
         // Then: okPath = enum toString(), INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, MeterLifeCycleTestHelper.TestEnum.VALUE1.name(), null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -203,14 +221,16 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkWithThrowablePath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         final Exception ex = new Exception("success_cause");
 
         // When: ok(exception) is called
-        meter.ok(ex);
+        recordStopWithWindow(tr, () -> meter.ok(ex));
 
         // Then: okPath = exception class name, INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -224,14 +244,16 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkWithObjectPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         final MeterLifeCycleTestHelper.TestObject obj = new MeterLifeCycleTestHelper.TestObject();
 
         // When: ok(object) is called
-        meter.ok(obj);
+        recordStopWithWindow(tr, () -> meter.ok(obj));
 
         // Then: okPath = object toString(), INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -245,12 +267,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldHandleOkWithNullPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ok(null) is called
-        meter.ok(null);
+        recordStopWithWindow(tr, () -> meter.ok(null));
 
         // Then: okPath remains unset, logs ILLEGAL, completes with INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ILLEGAL + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -269,15 +293,18 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkAfterPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("configured_path") → ok() is called
         meter.path("configured_path");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "configured_path", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: okPath = "configured_path", INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "configured_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -291,15 +318,18 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkPathOverridingPreviousPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("configured_path") → ok("override_path") is called
         meter.path("configured_path");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "configured_path", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.ok("override_path");
+        recordStopWithWindow(tr, () -> meter.ok("override_path"));
 
         // Then: okPath = "override_path" (ok(path) overrides path())
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "override_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -313,6 +343,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkWithDescriptionAndPathPreserved() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("step") → path("step_path") → ok() is called
         meter.m("step");
@@ -320,11 +351,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("step_path");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "step_path", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: okPath = "step_path", description and path both preserved
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "step_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         assertEquals("step", meter.getDescription());
 
         // Then: logs start + ok + DATA_OK
@@ -339,15 +372,18 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldHandlePathNullThenOk() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path(null) → ok() is called
         meter.path(null);
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: path rejects null (ILLEGAL), okPath = null, INFO log for ok()
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ILLEGAL + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -366,6 +402,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkAfterTwoPathCalls() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("first") → path("second") → ok() is called
         meter.path("first");
@@ -373,11 +410,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("second");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: okPath = "second" (last wins)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "second", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -391,6 +430,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkAfterThreePathCalls() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("first") → path("second") → path("third") → ok() is called
         meter.path("first");
@@ -401,11 +441,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("third");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "third", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: okPath = "third" (last wins)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "third", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -419,6 +461,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaOkPathOverridingMultiplePathCalls() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("first") → path("second") → ok("final_override") is called
         meter.path("first");
@@ -426,11 +469,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("second");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.ok("final_override");
+        recordStopWithWindow(tr, () -> meter.ok("final_override"));
 
         // Then: okPath = "final_override" (ok() overrides last path())
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "final_override", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -448,12 +493,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaSuccessAlias() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: success() is called
-        meter.success();
+        recordStopWithWindow(tr, () -> meter.success());
 
         // Then: meter transitions to OK state, okPath unset, INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -467,12 +514,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaSuccessPathAlias() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: success("alias_path") is called
-        meter.success("alias_path");
+        recordStopWithWindow(tr, () -> meter.success("alias_path"));
 
         // Then: okPath = "alias_path", INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "alias_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -486,15 +535,18 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaSuccessAfterPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("configured") → success() is called
         meter.path("configured");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "configured", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.success();
+        recordStopWithWindow(tr, () -> meter.success());
 
         // Then: okPath = "configured", INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -512,17 +564,20 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldHandlePathValidThenOkNull() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("validPath") → ok(null) is called
         meter.path("validPath");
         // Then: validate path was applied (pedagogical validation)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "validPath", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
         // When: ok(null) is called
-        meter.ok(null);
+        recordStopWithWindow(tr, () -> meter.ok(null));
 
         // Then: ok() ignores null (ILLEGAL), okPath = "validPath" preserved
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ILLEGAL + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
@@ -541,12 +596,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaRejectWithStringCause() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: reject("validation_error") is called
-        meter.reject("validation_error");
+        recordStopWithWindow(tr, () -> meter.reject("validation_error"));
 
         // Then: rejectPath = "validation_error", INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "validation_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + DATA_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -560,12 +617,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaRejectWithEnumCause() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: reject(TestEnum.VALUE1) is called
-        meter.reject(MeterLifeCycleTestHelper.TestEnum.VALUE1);
+        recordStopWithWindow(tr, () -> meter.reject(MeterLifeCycleTestHelper.TestEnum.VALUE1));
 
         // Then: rejectPath = enum toString(), INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, MeterLifeCycleTestHelper.TestEnum.VALUE1.name(), null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + DATA_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -579,14 +638,16 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaRejectWithThrowableCause() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         final Exception ex = new IllegalArgumentException("invalid format");
 
         // When: reject(exception) is called
-        meter.reject(ex);
+        recordStopWithWindow(tr, () -> meter.reject(ex));
 
         // Then: rejectPath = exception class name, INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, ex.getClass().getSimpleName(), null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + DATA_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -600,14 +661,16 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaRejectWithObjectCause() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         final MeterLifeCycleTestHelper.TestObject obj = new MeterLifeCycleTestHelper.TestObject();
 
         // When: reject(object) is called
-        meter.reject(obj);
+        recordStopWithWindow(tr, () -> meter.reject(obj));
 
         // Then: rejectPath = object toString(), INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, obj.toString(), null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + DATA_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -625,15 +688,18 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaRejectAfterPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("ok_path") → reject("business_error") is called
         meter.path("ok_path");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "ok_path", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.reject("business_error");
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
 
         // Then: rejectPath = "business_error", okPath remains unset
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + DATA_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -647,6 +713,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaRejectAfterPathWithDescription() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("step") → path("ok_expectation") → reject("precondition_failed") is called
         meter.m("step");
@@ -654,11 +721,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("ok_expectation");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "ok_expectation", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.reject("precondition_failed");
+        recordStopWithWindow(tr, () -> meter.reject("precondition_failed"));
 
         // Then: rejectPath = "precondition_failed", okPath unset
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "precondition_failed", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         assertEquals("step", meter.getDescription());
 
         // Then: logs start + reject + DATA_REJECT
@@ -677,6 +746,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaRejectAfterMultiplePathCalls() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("first") → path("second") → reject("business_rule") is called
         meter.path("first");
@@ -684,11 +754,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("second");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.reject("business_rule");
+        recordStopWithWindow(tr, () -> meter.reject("business_rule"));
 
         // Then: rejectPath = "business_rule", okPath unset
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_rule", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + DATA_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -706,12 +778,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaFailWithStringCause() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: fail("critical_error") is called
-        meter.fail("critical_error");
+        recordStopWithWindow(tr, () -> meter.fail("critical_error"));
 
         // Then: failPath = "critical_error", failMessage = null, ERROR log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "critical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + DATA_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -725,12 +799,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaFailWithEnumCause() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: fail(TestEnum.VALUE2) is called
-        meter.fail(MeterLifeCycleTestHelper.TestEnum.VALUE2);
+        recordStopWithWindow(tr, () -> meter.fail(MeterLifeCycleTestHelper.TestEnum.VALUE2));
 
         // Then: failPath = enum toString(), failMessage = null, ERROR log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, MeterLifeCycleTestHelper.TestEnum.VALUE2.name(), null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + DATA_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -744,14 +820,16 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaFailWithThrowableCause() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         final Exception ex = new SQLException("connection refused");
 
         // When: fail(exception) is called
-        meter.fail(ex);
+        recordStopWithWindow(tr, () -> meter.fail(ex));
 
         // Then: failPath = className, failMessage = message (separated), ERROR log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, ex.getClass().getName(), ex.getMessage(), 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + DATA_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -765,14 +843,16 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaFailWithObjectCause() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         final MeterLifeCycleTestHelper.TestObject obj = new MeterLifeCycleTestHelper.TestObject();
 
         // When: fail(object) is called
-        meter.fail(obj);
+        recordStopWithWindow(tr, () -> meter.fail(obj));
 
         // Then: failPath = object toString(), failMessage = null, ERROR log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, obj.toString(), null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + DATA_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -790,15 +870,18 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaFailAfterPath() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("success_expectation") → fail("timeout") is called
         meter.path("success_expectation");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "success_expectation", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.fail("timeout");
+        recordStopWithWindow(tr, () -> meter.fail("timeout"));
 
         // Then: failPath = "timeout", okPath remains unset, ERROR log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "timeout", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + DATA_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -812,6 +895,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaFailAfterPathWithDescription() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("operation") → path("ok_path") → fail("unexpected_exception") is called
         meter.m("operation");
@@ -819,11 +903,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("ok_path");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "ok_path", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.fail("unexpected_exception");
+        recordStopWithWindow(tr, () -> meter.fail("unexpected_exception"));
 
         // Then: failPath = "unexpected_exception", okPath unset, ERROR log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "unexpected_exception", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         assertEquals("operation", meter.getDescription());
 
         // Then: logs start + fail + DATA_FAIL
@@ -842,6 +928,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldTerminateViaFailAfterMultiplePathCalls() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: path("first") → path("second") → fail("system_error") is called
         meter.path("first");
@@ -849,11 +936,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("second");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "second", null, null, null, 0, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.fail("system_error");
+        recordStopWithWindow(tr, () -> meter.fail("system_error"));
 
         // Then: failPath = "system_error", okPath unset, ERROR log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "system_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + DATA_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -871,6 +960,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldHandleComplexChainWithOk() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("operation") → iterations(100) → inc() × 50 → path("checkpoint") → ok() is called
         meter.m("operation");
@@ -886,11 +976,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("checkpoint");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "checkpoint", null, null, null, 50, 100, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: description, iterations, okPath all preserved, INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "checkpoint", null, null, null, 50, 100, 0);
+        assertMeterStopTime(meter, tr);
         assertEquals("operation", meter.getDescription());
 
         // Then: logs start + ok + DATA_OK
@@ -905,6 +997,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldHandleComplexChainWithReject() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: limitMilliseconds(5000) → inc() × 25 → path("expected") → reject("performance") is called
         meter.limitMilliseconds(5000);
@@ -917,11 +1010,13 @@ class MeterLifeCyclePostStartTerminationTest {
 
         meter.path("expected");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "expected", null, null, null, 25, 0, 5000);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.reject("performance_degradation");
+        recordStopWithWindow(tr, () -> meter.reject("performance_degradation"));
 
         // Then: timeLimit, iterations, rejectPath all correct, INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "performance_degradation", null, null, 25, 0, 5000);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + DATA_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -935,6 +1030,7 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldHandleComplexChainWithFail() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: m("critical") → ctx("user", "admin") → inc() × 10 → fail("auth_failure") is called
         meter.m("critical");
@@ -948,11 +1044,13 @@ class MeterLifeCyclePostStartTerminationTest {
             meter.inc();
         }
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
+        assertMeterStartTimePreserved(meter, tr);
 
-        meter.fail("auth_failure");
+        recordStopWithWindow(tr, () -> meter.fail("auth_failure"));
 
         // Then: description, iterations, failPath all preserved, ERROR log (context is cleared after emission)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "auth_failure", null, 10, 0, 0);
+        assertMeterStopTime(meter, tr);
         assertEquals("critical", meter.getDescription());
 
         // Then: logs start + fail + DATA_FAIL
@@ -971,12 +1069,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldHandleMinimalMeterOk() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: ok() is called
-        meter.ok();
+        recordStopWithWindow(tr, () -> meter.ok());
 
         // Then: clean transition with no additional attributes, INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -990,12 +1090,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldHandleMinimalMeterReject() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: reject("no_work_done") is called
-        meter.reject("no_work_done");
+        recordStopWithWindow(tr, () -> meter.reject("no_work_done"));
 
         // Then: rejectPath captured, INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "no_work_done", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + DATA_REJECT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1009,12 +1111,14 @@ class MeterLifeCyclePostStartTerminationTest {
     void shouldHandleMinimalMeterFail() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: fail("no_work_done") is called
-        meter.fail("no_work_done");
+        recordStopWithWindow(tr, () -> meter.fail("no_work_done"));
 
         // Then: failPath captured, ERROR log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "no_work_done", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + DATA_FAIL
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -1039,16 +1143,18 @@ class MeterLifeCyclePostStartTerminationTest {
 
         // When: meter starts
         meter.start();
+        final TimeRecord tr = fromStarted(meter);
 
         // When: time advances beyond limit (simulate 50ms elapsed)
         timeSource.advanceMiliseconds(50);
 
         // When: ok() is called
-        meter.ok();
+        recordStop(tr, () -> meter.ok());
 
         // Then: isSlow() = true, WARN log with MSG_SLOW_OK marker (not MSG_OK)
         assertTrue(meter.isSlow());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 10);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs start + slow_ok + DATA_SLOW_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.WARN, Markers.MSG_SLOW_OK);
