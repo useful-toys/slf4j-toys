@@ -105,12 +105,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectSecondOkAfterOkWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ok() is called without start()
-        meter.ok();
         recordStopWithWindow(tr, () -> meter.ok());
         // Then: meter stops with INCONSISTENT_OK
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
@@ -133,12 +131,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkPathAfterOkWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ok() is called without start()
-        meter.ok();
         recordStopWithWindow(tr, () -> meter.ok());
         // Then: meter stops with INCONSISTENT_OK, okPath unset
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
@@ -161,12 +157,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectRejectAfterOkWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ok() is called without start()
-        meter.ok();
         recordStopWithWindow(tr, () -> meter.ok());
         // Then: meter stops with INCONSISTENT_OK
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
@@ -189,12 +183,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectFailAfterOkWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ok() is called without start()
-        meter.ok();
         recordStopWithWindow(tr, () -> meter.ok());
         // Then: meter stops with INCONSISTENT_OK
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
@@ -217,12 +209,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectSecondOkAfterOkPathWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ok("first_path") is called without start()
-        meter.ok("first_path");
         recordStopWithWindow(tr, () -> meter.ok("first_path"));
         // Then: meter stops with INCONSISTENT_OK, okPath="first_path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
@@ -245,12 +235,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkPath2AfterOkPath1WithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ok("first_path") is called without start()
-        meter.ok("first_path");
         recordStopWithWindow(tr, () -> meter.ok("first_path"));
         // Then: meter stops with INCONSISTENT_OK, okPath="first_path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
@@ -273,12 +261,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectRejectAfterOkPathWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ok("path") is called without start()
-        meter.ok("path");
         recordStopWithWindow(tr, () -> meter.ok("path"));
         // Then: meter stops with INCONSISTENT_OK, okPath="path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
@@ -301,12 +287,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectFailAfterOkPathWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: ok("path") is called without start()
-        meter.ok("path");
         recordStopWithWindow(tr, () -> meter.ok("path"));
         // Then: meter stops with INCONSISTENT_OK, okPath="path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
@@ -329,12 +313,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkAfterRejectWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: reject("business_error") is called without start()
-        meter.reject("business_error");
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
         // Then: meter stops with INCONSISTENT_REJECT
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
@@ -357,12 +339,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkPathAfterRejectWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: reject("business_error") is called without start()
-        meter.reject("business_error");
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
         // Then: meter stops with INCONSISTENT_REJECT
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
@@ -385,12 +365,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectSecondRejectAfterRejectWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: reject("business_error") is called without start()
-        meter.reject("business_error");
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
         // Then: meter stops with INCONSISTENT_REJECT
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
@@ -413,12 +391,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectFailAfterRejectWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: reject("business_error") is called without start()
-        meter.reject("business_error");
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
         // Then: meter stops with INCONSISTENT_REJECT
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
@@ -441,12 +417,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkAfterFailWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: fail("technical_error") is called without start()
-        meter.fail("technical_error");
         recordStopWithWindow(tr, () -> meter.fail("technical_error"));
         // Then: meter stops with INCONSISTENT_FAIL
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
@@ -469,12 +443,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectOkPathAfterFailWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: fail("technical_error") is called without start()
-        meter.fail("technical_error");
         recordStopWithWindow(tr, () -> meter.fail("technical_error"));
         // Then: meter stops with INCONSISTENT_FAIL
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
@@ -497,12 +469,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectRejectAfterFailWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: fail("technical_error") is called without start()
-        meter.fail("technical_error");
         recordStopWithWindow(tr, () -> meter.fail("technical_error"));
         // Then: meter stops with INCONSISTENT_FAIL
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
@@ -525,12 +495,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
     @ValidateCleanMeter
     void shouldRejectSecondFailAfterFailWithoutStart() {
         // Given: a new Meter
-        final Meter meter = new Meter(logger);
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: fail("technical_error") is called without start()
-        meter.fail("technical_error");
         recordStopWithWindow(tr, () -> meter.fail("technical_error"));
         // Then: meter stops with INCONSISTENT_FAIL
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
@@ -839,7 +807,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         // When: ok() is called
         meter.ok();
         // Then: state remains Failed - first termination wins
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "tech", null, 0, 0, 0);
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
