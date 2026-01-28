@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -32,6 +33,9 @@ import org.usefultoys.test.WithLocale;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWithWindow;
 
 /**
  * Unit tests for invalid {@link Meter} operations after Failed termination.
@@ -67,6 +71,7 @@ import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterSta
  * </ul>
  *
  * @author Co-authored-by: GitHub Copilot using Claude 3.5 Sonnet
+ * @author Co-authored-by: Google Gemini using <model name>
  */
 @ValidateCharset
 @ResetMeterConfig
@@ -90,7 +95,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectDescriptionAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m("step 1") is called after stop
         meter.m("step 1");
@@ -98,6 +107,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -111,7 +121,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectDescriptionWithArgsAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m("step %d", 1) is called after stop
         meter.m("step %d", 1);
@@ -119,6 +133,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -132,7 +147,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullDescriptionAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m(null) is called after stop
         meter.m(null);
@@ -140,6 +159,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -157,13 +177,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectIncAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: inc() is called after stop
         meter.inc();
 
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -177,13 +202,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectIncByAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: incBy(5) is called after stop
         meter.incBy(5);
 
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -197,13 +227,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectIncToAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: incTo(10) is called after stop
         meter.incTo(10);
 
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -221,13 +256,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectProgressAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: progress() is called after stop
         meter.progress();
 
         // Then: state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no progress message
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -243,16 +283,19 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     void shouldRejectProgressAfterIncAndFail() {
         // Given: a meter with inc() that has been stopped with fail("technical_error")
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.inc();
-        meter.fail("technical_error");
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
         // Then: validate meter is in stopped state with currentIteration=1 (pedagogical validation)
         assertMeterState(meter, true, true, null, null, "technical_error", null, 1, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: progress() is called after stop
         meter.progress();
 
         // Then: state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 1, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no further progress logged
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -271,7 +314,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key1", "value1") is called after stop
         meter.ctx("key1", "value1");
@@ -279,6 +326,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key1"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -294,10 +342,12 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Given: a meter with context that has been stopped with fail("technical_error")
         final Meter meter = new Meter(logger).start();
         meter.ctx("key", "val");
-        meter.fail("technical_error");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
         // Then: validate meter is in stopped state (pedagogical validation)
         // Note: context is cleared after fail() - this is expected behavior
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "val2") is called after stop
         meter.ctx("key", "val2");
@@ -305,6 +355,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context still not present (was cleared by fail()), state unchanged after invalid operation
         assertNull(meter.getContext().get("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -322,7 +373,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectIntContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 42) is called after stop
         meter.ctx("key", 42);
@@ -330,6 +385,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -343,7 +399,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectLongContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 42L) is called after stop
         meter.ctx("key", 42L);
@@ -351,6 +411,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -364,7 +425,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectBooleanContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", true) is called after stop
         meter.ctx("key", true);
@@ -372,6 +437,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -385,7 +451,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectFloatContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 3.14f) is called after stop
         meter.ctx("key", 3.14f);
@@ -393,6 +463,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -406,7 +477,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectDoubleContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 3.14) is called after stop
         meter.ctx("key", 3.14);
@@ -414,6 +489,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -431,7 +507,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectIntegerWrapperContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Integer.valueOf(42)) is called after stop
         meter.ctx("key", Integer.valueOf(42));
@@ -439,6 +519,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -452,7 +533,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectLongWrapperContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Long.valueOf(42L)) is called after stop
         meter.ctx("key", Long.valueOf(42L));
@@ -460,6 +545,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -473,7 +559,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectBooleanWrapperContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Boolean.TRUE) is called after stop
         meter.ctx("key", Boolean.TRUE);
@@ -481,6 +571,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -494,7 +585,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectFloatWrapperContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Float.valueOf(3.14f)) is called after stop
         meter.ctx("key", Float.valueOf(3.14f));
@@ -502,6 +597,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -515,7 +611,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectDoubleWrapperContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Double.valueOf(3.14)) is called after stop
         meter.ctx("key", Double.valueOf(3.14));
@@ -523,6 +623,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -536,7 +637,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullIntegerWrapperContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", (Integer) null) is called after stop
         meter.ctx("key", (Integer) null);
@@ -544,6 +649,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -561,7 +667,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectFormattedContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "value %d", 42) is called after stop
         meter.ctx("key", "value %d", 42);
@@ -569,6 +679,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -582,7 +693,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectObjectContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", new Object()) is called after stop
         meter.ctx("key", new Object());
@@ -590,6 +705,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -603,7 +719,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullObjectContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", (Object) null) is called after stop
         meter.ctx("key", (Object) null);
@@ -611,6 +731,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -628,7 +749,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectKeyOnlyContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("marker") is called after stop
         meter.ctx("marker");
@@ -636,6 +761,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("marker"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -649,7 +775,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectConditionalKeyOnlyTrueAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, "marker") is called after stop
         meter.ctx(true, "marker");
@@ -657,6 +787,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("marker"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -675,13 +806,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
          * This test documents the actual behavior: conditional ctx() with false silently does nothing. */
         
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, "marker") is called (condition=false returns early)
         meter.ctx(false, "marker");
 
         // Then: context unchanged, state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: only fail logs (no ILLEGAL because putContext was never called)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -694,7 +830,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectConditionalTrueFalseNamesAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, "trueMarker", "falseMarker") is called after stop
         meter.ctx(true, "trueMarker", "falseMarker");
@@ -703,6 +843,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertFalse(meter.getContext().containsKey("trueMarker"), "should not add context after stop");
         assertFalse(meter.getContext().containsKey("falseMarker"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -720,13 +861,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyOnlyContextAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null) is called after stop
         meter.ctx(null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -740,13 +886,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWhenTrueAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, null) is called after stop
         meter.ctx(true, null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -763,13 +914,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
          * However, condition=false causes early return before putContext() is called, so no ILLEGAL log occurs. */
         
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, null) is called (condition=false returns early)
         meter.ctx(false, null);
 
         // Then: context unchanged, state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: only fail logs (no ILLEGAL)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -782,7 +938,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWithFalseNameAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, null, "falseMarker") is called after stop
         meter.ctx(true, null, "falseMarker");
@@ -790,6 +950,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("falseMarker"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -803,7 +964,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullFalseNameWhenFalseAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, "trueMarker", null) is called after stop
         meter.ctx(false, "trueMarker", null);
@@ -811,6 +976,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("trueMarker"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -824,13 +990,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenTrueAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, null, null) is called after stop
         meter.ctx(true, null, null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -844,13 +1015,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenFalseAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, null, null) is called after stop
         meter.ctx(false, null, null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -868,13 +1044,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyWithValueAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null, "value") is called after stop
         meter.ctx(null, "value");
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -888,13 +1069,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyWithPrimitiveAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null, 42) is called after stop
         meter.ctx(null, 42);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -908,13 +1094,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyWithFormatAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null, "format %d", 42) is called after stop
         meter.ctx(null, "format %d", 42);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -928,7 +1119,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullFormatAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", null, 42) is called after stop (null format string)
         meter.ctx("key", null, 42);
@@ -936,6 +1131,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -949,7 +1145,11 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullArgsArrayAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "format", (Object[]) null) is called after stop (null args array)
         meter.ctx("key", "format", (Object[]) null);
@@ -957,6 +1157,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
@@ -974,13 +1175,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectPathAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path("new_path") is called after stop
         meter.path("new_path");
 
         // Then: logs ILLEGAL, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -990,13 +1196,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectPathUpdateAfterFail() {
         // Given: a meter that has been stopped with fail("original_error")
-        final Meter meter = new Meter(logger).start().fail("original_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("original_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path("new_path") is called after stop
         meter.path("new_path");
 
         // Then: logs ILLEGAL, meter state unchanged
         assertMeterState(meter, true, true, null, null, "original_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1006,13 +1217,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullPathAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path(null) is called after stop
         meter.path(null);
 
         // Then: logs ILLEGAL, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1026,13 +1242,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectLimitAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(5000) is called after stop
         meter.limitMilliseconds(5000);
 
         // Then: logs ILLEGAL, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1044,13 +1265,17 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Given: a meter with timeLimit that has been stopped with fail("technical_error")
         final Meter meter = new Meter(logger).start();
         meter.limitMilliseconds(100);
-        meter.fail("technical_error");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(5000) is called after stop
         meter.limitMilliseconds(5000);
 
         // Then: logs ILLEGAL, meter state unchanged (timeLimit remains 100)
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 100);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1060,13 +1285,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectZeroLimitAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(0) is called after stop
         meter.limitMilliseconds(0);
 
         // Then: logs ILLEGAL, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1076,13 +1306,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNegativeLimitAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(-1) is called after stop
         meter.limitMilliseconds(-1);
 
         // Then: logs ILLEGAL, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1096,13 +1331,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectIterationsAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(100) is called after stop
         meter.iterations(100);
 
         // Then: logs ILLEGAL, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1114,13 +1354,17 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Given: a meter with expectedIterations that has been stopped with fail("technical_error")
         final Meter meter = new Meter(logger).start();
         meter.iterations(50);
-        meter.fail("technical_error");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(100) is called after stop
         meter.iterations(100);
 
         // Then: logs ILLEGAL, meter state unchanged (expectedIterations remains 50)
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 50, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1130,13 +1374,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectZeroIterationsAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(0) is called after stop
         meter.iterations(0);
 
         // Then: logs ILLEGAL, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1146,13 +1395,18 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     @ValidateCleanMeter
     void shouldRejectNegativeIterationsAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
-        final Meter meter = new Meter(logger).start().fail("technical_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, ()->  meter.fail("technical_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(-5) is called after stop
         meter.iterations(-5);
 
         // Then: logs ILLEGAL, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
         AssertLogger.assertEventCount(logger, 5);
     }

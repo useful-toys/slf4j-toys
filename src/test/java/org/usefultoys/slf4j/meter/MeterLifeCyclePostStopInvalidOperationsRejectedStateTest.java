@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -32,6 +33,10 @@ import org.usefultoys.test.WithLocale;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWithWindow;
 
 /**
  * Unit tests for invalid {@link Meter} operations after Rejected termination.
@@ -67,6 +72,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * </ul>
  *
  * @author Co-authored-by: GitHub Copilot using Claude 3.5 Sonnet
+ * @author Co-authored-by: Google Gemini using <model name>
  */
 @ValidateCharset
 @ResetMeterConfig
@@ -91,14 +97,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectDescriptionAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m("step 1") is called after stop
         meter.m("step 1");
 
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -112,14 +123,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectDescriptionWithArgsAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m("step %d", 1) is called after stop
         meter.m("step %d", 1);
 
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -133,14 +149,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullDescriptionAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m(null) is called after stop
         meter.m(null);
 
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -158,14 +179,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectIncAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: inc() is called after stop
         meter.inc();
 
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -179,14 +205,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectIncByAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: incBy(5) is called after stop
         meter.incBy(5);
 
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -200,14 +231,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectIncToAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: incTo(10) is called after stop
         meter.incTo(10);
 
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -225,13 +261,18 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectProgressAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: progress() is called after stop
         meter.progress();
 
         // Then: state unchanged after invalid operation
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no progress message
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -247,16 +288,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     void shouldRejectProgressAfterIncAndReject() {
         // Given: a meter with inc() that has been stopped with reject("business_error")
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.inc();
-        meter.reject("business_error");
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
         // Then: validate meter is in stopped state with currentIteration=1 (pedagogical validation)
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 1, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 1, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: progress() is called after stop
         meter.progress();
 
         // Then: state unchanged after invalid operation
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 1, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 1, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no further progress logged
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -275,14 +319,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key1", "value1") is called after stop
         meter.ctx("key1", "value1");
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key1"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -298,17 +347,20 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Given: a meter with context that has been stopped with reject("business_error")
         final Meter meter = new Meter(logger).start();
         meter.ctx("key", "val");
-        meter.reject("business_error");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
         // Then: validate meter is in stopped state (pedagogical validation)
         // Note: context is cleared after reject() - this is expected behavior
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "val2") is called after stop
         meter.ctx("key", "val2");
 
         // Then: context still not present (was cleared by reject()), state unchanged after invalid operation
         assertNull(meter.getContext().get("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -326,14 +378,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectIntContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 42) is called after stop
         meter.ctx("key", 42);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -347,14 +404,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectLongContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 42L) is called after stop
         meter.ctx("key", 42L);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -368,14 +430,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectBooleanContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", true) is called after stop
         meter.ctx("key", true);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -389,14 +456,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectFloatContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 3.14f) is called after stop
         meter.ctx("key", 3.14f);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -410,14 +482,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectDoubleContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 3.14) is called after stop
         meter.ctx("key", 3.14);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -435,14 +512,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectIntegerWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Integer.valueOf(42)) is called after stop
         meter.ctx("key", Integer.valueOf(42));
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -456,14 +538,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectLongWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Long.valueOf(42L)) is called after stop
         meter.ctx("key", Long.valueOf(42L));
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -477,14 +564,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectBooleanWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Boolean.TRUE) is called after stop
         meter.ctx("key", Boolean.TRUE);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -498,14 +590,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectFloatWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Float.valueOf(3.14f)) is called after stop
         meter.ctx("key", Float.valueOf(3.14f));
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -519,14 +616,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectDoubleWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Double.valueOf(3.14)) is called after stop
         meter.ctx("key", Double.valueOf(3.14));
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -540,14 +642,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullIntegerWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", (Integer) null) is called after stop
         meter.ctx("key", (Integer) null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -565,14 +672,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectFormattedContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "value %d", 42) is called after stop
         meter.ctx("key", "value %d", 42);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -586,14 +698,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectObjectContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", new Object()) is called after stop
         meter.ctx("key", new Object());
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -607,14 +724,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullObjectContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", (Object) null) is called after stop
         meter.ctx("key", (Object) null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -632,14 +754,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectKeyOnlyContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("marker") is called after stop
         meter.ctx("marker");
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("marker"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -653,14 +780,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectConditionalKeyOnlyTrueAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, "marker") is called after stop
         meter.ctx(true, "marker");
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("marker"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -679,15 +811,20 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
          * This test documents the actual behavior: conditional ctx() with false silently does nothing. */
         
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, "marker") is called (condition=false returns early)
         meter.ctx(false, "marker");
 
         // Then: context unchanged, state unchanged
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
-        // Then: only reject logs (no ILLEGAL)
+        // Then: only reject logs (no ILLEGAL because putContext was never called)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEventCount(logger, 4);
@@ -698,7 +835,11 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectConditionalTrueFalseNamesAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, "trueMarker", "falseMarker") is called after stop
         meter.ctx(true, "trueMarker", "falseMarker");
@@ -706,7 +847,8 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("trueMarker"), "should not add context after stop");
         assertFalse(meter.getContext().containsKey("falseMarker"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -724,13 +866,18 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyOnlyContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null) is called after stop
         meter.ctx(null);
 
         // Then: context unchanged, state unchanged after invalid operation
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -744,13 +891,18 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWhenTrueAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, null) is called after stop
         meter.ctx(true, null);
 
         // Then: context unchanged, state unchanged after invalid operation
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -767,13 +919,18 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
          * However, condition=false causes early return before putContext() is called, so no ILLEGAL log occurs. */
         
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, null) is called (condition=false returns early)
         meter.ctx(false, null);
 
         // Then: context unchanged, state unchanged
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: only reject logs (no ILLEGAL)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -786,14 +943,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWithFalseNameAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, null, "falseMarker") is called after stop
         meter.ctx(true, null, "falseMarker");
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("falseMarker"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -807,14 +969,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullFalseNameWhenFalseAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, "trueMarker", null) is called after stop
         meter.ctx(false, "trueMarker", null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("trueMarker"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -828,13 +995,18 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenTrueAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, null, null) is called after stop
         meter.ctx(true, null, null);
 
         // Then: context unchanged, state unchanged after invalid operation
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -848,13 +1020,18 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenFalseAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, null, null) is called after stop
         meter.ctx(false, null, null);
 
         // Then: context unchanged, state unchanged after invalid operation
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -872,13 +1049,18 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyWithValueAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null, "value") is called after stop
         meter.ctx(null, "value");
 
         // Then: context unchanged, state unchanged after invalid operation
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -892,13 +1074,18 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyWithPrimitiveAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null, 42) is called after stop
         meter.ctx(null, 42);
 
         // Then: context unchanged, state unchanged after invalid operation
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -912,13 +1099,18 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyWithFormatAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null, "format %d", 42) is called after stop
         meter.ctx(null, "format %d", 42);
 
         // Then: context unchanged, state unchanged after invalid operation
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -932,14 +1124,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullFormatAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", null, 42) is called after stop (null format string)
         meter.ctx("key", null, 42);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -953,14 +1150,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullArgsArrayAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "format", (Object[]) null) is called after stop (null args array)
         meter.ctx("key", "format", (Object[]) null);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -978,14 +1180,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectPathAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path("new_path") is called after stop
         meter.path("new_path");
 
         // Then: rejectPath unchanged, state unchanged after invalid operation
         assertEquals("business_error", meter.getRejectPath(), "should not update path after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -999,14 +1206,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectPathUpdateAfterReject() {
         // Given: a meter that has been stopped with reject("original_error")
-        final Meter meter = new Meter(logger).start().reject("original_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("original_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path("new_path") is called after stop
         meter.path("new_path");
 
         // Then: rejectPath unchanged, state unchanged after invalid operation
         assertEquals("original_error", meter.getRejectPath(), "should not update path after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "original_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "original_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1020,14 +1232,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNullPathAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path(null) is called after stop
         meter.path(null);
 
         // Then: rejectPath unchanged, state unchanged after invalid operation
         assertEquals("business_error", meter.getRejectPath(), "should not update path after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1045,14 +1262,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectLimitAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(5000) is called after stop
         meter.limitMilliseconds(5000);
 
         // Then: timeLimit unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1068,16 +1290,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Given: a meter with timeLimit that has been stopped with reject("business_error")
         final Meter meter = new Meter(logger).start();
         meter.limitMilliseconds(100);
-        meter.reject("business_error");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
         // Then: validate meter is in stopped state with timeLimit (pedagogical validation)
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 100);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 100);
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(5000) is called after stop
         meter.limitMilliseconds(5000);
 
         // Then: timeLimit remains 100ms (100,000,000 ns), state unchanged after invalid operation
         assertEquals(100_000_000L, meter.getTimeLimit(), "should not update timeLimit after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 100);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 100);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1091,14 +1316,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectZeroLimitAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(0) is called after stop
         meter.limitMilliseconds(0);
 
         // Then: timeLimit unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1112,14 +1342,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNegativeLimitAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(-1) is called after stop
         meter.limitMilliseconds(-1);
 
         // Then: timeLimit unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1137,14 +1372,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectIterationsAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(100) is called after stop
         meter.iterations(100);
 
         // Then: expectedIterations unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1160,16 +1400,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Given: a meter with expectedIterations that has been stopped with reject("business_error")
         final Meter meter = new Meter(logger).start();
         meter.iterations(50);
-        meter.reject("business_error");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
         // Then: validate meter is in stopped state with expectedIterations (pedagogical validation)
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 50, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 50, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(100) is called after stop
         meter.iterations(100);
 
         // Then: expectedIterations remains 50, state unchanged after invalid operation
         assertEquals(50, meter.getExpectedIterations(), "should not update expectedIterations after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 50, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 50, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1183,14 +1426,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectZeroIterationsAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(0) is called after stop
         meter.iterations(0);
 
         // Then: expectedIterations unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -1204,14 +1452,19 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldRejectNegativeIterationsAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
-        final Meter meter = new Meter(logger).start().reject("business_error");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.reject("business_error"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(-5) is called after stop
         meter.iterations(-5);
 
         // Then: expectedIterations unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
-        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);

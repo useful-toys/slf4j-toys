@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -32,6 +33,9 @@ import org.usefultoys.test.WithLocale;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWithWindow;
 
 /**
  * Unit tests for invalid {@link Meter} operations after OK termination.
@@ -68,6 +72,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * </ul>
  *
  * @author Co-authored-by: GitHub Copilot using Claude 3.5 Sonnet
+ * @author Co-authored-by: Google Gemini using <model name>
  */
 @ValidateCharset
 @ResetMeterConfig
@@ -92,7 +97,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectDescriptionAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m("step 1") is called after stop
         meter.m("step 1");
@@ -100,6 +109,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -113,7 +123,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectDescriptionWithArgsAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m("step %d", 1) is called after stop
         meter.m("step %d", 1);
@@ -121,6 +135,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -134,7 +149,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullDescriptionAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m(null) is called after stop
         meter.m(null);
@@ -142,6 +161,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -155,7 +175,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectDescriptionAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m("step 1") is called after stop
         meter.m("step 1");
@@ -163,6 +187,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -176,7 +201,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectDescriptionWithArgsAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m("step %d", 1) is called after stop
         meter.m("step %d", 1);
@@ -184,6 +213,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -197,7 +227,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullDescriptionAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: m(null) is called after stop
         meter.m(null);
@@ -205,6 +239,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -222,7 +257,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIncAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: inc() is called after stop
         meter.inc();
@@ -230,6 +269,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -243,7 +283,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIncByAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: incBy(5) is called after stop
         meter.incBy(5);
@@ -251,6 +295,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -264,7 +309,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIncToAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: incTo(10) is called after stop
         meter.incTo(10);
@@ -272,6 +321,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -285,7 +335,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIncAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: inc() is called after stop
         meter.inc();
@@ -293,6 +347,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -306,7 +361,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIncByAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: incBy(5) is called after stop
         meter.incBy(5);
@@ -314,6 +373,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -327,7 +387,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIncToAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: incTo(10) is called after stop
         meter.incTo(10);
@@ -335,6 +399,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: currentIteration unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getCurrentIteration(), "should not increment after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -352,13 +417,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectProgressAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: progress() is called after stop
         meter.progress();
 
         // Then: state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no progress message
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -374,16 +444,19 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     void shouldRejectProgressAfterOkWithInc() {
         // Given: a meter that has been stopped with ok() after inc()
         final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
         meter.inc();
-        meter.ok();
+        recordStopWithWindow(tr, meter::ok);
         // Then: validate meter is in stopped state with currentIteration=1 (pedagogical validation)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 1, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: progress() is called after stop
         meter.progress();
 
         // Then: state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 1, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no further progress logged
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -398,13 +471,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectProgressAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: progress() is called after stop
         meter.progress();
 
         // Then: state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no progress message
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -421,15 +499,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Given: a meter that has been stopped with ok("completion_path") after inc()
         final Meter meter = new Meter(logger).start();
         meter.inc();
-        meter.ok("completion_path");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
         // Then: validate meter is in stopped state with currentIteration=1 (pedagogical validation)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 1, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: progress() is called after stop
         meter.progress();
 
         // Then: state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 1, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no further progress logged
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -448,7 +529,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key1", "value1") is called after stop
         meter.ctx("key1", "value1");
@@ -456,6 +541,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key1"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -471,10 +557,12 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Given: a meter with context, stopped with ok()
         final Meter meter = new Meter(logger).start();
         meter.ctx("key", "val");
-        meter.ok();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
         // Then: validate meter is in stopped state (pedagogical validation)
         // Note: context is cleared after ok() - this is expected behavior
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "val2") is called after stop
         meter.ctx("key", "val2");
@@ -482,6 +570,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context still not present (was cleared by ok()), state unchanged after invalid operation
         assertNull(meter.getContext().get("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -495,7 +584,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectContextAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key1", "value1") is called after stop
         meter.ctx("key1", "value1");
@@ -503,6 +596,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key1"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -518,10 +612,12 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Given: a meter with context, stopped with ok("completion_path")
         final Meter meter = new Meter(logger).start();
         meter.ctx("key", "val");
-        meter.ok("completion_path");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
         // Then: validate meter is in stopped state (pedagogical validation)
         // Note: context is cleared after ok() - this is expected behavior
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "val2") is called after stop
         meter.ctx("key", "val2");
@@ -529,6 +625,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context still not present (was cleared by ok()), state unchanged after invalid operation
         assertNull(meter.getContext().get("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -546,7 +643,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIntContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 42) is called after stop
         meter.ctx("key", 42);
@@ -554,6 +655,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -567,7 +669,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectLongContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 42L) is called after stop
         meter.ctx("key", 42L);
@@ -575,6 +681,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -588,7 +695,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectBooleanContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", true) is called after stop
         meter.ctx("key", true);
@@ -596,6 +707,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -609,7 +721,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectFloatContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 3.14f) is called after stop
         meter.ctx("key", 3.14f);
@@ -617,6 +733,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -630,7 +747,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectDoubleContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", 3.14) is called after stop
         meter.ctx("key", 3.14);
@@ -638,6 +759,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -655,7 +777,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIntegerWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Integer.valueOf(42)) is called after stop
         meter.ctx("key", Integer.valueOf(42));
@@ -663,6 +789,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -676,7 +803,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectLongWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Long.valueOf(42L)) is called after stop
         meter.ctx("key", Long.valueOf(42L));
@@ -684,6 +815,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -697,7 +829,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectBooleanWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Boolean.TRUE) is called after stop
         meter.ctx("key", Boolean.TRUE);
@@ -705,6 +841,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -718,7 +855,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectFloatWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Float.valueOf(3.14f)) is called after stop
         meter.ctx("key", Float.valueOf(3.14f));
@@ -726,6 +867,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -739,7 +881,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectDoubleWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", Double.valueOf(3.14)) is called after stop
         meter.ctx("key", Double.valueOf(3.14));
@@ -747,6 +893,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -760,7 +907,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullIntegerWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", (Integer) null) is called after stop
         meter.ctx("key", (Integer) null);
@@ -768,6 +919,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -785,7 +937,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectFormattedContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "value %d", 42) is called after stop
         meter.ctx("key", "value %d", 42);
@@ -793,6 +949,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -806,7 +963,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectObjectContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", new Object()) is called after stop
         meter.ctx("key", new Object());
@@ -814,6 +975,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -827,7 +989,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullObjectContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", (Object) null) is called after stop
         meter.ctx("key", (Object) null);
@@ -835,6 +1001,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -852,7 +1019,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectKeyOnlyContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("marker") is called after stop
         meter.ctx("marker");
@@ -860,6 +1031,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("marker"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -873,7 +1045,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectConditionalKeyOnlyTrueAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, "marker") is called after stop
         meter.ctx(true, "marker");
@@ -881,6 +1057,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("marker"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -899,13 +1076,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
          * This test documents the actual behavior: conditional ctx() with false silently does nothing. */
         
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, "marker") is called (condition=false returns early)
         meter.ctx(false, "marker");
 
         // Then: context unchanged, state unchanged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: only ok logs (no ILLEGAL)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -918,7 +1100,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectConditionalTrueFalseNamesAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, "trueMarker", "falseMarker") is called after stop
         meter.ctx(true, "trueMarker", "falseMarker");
@@ -927,6 +1113,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         assertFalse(meter.getContext().containsKey("trueMarker"), "should not add context after stop");
         assertFalse(meter.getContext().containsKey("falseMarker"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -944,13 +1131,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyOnlyContextAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null) is called after stop
         meter.ctx(null);
 
         // Then: context unchanged, state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -964,13 +1156,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWhenTrueAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, null) is called after stop
         meter.ctx(true, null);
 
         // Then: context unchanged, state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -987,13 +1184,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
          * However, condition=false causes early return before putContext() is called, so no ILLEGAL log occurs. */
         
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, null) is called (condition=false returns early)
         meter.ctx(false, null);
 
         // Then: context unchanged, state unchanged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: only ok logs (no ILLEGAL)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1006,7 +1208,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWithFalseNameAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, null, "falseMarker") is called after stop
         meter.ctx(true, null, "falseMarker");
@@ -1014,6 +1220,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("falseMarker"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1027,7 +1234,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullFalseNameWhenFalseAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, "trueMarker", null) is called after stop
         meter.ctx(false, "trueMarker", null);
@@ -1035,6 +1246,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("trueMarker"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1048,13 +1260,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenTrueAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(true, null, null) is called after stop
         meter.ctx(true, null, null);
 
         // Then: context unchanged, state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1068,13 +1285,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenFalseAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(false, null, null) is called after stop
         meter.ctx(false, null, null);
 
         // Then: context unchanged, state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1092,13 +1314,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyWithValueAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null, "value") is called after stop
         meter.ctx(null, "value");
 
         // Then: context unchanged, state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1112,13 +1339,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyWithPrimitiveAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null, 42) is called after stop
         meter.ctx(null, 42);
 
         // Then: context unchanged, state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1132,13 +1364,18 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullKeyWithFormatAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx(null, "format %d", 42) is called after stop
         meter.ctx(null, "format %d", 42);
 
         // Then: context unchanged, state unchanged after invalid operation
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1152,7 +1389,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullFormatAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", null, 42) is called after stop (null format string)
         meter.ctx("key", null, 42);
@@ -1160,6 +1401,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1173,7 +1415,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullArgsArrayAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: ctx("key", "format", (Object[]) null) is called after stop (null args array)
         meter.ctx("key", "format", (Object[]) null);
@@ -1181,6 +1427,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1198,7 +1445,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectPathAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path("new_path") is called after stop
         meter.path("new_path");
@@ -1206,6 +1457,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: okPath unchanged (null), state unchanged after invalid operation
         assertNull(meter.getOkPath(), "should not update path after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1219,7 +1471,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectPathAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("original_path")
-        final Meter meter = new Meter(logger).start().ok("original_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("original_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path("new_path") is called after stop
         meter.path("new_path");
@@ -1227,6 +1483,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: okPath remains "original_path", state unchanged after invalid operation
         assertEquals("original_path", meter.getOkPath(), "should not update path after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "original_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1240,7 +1497,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullPathAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path(null) is called after stop
         meter.path(null);
@@ -1248,6 +1509,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: okPath unchanged (null), state unchanged after invalid operation
         assertNull(meter.getOkPath(), "should not update path after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1261,7 +1523,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectPathAfterOkWithCompletionPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path("new_path") is called after stop
         meter.path("new_path");
@@ -1269,6 +1535,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: okPath remains "completion_path", state unchanged after invalid operation
         assertEquals("completion_path", meter.getOkPath(), "should not update path after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1282,7 +1549,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNullPathAfterOkWithCompletionPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: path(null) is called after stop
         meter.path(null);
@@ -1290,6 +1561,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: okPath unchanged, state unchanged after invalid operation
         assertEquals("completion_path", meter.getOkPath(), "should not update path after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1307,7 +1579,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectTimeLimitAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(5000) is called after stop
         meter.limitMilliseconds(5000);
@@ -1315,6 +1591,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: timeLimit unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1330,9 +1607,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Given: a meter with timeLimit, stopped with ok()
         final Meter meter = new Meter(logger).start();
         meter.limitMilliseconds(100);
-        meter.ok();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
         // Then: validate meter is in stopped state with timeLimit (pedagogical validation)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 100);
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(5000) is called after stop
         meter.limitMilliseconds(5000);
@@ -1340,6 +1619,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: timeLimit remains 100ms (100,000,000 ns), state unchanged after invalid operation
         assertEquals(100_000_000L, meter.getTimeLimit(), "should not update timeLimit after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 100);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1353,7 +1633,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectZeroTimeLimitAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(0) is called after stop
         meter.limitMilliseconds(0);
@@ -1361,6 +1645,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: timeLimit unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1374,7 +1659,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNegativeTimeLimitAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(-1) is called after stop
         meter.limitMilliseconds(-1);
@@ -1382,6 +1671,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: timeLimit unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1395,7 +1685,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectTimeLimitAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(5000) is called after stop
         meter.limitMilliseconds(5000);
@@ -1403,6 +1697,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: timeLimit unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1418,9 +1713,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Given: a meter with timeLimit, stopped with ok("completion_path")
         final Meter meter = new Meter(logger).start();
         meter.limitMilliseconds(100);
-        meter.ok("completion_path");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
         // Then: validate meter is in stopped state with timeLimit (pedagogical validation)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 100);
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(5000) is called after stop
         meter.limitMilliseconds(5000);
@@ -1428,6 +1725,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: timeLimit remains 100ms (100,000,000 ns), state unchanged after invalid operation
         assertEquals(100_000_000L, meter.getTimeLimit(), "should not update timeLimit after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 100);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1441,7 +1739,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectZeroTimeLimitAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(0) is called after stop
         meter.limitMilliseconds(0);
@@ -1449,6 +1751,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: timeLimit unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1462,7 +1765,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNegativeTimeLimitAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: limitMilliseconds(-1) is called after stop
         meter.limitMilliseconds(-1);
@@ -1470,6 +1777,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: timeLimit unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getTimeLimit(), "should not update timeLimit after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1487,7 +1795,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIterationsAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(100) is called after stop
         meter.iterations(100);
@@ -1495,6 +1807,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: expectedIterations unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1510,9 +1823,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Given: a meter with expectedIterations, stopped with ok()
         final Meter meter = new Meter(logger).start();
         meter.iterations(50);
-        meter.ok();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
         // Then: validate meter is in stopped state with expectedIterations (pedagogical validation)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 50, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(100) is called after stop
         meter.iterations(100);
@@ -1520,6 +1835,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: expectedIterations remains 50, state unchanged after invalid operation
         assertEquals(50, meter.getExpectedIterations(), "should not update expectedIterations after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 50, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1533,7 +1849,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectZeroIterationsAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(0) is called after stop
         meter.iterations(0);
@@ -1541,6 +1861,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: expectedIterations unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1554,7 +1875,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNegativeIterationsAfterOk() {
         // Given: a meter that has been stopped with ok()
-        final Meter meter = new Meter(logger).start().ok();
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(-5) is called after stop
         meter.iterations(-5);
@@ -1562,6 +1887,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: expectedIterations unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1575,7 +1901,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectIterationsAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(100) is called after stop
         meter.iterations(100);
@@ -1583,6 +1913,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: expectedIterations unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1598,9 +1929,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Given: a meter with expectedIterations, stopped with ok("completion_path")
         final Meter meter = new Meter(logger).start();
         meter.iterations(50);
-        meter.ok("completion_path");
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
         // Then: validate meter is in stopped state with expectedIterations (pedagogical validation)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 50, 0);
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(100) is called after stop
         meter.iterations(100);
@@ -1608,6 +1941,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: expectedIterations remains 50, state unchanged after invalid operation
         assertEquals(50, meter.getExpectedIterations(), "should not update expectedIterations after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 50, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1621,7 +1955,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectZeroIterationsAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(0) is called after stop
         meter.iterations(0);
@@ -1629,6 +1967,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: expectedIterations unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -1642,7 +1981,11 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldRejectNegativeIterationsAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
-        final Meter meter = new Meter(logger).start().ok("completion_path");
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, () -> meter.ok("completion_path"));
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
 
         // When: iterations(-5) is called after stop
         meter.iterations(-5);
@@ -1650,6 +1993,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         // Then: expectedIterations unchanged (0), state unchanged after invalid operation
         assertEquals(0, meter.getExpectedIterations(), "should not update expectedIterations after stop");
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
 
         // Then: logs ok (from setup) + ILLEGAL (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
