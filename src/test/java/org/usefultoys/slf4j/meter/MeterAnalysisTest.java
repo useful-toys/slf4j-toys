@@ -27,7 +27,7 @@ import org.usefultoys.test.WithLocale;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link MeterAnalysis} interface default methods.

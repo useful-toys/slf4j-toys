@@ -29,18 +29,25 @@ import org.usefultoys.test.ValidateCleanMeter;
 
 import java.nio.charset.Charset;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.slf4j.impl.MockLoggerEvent.Level.ERROR;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.slf4j.impl.MockLoggerEvent.Level.DEBUG;
+import static org.slf4j.impl.MockLoggerEvent.Level.ERROR;
 import static org.slf4j.impl.MockLoggerEvent.Level.INFO;
 import static org.slf4j.impl.MockLoggerEvent.Level.TRACE;
-import static org.usefultoys.slf4j.meter.Markers.*;
 import static org.usefultoys.slf4j.meter.Markers.DATA_FAIL;
 import static org.usefultoys.slf4j.meter.Markers.DATA_OK;
 import static org.usefultoys.slf4j.meter.Markers.DATA_REJECT;
+import static org.usefultoys.slf4j.meter.Markers.DATA_START;
+import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_CLOSE;
 import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_OK;
 import static org.usefultoys.slf4j.meter.Markers.MSG_FAIL;
+import static org.usefultoys.slf4j.meter.Markers.MSG_OK;
 import static org.usefultoys.slf4j.meter.Markers.MSG_REJECT;
+import static org.usefultoys.slf4j.meter.Markers.MSG_START;
 
 /**
  * @author Daniel Felix Ferber

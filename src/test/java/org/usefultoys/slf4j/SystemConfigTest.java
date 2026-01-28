@@ -22,7 +22,9 @@ import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.test.ResetSystemConfig;
 import org.usefultoys.test.ValidateCharset;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link SystemConfig}.
