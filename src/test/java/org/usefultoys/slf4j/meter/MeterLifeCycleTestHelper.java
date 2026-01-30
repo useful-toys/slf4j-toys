@@ -177,6 +177,12 @@ final class MeterLifeCycleTestHelper {
         return tv;
     }
 
+    static Meter fromStarted(final TimeRecord tr, final Meter meter) {
+        tr.expectedCreateTime = meter.getCreateTime();
+        tr.expectedStartTime = meter.getLastCurrentTime();
+        return meter;
+    }
+
     @SneakyThrows
     static Meter recordStartWithWindow(final TimeRecord tv, final Callable<Meter> stopAction) {
         tv.beforeStart = System.nanoTime();

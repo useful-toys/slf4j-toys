@@ -21,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent.Level;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
@@ -29,10 +30,21 @@ import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 import org.usefultoys.test.WithLocale;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertLogs;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterNotStartedStopTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStartTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStartTimePreserved;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTime;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTimeWindow;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterTime;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.configureLogger;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.event;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordCreateWithWindow;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStartWithWindow;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWithWindow;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.eventWithTrowable;
 
 /**
@@ -94,15 +106,22 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldFollowTryWithResourcesFlowImplicitFailure(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         final Meter meter;
         // Given: a new, started Meter withing try with resources
-        try (final Meter m = new Meter(logger).start()) {
+        try (final Meter m = fromStarted(tv, new Meter(logger).start())) {
             meter = m;
             // do nothing
-        }
+
+            tv.beforeStop = System.nanoTime();
+        } // When: try-with-resources closes, auto-fail is triggered
+        tv.expectedStopTime = meter.getLastCurrentTime();
+        tv.afterStop = System.nanoTime();
 
         // Then: it should be automatically failed on close()
         assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
+        // Then: stop time should be set correctly during close();
+        assertMeterStopTime(meter, tv);
 
         // Then: all log messages recorded correctly
         assertLogs(logger, level,
@@ -119,20 +138,25 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldFollowTryWithResourcesFlowExplicitSuccess(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         final Meter meter;
         // Given: a new, started Meter withing try with resources
-        try (final Meter m = new Meter(logger).start()) {
+        try (final Meter m = fromStarted(tv, new Meter(logger).start())) {
             meter = m;
 
             // When: ok() is called
-            m.ok();
+            recordStopWithWindow(tv, () -> m.ok());
 
             // Then: Meter is in stopped state
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-        }
+            // Then: timestamps should be set correctly BEFORE close() is called
+            assertMeterStopTime(meter, tv);
+        } // Then: close() is no-op, stopTime preserved
 
         // Then: it should remain in success state after close()
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        // Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op)
+        assertMeterStopTime(meter, tv);
 
         // Then: all log messages recorded correctly
         assertLogs(logger, level,
@@ -149,26 +173,32 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldFollowTryWithResourcesFlowPathAndExplicitSuccess(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         final Meter meter;
         // Given: a new, started Meter withing try with resources
-        try (final Meter m = new Meter(logger).start()) {
+        try (final Meter m = fromStarted(tv, new Meter(logger).start())) {
             meter = m;
 
             // When: path() is called
             m.path("customPath");
 
-            // Then: path is set
+            // Then: path is set, timestamps unchanged by path()
             assertMeterState(meter, true, false, "customPath", null, null, null, 0, 0, 0);
+            assertMeterStartTimePreserved(meter, tv); // path() does not change startTime
 
             // When: ok() is called
-            m.ok();
+            recordStopWithWindow(tv, () -> m.ok());
 
             // Then: Meter is in stopped state with path preserved
             assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
-        }
+            // Then: timestamps should be set correctly BEFORE close() is called
+            assertMeterStopTime(meter, tv);
+        } // Then: close() is no-op
 
         // Then: it should remain in success state after close()
         assertMeterState(meter, true, true, "customPath", null, null, null, 0, 0, 0);
+        // Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op)
+        assertMeterStopTime(meter, tv);
 
         // Then: all log messages recorded correctly
         assertLogs(logger, level,
@@ -185,20 +215,25 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldFollowTryWithResourcesFlowExplicitRejection(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         final Meter meter;
         // Given: a new, started Meter withing try with resources
-        try (final Meter m = new Meter(logger).start()) {
+        try (final Meter m = fromStarted(tv, new Meter(logger).start())) {
             meter = m;
 
             // When: reject() is called
-            m.reject("rejected");
+            recordStopWithWindow(tv, () -> m.reject("rejected"));
 
             // Then: Meter is in stopped state with reject path set
             assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
+            // Then: timestamps should be set correctly BEFORE close() is called
+            assertMeterStopTime(meter, tv);
         }
 
         // Then: it should remain in rejection state after close()
         assertMeterState(meter, true, true, null, "rejected", null, null, 0, 0, 0);
+        // Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op)
+        assertMeterStopTime(meter, tv);
 
         // Then: all log messages recorded correctly
         assertLogs(logger, level,
@@ -215,20 +250,25 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldFollowTryWithResourcesFlowExplicitFailure(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         final Meter meter;
         // Given: a new, started Meter withing try with resources
-        try (final Meter m = new Meter(logger).start()) {
+        try (final Meter m = fromStarted(tv, new Meter(logger).start())) {
             meter = m;
 
             // When: fail() is called
-            m.fail("failed");
+            recordStopWithWindow(tv, () -> m.fail("failed"));
 
             // Then: Meter is in stopped state with failure message
             assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
+            // Then: timestamps should be set correctly BEFORE close() is called
+            assertMeterStopTime(meter, tv);
         }
 
         // Then: it should remain in failure state after close()
         assertMeterState(meter, true, true, null, null, "failed", null, 0, 0, 0);
+        // Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op)
+        assertMeterStopTime(meter, tv);
 
         // Then: all log messages recorded correctly
         assertLogs(logger, level,
@@ -249,16 +289,22 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose(final Level level) {
         configureLogger(logger, level);
 
+        final MeterLifeCycleTestHelper.TimeRecord tv = new MeterLifeCycleTestHelper.TimeRecord();
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: block executes without calling start(), ok(), reject(), or fail()
              * (meter auto-closes with implicit fail) */
-        }
+            tv.beforeStop = System.nanoTime();
+        } // Then: close() sets both startTime and stopTime (Tier 3 auto-correction)
+        tv.expectedStopTime = meter.getLastCurrentTime();
+        tv.afterStop = System.nanoTime();
 
         /* Then: meter is in Failed state after close() */
         assertMeterState(meter, true, true, null, null, "try-with-resources", null, 0, 0, 0);
+        /* Then: timestamps should reflect auto-correction (startTime = stopTime during close()) */
+        assertMeterNotStartedStopTime(meter, tv); // Both startTime and stopTime set during close()
 
         /* Then: logs INCONSISTENT_CLOSE + ERROR for implicit failure */
         assertLogs(logger, level,
@@ -274,19 +320,24 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: ok() is called without start() */
-            m.ok();
+            recordStopWithWindow(tv, () -> m.ok());
 
             /* Then: Meter is in stopped state (pedagogical validation) */
             assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
-        }
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
+        } // Then: close() is no-op (already stopped)
 
         /* Then: meter remains in OK state after close() */
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
@@ -302,19 +353,24 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: ok("success_path") is called without start() */
-            m.ok("success_path");
+            recordStopWithWindow(tv, () -> m.ok("success_path"));
 
             /* Then: Meter is in stopped state with path (pedagogical validation) */
             assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in OK state with path after close() */
         assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
@@ -330,19 +386,24 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: ok(Enum) is called without start() */
-            m.ok(MeterLifeCycleTestHelper.TestEnum.VALUE1);
+            recordStopWithWindow(tv, () -> m.ok(MeterLifeCycleTestHelper.TestEnum.VALUE1));
 
             /* Then: Meter is in stopped state with enum path (pedagogical validation) */
             assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in OK state with enum path after close() */
         assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
@@ -358,20 +419,25 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToOkWithThrowableViaTryWithResourcesWithoutStartExplicitOkThrowable(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         final RuntimeException exception = new RuntimeException("test cause");
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: ok(Throwable) is called without start() */
-            m.ok(exception);
+            recordStopWithWindow(tv, () -> m.ok(exception));
 
             /* Then: Meter is in stopped state with throwable path (pedagogical validation) */
             assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in OK state with throwable path after close() */
         assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
@@ -387,20 +453,25 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToOkWithObjectViaTryWithResourcesWithoutStartExplicitOkObject(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         final MeterLifeCycleTestHelper.TestObject testObject = new MeterLifeCycleTestHelper.TestObject();
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: ok(Object) is called without start() */
-            m.ok(testObject);
+            recordStopWithWindow(tv, () -> m.ok(testObject));
 
             /* Then: Meter is in stopped state with object path (pedagogical validation) */
             assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in OK state with object path after close() */
         assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
@@ -416,19 +487,24 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: reject("business_error") is called without start() */
-            m.reject("business_error");
+            recordStopWithWindow(tv, () -> m.reject("business_error"));
 
             /* Then: Meter is in stopped state with rejectPath (pedagogical validation) */
             assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in Rejected state after close() */
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
@@ -444,19 +520,24 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: reject(Enum) is called without start() */
-            m.reject(MeterLifeCycleTestHelper.TestEnum.VALUE2);
+            recordStopWithWindow(tv, () -> m.reject(MeterLifeCycleTestHelper.TestEnum.VALUE2));
 
             /* Then: Meter is in stopped state with enum rejectPath (pedagogical validation) */
             assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in Rejected state with enum cause after close() */
         assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
@@ -472,20 +553,25 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToRejectedWithThrowableViaTryWithResourcesWithoutStartExplicitRejectThrowable(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         final IllegalArgumentException exception = new IllegalArgumentException("invalid input");
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: reject(Throwable) is called without start() */
-            m.reject(exception);
+            recordStopWithWindow(tv, () -> m.reject(exception));
 
             /* Then: Meter is in stopped state with throwable rejectPath (pedagogical validation) */
             assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in Rejected state with throwable cause after close() */
         assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
@@ -501,20 +587,25 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToRejectedWithObjectViaTryWithResourcesWithoutStartExplicitRejectObject(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         final MeterLifeCycleTestHelper.TestObject testObject = new MeterLifeCycleTestHelper.TestObject();
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: reject(Object) is called without start() */
-            m.reject(testObject);
+            recordStopWithWindow(tv, () -> m.reject(testObject));
 
             /* Then: Meter is in stopped state with object rejectPath (pedagogical validation) */
             assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in Rejected state with object cause after close() */
         assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
@@ -530,19 +621,24 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: fail("technical_error") is called without start() */
-            m.fail("technical_error");
+            recordStopWithWindow(tv, () -> m.fail("technical_error"));
 
             /* Then: Meter is in stopped state with failPath (pedagogical validation) */
             assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in Failed state after close() */
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
@@ -558,19 +654,24 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: fail(Enum) is called without start() */
-            m.fail(MeterLifeCycleTestHelper.TestEnum.VALUE1);
+            recordStopWithWindow(tv, () -> m.fail(MeterLifeCycleTestHelper.TestEnum.VALUE1));
 
             /* Then: Meter is in stopped state with enum failPath (pedagogical validation) */
             assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in Failed state with enum cause after close() */
         assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
@@ -586,20 +687,25 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         final Exception exception = new Exception("connection timeout");
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: fail(Throwable) is called without start() */
-            m.fail(exception);
+            recordStopWithWindow(tv, () -> m.fail(exception));
 
             /* Then: Meter is in stopped state with throwable failPath and failMessage (pedagogical validation) */
             assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in Failed state with throwable details after close() */
         assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
@@ -615,20 +721,25 @@ class MeterLifeCycleTryWithResourcesTest {
     void shouldTransitionToFailedWithObjectViaTryWithResourcesWithoutStartExplicitFailObject(final Level level) {
         configureLogger(logger, level);
 
+        final TimeRecord tv = new TimeRecord();
         Meter meter = null;
         final MeterLifeCycleTestHelper.TestObject testObject = new MeterLifeCycleTestHelper.TestObject();
         /* Given: Meter created in try-with-resources without start() */
-        try (final Meter m = new Meter(logger)) {
+        try (final Meter m = fromStarted(tv, new Meter(logger))) {
             meter = m;
             /* When: fail(Object) is called without start() */
-            m.fail(testObject);
+            recordStopWithWindow(tv, () -> m.fail(testObject));
 
             /* Then: Meter is in stopped state with object failPath (pedagogical validation) */
             assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
+            /* Then: timestamps should be set correctly BEFORE close() is called */
+            assertMeterNotStartedStopTime(meter, tv);
         }
 
         /* Then: meter remains in Failed state with object cause after close() */
         assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
+        /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
+        assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
