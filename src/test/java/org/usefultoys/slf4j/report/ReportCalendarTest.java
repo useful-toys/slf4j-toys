@@ -29,6 +29,7 @@ import org.usefultoys.test.WithLocale;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -95,13 +96,14 @@ class ReportCalendarTest {
         report.run();
 
         // Then: should log calendar information with fixed timezone details
-        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        final Locale locale = Locale.getDefault();
+        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, locale);
         df.setTimeZone(fixedTimeZone);
         final String expectedDateString = df.format(fixedCurrentDate);
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Calendar",
             " - current date/time: " + expectedDateString,
-            " - default timezone: " + fixedTimeZone.getDisplayName() + " (" + fixedTimeZone.getID() + ")",
+            " - default timezone: " + fixedTimeZone.getDisplayName(locale) + " (" + fixedTimeZone.getID() + ")",
             "; DST=" + (fixedTimeZone.getDSTSavings() / 60000) + "min",
             "; observesDST=" + fixedTimeZone.observesDaylightTime(),
             "; useDST=" + fixedTimeZone.useDaylightTime(),
@@ -148,13 +150,14 @@ class ReportCalendarTest {
         report.run();
 
         // Then: should log calendar information with custom timezone details and available IDs
-        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        final Locale locale = Locale.getDefault();
+        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, locale);
         df.setTimeZone(customTimeZone);
         final String expectedDateString = df.format(customDate);
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
             "Calendar",
             " - current date/time: " + expectedDateString,
-            " - default timezone: " + customTimeZone.getDisplayName() + " (" + customTimeZone.getID() + ")",
+            " - default timezone: " + customTimeZone.getDisplayName(locale) + " (" + customTimeZone.getID() + ")",
             "; DST=" + (customTimeZone.getDSTSavings() / 60000) + "min",
             "; observesDST=" + customTimeZone.observesDaylightTime(),
             "; useDST=" + customTimeZone.useDaylightTime(),
