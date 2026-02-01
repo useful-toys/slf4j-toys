@@ -79,7 +79,8 @@ public class CallerStackTraceThrowable extends Throwable {
 
         /* Skip all frames from the CallerStackTraceThrowable and library internals. */
         while (framesToDiscard < stacktrace.length &&
-                stacktrace[framesToDiscard].getClassName().startsWith(PACKAGE_NAME)) {
+                stacktrace[framesToDiscard].getClassName().startsWith(PACKAGE_NAME) &&
+                ! stacktrace[framesToDiscard].getClassName().endsWith("Test")) {
             framesToDiscard++;
         }
 
