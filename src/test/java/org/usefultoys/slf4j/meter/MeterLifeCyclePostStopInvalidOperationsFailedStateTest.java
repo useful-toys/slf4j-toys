@@ -143,7 +143,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter m but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
-        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "m");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -171,7 +171,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter m but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
-        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "m");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -319,7 +319,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
-        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "progress");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -1268,7 +1268,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
-        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "path");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1314,7 +1314,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
-        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "path");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1411,7 +1411,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
-        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "limitMilliseconds");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
