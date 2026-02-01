@@ -161,7 +161,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject iterations(0) after start() - logs ILLEGAL, expectedIterations unchanged")
+    @DisplayName("should reject iterations(0) after start() - logs ILLEGAL_ARGUMENT, expectedIterations unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectIterationsZeroAfterStart() {
         // Given: a started Meter
@@ -175,13 +175,13 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
     @Test
-    @DisplayName("should reject iterations(-5) after start() - logs ILLEGAL, expectedIterations unchanged")
+    @DisplayName("should reject iterations(-5) after start() - logs ILLEGAL_ARGUMENT, expectedIterations unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectIterationsNegativeAfterStart() {
         // Given: a started Meter
@@ -195,7 +195,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -220,7 +220,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 10, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -230,7 +230,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject limitMilliseconds(0) after start() - logs ILLEGAL, timeLimit unchanged")
+    @DisplayName("should reject limitMilliseconds(0) after start() - logs ILLEGAL_ARGUMENT, timeLimit unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectLimitMillisecondsZeroAfterStart() {
         // Given: a started Meter
@@ -244,13 +244,13 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds(-100) after start() - logs ILLEGAL, timeLimit unchanged")
+    @DisplayName("should reject limitMilliseconds(-100) after start() - logs ILLEGAL_ARGUMENT, timeLimit unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectLimitMillisecondsNegativeAfterStart() {
         // Given: a started Meter
@@ -264,7 +264,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -289,7 +289,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -299,7 +299,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject path(null) after start() - logs ILLEGAL, okPath unchanged")
+    @DisplayName("should reject path(null) after start() - logs ILLEGAL_ARGUMENT, okPath unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectPathNullAfterStart() {
         // Given: a started Meter
@@ -313,7 +313,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -334,7 +334,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
-        // Then: logs ILLEGAL for path(null), completes with INFO log
+        // Then: logs ILLEGAL_ARGUMENT for path(null), completes with INFO log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -359,7 +359,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: only start logs (no ILLEGAL log)
+        // Then: only start logs (no ILLEGAL_ARGUMENT log)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
         AssertLogger.assertEventCount(logger, 2);
@@ -446,7 +446,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject incBy(0) after start() - logs ILLEGAL, currentIteration unchanged")
+    @DisplayName("should reject incBy(0) after start() - logs ILLEGAL_ARGUMENT, currentIteration unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectIncByZeroAfterStart() {
         // Given: a started Meter
@@ -460,13 +460,13 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
     @Test
-    @DisplayName("should reject incBy(-3) after start() - logs ILLEGAL, currentIteration unchanged")
+    @DisplayName("should reject incBy(-3) after start() - logs ILLEGAL_ARGUMENT, currentIteration unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectIncByNegativeAfterStart() {
         // Given: a started Meter
@@ -480,7 +480,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -510,7 +510,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -520,7 +520,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject incTo(0) after start() - logs ILLEGAL, currentIteration unchanged")
+    @DisplayName("should reject incTo(0) after start() - logs ILLEGAL_ARGUMENT, currentIteration unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectIncToZeroAfterStart() {
         // Given: a started Meter
@@ -534,13 +534,13 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
     @Test
-    @DisplayName("should reject incTo(-50) after start() - logs ILLEGAL, currentIteration unchanged")
+    @DisplayName("should reject incTo(-50) after start() - logs ILLEGAL_ARGUMENT, currentIteration unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectIncToNegativeAfterStart() {
         // Given: a started Meter
@@ -554,7 +554,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -564,7 +564,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject incTo(5) when currentIteration = 5 - logs ILLEGAL, currentIteration unchanged")
+    @DisplayName("should reject incTo(5) when currentIteration = 5 - logs ILLEGAL_ARGUMENT, currentIteration unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectIncToEqualToCurrentIteration() {
         // Given: a started Meter with currentIteration = 5
@@ -588,13 +588,13 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
     @Test
-    @DisplayName("should reject incTo(3) when currentIteration = 5 - logs ILLEGAL, currentIteration unchanged")
+    @DisplayName("should reject incTo(3) when currentIteration = 5 - logs ILLEGAL_ARGUMENT, currentIteration unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectIncToLessThanCurrentIteration() {
         // Given: a started Meter with currentIteration = 5
@@ -618,13 +618,13 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
     @Test
-    @DisplayName("should reject incTo(5) after incTo(10) - logs ILLEGAL, currentIteration remains 10")
+    @DisplayName("should reject incTo(5) after incTo(10) - logs ILLEGAL_ARGUMENT, currentIteration remains 10")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectIncToAfterHigherIncTo() {
         // Given: a started Meter with currentIteration = 10
@@ -643,7 +643,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL
+        // Then: logs ILLEGAL_ARGUMENT
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -653,7 +653,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ok(null) - logs ILLEGAL, completes with INFO log, okPath unset")
+    @DisplayName("should reject ok(null) - logs ILLEGAL_ARGUMENT, completes with INFO log, okPath unset")
     @ValidateCleanMeter
     void shouldRejectOkNull() {
         // Given: a started Meter
@@ -668,14 +668,14 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
-        // Then: logs ILLEGAL for null argument, completes with INFO log
+        // Then: logs ILLEGAL_ARGUMENT for null argument, completes with INFO log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject reject(null) - logs ILLEGAL, completes with INFO log, rejectPath unset")
+    @DisplayName("should reject reject(null) - logs ILLEGAL_ARGUMENT, completes with INFO log, rejectPath unset")
     @ValidateCleanMeter
     void shouldRejectRejectNull() {
         // Given: a started Meter
@@ -690,14 +690,14 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
-        // Then: logs ILLEGAL for null argument, completes with INFO log
+        // Then: logs ILLEGAL_ARGUMENT for null argument, completes with INFO log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject fail(null) - logs ILLEGAL, completes with ERROR log, failPath unset")
+    @DisplayName("should reject fail(null) - logs ILLEGAL_ARGUMENT, completes with ERROR log, failPath unset")
     @ValidateCleanMeter
     void shouldRejectFailNull() {
         // Given: a started Meter
@@ -712,7 +712,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
-        // Then: logs ILLEGAL for null argument, completes with ERROR log
+        // Then: logs ILLEGAL_ARGUMENT for null argument, completes with ERROR log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEventCount(logger, 5);
@@ -723,7 +723,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject all invalid operations - logs ILLEGAL for each, all attributes unchanged")
+    @DisplayName("should reject all invalid operations - logs ILLEGAL_ARGUMENT for each, all attributes unchanged")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldRejectAllInvalidOperationsAfterStart() {
         // Given: a started Meter
@@ -739,7 +739,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs ILLEGAL for each
+        // Then: logs ILLEGAL_ARGUMENT for each
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -766,7 +766,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 3, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
-        // Then: logs ILLEGAL for iterations(-1) and incBy(0), completes with INFO log
+        // Then: logs ILLEGAL_ARGUMENT for iterations(-1) and incBy(0), completes with INFO log
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.INFO, Markers.MSG_OK);

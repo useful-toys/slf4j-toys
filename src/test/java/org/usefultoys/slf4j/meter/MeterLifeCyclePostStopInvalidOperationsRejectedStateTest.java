@@ -93,7 +93,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject m(String) after reject() - logs ILLEGAL")
+    @DisplayName("should reject m(String) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDescriptionAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -111,7 +111,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -119,7 +119,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject m(String, Object...) after reject() - logs ILLEGAL")
+    @DisplayName("should reject m(String, Object...) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDescriptionWithArgsAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -137,7 +137,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -145,7 +145,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject m(null) after reject() - logs ILLEGAL")
+    @DisplayName("should reject m(null) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullDescriptionAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -163,7 +163,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -315,7 +315,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx() after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx() after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -333,7 +333,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -341,7 +341,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx() update after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx() update after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectContextUpdateAfterReject() {
         // Given: a meter with context that has been stopped with reject("business_error")
@@ -362,7 +362,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -374,7 +374,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(String, int) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, int) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIntContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -392,7 +392,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -400,7 +400,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, long) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, long) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectLongContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -418,7 +418,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -426,7 +426,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, boolean) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, boolean) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectBooleanContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -444,7 +444,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -452,7 +452,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, float) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, float) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectFloatContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -470,7 +470,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -478,7 +478,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, double) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, double) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDoubleContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -496,7 +496,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -508,7 +508,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(String, Integer) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, Integer) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIntegerWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -526,7 +526,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -534,7 +534,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Long) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, Long) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectLongWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -552,7 +552,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -560,7 +560,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Boolean) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, Boolean) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectBooleanWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -578,7 +578,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -586,7 +586,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Float) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, Float) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectFloatWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -604,7 +604,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -612,7 +612,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Double) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, Double) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDoubleWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -630,7 +630,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -638,7 +638,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, null Integer) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, null Integer) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullIntegerWrapperContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -656,7 +656,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -668,7 +668,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(String, String, Object...) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, String, Object...) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectFormattedContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -686,7 +686,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -694,7 +694,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Object) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, Object) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectObjectContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -712,7 +712,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -720,7 +720,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, null Object) after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, null Object) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullObjectContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -738,7 +738,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -750,7 +750,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(String) key-only after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String) key-only after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectKeyOnlyContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -768,7 +768,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -776,7 +776,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(true, String) conditional key-only after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(true, String) conditional key-only after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectConditionalKeyOnlyTrueAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -794,7 +794,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -807,7 +807,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     void shouldSilentlyIgnoreConditionalKeyOnlyFalseAfterReject() {
         /* NOTE: This test was intended to validate that ctx(false, String) is rejected as invalid after reject().
          * However, the current Meter implementation returns early when condition=false (before calling putContext()),
-         * so validateContextPrecondition() is never invoked, and no ILLEGAL log is generated.
+         * so validateContextPrecondition() is never invoked, and no ILLEGAL_ARGUMENT log is generated.
          * This test documents the actual behavior: conditional ctx() with false silently does nothing. */
         
         // Given: a meter that has been stopped with reject("business_error")
@@ -824,14 +824,14 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: only reject logs (no ILLEGAL because putContext was never called)
+        // Then: only reject logs (no ILLEGAL_ARGUMENT because putContext was never called)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
-    @DisplayName("should reject ctx(boolean, String, String) conditional true/false names after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(boolean, String, String) conditional true/false names after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectConditionalTrueFalseNamesAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -850,7 +850,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -862,7 +862,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(null) null key-only after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(null) null key-only after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullKeyOnlyContextAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -879,7 +879,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -887,7 +887,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(true, null) null trueName when true after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(true, null) null trueName when true after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWhenTrueAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -904,7 +904,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -916,7 +916,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     @ValidateCleanMeter
     void shouldSilentlyIgnoreNullTrueNameWhenFalseAfterReject() {
         /* NOTE: This test was intended to validate that ctx(false, null) is rejected as invalid after reject().
-         * However, condition=false causes early return before putContext() is called, so no ILLEGAL log occurs. */
+         * However, condition=false causes early return before putContext() is called, so no ILLEGAL_ARGUMENT log occurs. */
         
         // Given: a meter that has been stopped with reject("business_error")
         final Meter meter = new Meter(logger).start();
@@ -932,14 +932,14 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: only reject logs (no ILLEGAL)
+        // Then: only reject logs (no ILLEGAL_ARGUMENT)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
-    @DisplayName("should reject ctx(true, null, String) null trueName with falseName after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(true, null, String) null trueName with falseName after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWithFalseNameAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -957,7 +957,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -965,7 +965,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(false, String, null) null falseName when false after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(false, String, null) null falseName when false after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullFalseNameWhenFalseAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -983,7 +983,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -991,7 +991,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(true, null, null) both names null when true after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(true, null, null) both names null when true after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenTrueAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1008,7 +1008,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1016,7 +1016,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(false, null, null) both names null when false after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(false, null, null) both names null when false after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenFalseAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1033,7 +1033,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1045,7 +1045,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(null, String) null key with value after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(null, String) null key with value after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullKeyWithValueAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1062,7 +1062,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1070,7 +1070,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(null, int) null key with primitive after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(null, int) null key with primitive after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullKeyWithPrimitiveAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1087,7 +1087,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1095,7 +1095,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(null, String, Object...) null key with format after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(null, String, Object...) null key with format after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullKeyWithFormatAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1112,7 +1112,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1120,7 +1120,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, null, Object...) null format after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, null, Object...) null format after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullFormatAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1138,7 +1138,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1146,7 +1146,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject ctx(String, String, null) null args array after reject() - logs ILLEGAL")
+    @DisplayName("should reject ctx(String, String, null) null args array after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullArgsArrayAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1164,7 +1164,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1176,7 +1176,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject path() after reject() - logs ILLEGAL")
+    @DisplayName("should reject path() after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectPathAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1194,7 +1194,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1202,7 +1202,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject path() update after reject() - logs ILLEGAL")
+    @DisplayName("should reject path() update after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectPathUpdateAfterReject() {
         // Given: a meter that has been stopped with reject("original_error")
@@ -1220,7 +1220,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "original_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1228,7 +1228,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject path(null) after reject() - logs ILLEGAL")
+    @DisplayName("should reject path(null) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullPathAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1246,7 +1246,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1258,7 +1258,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject limitMilliseconds() after reject() - logs ILLEGAL")
+    @DisplayName("should reject limitMilliseconds() after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectLimitAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1276,7 +1276,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1284,7 +1284,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds() update after reject() - logs ILLEGAL")
+    @DisplayName("should reject limitMilliseconds() update after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectLimitUpdateAfterReject() {
         // Given: a meter with timeLimit that has been stopped with reject("business_error")
@@ -1304,7 +1304,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 100);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1312,7 +1312,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds(0) after reject() - logs ILLEGAL")
+    @DisplayName("should reject limitMilliseconds(0) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectZeroLimitAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1330,7 +1330,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1338,7 +1338,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds(-1) after reject() - logs ILLEGAL")
+    @DisplayName("should reject limitMilliseconds(-1) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNegativeLimitAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1356,7 +1356,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation) only
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1368,7 +1368,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject iterations() after reject() - logs ILLEGAL")
+    @DisplayName("should reject iterations() after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIterationsAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1386,7 +1386,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1394,7 +1394,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject iterations() update after reject() - logs ILLEGAL")
+    @DisplayName("should reject iterations() update after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIterationsUpdateAfterReject() {
         // Given: a meter with expectedIterations that has been stopped with reject("business_error")
@@ -1414,7 +1414,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 50, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1422,7 +1422,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject iterations(0) after reject() - logs ILLEGAL")
+    @DisplayName("should reject iterations(0) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectZeroIterationsAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1440,7 +1440,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
@@ -1448,7 +1448,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject iterations(-5) after reject() - logs ILLEGAL")
+    @DisplayName("should reject iterations(-5) after reject() - logs ILLEGAL_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNegativeIterationsAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -1466,7 +1466,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + ILLEGAL (from invalid operation) only
+        // Then: logs reject (from setup) + ILLEGAL_ARGUMENT (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);

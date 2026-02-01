@@ -65,7 +65,6 @@ public class MessageHighlightConverter extends ForegroundCompositeConverterBase<
         MARKER_MAP.put(org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER, LESS_VISIBILITY);
 
         MARKER_MAP.put(Markers.UNEXPECTED_EXCEPTION, ERROR_VISIBILITY);
-        MARKER_MAP.put(Markers.ILLEGAL, ERROR_VISIBILITY);
         MARKER_MAP.put(Markers.INCONSISTENT_START, ERROR_VISIBILITY);
         MARKER_MAP.put(Markers.INCONSISTENT_INCREMENT, ERROR_VISIBILITY);
         MARKER_MAP.put(Markers.INCONSISTENT_PROGRESS, ERROR_VISIBILITY);

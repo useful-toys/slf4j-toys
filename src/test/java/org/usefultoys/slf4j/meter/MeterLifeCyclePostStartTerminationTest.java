@@ -262,7 +262,7 @@ class MeterLifeCyclePostStartTerminationTest {
     }
 
     @Test
-    @DisplayName("should handle ok(null) - logs ILLEGAL but completes")
+    @DisplayName("should handle ok(null) - logs ILLEGAL_ARGUMENT but completes")
     @ValidateCleanMeter
     void shouldHandleOkWithNullPath() {
         // Given: a new, started Meter
@@ -272,11 +272,11 @@ class MeterLifeCyclePostStartTerminationTest {
         // When: ok(null) is called
         recordStopWithWindow(tr, () -> meter.ok(null));
 
-        // Then: okPath remains unset, logs ILLEGAL, completes with INFO log
+        // Then: okPath remains unset, logs ILLEGAL_ARGUMENT, completes with INFO log
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ILLEGAL + ok + DATA_OK
+        // Then: logs start + ILLEGAL_ARGUMENT + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
@@ -381,11 +381,11 @@ class MeterLifeCyclePostStartTerminationTest {
 
         recordStopWithWindow(tr, () -> meter.ok());
 
-        // Then: path rejects null (ILLEGAL), okPath = null, INFO log for ok()
+        // Then: path rejects null (ILLEGAL_ARGUMENT), okPath = null, INFO log for ok()
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ILLEGAL + ok + DATA_OK
+        // Then: logs start + ILLEGAL_ARGUMENT + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
@@ -575,11 +575,11 @@ class MeterLifeCyclePostStartTerminationTest {
         // When: ok(null) is called
         recordStopWithWindow(tr, () -> meter.ok(null));
 
-        // Then: ok() ignores null (ILLEGAL), okPath = "validPath" preserved
+        // Then: ok() ignores null (ILLEGAL_ARGUMENT), okPath = "validPath" preserved
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ILLEGAL + ok + DATA_OK
+        // Then: logs start + ILLEGAL_ARGUMENT + ok + DATA_OK
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);

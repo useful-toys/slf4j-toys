@@ -552,11 +552,11 @@ class MeterLifeCyclePreStartTerminationTest {
         meter.path("custom_path");
         recordStopWithWindow(tr, () -> meter.ok());
 
-        // Then: path() was rejected (ILLEGAL), okPath remains undefined after ok()
+        // Then: path() was rejected (ILLEGAL_ARGUMENT), okPath remains undefined after ok()
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs ILLEGAL (path before start) + INCONSISTENT_OK + MSG_OK + DATA_OK
+        // Then: logs ILLEGAL_ARGUMENT (path before start) + INCONSISTENT_OK + MSG_OK + DATA_OK
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -575,11 +575,11 @@ class MeterLifeCyclePreStartTerminationTest {
         meter.path("custom_path");
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
 
-        // Then: path() was rejected (ILLEGAL), meter still reaches Rejected state
+        // Then: path() was rejected (ILLEGAL_ARGUMENT), meter still reaches Rejected state
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs ILLEGAL (path before start) + INCONSISTENT_REJECT + MSG_REJECT + DATA_REJECT
+        // Then: logs ILLEGAL_ARGUMENT (path before start) + INCONSISTENT_REJECT + MSG_REJECT + DATA_REJECT
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
@@ -598,11 +598,11 @@ class MeterLifeCyclePreStartTerminationTest {
         meter.path("custom_path");
         recordStopWithWindow(tr, () -> meter.fail("technical_error"));
 
-        // Then: path() was rejected (ILLEGAL), meter reaches Failed (failMessage null for String)
+        // Then: path() was rejected (ILLEGAL_ARGUMENT), meter reaches Failed (failMessage null for String)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs ILLEGAL (path before start) + INCONSISTENT_FAIL + MSG_FAIL + DATA_FAIL
+        // Then: logs ILLEGAL_ARGUMENT (path before start) + INCONSISTENT_FAIL + MSG_FAIL + DATA_FAIL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);

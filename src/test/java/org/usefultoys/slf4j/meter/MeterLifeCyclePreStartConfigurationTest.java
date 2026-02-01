@@ -137,13 +137,13 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterState(meter, false, false, null, null, null, null, 0, 0, 5000);
         assertMeterCreateTime(meter, tr);
 
-        // Then: ILLEGAL event logged
+        // Then: ILLEGAL_ARGUMENT event logged
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
     @Test
-    @DisplayName("should log ILLEGAL when negative time limit attempted")
+    @DisplayName("should log ILLEGAL_ARGUMENT when negative time limit attempted")
     void shouldLogIllegalWhenNegativeTimeLimitAttempted() {
         // Given: a new Meter
         final TimeRecord tr = new TimeRecord();
@@ -156,7 +156,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: ILLEGAL event logged
+        // Then: ILLEGAL_ARGUMENT event logged
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
@@ -217,13 +217,13 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterState(meter, false, false, null, null, null, null, 0, 100, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: ILLEGAL event logged
+        // Then: ILLEGAL_ARGUMENT event logged
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
     @Test
-    @DisplayName("should log ILLEGAL when negative iterations attempted")
+    @DisplayName("should log ILLEGAL_ARGUMENT when negative iterations attempted")
     void shouldLogIllegalWhenNegativeIterationsAttempted() {
         // Given: a new Meter
         final TimeRecord tr = new TimeRecord();
@@ -236,7 +236,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: ILLEGAL event logged
+        // Then: ILLEGAL_ARGUMENT event logged
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
@@ -300,13 +300,13 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: ILLEGAL event logged
+        // Then: ILLEGAL_ARGUMENT event logged
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
     @Test
-    @DisplayName("should log ILLEGAL when null message attempted before any valid message")
+    @DisplayName("should log ILLEGAL_ARGUMENT when null message attempted before any valid message")
     void shouldLogIllegalWhenNullMessageAttemptedBeforeAnyValidMessage() {
         // Given: a new Meter
         final TimeRecord tr = new TimeRecord();
@@ -320,7 +320,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: ILLEGAL event logged
+        // Then: ILLEGAL_ARGUMENT event logged
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
@@ -379,18 +379,18 @@ class MeterLifeCyclePreStartConfigurationTest {
         meter.m("valid: %s", "arg");
         meter.m(null, "arg");
 
-        // Then: null format is rejected with ILLEGAL log, description is reset to null, meter remains in Created state
+        // Then: null format is rejected with ILLEGAL_ARGUMENT log, description is reset to null, meter remains in Created state
         assertNull(meter.getDescription(), "should reset description to null when null format attempted");
         assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: ILLEGAL event logged
+        // Then: ILLEGAL_ARGUMENT event logged
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
     @Test
-    @DisplayName("should log ILLEGAL when invalid format string attempted")
+    @DisplayName("should log ILLEGAL_ARGUMENT when invalid format string attempted")
     void shouldLogIllegalWhenInvalidFormatStringAttempted() {
         // Given: a new Meter
         final TimeRecord tr = new TimeRecord();
@@ -404,7 +404,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: ILLEGAL event logged
+        // Then: ILLEGAL_ARGUMENT event logged
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
@@ -841,7 +841,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterState(meter, false, false, null, null, null, null, 0, 100, 5000);
         assertMeterCreateTime(meter, tr);
 
-        // Then: two ILLEGAL events logged
+        // Then: two ILLEGAL_ARGUMENT events logged
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 2);

@@ -58,7 +58,7 @@ We adopt a **four-tier resilience strategy** that gracefully handles both expect
 
 ### Tier 3: ⚠️ State-Correcting (Outside Expected Flow)
 
-**Definition**: A call that violates the expected API contract, but is accepted and applied to correct the state to a valid configuration while maintaining resilience. The call may change the lifecycle state and/or update attributes. An error log entry is emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
+**Definition**: A call that violates the expected API contract, but is accepted and applied to correct the state to a valid configuration while maintaining resilience. The call may change the lifecycle state and/or update attributes. An error log entry is emitted (e.g., `ILLEGAL_ARGUMENT` or `INCONSISTENT_*`).
 
 **Behavior**:
 * A warning or error is logged to alert developers that the call violates the API contract.
@@ -79,12 +79,12 @@ We adopt a **four-tier resilience strategy** that gracefully handles both expect
 
 ### Tier 4: ❌ State-Preserving (Invalid Flow)
 
-**Definition**: A call made when preconditions or arguments are not met. The call is rejected and ignored to preserve the current valid state. An error log entry is emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
+**Definition**: A call made when preconditions or arguments are not met. The call is rejected and ignored to preserve the current valid state. An error log entry is emitted (e.g., `ILLEGAL_ARGUMENT` or `INCONSISTENT_*`).
 
 **Behavior**:
 * A warning or error is logged to alert developers that preconditions or arguments are invalid.
 * The call is rejected and has no effect on the state or attributes.
-* Example: `inc()` called from `Created` (logs `INCONSISTENT_INCREMENT` but does nothing), or `ok(null)` with a null path argument (logs `ILLEGAL` but does not transition).
+* Example: `inc()` called from `Created` (logs `INCONSISTENT_INCREMENT` but does nothing), or `ok(null)` with a null path argument (logs `ILLEGAL_ARGUMENT` but does not transition).
 
 **Guarantees**:
 * The meter remains in exactly the same state (state is preserved).
@@ -150,7 +150,7 @@ This ensures that a Meter reported as "OK" cannot later change to "Failed" due t
 
 * **Tier 1/2**: No log entry (normal usage).
 * **Tier 3**: Logs with `INCONSISTENT_*` markers to indicate discouraged but tolerated usage.
-* **Tier 4**: Logs with `ILLEGAL` or `INCONSISTENT_*` markers to indicate ignored calls.
+* **Tier 4**: Logs with `ILLEGAL_ARGUMENT` or `INCONSISTENT_*` markers to indicate ignored calls.
 
 All logging uses markers from [src/main/java/org/usefultoys/slf4j/meter/Markers.java](../src/main/java/org/usefultoys/slf4j/meter/Markers.java) for aggregation and filtering.
 
@@ -163,7 +163,7 @@ All logging uses markers from [src/main/java/org/usefultoys/slf4j/meter/Markers.
 * **Non-intrusive**: No exceptions disrupt production applications.
 * **Forgiving but guided**: Incorrect usage is tolerated but flagged in logs.
 * **State invariant**: The `Meter` is always in a valid state, even after misuse.
-* **Debuggable**: Developers can detect their mistakes by monitoring `INCONSISTENT_*` and `ILLEGAL` markers.
+* **Debuggable**: Developers can detect their mistakes by monitoring `INCONSISTENT_*` and `ILLEGAL_ARGUMENT` markers.
 * **Testable**: Test suites can verify that invalid transitions are logged correctly without throwing exceptions.
 * **Contract preserved**: The recommended usage pattern is clear and works as designed; out-of-order usage is discouraged via logging but not prevented by the API.
 

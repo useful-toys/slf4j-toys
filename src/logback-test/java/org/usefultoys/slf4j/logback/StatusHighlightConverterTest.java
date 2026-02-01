@@ -3,6 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -224,17 +225,6 @@ class StatusHighlightConverterTest {
         void testUnexpectedExceptionMarker() {
             // Given: logging event with UNEXPECTED_EXCEPTION marker
             when(mockEvent.getMarker()).thenReturn(Markers.UNEXPECTED_EXCEPTION);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for ILLEGAL marker")
-        void testIllegalMarker() {
-            // Given: logging event with ILLEGAL marker
-            when(mockEvent.getMarker()).thenReturn(Markers.ILLEGAL);
             // When: getForegroundColorCode is called
             final String result = converter.getForegroundColorCode(mockEvent);
             // Then: should return INCONSISTENCY_VISIBILITY code

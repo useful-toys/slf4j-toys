@@ -136,8 +136,8 @@ The following table details all state-related method calls for `Meter`.
 **Legend (Resilience Tiers):**
 - ✅ **Tier 1 - Valid state-changing (expected flow):** A valid call that changes the lifecycle in the normal sequence (typically `Created → Started → (OK | Rejected | Failed)`), by updating state-driving attributes.
 - ☑️ **Tier 2 - Valid non-state-changing (expected flow):** A valid call used while the meter is in a normal state for that call. It does not change the lifecycle classification, but may update supporting attributes.
-- ⚠️ **Tier 3 - State-correcting (outside expected flow):** The call violates the expected API contract, but is accepted and applied to correct the state to a valid configuration while maintaining resilience. It may change the lifecycle state and/or update attributes. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
-- ❌ **Tier 4 - State-preserving (invalid flow):** Preconditions and/or arguments are not met, so the call is ignored to preserve the current valid state. No transition/attribute change is applied for that call. An error log entry is typically emitted (e.g., `ILLEGAL` or `INCONSISTENT_*`).
+- ⚠️ **Tier 3 - State-correcting (outside expected flow):** The call violates the expected API contract, but is accepted and applied to correct the state to a valid configuration while maintaining resilience. It may change the lifecycle state and/or update attributes. An error log entry is typically emitted (e.g., `ILLEGAL_ARGUMENT` or `INCONSISTENT_*`).
+- ❌ **Tier 4 - State-preserving (invalid flow):** Preconditions and/or arguments are not met, so the call is ignored to preserve the current valid state. No transition/attribute change is applied for that call. An error log entry is typically emitted (e.g., `ILLEGAL_ARGUMENT` or `INCONSISTENT_*`).
 
 **Definitions:**
 - **Lifecycle classification:** The state returned by `isStarted()`, `isStopped()`, `isOK()`, `isReject()`, `isFail()`, and `isSlow()`, based on `MeterData` attributes.
@@ -157,74 +157,74 @@ Note: A call may be valid for a given state, but still be invalid if its argumen
 
 |  | From State | Call | To State | Notes |
 |:--:|:---|:---|:---|:---|
-| ☑️ | **Created** | `iterations(n)` | **Created** | When `n > 0`: sets `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
-| ☑️ | **Created** | `limitMilliseconds(n)` | **Created** | When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
-| ❌ | **Created** | `path(okPath)` | **Created** | Ignored. Logs `ILLEGAL` (Meter path but not started).
+| ☑️ | **Created** | `iterations(n)` | **Created** | When `n > 0`: sets `expectedIterations`.<br/>Otherwise: logs `ILLEGAL_ARGUMENT` (Non-positive argument).
+| ☑️ | **Created** | `limitMilliseconds(n)` | **Created** | When `n > 0`: sets `timeLimit`.<br/>Otherwise: logs `ILLEGAL_ARGUMENT` (Non-positive argument).
+| ❌ | **Created** | `path(okPath)` | **Created** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter path but not started).
 | ❌ | **Created** | `inc()` | **Created** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter not started).
 | ❌ | **Created** | `incBy(n)` | **Created** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter not started).
 | ❌ | **Created** | `incTo(n)` | **Created** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter not started).
 | ✅ | **Created** | `start()` | **Started** | Normal start. Sets `startTime` and enables thread-local propagation.
 | ❌ | **Created** | `progress()` | **Created** | Ignored. Logs `INCONSISTENT_PROGRESS` (Meter progress but not started).
 | ⚠️ | **Created** | `ok()` | **OK** | Termination (resilience). Logs `INCONSISTENT_OK` (Meter stopped but not started).
-| ⚠️ | **Created** | `ok(okPath)` | **OK** | Termination (resilience). When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter stopped but not started).
-| ⚠️ | **Created** | `reject(cause)` | **Rejected** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter stopped but not started).
-| ⚠️ | **Created** | `fail(cause)` | **Failed** | Termination (resilience). When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter stopped but not started).
+| ⚠️ | **Created** | `ok(okPath)` | **OK** | Termination (resilience). When `okPath == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter stopped but not started).
+| ⚠️ | **Created** | `reject(cause)` | **Rejected** | Termination (resilience). When `cause == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter stopped but not started).
+| ⚠️ | **Created** | `fail(cause)` | **Failed** | Termination (resilience). When `cause == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter stopped but not started).
 | ⚠️ | **Created** | `close()` | **Failed** | Termination (resilience). Logs `INCONSISTENT_CLOSE` (Meter stopped but not started).
 | ❌ | **Created** | `finalize()` | **Created** | Ignored. `validateFinalize` logs only when Started and not Stopped.
 | ⚠️ | **Started** | `start()` | **Started** | State-correcting. Logs `INCONSISTENT_START` (Meter already started). Resets `startTime` to now.
-| ☑️ | **Started** | `iterations(n)` | **Started** | When `n > 0`: sets/overrides `expectedIterations`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
-| ☑️ | **Started** | `limitMilliseconds(n)` | **Started** | When `n > 0`: sets/overrides `timeLimit`.<br/>Otherwise: logs `ILLEGAL` (Non-positive argument).
-| ☑️ | **Started** | `path(okPath)` | **Started** | When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: sets/overrides `okPath`.
+| ☑️ | **Started** | `iterations(n)` | **Started** | When `n > 0`: sets/overrides `expectedIterations`.<br/>Otherwise: logs `ILLEGAL_ARGUMENT` (Non-positive argument).
+| ☑️ | **Started** | `limitMilliseconds(n)` | **Started** | When `n > 0`: sets/overrides `timeLimit`.<br/>Otherwise: logs `ILLEGAL_ARGUMENT` (Non-positive argument).
+| ☑️ | **Started** | `path(okPath)` | **Started** | When `okPath == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: sets/overrides `okPath`.
 | ☑️ | **Started** | `inc()` | **Started** | Increments `currentIteration`.
-| ☑️ | **Started** | `incBy(n)` | **Started** | When `n > 0`: adds `n` to `currentIteration`.<br/>Otherwise: logs `ILLEGAL` (Non-positive increment).
-| ☑️ | **Started** | `incTo(n)` | **Started** | When `n > 0` and `n > currentIteration`: sets `currentIteration = n`.<br/>Otherwise when `n <= 0`: logs `ILLEGAL` (Non-positive argument).<br/>Otherwise: logs `ILLEGAL` (Non-forward increment).
+| ☑️ | **Started** | `incBy(n)` | **Started** | When `n > 0`: adds `n` to `currentIteration`.<br/>Otherwise: logs `ILLEGAL_ARGUMENT` (Non-positive increment).
+| ☑️ | **Started** | `incTo(n)` | **Started** | When `n > 0` and `n > currentIteration`: sets `currentIteration = n`.<br/>Otherwise when `n <= 0`: logs `ILLEGAL_ARGUMENT` (Non-positive argument).<br/>Otherwise: logs `ILLEGAL_ARGUMENT` (Non-forward increment).
 | ☑️ | **Started** | `progress()` | **Started** | May log progress periodically (only when progress advanced and throttling allows).
 | ✅ | **Started** | `ok()` | **OK** | Normal termination.
-| ✅ | **Started** | `ok(okPath)` | **OK** | When okPath == null: logs `ILLEGAL` (Null argument).<br/>Otherwise: normal termination with path.
-| ✅ | **Started** | `reject(cause)` | **Rejected** | When cause == null: logs `ILLEGAL` (Null argument).<br/>Otherwise: normal rejection termination.
-| ✅ | **Started** | `fail(cause)` | **Failed** | When cause == null: logs `ILLEGAL` (Null argument).<br/>Otherwise: normal failure termination.
+| ✅ | **Started** | `ok(okPath)` | **OK** | When okPath == null: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: normal termination with path.
+| ✅ | **Started** | `reject(cause)` | **Rejected** | When cause == null: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: normal rejection termination.
+| ✅ | **Started** | `fail(cause)` | **Failed** | When cause == null: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: normal failure termination.
 | ✅ | **Started** | `close()` | **Failed** | Auto-fail for try-with-resources when not explicitly stopped.
 | ⚠️ | **Started** | `finalize()` | **Started** | Termination (resilience). Logs `INCONSISTENT_FINALIZED` (Meter started but never stopped).
 | ❌ | **OK** | `start()` | **OK** | Ignored. Logs `INCONSISTENT_START` (Meter already started). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently resets `startTime`.
-| ❌ | **OK** | `iterations(n)` | **OK** | Ignored. Logs `ILLEGAL` (Meter iterations but already stopped).
-| ❌ | **OK** | `limitMilliseconds(n)` | **OK** | Ignored. Logs `ILLEGAL` (Meter already stopped).
-| ❌ | **OK** | `path(okPath)` | **OK** | Ignored. Logs `ILLEGAL` (Meter already stopped).
+| ❌ | **OK** | `iterations(n)` | **OK** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter iterations but already stopped).
+| ❌ | **OK** | `limitMilliseconds(n)` | **OK** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter already stopped).
+| ❌ | **OK** | `path(okPath)` | **OK** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter already stopped).
 | ❌ | **OK** | `inc()` | **OK** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter already stopped).
 | ❌ | **OK** | `incBy(n)` | **OK** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter already stopped).
 | ❌ | **OK** | `incTo(n)` | **OK** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter already stopped).
 | ❌ | **OK** | `progress()` | **OK** | Ignored. Logs `INCONSISTENT_PROGRESS` (Meter already stopped).
 | ❌ | **OK** | `ok()` | **OK** | Ignored. Logs `INCONSISTENT_OK` (Meter already stopped). Violates immutability guarantee.
-| ❌ | **OK** | `ok(okPath)` | **OK** | Ignored. When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped). Violates immutability guarantee.
-| ❌ | **OK** | `reject(cause)` | **OK** | Ignored. When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to Rejected state.
-| ❌ | **OK** | `fail(cause)` | **OK** | Ignored. When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to Failed state.
+| ❌ | **OK** | `ok(okPath)` | **OK** | Ignored. When `okPath == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped). Violates immutability guarantee.
+| ❌ | **OK** | `reject(cause)` | **OK** | Ignored. When `cause == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to Rejected state.
+| ❌ | **OK** | `fail(cause)` | **OK** | Ignored. When `cause == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to Failed state.
 | ❌ | **OK** | `close()` | **OK** | Ignored. `close()` returns immediately when already stopped.
 | ❌ | **OK** | `finalize()` | **OK** | Ignored. `validateFinalize` logs only when Started and not Stopped.
 | ❌ | **Rejected** | `start()` | **Rejected** | Ignored. Logs `INCONSISTENT_START` (Meter already started). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently resets `startTime`.
-| ❌ | **Rejected** | `iterations(n)` | **Rejected** | Ignored. Logs `ILLEGAL` (Meter already stopped).
-| ❌ | **Rejected** | `limitMilliseconds(n)` | **Rejected** | Ignored. Logs `ILLEGAL` (Meter already stopped).
-| ❌ | **Rejected** | `path(okPath)` | **Rejected** | Ignored. Logs `ILLEGAL` (Meter already stopped).
+| ❌ | **Rejected** | `iterations(n)` | **Rejected** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter already stopped).
+| ❌ | **Rejected** | `limitMilliseconds(n)` | **Rejected** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter already stopped).
+| ❌ | **Rejected** | `path(okPath)` | **Rejected** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter already stopped).
 | ❌ | **Rejected** | `inc()` | **Rejected** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter already stopped).
 | ❌ | **Rejected** | `incBy(n)` | **Rejected** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter already stopped).
 | ❌ | **Rejected** | `incTo(n)` | **Rejected** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter already stopped).
 | ❌ | **Rejected** | `progress()` | **Rejected** | Ignored. Logs `INCONSISTENT_PROGRESS` (Meter already stopped).
 | ❌ | **Rejected** | `ok()` | **OK** | Ignored. Logs `INCONSISTENT_OK` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to OK state.
-| ❌ | **Rejected** | `ok(okPath)` | **OK** | Ignored. When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to OK state.
-| ❌ | **Rejected** | `reject(cause)` | **Rejected** | Ignored. When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped). Violates immutability guarantee.
-| ❌ | **Rejected** | `fail(cause)` | **Failed** | Ignored. When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to Failed state.
+| ❌ | **Rejected** | `ok(okPath)` | **OK** | Ignored. When `okPath == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to OK state.
+| ❌ | **Rejected** | `reject(cause)` | **Rejected** | Ignored. When `cause == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped). Violates immutability guarantee.
+| ❌ | **Rejected** | `fail(cause)` | **Failed** | Ignored. When `cause == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to Failed state.
 | ❌ | **Rejected** | `close()` | **Rejected** | Ignored. `close()` returns immediately when already stopped.
 | ❌ | **Rejected** | `finalize()` | **Rejected** | Ignored. `validateFinalize` logs only when Started and not Stopped.
 | ❌ | **Failed** | `start()` | **Failed** | Ignored. Logs `INCONSISTENT_START` (Meter already started). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently resets `startTime`.
-| ❌ | **Failed** | `iterations(n)` | **Failed** | Ignored. Logs `ILLEGAL` (Meter already stopped).
-| ❌ | **Failed** | `limitMilliseconds(n)` | **Failed** | Ignored. Logs `ILLEGAL` (Meter already stopped).
-| ❌ | **Failed** | `path(okPath)` | **Failed** | Ignored. Logs `ILLEGAL` (Meter already stopped).
+| ❌ | **Failed** | `iterations(n)` | **Failed** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter already stopped).
+| ❌ | **Failed** | `limitMilliseconds(n)` | **Failed** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter already stopped).
+| ❌ | **Failed** | `path(okPath)` | **Failed** | Ignored. Logs `ILLEGAL_ARGUMENT` (Meter already stopped).
 | ❌ | **Failed** | `inc()` | **Failed** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter already stopped).
 | ❌ | **Failed** | `incBy(n)` | **Failed** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter already stopped).
 | ❌ | **Failed** | `incTo(n)` | **Failed** | Ignored. Logs `INCONSISTENT_INCREMENT` (Meter already stopped).
 | ❌ | **Failed** | `progress()` | **Failed** | Ignored. Logs `INCONSISTENT_PROGRESS` (Meter already stopped).
 | ❌ | **Failed** | `ok()` | **Failed** | Ignored. Logs `INCONSISTENT_OK` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to OK state.
-| ❌ | **Failed** | `ok(okPath)` | **Failed** | Ignored. When `okPath == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to OK state.
-| ❌ | **Failed** | `reject(cause)` | **Failed** | Ignored. When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to Rejected state.
-| ❌ | **Failed** | `fail(cause)` | **Failed** | Ignored. When `cause == null`: logs `ILLEGAL` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped). Violates immutability guarantee.
+| ❌ | **Failed** | `ok(okPath)` | **Failed** | Ignored. When `okPath == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_OK` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to OK state.
+| ❌ | **Failed** | `reject(cause)` | **Failed** | Ignored. When `cause == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_REJECT` (Meter already stopped). Violates immutability guarantee. ⚠️ **Implementation diverges**: currently transitions to Rejected state.
+| ❌ | **Failed** | `fail(cause)` | **Failed** | Ignored. When `cause == null`: logs `ILLEGAL_ARGUMENT` (Null argument).<br/>Otherwise: logs `INCONSISTENT_FAIL` (Meter already stopped). Violates immutability guarantee.
 | ❌ | **Failed** | `close()` | **Failed** | Ignored. `close()` returns immediately when already stopped.
 | ❌ | **Failed** | `finalize()` | **Failed** | Ignored. `validateFinalize` logs only when Started and not Stopped.
 

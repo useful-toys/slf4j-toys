@@ -229,17 +229,6 @@ class MessageHighlightConverterTest {
         }
 
         @Test
-        @DisplayName("should return ERROR_VISIBILITY for ILLEGAL marker")
-        void testIllegalMarker() {
-            // Given: logging event with ILLEGAL marker
-            when(mockEvent.getMarker()).thenReturn(Markers.ILLEGAL);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return ERROR_VISIBILITY code
-            assertEquals(MessageHighlightConverter.ERROR_VISIBILITY, result);
-        }
-
-        @Test
         @DisplayName("should return ERROR_VISIBILITY for INCONSISTENT_START marker")
         void testInconsistentStartMarker() {
             // Given: logging event with INCONSISTENT_START marker

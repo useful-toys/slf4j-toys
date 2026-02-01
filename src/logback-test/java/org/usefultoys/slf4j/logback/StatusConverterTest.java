@@ -231,17 +231,6 @@ class StatusConverterTest {
         }
 
         @Test
-        @DisplayName("should convert ILLEGAL marker to ILLEGAL")
-        void testIllegalMarker() {
-            // Given: logging event with ILLEGAL marker
-            when(mockEvent.getMarker()).thenReturn(Markers.ILLEGAL);
-            // When: convert is called
-            final String result = converter.convert(mockEvent);
-            // Then: should return ILLEGAL status
-            assertEquals("ILLEGAL", result);
-        }
-
-        @Test
         @DisplayName("should convert INCONSISTENT_START marker to INCONSISTENT")
         void testInconsistentStartMarker() {
             // Given: logging event with INCONSISTENT_START marker
