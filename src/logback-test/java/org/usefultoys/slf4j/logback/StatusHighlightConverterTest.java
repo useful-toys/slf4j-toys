@@ -220,10 +220,10 @@ class StatusHighlightConverterTest {
     class InconsistencyMarkersTest {
 
         @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for BUG marker")
-        void testBugMarker() {
-            // Given: logging event with BUG marker
-            when(mockEvent.getMarker()).thenReturn(Markers.BUG);
+        @DisplayName("should return INCONSISTENCY_VISIBILITY for UNEXPECTED_EXCEPTION marker")
+        void testUnexpectedExceptionMarker() {
+            // Given: logging event with UNEXPECTED_EXCEPTION marker
+            when(mockEvent.getMarker()).thenReturn(Markers.UNEXPECTED_EXCEPTION);
             // When: getForegroundColorCode is called
             final String result = converter.getForegroundColorCode(mockEvent);
             // Then: should return INCONSISTENCY_VISIBILITY code

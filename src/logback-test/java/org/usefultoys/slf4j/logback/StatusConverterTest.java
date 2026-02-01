@@ -220,14 +220,14 @@ class StatusConverterTest {
     class ErrorMarkersTest {
 
         @Test
-        @DisplayName("should convert BUG marker to BUG")
-        void testBugMarker() {
-            // Given: logging event with BUG marker
-            when(mockEvent.getMarker()).thenReturn(Markers.BUG);
+        @DisplayName("should convert UNEXPECTED_EXCEPTION marker to UNEXPECTED_EXCEPTION")
+        void testUnexpectedExceptionMarker() {
+            // Given: logging event with UNEXPECTED_EXCEPTION marker
+            when(mockEvent.getMarker()).thenReturn(Markers.UNEXPECTED_EXCEPTION);
             // When: convert is called
             final String result = converter.convert(mockEvent);
-            // Then: should return BUG status
-            assertEquals("BUG", result);
+            // Then: should return UNEXPECTED_EXCEPTION status
+            assertEquals("UNEXPECTED_EXCEPTION", result);
         }
 
         @Test

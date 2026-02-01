@@ -582,14 +582,14 @@ public class MeterValidatorTest {
     class ErrorLoggingTests {
 
         @Test
-        @DisplayName("should log bug when exception is thrown")
-        void shouldLogBugWhenExceptionThrown() {
+        @DisplayName("should log unexpected exception when exception is thrown")
+        void shouldLogUnexpectedExceptionWhenExceptionThrown() {
             // Given: a throwable exception from a meter method
             final Throwable t = new RuntimeException("bug");
-            // When: logBug is called
-            // Then: should log bug marker with exception information
-            MeterValidator.logBug(meter, "testMethod", t);
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.BUG, "Meter.testMethod method threw exception; id=test-id");
+            // When: logUnexpectedException is called
+            // Then: should log unexpected exception marker with exception information
+            MeterValidator.logUnexpectedException(meter, t);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.UNEXPECTED_EXCEPTION, "Unexpected exception in Meter; id=test-id");
             assertEventWithThrowable(logger, 0, RuntimeException.class, "bug");
         }
     }

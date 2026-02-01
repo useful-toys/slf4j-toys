@@ -357,7 +357,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
 
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "start()", t);
+            MeterValidator.logUnexpectedException(this, t);
         }
         return this;
     }
@@ -441,7 +441,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 }
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "progress()", t);
+            MeterValidator.logUnexpectedException(this, t);
         }
         return this;
     }
@@ -517,7 +517,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 clearContext();
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "ok(...)", t);
+            MeterValidator.logUnexpectedException(this, t);
         }
         return this;
     }
@@ -621,7 +621,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 clearContext();
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "reject(cause)", t);
+            MeterValidator.logUnexpectedException(this, t);
         }
         return this;
     }
@@ -668,7 +668,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 clearContext();
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "fail(cause)", t);
+            MeterValidator.logUnexpectedException(this, t);
         }
         return this;
     }
@@ -725,7 +725,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 clearContext();
             }
         } catch (final Exception t) {
-            MeterValidator.logBug(this, "close()", t);
+            MeterValidator.logUnexpectedException(this, t);
         }
     }
 }

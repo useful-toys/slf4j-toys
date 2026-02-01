@@ -335,14 +335,13 @@ public class MeterValidator {
     }
 
     /**
-     * Logs a bug when a Meter method throws an unexpected exception.
+     * Logs an unexpected exception that occurred within the Meter implementation.
      *
-     * @param meter      The Meter instance where the exception occurred.
-     * @param methodName The name of the method that threw the exception.
-     * @param t          The Throwable that was caught.
+     * @param meter The Meter instance where the exception occurred.
+     * @param t     The Throwable that was caught.
      */
-    public void logBug(final Meter meter, final String methodName, final Throwable t) {
-        meter.getMessageLogger().error(Markers.BUG, "Meter.{} method threw exception; id={}", methodName, meter.getFullID(), t);
+    public void logUnexpectedException(final Meter meter, final Throwable t) {
+        meter.getMessageLogger().error(Markers.UNEXPECTED_EXCEPTION, "Unexpected exception in Meter; id={}", meter.getFullID(), t);
     }
 
     /**

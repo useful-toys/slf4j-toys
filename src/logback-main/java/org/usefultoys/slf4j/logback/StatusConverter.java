@@ -50,7 +50,7 @@ public class StatusConverter extends ClassicConverter {
         STATUS_MAP.put(Markers.DATA_SLOW_OK, "");
         STATUS_MAP.put(Markers.DATA_REJECT, "");
         STATUS_MAP.put(Markers.DATA_FAIL, "");
-        STATUS_MAP.put(Markers.BUG, "BUG");
+        STATUS_MAP.put(Markers.UNEXPECTED_EXCEPTION, "UNEXPECTED_EXCEPTION");
         STATUS_MAP.put(Markers.ILLEGAL, "ILLEGAL");
         STATUS_MAP.put(Markers.INCONSISTENT_START, "INCONSISTENT");
         STATUS_MAP.put(Markers.INCONSISTENT_INCREMENT, "INCONSISTENT");
