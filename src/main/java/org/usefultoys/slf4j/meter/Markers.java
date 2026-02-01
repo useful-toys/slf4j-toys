@@ -76,6 +76,8 @@ public class Markers {
     /** Marker for internal inconsistencies: an operation was closed inconsistently. */
     public final Marker INCONSISTENT_CLOSE = MarkerFactory.getMarker("METER_INCONSISTENT_CLOSE");
 
+    /** Marker for Meter API calls that are inconsistent with lifecycle state. */
+    public final Marker INCONSISTENT_STATE = MarkerFactory.getMarker("METER_INCONSISTENT_STATE");
     /** Marker for unexpected exceptions within the Meter implementation. */
     public final Marker UNEXPECTED_EXCEPTION = MarkerFactory.getMarker("METER_UNEXPECTED_EXCEPTION");
     /** Marker for illegal argument usage of the Meter API. */

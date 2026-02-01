@@ -25,11 +25,51 @@ public final class LibraryHelper {
         // Utility class
     }
 
-    public static Throwable create() {
+    public static CallerStackTraceThrowable innerMethod() {
         return new CallerStackTraceThrowable();
     }
 
-    public static Throwable createWithException() {
-        return new CallerStackTraceThrowable(new IllegalStateException("Illegal State"));
+    public static CallerStackTraceThrowable outerMethod() {
+        return middleMethod();
+    }
+
+    public static CallerStackTraceThrowable middleMethod() {
+        return innerMethod();
+    }
+
+    public static CallerStackTraceThrowable outerMethodWithCause(final Exception cause) {
+        return middleMethodWithCause(cause);
+    }
+
+    public static CallerStackTraceThrowable middleMethodWithCause(final Exception cause) {
+        return innerMethodWithCause(cause);
+    }
+
+    public static CallerStackTraceThrowable innerMethodWithCause(final Exception cause) {
+        return new CallerStackTraceThrowable(cause);
+    }
+
+    public static CallerStackTraceThrowable innerMethodWithMessage(final String message) {
+        return new CallerStackTraceThrowable(message);
+    }
+
+    public static CallerStackTraceThrowable middleMethodWithMessage(final String message) {
+        return innerMethodWithMessage(message);
+    }
+
+    public static CallerStackTraceThrowable outerMethodWithMessage(final String message) {
+        return middleMethodWithMessage(message);
+    }
+
+    public static CallerStackTraceThrowable innerMethodWithMessageAndCause(final String message, final Exception cause) {
+        return new CallerStackTraceThrowable(message, cause);
+    }
+
+    public static CallerStackTraceThrowable middleMethodWithMessageAndCause(final String message, final Exception cause) {
+        return innerMethodWithMessageAndCause(message, cause);
+    }
+
+    public static CallerStackTraceThrowable outerMethodWithMessageAndCause(final String message, final Exception cause) {
+        return middleMethodWithMessageAndCause(message, cause);
     }
 }
