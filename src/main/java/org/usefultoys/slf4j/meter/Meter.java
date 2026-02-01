@@ -224,7 +224,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return A new `Meter` instance for the sub-operation.
      */
     public Meter sub(final String suboperationName) {
-        MeterValidator.validateSubCallArguments(this, suboperationName);
+        MeterValidator.validateSubCallArgument(this, suboperationName);
         String subOperation = null;
         if (operation == null) {
             subOperation = suboperationName;
@@ -249,7 +249,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter m(final String message) {
-        if (!MeterValidator.validateMPrecondition(this) || !MeterValidator.validateMCallArguments(this, message)) {
+        if (!MeterValidator.validateMPrecondition(this) || !MeterValidator.validateMCallArgument(this, message)) {
             return this;
         }
         description = message;
@@ -268,7 +268,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         if (!MeterValidator.validateMPrecondition(this)) {
             return this;
         }
-        description = MeterValidator.validateAndFormatMCallArguments(this, format, args);
+        description = MeterValidator.validateAndFormatMCallArgument(this, format, args);
         return this;
     }
 
@@ -280,7 +280,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter limitMilliseconds(final long timeLimit) {
-        if (!MeterValidator.validateLimitMillisecondsPrecondition(this) || !MeterValidator.validateLimitMillisecondsCallArguments(this, timeLimit)) {
+        if (!MeterValidator.validateLimitMillisecondsPrecondition(this) || !MeterValidator.validateLimitMillisecondsCallArgument(this, timeLimit)) {
             return this;
         }
         this.timeLimit = timeLimit * 1000 * 1000; // Convert milliseconds to nanoseconds
@@ -296,7 +296,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter iterations(final long expectedIterations) {
-        if (!MeterValidator.validateIterationsPrecondition(this) || !MeterValidator.validateIterationsCallArguments(this, expectedIterations)) {
+        if (!MeterValidator.validateIterationsPrecondition(this) || !MeterValidator.validateIterationsCallArgument(this, expectedIterations)) {
             return this;
         }
         this.expectedIterations = expectedIterations;
@@ -384,7 +384,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter incBy(final long increment) {
-        if (!MeterValidator.validateIncPrecondition(this) || !MeterValidator.validateIncByArguments(this, increment)) {
+        if (!MeterValidator.validateIncPrecondition(this) || !MeterValidator.validateIncByCallArgument(this, increment)) {
             return this;
         }
         currentIteration += increment;
@@ -399,7 +399,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter incTo(final long currentIteration) {
-        if (!MeterValidator.validateIncPrecondition(this) || !MeterValidator.validateIncToArguments(this, currentIteration)) {
+        if (!MeterValidator.validateIncPrecondition(this) || !MeterValidator.validateIncToCallArgument(this, currentIteration)) {
             return this;
         }
         this.currentIteration = currentIteration;
@@ -459,7 +459,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter path(final Object pathId) {
-        if (!MeterValidator.validatePathArgument(this, "path(pathId)", pathId)) {
+        if (!MeterValidator.validatePathCallArgument(this, pathId)) {
             return this;
         }
         if (!MeterValidator.validatePathPrecondition(this)) {
@@ -549,7 +549,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter ok(final Object pathId) {
-        MeterValidator.validatePathArgument(this, "ok(pathId)", pathId);
+            MeterValidator.validatePathCallArgument(this, pathId);
         return commonOk(pathId);
     }
 
@@ -578,7 +578,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter success(final Object pathId) {
-        MeterValidator.validatePathArgument(this, "success(pathId)", pathId);
+            MeterValidator.validatePathCallArgument(this, pathId);
         return commonOk(pathId);
     }
 
@@ -593,7 +593,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter reject(final Object cause) {
         try {
-            MeterValidator.validatePathArgument(this, "reject(cause)", cause);
+                MeterValidator.validatePathCallArgument(this, cause);
             if (!MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_REJECT)) {
                 return this;
             }
@@ -640,7 +640,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter fail(final Object cause) {
         try {
-            MeterValidator.validatePathArgument(this, "fail(cause)", cause);
+                MeterValidator.validatePathCallArgument(this, cause);
             if (!MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_FAIL)) {
                 return this;
             }

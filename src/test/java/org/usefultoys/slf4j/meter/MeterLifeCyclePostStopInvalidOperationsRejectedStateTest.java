@@ -114,7 +114,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -140,7 +140,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -166,7 +166,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -336,7 +336,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -365,7 +365,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -395,7 +395,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -421,7 +421,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -447,7 +447,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -473,7 +473,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -499,7 +499,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -529,7 +529,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -555,7 +555,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -581,7 +581,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -607,7 +607,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -633,7 +633,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -659,7 +659,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -689,7 +689,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -715,7 +715,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -741,7 +741,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -771,7 +771,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -797,7 +797,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -853,7 +853,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -882,7 +882,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -907,7 +907,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -960,7 +960,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -986,7 +986,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1011,7 +1011,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1036,7 +1036,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1065,7 +1065,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1090,7 +1090,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1115,7 +1115,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1141,7 +1141,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1167,7 +1167,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1197,7 +1197,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1223,7 +1223,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1249,7 +1249,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1279,7 +1279,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1307,7 +1307,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1333,7 +1333,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1359,7 +1359,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1389,7 +1389,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1417,7 +1417,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1443,7 +1443,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1469,7 +1469,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         // Then: logs reject (from setup) + ILLEGAL (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 }

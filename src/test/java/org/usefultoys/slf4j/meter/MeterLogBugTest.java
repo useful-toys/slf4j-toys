@@ -35,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.slf4j.impl.MockLoggerEvent.Level;
 
@@ -172,14 +171,14 @@ class MeterLogBugTest {
         @ValidateCleanMeter(expectDirtyStack = true)
         @DisplayName("should call logUnexpectedException when exception occurs in ok(pathId)")
         void shouldCallLogUnexpectedExceptionWhenExceptionInOkWithPath() {
-            // Given: MeterValidator mocked to throw exception in validatePathArgument
+            // Given: MeterValidator mocked to throw exception in validatePathCallArgument
             final Meter result;
             
             try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
-                mockedValidator.when(() -> MeterValidator.validatePathArgument(any(), anyString(), any()))
-                        .thenReturn(true);  // Allow first call (validatePathArgument before commonOk)
+                mockedValidator.when(() -> MeterValidator.validatePathCallArgument(any(), any()))
+                        .thenReturn(true);  // Allow first call (validatePathCallArgument before commonOk)
                 mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_OK)))
                         .thenThrow(new RuntimeException("Stop validation failed"));
                 mockedValidator.when(() -> MeterValidator.logUnexpectedException(any(), any()))
@@ -213,7 +212,7 @@ class MeterLogBugTest {
             try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
-                mockedValidator.when(() -> MeterValidator.validatePathArgument(any(), anyString(), any()))
+                mockedValidator.when(() -> MeterValidator.validatePathCallArgument(any(), any()))
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_REJECT)))
                         .thenThrow(new RuntimeException("Reject validation failed"));
@@ -249,7 +248,7 @@ class MeterLogBugTest {
             try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
-                mockedValidator.when(() -> MeterValidator.validatePathArgument(any(), anyString(), any()))
+                mockedValidator.when(() -> MeterValidator.validatePathCallArgument(any(), any()))
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_FAIL)))
                         .thenThrow(new RuntimeException("Fail validation failed"));
@@ -280,7 +279,7 @@ class MeterLogBugTest {
             try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
-                mockedValidator.when(() -> MeterValidator.validatePathArgument(any(), anyString(), any()))
+                mockedValidator.when(() -> MeterValidator.validatePathCallArgument(any(), any()))
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_FAIL)))
                         .thenThrow(new RuntimeException("Fail validation failed"));

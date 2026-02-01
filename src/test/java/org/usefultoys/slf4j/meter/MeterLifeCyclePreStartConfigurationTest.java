@@ -21,8 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
-import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
-import static org.usefultoys.slf4jtestmock.AssertLogger.assertEventCount;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
@@ -36,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterCreateTime;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordCreateWithWindow;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEventCount;
 
 /**
  * Unit tests for {@link Meter} configuration before start().
@@ -138,7 +138,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
@@ -157,7 +157,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
@@ -218,7 +218,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
@@ -237,7 +237,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
@@ -301,7 +301,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
@@ -321,7 +321,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
@@ -385,7 +385,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
@@ -405,7 +405,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 1);
     }
 
@@ -842,8 +842,8 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: two ILLEGAL events logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         assertEventCount(logger, 2);
     }
 

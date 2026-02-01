@@ -176,7 +176,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -196,7 +196,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -221,7 +221,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -245,7 +245,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -265,7 +265,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -290,7 +290,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -314,7 +314,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -335,7 +335,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for path(null), completes with INFO log
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -461,7 +461,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -481,7 +481,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -511,7 +511,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -535,7 +535,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -555,7 +555,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -589,7 +589,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -619,7 +619,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -644,7 +644,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -669,7 +669,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for null argument, completes with INFO log
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -691,7 +691,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for null argument, completes with INFO log
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -713,7 +713,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for null argument, completes with ERROR log
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEventCount(logger, 5);
     }
@@ -740,9 +740,9 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs ILLEGAL for each
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -767,8 +767,8 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTimePreserved(meter, tr);
 
         // Then: logs ILLEGAL for iterations(-1) and incBy(0), completes with INFO log
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEventCount(logger, 6);
     }

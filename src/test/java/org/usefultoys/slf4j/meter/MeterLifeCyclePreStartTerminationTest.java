@@ -557,7 +557,7 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path before start) + INCONSISTENT_OK + MSG_OK + DATA_OK
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
@@ -580,7 +580,7 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path before start) + INCONSISTENT_REJECT + MSG_REJECT + DATA_REJECT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
@@ -603,7 +603,7 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path before start) + INCONSISTENT_FAIL + MSG_FAIL + DATA_FAIL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);

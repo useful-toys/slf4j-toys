@@ -78,6 +78,8 @@ public class Markers {
 
     /** Marker for unexpected exceptions within the Meter implementation. */
     public final Marker UNEXPECTED_EXCEPTION = MarkerFactory.getMarker("METER_UNEXPECTED_EXCEPTION");
-    /** Marker for illegal API usage of the Meter. */
-    public final Marker ILLEGAL = MarkerFactory.getMarker("METER_ILLEGAL");
+    /** Marker for illegal argument usage of the Meter API. */
+    public final Marker ILLEGAL_ARGUMENT = MarkerFactory.getMarker("ILLEGAL_ARGUMENT");
+    /** Marker for illegal API usage of the Meter (precondition violations). */
+    public final Marker ILLEGAL = MarkerFactory.getMarker("ILLEGAL");
 }

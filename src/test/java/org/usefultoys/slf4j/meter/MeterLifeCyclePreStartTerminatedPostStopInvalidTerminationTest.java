@@ -547,7 +547,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first ok) + INCONSISTENT_OK (second ok, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -580,7 +580,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -613,7 +613,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEventCount(logger, 5);
@@ -646,7 +646,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_OK (first) + INCONSISTENT_FAIL (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEventCount(logger, 5);
@@ -679,7 +679,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -712,7 +712,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -745,7 +745,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEventCount(logger, 5);
@@ -778,7 +778,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_FAIL (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEventCount(logger, 5);
@@ -811,7 +811,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -844,7 +844,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -877,7 +877,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEventCount(logger, 5);
@@ -910,7 +910,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_FAIL (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEventCount(logger, 5);
@@ -1066,7 +1066,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
         // Then: logs ILLEGAL (path) + INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 5 total
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
         AssertLogger.assertEventCount(logger, 5);
@@ -1102,7 +1102,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
         // Then: logs ILLEGAL (path) + INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 5 total
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
         AssertLogger.assertEventCount(logger, 5);
@@ -1138,7 +1138,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
         // Then: logs ILLEGAL (path) + INCONSISTENT_REJECT (2 events) + INCONSISTENT_START (2 events) = 5 total
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
         AssertLogger.assertEventCount(logger, 5);
@@ -1174,7 +1174,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
         // Then: logs ILLEGAL (path) + INCONSISTENT_FAIL (2 events) + INCONSISTENT_START (2 events) = 5 total
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
         AssertLogger.assertEventCount(logger, 5);

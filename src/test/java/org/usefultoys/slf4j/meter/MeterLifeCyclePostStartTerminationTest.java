@@ -277,7 +277,7 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ILLEGAL + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -386,7 +386,7 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ILLEGAL + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -580,7 +580,7 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ILLEGAL + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEventCount(logger, 5);

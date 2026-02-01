@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -27,7 +28,6 @@ import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
-import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -351,7 +351,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -371,7 +371,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -392,7 +392,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -413,7 +413,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -435,9 +435,9 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs 3x ILLEGAL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -465,7 +465,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         // Then: logs INCONSISTENT_INCREMENT + INCONSISTENT_PROGRESS + ILLEGAL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -493,7 +493,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         // Then: logs INCONSISTENT_INCREMENT + INCONSISTENT_PROGRESS + ILLEGAL
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
         AssertLogger.assertEventCount(logger, 3);
     }
 }
