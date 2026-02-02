@@ -33,6 +33,7 @@ import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertLogs;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterState;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.configureLogger;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.event;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.eventWithTrowable;
 
 /**
  * Unit tests for {@link Meter} try-with-resources lifecycle patterns.
@@ -261,7 +262,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_CLOSE + ERROR for implicit failure */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_CLOSE),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_CLOSE, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose"),
                 event(Level.ERROR, Markers.MSG_FAIL, "try-with-resources"),
                 event(Level.TRACE, Markers.DATA_FAIL, "try-with-resources")
         );
@@ -289,7 +290,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -317,7 +318,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -345,7 +346,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -374,7 +375,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithThrowableViaTryWithResourcesWithoutStartExplicitOkThrowable"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -403,7 +404,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_OK),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithObjectViaTryWithResourcesWithoutStartExplicitOkObject"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -431,7 +432,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_REJECT),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString"),
                 event(Level.INFO, Markers.MSG_REJECT, "business_error"),
                 event(Level.TRACE, Markers.DATA_REJECT, "business_error")
         );
@@ -459,7 +460,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_REJECT),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum"),
                 event(Level.INFO, Markers.MSG_REJECT, "VALUE2"),
                 event(Level.TRACE, Markers.DATA_REJECT, "VALUE2")
         );
@@ -488,7 +489,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_REJECT),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedWithThrowableViaTryWithResourcesWithoutStartExplicitRejectThrowable"),
                 event(Level.INFO, Markers.MSG_REJECT, "IllegalArgumentException"),
                 event(Level.TRACE, Markers.DATA_REJECT, "IllegalArgumentException")
         );
@@ -517,7 +518,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_REJECT),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedWithObjectViaTryWithResourcesWithoutStartExplicitRejectObject"),
                 event(Level.INFO, Markers.MSG_REJECT, "testObjectString"),
                 event(Level.TRACE, Markers.DATA_REJECT, "testObjectString")
         );
@@ -545,7 +546,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_FAIL),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString"),
                 event(Level.ERROR, Markers.MSG_FAIL, "technical_error"),
                 event(Level.TRACE, Markers.DATA_FAIL, "technical_error")
         );
@@ -573,7 +574,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_FAIL),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum"),
                 event(Level.ERROR, Markers.MSG_FAIL, "VALUE1"),
                 event(Level.TRACE, Markers.DATA_FAIL, "VALUE1")
         );
@@ -602,7 +603,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_FAIL),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable"),
                 event(Level.ERROR, Markers.MSG_FAIL, "java.lang.Exception"),
                 event(Level.TRACE, Markers.DATA_FAIL, "java.lang.Exception")
         );
@@ -631,7 +632,7 @@ class MeterLifeCycleTryWithResourcesTest {
 
         /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
-                event(Level.ERROR, Markers.INCONSISTENT_FAIL),
+                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithObjectViaTryWithResourcesWithoutStartExplicitFailObject"),
                 event(Level.ERROR, Markers.MSG_FAIL, "testObjectString"),
                 event(Level.TRACE, Markers.DATA_FAIL, "testObjectString")
         );

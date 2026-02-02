@@ -279,11 +279,28 @@ final class MeterLifeCycleTestHelper {
         final Level level;
         final Marker marker;
         final String[] messageParts;
+        final Class<? extends Throwable> throwableType;
+        final String throwableMessage;    
+        final String stacktraceMessage;
 
         ExpectedLogEvent(final Level level, final Marker marker, final String... messageParts) {
             this.level = level;
             this.marker = marker;
             this.messageParts = messageParts;
+            this.throwableType = null;
+            this.throwableMessage = null;
+            this.stacktraceMessage = null;
+        }
+
+        ExpectedLogEvent(final Level level, final Marker marker, final String message, 
+            final Class<? extends Throwable> throwableType, final String throwableMessage, final String stacktraceMessage) {
+            this.level = level;
+            this.marker = marker;
+            this.messageParts = new String[]{message} ;
+            this.throwableType = throwableType;
+            this.throwableMessage = throwableMessage;
+            this.stacktraceMessage = stacktraceMessage;
+            
         }
     }
 
@@ -297,6 +314,11 @@ final class MeterLifeCycleTestHelper {
      */
     public static ExpectedLogEvent event(final Level level, final Marker marker, final String... messageParts) {
         return new ExpectedLogEvent(level, marker, messageParts);
+    }
+
+    public static ExpectedLogEvent eventWithTrowable(final Level level, final Marker marker, final String message, 
+        Class<? extends Throwable> throwableType, final String throableMessage, final String stackStraceMessage) {
+        return new ExpectedLogEvent(level, marker, message, throwableType, throableMessage, stackStraceMessage);
     }
 
     /**
@@ -320,6 +342,14 @@ final class MeterLifeCycleTestHelper {
                 AssertLogger.assertEvent(logger, i, e.level, e.marker, e.messageParts);
             } else {
                 AssertLogger.assertEvent(logger, i, e.level, e.marker);
+            }
+            if (e.throwableType != null) {
+                if (e.throwableMessage != null) {
+                    AssertLogger.assertEventWithThrowable(logger, i, e.throwableType, e.throwableMessage);
+                }
+                if (e.stacktraceMessage != null) {
+                    AssertLogger.assertEventThrowableStackTraceContains(logger, i, e.throwableType, e.stacktraceMessage);
+                }
             }
         }
     }
