@@ -69,7 +69,7 @@ public class MeterValidator {
      * @param args   The arguments for the format string.
      * @return The formatted string, or {@code null} if the format is null or invalid.
      */
-    public String validateAndFormatMCallArgument(final Meter meter, final String format, final Object... args) {
+    public String validateMCallArgument(final Meter meter, final String format, final Object... args) {
         if (format == null) {
             logIllegalCallArgument(meter, "Null argument: format");
             return null;

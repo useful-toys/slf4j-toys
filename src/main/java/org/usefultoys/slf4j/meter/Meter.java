@@ -268,7 +268,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         if (!MeterValidator.validateMPrecondition(this)) {
             return this;
         }
-        description = MeterValidator.validateAndFormatMCallArgument(this, format, args);
+        description = MeterValidator.validateMCallArgument(this, format, args);
         return this;
     }
 
