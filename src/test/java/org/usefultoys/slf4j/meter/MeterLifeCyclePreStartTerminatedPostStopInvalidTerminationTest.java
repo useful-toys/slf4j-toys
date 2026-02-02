@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.CallerStackTraceThrowable;
 import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
@@ -147,8 +148,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -225,8 +230,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -251,8 +260,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -277,8 +290,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -329,8 +346,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -355,8 +376,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -381,8 +406,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -407,8 +436,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_FAIL (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -433,8 +466,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -459,8 +496,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -485,8 +526,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -511,8 +556,12 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_FAIL (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1180,3 +1229,5 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         AssertLogger.assertEventCount(logger, 5);
     }
 }
+
+
