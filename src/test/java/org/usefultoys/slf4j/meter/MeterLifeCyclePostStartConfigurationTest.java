@@ -669,12 +669,12 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: logs start + 2 INVALID_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.incBy", "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.incBy", "Non-positive argument: increment", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEvent(logger, 3, ERROR, INVALID_ARGUMENT, "Meter.incTo", "Non-positive argument: currentIteration", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.incTo(");
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
         AssertLogger.assertEventCount(logger, 6);
     }
 
@@ -1282,7 +1282,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "valid", null, null, null, 0, 0, 0);
 
         // Then: logs start + INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.path", "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1302,7 +1302,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
         // Then: logs start + INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.path", "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1323,7 +1323,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "valid", null, null, null, 0, 0, 0);
 
         // Then: logs start + INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.path", "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1703,7 +1703,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 1, 0, 0);
 
         // Then: logs start + INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Null argument: message", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.m", "Null argument: message", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1755,7 +1755,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "path1", null, null, null, 8, 0, 0);
 
         // Then: logs start + INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.path", "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1779,10 +1779,10 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
 
         // Then: logs start + 2 INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Null argument: message", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.m", "Null argument: message", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.m(");
-        AssertLogger.assertEvent(logger, 3, ERROR, INVALID_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, ERROR, INVALID_ARGUMENT, "Meter.limitMilliseconds", "Non-positive argument: timeLimit", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 4);

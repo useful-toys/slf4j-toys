@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2025 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -372,7 +372,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 1);
@@ -394,7 +394,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 1);
@@ -417,7 +417,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 1);
@@ -440,7 +440,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 1);
@@ -464,13 +464,13 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs 3x INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.path(");
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -504,7 +504,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.progress(");
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -538,7 +538,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.progress(");
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);

@@ -278,7 +278,7 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + INVALID_ARGUMENT + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter.ok", "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -389,7 +389,7 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + INVALID_ARGUMENT + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter.path", "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -585,7 +585,7 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + INVALID_ARGUMENT + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter.ok", "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);

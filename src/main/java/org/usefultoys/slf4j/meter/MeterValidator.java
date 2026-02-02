@@ -193,7 +193,7 @@ public class MeterValidator {
      */
     public boolean validateMPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_ARGUMENT, "Meter m but already stopped");
+            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter m but already stopped");
             return false;
         }
         return true;
@@ -228,7 +228,7 @@ public class MeterValidator {
      */
     public boolean validateContextPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped");
+            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter putContext but already stopped");
             return false;
         }
         return true;
@@ -243,7 +243,7 @@ public class MeterValidator {
      */
     public boolean validateLimitMillisecondsPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped");
+            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter limitMilliseconds but already stopped");
             return false;
         }
         return true;
@@ -258,7 +258,7 @@ public class MeterValidator {
      */
     public boolean validateIterationsPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped");
+            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter iterations but already stopped");
             return false;
         }
         return true;
@@ -311,11 +311,11 @@ public class MeterValidator {
      */
     public boolean validatePathPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_ARGUMENT, "Meter path but not started");
+            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter path but not started");
             return false;
         }
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_ARGUMENT, "Meter path but already stopped");
+            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter path but already stopped");
             return false;
         }
         return true;

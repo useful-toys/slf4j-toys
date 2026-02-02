@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -192,7 +192,7 @@ public class MeterValidatorTest {
             // When: validateMPrecondition is called
             // Then: should return false and log error event
             assertFalse(MeterValidator.validateMPrecondition(meter), "should reject m() when already stopped");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter m but already stopped; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter m but already stopped; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -345,7 +345,7 @@ public class MeterValidatorTest {
             // When: validateLimitMillisecondsPrecondition is called
             // Then: should return false and log illegal precondition error
             assertFalse(MeterValidator.validateLimitMillisecondsPrecondition(meter), "should reject when meter already stopped");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter limitMilliseconds but already stopped; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -399,7 +399,7 @@ public class MeterValidatorTest {
             // When: validateIterationsPrecondition is called
             // Then: should return false and log illegal precondition error
             assertFalse(MeterValidator.validateIterationsPrecondition(meter), "should reject when meter already stopped");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter iterations but already stopped; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -574,7 +574,7 @@ public class MeterValidatorTest {
             // When: validateContextPrecondition is called
             // Then: should return false and log illegal precondition error
             assertFalse(MeterValidator.validateContextPrecondition(meter), "should reject when meter already stopped");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
