@@ -30,6 +30,8 @@ import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.ValidateCleanMeter;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -582,15 +584,69 @@ public class MeterValidatorTest {
     class ErrorLoggingTests {
 
         @Test
-        @DisplayName("should log unexpected exception when exception is thrown")
-        void shouldLogUnexpectedExceptionWhenExceptionThrown() {
-            // Given: a throwable exception from a meter method
-            final Throwable t = new RuntimeException("bug");
+        @DisplayName("should log unexpected exception with RuntimeException")
+        void shouldLogUnexpectedExceptionWithRuntimeException() {
+            // Given: a RuntimeException with a message
+            final Throwable t = new RuntimeException("Runtime error occurred");
             // When: logUnexpectedException is called
-            // Then: should log unexpected exception marker with exception information
+            // Then: should log unexpected exception marker with method name, message, and ID
             MeterValidator.logUnexpectedException(meter, t);
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.UNEXPECTED_EXCEPTION, "Unexpected exception in Meter; id=test-id");
-            assertEventWithThrowable(logger, 0, RuntimeException.class, "bug");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
+                    "Meter.logUnexpectedException", "Unexpected exception", "test-id");
+            assertEventWithThrowable(logger, 0, RuntimeException.class, "Runtime error occurred");
+        }
+
+        @Test
+        @DisplayName("should log unexpected exception with IllegalStateException")
+        void shouldLogUnexpectedExceptionWithIllegalStateException() {
+            // Given: an IllegalStateException with a message
+            final Throwable t = new IllegalStateException("Invalid state for operation");
+            // When: logUnexpectedException is called
+            // Then: should log unexpected exception marker with method name, message, and ID
+            MeterValidator.logUnexpectedException(meter, t);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
+                    "Meter.logUnexpectedException", "Unexpected exception", "test-id");
+            assertEventWithThrowable(logger, 0, IllegalStateException.class, "Invalid state for operation");
+        }
+
+        @Test
+        @DisplayName("should log unexpected exception with NullPointerException")
+        void shouldLogUnexpectedExceptionWithNullPointerException() {
+            // Given: a NullPointerException
+            final Throwable t = new NullPointerException();
+            // When: logUnexpectedException is called
+            // Then: should log unexpected exception marker with method name, message, and ID
+            MeterValidator.logUnexpectedException(meter, t);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
+                    "Meter.logUnexpectedException", "Unexpected exception", "test-id");
+            assertEventWithThrowable(logger, 0, NullPointerException.class);
+        }
+
+        @Test
+        @DisplayName("should log unexpected exception with checked Exception")
+        void shouldLogUnexpectedExceptionWithCheckedException() {
+            // Given: a checked Exception
+            final Throwable t = new Exception("Checked exception occurred");
+            // When: logUnexpectedException is called
+            // Then: should log unexpected exception marker with method name, message, and ID
+            MeterValidator.logUnexpectedException(meter, t);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
+                    "Meter.logUnexpectedException", "Unexpected exception", "test-id");
+            assertEventWithThrowable(logger, 0, Exception.class, "Checked exception occurred");
+        }
+
+        @Test
+        @DisplayName("should log unexpected exception with nested cause")
+        void shouldLogUnexpectedExceptionWithNestedCause() {
+            // Given: an exception with a nested cause
+            final Throwable cause = new IOException("Original I/O error");
+            final Throwable t = new RuntimeException("Wrapper exception", cause);
+            // When: logUnexpectedException is called
+            // Then: should log unexpected exception marker and capture the wrapper exception
+            MeterValidator.logUnexpectedException(meter, t);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
+                    "Meter.logUnexpectedException", "Unexpected exception", "test-id");
+            assertEventWithThrowable(logger, 0, RuntimeException.class, "Wrapper exception");
         }
     }
 

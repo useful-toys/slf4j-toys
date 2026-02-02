@@ -365,6 +365,7 @@ public class MeterValidator {
      * @param t     The Throwable that was caught.
      */
     public void logUnexpectedException(final Meter meter, final Throwable t) {
-        meter.getMessageLogger().error(Markers.UNEXPECTED_EXCEPTION, "Unexpected exception in Meter; id={}", meter.getFullID(), t);
+        final CallerStackTraceThrowable e = new CallerStackTraceThrowable();
+        meter.getMessageLogger().error(Markers.UNEXPECTED_EXCEPTION, "Meter.{} - Unexpected exception; id={}", e.getApiMethodName(),  meter.getFullID(), t);
     }
 }

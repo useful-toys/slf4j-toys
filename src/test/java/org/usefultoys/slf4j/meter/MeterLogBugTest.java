@@ -94,7 +94,7 @@ class MeterLogBugTest {
             assertSame(result, meter, "should return the same meter instance");
             // - logUnexpectedException was called and exception was logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Unexpected exception in Meter");
+                    "Meter.start", "Unexpected exception", meter.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 0, RuntimeException.class, "Validation failed");
         }
     }
@@ -129,7 +129,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Unexpected exception in Meter");
+                    "Meter.progress", "Unexpected exception", meter.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Progress validation failed");
         }
     }
@@ -163,7 +163,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Unexpected exception in Meter");
+                    "Meter.ok", "Unexpected exception", result.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Stop validation failed");
         }
 
@@ -194,7 +194,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Unexpected exception in Meter");
+                    "Meter.ok", "Unexpected exception", result.getFullID());
         }
     }
 
@@ -229,7 +229,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Unexpected exception in Meter");
+                    "Meter.reject", "Unexpected exception", result.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Reject validation failed");
         }
     }
@@ -265,7 +265,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Unexpected exception in Meter");
+                    "Meter.fail", "Unexpected exception", result.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Fail validation failed");
         }
 
@@ -297,7 +297,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Unexpected exception in Meter");
+                    "Meter.fail", "Unexpected exception", result.getFullID());
         }
     }
 
@@ -328,7 +328,7 @@ class MeterLogBugTest {
             // Then:
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Unexpected exception in Meter");
+                    "Meter.close", "Unexpected exception", meter.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Close validation failed");
         }
     }
