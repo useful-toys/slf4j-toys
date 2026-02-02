@@ -20,7 +20,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.CallerStackTraceThrowable;
 import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
+import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
@@ -138,7 +140,9 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL_ARGUMENT event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         assertEventCount(logger, 1);
     }
 
@@ -157,7 +161,9 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL_ARGUMENT event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         assertEventCount(logger, 1);
     }
 
@@ -218,7 +224,9 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL_ARGUMENT event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.iterations(");
         assertEventCount(logger, 1);
     }
 
@@ -237,7 +245,9 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL_ARGUMENT event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.iterations(");
         assertEventCount(logger, 1);
     }
 
@@ -301,7 +311,9 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL_ARGUMENT event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: message", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.m(");
         assertEventCount(logger, 1);
     }
 
@@ -321,7 +333,9 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL_ARGUMENT event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: message", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.m(");
         assertEventCount(logger, 1);
     }
 
@@ -385,7 +399,9 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL_ARGUMENT event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: format", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.m(");
         assertEventCount(logger, 1);
     }
 
@@ -405,7 +421,9 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: ILLEGAL_ARGUMENT event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Illegal format string", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.m(");
         assertEventCount(logger, 1);
     }
 
@@ -842,8 +860,12 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: two ILLEGAL_ARGUMENT events logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
-        assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
+        assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.iterations(");
         assertEventCount(logger, 2);
     }
 
@@ -873,3 +895,4 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertEventCount(logger, 0);
     }
 }
+
