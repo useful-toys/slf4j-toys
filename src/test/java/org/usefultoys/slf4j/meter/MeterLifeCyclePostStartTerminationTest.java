@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.CallerStackTraceThrowable;
 import org.usefultoys.slf4j.internal.TestTimeSource;
 import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
@@ -277,7 +278,9 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ILLEGAL_ARGUMENT + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -386,7 +389,9 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ILLEGAL_ARGUMENT + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -580,7 +585,9 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ILLEGAL_ARGUMENT + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEventCount(logger, 5);
@@ -1162,3 +1169,4 @@ class MeterLifeCyclePostStartTerminationTest {
         AssertLogger.assertEventCount(logger, 4);
     }
 }
+
