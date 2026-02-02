@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.CallerStackTraceThrowable;
 import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
@@ -98,7 +99,9 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.inc(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -118,7 +121,9 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -138,7 +143,9 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -160,9 +167,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs 3x INCONSISTENT_INCREMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.inc(");
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.incBy(");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -186,7 +199,9 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_PROGRESS
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -208,9 +223,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs 3x INCONSISTENT_PROGRESS
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.progress(");
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.progress(");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -351,7 +372,9 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -371,7 +394,9 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -392,7 +417,9 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -413,7 +440,9 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
@@ -435,9 +464,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs 3x ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.path(");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -463,9 +498,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT + INCONSISTENT_PROGRESS + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.inc(");
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.progress(");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -491,9 +532,16 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: logs INCONSISTENT_INCREMENT + INCONSISTENT_PROGRESS + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT);
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.inc(");
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.progress(");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
     }
 }
+
