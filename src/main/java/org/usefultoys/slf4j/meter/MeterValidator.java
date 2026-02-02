@@ -344,7 +344,8 @@ public class MeterValidator {
      * @param message    A descriptive message about the illegal argument.
      */
     void logIllegalCallArgument(final Meter meter, final String message) {
-        meter.getMessageLogger().error(Markers.INVALID_ARGUMENT, "{}; id={}", message, meter.getFullID(), new CallerStackTraceThrowable());
+        final CallerStackTraceThrowable throwable = new CallerStackTraceThrowable();
+        meter.getMessageLogger().error(Markers.INVALID_ARGUMENT, "Meter.{} - {}; id={}", throwable.getApiMethodName(), message, meter.getFullID(), throwable);
     }
 
     /**

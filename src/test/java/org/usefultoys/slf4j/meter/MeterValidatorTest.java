@@ -651,6 +651,142 @@ public class MeterValidatorTest {
     }
 
     @Nested
+    @DisplayName("Illegal Call Argument Logging Tests")
+    class IllegalCallArgumentLoggingTests {
+
+        @Test
+        @DisplayName("should log illegal call argument with null argument message")
+        void shouldLogIllegalCallArgumentWithNullMessage() {
+            // Given: a null argument message
+            final String message = "Null argument: suboperation name";
+            // When: logIllegalCallArgument is called
+            // Then: should log illegal argument marker with method name, message, and ID
+            MeterValidator.validateSubCallArgument(meter, null);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validateSubCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log illegal call argument with message argument")
+        void shouldLogIllegalCallArgumentWithMessageArgument() {
+            // Given: a null message argument
+            final String message = "Null argument: message";
+            // When: validateMCallArgument is called with null
+            // Then: should log illegal argument marker
+            MeterValidator.validateMCallArgument(meter, null);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validateMCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log illegal call argument with format argument")
+        void shouldLogIllegalCallArgumentWithFormatArgument() {
+            // Given: a null format argument
+            final String message = "Null argument: format";
+            // When: validateMCallArgument is called with null format
+            // Then: should log illegal argument marker
+            MeterValidator.validateMCallArgument(meter, null, 1);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validateMCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log illegal call argument with illegal format message")
+        void shouldLogIllegalCallArgumentWithIllegalFormatMessage() {
+            // Given: an invalid format string
+            final String message = "Illegal format string";
+            // When: validateMCallArgument is called with invalid format
+            // Then: should log illegal argument marker
+            MeterValidator.validateMCallArgument(meter, "value %d", "non-integer");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validateMCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log illegal call argument with non-positive timeLimit")
+        void shouldLogIllegalCallArgumentWithNonPositiveTimeLimit() {
+            // Given: a non-positive time limit
+            final String message = "Non-positive argument: timeLimit";
+            // When: validateLimitMillisecondsCallArgument is called
+            // Then: should log illegal argument marker
+            MeterValidator.validateLimitMillisecondsCallArgument(meter, 0L);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validateLimitMillisecondsCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log illegal call argument with non-positive expectedIterations")
+        void shouldLogIllegalCallArgumentWithNonPositiveIterations() {
+            // Given: a non-positive iteration count
+            final String message = "Non-positive argument: expectedIterations";
+            // When: validateIterationsCallArgument is called
+            // Then: should log illegal argument marker
+            MeterValidator.validateIterationsCallArgument(meter, -5L);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validateIterationsCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log illegal call argument with non-positive increment")
+        void shouldLogIllegalCallArgumentWithNonPositiveIncrement() {
+            // Given: a non-positive increment value
+            final String message = "Non-positive argument: increment";
+            // When: validateIncByCallArgument is called
+            // Then: should log illegal argument marker
+            MeterValidator.validateIncByCallArgument(meter, 0L);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validateIncByCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log illegal call argument with non-positive currentIteration")
+        void shouldLogIllegalCallArgumentWithNonPositiveCurrentIteration() {
+            // Given: a non-positive current iteration value
+            final String message = "Non-positive argument: currentIteration";
+            // When: validateIncToCallArgument is called
+            // Then: should log illegal argument marker
+            MeterValidator.validateIncToCallArgument(meter, 0L);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validateIncToCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log illegal call argument with non-forward currentIteration")
+        void shouldLogIllegalCallArgumentWithNonForwardCurrentIteration() {
+            // Given: a non-forward current iteration value (equal to current)
+            when(meter.getCurrentIteration()).thenReturn(10L);
+            final String message = "Non-forward argument: currentIteration";
+            // When: validateIncToCallArgument is called with non-forward value
+            // Then: should log illegal argument marker
+            MeterValidator.validateIncToCallArgument(meter, 10L);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validateIncToCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log illegal call argument with null pathId")
+        void shouldLogIllegalCallArgumentWithNullPathId() {
+            // Given: a null path identifier
+            final String message = "Null argument: pathId";
+            // When: validatePathCallArgument is called
+            // Then: should log illegal argument marker
+            MeterValidator.validatePathCallArgument(meter, null);
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                    "Meter.validatePathCallArgument", message, "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+    }
+
+    @Nested
     @DisplayName("Finalization Tests")
     class FinalizationTests {
 
