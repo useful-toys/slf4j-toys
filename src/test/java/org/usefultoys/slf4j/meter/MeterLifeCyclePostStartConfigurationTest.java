@@ -136,13 +136,13 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.m("valid");
         meter.m(null);
 
-        // Then: null rejected (logs ILLEGAL_ARGUMENT), "valid" is preserved
+        // Then: null rejected (logs INVALID_ARGUMENT), "valid" is preserved
         assertEquals("valid", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: message", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: message", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 3);
@@ -201,20 +201,20 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.m("valid: %s", "arg");
         meter.m(null, "arg");
 
-        // Then: null format rejected (logs ILLEGAL_ARGUMENT), previous description is lost
+        // Then: null format rejected (logs INVALID_ARGUMENT), previous description is lost
         assertNull(meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: format", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: format", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 3);
     }
 
     @Test
-    @DisplayName("should log ILLEGAL_ARGUMENT when invalid format string attempted after start()")
+    @DisplayName("should log INVALID_ARGUMENT when invalid format string attempted after start()")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldLogIllegalWhenInvalidFormatStringAttemptedAfterStart() {
         // Given: a new, started Meter
@@ -229,8 +229,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Illegal format string", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Illegal format string", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 3);
@@ -254,8 +254,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: message", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: message", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 3);
@@ -438,8 +438,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 100, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-forward argument: currentIteration", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-forward argument: currentIteration", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -463,12 +463,12 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
-        // Then: zero rejected (logs ILLEGAL_ARGUMENT), currentIteration = 5, progress message still logged
+        // Then: zero rejected (logs INVALID_ARGUMENT), currentIteration = 5, progress message still logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -492,12 +492,12 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
-        // Then: negative rejected (logs ILLEGAL_ARGUMENT), currentIteration = 5, progress message still logged
+        // Then: negative rejected (logs INVALID_ARGUMENT), currentIteration = 5, progress message still logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 5, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -520,13 +520,13 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
-        // Then: negative rejected (logs ILLEGAL_ARGUMENT), currentIteration = 0 (unchanged)
+        // Then: negative rejected (logs INVALID_ARGUMENT), currentIteration = 0 (unchanged)
         // progress() is called but does NOT log because no iteration advanced
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT (no progress logged)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT (no progress logged)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -548,13 +548,13 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
-        // Then: zero rejected (logs ILLEGAL_ARGUMENT), currentIteration = 0 (unchanged)
+        // Then: zero rejected (logs INVALID_ARGUMENT), currentIteration = 0 (unchanged)
         // progress() is called but does NOT log because no iteration advanced
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT (no progress logged)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT (no progress logged)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -576,12 +576,12 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.progress();
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
-        // Then: backward rejected (logs ILLEGAL_ARGUMENT), currentIteration = 10, progress message still logged
+        // Then: backward rejected (logs INVALID_ARGUMENT), currentIteration = 10, progress message still logged
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 10, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-forward argument: currentIteration", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-forward argument: currentIteration", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -603,13 +603,13 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.progress();
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
-        // Then: negative rejected (logs ILLEGAL_ARGUMENT), currentIteration = 0 (unchanged)
+        // Then: negative rejected (logs INVALID_ARGUMENT), currentIteration = 0 (unchanged)
         // progress() is called but does NOT log because no iteration advanced
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT (no MSG_PROGRESS because no iteration change)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: currentIteration", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT (no MSG_PROGRESS because no iteration change)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: currentIteration", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -630,13 +630,13 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.progress();
         MeterLifeCycleTestHelper.assertMeterProgressTime(meter, tr, -1);
 
-        // Then: zero rejected (logs ILLEGAL_ARGUMENT), currentIteration = 0 (unchanged)
+        // Then: zero rejected (logs INVALID_ARGUMENT), currentIteration = 0 (unchanged)
         // progress() is called but does NOT log because no iteration advanced
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + ILLEGAL_ARGUMENT (no MSG_PROGRESS because no iteration change)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: currentIteration", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT (no MSG_PROGRESS because no iteration change)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: currentIteration", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -664,11 +664,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 2, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs start + 2 ILLEGAL_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
+        // Then: logs start + 2 INVALID_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incBy(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: currentIteration", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: currentIteration", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -1276,11 +1276,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.path("valid");
         meter.path(null);
 
-        // Then: null rejected (logs ILLEGAL_ARGUMENT), "valid" is preserved
+        // Then: null rejected (logs INVALID_ARGUMENT), "valid" is preserved
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "valid", null, null, null, 0, 0, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1296,11 +1296,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         // When: path(null) is called without setting a previous path
         meter.path(null);
 
-        // Then: null rejected (logs ILLEGAL_ARGUMENT), okPath remains undefined
+        // Then: null rejected (logs INVALID_ARGUMENT), okPath remains undefined
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1317,11 +1317,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.path(null);
         meter.path("valid");
 
-        // Then: null rejected (logs ILLEGAL_ARGUMENT), then valid accepted (okPath = "valid")
+        // Then: null rejected (logs INVALID_ARGUMENT), then valid accepted (okPath = "valid")
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "valid", null, null, null, 0, 0, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1425,11 +1425,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.limitMilliseconds(5000);
         meter.limitMilliseconds(0);
 
-        // Then: zero rejected (logs ILLEGAL_ARGUMENT), timeLimit = 5000
+        // Then: zero rejected (logs INVALID_ARGUMENT), timeLimit = 5000
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1446,11 +1446,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.limitMilliseconds(5000);
         meter.limitMilliseconds(-1);
 
-        // Then: negative rejected (logs ILLEGAL_ARGUMENT), timeLimit = 5000
+        // Then: negative rejected (logs INVALID_ARGUMENT), timeLimit = 5000
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1466,11 +1466,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         // When: limitMilliseconds(0) is called
         meter.limitMilliseconds(0);
 
-        // Then: zero rejected (logs ILLEGAL_ARGUMENT), timeLimit = 0 (unchanged)
+        // Then: zero rejected (logs INVALID_ARGUMENT), timeLimit = 0 (unchanged)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1486,11 +1486,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         // When: limitMilliseconds(-5) is called
         meter.limitMilliseconds(-5);
 
-        // Then: negative rejected (logs ILLEGAL_ARGUMENT), timeLimit = 0 (unchanged)
+        // Then: negative rejected (logs INVALID_ARGUMENT), timeLimit = 0 (unchanged)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1564,11 +1564,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.iterations(100);
         meter.iterations(0);
 
-        // Then: zero rejected (logs ILLEGAL_ARGUMENT), expectedIterations = 100
+        // Then: zero rejected (logs INVALID_ARGUMENT), expectedIterations = 100
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1585,11 +1585,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         meter.iterations(100);
         meter.iterations(-5);
 
-        // Then: negative rejected (logs ILLEGAL_ARGUMENT), expectedIterations = 100
+        // Then: negative rejected (logs INVALID_ARGUMENT), expectedIterations = 100
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 100, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1605,11 +1605,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         // When: iterations(0) is called
         meter.iterations(0);
 
-        // Then: zero rejected (logs ILLEGAL_ARGUMENT), expectedIterations = 0 (unchanged)
+        // Then: zero rejected (logs INVALID_ARGUMENT), expectedIterations = 0 (unchanged)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1625,11 +1625,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         // When: iterations(-5) is called
         meter.iterations(-5);
 
-        // Then: negative rejected (logs ILLEGAL_ARGUMENT), expectedIterations = 0 (unchanged)
+        // Then: negative rejected (logs INVALID_ARGUMENT), expectedIterations = 0 (unchanged)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1700,8 +1700,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         assertEquals("val", meter.getContext().get("key"));
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 1, 0, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: message", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: message", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1724,11 +1724,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: two invalid, valid ones succeed (expectedIterations = 100, currentIteration = 2)
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 2, 100, 0);
 
-        // Then: logs start + 2 ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
+        // Then: logs start + 2 INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: expectedIterations", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.iterations(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEventCount(logger, 4);
@@ -1752,8 +1752,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         assertEquals("step", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, "path1", null, null, null, 8, 0, 0);
 
-        // Then: logs start + ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        // Then: logs start + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 3);
@@ -1776,11 +1776,11 @@ class MeterLifeCyclePostStartConfigurationTest {
         assertEquals("step1", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 5000);
 
-        // Then: logs start + 2 ILLEGAL_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: message", meter.getFullID());
+        // Then: logs start + 2 INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: message", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.m(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: timeLimit", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 4);

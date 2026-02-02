@@ -94,7 +94,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject m(String) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject m(String) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDescriptionAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -112,17 +112,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter m but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter m but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject m(String, Object...) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject m(String, Object...) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDescriptionWithArgsAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -140,17 +140,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter m but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter m but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject m(null) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject m(null) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullDescriptionAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -168,17 +168,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter m but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter m but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject m(String) after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject m(String) after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDescriptionAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -196,17 +196,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter m but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter m but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject m(String, Object...) after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject m(String, Object...) after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDescriptionWithArgsAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -224,17 +224,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter m but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter m but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject m(null) after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject m(null) after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullDescriptionAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -252,10 +252,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter m but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter m but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
@@ -558,7 +558,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx() after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx() after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -576,17 +576,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx() after ok() with existing context - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx() after ok() with existing context - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectContextUpdateAfterOk() {
         // Given: a meter with context, stopped with ok()
@@ -607,17 +607,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx() after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx() after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectContextAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -635,17 +635,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx() after ok(path) with existing context - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx() after ok(path) with existing context - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectContextUpdateAfterOkWithPath() {
         // Given: a meter with context, stopped with ok("completion_path")
@@ -666,10 +666,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -680,7 +680,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(String, int) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, int) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIntContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -698,17 +698,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, long) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, long) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectLongContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -726,17 +726,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, boolean) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, boolean) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectBooleanContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -754,17 +754,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, float) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, float) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectFloatContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -782,17 +782,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, double) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, double) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDoubleContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -810,10 +810,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -824,7 +824,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(String, Integer) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, Integer) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIntegerWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -842,17 +842,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Long) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, Long) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectLongWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -870,17 +870,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Boolean) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, Boolean) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectBooleanWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -898,17 +898,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Float) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, Float) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectFloatWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -926,17 +926,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Double) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, Double) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectDoubleWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -954,17 +954,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, null Integer) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, null Integer) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullIntegerWrapperContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -982,10 +982,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -996,7 +996,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(String, String, Object...) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, String, Object...) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectFormattedContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1014,17 +1014,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, Object) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, Object) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectObjectContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1042,17 +1042,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, null Object) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, null Object) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullObjectContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1070,10 +1070,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1084,7 +1084,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(String) key-only after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String) key-only after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectKeyOnlyContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1102,17 +1102,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(true, String) conditional key-only after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(true, String) conditional key-only after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectConditionalKeyOnlyTrueAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1130,10 +1130,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1145,7 +1145,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     void shouldSilentlyIgnoreConditionalKeyOnlyFalseAfterOk() {
         /* NOTE: This test was intended to validate that ctx(false, String) is rejected as invalid after ok().
          * However, the current Meter implementation returns early when condition=false (before calling putContext()),
-         * so validateContextPrecondition() is never invoked, and no ILLEGAL_ARGUMENT log is generated.
+         * so validateContextPrecondition() is never invoked, and no INVALID_ARGUMENT log is generated.
          * This test documents the actual behavior: conditional ctx() with false silently does nothing. */
         
         // Given: a meter that has been stopped with ok()
@@ -1162,14 +1162,14 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: only ok logs (no ILLEGAL_ARGUMENT)
+        // Then: only ok logs (no INVALID_ARGUMENT)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
-    @DisplayName("should reject ctx(boolean, String, String) conditional true/false names after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(boolean, String, String) conditional true/false names after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectConditionalTrueFalseNamesAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1188,10 +1188,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1202,7 +1202,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject limitMilliseconds() after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject limitMilliseconds() after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullKeyOnlyContextAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1219,17 +1219,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(true, null) null trueName when true after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(true, null) null trueName when true after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWhenTrueAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1246,10 +1246,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1260,7 +1260,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     @ValidateCleanMeter
     void shouldSilentlyIgnoreNullTrueNameWhenFalseAfterOk() {
         /* NOTE: This test was intended to validate that ctx(false, null) is rejected as invalid after ok().
-         * However, condition=false causes early return before putContext() is called, so no ILLEGAL_ARGUMENT log occurs. */
+         * However, condition=false causes early return before putContext() is called, so no INVALID_ARGUMENT log occurs. */
         
         // Given: a meter that has been stopped with ok()
         final Meter meter = new Meter(logger).start();
@@ -1276,14 +1276,14 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: only ok logs (no ILLEGAL_ARGUMENT)
+        // Then: only ok logs (no INVALID_ARGUMENT)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
         AssertLogger.assertEventCount(logger, 4);
     }
 
     @Test
-    @DisplayName("should reject ctx(true, null, String) null trueName with falseName after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(true, null, String) null trueName with falseName after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullTrueNameWithFalseNameAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1301,17 +1301,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(false, String, null) null falseName when false after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(false, String, null) null falseName when false after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullFalseNameWhenFalseAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1329,17 +1329,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(true, null, null) both names null when true after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(true, null, null) both names null when true after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenTrueAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1356,17 +1356,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(false, null, null) both names null when false after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(false, null, null) both names null when false after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectBothNamesNullWhenFalseAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1383,10 +1383,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1397,7 +1397,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ctx(null, String) null key with value after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(null, String) null key with value after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullKeyWithValueAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1414,17 +1414,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(null, int) null key with primitive after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(null, int) null key with primitive after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullKeyWithPrimitiveAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1441,17 +1441,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(null, String, Object...) null key with format after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(null, String, Object...) null key with format after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullKeyWithFormatAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1468,17 +1468,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, null, Object...) null format after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, null, Object...) null format after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullFormatAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1496,17 +1496,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ctx(String, String, null) null args array after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject ctx(String, String, null) null args array after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullArgsArrayAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1524,10 +1524,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1538,7 +1538,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject path() after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject path() after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectPathAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1556,17 +1556,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject path() after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject path() after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectPathAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("original_path")
@@ -1584,17 +1584,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "original_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject path(null) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject path(null) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullPathAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1612,17 +1612,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject path() after ok(completion_path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject path() after ok(completion_path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectPathAfterOkWithCompletionPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -1640,17 +1640,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter path but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter path but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject path(null) after ok(completion_path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject path(null) after ok(completion_path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullPathAfterOkWithCompletionPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -1668,10 +1668,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1682,7 +1682,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject limitMilliseconds() after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject limitMilliseconds() after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectTimeLimitAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1700,17 +1700,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds() after ok() with existing limit - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject limitMilliseconds() after ok() with existing limit - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectTimeLimitUpdateAfterOk() {
         // Given: a meter with timeLimit, stopped with ok()
@@ -1730,17 +1730,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 100);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds(0) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject limitMilliseconds(0) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectZeroTimeLimitAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1758,17 +1758,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds(-1) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject limitMilliseconds(-1) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNegativeTimeLimitAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1786,17 +1786,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation) only
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds() after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject limitMilliseconds() after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectTimeLimitAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -1814,17 +1814,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds() after ok(path) with existing limit - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject limitMilliseconds() after ok(path) with existing limit - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectTimeLimitUpdateAfterOkWithPath() {
         // Given: a meter with timeLimit, stopped with ok("completion_path")
@@ -1844,17 +1844,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 100);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds(0) after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject limitMilliseconds(0) after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectZeroTimeLimitAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -1872,17 +1872,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject limitMilliseconds(-1) after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject limitMilliseconds(-1) after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNegativeTimeLimitAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -1900,10 +1900,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation) only
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1914,7 +1914,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject iterations() after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject iterations() after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIterationsAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1932,17 +1932,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject iterations() after ok() with existing iterations - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject iterations() after ok() with existing iterations - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIterationsUpdateAfterOk() {
         // Given: a meter with expectedIterations, stopped with ok()
@@ -1962,17 +1962,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 50, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject iterations(0) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject iterations(0) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectZeroIterationsAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -1990,17 +1990,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject iterations(-5) after ok() - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject iterations(-5) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNegativeIterationsAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -2018,17 +2018,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation) only
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject iterations() after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject iterations() after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIterationsAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -2046,17 +2046,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject iterations() after ok(path) with existing iterations - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject iterations() after ok(path) with existing iterations - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectIterationsUpdateAfterOkWithPath() {
         // Given: a meter with expectedIterations, stopped with ok("completion_path")
@@ -2076,17 +2076,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 50, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject iterations(0) after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject iterations(0) after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectZeroIterationsAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -2104,17 +2104,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject iterations(-5) after ok(path) - logs ILLEGAL_ARGUMENT")
+    @DisplayName("should reject iterations(-5) after ok(path) - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNegativeIterationsAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -2132,10 +2132,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + ILLEGAL_ARGUMENT (from invalid operation) only
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation) only
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);

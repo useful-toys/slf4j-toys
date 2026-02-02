@@ -452,7 +452,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * <p>
      * <b>Precondition:</b> This method must be called after {@link #start()} and before any termination method
      * ({@link #ok()}, {@link #reject(Object)}, {@link #fail(Object)}). Calling it before starting or after stopping
-     * will log an error with {@link Markers#ILLEGAL_ARGUMENT} marker and have no effect on the Meter state.
+     * will log an error with {@link Markers#INVALID_ARGUMENT} marker and have no effect on the Meter state.
      *
      * @param pathId An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that identifies
      *               the successful execution path.

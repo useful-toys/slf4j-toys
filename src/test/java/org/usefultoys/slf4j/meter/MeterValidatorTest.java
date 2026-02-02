@@ -192,7 +192,7 @@ public class MeterValidatorTest {
             // When: validateMPrecondition is called
             // Then: should return false and log error event
             assertFalse(MeterValidator.validateMPrecondition(meter), "should reject m() when already stopped");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter m but already stopped; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter m but already stopped; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -218,7 +218,7 @@ public class MeterValidatorTest {
             // When: validateSubCallArgument is called
             // Then: should log illegal argument error
             MeterValidator.validateSubCallArgument(meter, null);
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: suboperation name; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: suboperation name; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -244,7 +244,7 @@ public class MeterValidatorTest {
             // When: validateMCallArgument is called
             // Then: should return false and log illegal argument error
             assertFalse(MeterValidator.validateMCallArgument(meter, null), "should reject null message");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: message; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: message; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -270,7 +270,7 @@ public class MeterValidatorTest {
             // When: validateMCallArgument is called
             // Then: should return null and log illegal argument error
             assertNull(MeterValidator.validateMCallArgument(meter, null, 1), "should return null for null format");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: format; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: format; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
 
@@ -291,7 +291,7 @@ public class MeterValidatorTest {
             // When: validateMCallArgument is called
             // Then: should return null and log illegal format error
             assertNull(MeterValidator.validateMCallArgument(meter, "message %d", "s"), "should return null for mismatched format");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Illegal format string; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Illegal format string; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -317,7 +317,7 @@ public class MeterValidatorTest {
             // When: validateLimitMillisecondsCallArgument is called
             // Then: should return false and log illegal argument error
             assertFalse(MeterValidator.validateLimitMillisecondsCallArgument(meter, 0L), "should reject non-positive limit");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: timeLimit; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: timeLimit; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -345,7 +345,7 @@ public class MeterValidatorTest {
             // When: validateLimitMillisecondsPrecondition is called
             // Then: should return false and log illegal precondition error
             assertFalse(MeterValidator.validateLimitMillisecondsPrecondition(meter), "should reject when meter already stopped");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter limitMilliseconds but already stopped; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter limitMilliseconds but already stopped; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -371,7 +371,7 @@ public class MeterValidatorTest {
             // When: validateIterationsCallArgument is called
             // Then: should return false and log illegal argument error
             assertFalse(MeterValidator.validateIterationsCallArgument(meter, 0L), "should reject non-positive iteration count");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: expectedIterations; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -399,7 +399,7 @@ public class MeterValidatorTest {
             // When: validateIterationsPrecondition is called
             // Then: should return false and log illegal precondition error
             assertFalse(MeterValidator.validateIterationsPrecondition(meter), "should reject when meter already stopped");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter iterations but already stopped; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter iterations but already stopped; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -453,7 +453,7 @@ public class MeterValidatorTest {
             // When: validateIncByCallArgument is called
             // Then: should return false and log illegal argument error
             assertFalse(MeterValidator.validateIncByCallArgument(meter, 0L), "should reject non-positive increment");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: increment; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: increment; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -480,7 +480,7 @@ public class MeterValidatorTest {
             // When: validateIncToCallArgument is called
             // Then: should return false and log illegal argument error
             assertFalse(MeterValidator.validateIncToCallArgument(meter, 0L), "should reject non-positive target iteration");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-positive argument: currentIteration; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-positive argument: currentIteration; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
 
@@ -492,7 +492,7 @@ public class MeterValidatorTest {
             // When: validateIncToCallArgument is called
             // Then: should return false and log non-forward increment error
             assertFalse(MeterValidator.validateIncToCallArgument(meter, 10L), "should reject non-forward increment");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Non-forward argument: currentIteration; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Non-forward argument: currentIteration; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -546,7 +546,7 @@ public class MeterValidatorTest {
             // When: validatePathCallArgument is called
             // Then: should log illegal argument error
             MeterValidator.validatePathCallArgument(meter, null);
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Null argument: pathId; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: pathId; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
@@ -574,7 +574,7 @@ public class MeterValidatorTest {
             // When: validateContextPrecondition is called
             // Then: should return false and log illegal precondition error
             assertFalse(MeterValidator.validateContextPrecondition(meter), "should reject when meter already stopped");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.ILLEGAL_ARGUMENT, "Meter putContext but already stopped; id=test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter putContext but already stopped; id=test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }

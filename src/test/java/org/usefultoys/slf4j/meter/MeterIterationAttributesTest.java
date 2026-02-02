@@ -28,7 +28,7 @@ import org.usefultoys.test.ValidateCleanMeter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.usefultoys.slf4j.meter.Markers.ILLEGAL_ARGUMENT;
+import static org.usefultoys.slf4j.meter.Markers.INVALID_ARGUMENT;
 import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_INCREMENT;
 
 /**
@@ -139,25 +139,25 @@ class MeterIterationAttributesTest {
         // When: setting negative iterations
         meter.iterations(-1);
         // Then: should log illegal argument error
-        AssertLogger.assertEvent(logger, 0, Level.ERROR, ILLEGAL_ARGUMENT, "Non-positive argument: expectedIterations", "MeterIterationAttributesTest#");
+        AssertLogger.assertEvent(logger, 0, Level.ERROR, INVALID_ARGUMENT, "Non-positive argument: expectedIterations", "MeterIterationAttributesTest#");
 
         meter.start();
         
         // When: incrementing by negative value
         meter.incBy(-1);
         // Then: should log illegal argument error
-        AssertLogger.assertEvent(logger, 3, Level.ERROR, ILLEGAL_ARGUMENT, "Non-positive argument: increment", "MeterIterationAttributesTest#");
+        AssertLogger.assertEvent(logger, 3, Level.ERROR, INVALID_ARGUMENT, "Non-positive argument: increment", "MeterIterationAttributesTest#");
 
         // When: incrementing to negative value
         meter.incTo(-1);
         // Then: should log illegal argument error
-        AssertLogger.assertEvent(logger, 4, Level.ERROR, ILLEGAL_ARGUMENT, "Non-positive argument: currentIteration", "MeterIterationAttributesTest#");
+        AssertLogger.assertEvent(logger, 4, Level.ERROR, INVALID_ARGUMENT, "Non-positive argument: currentIteration", "MeterIterationAttributesTest#");
 
         // When: incrementing to a value that does not move forward
         meter.incTo(10);
         meter.incTo(5);
         // Then: should log non-forward increment error
-        AssertLogger.assertEvent(logger, 5, Level.ERROR, ILLEGAL_ARGUMENT, "Non-forward argument: currentIteration", "MeterIterationAttributesTest#");
+        AssertLogger.assertEvent(logger, 5, Level.ERROR, INVALID_ARGUMENT, "Non-forward argument: currentIteration", "MeterIterationAttributesTest#");
 
 
         meter.ok();
