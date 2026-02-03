@@ -57,27 +57,10 @@ public class Markers {
     /** Marker for human-readable messages when an operation fails. */
     public final Marker MSG_FAIL = MarkerFactory.getMarker("METER_MSG_FAIL");
 
-    /** Marker for internal inconsistencies: an operation was finalized without being started. */
-    public final Marker INCONSISTENT_FINALIZED = MarkerFactory.getMarker("METER_INCONSISTENT_FINALIZED");
-    /** Marker for internal inconsistencies: an operation was started more than once. */
-    public final Marker INCONSISTENT_START = MarkerFactory.getMarker("METER_INCONSISTENT_START");
-    /** Marker for internal inconsistencies: an iteration counter was incremented without the operation being started. */
-    public final Marker INCONSISTENT_INCREMENT = MarkerFactory.getMarker("INCONSISTENT_INCREMENT");
-    /** Marker for internal inconsistencies: progress was reported without the operation being started. */
-    public final Marker INCONSISTENT_PROGRESS = MarkerFactory.getMarker("INCONSISTENT_PROGRESS");
-    /** Marker for internal inconsistencies: an operation was marked as OK without being started. */
-    public final Marker INCONSISTENT_OK = MarkerFactory.getMarker("METER_INCONSISTENT_OK");
-    /** Marker for internal inconsistencies: an operation was rejected without being started. */
-    public final Marker INCONSISTENT_REJECT = MarkerFactory.getMarker("METER_INCONSISTENT_REJECT");
-    /** Marker for internal inconsistencies: an operation failed without being started. */
-    public final Marker INCONSISTENT_FAIL = MarkerFactory.getMarker("METER_INCONSISTENT_FAIL");
-    /** Marker for internal inconsistencies: an exception was handled inconsistently. */
-    public final Marker INCONSISTENT_EXCEPTION = MarkerFactory.getMarker("METER_INCONSISTENT_EXCEPTION");
-    /** Marker for internal inconsistencies: an operation was closed inconsistently. */
-    public final Marker INCONSISTENT_CLOSE = MarkerFactory.getMarker("METER_INCONSISTENT_CLOSE");
-
     /** Marker for Meter API calls that are inconsistent with lifecycle state. */
     public final Marker INVALID_STATE = MarkerFactory.getMarker("METER_INVALID_STATE");
+    /** Marker for Meter API calls that are invalid state transitions. */
+    public final Marker INVALID_TRANSITION = MarkerFactory.getMarker("METER_INVALID_TRANSITION");
     /** Marker for unexpected exceptions within the Meter implementation. */
     public final Marker UNEXPECTED_EXCEPTION = MarkerFactory.getMarker("METER_UNEXPECTED_EXCEPTION");
     /** Marker for illegal argument usage of the Meter API. */

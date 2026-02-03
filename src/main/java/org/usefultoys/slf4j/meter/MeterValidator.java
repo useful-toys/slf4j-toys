@@ -16,7 +16,7 @@
 package org.usefultoys.slf4j.meter;
 
 import lombok.experimental.UtilityClass;
-import org.slf4j.Marker;
+
 import org.usefultoys.slf4j.CallerStackTraceThrowable;
 
 import java.util.IllegalFormatException;
@@ -42,7 +42,7 @@ public class MeterValidator {
      */
     public void validateSubCallArgument(final Meter meter, final String suboperationName) {
         if (suboperationName == null) {
-            logIllegalCallArgument(meter, "Null argument: suboperation name");
+            logInvalidArgument(meter, "Null argument: suboperation name");
         }
     }
 
@@ -55,7 +55,7 @@ public class MeterValidator {
      */
     public boolean validateMCallArgument(final Meter meter, final String message) {
         if (message == null) {
-            logIllegalCallArgument(meter, "Null argument: message");
+            logInvalidArgument(meter, "Null argument: message");
             return false;
         }
         return true;
@@ -71,13 +71,13 @@ public class MeterValidator {
      */
     public String validateMCallArgument(final Meter meter, final String format, final Object... args) {
         if (format == null) {
-            logIllegalCallArgument(meter, "Null argument: format");
+            logInvalidArgument(meter, "Null argument: format");
             return null;
         }
         try {
             return String.format(format, args);
         } catch (final IllegalFormatException e) {
-            logIllegalCallArgument(meter, "Illegal format string");
+            logInvalidArgument(meter, "Illegal format string");
             return null;
         }
     }
@@ -92,7 +92,7 @@ public class MeterValidator {
      */
     public boolean validateLimitMillisecondsCallArgument(final Meter meter, final long timeLimit) {
         if (timeLimit <= 0) {
-            logIllegalCallArgument(meter, "Non-positive argument: timeLimit");
+            logInvalidArgument(meter, "Non-positive argument: timeLimit");
             return false;
         }
         return true;
@@ -108,7 +108,7 @@ public class MeterValidator {
      */
     public boolean validateIterationsCallArgument(final Meter meter, final long expectedIterations) {
         if (expectedIterations <= 0) {
-            logIllegalCallArgument(meter, "Non-positive argument: expectedIterations");
+            logInvalidArgument(meter, "Non-positive argument: expectedIterations");
             return false;
         }
         return true;
@@ -124,7 +124,7 @@ public class MeterValidator {
      */
     public boolean validateIncByCallArgument(final Meter meter, final long increment) {
         if (increment <= 0) {
-            logIllegalCallArgument(meter, "Non-positive argument: increment");
+            logInvalidArgument(meter, "Non-positive argument: increment");
             return false;
         }
         return true;
@@ -140,11 +140,11 @@ public class MeterValidator {
      */
     public boolean validateIncToCallArgument(final Meter meter, final long currentIteration) {
         if (currentIteration <= 0) {
-            logIllegalCallArgument(meter, "Non-positive argument: currentIteration");
+            logInvalidArgument(meter, "Non-positive argument: currentIteration");
             return false;
         }
         if (currentIteration <= meter.getCurrentIteration()) {
-            logIllegalCallArgument(meter, "Non-forward argument: currentIteration");
+            logInvalidArgument(meter, "Non-forward argument: currentIteration");
             return false;
         }
         return true;
@@ -160,7 +160,7 @@ public class MeterValidator {
      */
     public boolean validatePathCallArgument(final Meter meter, final Object pathId) {
         if (pathId == null) {
-            logIllegalCallArgument(meter, "Null argument: pathId");
+            logInvalidArgument(meter, "Null argument: pathId");
             return false;
         }
         return true;
@@ -178,7 +178,7 @@ public class MeterValidator {
      */
     public boolean validateStartPrecondition(final Meter meter) {
         if (meter.getStartTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INCONSISTENT_START, "Meter already started");
+            logInvalidState(meter, "Meter already started");
             return false;
         }
         return true;
@@ -193,7 +193,7 @@ public class MeterValidator {
      */
     public boolean validateMPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter m but already stopped");
+            logInvalidStateAlreadyStopped(meter);
             return false;
         }
         return true;
@@ -207,14 +207,14 @@ public class MeterValidator {
      * @param marker The SLF4J marker to use for the log message in case of inconsistency.
      * @return {@code true} if the meter can proceed to stop (even with warnings), {@code false} if the meter is already stopped.
      */
-    public boolean validateStopPrecondition(final Meter meter, final Marker marker) {
+    public boolean validateStopPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, marker, "Meter already stopped");
+            logInvalidState(meter, "Meter already stopped, ");
             return false;
         } else if (meter.getStartTime() == 0) {
-            logIllegalPrecondition(meter, marker, "Meter stopped but not started");
+            logInvalidState(meter, "Meter stopped but not started");
         } else if (meter.checkCurrentInstance()) {
-            logIllegalPrecondition(meter, marker, "Meter out of order");
+            logInvalidState(meter, "Meter out of order");
         }
         return true;
     }
@@ -228,7 +228,7 @@ public class MeterValidator {
      */
     public boolean validateContextPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter putContext but already stopped");
+            logInvalidStateAlreadyStopped(meter);
             return false;
         }
         return true;
@@ -243,7 +243,7 @@ public class MeterValidator {
      */
     public boolean validateLimitMillisecondsPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter limitMilliseconds but already stopped");
+            logInvalidStateAlreadyStopped(meter);
             return false;
         }
         return true;
@@ -258,7 +258,7 @@ public class MeterValidator {
      */
     public boolean validateIterationsPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter iterations but already stopped");
+            logInvalidStateAlreadyStopped(meter);
             return false;
         }
         return true;
@@ -273,11 +273,11 @@ public class MeterValidator {
      */
     public boolean validateIncPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
-            logIllegalPrecondition(meter, Markers.INCONSISTENT_INCREMENT, "Meter not started");
+            logInvalidStateNotStarted(meter);
             return false;
         }
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped");
+            logInvalidStateAlreadyStopped(meter);
             return false;
         }
         return true;
@@ -292,11 +292,11 @@ public class MeterValidator {
      */
     public boolean validateProgressPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
-            logIllegalPrecondition(meter, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started");
+            logInvalidStateNotStarted(meter);
             return false;
         }
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped");
+            logInvalidStateAlreadyStopped(meter);
             return false;
         }
         return true;
@@ -311,15 +311,16 @@ public class MeterValidator {
      */
     public boolean validatePathPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter path but not started");
+            logInvalidStateNotStarted(meter);
             return false;
         }
         if (meter.getStopTime() != 0) {
-            logIllegalPrecondition(meter, Markers.INVALID_STATE, "Meter path but already stopped");
+            logInvalidStateAlreadyStopped(meter);
             return false;
         }
         return true;
     }
+
 
     /* ========== Validate Finalize Method ========== */
 
@@ -331,11 +332,19 @@ public class MeterValidator {
      */
     public void validateFinalize(final Meter meter) {
         if (meter.getStartTime() != 0 && meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
-            meter.getMessageLogger().error(Markers.INCONSISTENT_FINALIZED,"Meter started but never stopped; id={}", meter.getFullID());
+            meter.getMessageLogger().error(Markers.INVALID_ARGUMENT, "{}; id={}", "Meter never stopped, must remember to call ok/reject/fail/success()", meter.getFullID());   
         }
     }
 
     /* ========== Utility Methods ========== */
+
+    private void logInvalidStateAlreadyStopped(final Meter meter) {
+        logInvalidState(meter, "Meter already stopped, must call before ok/reject/fail/success()");
+    }
+
+    private void logInvalidStateNotStarted(final Meter meter) {
+        logInvalidState(meter, "Meter not yet started, must call after start()");
+    }
 
     /**
      * Logs an illegal argument call to a Meter method.
@@ -343,20 +352,24 @@ public class MeterValidator {
      * @param meter      The Meter instance on which the illegal call was made.
      * @param message    A descriptive message about the illegal argument.
      */
-    void logIllegalCallArgument(final Meter meter, final String message) {
+    void logInvalidArgument(final Meter meter, final String message) {
         final CallerStackTraceThrowable throwable = new CallerStackTraceThrowable();
         meter.getMessageLogger().error(Markers.INVALID_ARGUMENT, "Meter.{} - {}; id={}", throwable.getApiMethodName(), message, meter.getFullID(), throwable);
     }
 
     /**
      * Logs an illegal precondition for a Meter operation.
-     *
      * @param meter   The Meter instance with the illegal precondition.
-     * @param marker  The SLF4J marker to use for the log message.
      * @param message A descriptive message about the illegal precondition.
      */
-    private void logIllegalPrecondition(final Meter meter, final Marker marker, final String message) {
-        meter.getMessageLogger().error(marker, "{}; id={}", message, meter.getFullID(), new CallerStackTraceThrowable());
+    private void logInvalidState(final Meter meter, final String message) {
+        final CallerStackTraceThrowable throwable = new CallerStackTraceThrowable();
+        meter.getMessageLogger().error(Markers.INVALID_STATE, "Meter.{} - {}; id={}", throwable.getApiMethodName(), message, meter.getFullID(), throwable);
+    }
+
+     private void logInvalidTransition(final Meter meter, final String message) {
+        final CallerStackTraceThrowable throwable = new CallerStackTraceThrowable();
+        meter.getMessageLogger().error(Markers.INVALID_TRANSITION, "Meter.{} - {}; id={}", throwable.getApiMethodName(), message, meter.getFullID(), throwable);
     }
 
     /**
