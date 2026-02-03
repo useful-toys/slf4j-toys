@@ -478,7 +478,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     Meter commonOk(final Object pathId) {
         try {
-            if (!MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_OK)) {
+            if (!MeterValidator.validateStopPrecondition(this)) {
                 return this;
             }
 
