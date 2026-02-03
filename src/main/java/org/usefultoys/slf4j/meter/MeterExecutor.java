@@ -327,7 +327,7 @@ public interface MeterExecutor<T> extends MeterAnalysis {
             return exceptionClass.getConstructor(String.class, Throwable.class).newInstance("MeterExecutor.safeCall wrapped exception", e);
         } catch (final NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException |
                        IllegalArgumentException | InvocationTargetException ignored) {
-           getMessageLogger().error(Markers.INCONSISTENT_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
+           getMessageLogger().error(Markers.INVALID_EXCEPTION, ERROR_MSG_METER_CANNOT_CREATE_EXCEPTION, exceptionClass, e);
         }
         return new RuntimeException(e);
     }

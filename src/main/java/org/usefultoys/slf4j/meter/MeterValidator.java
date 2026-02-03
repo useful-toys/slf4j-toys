@@ -178,7 +178,7 @@ public class MeterValidator {
      */
     public boolean validateStartPrecondition(final Meter meter) {
         if (meter.getStartTime() != 0) {
-            logInvalidState(meter, "Meter already started");
+            logInvalidTransition(meter, "Meter already stopped, must call start() only once");
             return false;
         }
         return true;
@@ -209,12 +209,12 @@ public class MeterValidator {
      */
     public boolean validateStopPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
-            logInvalidState(meter, "Meter already stopped, ");
+            logInvalidTransition(meter, "Meter already stopped, must call ok/reject/fail/success() only once");
             return false;
         } else if (meter.getStartTime() == 0) {
-            logInvalidState(meter, "Meter stopped but not started");
+            logInvalidTransition(meter, "Meter not started, should call start() first");
         } else if (meter.checkCurrentInstance()) {
-            logInvalidState(meter, "Meter out of order");
+            logInvalidTransition(meter, "Meter stopped before the current instance on the thread, possible mismatched start/stop calls");
         }
         return true;
     }
@@ -332,7 +332,7 @@ public class MeterValidator {
      */
     public void validateFinalize(final Meter meter) {
         if (meter.getStartTime() != 0 && meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
-            meter.getMessageLogger().error(Markers.INVALID_ARGUMENT, "{}; id={}", "Meter never stopped, must remember to call ok/reject/fail/success()", meter.getFullID());   
+            meter.getMessageLogger().error(Markers.INVALID_ARGUMENT, "{}; id={}", "Meter never stopped, must remember to call ok/reject/fail/success() on each started one", meter.getFullID());
         }
     }
 
@@ -343,7 +343,7 @@ public class MeterValidator {
     }
 
     private void logInvalidStateNotStarted(final Meter meter) {
-        logInvalidState(meter, "Meter not yet started, must call after start()");
+        logInvalidState(meter, "Meter not yet started, must call start() first");
     }
 
     /**

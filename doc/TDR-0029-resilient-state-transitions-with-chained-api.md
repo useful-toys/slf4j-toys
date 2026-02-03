@@ -64,7 +64,7 @@ We adopt a **four-tier resilience strategy** that gracefully handles both expect
 * A warning or error is logged to alert developers that the call violates the API contract.
 * The call is still executed to maintain non-intrusive behavior and correct the state.
 * The state transition or attribute update is applied to restore validity.
-* Example: `start()` called twice (logs `INCONSISTENT_START` but resets `startTime` to now), or `ok()` called from `Created` (logs `INCONSISTENT_OK` but still terminates the meter as OK).
+* Example: `start()` called twice (logs `INVALID_TRANSITION` but resets `startTime` to now), or `ok()` called from `Created` (logs `INVALID_TRANSITION` but still terminates the meter as OK).
 
 **Guarantees**:
 * The meter remains in a valid state after the call (first-termination-wins ensures immutability).
@@ -84,7 +84,7 @@ We adopt a **four-tier resilience strategy** that gracefully handles both expect
 **Behavior**:
 * A warning or error is logged to alert developers that preconditions or arguments are invalid.
 * The call is rejected and has no effect on the state or attributes.
-* Example: `inc()` called from `Created` (logs `INCONSISTENT_INCREMENT` but does nothing), or `ok(null)` with a null path argument (logs `INVALID_ARGUMENT` but does not transition).
+* Example: `inc()` called from `Created` (logs `INVALID_STATE` but does nothing), or `ok(null)` with a null path argument (logs `INVALID_ARGUMENT` but does not transition).
 
 **Guarantees**:
 * The meter remains in exactly the same state (state is preserved).
@@ -121,7 +121,7 @@ public void ok() {
     if (startTime == 0) {
         // Outside expected flow: apply the termination anyway
         stopTime = System.currentTimeMillis();
-        validateStopPrecondition(this, Markers.INCONSISTENT_OK);
+        validateStopPrecondition(this, Markers.INVALID_TRANSITION);
         // ... logging and data emission ...
         return;
     }
@@ -129,7 +129,7 @@ public void ok() {
     // Tier 4 check: Is the meter already Stopped?
     if (stopTime != 0) {
         // Ignored: do nothing
-        validateStopPrecondition(this, Markers.INCONSISTENT_OK);
+        validateStopPrecondition(this, Markers.INVALID_TRANSITION);
         // ... log warning but do not change state ...
     }
 }

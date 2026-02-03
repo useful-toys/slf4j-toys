@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.impl.MockLogger;
+import org.usefultoys.slf4j.CallerStackTraceThrowable;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4jtestmock.AssertLogger;
@@ -44,12 +45,15 @@ import static org.usefultoys.slf4j.meter.Markers.DATA_FAIL;
 import static org.usefultoys.slf4j.meter.Markers.DATA_OK;
 import static org.usefultoys.slf4j.meter.Markers.DATA_REJECT;
 import static org.usefultoys.slf4j.meter.Markers.DATA_START;
-import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_EXCEPTION;
-import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_START;
+import static org.usefultoys.slf4j.meter.Markers.INVALID_EXCEPTION;
+import static org.usefultoys.slf4j.meter.Markers.INVALID_STATE;
+import static org.usefultoys.slf4j.meter.Markers.INVALID_TRANSITION;
 import static org.usefultoys.slf4j.meter.Markers.MSG_FAIL;
 import static org.usefultoys.slf4j.meter.Markers.MSG_OK;
 import static org.usefultoys.slf4j.meter.Markers.MSG_REJECT;
 import static org.usefultoys.slf4j.meter.Markers.MSG_START;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEventThrowableStackTraceContains;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEventWithThrowable;
 
 /**
  * Unit tests demonstrating the MeterExecutor interface functionality.
@@ -126,7 +130,9 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
         AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
@@ -406,7 +412,9 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
         AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
@@ -516,7 +524,9 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
         AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
@@ -698,7 +708,9 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
         AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
@@ -876,7 +888,9 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
         AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
@@ -933,7 +947,9 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
         AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
@@ -1108,7 +1124,9 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INCONSISTENT_START); // Error from excessive start() call
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
+        assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
         AssertLogger.assertEvent(logger, 4, TRACE, DATA_OK);
     }
@@ -1278,6 +1296,8 @@ class MeterExecutorTest {
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
         AssertLogger.assertEvent(logger, 2, ERROR, MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, TRACE, DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, ERROR, INCONSISTENT_EXCEPTION); // Error from convertException fallback
+        AssertLogger.assertEvent(logger, 4, ERROR, INVALID_EXCEPTION, "Meter.convertException", "Failed to convert exception");
+        assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
+        assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.convertException(");
     }
 }

@@ -182,7 +182,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject inc() after reject() - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject inc() after reject() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -200,17 +200,17 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs reject (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.inc(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject incBy(5) after reject() - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject incBy(5) after reject() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncByAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -228,17 +228,17 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs reject (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject incTo(10) after reject() - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject incTo(10) after reject() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncToAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -256,10 +256,10 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs reject (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEventCount(logger, 5);
@@ -270,7 +270,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject progress() after reject() - logs INCONSISTENT_PROGRESS")
+    @DisplayName("should reject progress() after reject() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectProgressAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -287,10 +287,10 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no progress message
+        // Then: logs reject (from setup) + INVALID_STATE (from invalid operation), no progress message
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -298,7 +298,7 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
     }
 
     @Test
-    @DisplayName("should reject progress() after inc() and reject() - logs INCONSISTENT_PROGRESS")
+    @DisplayName("should reject progress() after inc() and reject() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectProgressAfterIncAndReject() {
         // Given: a meter with inc() that has been stopped with reject("business_error")
@@ -317,10 +317,10 @@ class MeterLifeCyclePostStopInvalidOperationsRejectedStateTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 1, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs reject (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no further progress logged
+        // Then: logs reject (from setup) + INVALID_STATE (from invalid operation), no further progress logged
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);

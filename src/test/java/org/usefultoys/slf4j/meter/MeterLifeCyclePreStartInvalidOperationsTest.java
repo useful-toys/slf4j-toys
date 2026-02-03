@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2025 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,7 +84,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject inc() before start() - logs INCONSISTENT_INCREMENT, currentIteration unchanged")
+    @DisplayName("should reject inc() before start() - logs INVALID_STATE, currentIteration unchanged")
     @ValidateCleanMeter
     void shouldRejectIncBeforeStart() {
         // Given: a new Meter without start()
@@ -98,15 +98,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: logs INCONSISTENT_INCREMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        // Then: logs INVALID_STATE
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.inc(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
     @Test
-    @DisplayName("should reject incBy(5) before start() - logs INCONSISTENT_INCREMENT, currentIteration unchanged")
+    @DisplayName("should reject incBy(5) before start() - logs INVALID_STATE, currentIteration unchanged")
     @ValidateCleanMeter
     void shouldRejectIncByBeforeStart() {
         // Given: a new Meter without start()
@@ -120,15 +120,15 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: logs INCONSISTENT_INCREMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        // Then: logs INVALID_STATE
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEventCount(logger, 1);
     }
 
     @Test
-    @DisplayName("should reject incTo(10) before start() - logs INCONSISTENT_INCREMENT, currentIteration unchanged")
+    @DisplayName("should reject incTo(10) before start() - logs INVALID_STATE, currentIteration unchanged")
     @ValidateCleanMeter
     void shouldRejectIncToBeforeStart() {
         // Given: a new Meter without start()
@@ -142,8 +142,8 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: logs INCONSISTENT_INCREMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        // Then: logs INVALID_STATE
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEventCount(logger, 1);
@@ -166,14 +166,14 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: logs 3x INCONSISTENT_INCREMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        // Then: logs 3x INVALID_STATE
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.inc(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.incBy(");
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEventCount(logger, 3);
@@ -184,7 +184,7 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject progress() before start() - logs INCONSISTENT_PROGRESS, no progress report")
+    @DisplayName("should reject progress() before start() - logs INVALID_STATE, no progress report")
     @ValidateCleanMeter
     void shouldRejectProgressBeforeStart() {
         // Given: a new Meter without start()
@@ -198,8 +198,8 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: logs INCONSISTENT_PROGRESS
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        // Then: logs INVALID_STATE
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertEventCount(logger, 1);
@@ -222,14 +222,14 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: logs 3x INCONSISTENT_PROGRESS
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        // Then: logs 3x INVALID_STATE
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.progress(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.progress(");
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertEventCount(logger, 3);
@@ -497,11 +497,11 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, false, false, null, null, null, null, 0, 0, 0);
         assertMeterCreateTime(meter, tr);
 
-        // Then: logs INCONSISTENT_INCREMENT + INCONSISTENT_PROGRESS + INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        // Then: logs INVALID_STATE + INVALID_STATE + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.inc(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
@@ -531,11 +531,11 @@ class MeterLifeCyclePreStartInvalidOperationsTest {
         assertEquals("operation", meter.getDescription());
         assertMeterCreateTime(meter, tr);
 
-        // Then: logs INCONSISTENT_INCREMENT + INCONSISTENT_PROGRESS + INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter not started", meter.getFullID());
+        // Then: logs INVALID_STATE + INVALID_STATE + INVALID_ARGUMENT
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.inc(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());

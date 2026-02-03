@@ -42,8 +42,7 @@ import static org.usefultoys.slf4j.meter.Markers.DATA_FAIL;
 import static org.usefultoys.slf4j.meter.Markers.DATA_OK;
 import static org.usefultoys.slf4j.meter.Markers.DATA_REJECT;
 import static org.usefultoys.slf4j.meter.Markers.DATA_START;
-import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_CLOSE;
-import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_OK;
+import static org.usefultoys.slf4j.meter.Markers.INVALID_TRANSITION;
 import static org.usefultoys.slf4j.meter.Markers.MSG_FAIL;
 import static org.usefultoys.slf4j.meter.Markers.MSG_OK;
 import static org.usefultoys.slf4j.meter.Markers.MSG_REJECT;
@@ -126,7 +125,7 @@ class MeterClosableTest {
         assertNull(m.getOkPath(), "Success path should be null when no path specified");
         assertNull(m.getRejectPath(), "Reject path should be null");
         assertNull(m.getFailPath(), "Fail path should be null");
-        logger.assertEvent(0, ERROR, INCONSISTENT_OK);
+        logger.assertEvent(0, ERROR, INVALID_TRANSITION);
         logger.assertEvent(1, INFO, MSG_OK);
         logger.assertEvent(2, TRACE, DATA_OK);
     }
@@ -168,7 +167,7 @@ class MeterClosableTest {
         assertNull(m.getOkPath(), "Success path should be null");
         assertNull(m.getRejectPath(), "Reject path should be null");
         assertEquals("try-with-resources", m.getFailPath(), "Fail path should be 'try-with-resources'");
-        logger.assertEvent(0, ERROR, INCONSISTENT_CLOSE);
+        logger.assertEvent(0, ERROR, INVALID_TRANSITION);
         logger.assertEvent(1, ERROR, MSG_FAIL);
         logger.assertEvent(2, TRACE, DATA_FAIL);
     }

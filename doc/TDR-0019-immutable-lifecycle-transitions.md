@@ -40,22 +40,22 @@ Stopped (stopTime!=0) → [OK | Rejected | Failed]
 |--------------|---------------|--------|---------------|
 | Created | `start()` | Sets `startTime`, transitions to Started | No |
 | Created | `ok()`/`reject()`/`fail()` | Ignored | Yes (`INCONSISTENT_*`) |
-| Created | `progress()` | Ignored | Yes (`INCONSISTENT_PROGRESS`) |
-| Started | `start()` | Ignored (already started) | Yes (`INCONSISTENT_START`) |
+| Created | `progress()` | Ignored | Yes (`INVALID_STATE`) |
+| Started | `start()` | Ignored (already started) | Yes (`INVALID_TRANSITION`) |
 | Started | `ok()` (first) | Sets `stopTime`, transitions to OK | No |
 | Started | `reject()` (first) | Sets `stopTime`, transitions to Rejected | No |
 | Started | `fail()` (first) | Sets `stopTime`, transitions to Failed | No |
 | Started | `progress()` | Logs progress, remains Started | No |
-| Stopped | `start()` | Ignored | Yes (`INCONSISTENT_START`) |
+| Stopped | `start()` | Ignored | Yes (`INVALID_TRANSITION`) |
 | Stopped | `ok()`/`reject()`/`fail()` | Ignored (already stopped) | Yes (`INCONSISTENT_*`) |
-| Stopped | `progress()` | Ignored | Yes (`INCONSISTENT_PROGRESS`) |
+| Stopped | `progress()` | Ignored | Yes (`INVALID_STATE`) |
 
 ### Implementation Details
 
 *   **`startTime` guard**: Methods like `ok()`, `reject()`, and `fail()` check `if (startTime == 0)` and return early if the meter wasn't started.
 *   **`stopTime` guard**: These same methods also check `if (stopTime != 0)` and return early if the meter is already stopped.
 *   **First-write-wins semantics**: Since termination methods set `stopTime` immediately, the first one to execute "wins" and prevents subsequent calls from modifying the state.
-*   **Validation via `MeterValidator`**: All precondition checks are delegated to `MeterValidator`, which logs warnings using markers like `INCONSISTENT_START`, `INCONSISTENT_OK`, `INCONSISTENT_FAIL`.
+*   **Validation via `MeterValidator`**: All precondition checks are delegated to `MeterValidator`, which logs warnings using markers like `INVALID_TRANSITION`, `INVALID_TRANSITION`, `INVALID_TRANSITION`.
 
 ## Consequences
 

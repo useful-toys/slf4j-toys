@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2025 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,8 +67,8 @@ import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWith
  * <p>
  * <b>Error Handling Pattern:</b>
  * <ul>
- *   <li>First termination: Log INCONSISTENT_OK/REJECT/FAIL + terminate directly to final state</li>
- *   <li>Second termination: Log another INCONSISTENT_OK/REJECT/FAIL + ignore (state unchanged)</li>
+ *   <li>First termination: Log INVALID_TRANSITION/REJECT/FAIL + terminate directly to final state</li>
+ *   <li>Second termination: Log another INVALID_TRANSITION/REJECT/FAIL + ignore (state unchanged)</li>
  * </ul>
  * <p>
  * <b>Design Note:</b> This represents extreme API misuse (terminating before start,
@@ -111,7 +111,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -121,9 +121,9 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -137,7 +137,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK, okPath unset
+        // Then: meter stops with INVALID_TRANSITION, okPath unset
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -147,11 +147,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
@@ -167,7 +167,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -177,9 +177,9 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -193,7 +193,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -203,9 +203,9 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_FAIL (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -219,7 +219,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("first_path") is called without start()
         recordStopWithWindow(tr, () -> meter.ok("first_path"));
-        // Then: meter stops with INCONSISTENT_OK, okPath="first_path"
+        // Then: meter stops with INVALID_TRANSITION, okPath="first_path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -229,11 +229,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
@@ -249,7 +249,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("first_path") is called without start()
         recordStopWithWindow(tr, () -> meter.ok("first_path"));
-        // Then: meter stops with INCONSISTENT_OK, okPath="first_path"
+        // Then: meter stops with INVALID_TRANSITION, okPath="first_path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -259,11 +259,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
@@ -279,7 +279,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("path") is called without start()
         recordStopWithWindow(tr, () -> meter.ok("path"));
-        // Then: meter stops with INCONSISTENT_OK, okPath="path"
+        // Then: meter stops with INVALID_TRANSITION, okPath="path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -289,11 +289,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 4);
@@ -309,7 +309,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("path") is called without start()
         recordStopWithWindow(tr, () -> meter.ok("path"));
-        // Then: meter stops with INCONSISTENT_OK, okPath="path"
+        // Then: meter stops with INVALID_TRANSITION, okPath="path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -319,9 +319,9 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (first) + INCONSISTENT_FAIL (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -335,7 +335,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("business_error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -345,11 +345,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
@@ -365,7 +365,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("business_error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -375,11 +375,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
@@ -395,7 +395,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("business_error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -405,11 +405,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 4);
@@ -425,7 +425,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("business_error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("business_error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -435,11 +435,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_REJECT (first) + INCONSISTENT_FAIL (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 4);
@@ -455,7 +455,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("technical_error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("technical_error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -465,11 +465,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
@@ -485,7 +485,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("technical_error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("technical_error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -495,11 +495,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 4);
@@ -515,7 +515,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("technical_error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("technical_error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -525,11 +525,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_REJECT (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 4);
@@ -545,7 +545,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("technical_error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("technical_error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -555,11 +555,11 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_FAIL (first) + INCONSISTENT_FAIL (second, no termination events)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 4);
@@ -585,7 +585,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK, okPath remains null
+        // Then: meter stops with INVALID_TRANSITION, okPath remains null
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -595,10 +595,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_OK (first ok) + INCONSISTENT_OK (second ok, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first ok) + INVALID_TRANSITION (second ok, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -618,7 +618,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK, okPath remains null
+        // Then: meter stops with INVALID_TRANSITION, okPath remains null
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -628,10 +628,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_OK (first) + INCONSISTENT_OK (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -651,7 +651,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -661,10 +661,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_OK (first) + INCONSISTENT_REJECT (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -684,7 +684,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -694,10 +694,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_OK (first) + INCONSISTENT_FAIL (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -717,7 +717,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -727,10 +727,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -750,7 +750,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -760,10 +760,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_OK (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -783,7 +783,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -793,10 +793,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_REJECT (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -816,7 +816,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -826,10 +826,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_REJECT (first) + INCONSISTENT_FAIL (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -849,7 +849,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -859,10 +859,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -882,7 +882,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -892,10 +892,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_OK (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -915,7 +915,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -925,10 +925,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_REJECT (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -948,7 +948,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
@@ -958,10 +958,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_FAIL (first) + INCONSISTENT_FAIL (second, no termination events)
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (first) + INVALID_TRANSITION (second, no termination events)
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -979,7 +979,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
         // When: start() is called on stopped meter
@@ -992,9 +992,9 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         assertNull(meter.getFailPath(), "failPath should remain null");
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 4 total
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
+        // Then: logs INVALID_TRANSITION (2 events) + INVALID_TRANSITION (2 events) = 4 total
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1008,7 +1008,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("path") is called without start()
         recordStopWithWindow(tr, () -> meter.ok("path"));
-        // Then: meter stops with INCONSISTENT_OK, okPath="path"
+        // Then: meter stops with INVALID_TRANSITION, okPath="path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
 
         // When: start() is called on stopped meter
@@ -1021,9 +1021,9 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         assertNull(meter.getFailPath(), "failPath should remain null");
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 4 total
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
+        // Then: logs INVALID_TRANSITION (2 events) + INVALID_TRANSITION (2 events) = 4 total
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1037,7 +1037,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
 
         // When: start() is called on stopped meter
@@ -1050,9 +1050,9 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         assertNull(meter.getFailPath(), "failPath should remain null");
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INCONSISTENT_REJECT (2 events) + INCONSISTENT_START (2 events) = 4 total
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
+        // Then: logs INVALID_TRANSITION (2 events) + INVALID_TRANSITION (2 events) = 4 total
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1066,7 +1066,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
 
         // When: start() is called on stopped meter
@@ -1079,9 +1079,9 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         assertEquals("error", meter.getFailPath(), "failPath should remain error");
 
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
-        // Then: logs INCONSISTENT_FAIL (2 events) + INCONSISTENT_START (2 events) = 4 total
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
+        // Then: logs INVALID_TRANSITION (2 events) + INVALID_TRANSITION (2 events) = 4 total
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1101,7 +1101,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok() is called without start()
         recordStopWithWindow(tr, () -> meter.ok());
-        // Then: meter stops with INCONSISTENT_OK
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
 
         // When: start() is called on stopped meter
@@ -1114,10 +1114,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         assertNull(meter.getFailPath(), "failPath should remain null");
 
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 5 total
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (2 events) + INVALID_TRANSITION (2 events) = 5 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1137,7 +1137,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: ok("path") is called without start()
         recordStopWithWindow(tr, () -> meter.ok("path"));
-        // Then: meter stops with INCONSISTENT_OK, okPath="path"
+        // Then: meter stops with INVALID_TRANSITION, okPath="path"
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
 
         // When: start() is called on stopped meter
@@ -1150,10 +1150,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         assertNull(meter.getFailPath(), "failPath should remain null");
 
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_OK (2 events) + INCONSISTENT_START (2 events) = 5 total
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (2 events) + INVALID_TRANSITION (2 events) = 5 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1173,7 +1173,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: reject("error") is called without start()
         recordStopWithWindow(tr, () -> meter.reject("error"));
-        // Then: meter stops with INCONSISTENT_REJECT
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
 
         // When: start() is called on stopped meter
@@ -1186,10 +1186,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         assertNull(meter.getFailPath(), "failPath should remain null");
 
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_REJECT (2 events) + INCONSISTENT_START (2 events) = 5 total
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (2 events) + INVALID_TRANSITION (2 events) = 5 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -1209,7 +1209,7 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
 
         // When: fail("error") is called without start()
         recordStopWithWindow(tr, () -> meter.fail("error"));
-        // Then: meter stops with INCONSISTENT_FAIL
+        // Then: meter stops with INVALID_TRANSITION
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
 
         // When: start() is called on stopped meter
@@ -1222,10 +1222,10 @@ class MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest {
         assertEquals("error", meter.getFailPath(), "failPath should remain error");
 
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
-        // Then: logs INVALID_STATE (path) + INCONSISTENT_FAIL (2 events) + INCONSISTENT_START (2 events) = 5 total
+        // Then: logs INVALID_STATE (path) + INVALID_TRANSITION (2 events) + INVALID_TRANSITION (2 events) = 5 total
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
         AssertLogger.assertEventCount(logger, 5);
     }
 }

@@ -44,7 +44,7 @@ import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
  * <b>Test Coverage:</b>
  * <ul>
  *   <li><b>Double start():</b> Tests that calling start() on an already started meter is invalid</li>
- *   <li><b>Error Logging:</b> Validates INCONSISTENT_START marker is logged for double start</li>
+ *   <li><b>Error Logging:</b> Validates INVALID_TRANSITION marker is logged for double start</li>
  *   <li><b>State Preservation:</b> Confirms that invalid start() doesn't corrupt meter state</li>
  *   <li><b>No Re-initialization:</b> Verifies that double start() doesn't reset timestamps or counters</li>
  *   <li><b>Thread-Local Handling:</b> Tests getCurrentInstance() behavior after double start attempt</li>
@@ -52,7 +52,7 @@ import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
  * <p>
  * <b>State Tested:</b> Started (after start, before termination)
  * <p>
- * <b>Error Handling Pattern:</b> Log INCONSISTENT_START error + ignore operation (no exception thrown)
+ * <b>Error Handling Pattern:</b> Log INVALID_TRANSITION error + ignore operation (no exception thrown)
  * <p>
  * <b>Design Note:</b> Unlike pre-start invalid operations, the Started state allows most operations
  * (inc, progress, configuration). Only re-starting is invalid.
@@ -102,8 +102,8 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs INCONSISTENT_START only (Guard Clause prevents MSG_START and DATA_START)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION only (Guard Clause prevents MSG_START and DATA_START)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 3);
@@ -125,11 +125,11 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs INCONSISTENT_START for each duplicate start attempt (no MSG_START/DATA_START)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION for each duplicate start attempt (no MSG_START/DATA_START)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 4);
@@ -158,8 +158,8 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, false, null, null, null, null, 3, 0, 0);
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
-        // Then: logs INCONSISTENT_START only (Guard Clause prevents MSG_START and DATA_START)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION only (Guard Clause prevents MSG_START and DATA_START)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 3);

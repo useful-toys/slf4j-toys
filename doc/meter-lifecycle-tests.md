@@ -268,28 +268,28 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 5. **Try-with-resources WITHOUT start() - Implicit close (⚠️ Tier 3)**
    - `try (Meter m = new Meter(logger)) { /* no start(), no explicit termination */ }` → implicit close() calls fail() with auto-correction
    - Verify meter transitions Created → Failed (with startTime auto-initialized)
-   - Verify INCONSISTENT_CLOSE + ERROR log for implicit failure
+   - Verify INVALID_TRANSITION + ERROR log for implicit failure
    - Verify "try-with-resources" marker in log
    - Verify Meter removed from thread-local stack after block
 
 6. **Try-with-resources WITHOUT start() - Explicit ok() (⚠️ Tier 3)**
    - `try (Meter m = new Meter(logger)) { m.ok(); }` → explicit ok() without start(), then close() does nothing
    - Verify meter transitions Created → OK (with startTime auto-initialized)
-   - Verify INCONSISTENT_OK + INFO log with completion report
+   - Verify INVALID_TRANSITION + INFO log with completion report
    - Verify close() is no-op (no additional logs)
    - Test all ok() variations: `ok()`, `ok("success_path")`, `ok(Enum)`, `ok(Throwable)`, `ok(Object)`
 
 7. **Try-with-resources WITHOUT start() - Explicit reject() (⚠️ Tier 3)**
    - `try (Meter m = new Meter(logger)) { m.reject("business_error"); }` → explicit reject() without start(), then close() does nothing
    - Verify meter transitions Created → Rejected (with startTime auto-initialized)
-   - Verify INCONSISTENT_REJECT + WARN log with rejection report
+   - Verify INVALID_TRANSITION + WARN log with rejection report
    - Verify close() is no-op (no additional logs)
    - Test all reject() variations: `reject(String)`, `reject(Enum)`, `reject(Throwable)`, `reject(Object)`
 
 8. **Try-with-resources WITHOUT start() - Explicit fail() (⚠️ Tier 3)**
    - `try (Meter m = new Meter(logger)) { m.fail("technical_error"); }` → explicit fail() without start(), then close() does nothing
    - Verify meter transitions Created → Failed (with startTime auto-initialized)
-   - Verify INCONSISTENT_FAIL + ERROR log with failure report
+   - Verify INVALID_TRANSITION + ERROR log with failure report
    - Verify close() is no-op (no additional logs)
    - Test all fail() variations: `fail(String)`, `fail(Enum)`, `fail(Throwable)`, `fail(Object)`
 
@@ -358,9 +358,9 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 14. **Try-with-resources WITHOUT start() - Implicit close + implicit start with auto-correction**
     - `try (Meter m = new Meter(logger)) { m.inc(); /* no start(), no explicit termination */ }` → implicit close() with auto-correction
     - Verify meter transitions Created → Failed (via auto-correction and implicit close)
-    - Verify `inc()` call logged as INCONSISTENT_INCREMENT (meter not started)
+    - Verify `inc()` call logged as INVALID_STATE (meter not started)
     - Verify currentIteration = 0 (increment was rejected/ignored)
-    - Verify INCONSISTENT_CLOSE + ERROR log for implicit failure
+    - Verify INVALID_TRANSITION + ERROR log for implicit failure
     - Verify Meter removed from thread-local stack after block
     - Verify startTime auto-initialized during close()
 
@@ -368,7 +368,7 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
     - `try (Meter m = new Meter(logger)) { m.iterations(100); m.ok(); }` → explicit ok() without start()
     - Verify meter transitions Created → OK (with startTime auto-initialized)
     - Verify expectedIterations = 100 (setup before termination)
-    - Verify INCONSISTENT_OK + INFO log with completion report
+    - Verify INVALID_TRANSITION + INFO log with completion report
     - Verify close() is no-op (no additional logs)
     - Verify expectedIterations preserved in OK state
 
@@ -376,15 +376,15 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
     - `try (Meter m = new Meter(logger)) { m.limitMilliseconds(5000); m.reject("business_error"); }`
     - Verify meter transitions Created → Rejected (with startTime auto-initialized)
     - Verify `timeLimit = 5000` (setup before termination)
-    - Verify INCONSISTENT_REJECT + WARN log with rejection report
+    - Verify INVALID_TRANSITION + WARN log with rejection report
     - Verify close() is no-op (no additional logs)
     - Verify timeLimit preserved in Rejected state
 
 17. **Try-with-resources WITHOUT start() - Implicit close + progress attempt (⚠️ Tier 3)**
     - `try (Meter m = new Meter(logger)) { m.progress(); /* no start(), no explicit termination */ }` → implicit close() with auto-correction
     - Verify meter transitions Created → Failed (via auto-correction and implicit close)
-    - Verify `progress()` call logged as INCONSISTENT_PROGRESS (meter not started)
-    - Verify INCONSISTENT_CLOSE + ERROR log for implicit failure
+    - Verify `progress()` call logged as INVALID_STATE (meter not started)
+    - Verify INVALID_TRANSITION + ERROR log for implicit failure
     - Verify try-with-resources cleanup happens correctly
     - Verify startTime auto-initialized during close()
 
@@ -452,40 +452,40 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 **Test Scenarios:**
 
 1. **OK without starting (Created → OK)**
-   - `new Meter(logger) → ok()` → logs INCONSISTENT_OK, transitions to OK state
+   - `new Meter(logger) → ok()` → logs INVALID_TRANSITION, transitions to OK state
    - Verify meter reaches OK state despite missing start()
    - Verify startTime auto-initialized (not 0)
    - Verify stopTime > 0
-   - Verify INFO log with completion report (includes INCONSISTENT_OK warning)
+   - Verify INFO log with completion report (includes INVALID_TRANSITION warning)
    - Verify okPath not defined (default)
    - Test path variations: `ok("success_path")`, `ok(SomeEnum.SUCCESS)`, `ok(new RuntimeException("cause"))`, `ok(new Object())`
-   - Verify all variations log INCONSISTENT_OK but transition successfully
+   - Verify all variations log INVALID_TRANSITION but transition successfully
    - Verify path captured correctly for each variation (String, enum toString, throwable message, object toString)
 
 2. **Reject without starting (Created → Rejected)**
-   - `new Meter(logger) → reject("business_error")` → logs INCONSISTENT_REJECT, transitions to Rejected state
+   - `new Meter(logger) → reject("business_error")` → logs INVALID_TRANSITION, transitions to Rejected state
    - Verify meter reaches Rejected state despite missing start()
    - Verify startTime auto-initialized (not 0)
    - Verify stopTime > 0
-   - Verify WARN log with rejection report (includes INCONSISTENT_REJECT warning)
+   - Verify WARN log with rejection report (includes INVALID_TRANSITION warning)
    - Verify rejectPath = "business_error"
    - Test cause variations: `reject(SomeEnum.VALIDATION_ERROR)`, `reject(new IllegalArgumentException("invalid input"))`, `reject(new Object())`
-   - Verify all variations log INCONSISTENT_REJECT but transition successfully
+   - Verify all variations log INVALID_TRANSITION but transition successfully
    - Verify cause captured correctly for each variation
 
 3. **Fail without starting (Created → Failed)**
-   - `new Meter(logger) → fail("technical_error")` → logs INCONSISTENT_FAIL, transitions to Failed state
+   - `new Meter(logger) → fail("technical_error")` → logs INVALID_TRANSITION, transitions to Failed state
    - Verify meter reaches Failed state despite missing start()
    - Verify startTime auto-initialized (not 0)
    - Verify stopTime > 0
-   - Verify ERROR log with failure report (includes INCONSISTENT_FAIL warning)
+   - Verify ERROR log with failure report (includes INVALID_TRANSITION warning)
    - Verify failPath = "technical_error"
    - Test cause variations: `fail(SomeEnum.DATABASE_ERROR)`, `fail(new SQLException("connection timeout"))`, `fail(new Object())`
-   - Verify all variations log INCONSISTENT_FAIL but transition successfully
+   - Verify all variations log INVALID_TRANSITION but transition successfully
    - Verify cause captured correctly for each variation
 
 4. **Pre-configured attributes preserved on self-correcting termination**
-   - `new Meter(logger) → iterations(100) → limitMilliseconds(5000) → m("operation") → ok()` → logs INCONSISTENT_OK
+   - `new Meter(logger) → iterations(100) → limitMilliseconds(5000) → m("operation") → ok()` → logs INVALID_TRANSITION
    - Verify expectedIterations = 100 preserved in terminal state
    - Verify timeLimit = 5000 preserved
    - Verify description = "operation" preserved
@@ -493,13 +493,13 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - Test same with reject() and fail()
 
 6. **Context preserved on self-correcting termination**
-   - `new Meter(logger) → ctx("user", "alice") → ctx("action", "import") → reject("validation_error")` → logs INCONSISTENT_REJECT
+   - `new Meter(logger) → ctx("user", "alice") → ctx("action", "import") → reject("validation_error")` → logs INVALID_TRANSITION
    - Verify context entries preserved in terminal state
    - Verify context appears in rejection report
    - Test same with ok() and fail()
 
 7. **Path set before starting (rejected, then termination)**
-   - `new Meter(logger) → path("custom") → ok()` → logs ILLEGAL (path before start), then INCONSISTENT_OK
+   - `new Meter(logger) → path("custom") → ok()` → logs ILLEGAL (path before start), then INVALID_TRANSITION
    - Verify path("custom") rejected (logs ILLEGAL), okPath remains undefined after ok()
    - Verify meter still reaches OK state
    - Test same pattern with reject() and fail()
@@ -513,13 +513,13 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 **Test Scenarios:**
 
 1. **Increment operations without starting**
-   - `new Meter() → inc()` → logs INCONSISTENT_INCREMENT, currentIteration unchanged
-   - `new Meter() → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged
-   - `new Meter() → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged
+   - `new Meter() → inc()` → logs INVALID_STATE, currentIteration unchanged
+   - `new Meter() → incBy(5)` → logs INVALID_STATE, currentIteration unchanged
+   - `new Meter() → incTo(10)` → logs INVALID_STATE, currentIteration unchanged
    - Verify meter remains in Created state
 
 2. **Progress without starting**
-   - `new Meter() → progress()` → logs INCONSISTENT_PROGRESS
+   - `new Meter() → progress()` → logs INVALID_STATE
    - Verify meter remains in Created state
    - Verify no progress report generated
 
@@ -713,10 +713,10 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
 **Test Scenarios:**
 
 #### 1. **Double Start (State-Correcting - ⚠️ Tier 3)**
-   - `start() → start()` → logs INCONSISTENT_START (Meter already started), resets startTime to now (state-correcting behavior)
-   - `start() → path("configured") → start()` → logs INCONSISTENT_START, okPath preserved, startTime reset
-   - `start() → inc() × 5 → start()` → logs INCONSISTENT_START, currentIteration preserved, startTime reset
-   - `start() → m("operation") → start()` → logs INCONSISTENT_START, description preserved, startTime reset
+   - `start() → start()` → logs INVALID_TRANSITION (Meter already started), resets startTime to now (state-correcting behavior)
+   - `start() → path("configured") → start()` → logs INVALID_TRANSITION, okPath preserved, startTime reset
+   - `start() → inc() × 5 → start()` → logs INVALID_TRANSITION, currentIteration preserved, startTime reset
+   - `start() → m("operation") → start()` → logs INVALID_TRANSITION, description preserved, startTime reset
    - **Note**: Currently implemented as ⚠️ Tier 3 (state-correcting) by resetting startTime. According to TDR-0019, this should be ❌ Tier 4 (state-preserving/rejected).
 
 #### 2. **Invalid Argument: iterations(n) with n ≤ 0**
@@ -777,8 +777,8 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - `start() → iterations(-1) → inc() × 3 → incBy(0) → ok()` → logs ILLEGAL for iterations(-1) and incBy(0), currentIteration = 3, completes normally
 
 #### 12. **Multiple start() Calls in Sequence**
-   - `start() → start() → start()` → logs INCONSISTENT_START for each duplicate start(), startTime reset each time
-   - `start() → inc() × 5 → start() → inc() × 3` → logs INCONSISTENT_START on second start(), iterations preserved (8 total)
+   - `start() → start() → start()` → logs INVALID_TRANSITION for each duplicate start(), startTime reset each time
+   - `start() → inc() × 5 → start() → inc() × 3` → logs INVALID_TRANSITION on second start(), iterations preserved (8 total)
 
 ---
 
@@ -797,18 +797,18 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - `start() → ok("completion_path") → m(null)` → logs ILLEGAL, description unchanged
 
 2. **Increment operations after stop (OK state)**
-   - `start() → ok() → inc()` → logs INCONSISTENT_INCREMENT (Meter already stopped), currentIteration unchanged (0)
-   - `start() → ok() → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
-   - `start() → ok() → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
-   - `start() → ok("completion_path") → inc()` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
-   - `start() → ok("completion_path") → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
-   - `start() → ok("completion_path") → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+   - `start() → ok() → inc()` → logs INVALID_STATE (Meter already stopped), currentIteration unchanged (0)
+   - `start() → ok() → incBy(5)` → logs INVALID_STATE, currentIteration unchanged (0)
+   - `start() → ok() → incTo(10)` → logs INVALID_STATE, currentIteration unchanged (0)
+   - `start() → ok("completion_path") → inc()` → logs INVALID_STATE, currentIteration unchanged (0)
+   - `start() → ok("completion_path") → incBy(5)` → logs INVALID_STATE, currentIteration unchanged (0)
+   - `start() → ok("completion_path") → incTo(10)` → logs INVALID_STATE, currentIteration unchanged (0)
 
 3. **Progress after stop (OK state)**
-   - `start() → ok() → progress()` → logs INCONSISTENT_PROGRESS (Meter already stopped), no progress message
-   - `start() → inc() → ok() → progress()` → logs INCONSISTENT_PROGRESS, no further progress logged
-   - `start() → ok("completion_path") → progress()` → logs INCONSISTENT_PROGRESS, no progress message
-   - `start() → inc() → ok("completion_path") → progress()` → logs INCONSISTENT_PROGRESS, no further progress logged
+   - `start() → ok() → progress()` → logs INVALID_STATE (Meter already stopped), no progress message
+   - `start() → inc() → ok() → progress()` → logs INVALID_STATE, no further progress logged
+   - `start() → ok("completion_path") → progress()` → logs INVALID_STATE, no progress message
+   - `start() → inc() → ok("completion_path") → progress()` → logs INVALID_STATE, no further progress logged
 
 4. **Update context after stop (OK state)**
    - `start() → ok() → ctx("key1", "value1")` → logs ILLEGAL (Meter already stopped), context unchanged
@@ -857,13 +857,13 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - `start() → reject("business_error") → m(null)` → logs ILLEGAL, description unchanged
 
 2. **Increment operations after reject (Rejected state)**
-   - `start() → reject("business_error") → inc()` → logs INCONSISTENT_INCREMENT (Meter already stopped), currentIteration unchanged (0)
-   - `start() → reject("business_error") → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
-   - `start() → reject("business_error") → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+   - `start() → reject("business_error") → inc()` → logs INVALID_STATE (Meter already stopped), currentIteration unchanged (0)
+   - `start() → reject("business_error") → incBy(5)` → logs INVALID_STATE, currentIteration unchanged (0)
+   - `start() → reject("business_error") → incTo(10)` → logs INVALID_STATE, currentIteration unchanged (0)
 
 3. **Progress after reject (Rejected state)**
-   - `start() → reject("business_error") → progress()` → logs INCONSISTENT_PROGRESS (Meter already stopped), no progress message
-   - `start() → inc() → reject("business_error") → progress()` → logs INCONSISTENT_PROGRESS, no further progress logged
+   - `start() → reject("business_error") → progress()` → logs INVALID_STATE (Meter already stopped), no progress message
+   - `start() → inc() → reject("business_error") → progress()` → logs INVALID_STATE, no further progress logged
 
 4. **Update context after reject (Rejected state)**
    - `start() → reject("business_error") → ctx("key1", "value1")` → logs ILLEGAL (Meter already stopped), context unchanged
@@ -900,13 +900,13 @@ By organizing tests in groups from foundational (Group 1) to complex scenarios (
    - `start() → fail("technical_error") → m(null)` → logs ILLEGAL, description unchanged
 
 2. **Increment operations after fail (Failed state)**
-   - `start() → fail("technical_error") → inc()` → logs INCONSISTENT_INCREMENT (Meter already stopped), currentIteration unchanged (0)
-   - `start() → fail("technical_error") → incBy(5)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
-   - `start() → fail("technical_error") → incTo(10)` → logs INCONSISTENT_INCREMENT, currentIteration unchanged (0)
+   - `start() → fail("technical_error") → inc()` → logs INVALID_STATE (Meter already stopped), currentIteration unchanged (0)
+   - `start() → fail("technical_error") → incBy(5)` → logs INVALID_STATE, currentIteration unchanged (0)
+   - `start() → fail("technical_error") → incTo(10)` → logs INVALID_STATE, currentIteration unchanged (0)
 
 3. **Progress after fail (Failed state)**
-   - `start() → fail("technical_error") → progress()` → logs INCONSISTENT_PROGRESS (Meter already stopped), no progress message
-   - `start() → inc() → fail("technical_error") → progress()` → logs INCONSISTENT_PROGRESS, no further progress logged
+   - `start() → fail("technical_error") → progress()` → logs INVALID_STATE (Meter already stopped), no progress message
+   - `start() → inc() → fail("technical_error") → progress()` → logs INVALID_STATE, no further progress logged
 
 4. **Update context after fail (Failed state)**
    - `start() → fail("technical_error") → ctx("key1", "value1")` → logs ILLEGAL (Meter already stopped), context unchanged

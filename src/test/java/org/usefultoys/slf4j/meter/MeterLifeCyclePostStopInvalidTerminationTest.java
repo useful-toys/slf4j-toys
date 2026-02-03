@@ -96,7 +96,7 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ok() after ok() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok() after ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -113,17 +113,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_OK (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_TRANSITION (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok(path) after ok() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok(path) after ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -140,17 +140,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_OK
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject reject() after ok() - logs INCONSISTENT_REJECT")
+    @DisplayName("should reject reject() after ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectRejectAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -167,17 +167,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_REJECT
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject fail() after ok() - logs INCONSISTENT_FAIL")
+    @DisplayName("should reject fail() after ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectFailAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -194,17 +194,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_FAIL
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok() after ok(path) - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok() after ok(path) - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("first_path")
@@ -221,17 +221,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_OK
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok(path) after ok(path) - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok(path) after ok(path) - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("first_path")
@@ -248,17 +248,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, "first_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_OK
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject reject() after ok(path) - logs INCONSISTENT_REJECT")
+    @DisplayName("should reject reject() after ok(path) - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectRejectAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("path")
@@ -275,17 +275,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_REJECT
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject fail() after ok(path) - logs INCONSISTENT_FAIL")
+    @DisplayName("should reject fail() after ok(path) - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectFailAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("path")
@@ -302,17 +302,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, "path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_FAIL
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok() after reject() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok() after reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -329,17 +329,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first reject + INCONSISTENT_OK
+        // Then: logs start + first reject + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok(path) after reject() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok(path) after reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -356,17 +356,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first reject + INCONSISTENT_OK
+        // Then: logs start + first reject + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject reject() after reject() - logs INCONSISTENT_REJECT")
+    @DisplayName("should reject reject() after reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectRejectAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -383,17 +383,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first reject + INCONSISTENT_REJECT
+        // Then: logs start + first reject + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject fail() after reject() - logs INCONSISTENT_FAIL")
+    @DisplayName("should reject fail() after reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectFailAfterReject() {
         // Given: a meter that has been stopped with reject("business_error")
@@ -410,17 +410,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first reject + INCONSISTENT_FAIL
+        // Then: logs start + first reject + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok() after fail() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok() after fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
@@ -437,17 +437,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first fail + INCONSISTENT_OK
+        // Then: logs start + first fail + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok(path) after fail() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok(path) after fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
@@ -464,17 +464,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first fail + INCONSISTENT_OK
+        // Then: logs start + first fail + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject reject() after fail() - logs INCONSISTENT_REJECT")
+    @DisplayName("should reject reject() after fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectRejectAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
@@ -491,17 +491,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first fail + INCONSISTENT_REJECT
+        // Then: logs start + first fail + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject fail() after fail() - logs INCONSISTENT_FAIL")
+    @DisplayName("should reject fail() after fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectFailAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
@@ -518,10 +518,10 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first fail + INCONSISTENT_FAIL
+        // Then: logs start + first fail + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
@@ -532,7 +532,7 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject ok() after path()->ok() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok() after path()->ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
@@ -550,17 +550,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_OK
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok(path) after path()->ok() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok(path) after path()->ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
@@ -578,17 +578,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_OK
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject reject() after path()->ok() - logs INCONSISTENT_REJECT")
+    @DisplayName("should reject reject() after path()->ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectRejectAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
@@ -606,17 +606,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_REJECT
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject fail() after path()->ok() - logs INCONSISTENT_FAIL")
+    @DisplayName("should reject fail() after path()->ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectFailAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
@@ -634,17 +634,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first ok + INCONSISTENT_FAIL
+        // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok() after path()->reject() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok() after path()->reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
@@ -662,17 +662,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first reject + INCONSISTENT_OK
+        // Then: logs start + first reject + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok(path) after path()->reject() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok(path) after path()->reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
@@ -690,17 +690,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first reject + INCONSISTENT_OK
+        // Then: logs start + first reject + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject reject() after path()->reject() - logs INCONSISTENT_REJECT")
+    @DisplayName("should reject reject() after path()->reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectRejectAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
@@ -718,17 +718,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first reject + INCONSISTENT_REJECT
+        // Then: logs start + first reject + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject fail() after path()->reject() - logs INCONSISTENT_FAIL")
+    @DisplayName("should reject fail() after path()->reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectFailAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
@@ -746,17 +746,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, "error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first reject + INCONSISTENT_FAIL
+        // Then: logs start + first reject + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok() after path()->fail() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok() after path()->fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
@@ -774,17 +774,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first fail + INCONSISTENT_OK
+        // Then: logs start + first fail + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject ok(path) after path()->fail() - logs INCONSISTENT_OK")
+    @DisplayName("should reject ok(path) after path()->fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectOkWithPathAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
@@ -802,17 +802,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first fail + INCONSISTENT_OK
+        // Then: logs start + first fail + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject reject() after path()->fail() - logs INCONSISTENT_REJECT")
+    @DisplayName("should reject reject() after path()->fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectRejectAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
@@ -830,17 +830,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first fail + INCONSISTENT_REJECT
+        // Then: logs start + first fail + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject fail() after path()->fail() - logs INCONSISTENT_FAIL")
+    @DisplayName("should reject fail() after path()->fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectFailAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
@@ -858,10 +858,10 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterState(meter, true, true, null, null, "error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + first fail + INCONSISTENT_FAIL
+        // Then: logs start + first fail + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
@@ -872,7 +872,7 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject start() after ok() - logs INCONSISTENT_START")
+    @DisplayName("should reject start() after ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectStartAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -889,17 +889,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertTrue(meter.getStartTime() > 0, "startTime should be > 0");
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
+        // Then: logs start + ok + INVALID_TRANSITION (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject start() after ok(path) - logs INCONSISTENT_START")
+    @DisplayName("should reject start() after ok(path) - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectStartAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("path")
@@ -917,17 +917,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertEquals("path", meter.getOkPath(), "okPath should be preserved");
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
+        // Then: logs start + ok + INVALID_TRANSITION (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject start() after reject() - logs INCONSISTENT_START")
+    @DisplayName("should reject start() after reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectStartAfterReject() {
         // Given: a meter that has been stopped with reject("error")
@@ -945,17 +945,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertEquals("error", meter.getRejectPath(), "rejectPath should be preserved");
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + INCONSISTENT_START (no second start events due to Guard Clause)
+        // Then: logs start + reject + INVALID_TRANSITION (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject start() after fail() - logs INCONSISTENT_START")
+    @DisplayName("should reject start() after fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectStartAfterFail() {
         // Given: a meter that has been stopped with fail("error")
@@ -973,17 +973,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertEquals("error", meter.getFailPath(), "failPath should be preserved");
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + INCONSISTENT_START (no second start events due to Guard Clause)
+        // Then: logs start + fail + INVALID_TRANSITION (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject start() after path()->ok() - logs INCONSISTENT_START")
+    @DisplayName("should reject start() after path()->ok() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectStartAfterPathAndOk() {
         // Given: a meter configured with path() and stopped with ok()
@@ -1002,17 +1002,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertEquals("configured", meter.getOkPath(), "okPath should be preserved");
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
+        // Then: logs start + ok + INVALID_TRANSITION (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject start() after path()->ok(path) - logs INCONSISTENT_START")
+    @DisplayName("should reject start() after path()->ok(path) - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectStartAfterPathAndOkWithPath() {
         // Given: a meter configured with path() and stopped with ok("path")
@@ -1031,17 +1031,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertEquals("path", meter.getOkPath(), "okPath should be preserved");
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + INCONSISTENT_START (no second start events due to Guard Clause)
+        // Then: logs start + ok + INVALID_TRANSITION (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject start() after path()->reject() - logs INCONSISTENT_START")
+    @DisplayName("should reject start() after path()->reject() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectStartAfterPathAndReject() {
         // Given: a meter configured with path() and stopped with reject()
@@ -1060,17 +1060,17 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertEquals("error", meter.getRejectPath(), "rejectPath should be preserved");
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + INCONSISTENT_START (no second start events due to Guard Clause)
+        // Then: logs start + reject + INVALID_TRANSITION (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject start() after path()->fail() - logs INCONSISTENT_START")
+    @DisplayName("should reject start() after path()->fail() - logs INVALID_TRANSITION")
     @ValidateCleanMeter
     void shouldRejectStartAfterPathAndFail() {
         // Given: a meter configured with path() and stopped with fail()
@@ -1089,10 +1089,10 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertEquals("error", meter.getFailPath(), "failPath should be preserved");
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + INCONSISTENT_START (no second start events due to Guard Clause)
+        // Then: logs start + fail + INVALID_TRANSITION (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_START, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);

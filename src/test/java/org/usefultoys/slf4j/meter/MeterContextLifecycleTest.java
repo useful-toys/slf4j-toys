@@ -322,8 +322,8 @@ class MeterContextLifecycleTest {
                 assertContext(meter);
 
                 // Then: expected log messages (3 events total)
-                // auto-correct emits ERROR INCONSISTENT_OK (startTime was 0)
-                AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_OK);
+                // auto-correct emits ERROR INVALID_TRANSITION (startTime was 0)
+                AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
                 // ok() emits: INFO message + TRACE JSON5 with context A
                 AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
                 AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "user", "eve", "action", "skip-start");
@@ -551,8 +551,8 @@ class MeterContextLifecycleTest {
                 assertContext(meter);
 
                 // Then: expected log messages (3 events total)
-                // auto-correct emits ERROR INCONSISTENT_REJECT (startTime was 0)
-                AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_REJECT);
+                // auto-correct emits ERROR INVALID_TRANSITION (startTime was 0)
+                AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
                 // reject() emits: INFO message + TRACE JSON5 with context A
                 AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
                 AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "user", "jack");
@@ -780,8 +780,8 @@ class MeterContextLifecycleTest {
                 assertContext(meter);
 
                 // Then: expected log messages (3 events total)
-                // auto-correct emits ERROR INCONSISTENT_FAIL (startTime was 0)
-                AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_FAIL);
+                // auto-correct emits ERROR INVALID_TRANSITION (startTime was 0)
+                AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION);
                 // fail() emits: ERROR message + TRACE JSON5 with context A
                 AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
                 AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "user", "oscar");

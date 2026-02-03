@@ -69,7 +69,7 @@ import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.eventWithTrowa
  * <b>close() Behavior:</b>
  * <ul>
  *   <li>If Started + Not Terminated → calls fail("try-with-resources")</li>
- *   <li>If Already Terminated → no-op (logs INCONSISTENT_CLOSE if called explicitly)</li>
+ *   <li>If Already Terminated → no-op (logs INVALID_TRANSITION if called explicitly)</li>
  *   <li>If Not Started → no-op</li>
  * </ul>
  * <p>
@@ -306,9 +306,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should reflect auto-correction (startTime = stopTime during close()) */
         assertMeterNotStartedStopTime(meter, tv); // Both startTime and stopTime set during close()
 
-        /* Then: logs INCONSISTENT_CLOSE + ERROR for implicit failure */
+        /* Then: logs INVALID_TRANSITION + ERROR for implicit failure */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_CLOSE, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedViaTryWithResourcesWithoutStartImplicitClose"),
                 event(Level.ERROR, Markers.MSG_FAIL, "try-with-resources"),
                 event(Level.TRACE, Markers.DATA_FAIL, "try-with-resources")
         );
@@ -339,9 +339,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkViaTryWithResourcesWithoutStartExplicitOk"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -372,9 +372,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithPathViaTryWithResourcesWithoutStartExplicitOkString"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -405,9 +405,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithEnumViaTryWithResourcesWithoutStartExplicitOkEnum"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -439,9 +439,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithThrowableViaTryWithResourcesWithoutStartExplicitOkThrowable"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithThrowableViaTryWithResourcesWithoutStartExplicitOkThrowable"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -473,9 +473,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_OK + INFO completion report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + INFO completion report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_OK, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithObjectViaTryWithResourcesWithoutStartExplicitOkObject"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToOkWithObjectViaTryWithResourcesWithoutStartExplicitOkObject"),
                 event(Level.INFO, Markers.MSG_OK),
                 event(Level.TRACE, Markers.DATA_OK)
         );
@@ -506,9 +506,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedViaTryWithResourcesWithoutStartExplicitRejectString"),
                 event(Level.INFO, Markers.MSG_REJECT, "business_error"),
                 event(Level.TRACE, Markers.DATA_REJECT, "business_error")
         );
@@ -539,9 +539,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedWithEnumViaTryWithResourcesWithoutStartExplicitRejectEnum"),
                 event(Level.INFO, Markers.MSG_REJECT, "VALUE2"),
                 event(Level.TRACE, Markers.DATA_REJECT, "VALUE2")
         );
@@ -573,9 +573,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedWithThrowableViaTryWithResourcesWithoutStartExplicitRejectThrowable"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedWithThrowableViaTryWithResourcesWithoutStartExplicitRejectThrowable"),
                 event(Level.INFO, Markers.MSG_REJECT, "IllegalArgumentException"),
                 event(Level.TRACE, Markers.DATA_REJECT, "IllegalArgumentException")
         );
@@ -607,9 +607,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_REJECT + INFO rejection report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + INFO rejection report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_REJECT, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedWithObjectViaTryWithResourcesWithoutStartExplicitRejectObject"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToRejectedWithObjectViaTryWithResourcesWithoutStartExplicitRejectObject"),
                 event(Level.INFO, Markers.MSG_REJECT, "testObjectString"),
                 event(Level.TRACE, Markers.DATA_REJECT, "testObjectString")
         );
@@ -640,9 +640,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedViaTryWithResourcesWithoutStartExplicitFailString"),
                 event(Level.ERROR, Markers.MSG_FAIL, "technical_error"),
                 event(Level.TRACE, Markers.DATA_FAIL, "technical_error")
         );
@@ -673,9 +673,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithEnumViaTryWithResourcesWithoutStartExplicitFailEnum"),
                 event(Level.ERROR, Markers.MSG_FAIL, "VALUE1"),
                 event(Level.TRACE, Markers.DATA_FAIL, "VALUE1")
         );
@@ -707,9 +707,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable"),
                 event(Level.ERROR, Markers.MSG_FAIL, "java.lang.Exception"),
                 event(Level.TRACE, Markers.DATA_FAIL, "java.lang.Exception")
         );
@@ -741,9 +741,9 @@ class MeterLifeCycleTryWithResourcesTest {
         /* Then: timestamps should be PRESERVED by close() (validation that close() is truly no-op) */
         assertMeterNotStartedStopTime(meter, tv);
 
-        /* Then: logs INCONSISTENT_FAIL + ERROR failure report, close() does nothing */
+        /* Then: logs INVALID_TRANSITION + ERROR failure report, close() does nothing */
         assertLogs(logger, level,
-                eventWithTrowable(Level.ERROR, Markers.INCONSISTENT_FAIL, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithObjectViaTryWithResourcesWithoutStartExplicitFailObject"),
+                eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithObjectViaTryWithResourcesWithoutStartExplicitFailObject"),
                 event(Level.ERROR, Markers.MSG_FAIL, "testObjectString"),
                 event(Level.TRACE, Markers.DATA_FAIL, "testObjectString")
         );

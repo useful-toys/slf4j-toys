@@ -28,8 +28,9 @@ import org.usefultoys.test.ValidateCleanMeter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.slf4j.impl.MockLoggerEvent.Level.ERROR;
 import static org.usefultoys.slf4j.meter.Markers.INVALID_ARGUMENT;
-import static org.usefultoys.slf4j.meter.Markers.INCONSISTENT_INCREMENT;
+import static org.usefultoys.slf4j.meter.Markers.INVALID_STATE;
 
 /**
  * Unit tests for {@link Meter} iteration attributes.
@@ -139,25 +140,25 @@ class MeterIterationAttributesTest {
         // When: setting negative iterations
         meter.iterations(-1);
         // Then: should log illegal argument error
-        AssertLogger.assertEvent(logger, 0, Level.ERROR, INVALID_ARGUMENT, "Meter.iterations", "Non-positive argument: expectedIterations", meter.getFullID());
+        AssertLogger.assertEvent(logger, 0, ERROR, INVALID_ARGUMENT, "Meter.iterations", "Non-positive argument: expectedIterations", meter.getFullID());
 
         meter.start();
         
         // When: incrementing by negative value
         meter.incBy(-1);
         // Then: should log illegal argument error
-        AssertLogger.assertEvent(logger, 3, Level.ERROR, INVALID_ARGUMENT, "Meter.incBy", "Non-positive argument: increment", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, ERROR, INVALID_ARGUMENT, "Meter.incBy", "Non-positive argument: increment", meter.getFullID());
 
         // When: incrementing to negative value
         meter.incTo(-1);
         // Then: should log illegal argument error
-        AssertLogger.assertEvent(logger, 4, Level.ERROR, INVALID_ARGUMENT, "Meter.incTo", "Non-positive argument: currentIteration", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, ERROR, INVALID_ARGUMENT, "Meter.incTo", "Non-positive argument: currentIteration", meter.getFullID());
 
         // When: incrementing to a value that does not move forward
         meter.incTo(10);
         meter.incTo(5);
         // Then: should log non-forward increment error
-        AssertLogger.assertEvent(logger, 5, Level.ERROR, INVALID_ARGUMENT, "Meter.incTo", "Non-forward argument: currentIteration", meter.getFullID());
+        AssertLogger.assertEvent(logger, 5, ERROR, INVALID_ARGUMENT, "Meter.incTo", "Non-forward argument: currentIteration", meter.getFullID());
 
 
         meter.ok();
@@ -172,7 +173,7 @@ class MeterIterationAttributesTest {
         // When: incBy(-1) is called (both precondition and argument are invalid)
         meter.incBy(-1);
         // Then: should log "Meter not started" (precondition), NOT "Non-positive increment" (argument)
-        AssertLogger.assertEvent(logger, 0, Level.ERROR, INCONSISTENT_INCREMENT, "Meter not started", "MeterIterationAttributesTest#");
+        AssertLogger.assertEvent(logger, 0, ERROR, INVALID_STATE, "Meter not started", "MeterIterationAttributesTest#");
     }
 
     @Test
@@ -184,6 +185,6 @@ class MeterIterationAttributesTest {
         // When: incTo(-1) is called (both precondition and argument are invalid)
         meter.incTo(-1);
         // Then: should log "Meter not started" (precondition), NOT "Non-positive argument" (argument)
-        AssertLogger.assertEvent(logger, 0, Level.ERROR, INCONSISTENT_INCREMENT, "Meter not started", "MeterIterationAttributesTest#");
+        AssertLogger.assertEvent(logger, 0, ERROR, INVALID_STATE, "Meter not started", "MeterIterationAttributesTest#");
     }
 }

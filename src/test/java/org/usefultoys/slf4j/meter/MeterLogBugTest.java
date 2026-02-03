@@ -94,7 +94,7 @@ class MeterLogBugTest {
             assertSame(result, meter, "should return the same meter instance");
             // - logUnexpectedException was called and exception was logged
             AssertLogger.assertEvent(logger, 0, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Meter.start", "Unexpected exception", meter.getFullID());
+                    "Meter.logUnexpectedException", "Unexpected exception", meter.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 0, RuntimeException.class, "Validation failed");
         }
     }
@@ -129,7 +129,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Meter.progress", "Unexpected exception", meter.getFullID());
+                    "Meter.logUnexpectedException", "Unexpected exception", meter.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Progress validation failed");
         }
     }
@@ -148,7 +148,7 @@ class MeterLogBugTest {
             try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
-                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_OK)))
+                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any()))
                         .thenThrow(new RuntimeException("Stop validation failed"));
                 mockedValidator.when(() -> MeterValidator.logUnexpectedException(any(), any()))
                         .thenCallRealMethod();
@@ -163,7 +163,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Meter.ok", "Unexpected exception", result.getFullID());
+                    "Meter.logUnexpectedException", "Unexpected exception", result.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Stop validation failed");
         }
 
@@ -179,7 +179,7 @@ class MeterLogBugTest {
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validatePathCallArgument(any(), any()))
                         .thenReturn(true);  // Allow first call (validatePathCallArgument before commonOk)
-                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_OK)))
+                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any()))
                         .thenThrow(new RuntimeException("Stop validation failed"));
                 mockedValidator.when(() -> MeterValidator.logUnexpectedException(any(), any()))
                         .thenCallRealMethod();
@@ -194,7 +194,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Meter.ok", "Unexpected exception", result.getFullID());
+                    "Meter.logUnexpectedException", "Unexpected exception", result.getFullID());
         }
     }
 
@@ -214,7 +214,7 @@ class MeterLogBugTest {
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validatePathCallArgument(any(), any()))
                         .thenReturn(true);
-                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_REJECT)))
+                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any()))
                         .thenThrow(new RuntimeException("Reject validation failed"));
                 mockedValidator.when(() -> MeterValidator.logUnexpectedException(any(), any()))
                         .thenCallRealMethod();
@@ -229,7 +229,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Meter.reject", "Unexpected exception", result.getFullID());
+                    "Meter.logUnexpectedException", "Unexpected exception", result.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Reject validation failed");
         }
     }
@@ -250,7 +250,7 @@ class MeterLogBugTest {
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validatePathCallArgument(any(), any()))
                         .thenReturn(true);
-                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_FAIL)))
+                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any()))
                         .thenThrow(new RuntimeException("Fail validation failed"));
                 mockedValidator.when(() -> MeterValidator.logUnexpectedException(any(), any()))
                         .thenCallRealMethod();
@@ -265,7 +265,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Meter.fail", "Unexpected exception", result.getFullID());
+                    "Meter.logUnexpectedException", "Unexpected exception", result.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Fail validation failed");
         }
 
@@ -281,7 +281,7 @@ class MeterLogBugTest {
                         .thenReturn(true);
                 mockedValidator.when(() -> MeterValidator.validatePathCallArgument(any(), any()))
                         .thenReturn(true);
-                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_FAIL)))
+                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any()))
                         .thenThrow(new RuntimeException("Fail validation failed"));
                 mockedValidator.when(() -> MeterValidator.logUnexpectedException(any(), any()))
                         .thenCallRealMethod();
@@ -297,7 +297,7 @@ class MeterLogBugTest {
             assertNotNull(result, "should return self");
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Meter.fail", "Unexpected exception", result.getFullID());
+                    "Meter.logUnexpectedException", "Unexpected exception", result.getFullID());
         }
     }
 
@@ -315,7 +315,7 @@ class MeterLogBugTest {
             try (final MockedStatic<MeterValidator> mockedValidator = Mockito.mockStatic(MeterValidator.class)) {
                 mockedValidator.when(() -> MeterValidator.validateStartPrecondition(any()))
                         .thenReturn(true);
-                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any(), eq(Markers.INCONSISTENT_CLOSE)))
+                mockedValidator.when(() -> MeterValidator.validateStopPrecondition(any()))
                         .thenThrow(new RuntimeException("Close validation failed"));
                 mockedValidator.when(() -> MeterValidator.logUnexpectedException(any(), any()))
                         .thenCallRealMethod();
@@ -328,7 +328,7 @@ class MeterLogBugTest {
             // Then:
             // - logUnexpectedException was called
             AssertLogger.assertEvent(logger, 2, Level.ERROR, Markers.UNEXPECTED_EXCEPTION,
-                    "Meter.close", "Unexpected exception", meter.getFullID());
+                    "Meter.logUnexpectedException", "Unexpected exception", meter.getFullID());
             AssertLogger.assertEventWithThrowable(logger, 2, RuntimeException.class, "Close validation failed");
         }
     }
