@@ -182,7 +182,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject inc() after fail() - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject inc() after fail() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
@@ -199,17 +199,17 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs fail (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.inc(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject incBy(5) after fail() - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject incBy(5) after fail() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncByAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
@@ -226,17 +226,17 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs fail (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject incTo(10) after fail() - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject incTo(10) after fail() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncToAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
@@ -253,10 +253,10 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs fail (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEventCount(logger, 5);
@@ -267,7 +267,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject progress() after fail() - logs INCONSISTENT_PROGRESS")
+    @DisplayName("should reject progress() after fail() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectProgressAfterFail() {
         // Given: a meter that has been stopped with fail("technical_error")
@@ -284,10 +284,10 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs fail (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no progress message
+        // Then: logs fail (from setup) + INVALID_STATE (from invalid operation), no progress message
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -295,7 +295,7 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
     }
 
     @Test
-    @DisplayName("should reject progress() after inc() and fail() - logs INCONSISTENT_PROGRESS")
+    @DisplayName("should reject progress() after inc() and fail() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectProgressAfterIncAndFail() {
         // Given: a meter with inc() that has been stopped with fail("technical_error")
@@ -314,10 +314,10 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterState(meter, true, true, null, null, "technical_error", null, 1, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs fail (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no further progress logged
+        // Then: logs fail (from setup) + INVALID_STATE (from invalid operation), no further progress logged
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);

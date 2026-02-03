@@ -143,7 +143,7 @@ A fluent API would require developers to track type changes across the operation
 Instead of compile-time enforcement of order:
 
 - **State tracking** (`isStarted()`, `isStopped()`, `isOK()`, etc.) provides runtime insight
-- **Logging** (via markers like `INCONSISTENT_START`, `INVALID_ARGUMENT`) alerts developers to out-of-order usage
+- **Logging** (via markers like `INVALID_TRANSITION`, `INVALID_ARGUMENT`) alerts developers to out-of-order usage
 - **Resilience** (four-tier strategy from [TDR-0029](TDR-0029-resilient-state-transitions-with-chained-api.md)) gracefully handles violations
 
 This approach is pragmatic: it allows the library to work with real-world code (which often has complex control flow) while still guiding developers toward correct usage.

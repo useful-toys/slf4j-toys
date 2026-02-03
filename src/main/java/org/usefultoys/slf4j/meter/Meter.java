@@ -336,7 +336,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter start() {
         try {
             /* Guard Clause: If precondition fails (e.g., meter already started),
-               return early without modifying state. The validator logs INCONSISTENT_START. */
+               return early without modifying state. The validator logs INVALID_TRANSITION. */
             if (!MeterValidator.validateStartPrecondition(this)) {
                 return this;
             }
@@ -594,7 +594,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter reject(final Object cause) {
         try {
                 MeterValidator.validatePathCallArgument(this, cause);
-            if (!MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_REJECT)) {
+            if (!MeterValidator.validateStopPrecondition(this)) {
                 return this;
             }
 
@@ -641,7 +641,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public Meter fail(final Object cause) {
         try {
                 MeterValidator.validatePathCallArgument(this, cause);
-            if (!MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_FAIL)) {
+            if (!MeterValidator.validateStopPrecondition(this)) {
                 return this;
             }
 
@@ -682,6 +682,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      *
      * @throws Throwable if an error occurs during finalization.
      */
+    @SuppressWarnings("removal")
     @Override
     protected void finalize() throws Throwable {
         MeterValidator.validateFinalize(this);
@@ -703,7 +704,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             if (stopTime != 0) {
                 return;
             }
-            MeterValidator.validateStopPrecondition(this, Markers.INCONSISTENT_CLOSE);
+            MeterValidator.validateStopPrecondition(this);
 
             stopTime = collectCurrentTime();
             /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */

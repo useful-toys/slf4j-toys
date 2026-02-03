@@ -266,7 +266,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject inc() after ok() - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject inc() after ok() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -284,17 +284,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.inc(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject incBy(5) after ok() - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject incBy(5) after ok() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncByAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -312,17 +312,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject incTo(10) after ok() - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject incTo(10) after ok() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncToAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -340,17 +340,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject inc() after ok(path) - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject inc() after ok(path) - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -368,17 +368,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.inc(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject incBy(5) after ok(path) - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject incBy(5) after ok(path) - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncByAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -396,17 +396,17 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEventCount(logger, 5);
     }
 
     @Test
-    @DisplayName("should reject incTo(10) after ok(path) - logs INCONSISTENT_INCREMENT")
+    @DisplayName("should reject incTo(10) after ok(path) - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectIncToAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -424,10 +424,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_INCREMENT (from invalid operation)
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_INCREMENT, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEventCount(logger, 5);
@@ -438,7 +438,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     // ============================================================================
 
     @Test
-    @DisplayName("should reject progress() after ok() - logs INCONSISTENT_PROGRESS")
+    @DisplayName("should reject progress() after ok() - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectProgressAfterOk() {
         // Given: a meter that has been stopped with ok()
@@ -455,10 +455,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no progress message
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation), no progress message
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -466,7 +466,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     }
 
     @Test
-    @DisplayName("should reject progress() after ok() with inc - logs INCONSISTENT_PROGRESS")
+    @DisplayName("should reject progress() after ok() with inc - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectProgressAfterOkWithInc() {
         // Given: a meter that has been stopped with ok() after inc()
@@ -485,10 +485,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 1, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no further progress logged
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation), no further progress logged
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -496,7 +496,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     }
 
     @Test
-    @DisplayName("should reject progress() after ok(path) - logs INCONSISTENT_PROGRESS")
+    @DisplayName("should reject progress() after ok(path) - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectProgressAfterOkWithPath() {
         // Given: a meter that has been stopped with ok("completion_path")
@@ -513,10 +513,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no progress message
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation), no progress message
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -524,7 +524,7 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     }
 
     @Test
-    @DisplayName("should reject progress() after ok(path) with inc - logs INCONSISTENT_PROGRESS")
+    @DisplayName("should reject progress() after ok(path) with inc - logs INVALID_STATE")
     @ValidateCleanMeter
     void shouldRejectProgressAfterOkWithPathAndInc() {
         // Given: a meter that has been stopped with ok("completion_path") after inc()
@@ -543,10 +543,10 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "completion_path", null, null, null, 1, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs ok (from setup) + INCONSISTENT_PROGRESS (from invalid operation), no further progress logged
+        // Then: logs ok (from setup) + INVALID_STATE (from invalid operation), no further progress logged
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INCONSISTENT_PROGRESS, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);

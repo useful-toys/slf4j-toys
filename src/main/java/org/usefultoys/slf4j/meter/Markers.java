@@ -49,6 +49,8 @@ public class Markers {
     /** Marker for human-readable messages when an operation reports progress. */
     public final Marker MSG_PROGRESS = MarkerFactory.getMarker("METER_MSG_PROGRESS");
     /** Marker for human-readable messages when an operation completes successfully. */
+    public final Marker MSG_SLOW_PROGRESS = MarkerFactory.getMarker("METER_MSG_SLOW_PROGRESS");
+    /** Marker for human-readable messages when an operation completes successfully. */
     public final Marker MSG_OK = MarkerFactory.getMarker("METER_MSG_OK");
     /** Marker for human-readable messages when a successful operation exceeds its time limit. */
     public final Marker MSG_SLOW_OK = MarkerFactory.getMarker("METER_MSG_SLOW_OK");
@@ -57,6 +59,8 @@ public class Markers {
     /** Marker for human-readable messages when an operation fails. */
     public final Marker MSG_FAIL = MarkerFactory.getMarker("METER_MSG_FAIL");
 
+    /** Marker for Meter API calls that are inconsistent with lifecycle state. */
+    public final Marker INVALID_EXCEPTION = MarkerFactory.getMarker("METER_INVALID_EXCEPTION");
     /** Marker for Meter API calls that are inconsistent with lifecycle state. */
     public final Marker INVALID_STATE = MarkerFactory.getMarker("METER_INVALID_STATE");
     /** Marker for Meter API calls that are invalid state transitions. */

@@ -231,10 +231,10 @@ class StatusConverterTest {
         }
 
         @Test
-        @DisplayName("should convert INCONSISTENT_START marker to INCONSISTENT")
+        @DisplayName("should convert INVALID_TRANSITION marker to INCONSISTENT")
         void testInconsistentStartMarker() {
-            // Given: logging event with INCONSISTENT_START marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_START);
+            // Given: logging event with INVALID_TRANSITION marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_TRANSITION);
             // When: convert is called
             final String result = converter.convert(mockEvent);
             // Then: should return INCONSISTENT status
@@ -242,10 +242,10 @@ class StatusConverterTest {
         }
 
         @Test
-        @DisplayName("should convert INCONSISTENT_INCREMENT marker to INCONSISTENT")
+        @DisplayName("should convert INVALID_STATE marker to INCONSISTENT")
         void testInconsistentIncrementMarker() {
-            // Given: logging event with INCONSISTENT_INCREMENT marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_INCREMENT);
+            // Given: logging event with INVALID_STATE marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_STATE);
             // When: convert is called
             final String result = converter.convert(mockEvent);
             // Then: should return INCONSISTENT status
@@ -253,10 +253,10 @@ class StatusConverterTest {
         }
 
         @Test
-        @DisplayName("should convert INCONSISTENT_PROGRESS marker to INCONSISTENT")
+        @DisplayName("should convert INVALID_STATE marker to INCONSISTENT")
         void testInconsistentProgressMarker() {
-            // Given: logging event with INCONSISTENT_PROGRESS marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_PROGRESS);
+            // Given: logging event with INVALID_STATE marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_STATE);
             // When: convert is called
             final String result = converter.convert(mockEvent);
             // Then: should return INCONSISTENT status
@@ -275,10 +275,10 @@ class StatusConverterTest {
         }
 
         @Test
-        @DisplayName("should convert INCONSISTENT_REJECT marker to INCONSISTENT")
+        @DisplayName("should convert INVALID_TRANSITION marker to INCONSISTENT")
         void testInconsistentRejectMarker() {
-            // Given: logging event with INCONSISTENT_REJECT marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_REJECT);
+            // Given: logging event with INVALID_TRANSITION marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_TRANSITION);
             // When: convert is called
             final String result = converter.convert(mockEvent);
             // Then: should return INCONSISTENT status
@@ -286,10 +286,10 @@ class StatusConverterTest {
         }
 
         @Test
-        @DisplayName("should convert INCONSISTENT_OK marker to INCONSISTENT")
+        @DisplayName("should convert INVALID_TRANSITION marker to INCONSISTENT")
         void testInconsistentOkMarker() {
-            // Given: logging event with INCONSISTENT_OK marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_OK);
+            // Given: logging event with INVALID_TRANSITION marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_TRANSITION);
             // When: convert is called
             final String result = converter.convert(mockEvent);
             // Then: should return INCONSISTENT status
@@ -297,10 +297,10 @@ class StatusConverterTest {
         }
 
         @Test
-        @DisplayName("should convert INCONSISTENT_FAIL marker to INCONSISTENT")
+        @DisplayName("should convert INVALID_TRANSITION marker to INCONSISTENT")
         void testInconsistentFailMarker() {
-            // Given: logging event with INCONSISTENT_FAIL marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_FAIL);
+            // Given: logging event with INVALID_TRANSITION marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_TRANSITION);
             // When: convert is called
             final String result = converter.convert(mockEvent);
             // Then: should return INCONSISTENT status
