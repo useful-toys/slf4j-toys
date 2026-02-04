@@ -104,8 +104,8 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK (with path)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -127,12 +127,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "success_path", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK (with path)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "success_path");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "success_path");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -150,12 +150,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "VALUE1", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK (with enum path)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "VALUE1");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "VALUE1");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -174,12 +174,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "RuntimeException", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK (with throwable path)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "RuntimeException");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "RuntimeException");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -198,12 +198,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "testObjectString", null, null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK (with object path)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "testObjectString");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "testObjectString");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -225,12 +225,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT (with reject cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "business_error");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -248,12 +248,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "VALUE2", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT (with enum cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "VALUE2");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "VALUE2");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -272,12 +272,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "IllegalArgumentException", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT (with throwable cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "IllegalArgumentException");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "IllegalArgumentException");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -296,12 +296,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "testObjectString", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT (with object cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "testObjectString");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "testObjectString");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -323,12 +323,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL (with fail cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -346,12 +346,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "VALUE1", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL (with enum cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "VALUE1");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "VALUE1");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -370,12 +370,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "java.lang.Exception", "connection timeout", 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL (with throwable cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "java.lang.Exception");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "java.lang.Exception");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -394,12 +394,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "testObjectString", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL (with object cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "testObjectString");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "testObjectString");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -426,7 +426,7 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK (with attributes)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -453,12 +453,12 @@ class MeterLifeCyclePreStartTerminationTest {
         assertEquals("validation check", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT (with attributes)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT (with reject cause and attributes)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "validation_error");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "validation_error");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, "validation check");
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -481,12 +481,12 @@ class MeterLifeCyclePreStartTerminationTest {
         assertEquals("database operation", meter.getDescription());
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL (with attributes)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL (with fail cause and attributes)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "connection_error");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "connection_error");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, "database operation");
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -512,7 +512,7 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INVALID_TRANSITION + MSG_OK + DATA_OK (with context)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -538,12 +538,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "validation_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT (with context)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_REJECT + DATA_REJECT (with reject cause and context)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "validation_error");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "validation_error");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, "user", "bob");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, "action", "export");
         AssertLogger.assertEventCount(logger, 3);
@@ -565,12 +565,12 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "permission_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL (with context)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        // Then: logs INVALID_TRANSITION + MSG_FAIL + DATA_FAIL (with fail cause and context)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "permission_error");
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "permission_error");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, "user", "charlie");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, "action", "delete");
         AssertLogger.assertEventCount(logger, 3);
@@ -596,10 +596,10 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
         // Then: logs INVALID_ARGUMENT (path before start) + INVALID_TRANSITION + MSG_OK + DATA_OK
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.path", "Meter not yet started, must call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
@@ -622,15 +622,15 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_ARGUMENT (path before start) + INVALID_TRANSITION + MSG_REJECT + DATA_REJECT
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
+        // Then: logs INVALID_ARGUMENT (path before start) + INVALID_TRANSITION + MSG_REJECT + DATA_REJECT (with reject cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.path", "Meter not yet started, must call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.reject(");
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "business_error");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -649,15 +649,15 @@ class MeterLifeCyclePreStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         MeterLifeCycleTestHelper.assertMeterNotStartedStopTime(meter, tr);
 
-        // Then: logs INVALID_ARGUMENT (path before start) + INVALID_TRANSITION + MSG_FAIL + DATA_FAIL
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but not started", meter.getFullID());
+        // Then: logs INVALID_ARGUMENT (path before start) + INVALID_TRANSITION + MSG_FAIL + DATA_FAIL (with fail cause)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.path", "Meter not yet started, must call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.path(");
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter stopped but not started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 1, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 1, CallerStackTraceThrowable.class, "Meter.fail(");
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
         AssertLogger.assertEventCount(logger, 4);
     }
 }
