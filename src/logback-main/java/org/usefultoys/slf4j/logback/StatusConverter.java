@@ -53,12 +53,8 @@ public class StatusConverter extends ClassicConverter {
         STATUS_MAP.put(Markers.UNEXPECTED_EXCEPTION, "UNEXPECTED_EXCEPTION");
         STATUS_MAP.put(Markers.INVALID_TRANSITION, "INCONSISTENT");
         STATUS_MAP.put(Markers.INVALID_STATE, "INCONSISTENT");
-        STATUS_MAP.put(Markers.INVALID_STATE, "INCONSISTENT");
-        STATUS_MAP.put(Markers.INCONSISTENT_EXCEPTION, "INCONSISTENT");
-        STATUS_MAP.put(Markers.INVALID_TRANSITION, "INCONSISTENT");
-        STATUS_MAP.put(Markers.INVALID_TRANSITION, "INCONSISTENT");
-        STATUS_MAP.put(Markers.INVALID_TRANSITION, "INCONSISTENT");
-        STATUS_MAP.put(Markers.INCONSISTENT_FINALIZED, "INCONSISTENT");
+        STATUS_MAP.put(Markers.INVALID_EXCEPTION, "INCONSISTENT");
+        STATUS_MAP.put(Markers.INVALID_ARGUMENT, "INVALID_ARGUMENT");
         STATUS_MAP.put(org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER, "WATCHER");
         STATUS_MAP.put(org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER, "");
     }
