@@ -1,6 +1,6 @@
 ---
 name: run-test
-description: 'Skill to run Maven tests in the slf4j-toys project.'
+description: 'Instructions to run tests in the slf4j-toys project.'
 ---
 
 # Test Execution Strategy
@@ -11,11 +11,13 @@ description: 'Skill to run Maven tests in the slf4j-toys project.'
  - Avoid using `clean` goal.
  - Remember that running tests requires Java 21.
 
-**Two-tier testing strategy**: IDE-friendly default build + Maven-only Logback testing.
-
 ## Default Build - Core Tests (~1441 tests)
 
-**IDE Support**: ✅ Full support (run, debug, coverage)
+* Tests core functionality (Meter, Watcher, Reporter), excluding Logback integration tests
+* Suporrts IDEs (run, debug, coverage)
+* Includes core library features with MockLogger  
+* Excludes Logback integration tests (`**/logback/**/*Test.java`)  
+* Dependencies: `slf4j-test-mock` (MockLogger)
 
 ```powershell
 # Run all core tests (Meter, Watcher, Reporter)
@@ -28,13 +30,14 @@ description: 'Skill to run Maven tests in the slf4j-toys project.'
 .\mvnw test '-Dtest=MeterLifeCycleTest#shouldCreateMeterWithLoggerInitialState'
 ```
 
-**What's tested**: Core library features with MockLogger  
-**What's excluded**: Logback integration tests (`**/logback/**/*Test.java`)  
-**Dependencies**: `slf4j-test-mock` (MockLogger)
-
 ## With-Logback Profile - Logback Tests (+84 tests)
 
-**IDE Support**: ❌ Maven-only (IDE cannot run these tests)
+* Not susupported by IDEs (run, debug, coverage)
+* Tests all features including Logback integration
+* Requires Maven profile `with-logback` to activate Logback source dirs and tests
+* Includes all tests 
+* Dependencies: `logback-classic` (real Logback Logger) and `slf4j-test-mock` (MockLogger)
+* Adds source main and test directores `src/logback-main/java`, `src/logback-test/java`
 
 ```powershell
 # Run ALL tests (core + logback)
@@ -46,16 +49,3 @@ description: 'Skill to run Maven tests in the slf4j-toys project.'
 # Run specific logback test method (requires quotes for # character)
 .\mvnw test -P slf4j-2.0,with-logback '-Dtest=MessageHighlightConverterTest#testMsgStartMarker'
 ```
-
-**What's tested**: Logback converters and integration features  
-**What's included**: Only `**/logback/**/*Test.java` tests  
-**Dependencies**: `logback-classic` (real Logback Logger)  
-**Source dirs added**: `src/logback-main/java`, `src/logback-test/java`
-
-## Important Notes
-
-- **Classpath isolation**: Each execution excludes the conflicting SLF4J binding to prevent ClassCastException
-- **Profile required for Logback**: Must use `-P slf4j-2.0,with-logback` to activate Logback source directories and tests
-- **Quote special characters**: Use single quotes for `-Dtest` parameters containing `#`
-
-**See**: [TDR-0031](../../../doc/TDR-0031-ide-friendly-build-with-optional-logback-testing.md) for complete rationale.
