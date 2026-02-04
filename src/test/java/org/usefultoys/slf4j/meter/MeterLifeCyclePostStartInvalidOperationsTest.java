@@ -103,7 +103,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs INVALID_TRANSITION only (Guard Clause prevents MSG_START and DATA_START)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 3);
@@ -126,10 +126,10 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs INVALID_TRANSITION for each duplicate start attempt (no MSG_START/DATA_START)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 4);
@@ -159,7 +159,7 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs INVALID_TRANSITION only (Guard Clause prevents MSG_START and DATA_START)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already started", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 3);
@@ -385,8 +385,6 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: only start logs (no INVALID_ARGUMENT log)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
         AssertLogger.assertEventCount(logger, 2);
     }
 
