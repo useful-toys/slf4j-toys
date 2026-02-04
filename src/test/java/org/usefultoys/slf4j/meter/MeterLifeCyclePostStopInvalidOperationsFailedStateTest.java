@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2025 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -111,9 +111,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.m", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
@@ -139,9 +139,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.m", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
@@ -167,9 +167,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.m", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.m(");
         AssertLogger.assertEventCount(logger, 5);
@@ -200,9 +200,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.inc", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.inc(");
         AssertLogger.assertEventCount(logger, 5);
@@ -227,9 +227,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.incBy", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEventCount(logger, 5);
@@ -254,9 +254,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter inc but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.incTo", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.incTo(");
         AssertLogger.assertEventCount(logger, 5);
@@ -285,9 +285,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation), no progress message
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.progress", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -315,9 +315,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation), no further progress logged
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter progress but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "1", "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "1", "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.progress", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.progress(");
         AssertLogger.assertNoEvent(logger, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
@@ -348,9 +348,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -379,9 +379,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "key", "val", "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "key", "val", "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -411,9 +411,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -439,9 +439,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -467,9 +467,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -495,9 +495,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -523,9 +523,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -555,9 +555,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -583,9 +583,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -611,9 +611,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -639,9 +639,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -667,9 +667,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -695,9 +695,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -727,9 +727,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -755,9 +755,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -783,9 +783,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -815,9 +815,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -843,9 +843,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -875,8 +875,8 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: only fail logs (no INVALID_ARGUMENT because putContext was never called)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -901,9 +901,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -932,9 +932,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -959,9 +959,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -989,8 +989,8 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: only fail logs (no INVALID_ARGUMENT)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1014,9 +1014,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1042,9 +1042,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1069,9 +1069,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1096,9 +1096,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1127,9 +1127,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1154,9 +1154,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1181,9 +1181,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1209,9 +1209,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1237,9 +1237,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs fail (from setup) + INVALID_STATE (from invalid operation)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter putContext but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.ctx", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "MeterContext.ctx(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1266,7 +1266,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.path", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1289,7 +1291,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged
         assertMeterState(meter, true, true, null, null, "original_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter path but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "original_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "original_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.path", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1312,6 +1316,8 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
         AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter.path", "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.path(");
@@ -1339,7 +1345,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.limitMilliseconds", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1363,7 +1371,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged (timeLimit remains 100)
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 100);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.limitMilliseconds", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1386,7 +1396,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.limitMilliseconds", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1409,7 +1421,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter limitMilliseconds but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.limitMilliseconds", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.limitMilliseconds(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1436,7 +1450,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.iterations", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1460,7 +1476,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged (expectedIterations remains 50)
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 50, 0);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.iterations", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1483,7 +1501,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.iterations", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1506,7 +1526,9 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: logs INVALID_ARGUMENT, meter state unchanged
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter iterations but already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.iterations", "Meter already stopped", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.iterations(");
         AssertLogger.assertEventCount(logger, 5);

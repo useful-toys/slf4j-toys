@@ -385,6 +385,8 @@ class MeterLifeCyclePostStartInvalidOperationsTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: only start logs (no INVALID_ARGUMENT log)
+        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
+        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
         AssertLogger.assertEventCount(logger, 2);
     }
 
