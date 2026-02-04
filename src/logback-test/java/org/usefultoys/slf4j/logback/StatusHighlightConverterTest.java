@@ -3,7 +3,6 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -22,13 +21,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Marker;
 import org.usefultoys.slf4j.meter.Markers;
 import org.usefultoys.test.ValidateCharset;
 
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Named.named;
 import static org.mockito.Mockito.when;
 
 /**
@@ -37,14 +42,23 @@ import static org.mockito.Mockito.when;
  * Tests validate that StatusHighlightConverter correctly maps log markers and log levels
  * to appropriate foreground color codes for terminal output highlighting.
  * <p>
+ * Uses parameterized tests to efficiently verify all marker-to-color mappings.
+ * <p>
  * <b>Coverage:</b>
  * <ul>
- *   <li><b>Message Markers:</b> Tests color mapping for message-related markers</li>
- *   <li><b>Data Markers:</b> Verifies color mapping for data markers (LESS_VISIBILITY)</li>
- *   <li><b>Inconsistency Markers:</b> Tests color mapping for inconsistency-related markers</li>
- *   <li><b>Watcher Marker:</b> Covers color mapping for watcher-specific markers</li>
- *   <li><b>Default Behavior:</b> Ensures fallback color mapping for unmapped cases</li>
+ *   <li><b>START_VISIBILITY (2):</b> MSG_START, MSG_PROGRESS</li>
+ *   <li><b>WARN_VISIBILITY (2):</b> MSG_SLOW_PROGRESS, MSG_SLOW_OK</li>
+ *   <li><b>SUCCESS_VISIBILITY (1):</b> MSG_OK</li>
+ *   <li><b>REJECT_VISIBILITY (1):</b> MSG_REJECT</li>
+ *   <li><b>ERROR_VISIBILITY (1):</b> MSG_FAIL</li>
+ *   <li><b>LESS_VISIBILITY (8):</b> All DATA_* markers (7) + DATA_WATCHER</li>
+ *   <li><b>INCONSISTENCY_VISIBILITY (5):</b> UNEXPECTED_EXCEPTION, INVALID_TRANSITION, INVALID_STATE, INVALID_EXCEPTION, INVALID_ARGUMENT</li>
+ *   <li><b>WATCHER_VISIBILITY (1):</b> MSG_WATCHER</li>
+ *   <li><b>Level-based fallback:</b> ERROR, WARN, INFO, DEBUG, TRACE, default</li>
  * </ul>
+ *
+ * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  */
 @DisplayName("StatusHighlightConverter")
 @ValidateCharset
@@ -63,279 +77,47 @@ class StatusHighlightConverterTest {
         converter = new StatusHighlightConverter();
     }
 
-    @Nested
-    @DisplayName("Message markers")
-    class MessageMarkersTest {
-
-        @Test
-        @DisplayName("should return START_VISIBILITY for MSG_START marker")
-        void testMsgStartMarker() {
-            // Given: logging event with MSG_START marker
-            when(mockEvent.getMarker()).thenReturn(Markers.MSG_START);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return START_VISIBILITY code
-            assertEquals(StatusHighlightConverter.START_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return START_VISIBILITY for MSG_PROGRESS marker")
-        void testMsgProgressMarker() {
-            // Given: logging event with MSG_PROGRESS marker
-            when(mockEvent.getMarker()).thenReturn(Markers.MSG_PROGRESS);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return START_VISIBILITY code
-            assertEquals(StatusHighlightConverter.START_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return SUCCESS_VISIBILITY for MSG_OK marker")
-        void testMsgOkMarker() {
-            // Given: logging event with MSG_OK marker
-            when(mockEvent.getMarker()).thenReturn(Markers.MSG_OK);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return SUCCESS_VISIBILITY code
-            assertEquals(StatusHighlightConverter.SUCCESS_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return WARN_VISIBILITY for MSG_SLOW_OK marker")
-        void testMsgSlowOkMarker() {
-            // Given: logging event with MSG_SLOW_OK marker
-            when(mockEvent.getMarker()).thenReturn(Markers.MSG_SLOW_OK);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return WARN_VISIBILITY code
-            assertEquals(StatusHighlightConverter.WARN_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return REJECT_VISIBILITY for MSG_REJECT marker")
-        void testMsgRejectMarker() {
-            // Given: logging event with MSG_REJECT marker
-            when(mockEvent.getMarker()).thenReturn(Markers.MSG_REJECT);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return REJECT_VISIBILITY code
-            assertEquals(StatusHighlightConverter.REJECT_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return ERROR_VISIBILITY for MSG_FAIL marker")
-        void testMsgFailMarker() {
-            // Given: logging event with MSG_FAIL marker
-            when(mockEvent.getMarker()).thenReturn(Markers.MSG_FAIL);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return ERROR_VISIBILITY code
-            assertEquals(StatusHighlightConverter.ERROR_VISIBILITY, result);
-        }
+    @ParameterizedTest(name = "should return {1} for {0} marker")
+    @MethodSource("markerToColorMappings")
+    @DisplayName("Marker to color conversions")
+    void testMarkerToColorConversions(final Marker marker, final String expectedColor) {
+        // Given: logging event with marker
+        when(mockEvent.getMarker()).thenReturn(marker);
+        // When: getForegroundColorCode is called
+        final String result = converter.getForegroundColorCode(mockEvent);
+        // Then: should return expected color
+        assertEquals(expectedColor, result);
     }
 
-    @Nested
-    @DisplayName("Data markers (LESS_VISIBILITY)")
-    class DataMarkersTest {
-
-        @Test
-        @DisplayName("should return LESS_VISIBILITY for DATA_START marker")
-        void testDataStartMarker() {
-            // Given: logging event with DATA_START marker
-            when(mockEvent.getMarker()).thenReturn(Markers.DATA_START);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return LESS_VISIBILITY code
-            assertEquals(StatusHighlightConverter.LESS_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return LESS_VISIBILITY for DATA_PROGRESS marker")
-        void testDataProgressMarker() {
-            // Given: logging event with DATA_PROGRESS marker
-            when(mockEvent.getMarker()).thenReturn(Markers.DATA_PROGRESS);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return LESS_VISIBILITY code
-            assertEquals(StatusHighlightConverter.LESS_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return LESS_VISIBILITY for DATA_OK marker")
-        void testDataOkMarker() {
-            // Given: logging event with DATA_OK marker
-            when(mockEvent.getMarker()).thenReturn(Markers.DATA_OK);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return LESS_VISIBILITY code
-            assertEquals(StatusHighlightConverter.LESS_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return LESS_VISIBILITY for DATA_SLOW_OK marker")
-        void testDataSlowOkMarker() {
-            // Given: logging event with DATA_SLOW_OK marker
-            when(mockEvent.getMarker()).thenReturn(Markers.DATA_SLOW_OK);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return LESS_VISIBILITY code
-            assertEquals(StatusHighlightConverter.LESS_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return LESS_VISIBILITY for DATA_REJECT marker")
-        void testDataRejectMarker() {
-            // Given: logging event with DATA_REJECT marker
-            when(mockEvent.getMarker()).thenReturn(Markers.DATA_REJECT);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return LESS_VISIBILITY code
-            assertEquals(StatusHighlightConverter.LESS_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return LESS_VISIBILITY for DATA_FAIL marker")
-        void testDataFailMarker() {
-            // Given: logging event with DATA_FAIL marker
-            when(mockEvent.getMarker()).thenReturn(Markers.DATA_FAIL);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return LESS_VISIBILITY code
-            assertEquals(StatusHighlightConverter.LESS_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return LESS_VISIBILITY for DATA_WATCHER marker")
-        void testWatcherDataMarker() {
-            // Given: logging event with DATA_WATCHER marker
-            when(mockEvent.getMarker()).thenReturn(org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return LESS_VISIBILITY code
-            assertEquals(StatusHighlightConverter.LESS_VISIBILITY, result);
-        }
+    static Stream<Arguments> markerToColorMappings() {
+        return Stream.of(
+                // Message lifecycle markers
+                Arguments.of(named("MSG_START", Markers.MSG_START), StatusHighlightConverter.START_VISIBILITY),
+                Arguments.of(named("MSG_PROGRESS", Markers.MSG_PROGRESS), StatusHighlightConverter.START_VISIBILITY),
+                Arguments.of(named("MSG_SLOW_PROGRESS", Markers.MSG_SLOW_PROGRESS), StatusHighlightConverter.WARN_VISIBILITY),
+                Arguments.of(named("MSG_OK", Markers.MSG_OK), StatusHighlightConverter.SUCCESS_VISIBILITY),
+                Arguments.of(named("MSG_SLOW_OK", Markers.MSG_SLOW_OK), StatusHighlightConverter.WARN_VISIBILITY),
+                Arguments.of(named("MSG_REJECT", Markers.MSG_REJECT), StatusHighlightConverter.REJECT_VISIBILITY),
+                Arguments.of(named("MSG_FAIL", Markers.MSG_FAIL), StatusHighlightConverter.ERROR_VISIBILITY),
+                // Data markers
+                Arguments.of(named("DATA_START", Markers.DATA_START), StatusHighlightConverter.LESS_VISIBILITY),
+                Arguments.of(named("DATA_PROGRESS", Markers.DATA_PROGRESS), StatusHighlightConverter.LESS_VISIBILITY),
+                Arguments.of(named("DATA_SLOW_PROGRESS", Markers.DATA_SLOW_PROGRESS), StatusHighlightConverter.LESS_VISIBILITY),
+                Arguments.of(named("DATA_OK", Markers.DATA_OK), StatusHighlightConverter.LESS_VISIBILITY),
+                Arguments.of(named("DATA_SLOW_OK", Markers.DATA_SLOW_OK), StatusHighlightConverter.LESS_VISIBILITY),
+                Arguments.of(named("DATA_REJECT", Markers.DATA_REJECT), StatusHighlightConverter.LESS_VISIBILITY),
+                Arguments.of(named("DATA_FAIL", Markers.DATA_FAIL), StatusHighlightConverter.LESS_VISIBILITY),
+                // Inconsistency/error markers
+                Arguments.of(named("UNEXPECTED_EXCEPTION", Markers.UNEXPECTED_EXCEPTION), StatusHighlightConverter.INCONSISTENCY_VISIBILITY),
+                Arguments.of(named("INVALID_TRANSITION", Markers.INVALID_TRANSITION), StatusHighlightConverter.INCONSISTENCY_VISIBILITY),
+                Arguments.of(named("INVALID_STATE", Markers.INVALID_STATE), StatusHighlightConverter.INCONSISTENCY_VISIBILITY),
+                Arguments.of(named("INVALID_EXCEPTION", Markers.INVALID_EXCEPTION), StatusHighlightConverter.INCONSISTENCY_VISIBILITY),
+                Arguments.of(named("INVALID_ARGUMENT", Markers.INVALID_ARGUMENT), StatusHighlightConverter.INCONSISTENCY_VISIBILITY),
+                // Watcher markers
+                Arguments.of(named("MSG_WATCHER", org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER), StatusHighlightConverter.WATCHER_VISIBILITY),
+                Arguments.of(named("DATA_WATCHER", org.usefultoys.slf4j.watcher.Markers.DATA_WATCHER), StatusHighlightConverter.LESS_VISIBILITY)
+        );
     }
-
-    @Nested
-    @DisplayName("Inconsistency markers")
-    class InconsistencyMarkersTest {
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for UNEXPECTED_EXCEPTION marker")
-        void testUnexpectedExceptionMarker() {
-            // Given: logging event with UNEXPECTED_EXCEPTION marker
-            when(mockEvent.getMarker()).thenReturn(Markers.UNEXPECTED_EXCEPTION);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for INVALID_TRANSITION marker")
-        void testInconsistentStartMarker() {
-            // Given: logging event with INVALID_TRANSITION marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_TRANSITION);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for INVALID_STATE marker")
-        void testInconsistentIncrementMarker() {
-            // Given: logging event with INVALID_STATE marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_STATE);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for INVALID_STATE marker")
-        void testInconsistentProgressMarker() {
-            // Given: logging event with INVALID_STATE marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_STATE);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for INVALID_EXCEPTION marker")
-        void testInvalidExceptionMarker() {
-            // Given: logging event with INVALID_EXCEPTION marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_EXCEPTION);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for INVALID_TRANSITION marker")
-        void testInconsistentRejectMarker() {
-            // Given: logging event with INVALID_TRANSITION marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_TRANSITION);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for INVALID_TRANSITION marker")
-        void testInconsistentOkMarker() {
-            // Given: logging event with INVALID_TRANSITION marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_TRANSITION);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for INVALID_TRANSITION marker")
-        void testInconsistentFailMarker() {
-            // Given: logging event with INVALID_TRANSITION marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_TRANSITION);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-
-        @Test
-        @DisplayName("should return INCONSISTENCY_VISIBILITY for INVALID_STATE marker")
-        void testInvalidStateMarker() {
-            // Given: logging event with INVALID_STATE marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_STATE);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return INCONSISTENCY_VISIBILITY code
-            assertEquals(StatusHighlightConverter.INCONSISTENCY_VISIBILITY, result);
-        }
-    }
-
-    @Nested
-    @DisplayName("Watcher marker")
-    class WatcherMarkerTest {
-
-        @Test
-        @DisplayName("should return WATCHER_VISIBILITY for MSG_WATCHER marker")
-        void testWatcherMsgMarker() {
-            // Given: logging event with MSG_WATCHER marker
-            when(mockEvent.getMarker()).thenReturn(org.usefultoys.slf4j.watcher.Markers.MSG_WATCHER);
-            // When: getForegroundColorCode is called
-            final String result = converter.getForegroundColorCode(mockEvent);
-            // Then: should return WATCHER_VISIBILITY code
-            assertEquals(StatusHighlightConverter.WATCHER_VISIBILITY, result);
-        }
-    }
-
     @Nested
     @DisplayName("Level-based fallback (no matching marker)")
     class LevelBasedFallbackTest {

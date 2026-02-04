@@ -67,12 +67,14 @@ public class StatusHighlightConverter extends ForegroundCompositeConverterBase<I
     static {
         MARKER_MAP.put(Markers.MSG_START, START_VISIBILITY);
         MARKER_MAP.put(Markers.MSG_PROGRESS, START_VISIBILITY);
+        MARKER_MAP.put(Markers.MSG_SLOW_PROGRESS, WARN_VISIBILITY);
         MARKER_MAP.put(Markers.MSG_OK, SUCCESS_VISIBILITY);
         MARKER_MAP.put(Markers.MSG_SLOW_OK, WARN_VISIBILITY);
         MARKER_MAP.put(Markers.MSG_REJECT, REJECT_VISIBILITY);
         MARKER_MAP.put(Markers.MSG_FAIL, ERROR_VISIBILITY);
         MARKER_MAP.put(Markers.DATA_START, LESS_VISIBILITY);
         MARKER_MAP.put(Markers.DATA_PROGRESS, LESS_VISIBILITY);
+        MARKER_MAP.put(Markers.DATA_SLOW_PROGRESS, LESS_VISIBILITY);
         MARKER_MAP.put(Markers.DATA_OK, LESS_VISIBILITY);
         MARKER_MAP.put(Markers.DATA_SLOW_OK, LESS_VISIBILITY);
         MARKER_MAP.put(Markers.DATA_REJECT, LESS_VISIBILITY);
