@@ -264,10 +264,10 @@ class StatusConverterTest {
         }
 
         @Test
-        @DisplayName("should convert INCONSISTENT_EXCEPTION marker to INCONSISTENT")
-        void testInconsistentExceptionMarker() {
-            // Given: logging event with INCONSISTENT_EXCEPTION marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_EXCEPTION);
+        @DisplayName("should convert INVALID_EXCEPTION marker to INCONSISTENT")
+        void testInvalidExceptionMarker() {
+            // Given: logging event with INVALID_EXCEPTION marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_EXCEPTION);
             // When: convert is called
             final String result = converter.convert(mockEvent);
             // Then: should return INCONSISTENT status
@@ -308,10 +308,10 @@ class StatusConverterTest {
         }
 
         @Test
-        @DisplayName("should convert INCONSISTENT_FINALIZED marker to INCONSISTENT")
-        void testInconsistentFinalizedMarker() {
-            // Given: logging event with INCONSISTENT_FINALIZED marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_FINALIZED);
+        @DisplayName("should convert INVALID_STATE marker to INCONSISTENT")
+        void testInvalidStateMarker() {
+            // Given: logging event with INVALID_STATE marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_STATE);
             // When: convert is called
             final String result = converter.convert(mockEvent);
             // Then: should return INCONSISTENT status
