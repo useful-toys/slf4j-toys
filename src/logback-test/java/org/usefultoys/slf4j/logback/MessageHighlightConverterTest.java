@@ -262,10 +262,10 @@ class MessageHighlightConverterTest {
         }
 
         @Test
-        @DisplayName("should return ERROR_VISIBILITY for INCONSISTENT_EXCEPTION marker")
-        void testInconsistentExceptionMarker() {
-            // Given: logging event with INCONSISTENT_EXCEPTION marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_EXCEPTION);
+        @DisplayName("should return ERROR_VISIBILITY for INVALID_EXCEPTION marker")
+        void testInvalidExceptionMarker() {
+            // Given: logging event with INVALID_EXCEPTION marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_EXCEPTION);
             // When: getForegroundColorCode is called
             final String result = converter.getForegroundColorCode(mockEvent);
             // Then: should return ERROR_VISIBILITY code
@@ -306,10 +306,10 @@ class MessageHighlightConverterTest {
         }
 
         @Test
-        @DisplayName("should return ERROR_VISIBILITY for INCONSISTENT_FINALIZED marker")
-        void testInconsistentFinalizedMarker() {
-            // Given: logging event with INCONSISTENT_FINALIZED marker
-            when(mockEvent.getMarker()).thenReturn(Markers.INCONSISTENT_FINALIZED);
+        @DisplayName("should return ERROR_VISIBILITY for INVALID_STATE marker")
+        void testInvalidStateMarker() {
+            // Given: logging event with INVALID_STATE marker
+            when(mockEvent.getMarker()).thenReturn(Markers.INVALID_STATE);
             // When: getForegroundColorCode is called
             final String result = converter.getForegroundColorCode(mockEvent);
             // Then: should return ERROR_VISIBILITY code
