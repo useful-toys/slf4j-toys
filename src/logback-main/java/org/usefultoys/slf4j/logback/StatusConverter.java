@@ -40,12 +40,14 @@ public class StatusConverter extends ClassicConverter {
     static {
         STATUS_MAP.put(Markers.MSG_START, "START");
         STATUS_MAP.put(Markers.MSG_PROGRESS, "PROGR");
+        STATUS_MAP.put(Markers.MSG_SLOW_PROGRESS, "SLOW");
         STATUS_MAP.put(Markers.MSG_OK, "OK");
         STATUS_MAP.put(Markers.MSG_SLOW_OK, "SLOW");
         STATUS_MAP.put(Markers.MSG_REJECT, "REJECT");
         STATUS_MAP.put(Markers.MSG_FAIL, "FAIL");
         STATUS_MAP.put(Markers.DATA_START, "");
         STATUS_MAP.put(Markers.DATA_PROGRESS, "");
+        STATUS_MAP.put(Markers.DATA_SLOW_PROGRESS, "");
         STATUS_MAP.put(Markers.DATA_OK, "");
         STATUS_MAP.put(Markers.DATA_SLOW_OK, "");
         STATUS_MAP.put(Markers.DATA_REJECT, "");
