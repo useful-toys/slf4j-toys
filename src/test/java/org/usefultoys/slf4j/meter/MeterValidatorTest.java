@@ -103,7 +103,7 @@ public class MeterValidatorTest {
             // When: validateStartPrecondition is called
             // Then: should return false and log error event
             assertFalse(MeterValidator.validateStartPrecondition(meter), "should reject start when already started");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.validateStartPrecondition", "Meter already stopped, must call start() only once", "test-id");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.validateStartPrecondition", "Meter already started, must call start() only once", "test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
