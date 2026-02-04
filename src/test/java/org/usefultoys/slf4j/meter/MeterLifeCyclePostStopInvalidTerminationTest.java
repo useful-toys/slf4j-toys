@@ -116,7 +116,7 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // Then: logs ok (from setup) + INVALID_TRANSITION (from invalid operation)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -143,7 +143,7 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -170,7 +170,7 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.reject", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
@@ -197,7 +197,7 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // Then: logs start + first ok + INVALID_TRANSITION
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.fail", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
@@ -222,9 +222,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "first_path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "first_path");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -249,9 +249,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "first_path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "first_path");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -276,9 +276,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "path");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.reject", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
@@ -303,9 +303,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "path");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.fail", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
@@ -330,9 +330,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -357,9 +357,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -384,9 +384,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.reject", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
@@ -411,9 +411,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.fail", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
@@ -438,9 +438,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -465,9 +465,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -492,9 +492,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.reject", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
@@ -519,9 +519,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.fail", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
@@ -551,9 +551,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "configured");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "configured");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -579,9 +579,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "configured");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "configured");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -607,9 +607,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "configured");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "configured");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.reject", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
@@ -635,9 +635,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first ok + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "configured");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "configured");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.fail", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
@@ -663,9 +663,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -691,9 +691,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -719,9 +719,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.reject", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
@@ -747,9 +747,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first reject + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.fail", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
@@ -775,9 +775,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -803,9 +803,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.ok", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.ok(");
         AssertLogger.assertEventCount(logger, 5);
@@ -831,9 +831,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.reject", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.reject(");
         AssertLogger.assertEventCount(logger, 5);
@@ -859,9 +859,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + first fail + INVALID_TRANSITION
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.fail", "Meter already stopped, must call ok/reject/fail/success() only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEventCount(logger, 5);
@@ -892,7 +892,7 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         // Then: logs start + ok + INVALID_TRANSITION (no second start events due to Guard Clause)
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already stopped, must use instance only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
@@ -918,9 +918,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + INVALID_TRANSITION (no second start events due to Guard Clause)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "path");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already stopped, must use instance only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
@@ -946,9 +946,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + INVALID_TRANSITION (no second start events due to Guard Clause)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already stopped, must use instance only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
@@ -974,9 +974,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + INVALID_TRANSITION (no second start events due to Guard Clause)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already stopped, must use instance only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1003,9 +1003,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + INVALID_TRANSITION (no second start events due to Guard Clause)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "configured");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "configured");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already stopped, must use instance only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1032,9 +1032,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + INVALID_TRANSITION (no second start events due to Guard Clause)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "path");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already stopped, must use instance only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1061,9 +1061,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + reject + INVALID_TRANSITION (no second start events due to Guard Clause)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already stopped, must use instance only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
@@ -1090,9 +1090,9 @@ class MeterLifeCyclePostStopInvalidTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + fail + INVALID_TRANSITION (no second start events due to Guard Clause)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter already started", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "error");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, "Meter.start", "Meter already stopped, must use instance only once", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEventCount(logger, 5);
