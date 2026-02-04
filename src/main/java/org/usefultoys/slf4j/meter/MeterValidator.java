@@ -177,8 +177,12 @@ public class MeterValidator {
      * @return {@code true} if the precondition is met, {@code false} otherwise.
      */
     public boolean validateStartPrecondition(final Meter meter) {
+        if (meter.getStopTime() != 0) {
+            logInvalidTransition(meter, "Meter already stopped, must use instance only once");
+            return false;
+        }
         if (meter.getStartTime() != 0) {
-            logInvalidTransition(meter, "Meter already stopped, must call start() only once");
+            logInvalidTransition(meter, "Meter already started, must call start() only once");
             return false;
         }
         return true;

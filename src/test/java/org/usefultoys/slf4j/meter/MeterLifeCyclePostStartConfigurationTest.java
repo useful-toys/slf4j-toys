@@ -287,8 +287,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "1");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "1");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -313,8 +313,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "2");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "2");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -338,8 +338,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "5");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "5");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -364,8 +364,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "8");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "8");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -389,8 +389,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "10");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "10");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -415,8 +415,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "50");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "50");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -444,8 +444,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.incTo", "Non-forward argument: currentIteration", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incTo(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "100");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "100");
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -473,8 +473,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.incBy", "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incBy(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "5");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "5");
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -502,8 +502,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.incBy", "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incBy(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "5");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "5");
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -586,8 +586,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.incTo", "Non-forward argument: currentIteration", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incTo(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "10");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "10");
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -669,12 +669,12 @@ class MeterLifeCyclePostStartConfigurationTest {
         // Then: logs start + 2 INVALID_ARGUMENT + MSG_PROGRESS + DATA_PROGRESS
         AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.incBy", "Non-positive argument: increment", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.incBy", "Non-positive argument: increment", meter.getFullID());
-        AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.incBy(");
         AssertLogger.assertEvent(logger, 3, ERROR, INVALID_ARGUMENT, "Meter.incTo", "Non-positive argument: currentIteration", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 3, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 3, CallerStackTraceThrowable.class, "Meter.incTo(");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "2");
+        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "2");
         AssertLogger.assertEventCount(logger, 6);
     }
 
@@ -700,8 +700,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS + DATA_PROGRESS (second progress doesn't log because no iteration change)
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "1");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "1");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -750,10 +750,10 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + MSG_PROGRESS1 + DATA_PROGRESS + MSG_PROGRESS2 + DATA_PROGRESS
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS);
-        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "1");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "1");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.INFO, Markers.MSG_PROGRESS, "2");
+        AssertLogger.assertEvent(logger, 5, MockLoggerEvent.Level.TRACE, Markers.DATA_PROGRESS, "2");
         AssertLogger.assertEventCount(logger, 6);
     }
 
