@@ -6,10 +6,9 @@ applyTo: "*/**/meter/MeterLifeCycle*Test.java
 
 ## Core Principles
 
-1. **Validate actual behavior, not ideal behavior**
-2. **Use pedagogical validations** to make tests self-documenting
-3. **Separate concerns** with clear comment blocks (`// Given:`, `// When:`, `// Then:`)
-4. **Mandatory log validation** in all tests
+1. **Use pedagogical validations** to make tests self-documenting
+2. **Separate concerns** with clear comment blocks (`// Given:`, `// When:`, `// Then:`)
+3. **Mandatory log validation** in all tests
 
 ---
 

@@ -5,6 +5,32 @@ description: 'Instructions for running maven using PowerShell in the slf4j-toys 
 
 # PowerShell Usage Guidelines
 
+## Java Environment Setup
+
+Set up `JAVA_HOME` and update `PATH` for JDK 21 on each new PowerShell terminal session.
+
+**Prerequisites:**
+- JDK 21 must be installed in `$env:USERPROFILE\.jdks` directory
+
+**Setup:**
+Execute the following command once per terminal session:
+
+```powershell
+$jdk21 = Get-ChildItem -Path "$env:USERPROFILE\.jdks" -Filter "*21*" | Sort-Object -Property Name -Descending | Select-Object -First 1
+if ($null -ne $jdk21) {
+    $env:JAVA_HOME = $jdk21.FullName
+    $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+}
+```
+
+**Verification:**
+To verify the setup, execute:
+
+```powershell
+java -version
+$env:JAVA_HOME
+```
+
 ## Terminal Session Management
 
 **CRITICAL**: Always use the existing terminal session. Never create new terminal sessions or spawn new interpreter processes:
@@ -25,8 +51,6 @@ bash -c "mvnw test"                      # Attempts to launch bash
 Start-Job { .\mvnw test }                # Background job
 .\mvnw test &                            # Background operator (doesn't work as in Unix)
 ```
-
-**Rationale**: Creating sub-shells or background processes complicates environment management, loses output context, and creates unnecessary process overhead. All commands should execute synchronously in the current terminal session.
 
 ## Parameter Escaping
 
