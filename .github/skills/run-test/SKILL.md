@@ -5,6 +5,12 @@ description: 'Skill to run Maven tests in the slf4j-toys project.'
 
 # Test Execution Strategy
 
+## Guidelines
+
+ - Use maven wrapper.
+ - Avoid using `clean` goal.
+ - Remember that running tests requires Java 21.
+
 **Two-tier testing strategy**: IDE-friendly default build + Maven-only Logback testing.
 
 ## Default Build - Core Tests (~1441 tests)
@@ -48,7 +54,6 @@ description: 'Skill to run Maven tests in the slf4j-toys project.'
 
 ## Important Notes
 
-- **No `clean` needed**: Maven handles incremental compilation; avoid `clean` unless necessary
 - **Classpath isolation**: Each execution excludes the conflicting SLF4J binding to prevent ClassCastException
 - **Profile required for Logback**: Must use `-P slf4j-2.0,with-logback` to activate Logback source directories and tests
 - **Quote special characters**: Use single quotes for `-Dtest` parameters containing `#`

@@ -18,7 +18,6 @@ package org.usefultoys.slf4j.meter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
-import org.slf4j.impl.MockLoggerEvent.Level;
 import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -173,7 +172,7 @@ class MeterIterationAttributesTest {
         // When: incBy(-1) is called (both precondition and argument are invalid)
         meter.incBy(-1);
         // Then: should log "Meter not started" (precondition), NOT "Non-positive increment" (argument)
-        AssertLogger.assertEvent(logger, 0, ERROR, INVALID_STATE, "Meter not started", "MeterIterationAttributesTest#");
+        AssertLogger.assertEvent(logger, 0, ERROR, INVALID_STATE, "Meter not yet started", "MeterIterationAttributesTest#");
     }
 
     @Test
@@ -185,6 +184,6 @@ class MeterIterationAttributesTest {
         // When: incTo(-1) is called (both precondition and argument are invalid)
         meter.incTo(-1);
         // Then: should log "Meter not started" (precondition), NOT "Non-positive argument" (argument)
-        AssertLogger.assertEvent(logger, 0, ERROR, INVALID_STATE, "Meter not started", "MeterIterationAttributesTest#");
+        AssertLogger.assertEvent(logger, 0, ERROR, INVALID_STATE, "Meter not yet started", "MeterIterationAttributesTest#");
     }
 }

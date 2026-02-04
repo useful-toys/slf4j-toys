@@ -1,11 +1,12 @@
 ---
 name: java-env-setup
-description: Configures JAVA_HOME and PATH environment variables for Java 21 in PowerShell
+description: Configures JAVA_HOME and PATH environment variables for Java 21 in PowerShell for running Maven builds.
 ---
 
 # Java Environment Setup Skill
 
-This skill must be activated in each new PowerShell terminal session to configure Java JDK 21 as the active JDK. Maven builds require this configuration to compile and run the project.
+This skill must be activated in each new PowerShell terminal session to configure Java JDK 21 as the active JDK in order to run Maven build (compile and test).
+Maven builds require this configuration to compile and test the project.
 
 **Prerequisites:**
 - JDK 21 must be installed in `$env:USERPROFILE\.jdks` directory

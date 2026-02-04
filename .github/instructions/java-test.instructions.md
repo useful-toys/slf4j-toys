@@ -13,7 +13,7 @@ applyTo: '**/*Test.java'
 - Cover all meaningful combinations of parameters, even if redundant for coverage purposes
 - Prefer real-world scenarios when possible
 - Lombok-generated functionality (e.g., `@NonNull` validation, `@Getter`, `@ToString`) does not require explicit testing
-
+ADicione 
 ## Test Scenarios and Variations
 
 **Prefer parameterized tests** when testing multiple variations of the same scenario:
@@ -26,10 +26,10 @@ applyTo: '**/*Test.java'
     "2025-12-31, 2025, 12, 31",
     "2024-02-29, 2024, 2, 29"  // leap year
 })
-void shouldParseValidFormats(String input, int year, int month, int day) {
+void shouldParseValidFormats(final String input, final int year, final int month, final int day) {
     // Given: input date string
     // When: parsing the date
-    LocalDate result = DateParser.parse(input);
+    final LocalDate result = DateParser.parse(input);
     
     // Then: should match expected components
     assertEquals(year, result.getYear(), "should parse correct year");
@@ -107,7 +107,7 @@ class MeterTest {
 @DisplayName("should calculate duration when meter is stopped")
 void shouldCalculateDurationWhenMeterIsStopped() {
     // Given: a started meter
-    Meter meter = Meter.start("operation");
+    final Meter meter = Meter.start("operation");
     
     // When: stopping the meter
     meter.stop();
@@ -138,6 +138,43 @@ void shouldCalculateDurationWhenMeterIsStopped() {
   - Ensure proposals **do not introduce test-only code** in production (no test hooks, flags, or APIs)
   - Keep behavior and public APIs unchanged unless user explicitly requests changes
   - Examples of acceptable suggestions: dependency injection, small internal facades
+
+## Java Coding Standards
+
+### Import Organization
+
+Imports must be organized in this order:
+1. **Static imports** first: `AssertLogger.*`, `Assertions.*`, `Markers.*`, `Level.*`, `assertMeterState`
+2. **Regular imports** second: organized as java.* → javax.* → org.* → com.*
+3. Blank line separating static and regular imports
+
+### Formatting and Style
+
+- **Indentation**: 4 spaces (no tabs)
+- **Line length**: Maximum 120 characters per line
+- **Blank lines**: Single between test methods, double between `@Nested` groups
+- **Variable declaration**: All test variables must use `final` keyword
+- **Method visibility**: Package-private (no modifier) or `public`
+
+### Naming Conventions
+
+- **Test variables**: Descriptive, specific names (not single-letter abbreviations)
+- **Test methods**: `shouldDoSomethingWhenCondition` pattern (already covered in naming conventions section)
+- **Constants**: `UPPER_SNAKE_CASE`
+
+### Comments
+
+- Use Given-When-Then structure for test organization
+- Inline comments should explain **why**, not **what**
+- No TODO/FIXME comments in test code
+- Keep comments concise and focused
+
+### Type Declarations
+
+- Use explicit types (avoid `var` keyword for clarity)
+- Use diamond operator for generics: `new ArrayList<>()` not `new ArrayList<String>()`
+
+---
 
 ## Test Class Javadoc Requirements
 
