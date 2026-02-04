@@ -138,9 +138,9 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
         assertEquals("operation", meter.getDescription());
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with description
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "operation");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "operation");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -164,9 +164,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 5, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with iterations
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "5");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "5");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -189,9 +189,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "success_outcome", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "success_outcome");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "success_outcome");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -210,9 +210,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, MeterLifeCycleTestHelper.TestEnum.VALUE1.name(), null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with enum path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, MeterLifeCycleTestHelper.TestEnum.VALUE1.name());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, MeterLifeCycleTestHelper.TestEnum.VALUE1.name());
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -233,9 +233,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, ex.getClass().getSimpleName(), null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with exception class
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, ex.getClass().getSimpleName());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, ex.getClass().getSimpleName());
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -256,9 +256,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, obj.toString(), null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with object toString
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, obj.toString());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, obj.toString());
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -310,8 +310,8 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK,"configured_path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "configured_path");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -334,9 +334,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "override_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with override path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "override_path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "override_path");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -363,9 +363,9 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
         assertEquals("step", meter.getDescription());
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with description and path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "step", "step_path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "step", "step_path");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -423,9 +423,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "second", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with last path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "second");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "second");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -454,9 +454,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "third", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with last path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "third");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "third");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -482,9 +482,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "final_override", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with final override path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "final_override");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "final_override");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -528,9 +528,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "alias_path", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with alias path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "alias_path");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "alias_path");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -553,9 +553,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "configured", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with configured path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "configured");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "configured");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -584,12 +584,12 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, "validPath", null, null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + INVALID_ARGUMENT + ok + DATA_OK
+        // Then: logs start + INVALID_ARGUMENT + ok + DATA_OK with valid path
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter.ok", "Null argument: pathId", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.ok(");
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "validPath");
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "validPath");
         AssertLogger.assertEventCount(logger, 5);
     }
 
@@ -612,9 +612,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "validation_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + DATA_REJECT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        // Then: logs start + reject + DATA_REJECT with validation_error path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "validation_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "validation_error");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -633,9 +633,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, MeterLifeCycleTestHelper.TestEnum.VALUE1.name(), null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + DATA_REJECT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        // Then: logs start + reject + DATA_REJECT with enum name
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, MeterLifeCycleTestHelper.TestEnum.VALUE1.name());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, MeterLifeCycleTestHelper.TestEnum.VALUE1.name());
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -656,9 +656,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, ex.getClass().getSimpleName(), null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + DATA_REJECT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        // Then: logs start + reject + DATA_REJECT with exception class
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, ex.getClass().getSimpleName());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, ex.getClass().getSimpleName());
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -679,9 +679,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, obj.toString(), null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + DATA_REJECT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        // Then: logs start + reject + DATA_REJECT with object toString
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, obj.toString());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, obj.toString());
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -708,9 +708,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_error", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + DATA_REJECT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        // Then: logs start + reject + DATA_REJECT with business_error path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "business_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "business_error");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -737,9 +737,9 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
         assertEquals("step", meter.getDescription());
 
-        // Then: logs start + reject + DATA_REJECT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        // Then: logs start + reject + DATA_REJECT with description and path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "step", "precondition_failed");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "step", "precondition_failed");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -769,9 +769,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "business_rule", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + DATA_REJECT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        // Then: logs start + reject + DATA_REJECT with business_rule path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "business_rule");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "business_rule");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -794,9 +794,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "critical_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + DATA_FAIL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        // Then: logs start + fail + DATA_FAIL with critical_error path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "critical_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "critical_error");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -815,9 +815,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, MeterLifeCycleTestHelper.TestEnum.VALUE2.name(), null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + DATA_FAIL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        // Then: logs start + fail + DATA_FAIL with enum name
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, MeterLifeCycleTestHelper.TestEnum.VALUE2.name());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, MeterLifeCycleTestHelper.TestEnum.VALUE2.name());
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -838,9 +838,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, ex.getClass().getName(), ex.getMessage(), 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + DATA_FAIL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        // Then: logs start + fail + DATA_FAIL with exception class and message
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, ex.getClass().getName(), ex.getMessage());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, ex.getClass().getName(), ex.getMessage());
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -861,9 +861,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, obj.toString(), null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + DATA_FAIL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        // Then: logs start + fail + DATA_FAIL with object toString
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, obj.toString());
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, obj.toString());
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -890,9 +890,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "timeout", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + DATA_FAIL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        // Then: logs start + fail + DATA_FAIL with timeout path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "timeout");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "timeout");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -919,9 +919,9 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
         assertEquals("operation", meter.getDescription());
 
-        // Then: logs start + fail + DATA_FAIL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        // Then: logs start + fail + DATA_FAIL with description and path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "operation", "unexpected_exception");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "operation", "unexpected_exception");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -951,9 +951,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "system_error", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + DATA_FAIL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        // Then: logs start + fail + DATA_FAIL with system_error path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "system_error");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "system_error");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -992,9 +992,9 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
         assertEquals("operation", meter.getDescription());
 
-        // Then: logs start + ok + DATA_OK
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        // Then: logs start + ok + DATA_OK with description, iterations, and path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK, "operation", "50", "checkpoint");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK, "operation", "50", "checkpoint");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1025,9 +1025,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "performance_degradation", null, null, 25, 0, 5000);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + DATA_REJECT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        // Then: logs start + reject + DATA_REJECT with iterations and path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "25", "performance_degradation");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "25", "performance_degradation");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1060,9 +1060,9 @@ class MeterLifeCyclePostStartTerminationTest {
         assertMeterStopTime(meter, tr);
         assertEquals("critical", meter.getDescription());
 
-        // Then: logs start + fail + DATA_FAIL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        // Then: logs start + fail + DATA_FAIL with description, context, iterations, and path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "critical", "user", "admin", "10", "auth_failure");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "critical", "user", "admin", "10", "auth_failure");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1106,9 +1106,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, "no_work_done", null, null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + reject + DATA_REJECT
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT);
+        // Then: logs start + reject + DATA_REJECT with no_work_done path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_REJECT, "no_work_done");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_REJECT, "no_work_done");
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -1127,9 +1127,9 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, "no_work_done", null, 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + DATA_FAIL
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        // Then: logs start + fail + DATA_FAIL with no_work_done path
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "no_work_done");
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "no_work_done");
         AssertLogger.assertEventCount(logger, 4);
     }
 
