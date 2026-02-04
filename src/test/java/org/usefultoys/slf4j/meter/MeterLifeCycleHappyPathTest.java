@@ -33,6 +33,24 @@ import org.usefultoys.test.WithLocale;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.slf4j.impl.MockLoggerEvent.Level.DEBUG;
+import static org.slf4j.impl.MockLoggerEvent.Level.ERROR;
+import static org.slf4j.impl.MockLoggerEvent.Level.INFO;
+import static org.slf4j.impl.MockLoggerEvent.Level.TRACE;
+import static org.slf4j.impl.MockLoggerEvent.Level.WARN;
+import static org.usefultoys.slf4j.meter.Markers.DATA_FAIL;
+import static org.usefultoys.slf4j.meter.Markers.DATA_OK;
+import static org.usefultoys.slf4j.meter.Markers.DATA_PROGRESS;
+import static org.usefultoys.slf4j.meter.Markers.DATA_REJECT;
+import static org.usefultoys.slf4j.meter.Markers.DATA_SLOW_OK;
+import static org.usefultoys.slf4j.meter.Markers.DATA_SLOW_PROGRESS;
+import static org.usefultoys.slf4j.meter.Markers.DATA_START;
+import static org.usefultoys.slf4j.meter.Markers.MSG_FAIL;
+import static org.usefultoys.slf4j.meter.Markers.MSG_OK;
+import static org.usefultoys.slf4j.meter.Markers.MSG_PROGRESS;
+import static org.usefultoys.slf4j.meter.Markers.MSG_REJECT;
+import static org.usefultoys.slf4j.meter.Markers.MSG_SLOW_OK;
+import static org.usefultoys.slf4j.meter.Markers.MSG_START;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertLogs;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterProgressTime;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStartTime;
@@ -120,10 +138,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs ok completion (MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_OK),
-                event(Level.TRACE, Markers.DATA_OK)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_OK),
+                event(TRACE, DATA_OK)
         );
     }
 
@@ -151,10 +169,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs ok completion with path (MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_OK, "success_path"),
-                event(Level.TRACE, Markers.DATA_OK, "success_path")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_OK, "success_path"),
+                event(TRACE, DATA_OK, "success_path")
         );
     }
 
@@ -185,10 +203,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs ok completion with path (MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_OK, "custom_path"),
-                event(Level.TRACE, Markers.DATA_OK, "custom_path")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_OK, "custom_path"),
+                event(TRACE, DATA_OK, "custom_path")
         );
     }
 
@@ -212,10 +230,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs ok completion with enum path (MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_OK, "VALUE1"),
-                event(Level.TRACE, Markers.DATA_OK,"VALUE1")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_OK, "VALUE1"),
+                event(TRACE, DATA_OK,"VALUE1")
         );
     }
 
@@ -240,10 +258,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs ok completion with throwable path (MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_OK, "RuntimeException"),
-                event(Level.TRACE, Markers.DATA_OK, "RuntimeException")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_OK, "RuntimeException"),
+                event(TRACE, DATA_OK, "RuntimeException")
         );
     }
 
@@ -268,10 +286,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs ok completion with object path (MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_OK, "testObjectString"),
-                event(Level.TRACE, Markers.DATA_OK,"testObjectString")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_OK, "testObjectString"),
+                event(TRACE, DATA_OK,"testObjectString")
         );
     }
 
@@ -302,10 +320,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs ok completion with overridden path (MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_OK, "override_path"),
-                event(Level.TRACE, Markers.DATA_OK,"override_path")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_OK, "override_path"),
+                event(TRACE, DATA_OK,"override_path")
         );
     }
 
@@ -350,10 +368,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs ok completion with last path (MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_OK, "third"),
-                event(Level.TRACE, Markers.DATA_OK,"third")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_OK, "third"),
+                event(TRACE, DATA_OK,"third")
         );
     }
 
@@ -381,10 +399,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs rejection (MSG_REJECT + DATA_REJECT)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_REJECT,"business_error"),
-                event(Level.TRACE, Markers.DATA_REJECT,"business_error")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_REJECT,"business_error"),
+                event(TRACE, DATA_REJECT,"business_error")
         );
     }
 
@@ -408,10 +426,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs rejection with enum cause (MSG_REJECT + DATA_REJECT)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_REJECT, "VALUE2"),
-                event(Level.TRACE, Markers.DATA_REJECT,"VALUE2")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_REJECT, "VALUE2"),
+                event(TRACE, DATA_REJECT,"VALUE2")
         );
     }
 
@@ -436,10 +454,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs rejection with throwable cause (MSG_REJECT + DATA_REJECT)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_REJECT, "IllegalArgumentException"),
-                event(Level.TRACE, Markers.DATA_REJECT, "IllegalArgumentException")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_REJECT, "IllegalArgumentException"),
+                event(TRACE, DATA_REJECT, "IllegalArgumentException")
         );
     }
 
@@ -464,10 +482,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs rejection with object cause (MSG_REJECT + DATA_REJECT)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_REJECT, "testObjectString"),
-                event(Level.TRACE, Markers.DATA_REJECT, "testObjectString")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_REJECT, "testObjectString"),
+                event(TRACE, DATA_REJECT, "testObjectString")
         );
     }
 
@@ -498,10 +516,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs rejection overriding path expectation (MSG_REJECT + DATA_REJECT)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_REJECT, "business_error"),
-                event(Level.TRACE, Markers.DATA_REJECT, "business_error")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_REJECT, "business_error"),
+                event(TRACE, DATA_REJECT, "business_error")
         );
     }
 
@@ -529,10 +547,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs failure (MSG_FAIL + DATA_FAIL)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.ERROR, Markers.MSG_FAIL, "technical_error"),
-                event(Level.TRACE, Markers.DATA_FAIL, "technical_error")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(ERROR, MSG_FAIL, "technical_error"),
+                event(TRACE, DATA_FAIL, "technical_error")
         );
     }
 
@@ -556,10 +574,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs failure with enum cause (MSG_FAIL + DATA_FAIL)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.ERROR, Markers.MSG_FAIL, "VALUE1"),
-                event(Level.TRACE, Markers.DATA_FAIL, "VALUE1")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(ERROR, MSG_FAIL, "VALUE1"),
+                event(TRACE, DATA_FAIL, "VALUE1")
         );
     }
 
@@ -584,10 +602,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs failure with throwable cause (MSG_FAIL + DATA_FAIL)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.ERROR, Markers.MSG_FAIL, "java.lang.RuntimeException"),
-                event(Level.TRACE, Markers.DATA_FAIL, "java.lang.RuntimeException")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(ERROR, MSG_FAIL, "java.lang.RuntimeException"),
+                event(TRACE, DATA_FAIL, "java.lang.RuntimeException")
         );
     }
 
@@ -612,10 +630,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs failure with object cause (MSG_FAIL + DATA_FAIL)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.ERROR, Markers.MSG_FAIL, "testObjectString"),
-                event(Level.TRACE, Markers.DATA_FAIL, "testObjectString")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(ERROR, MSG_FAIL, "testObjectString"),
+                event(TRACE, DATA_FAIL, "testObjectString")
         );
     }
 
@@ -646,10 +664,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs failure overriding path expectation (MSG_FAIL + DATA_FAIL)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.ERROR, Markers.MSG_FAIL, "critical_error"),
-                event(Level.TRACE, Markers.DATA_FAIL, "critical_error")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(ERROR, MSG_FAIL, "critical_error"),
+                event(TRACE, DATA_FAIL, "critical_error")
         );
     }
 
@@ -720,14 +738,14 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs progress events + ok completion (2x MSG_PROGRESS + 2x DATA_PROGRESS + MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_OK),
-                event(Level.TRACE, Markers.DATA_OK)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_OK),
+                event(TRACE, DATA_OK)
         );
     }
 
@@ -785,12 +803,12 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs progress event + ok completion (MSG_PROGRESS + DATA_PROGRESS + MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_OK),
-                event(Level.TRACE, Markers.DATA_OK)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_OK),
+                event(TRACE, DATA_OK)
         );
     }
 
@@ -854,12 +872,12 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: progress messages should have been logged (skip indices 0 and 1 from start())
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_OK),
-                event(Level.TRACE, Markers.DATA_OK)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_OK),
+                event(TRACE, DATA_OK)
         );
     }
 
@@ -923,12 +941,12 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs progress event + ok completion with throttling (MSG_PROGRESS + DATA_PROGRESS + MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_OK),
-                event(Level.TRACE, Markers.DATA_OK)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_OK),
+                event(TRACE, DATA_OK)
         );
     }
 
@@ -964,10 +982,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs ok completion (not slow, MSG_OK + DATA_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_OK),
-                event(Level.TRACE, Markers.DATA_OK)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_OK),
+                event(TRACE, DATA_OK)
         );
     }
 
@@ -1003,10 +1021,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs slow ok completion (MSG_SLOW_OK + DATA_SLOW_OK)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.WARN, Markers.MSG_SLOW_OK),
-                event(Level.TRACE, Markers.DATA_SLOW_OK)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(WARN, MSG_SLOW_OK),
+                event(TRACE, DATA_SLOW_OK)
         );
     }
 
@@ -1038,10 +1056,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs rejection (slow operation does not affect reject marker, MSG_REJECT + DATA_REJECT)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_REJECT, "business_error"),
-                event(Level.TRACE, Markers.DATA_REJECT, "business_error")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_REJECT, "business_error"),
+                event(TRACE, DATA_REJECT, "business_error")
         );
     }
 
@@ -1073,10 +1091,10 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: logs failure (slow operation does not affect fail marker, MSG_FAIL + DATA_FAIL)
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.ERROR, Markers.MSG_FAIL, "business_error"),
-                event(Level.TRACE, Markers.DATA_FAIL, "business_error")
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(ERROR, MSG_FAIL, "business_error"),
+                event(TRACE, DATA_FAIL, "business_error")
         );
     }
 
@@ -1147,14 +1165,14 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_OK),
-                event(Level.TRACE, Markers.DATA_OK)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_OK),
+                event(TRACE, DATA_OK)
         );
     }
 
@@ -1224,14 +1242,14 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: WARN log includes slow operation warning with timing details (skip indices 0 and 1 from start())
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_SLOW_PROGRESS),
-                event(Level.WARN, Markers.MSG_SLOW_OK),
-                event(Level.TRACE, Markers.DATA_SLOW_OK)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_SLOW_PROGRESS),
+                event(WARN, MSG_SLOW_OK),
+                event(TRACE, DATA_SLOW_OK)
         );
     }
 
@@ -1301,14 +1319,14 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_REJECT),
-                event(Level.TRACE, Markers.DATA_REJECT)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_REJECT),
+                event(TRACE, DATA_REJECT)
         );
     }
 
@@ -1375,14 +1393,14 @@ class MeterLifeCycleHappyPathTest {
 
         // Then: completion report includes all progress metrics (skip indices 0 and 1 from start())
         assertLogs(logger, level,
-                event(Level.DEBUG, Markers.MSG_START),
-                event(Level.TRACE, Markers.DATA_START),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.INFO, Markers.MSG_PROGRESS),
-                event(Level.TRACE, Markers.DATA_PROGRESS),
-                event(Level.ERROR, Markers.MSG_FAIL),
-                event(Level.TRACE, Markers.DATA_FAIL)
+                event(DEBUG, MSG_START),
+                event(TRACE, DATA_START),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(INFO, MSG_PROGRESS),
+                event(TRACE, DATA_PROGRESS),
+                event(ERROR, MSG_FAIL),
+                event(TRACE, DATA_FAIL)
         );
     }
 }

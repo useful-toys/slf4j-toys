@@ -46,7 +46,6 @@ import static org.usefultoys.slf4j.meter.Markers.DATA_OK;
 import static org.usefultoys.slf4j.meter.Markers.DATA_REJECT;
 import static org.usefultoys.slf4j.meter.Markers.DATA_START;
 import static org.usefultoys.slf4j.meter.Markers.INVALID_EXCEPTION;
-import static org.usefultoys.slf4j.meter.Markers.INVALID_STATE;
 import static org.usefultoys.slf4j.meter.Markers.INVALID_TRANSITION;
 import static org.usefultoys.slf4j.meter.Markers.MSG_FAIL;
 import static org.usefultoys.slf4j.meter.Markers.MSG_OK;
@@ -130,7 +129,7 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_TRANSITION, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
         assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
@@ -412,7 +411,7 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_TRANSITION, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
         assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
@@ -524,7 +523,7 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_TRANSITION, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
         assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
@@ -708,7 +707,7 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_TRANSITION, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
         assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
@@ -888,7 +887,7 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_TRANSITION, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
         assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
@@ -947,7 +946,7 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_TRANSITION, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
         assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);
@@ -1124,7 +1123,7 @@ class MeterExecutorTest {
         AssertLogger.assertEventCount(logger, 5);
         AssertLogger.assertEvent(logger, 0, DEBUG, MSG_START);
         AssertLogger.assertEvent(logger, 1, TRACE, DATA_START);
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_STATE, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_TRANSITION, "Meter.start", "Meter already stopped, must call start() only once", meter.getFullID());
         assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
         assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.start(");
         AssertLogger.assertEvent(logger, 3, INFO, MSG_OK);

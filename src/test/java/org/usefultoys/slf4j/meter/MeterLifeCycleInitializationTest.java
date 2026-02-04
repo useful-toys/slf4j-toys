@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.TimeRecord;
-import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.slf4jtestmock.WithMockLoggerDebug;
@@ -36,6 +35,8 @@ import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterSta
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStartTimePreserved;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordCreateWithWindow;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStartWithWindow;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
+import static org.usefultoys.slf4jtestmock.AssertLogger.assertEventCount;
 
 /**
  * Unit tests for {@link Meter} initialization and construction.
@@ -97,7 +98,7 @@ class MeterLifeCycleInitializationTest {
                 "before start(), getCurrentInstance() should return unknown meter");
 
         // Then: no logs emitted before start()
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
@@ -122,7 +123,7 @@ class MeterLifeCycleInitializationTest {
                 "before start(), getCurrentInstance() should return unknown meter");
 
         // Then: no logs emitted before start()
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
@@ -149,7 +150,7 @@ class MeterLifeCycleInitializationTest {
                 "before start(), getCurrentInstance() should return unknown meter");
 
         // Then: no logs emitted before start()
-        AssertLogger.assertEventCount(logger, 0);
+        assertEventCount(logger, 0);
     }
 
     @Test
@@ -183,9 +184,9 @@ class MeterLifeCycleInitializationTest {
         assertEquals(meter, currentAfterStart, "after start(), meter should be current in thread-local");
 
         // Then: logs start events (MSG_START + DATA_START)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEventCount(logger, 2);
+        assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
+        assertEvent(logger, 1, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
+        assertEventCount(logger, 2);
     }
 
     @Test
@@ -226,11 +227,11 @@ class MeterLifeCycleInitializationTest {
         assertMeterStartTimePreserved(meterRef, tr);
 
         // Then: logs start events + auto-fail events (MSG_START + DATA_START + MSG_FAIL + DATA_FAIL)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEventCount(logger, 4);
+        assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
+        assertEvent(logger, 1, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
+        assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
+        assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        assertEventCount(logger, 4);
     }
 
     @Test
@@ -259,10 +260,10 @@ class MeterLifeCycleInitializationTest {
         assertMeterStartTimePreserved(meterRef, tr);
 
         // Then: logs start events + auto-fail events (MSG_START + DATA_START + MSG_FAIL + DATA_FAIL)
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
-        AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
-        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
-        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
-        AssertLogger.assertEventCount(logger, 4);
+        assertEvent(logger, 0, MockLoggerEvent.Level.DEBUG, Markers.MSG_START);
+        assertEvent(logger, 1, MockLoggerEvent.Level.TRACE, Markers.DATA_START);
+        assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL);
+        assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL);
+        assertEventCount(logger, 4);
     }
 }
