@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,9 @@ public class SessionConfig {
      * </ul>
      * <p>
      * The value is read from the system property {@code slf4jtoys.session.print.uuid.size}, defaulting to {@code 5}.
+     * <p>
+     * <strong>Thread Safety:</strong> This field can be modified at runtime, but caution is advised in concurrent
+     * environments as changes are not synchronized.
      */
     public int uuidSize = 5;
 
@@ -76,12 +79,19 @@ public class SessionConfig {
      * <p>
      * The value is read from the system property {@code slf4jtoys.session.print.charset}, defaulting to the
      * JVM's default charset.
+     * <p>
+     * <strong>Thread Safety:</strong> This field can be modified at runtime, but caution is advised in concurrent
+     * environments as changes are not synchronized.
      */
     public String charset = Charset.defaultCharset().name();
 
     /**
-     * Initializes the configuration properties. This method should be called at application startup to ensure
-     * consistent behavior.
+     * Initializes the configuration properties by reading values from system properties.
+     * <p>
+     * This method is automatically called in a static initializer when the class is first loaded.
+     * It can also be called manually to reload configuration from system properties after they have been modified.
+     * <p>
+     * For consistent behavior, ensure system properties are set before this class is first accessed.
      */
     public void init() {
         uuidSize = ConfigParser.getRangeProperty(PROP_PRINT_UUID_SIZE, 5, 0, UUID_LENGTH);
