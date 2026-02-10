@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import java.util.IllegalFormatException;
  * </p>
  *
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  */
 public interface MeterContext<T extends MeterData> {
 
@@ -39,6 +40,12 @@ public interface MeterContext<T extends MeterData> {
      * @param value The string value of the entry.
      */
     void putContext(final String name, final Object value);
+
+    /**
+     * Adds a key-only entry to the context map. This is interpreted as a marker or flag.
+     *
+     * @param name The key of the entry to add.
+     */
     void putContext(final String name);
 
     /**
@@ -48,6 +55,9 @@ public interface MeterContext<T extends MeterData> {
      */
     void removeContext(final String name);
 
+    /**
+     * Clears all entries from the context map.
+     */
     void clearContext();
 
     /**
@@ -166,7 +176,7 @@ public interface MeterContext<T extends MeterData> {
      * Adds a key-value entry to the context map with an {@link Integer} object value.
      *
      * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Integer} object value. {@code null} values are represented by {@code "<null>"}.
+     * @param value The {@link Integer} object value. {@code null} values are passed as {@code null}.
      * @return Reference to this `MeterContext` instance, for method chaining.
      */
     default T ctx(final String name, final Integer value) {
@@ -178,7 +188,7 @@ public interface MeterContext<T extends MeterData> {
      * Adds a key-value entry to the context map with a {@link Long} object value.
      *
      * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Long} object value. {@code null} values are represented by {@code "<null>"}.
+     * @param value The {@link Long} object value. {@code null} values are passed as {@code null}.
      * @return Reference to this `MeterContext` instance, for method chaining.
      */
     default T ctx(final String name, final Long value) {
@@ -190,7 +200,7 @@ public interface MeterContext<T extends MeterData> {
      * Adds a key-value entry to the context map with a {@link Boolean} object value.
      *
      * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Boolean} object value. {@code null} values are represented by {@code "<null>"}.
+     * @param value The {@link Boolean} object value. {@code null} values are passed as {@code null}.
      * @return Reference to this `MeterContext` instance, for method chaining.
      */
     default T ctx(final String name, final Boolean value) {
@@ -202,7 +212,7 @@ public interface MeterContext<T extends MeterData> {
      * Adds a key-value entry to the context map with a {@link Float} object value.
      *
      * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Float} object value. {@code null} values are represented by {@code "<null>"}.
+     * @param value The {@link Float} object value. {@code null} values are passed as {@code null}.
      * @return Reference to this `MeterContext` instance, for method chaining.
      */
     default T ctx(final String name, final Float value) {
@@ -214,7 +224,7 @@ public interface MeterContext<T extends MeterData> {
      * Adds a key-value entry to the context map with a {@link Double} object value.
      *
      * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The {@link Double} object value. {@code null} values are represented by {@code "<null>"}.
+     * @param value The {@link Double} object value. {@code null} values are passed as {@code null}.
      * @return Reference to this `MeterContext` instance, for method chaining.
      */
     default T ctx(final String name, final Double value) {
@@ -226,7 +236,7 @@ public interface MeterContext<T extends MeterData> {
      * Adds a key-value entry to the context map with a string value.
      *
      * @param name  The key of the entry to add. Must not be {@code null}.
-     * @param value The string value. {@code null} values are represented by {@code "<null>"}.
+     * @param value The string value. {@code null} values are passed as {@code null}.
      * @return Reference to this `MeterContext` instance, for method chaining.
      */
     default T ctx(final String name, final String value) {

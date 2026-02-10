@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import java.util.Objects;
  * data related to the operation's lifecycle, performance, and outcome.
  *
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  * @see Meter
  * @see SystemData
  */
@@ -194,7 +195,7 @@ public class MeterData extends SystemData implements MeterAnalysis {
     /**
      * Adds a key-value entry to the context map, using the {@code toString()} representation of an object as value.
      *
-     * @param name   The key of the entry to add.
+     * @param name   The key of the entry to add. {@code null} keys are represented by {@code "<null>"}.
      * @param object The object whose string representation will be used as the value. {@code null} objects are
      *               represented by {@code "<null>"}.
      */
@@ -206,6 +207,12 @@ public class MeterData extends SystemData implements MeterAnalysis {
                 object == null ? NULL_VALUE : object.toString());
     }
 
+    /**
+     * Adds a key-only entry to the context map with a {@code null} value.
+     * This is interpreted as a marker or flag.
+     *
+     * @param name The key of the entry to add. {@code null} keys are represented by {@code "<null>"}.
+     */
     public void putContext(final String name) {
         if (context == null) {
             context = new LinkedHashMap<>();
@@ -225,6 +232,9 @@ public class MeterData extends SystemData implements MeterAnalysis {
         }
     }
 
+    /**
+     * Clears all entries from the context map.
+     */
     public void clearContext() {
         if (context != null) {
             context.clear();
@@ -251,6 +261,7 @@ public class MeterData extends SystemData implements MeterAnalysis {
      * started.
      */
     public long collectCurrentWaitingTime() {
+        /* If not yet started, continue counting waiting time until now */
         if (startTime == 0) {
             return collectCurrentTime() - createTime;
         }
@@ -263,11 +274,14 @@ public class MeterData extends SystemData implements MeterAnalysis {
      * @return The time elapsed (in nanoseconds) since the operation started until now, or 0 if not yet started.
      */
     public long collectCurrentExecutionTime() {
+        /* Return 0 if operation not yet started */
         if (startTime == 0) {
             return 0;
         } else if (stopTime == 0) {
+            /* For ongoing operations, calculate time from start until now */
             return collectCurrentTime() - startTime;
         }
+        /* For completed operations, return total duration */
         return stopTime - startTime;
     }
 
