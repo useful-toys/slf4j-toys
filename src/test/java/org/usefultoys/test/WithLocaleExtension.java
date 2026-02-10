@@ -63,17 +63,17 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
      * @throws IllegalStateException if no {@link WithLocale} annotation is found on the test method or class
      */
     @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
+    public void beforeEach(final ExtensionContext context) throws Exception {
         // Save the original locale to restore it later
-        Locale original = Locale.getDefault();
+        final Locale original = Locale.getDefault();
         getStore(context).put(ORIGINAL_LOCALE_KEY, original);
 
         // Find the desired locale (method annotation takes precedence over class annotation)
-        Optional<WithLocale> withLocale = findWithLocaleAnnotation(context);
+        final Optional<WithLocale> withLocale = findWithLocaleAnnotation(context);
 
         if (withLocale.isPresent()) {
             // Parse the BCP 47 language tag and set as default locale
-            Locale newLocale = Locale.forLanguageTag(withLocale.get().value());
+            final Locale newLocale = Locale.forLanguageTag(withLocale.get().value());
             Locale.setDefault(newLocale);
         } else {
             // Extension is misconfigured - annotation must be present
@@ -91,10 +91,10 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
      * @param context the current extension context
      */
     @Override
-    public void afterEach(ExtensionContext context) throws Exception {
-        Store store = getStore(context);
+    public void afterEach(final ExtensionContext context) throws Exception {
+        final Store store = getStore(context);
         // Remove and retrieve the saved locale
-        Locale original = store.remove(ORIGINAL_LOCALE_KEY, Locale.class);
+        final Locale original = store.remove(ORIGINAL_LOCALE_KEY, Locale.class);
 
         if (original != null) {
             // Restore the original locale
@@ -111,7 +111,7 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
      * @param context the current extension context
      * @return the extension's private store
      */
-    private Store getStore(ExtensionContext context) {
+    private Store getStore(final ExtensionContext context) {
         return context.getStore(NAMESPACE);
     }
 

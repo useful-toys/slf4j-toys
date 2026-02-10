@@ -293,16 +293,16 @@ final class MeterLifeCycleTestHelper {
             this.level = level;
             this.marker = marker;
             this.messageParts = messageParts;
-            this.throwableType = null;
-            this.throwableMessage = null;
-            this.stacktraceMessage = null;
+            throwableType = null;
+            throwableMessage = null;
+            stacktraceMessage = null;
         }
 
         ExpectedLogEvent(final Level level, final Marker marker, final String message, 
             final Class<? extends Throwable> throwableType, final String throwableMessage, final String stacktraceMessage) {
             this.level = level;
             this.marker = marker;
-            this.messageParts = new String[]{message} ;
+            messageParts = new String[]{message} ;
             this.throwableType = throwableType;
             this.throwableMessage = throwableMessage;
             this.stacktraceMessage = stacktraceMessage;
@@ -322,8 +322,8 @@ final class MeterLifeCycleTestHelper {
         return new ExpectedLogEvent(level, marker, messageParts);
     }
 
-    public static ExpectedLogEvent eventWithTrowable(final Level level, final Marker marker, final String message, 
-        Class<? extends Throwable> throwableType, final String throableMessage, final String stackStraceMessage) {
+    public static ExpectedLogEvent eventWithTrowable(final Level level, final Marker marker, final String message,
+                                                     final Class<? extends Throwable> throwableType, final String throableMessage, final String stackStraceMessage) {
         return new ExpectedLogEvent(level, marker, message, throwableType, throableMessage, stackStraceMessage);
     }
 

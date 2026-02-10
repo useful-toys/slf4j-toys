@@ -52,7 +52,7 @@ public class ClearConfigParserExtension implements BeforeEachCallback, AfterEach
      * @param context the current extension context
      */
     @Override
-    public void beforeEach(ExtensionContext context) {
+    public void beforeEach(final ExtensionContext context) {
         // Clear any errors from previous test runs
         ConfigParser.clearInitializationErrors();
     }
@@ -66,7 +66,7 @@ public class ClearConfigParserExtension implements BeforeEachCallback, AfterEach
      * @param context the current extension context
      */
     @Override
-    public void afterEach(ExtensionContext context) {
+    public void afterEach(final ExtensionContext context) {
         // Clean up errors that may have been accumulated during this test
         ConfigParser.clearInitializationErrors();
     }
