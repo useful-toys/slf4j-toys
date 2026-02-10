@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,16 +39,16 @@ class NullOutputStream extends OutputStream {
 
     @Override
     public void write(final int b) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void write(@NonNull final byte[] b) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void write(@NonNull final byte[] b, final int off, final int len) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 }
