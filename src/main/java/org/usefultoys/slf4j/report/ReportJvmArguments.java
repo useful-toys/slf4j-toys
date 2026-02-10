@@ -63,9 +63,9 @@ public class ReportJvmArguments implements Runnable {
                 String displayArg = arg;
                 // Check if it's a system property argument like -Dkey=value
                 if (arg.startsWith("-D")) {
-                    int equalsIndex = arg.indexOf('=');
+                    final int equalsIndex = arg.indexOf('=');
                     if (equalsIndex > 2) { // Ensure it's -Dkey=value and not just -D or -D=
-                        String key = arg.substring(2, equalsIndex);
+                        final String key = arg.substring(2, equalsIndex);
                         if (forbiddenPattern.matcher(key).matches()) {
                             displayArg = arg.substring(0, equalsIndex + 1) + "********"; // Censor sensitive values
                         }

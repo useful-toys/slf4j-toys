@@ -60,7 +60,7 @@ public class ReportClasspath implements Runnable {
         if (classpath == null || classpath.isEmpty()) {
             ps.println(" - Classpath is empty.");
         } else {
-            final List<String> classpathEntries = Arrays.asList(classpath.split(pathSeparator));
+            final String[] classpathEntries = classpath.split(pathSeparator);
             for (final String entry : classpathEntries) {
                 ps.printf(" - %s%n", entry);
             }

@@ -55,21 +55,21 @@ public class ReportSecurityProviders implements Runnable {
         final PrintStream ps = LoggerFactory.getInfoPrintStream(logger);
         ps.println("Security Providers:");
 
-        Provider[] providers = Security.getProviders();
+        final Provider[] providers = Security.getProviders();
 
         if (providers.length == 0) {
             ps.println(" - No security providers found.");
         } else {
             for (int i = 0; i < providers.length; i++) {
-                Provider provider = providers[i];
+                final Provider provider = providers[i];
                 ps.printf(" - Provider %d: %s (Version: %f)%n", i + 1, provider.getName(), provider.getVersion());
                 ps.printf("   Info: %s%n", provider.getInfo());
 
                 // List services offered by the provider
-                SortedMap<Object, Object> sortedServices = new TreeMap<>(provider);
+                final SortedMap<Object, Object> sortedServices = new TreeMap<>(provider);
                 if (!sortedServices.isEmpty()) {
                     ps.println("   Services:");
-                    for (Map.Entry<Object, Object> entry : sortedServices.entrySet()) {
+                    for (final Map.Entry<Object, Object> entry : sortedServices.entrySet()) {
                         ps.printf("    - %s: %s%n", entry.getKey(), entry.getValue());
                     }
                 }

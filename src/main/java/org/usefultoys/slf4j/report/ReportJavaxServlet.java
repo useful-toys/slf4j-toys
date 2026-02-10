@@ -138,7 +138,7 @@ public class ReportJavaxServlet extends HttpServlet {
             new ReportCharset(logger).run();
         } else if ("networkinterface".equalsIgnoreCase(pathinfo)) {
             try {
-                final Enumeration<NetworkInterface> interfaces = this.getNetworkInterfaces();
+                final Enumeration<NetworkInterface> interfaces = getNetworkInterfaces();
                 while (interfaces.hasMoreElements()) {
                     final NetworkInterface nif = interfaces.nextElement();
                     new ReportNetworkInterface(logger, nif).run();
@@ -203,7 +203,7 @@ public class ReportJavaxServlet extends HttpServlet {
      * @throws SocketException If an I/O error occurs.
      */
     protected Enumeration<NetworkInterface> getNetworkInterfaces() throws SocketException {
-        return this.networkInterfaceProvider.getNetworkInterfaces();
+        return networkInterfaceProvider.getNetworkInterfaces();
     }
 
     /*

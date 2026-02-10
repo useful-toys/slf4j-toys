@@ -88,13 +88,13 @@ public class SystemMetricsCollector {
      * @param data The {@link SystemData} object to be populated.
      */
     public void collectPlatformStatus(final SystemData data) {
-        if (!SystemConfig.usePlatformManagedBean || this.osBean == null) {
+        if (!SystemConfig.usePlatformManagedBean || osBean == null) {
             return;
         }
 
-        if (this.osBean instanceof com.sun.management.OperatingSystemMXBean) {
+        if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
             final com.sun.management.OperatingSystemMXBean sunOsBean =
-                    (com.sun.management.OperatingSystemMXBean) this.osBean;
+                    (com.sun.management.OperatingSystemMXBean) osBean;
             final double cpuLoad = sunOsBean.getSystemCpuLoad();
             if (cpuLoad >= 0) {
                 data.systemLoad = cpuLoad;
@@ -102,8 +102,8 @@ public class SystemMetricsCollector {
             }
         }
 
-        final double loadAverage = this.osBean.getSystemLoadAverage();
-        final int availableProcessors = this.osBean.getAvailableProcessors();
+        final double loadAverage = osBean.getSystemLoadAverage();
+        final int availableProcessors = osBean.getAvailableProcessors();
         if (loadAverage >= 0 && availableProcessors > 0) {
             data.systemLoad = loadAverage / availableProcessors;
         }
@@ -115,33 +115,33 @@ public class SystemMetricsCollector {
      * @param data The {@link SystemData} object to be populated.
      */
     public void collectManagedBeanStatus(final SystemData data) {
-        if (SystemConfig.useMemoryManagedBean && this.memoryBean != null) {
-            final MemoryUsage heapUsage = this.memoryBean.getHeapMemoryUsage();
+        if (SystemConfig.useMemoryManagedBean && memoryBean != null) {
+            final MemoryUsage heapUsage = memoryBean.getHeapMemoryUsage();
             data.heap_commited = heapUsage.getCommitted();
             data.heap_max = heapUsage.getMax();
             data.heap_used = heapUsage.getUsed();
 
-            final MemoryUsage nonHeapUsage = this.memoryBean.getNonHeapMemoryUsage();
+            final MemoryUsage nonHeapUsage = memoryBean.getNonHeapMemoryUsage();
             data.nonHeap_commited = nonHeapUsage.getCommitted();
             data.nonHeap_max = nonHeapUsage.getMax();
             data.nonHeap_used = nonHeapUsage.getUsed();
-            data.objectPendingFinalizationCount = this.memoryBean.getObjectPendingFinalizationCount();
+            data.objectPendingFinalizationCount = memoryBean.getObjectPendingFinalizationCount();
         }
 
-        if (SystemConfig.useClassLoadingManagedBean && this.classLoadingBean != null) {
-            data.classLoading_loaded = this.classLoadingBean.getLoadedClassCount();
-            data.classLoading_total = this.classLoadingBean.getTotalLoadedClassCount();
-            data.classLoading_unloaded = this.classLoadingBean.getUnloadedClassCount();
+        if (SystemConfig.useClassLoadingManagedBean && classLoadingBean != null) {
+            data.classLoading_loaded = classLoadingBean.getLoadedClassCount();
+            data.classLoading_total = classLoadingBean.getTotalLoadedClassCount();
+            data.classLoading_unloaded = classLoadingBean.getUnloadedClassCount();
         }
 
-        if (SystemConfig.useCompilationManagedBean && this.compilationBean != null) {
-            data.compilationTime = this.compilationBean.getTotalCompilationTime();
+        if (SystemConfig.useCompilationManagedBean && compilationBean != null) {
+            data.compilationTime = compilationBean.getTotalCompilationTime();
         }
 
-        if (SystemConfig.useGarbageCollectionManagedBean && this.garbageCollectorBeans != null) {
+        if (SystemConfig.useGarbageCollectionManagedBean && garbageCollectorBeans != null) {
             long count = 0;
             long time = 0;
-            for (final GarbageCollectorMXBean garbageCollector : this.garbageCollectorBeans) {
+            for (final GarbageCollectorMXBean garbageCollector : garbageCollectorBeans) {
                 count += garbageCollector.getCollectionCount();
                 time += garbageCollector.getCollectionTime();
             }

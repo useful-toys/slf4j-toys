@@ -201,7 +201,7 @@ public class ConfigParser {
                 multiplicador = 60 * 60 * 1000;
             }
 
-            String numberPart = value.substring(0, value.length() - suffixLength).trim();
+            final String numberPart = value.substring(0, value.length() - suffixLength).trim();
             if (numberPart.isEmpty()) {
                 initializationErrors.add("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
                 return defaultValue;
