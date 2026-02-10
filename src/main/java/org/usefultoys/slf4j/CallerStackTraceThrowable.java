@@ -101,7 +101,27 @@ public class CallerStackTraceThrowable extends Throwable {
     @Override
     public synchronized Throwable fillInStackTrace() {
         final StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+        final StackTraceElement[] cleanedStackTrace = removeInternalFrames(stacktrace);
+        setStackTrace(cleanedStackTrace);
+        return this;
+    }
 
+    /**
+     * Removes internal library frames from the stack trace, keeping only the API entry point
+     * and user code frames.
+     * <p>
+     * This method processes the raw stack trace to produce a clean stack trace that:
+     * <ul>
+     *   <li>Skips Thread.getStackTrace(), fillInStackTrace(), and constructor frames (first 3 frames)</li>
+     *   <li>Removes internal library frames while keeping the first library method (API entry point)</li>
+     *   <li>Filters out reflection and Mockito frames during testing</li>
+     *   <li>Preserves all user code frames</li>
+     * </ul>
+     *
+     * @param stacktrace the raw stack trace from Thread.currentThread().getStackTrace()
+     * @return the cleaned stack trace with internal frames removed
+     */
+    StackTraceElement[] removeInternalFrames(final StackTraceElement[] stacktrace) {
         /* Always skip index 0 (Thread.getStackTrace, fillInStackTrace itself and Exception constructor) and start from index 3 */
         int framesToDiscard = 3;
 
@@ -126,18 +146,17 @@ public class CallerStackTraceThrowable extends Throwable {
 
         if (framesToDiscard == stacktrace.length) {
             /* All stack trace frames are from the library itself. */
-            setStackTrace(EMPTY_STACK_TRACE);
+            return EMPTY_STACK_TRACE;
         } else if (framesToDiscard == 3) {
             /* No library frames found (only user code), keep all from index 3 onwards */
-            setStackTrace(Arrays.copyOfRange(stacktrace, 3, stacktrace.length));
+            return Arrays.copyOfRange(stacktrace, 3, stacktrace.length);
         } else if (stacktrace[framesToDiscard - 1].getClassName().equals(CallerStackTraceThrowable.class.getName())) {
             /* Found exception constructor called directly from user code. */
-            setStackTrace(Arrays.copyOfRange(stacktrace, framesToDiscard, stacktrace.length));
+            return Arrays.copyOfRange(stacktrace, framesToDiscard, stacktrace.length);
         } else {
             /* Library frames found, keep first library frame + all user code.
                Decrease by 1 to include the last library method (API entry point). */
-            setStackTrace(Arrays.copyOfRange(stacktrace, framesToDiscard - 1, stacktrace.length));
+            return Arrays.copyOfRange(stacktrace, framesToDiscard - 1, stacktrace.length);
         }
-        return this;
     }
 }
