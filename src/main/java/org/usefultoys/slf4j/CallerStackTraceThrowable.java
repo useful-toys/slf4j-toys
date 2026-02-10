@@ -144,8 +144,8 @@ public class CallerStackTraceThrowable extends Throwable {
             framesToDiscard++;
         }
 
-        if (framesToDiscard == stacktrace.length) {
-            /* All stack trace frames are from the library itself. */
+        if (framesToDiscard >= stacktrace.length) {
+            /* All stack trace frames are from the library itself, or array is too short. */
             return EMPTY_STACK_TRACE;
         } else if (framesToDiscard == 3) {
             /* No library frames found (only user code), keep all from index 3 onwards */
