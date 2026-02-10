@@ -12,8 +12,50 @@ This document contains all Java-specific programming guidelines for the slf4j-to
 - **Java 8+**: Code must be compatible with Java 8 or higher
 - **Follow conventions**: Maintain consistency with existing code style
 - **UTF-8 encoding**: All source files must be encoded in UTF-8
-- **Comment style**: For comments explaining behavior or logic, prefer `/* ... */` style over `//` style
 - **Lombok usage**: Use Lombok annotations to reduce boilerplate
+
+## Inline Comments
+
+**Use `/* ... */` style comments** to explain non-obvious logic, especially for control flow structures (`if`, `while`, `for`, `switch`, etc.).
+
+**When to add explanatory comments**:
+- Complex or non-intuitive conditional logic
+- Nested loops or conditionals where purpose is not immediately clear
+- Counter-intuitive behavior or edge case handling
+- Algorithm steps that require context to understand
+- Business logic that isn't self-explanatory from variable/method names
+- Performance optimizations or workarounds
+
+**Placement**:
+- Place comment **before** the control structure or **at the beginning** of the block
+- Keep comments concise and focused on **why**, not **what**
+
+**Examples**:
+
+```java
+/* Reset counter when it reaches maximum value to prevent overflow */
+atomicLong.compareAndSet(Long.MAX_VALUE, 0);
+
+/* Report progress only if iterations advanced and minimum period elapsed */
+if (currentIteration > lastProgressIteration && (now - lastProgressTime) > meterProgressPeriodNanoseconds) {
+    // progress reporting logic
+}
+
+/* Use different marker for slow operations */
+if (warnSlowness) {
+    dataLogger.trace(Markers.DATA_SLOW_OK, message2);
+} else {
+    dataLogger.trace(Markers.DATA_OK, message2);
+}
+
+/* Returns true if this meter is NOT the current one (inverse logic for validation purposes) */
+return ref == null || ref.get() != this;
+```
+
+**When NOT to add comments**:
+- When code is self-explanatory through clear naming
+- For simple, straightforward logic
+- To repeat what the code already expresses clearly
 
 ## Immutability
 
@@ -99,29 +141,49 @@ public long measure(Runnable operation) {
 
 ## Nullability Policy
 
-**Use `@NonNull` annotation on all variables, parameters, and attributes whenever possible** to explicitly indicate that null values are not permitted.
+**Use `@NonNull` annotation when it adds value** to explicitly indicate that null values are not permitted and to enable automatic validation.
 
 ```java
 public class Meter {
-    @NonNull
-    private final String name;
+    // ❌ AVOID: Redundant on final fields with explicit initialization
+    private final String name = "default";
+    private final Logger logger = LoggerFactory.getLogger(Meter.class);
     
+    // ✅ PREFER: On mutable fields that should never be null
     @NonNull
-    private final Logger logger;
+    private String operationName;
     
+    // ✅ PREFER: On parameters to enable automatic null-checking
     public void start(@NonNull String operation) {
         // Lombok validates @NonNull parameters automatically
     }
     
+    // ✅ PREFER: On return types when null is explicitly forbidden
     @NonNull
     public String getName() {
         return name;
     }
+    
+    // ✅ PREFER: On constructor parameters for validation
+    public Meter(@NonNull String name, @NonNull Logger logger) {
+        this.name = name;
+        this.logger = logger;
+    }
 }
 ```
 
-**Guidelines**:
-- Mark all parameters, fields, and local variables with `@NonNull` unless null is a valid value
+**When to use `@NonNull`**:
+- **Method parameters**: Always use when null is not acceptable (enables automatic Lombok validation)
+- **Method return types**: Use when explicitly documenting that null will never be returned
+- **Mutable fields**: Use when the field should never be null throughout the object's lifecycle
+- **Constructor parameters**: Use to validate arguments at object creation time
+
+**When NOT to use `@NonNull`**:
+- **`final` fields with explicit initialization**: Redundant, as the compiler ensures initialization
+- **Local variables**: Generally unnecessary and clutters code
+- **Method parameters with obvious non-null semantics**: Use judgment to avoid annotation noise
+
+**Additional guidelines**:
 - Lombok automatically generates null-checks for `@NonNull` parameters in constructors and methods
 - Return `Optional<T>` when a method result may legitimately be absent
 - Avoid returning null from methods; prefer `Optional` or throw exceptions
