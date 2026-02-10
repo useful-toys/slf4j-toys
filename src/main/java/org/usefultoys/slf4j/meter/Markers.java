@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.slf4j.MarkerFactory;
  * These markers allow for fine-grained filtering and routing of log events in logging frameworks.
  *
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  * @see Meter
  */
 @UtilityClass
@@ -48,7 +49,7 @@ public class Markers {
     public final Marker MSG_START = MarkerFactory.getMarker("METER_MSG_START");
     /** Marker for human-readable messages when an operation reports progress. */
     public final Marker MSG_PROGRESS = MarkerFactory.getMarker("METER_MSG_PROGRESS");
-    /** Marker for human-readable messages when an operation completes successfully. */
+    /** Marker for human-readable messages when a progressing operation exceeds its time limit. */
     public final Marker MSG_SLOW_PROGRESS = MarkerFactory.getMarker("METER_MSG_SLOW_PROGRESS");
     /** Marker for human-readable messages when an operation completes successfully. */
     public final Marker MSG_OK = MarkerFactory.getMarker("METER_MSG_OK");
@@ -59,7 +60,7 @@ public class Markers {
     /** Marker for human-readable messages when an operation fails. */
     public final Marker MSG_FAIL = MarkerFactory.getMarker("METER_MSG_FAIL");
 
-    /** Marker for Meter API calls that are inconsistent with lifecycle state. */
+    /** Marker for errors when Meter cannot create or instantiate an exception. */
     public final Marker INVALID_EXCEPTION = MarkerFactory.getMarker("METER_INVALID_EXCEPTION");
     /** Marker for Meter API calls that are inconsistent with lifecycle state. */
     public final Marker INVALID_STATE = MarkerFactory.getMarker("METER_INVALID_STATE");
