@@ -53,22 +53,27 @@ public class NullLogger implements Logger {
 
     @Override
     public void trace(final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void trace(final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void trace(final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void trace(final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void trace(final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
@@ -78,22 +83,27 @@ public class NullLogger implements Logger {
 
     @Override
     public void trace(final Marker marker, final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void trace(final Marker marker, final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void trace(final Marker marker, final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void trace(final Marker marker, final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void trace(final Marker marker, final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
@@ -103,22 +113,27 @@ public class NullLogger implements Logger {
 
     @Override
     public void debug(final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void debug(final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void debug(final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void debug(final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void debug(final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
@@ -128,22 +143,27 @@ public class NullLogger implements Logger {
 
     @Override
     public void debug(final Marker marker, final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void debug(final Marker marker, final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void debug(final Marker marker, final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void debug(final Marker marker, final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void debug(final Marker marker, final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
@@ -153,22 +173,27 @@ public class NullLogger implements Logger {
 
     @Override
     public void info(final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void info(final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void info(final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void info(final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void info(final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
@@ -178,22 +203,27 @@ public class NullLogger implements Logger {
 
     @Override
     public void info(final Marker marker, final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void info(final Marker marker, final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void info(final Marker marker, final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void info(final Marker marker, final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void info(final Marker marker, final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
@@ -203,22 +233,27 @@ public class NullLogger implements Logger {
 
     @Override
     public void warn(final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void warn(final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void warn(final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void warn(final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void warn(final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
@@ -228,22 +263,27 @@ public class NullLogger implements Logger {
 
     @Override
     public void warn(final Marker marker, final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void warn(final Marker marker, final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void warn(final Marker marker, final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void warn(final Marker marker, final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void warn(final Marker marker, final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
@@ -253,22 +293,27 @@ public class NullLogger implements Logger {
 
     @Override
     public void error(final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void error(final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void error(final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void error(final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void error(final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
@@ -278,21 +323,26 @@ public class NullLogger implements Logger {
 
     @Override
     public void error(final Marker marker, final String msg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void error(final Marker marker, final String format, final Object arg) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void error(final Marker marker, final String format, final Object arg1, final Object arg2) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void error(final Marker marker, final String format, final Object... arguments) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void error(final Marker marker, final String msg, final Throwable t) {
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 }
