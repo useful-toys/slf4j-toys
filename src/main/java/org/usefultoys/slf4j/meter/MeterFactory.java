@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,89 +15,103 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
 
 /**
- * The MeterFactory is a utility class producing Meters.
- * The methods are shortcuts for calling the Meter constructor.
+ * Factory class for creating {@link Meter} instances with various configurations.
+ * Provides convenient factory methods as shortcuts for calling the Meter constructor.
+ * 
+ * <p>This class follows the static factory pattern and cannot be instantiated.</p>
  *
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  */
 public final class MeterFactory {
 
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
     private MeterFactory() {
     }
 
     /**
-     * Returns a Meter with category equal to the logger name and as meter category.
+     * Creates a Meter using the provided logger's name as the meter category.
      *
      * @param logger The logger used to report messages.
-     * @return the Meter
+     * @return A new Meter instance.
      */
-    public static Meter getMeter(final Logger logger) {
+    @NonNull
+    public static Meter getMeter(@NonNull final Logger logger) {
         return new Meter(logger);
     }
 
     /**
-     * Returns a Meter with given category, which will also be also the logger name.
+     * Creates a Meter with the specified category, which is also used as the logger name.
      *
-     * @param category The Meter category and logger name.
-     * @return the Meter
+     * @param category The meter category and logger name.
+     * @return A new Meter instance.
      */
-    public static Meter getMeter(final String category) {
+    @NonNull
+    public static Meter getMeter(@NonNull final String category) {
         return new Meter(LoggerFactory.getLogger(category));
     }
 
     /**
-     * Returns a Meter with given category equal to the class name, which will also be the logger name.
+     * Creates a Meter using the class name as both the category and logger name.
      *
-     * @param clazz The class which name is used as category and logger name.
-     * @return the Meter
+     * @param clazz The class whose name is used as category and logger name.
+     * @return A new Meter instance.
      */
-    public static Meter getMeter(final Class<?> clazz) {
+    @NonNull
+    public static Meter getMeter(@NonNull final Class<?> clazz) {
         return new Meter(LoggerFactory.getLogger(clazz));
     }
 
     /**
-     * Returns a Meter with given category equal to the class name, which will also be the logger name.
+     * Creates a Meter using the class name as category and logger name, with an operation name.
      *
-     * @param clazz         The class which name is used as category and logger name.
+     * @param clazz         The class whose name is used as category and logger name.
      * @param operationName Additional identification to distinguish operations reported on the same logger.
-     * @return the Meter
+     * @return A new Meter instance.
      */
-    public static Meter getMeter(final Class<?> clazz, final String operationName) {
+    @NonNull
+    public static Meter getMeter(@NonNull final Class<?> clazz, final String operationName) {
         return new Meter(LoggerFactory.getLogger(clazz), operationName);
     }
 
     /**
-     * Returns a Meter with given category equal to the logger name.
+     * Creates a Meter using the provided logger, with an operation name.
      *
-     * @param logger        The logger used to report messages and as meter category.
+     * @param logger        The logger used to report messages.
      * @param operationName Additional identification to distinguish operations reported on the same logger.
-     * @return the Meter
+     * @return A new Meter instance.
      */
-    public static Meter getMeter(final Logger logger, final String operationName) {
+    @NonNull
+    public static Meter getMeter(@NonNull final Logger logger, final String operationName) {
         return new Meter(logger, operationName);
     }
 
     /**
-     * Returns the most recently started Meter on the current thread.
+     * Retrieves the most recently started Meter on the current thread.
      *
-     * @return the Meter
+     * @return The current thread-local Meter instance.
      */
+    @NonNull
     public static Meter getCurrentMeter() {
         return Meter.getCurrentInstance();
     }
 
     /**
-     * Creates a new Meter whose name is subordinated under the hierarchy last started meter onthe current thread.
-     * Useful if a large task may be subdivided into smaller task and reported individually.
-     * The new meter uses the category of this meter. The new meter uses a name of the this meter, appended by slash and its own name.
+     * Creates a subordinated Meter under the current thread's most recently started Meter.
+     * The new meter inherits the category from the parent and appends the suboperation name to its hierarchy.
+     * Useful for subdividing large tasks into smaller, individually reported tasks.
      *
      * @param suboperationName Additional identification appended to the subordinated meter name.
-     * @return the  Meter
+     * @return A new subordinated Meter instance.
      */
+    @NonNull
     public static Meter getCurrentSubMeter(final String suboperationName) {
         return Meter.getCurrentInstance().sub(suboperationName);
     }
