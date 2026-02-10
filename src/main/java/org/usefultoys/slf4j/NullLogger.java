@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,20 @@ import org.slf4j.Marker;
 /**
  * A {@link Logger} implementation that silently discards all log events.
  * <p>
- * This class implements the Null Object pattern for SLF4J's {@link Logger} interface.
- * It is used as a performance optimization when log output is unnecessary (e.g., when the logging level
- * disables output), avoiding the overhead of formatting and I/O operations.
+ * Used as a performance optimization when log output is unnecessary (e.g., when the logging level disables output).
+ * This avoids the overhead of formatting and I/O operations.
  * <p>
- * All {@code is...Enabled()} methods return {@code false}, and all {@code log()} methods do nothing.
+ * Implements the Null Object pattern for SLF4J's {@link Logger} interface.
+ * All {@code is...Enabled()} methods return {@code false}, and all logging methods are no-ops.
  * <p>
  * This class is package-private and not intended for use outside this library.
  *
  * @author Daniel Felix Ferber
+ * @see <a href="../../../../../doc/TDR-0011-null-object-pattern-for-optional-logging.md">TDR-0011</a>
  */
 public class NullLogger implements Logger {
 
-    // Singleton instance to avoid repeated object creation
+    /* Singleton instance to avoid repeated object creation */
     public static final NullLogger INSTANCE = new NullLogger();
 
     private NullLogger() {
@@ -51,58 +52,48 @@ public class NullLogger implements Logger {
     }
 
     @Override
-    public void trace(String msg) {
-        // Do nothing
+    public void trace(final String msg) {
     }
 
     @Override
-    public void trace(String format, Object arg) {
-        // Do nothing
+    public void trace(final String format, final Object arg) {
     }
 
     @Override
-    public void trace(String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void trace(final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void trace(String format, Object... arguments) {
-        // Do nothing
+    public void trace(final String format, final Object... arguments) {
     }
 
     @Override
-    public void trace(String msg, Throwable t) {
-        // Do nothing
+    public void trace(final String msg, final Throwable t) {
     }
 
     @Override
-    public boolean isTraceEnabled(Marker marker) {
+    public boolean isTraceEnabled(final Marker marker) {
         return false;
     }
 
     @Override
-    public void trace(Marker marker, String msg) {
-        // Do nothing
+    public void trace(final Marker marker, final String msg) {
     }
 
     @Override
-    public void trace(Marker marker, String format, Object arg) {
-        // Do nothing
+    public void trace(final Marker marker, final String format, final Object arg) {
     }
 
     @Override
-    public void trace(Marker marker, String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void trace(final Marker marker, final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void trace(Marker marker, String format, Object... arguments) {
-        // Do nothing
+    public void trace(final Marker marker, final String format, final Object... arguments) {
     }
 
     @Override
-    public void trace(Marker marker, String msg, Throwable t) {
-        // Do nothing
+    public void trace(final Marker marker, final String msg, final Throwable t) {
     }
 
     @Override
@@ -111,58 +102,48 @@ public class NullLogger implements Logger {
     }
 
     @Override
-    public void debug(String msg) {
-        // Do nothing
+    public void debug(final String msg) {
     }
 
     @Override
-    public void debug(String format, Object arg) {
-        // Do nothing
+    public void debug(final String format, final Object arg) {
     }
 
     @Override
-    public void debug(String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void debug(final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void debug(String format, Object... arguments) {
-        // Do nothing
+    public void debug(final String format, final Object... arguments) {
     }
 
     @Override
-    public void debug(String msg, Throwable t) {
-        // Do nothing
+    public void debug(final String msg, final Throwable t) {
     }
 
     @Override
-    public boolean isDebugEnabled(Marker marker) {
+    public boolean isDebugEnabled(final Marker marker) {
         return false;
     }
 
     @Override
-    public void debug(Marker marker, String msg) {
-        // Do nothing
+    public void debug(final Marker marker, final String msg) {
     }
 
     @Override
-    public void debug(Marker marker, String format, Object arg) {
-        // Do nothing
+    public void debug(final Marker marker, final String format, final Object arg) {
     }
 
     @Override
-    public void debug(Marker marker, String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void debug(final Marker marker, final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void debug(Marker marker, String format, Object... arguments) {
-        // Do nothing
+    public void debug(final Marker marker, final String format, final Object... arguments) {
     }
 
     @Override
-    public void debug(Marker marker, String msg, Throwable t) {
-        // Do nothing
+    public void debug(final Marker marker, final String msg, final Throwable t) {
     }
 
     @Override
@@ -171,58 +152,48 @@ public class NullLogger implements Logger {
     }
 
     @Override
-    public void info(String msg) {
-        // Do nothing
+    public void info(final String msg) {
     }
 
     @Override
-    public void info(String format, Object arg) {
-        // Do nothing
+    public void info(final String format, final Object arg) {
     }
 
     @Override
-    public void info(String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void info(final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void info(String format, Object... arguments) {
-        // Do nothing
+    public void info(final String format, final Object... arguments) {
     }
 
     @Override
-    public void info(String msg, Throwable t) {
-        // Do nothing
+    public void info(final String msg, final Throwable t) {
     }
 
     @Override
-    public boolean isInfoEnabled(Marker marker) {
+    public boolean isInfoEnabled(final Marker marker) {
         return false;
     }
 
     @Override
-    public void info(Marker marker, String msg) {
-        // Do nothing
+    public void info(final Marker marker, final String msg) {
     }
 
     @Override
-    public void info(Marker marker, String format, Object arg) {
-        // Do nothing
+    public void info(final Marker marker, final String format, final Object arg) {
     }
 
     @Override
-    public void info(Marker marker, String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void info(final Marker marker, final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void info(Marker marker, String format, Object... arguments) {
-        // Do nothing
+    public void info(final Marker marker, final String format, final Object... arguments) {
     }
 
     @Override
-    public void info(Marker marker, String msg, Throwable t) {
-        // Do nothing
+    public void info(final Marker marker, final String msg, final Throwable t) {
     }
 
     @Override
@@ -231,58 +202,48 @@ public class NullLogger implements Logger {
     }
 
     @Override
-    public void warn(String msg) {
-        // Do nothing
+    public void warn(final String msg) {
     }
 
     @Override
-    public void warn(String format, Object arg) {
-        // Do nothing
+    public void warn(final String format, final Object arg) {
     }
 
     @Override
-    public void warn(String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void warn(final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void warn(String format, Object... arguments) {
-        // Do nothing
+    public void warn(final String format, final Object... arguments) {
     }
 
     @Override
-    public void warn(String msg, Throwable t) {
-        // Do nothing
+    public void warn(final String msg, final Throwable t) {
     }
 
     @Override
-    public boolean isWarnEnabled(Marker marker) {
+    public boolean isWarnEnabled(final Marker marker) {
         return false;
     }
 
     @Override
-    public void warn(Marker marker, String msg) {
-        // Do nothing
+    public void warn(final Marker marker, final String msg) {
     }
 
     @Override
-    public void warn(Marker marker, String format, Object arg) {
-        // Do nothing
+    public void warn(final Marker marker, final String format, final Object arg) {
     }
 
     @Override
-    public void warn(Marker marker, String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void warn(final Marker marker, final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void warn(Marker marker, String format, Object... arguments) {
-        // Do nothing
+    public void warn(final Marker marker, final String format, final Object... arguments) {
     }
 
     @Override
-    public void warn(Marker marker, String msg, Throwable t) {
-        // Do nothing
+    public void warn(final Marker marker, final String msg, final Throwable t) {
     }
 
     @Override
@@ -291,57 +252,47 @@ public class NullLogger implements Logger {
     }
 
     @Override
-    public void error(String msg) {
-        // Do nothing
+    public void error(final String msg) {
     }
 
     @Override
-    public void error(String format, Object arg) {
-        // Do nothing
+    public void error(final String format, final Object arg) {
     }
 
     @Override
-    public void error(String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void error(final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void error(String format, Object... arguments) {
-        // Do nothing
+    public void error(final String format, final Object... arguments) {
     }
 
     @Override
-    public void error(String msg, Throwable t) {
-        // Do nothing
+    public void error(final String msg, final Throwable t) {
     }
 
     @Override
-    public boolean isErrorEnabled(Marker marker) {
+    public boolean isErrorEnabled(final Marker marker) {
         return false;
     }
 
     @Override
-    public void error(Marker marker, String msg) {
-        // Do nothing
+    public void error(final Marker marker, final String msg) {
     }
 
     @Override
-    public void error(Marker marker, String format, Object arg) {
-        // Do nothing
+    public void error(final Marker marker, final String format, final Object arg) {
     }
 
     @Override
-    public void error(Marker marker, String format, Object arg1, Object arg2) {
-        // Do nothing
+    public void error(final Marker marker, final String format, final Object arg1, final Object arg2) {
     }
 
     @Override
-    public void error(Marker marker, String format, Object... arguments) {
-        // Do nothing
+    public void error(final Marker marker, final String format, final Object... arguments) {
     }
 
     @Override
-    public void error(Marker marker, String msg, Throwable t) {
-        // Do nothing
+    public void error(final Marker marker, final String msg, final Throwable t) {
     }
 }
