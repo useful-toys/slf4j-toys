@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.Map;
  * This class centralizes the logic for building log messages based on {@link MeterConfig} settings.
  *
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  */
 final class MeterDataFormatter {
 
@@ -72,11 +73,13 @@ final class MeterDataFormatter {
         /* Identification. */
         boolean hasId = false;
         if (MeterConfig.printCategory) {
+            /* Extract simple class name after last dot */
             final int index = data.getCategory().lastIndexOf('.') + 1;
             builder.append(data.getCategory().substring(index));
             hasId = true;
         }
         if (data.getOperation() != null) {
+            /* Add separator only if category was printed */
             if (MeterConfig.printCategory) {
                 builder.append('/');
             }
@@ -94,6 +97,7 @@ final class MeterDataFormatter {
         if (path != null) {
             builder.append("[");
             builder.append(path);
+            /* Append failure message for failed operations */
             if (data.isFail() && data.getFailMessage() != null) {
                 builder.append("; ");
                 builder.append(data.getFailMessage());
@@ -118,19 +122,23 @@ final class MeterDataFormatter {
 
         /* Timing. */
         if (!data.isStarted()) {
+            /* For not-yet-started operations, show waiting time */
             hasPrevious = separator(builder, hasPrevious);
             builder.append(UnitFormatter.nanoseconds(data.getWaitingTime()));
         } else {
+            /* Show execution time for stopped operations or when progress info is required */
             if (data.isStopped() || progressInfoRequired) {
                 hasPrevious = separator(builder, hasPrevious);
                 builder.append(UnitFormatter.nanoseconds(executionTime));
             }
 
+            /* Show throughput metrics for operations with iterations */
             if (data.getCurrentIteration() > 0 && (data.isStopped() || progressInfoRequired)) {
                 hasPrevious = separator(builder, hasPrevious);
                 final double iterationsPerSecond = data.getIterationsPerSecond();
                 builder.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
                 builder.append(' ');
+                /* Calculate inverse metric: time per iteration */
                 final double nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
                 builder.append(UnitFormatter.nanoseconds(nanoSecondsPerIteration));
             }
@@ -145,6 +153,7 @@ final class MeterDataFormatter {
         }
         final Map<String, String> context = data.getContext();
         if (context != null && !context.isEmpty()) {
+            /* Append all context entries as key=value or key-only for null values */
             for (final Map.Entry<String, String> entry : context.entrySet()) {
                 hasPrevious = separator(builder, hasPrevious);
                 builder.append(entry.getKey());
@@ -171,6 +180,14 @@ final class MeterDataFormatter {
         }
     }
 
+    /**
+     * Appends a separator to the StringBuilder if there is previous content.
+     * This method adds "; " as a separator between elements in the formatted message.
+     *
+     * @param sb          The StringBuilder to append to.
+     * @param hasPrevious Whether there is previous content that requires a separator.
+     * @return Always returns {@code true} to indicate that content has been added.
+     */
     private static boolean separator(final StringBuilder sb, final boolean hasPrevious) {
         if (hasPrevious) {
             sb.append("; ");
