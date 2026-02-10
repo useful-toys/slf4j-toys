@@ -58,6 +58,7 @@ import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterSta
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.assertMeterStopTime;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.configureLogger;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.event;
+import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.eventWithTrowable;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.fromStarted;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStop;
 import static org.usefultoys.slf4j.meter.MeterLifeCycleTestHelper.recordStopWithWindow;
@@ -601,10 +602,11 @@ class MeterLifeCycleHappyPathTest {
         assertMeterStopTime(meter, tr);
 
         // Then: logs failure with throwable cause (MSG_FAIL + DATA_FAIL)
+        // Then: MSG_FAIL should carry the original Throwable for SLF4J stack trace logging
         assertLogs(logger, level,
                 event(DEBUG, MSG_START),
                 event(TRACE, DATA_START),
-                event(ERROR, MSG_FAIL, "java.lang.RuntimeException"),
+                eventWithTrowable(ERROR, MSG_FAIL, "java.lang.RuntimeException", RuntimeException.class, "system failure", "shouldTransitionCreatedToStartedToFailedWithThrowableCause"),
                 event(TRACE, DATA_FAIL, "java.lang.RuntimeException")
         );
     }

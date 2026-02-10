@@ -328,6 +328,7 @@ class MeterLifeCyclePreStartTerminationTest {
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "technical_error");
+        AssertLogger.assertEventNotWithThrowable(logger, 1);
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "technical_error");
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -351,6 +352,7 @@ class MeterLifeCyclePreStartTerminationTest {
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "VALUE1");
+        AssertLogger.assertEventNotWithThrowable(logger, 1);
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "VALUE1");
         AssertLogger.assertEventCount(logger, 3);
     }
@@ -375,7 +377,10 @@ class MeterLifeCyclePreStartTerminationTest {
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "java.lang.Exception");
+        AssertLogger.assertEventWithThrowable(logger, 1, Exception.class, "connection timeout");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 1, Exception.class, "shouldTransitionToFailedWithThrowableCauseWhenFailThrowableCalledWithoutStart");
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "java.lang.Exception");
+        AssertLogger.assertEventNotWithThrowable(logger, 2);
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -399,6 +404,7 @@ class MeterLifeCyclePreStartTerminationTest {
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.fail(");
         AssertLogger.assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "testObjectString");
+        AssertLogger.assertEventNotWithThrowable(logger, 1);
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "testObjectString");
         AssertLogger.assertEventCount(logger, 3);
     }

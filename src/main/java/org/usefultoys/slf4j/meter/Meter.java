@@ -634,8 +634,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * system status.
      *
      * @param cause An object (String, Enum, Throwable, or any Object with a meaningful `toString()`) that describes the
-     *              cause of the failure. If it's a {@link Throwable}, its class name is used for `failPath` and its
-     *              message for `failMessage`.
+     *              cause of the failure. If it's a {@link Throwable}, its class name is used for `failPath`, its
+     *              message for `failMessage`, and the full stack trace is included in the log output.
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter fail(final Object cause) {
@@ -661,7 +661,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             if (messageLogger.isErrorEnabled()) {
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
                 SystemMetrics.getInstance().collectPlatformStatus(this);
-                messageLogger.error(Markers.MSG_FAIL, readableMessage());
+                if (cause instanceof Throwable) {
+                    messageLogger.error(Markers.MSG_FAIL, readableMessage(), (Throwable) cause);
+                } else {
+                    messageLogger.error(Markers.MSG_FAIL, readableMessage());
+                }
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_FAIL, json5Message());
                 }
