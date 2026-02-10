@@ -208,7 +208,6 @@ public class MeterValidator {
      * Checks if the meter has already been stopped, if it was started, and if it's the current instance on the thread.
      *
      * @param meter  The Meter instance to validate.
-     * @param marker The SLF4J marker to use for the log message in case of inconsistency.
      * @return {@code true} if the meter can proceed to stop (even with warnings), {@code false} if the meter is already stopped.
      */
     public boolean validateStopPrecondition(final Meter meter) {
