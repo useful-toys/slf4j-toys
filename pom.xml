@@ -397,6 +397,21 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>${maven-deploy-plugin.version}</version>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <!-- Prefer only stable (non-snapshot/non-pre) versions for both plugins and dependencies -->
+                    <allowSnapshots>false</allowSnapshots>
+                    <!--
+                      Ignore common pre-release qualifiers so display-*-updates suggests
+                      only stable releases. This regex filters out versions containing
+                      alpha, beta, rc, cr, m, milestone, ea, preview and SNAPSHOT.
+                    -->
+                    <ignoredVersions>(?i).*[.-]?(?:alpha|beta|rc|cr|m|milestone|ea|preview).*|.*-SNAPSHOT.*</ignoredVersions>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
