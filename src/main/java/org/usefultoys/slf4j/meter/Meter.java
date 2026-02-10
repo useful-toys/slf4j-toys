@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * All **lifecycle** events also generate a **machine-parsable data message** at TRACE level.
  *
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  * @see MeterData
  * @see MeterConfig
  * @see Markers
@@ -172,6 +173,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         final String key = operationName == null ? eventCategory : eventCategory + "/" + operationName;
         EVENT_COUNTER.putIfAbsent(key, new AtomicLong(0));
         final AtomicLong atomicLong = EVENT_COUNTER.get(key);
+        /* Reset counter when it reaches maximum value to prevent overflow */
         atomicLong.compareAndSet(Long.MAX_VALUE, 0);
         return atomicLong.incrementAndGet();
     }
@@ -185,6 +187,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     public static Meter getCurrentInstance() {
         final WeakReference<Meter> ref = localThreadInstance.get();
         final Meter current = ref == null ? null : ref.get();
+        /* Return dummy meter if no active meter on current thread */
         if (current == null) {
             return new Meter(LoggerFactory.getLogger(UNKNOWN_LOGGER_NAME));
         }
@@ -225,6 +228,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter sub(final String suboperationName) {
         MeterValidator.validateSubCallArgument(this, suboperationName);
+        /* Build sub-operation name by combining parent operation with sub-operation name */
         String subOperation = null;
         if (operation == null) {
             subOperation = suboperationName;
@@ -235,6 +239,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         }
         final Meter m = new Meter(messageLogger, subOperation, getFullID());
         if (context != null) {
+            /* Inherit parent's context for sub-operation */
             m.context = new HashMap<>(context);
         }
         return m;
@@ -421,6 +426,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
             final long now = collectCurrentTime();
             final long meterProgressPeriodNanoseconds = MeterConfig.progressPeriodMilliseconds * 1000 * 1000;
+            /* Report progress only if iterations advanced and minimum period elapsed */
             if (currentIteration > lastProgressIteration && (now - lastProgressTime) > meterProgressPeriodNanoseconds) {
                 lastProgressIteration = currentIteration;
                 lastProgressTime = now;
@@ -431,6 +437,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                     messageLogger.info(Markers.MSG_PROGRESS, readableMessage());
                     if (dataLogger.isTraceEnabled()) {
                         final String message2 = json5Message();
+                        /* Use different marker for slow progress */
                         if (isSlow()) {
                             dataLogger.trace(Markers.DATA_SLOW_PROGRESS, message2);
                         } else {
@@ -490,6 +497,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failPath = null;
             failMessage = null;
             rejectPath = null;
+            /* Override path if provided as parameter */
             if (pathId != null) {
                 okPath = toPath(pathId, true);
             }
@@ -501,6 +509,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
                 final boolean warnSlowness = isSlow();
                 final String message1 = readableMessage();
+                /* Log at WARN level for slow operations, INFO level otherwise */
                 if (warnSlowness) {
                     messageLogger.warn(Markers.MSG_SLOW_OK, message1);
                 } else if (messageLogger.isInfoEnabled()) {
@@ -508,6 +517,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 }
                 if (dataLogger.isTraceEnabled()) {
                     final String message2 = json5Message();
+                    /* Use different marker for slow operations */
                     if (warnSlowness) {
                         dataLogger.trace(Markers.DATA_SLOW_OK, message2);
                     } else {
@@ -529,6 +539,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     boolean checkCurrentInstance() {
         final WeakReference<Meter> ref = localThreadInstance.get();
+        /* Returns true if this meter is NOT the current one (inverse logic for validation purposes) */
         return ref == null || ref.get() != this;
     }
 
@@ -593,7 +604,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter reject(final Object cause) {
         try {
-                MeterValidator.validatePathCallArgument(this, cause);
+            MeterValidator.validatePathCallArgument(this, cause);
             if (!MeterValidator.validateStopPrecondition(this)) {
                 return this;
             }
@@ -640,7 +651,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     public Meter fail(final Object cause) {
         try {
-                MeterValidator.validatePathCallArgument(this, cause);
+            MeterValidator.validatePathCallArgument(this, cause);
             if (!MeterValidator.validateStopPrecondition(this)) {
                 return this;
             }
@@ -654,6 +665,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             okPath = null;
             localThreadInstance.set(previousInstance);
             failPath = toPath(cause, false);
+            /* Extract failure message from Throwable if applicable */
             if (cause instanceof Throwable) {
                 failMessage = ((Throwable)cause).getLocalizedMessage();
             }
@@ -661,6 +673,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             if (messageLogger.isErrorEnabled()) {
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
                 SystemMetrics.getInstance().collectPlatformStatus(this);
+                /* Include stack trace if cause is a Throwable */
                 if (cause instanceof Throwable) {
                     messageLogger.error(Markers.MSG_FAIL, readableMessage(), (Throwable) cause);
                 } else {
