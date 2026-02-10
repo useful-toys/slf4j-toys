@@ -173,20 +173,21 @@ public class Meter {
 ```
 
 **When to use `@NonNull`**:
-- **Method parameters**: Always use when null is not acceptable (enables automatic Lombok validation)
-- **Method return types**: Use when explicitly documenting that null will never be returned
+- **Public API method parameters**: Use when null is not acceptable and the method is part of the public API (enables automatic Lombok validation)
+- **Public API method return types**: Use when explicitly documenting that null will never be returned from a public API method
 - **Mutable fields**: Use when the field should never be null throughout the object's lifecycle
-- **Constructor parameters**: Use to validate arguments at object creation time
+- **Public constructor parameters**: Use to validate arguments at object creation time for public constructors
 
 **When NOT to use `@NonNull`**:
 - **`final` fields with explicit initialization**: Redundant, as the compiler ensures initialization
 - **Local variables**: Generally unnecessary and clutters code
+- **Internal/package-private/private methods**: Not needed for methods called only internally within the library
 - **Method parameters with obvious non-null semantics**: Use judgment to avoid annotation noise
 
 **Additional guidelines**:
 - Lombok automatically generates null-checks for `@NonNull` parameters in constructors and methods
-- Return `Optional<T>` when a method result may legitimately be absent
-- Avoid returning null from methods; prefer `Optional` or throw exceptions
+- Do not use `Optional<T>` - prefer returning null or throwing exceptions when a method result may legitimately be absent
+- Document null return values clearly in Javadoc when applicable
 
 ## Lombok Annotations
 
