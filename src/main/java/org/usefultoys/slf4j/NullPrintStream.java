@@ -39,153 +39,153 @@ class NullPrintStream extends PrintStream {
 
     @Override
     public void write(final byte[] b) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void write(final int b) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void write(final byte[] buf, final int off, final int len) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void print(final Object obj) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void print(final String s) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void print(final boolean b) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void print(final char c) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void print(final char[] s) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void print(final double d) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void print(final float f) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void print(final int i) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void print(final long l) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public PrintStream printf(final String format, final Object... args) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
         return this;
     }
 
     @Override
     public PrintStream printf(final Locale l, final String format, final Object... args) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
         return this;
     }
 
     @Override
     public void println() {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void println(final Object x) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void println(final String x) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void println(final boolean x) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void println(final char x) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void println(final char[] x) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void println(final double x) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void println(final float x) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void println(final int x) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public void println(final long x) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
     }
 
     @Override
     public PrintStream append(final CharSequence csq) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
         return this;
     }
 
     @Override
     public PrintStream append(final char c) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
         return this;
     }
 
     @Override
     public PrintStream append(final CharSequence csq, final int start, final int end) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
         return this;
     }
 
     @Override
     public PrintStream format(final String format, final Object... args) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
         return this;
     }
 
     @Override
     public PrintStream format(final Locale l, final String format, final Object... args) {
-        // ignore
+        /* Discard output to avoid unnecessary I/O and formatting overhead */
         return this;
     }
 }
