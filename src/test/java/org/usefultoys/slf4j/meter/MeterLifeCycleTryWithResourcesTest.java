@@ -708,9 +708,10 @@ class MeterLifeCycleTryWithResourcesTest {
         assertMeterNotStartedStopTime(meter, tv);
 
         /* Then: logs INVALID_TRANSITION + ERROR failure report, close() does nothing */
+        /* Then: MSG_FAIL should carry the original Throwable for SLF4J stack trace logging */
         assertLogs(logger, level,
                 eventWithTrowable(Level.ERROR, Markers.INVALID_TRANSITION, "Meter not started, should call start() first", org.usefultoys.slf4j.CallerStackTraceThrowable.class, null, "shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable"),
-                event(Level.ERROR, Markers.MSG_FAIL, "java.lang.Exception"),
+                eventWithTrowable(Level.ERROR, Markers.MSG_FAIL, "java.lang.Exception", Exception.class, "connection timeout", "shouldTransitionToFailedWithThrowableViaTryWithResourcesWithoutStartExplicitFailThrowable"),
                 event(Level.TRACE, Markers.DATA_FAIL, "java.lang.Exception")
         );
     }

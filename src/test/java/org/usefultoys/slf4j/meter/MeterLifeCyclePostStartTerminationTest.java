@@ -796,6 +796,7 @@ class MeterLifeCyclePostStartTerminationTest {
 
         // Then: logs start + fail + DATA_FAIL with critical_error path
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, "critical_error");
+        AssertLogger.assertEventNotWithThrowable(logger, 2);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, "critical_error");
         AssertLogger.assertEventCount(logger, 4);
     }
@@ -817,6 +818,7 @@ class MeterLifeCyclePostStartTerminationTest {
 
         // Then: logs start + fail + DATA_FAIL with enum name
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, MeterLifeCycleTestHelper.TestEnum.VALUE2.name());
+        AssertLogger.assertEventNotWithThrowable(logger, 2);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, MeterLifeCycleTestHelper.TestEnum.VALUE2.name());
         AssertLogger.assertEventCount(logger, 4);
     }
@@ -838,9 +840,12 @@ class MeterLifeCyclePostStartTerminationTest {
         MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, ex.getClass().getName(), ex.getMessage(), 0, 0, 0);
         assertMeterStopTime(meter, tr);
 
-        // Then: logs start + fail + DATA_FAIL with exception class and message
+        // Then: logs start + fail + DATA_FAIL with exception class and message, Throwable attached
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, ex.getClass().getName(), ex.getMessage());
+        AssertLogger.assertEventWithThrowable(logger, 2, SQLException.class, "connection refused");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, SQLException.class, "shouldTerminateViaFailWithThrowableCause");
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, ex.getClass().getName(), ex.getMessage());
+        AssertLogger.assertEventNotWithThrowable(logger, 3);
         AssertLogger.assertEventCount(logger, 4);
     }
 
@@ -863,6 +868,7 @@ class MeterLifeCyclePostStartTerminationTest {
 
         // Then: logs start + fail + DATA_FAIL with object toString
         AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.ERROR, Markers.MSG_FAIL, obj.toString());
+        AssertLogger.assertEventNotWithThrowable(logger, 2);
         AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_FAIL, obj.toString());
         AssertLogger.assertEventCount(logger, 4);
     }
