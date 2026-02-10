@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,21 +39,48 @@ public class CallerStackTraceThrowable extends Throwable {
     public static final String PACKAGE_NAME = CallerStackTraceThrowable.class.getPackage().getName();
     public static final StackTraceElement[] EMPTY_STACK_TRACE = new StackTraceElement[0];
 
+    /**
+     * Constructs a new instance with no detail message.
+     */
     public CallerStackTraceThrowable() {
     }
 
+    /**
+     * Constructs a new instance with the specified detail message.
+     *
+     * @param message the detail message
+     */
     public CallerStackTraceThrowable(final String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new instance with the specified detail message and cause.
+     *
+     * @param message the detail message
+     * @param cause the cause
+     */
     public CallerStackTraceThrowable(final String message, final Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Constructs a new instance with the specified cause.
+     *
+     * @param cause the cause
+     */
     public CallerStackTraceThrowable(final Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Returns the name of the API method from the stack trace, if available.
+     * <p>
+     * This method examines the first stack trace element and returns the method name
+     * if it belongs to the library package. Otherwise, returns null.
+     *
+     * @return the API method name, or null if not found or stack trace is empty
+     */
     public String getApiMethodName() {
         final StackTraceElement[] stacktrace = getStackTrace();
         if (stacktrace.length == 0) {
@@ -64,6 +91,7 @@ public class CallerStackTraceThrowable extends Throwable {
         }
         return null;
     }
+
     /**
      * Overrides `fillInStackTrace()` to prevent it from capturing the stack trace again,
      * as it has already been manipulated in the constructor.
