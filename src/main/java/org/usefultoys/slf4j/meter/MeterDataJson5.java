@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,46 +27,88 @@ import java.util.regex.Pattern;
  * {@link MeterData} objects to and from a JSON5-like string format.
  *
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  */
 @UtilityClass
 class MeterDataJson5 {
 
-    private final String PROP_DESCRIPTION = "d";
-    private final String PROP_PATH_ID = "p";
-    private final String PROP_REJECT_ID = "r";
-    private final String PROP_FAIL_ID = "f";
-    private final String PROP_FAIL_MESSAGE = "fm";
-    private final String PROP_CREATE_TIME = "t0";
-    private final String PROP_START_TIME = "t1";
-    private final String PROP_STOP_TIME = "t2";
-    private final String PROP_ITERATION = "i";
-    private final String PROP_EXPECTED_ITERATION = "ei";
-    private final String PROP_LIMIT_TIME = "tl";
-    private final String PROP_CONTEXT = "ctx";
-    private final String EVENT_CATEGORY = "c";
-    private final String EVENT_NAME = "n";
-    private final String EVENT_PARENT = "ep";
+    /** JSON property key for operation description. */
+    private static final String PROP_DESCRIPTION = "d";
+    /** JSON property key for success path identifier. */
+    private static final String PROP_PATH_ID = "p";
+    /** JSON property key for rejection path identifier. */
+    private static final String PROP_REJECT_ID = "r";
+    /** JSON property key for failure path identifier. */
+    private static final String PROP_FAIL_ID = "f";
+    /** JSON property key for failure message. */
+    private static final String PROP_FAIL_MESSAGE = "fm";
+    /** JSON property key for meter creation timestamp. */
+    private static final String PROP_CREATE_TIME = "t0";
+    /** JSON property key for operation start timestamp. */
+    private static final String PROP_START_TIME = "t1";
+    /** JSON property key for operation stop timestamp. */
+    private static final String PROP_STOP_TIME = "t2";
+    /** JSON property key for current iteration count. */
+    private static final String PROP_ITERATION = "i";
+    /** JSON property key for expected iteration count. */
+    private static final String PROP_EXPECTED_ITERATION = "ei";
+    /** JSON property key for time limit threshold. */
+    private static final String PROP_LIMIT_TIME = "tl";
+    /** JSON property key for context map. */
+    private static final String PROP_CONTEXT = "ctx";
+    /** JSON property key for event category. */
+    private static final String EVENT_CATEGORY = "c";
+    /** JSON property key for event name. */
+    private static final String EVENT_NAME = "n";
+    /** JSON property key for parent event identifier. */
+    private static final String EVENT_PARENT = "ep";
 
-    private final String REGEX_START = "[{,]";
-    private final String REGEX_STRING_VALUE = "\\s*:\\s*'([^']*)'";
-    private final String REGEX_WORD_VALUE = "\\s*:\\s*([^,}\\s]+)";
+    /** Regex pattern matching JSON property start (after '{' or ','). */
+    private static final String REGEX_START = "[{,]";
+    /** Regex pattern for extracting quoted string values. */
+    private static final String REGEX_STRING_VALUE = "\\s*:\\s*'([^']*)'";
+    /** Regex pattern for extracting unquoted word values. */
+    private static final String REGEX_WORD_VALUE = "\\s*:\\s*([^,}\\s]+)";
 
-    private final Pattern patternDescription = Pattern.compile(REGEX_START + PROP_DESCRIPTION + REGEX_STRING_VALUE);
-    private final Pattern patternPathId = Pattern.compile(REGEX_START + PROP_PATH_ID + REGEX_WORD_VALUE);
-    private final Pattern patternRejectId = Pattern.compile(REGEX_START + PROP_REJECT_ID + REGEX_WORD_VALUE);
-    private final Pattern patternFailId = Pattern.compile(REGEX_START + PROP_FAIL_ID + REGEX_WORD_VALUE);
-    private final Pattern patternFailMessage = Pattern.compile(REGEX_START + PROP_FAIL_MESSAGE + REGEX_STRING_VALUE);
-    private final Pattern patternCreateTime = Pattern.compile(REGEX_START + PROP_CREATE_TIME + REGEX_WORD_VALUE);
-    private final Pattern patternStartTime = Pattern.compile(REGEX_START + PROP_START_TIME + REGEX_WORD_VALUE);
-    private final Pattern patternStopTime = Pattern.compile(REGEX_START + PROP_STOP_TIME + REGEX_WORD_VALUE);
-    private final Pattern patternIteration = Pattern.compile(REGEX_START + PROP_ITERATION + REGEX_WORD_VALUE);
-    private final Pattern patternExpectedIteration = Pattern.compile(REGEX_START + PROP_EXPECTED_ITERATION + REGEX_WORD_VALUE);
-    private final Pattern patternLimitTime = Pattern.compile(REGEX_START + PROP_LIMIT_TIME + REGEX_WORD_VALUE);
-    private final Pattern patternEventCategory = Pattern.compile(REGEX_START + EVENT_CATEGORY + REGEX_WORD_VALUE);
-    private final Pattern patternEventName = Pattern.compile(REGEX_START + EVENT_NAME + REGEX_WORD_VALUE);
-    private final Pattern patternEventParent = Pattern.compile(REGEX_START + EVENT_PARENT + REGEX_WORD_VALUE);
-    private final Pattern patternContext = Pattern.compile(REGEX_START + PROP_CONTEXT + "\\s*:\\s*\\{([^}]*)\\}");
+    /** Pattern for parsing description property from JSON. */
+    private static final Pattern PATTERN_DESCRIPTION = Pattern.compile(REGEX_START + PROP_DESCRIPTION + REGEX_STRING_VALUE);
+    /** Pattern for parsing success path identifier from JSON. */
+    private static final Pattern PATTERN_PATH_ID = Pattern.compile(REGEX_START + PROP_PATH_ID + REGEX_WORD_VALUE);
+    /** Pattern for parsing rejection path identifier from JSON. */
+    private static final Pattern PATTERN_REJECT_ID = Pattern.compile(REGEX_START + PROP_REJECT_ID + REGEX_WORD_VALUE);
+    /** Pattern for parsing failure path identifier from JSON. */
+    private static final Pattern PATTERN_FAIL_ID = Pattern.compile(REGEX_START + PROP_FAIL_ID + REGEX_WORD_VALUE);
+    /** Pattern for parsing failure message from JSON. */
+    private static final Pattern PATTERN_FAIL_MESSAGE = Pattern.compile(REGEX_START + PROP_FAIL_MESSAGE + REGEX_STRING_VALUE);
+    /** Pattern for parsing creation timestamp from JSON. */
+    private static final Pattern PATTERN_CREATE_TIME = Pattern.compile(REGEX_START + PROP_CREATE_TIME + REGEX_WORD_VALUE);
+    /** Pattern for parsing start timestamp from JSON. */
+    private static final Pattern PATTERN_START_TIME = Pattern.compile(REGEX_START + PROP_START_TIME + REGEX_WORD_VALUE);
+    /** Pattern for parsing stop timestamp from JSON. */
+    private static final Pattern PATTERN_STOP_TIME = Pattern.compile(REGEX_START + PROP_STOP_TIME + REGEX_WORD_VALUE);
+    /** Pattern for parsing current iteration from JSON. */
+    private static final Pattern PATTERN_ITERATION = Pattern.compile(REGEX_START + PROP_ITERATION + REGEX_WORD_VALUE);
+    /** Pattern for parsing expected iterations from JSON. */
+    private static final Pattern PATTERN_EXPECTED_ITERATION = Pattern.compile(REGEX_START + PROP_EXPECTED_ITERATION + REGEX_WORD_VALUE);
+    /** Pattern for parsing time limit from JSON. */
+    private static final Pattern PATTERN_LIMIT_TIME = Pattern.compile(REGEX_START + PROP_LIMIT_TIME + REGEX_WORD_VALUE);
+    /** Pattern for parsing event category from JSON. */
+    private static final Pattern PATTERN_EVENT_CATEGORY = Pattern.compile(REGEX_START + EVENT_CATEGORY + REGEX_WORD_VALUE);
+    /** Pattern for parsing event name from JSON. */
+    private static final Pattern PATTERN_EVENT_NAME = Pattern.compile(REGEX_START + EVENT_NAME + REGEX_WORD_VALUE);
+    /** Pattern for parsing parent event identifier from JSON. */
+    private static final Pattern PATTERN_EVENT_PARENT = Pattern.compile(REGEX_START + EVENT_PARENT + REGEX_WORD_VALUE);
+    /** Pattern for parsing context map from JSON. */
+    private static final Pattern PATTERN_CONTEXT = Pattern.compile(REGEX_START + PROP_CONTEXT + "\\s*:\\s*\\{([^}]*)\\}");
 
+    /**
+     * Serializes MeterData attributes to JSON5-like format and appends them to the provided StringBuilder.
+     * Only non-null and non-zero values are serialized to minimize output size.
+     *
+     * @param data The MeterData object to serialize.
+     * @param sb   The StringBuilder to append the serialized data to.
+     */
+    
     @SuppressWarnings("MagicCharacter")
     void write(final MeterData data, final StringBuilder sb) {
         if (data.description != null) {
@@ -132,65 +174,73 @@ class MeterDataJson5 {
         }
     }
 
+    /**
+     * Deserializes a JSON5-like string and populates the provided MeterData object.
+     * Only properties present in the JSON string are set; absent properties remain unchanged.
+     *
+     * @param data  The MeterData object to populate with deserialized values.
+     * @param json5 The JSON5-like string to parse.
+     */
+    /* Suppressed warning: String.equals() is intentionally used for pattern matching */
     @SuppressWarnings("CallToSuspiciousStringMethod")
     void read(final MeterData data, final String json5) {
-        final Matcher matcherDescription = patternDescription.matcher(json5);
+        final Matcher matcherDescription = PATTERN_DESCRIPTION.matcher(json5);
         if (matcherDescription.find()) {
             data.description = matcherDescription.group(1);
         }
-        final Matcher matcherPathId = patternPathId.matcher(json5);
+        final Matcher matcherPathId = PATTERN_PATH_ID.matcher(json5);
         if (matcherPathId.find()) {
             data.okPath = matcherPathId.group(1);
         }
-        final Matcher matcherRejectId = patternRejectId.matcher(json5);
+        final Matcher matcherRejectId = PATTERN_REJECT_ID.matcher(json5);
         if (matcherRejectId.find()) {
             data.rejectPath = matcherRejectId.group(1);
         }
-        final Matcher matcherFailId = patternFailId.matcher(json5);
+        final Matcher matcherFailId = PATTERN_FAIL_ID.matcher(json5);
         if (matcherFailId.find()) {
             data.failPath = matcherFailId.group(1);
         }
-        final Matcher matcherFailMessage = patternFailMessage.matcher(json5);
+        final Matcher matcherFailMessage = PATTERN_FAIL_MESSAGE.matcher(json5);
         if (matcherFailMessage.find()) {
             data.failMessage = matcherFailMessage.group(1);
         }
-        final Matcher matcherCreateTime = patternCreateTime.matcher(json5);
+        final Matcher matcherCreateTime = PATTERN_CREATE_TIME.matcher(json5);
         if (matcherCreateTime.find()) {
             data.createTime = Long.parseLong(matcherCreateTime.group(1));
         }
-        final Matcher matcherStartTime = patternStartTime.matcher(json5);
+        final Matcher matcherStartTime = PATTERN_START_TIME.matcher(json5);
         if (matcherStartTime.find()) {
             data.startTime = Long.parseLong(matcherStartTime.group(1));
         }
-        final Matcher matcherStopTime = patternStopTime.matcher(json5);
+        final Matcher matcherStopTime = PATTERN_STOP_TIME.matcher(json5);
         if (matcherStopTime.find()) {
             data.stopTime = Long.parseLong(matcherStopTime.group(1));
         }
-        final Matcher matcherIteration = patternIteration.matcher(json5);
+        final Matcher matcherIteration = PATTERN_ITERATION.matcher(json5);
         if (matcherIteration.find()) {
             data.currentIteration = Long.parseLong(matcherIteration.group(1));
         }
-        final Matcher matcherExpectedIteration = patternExpectedIteration.matcher(json5);
+        final Matcher matcherExpectedIteration = PATTERN_EXPECTED_ITERATION.matcher(json5);
         if (matcherExpectedIteration.find()) {
             data.expectedIterations = Long.parseLong(matcherExpectedIteration.group(1));
         }
-        final Matcher matcherLimitTime = patternLimitTime.matcher(json5);
+        final Matcher matcherLimitTime = PATTERN_LIMIT_TIME.matcher(json5);
         if (matcherLimitTime.find()) {
             data.timeLimit = Long.parseLong(matcherLimitTime.group(1));
         }
-        final Matcher matcherEventCategory = patternEventCategory.matcher(json5);
+        final Matcher matcherEventCategory = PATTERN_EVENT_CATEGORY.matcher(json5);
         if (matcherEventCategory.find()) {
             data.category = matcherEventCategory.group(1);
         }
-        final Matcher matcherEventName = patternEventName.matcher(json5);
+        final Matcher matcherEventName = PATTERN_EVENT_NAME.matcher(json5);
         if (matcherEventName.find()) {
             data.operation = matcherEventName.group(1);
         }
-        final Matcher matcherEventParent = patternEventParent.matcher(json5);
+        final Matcher matcherEventParent = PATTERN_EVENT_PARENT.matcher(json5);
         if (matcherEventParent.find()) {
             data.parent = matcherEventParent.group(1);
         }
-        final Matcher matcherContext = patternContext.matcher(json5);
+        final Matcher matcherContext = PATTERN_CONTEXT.matcher(json5);
         if (matcherContext.find()) {
             final String contextString = matcherContext.group(1);
             if (contextString != null && !contextString.isEmpty()) {
