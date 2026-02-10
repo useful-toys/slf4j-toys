@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
  * allowing for better testability and composition.</p>
  * 
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  */
 public interface MeterExecutor<T> extends MeterAnalysis {
 
@@ -80,9 +82,22 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      * @param key The context key.
      * @param value The context value.
      */
-    void putContext(String key, Object value);
+    void putContext(@NonNull String key, Object value);
 
+    /**
+     * Gets the logger for human-readable message output.
+     * 
+     * @return The message logger instance.
+     */
+    @NonNull
     Logger getMessageLogger();
+    
+    /**
+     * Gets the logger for machine-parsable data output.
+     * 
+     * @return The data logger instance.
+     */
+    @NonNull
     Logger getDataLogger();
 
     /**
@@ -93,7 +108,7 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      *
      * @param runnable The {@link Runnable} task to be executed.
      */
-    default void run(final Runnable runnable) {
+    default void run(@NonNull final Runnable runnable) {
         if (! isStarted()) start();
         try {
             runnable.run();
@@ -116,7 +131,7 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      */
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    default void runOrReject(final Runnable runnable, final Class<? extends Exception>... exceptionsToReject) {
+    default void runOrReject(@NonNull final Runnable runnable, @NonNull final Class<? extends Exception>... exceptionsToReject) {
         if (! isStarted()) start();
         try {
             runnable.run();
@@ -145,7 +160,7 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      * @return The result of the callable task.
      * @throws Exception The original exception thrown by the callable.
      */
-    default <T> T call(final Callable<T> callable) throws Exception {
+    default <T> T call(@NonNull final Callable<T> callable) throws Exception {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
@@ -176,7 +191,7 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      * @return The result of the callable task.
      */
     @SneakyThrows
-    default <T> T callOrRejectChecked(final Callable<T> callable) {
+    default <T> T callOrRejectChecked(@NonNull final Callable<T> callable) {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
@@ -212,7 +227,7 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      */
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    default <T> T callOrReject(final Callable<T> callable, final Class<? extends Exception>... exceptionsToReject) {
+    default <T> T callOrReject(@NonNull final Callable<T> callable, @NonNull final Class<? extends Exception>... exceptionsToReject) {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
@@ -250,7 +265,7 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      * @return The result of the callable task.
      * @throws RuntimeException If the callable throws any exception, it will be wrapped in a RuntimeException.
      */
-    default <T> T safeCall(final Callable<T> callable) {
+    default <T> T safeCall(@NonNull final Callable<T> callable) {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
@@ -271,7 +286,7 @@ public interface MeterExecutor<T> extends MeterAnalysis {
         }
     }
 
-/**
+    /**
      * Executes the given {@link Callable} task within the `Meter`'s lifecycle control, wrapping any non-runtime
      * {@link Exception} into a specified {@link RuntimeException} subclass. The operation is automatically started
      * before execution and marked as {@code OK} upon successful completion. The result of the {@link Callable} is
@@ -290,7 +305,7 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      * @throws RuntimeException If the callable throws a RuntimeException, or if `exceptionClass` cannot be
      *                          instantiated.
      */
-    default <E extends RuntimeException, T> T safeCall(final Class<E> exceptionClass, final Callable<T> callable) {
+    default <E extends RuntimeException, T> T safeCall(@NonNull final Class<E> exceptionClass, @NonNull final Callable<T> callable) {
         if (! isStarted()) start();
         try {
             final T result = callable.call();
@@ -322,7 +337,8 @@ public interface MeterExecutor<T> extends MeterAnalysis {
      * @param <T>            The type of the {@link RuntimeException} subclass.
      * @return An instance of `exceptionClass` wrapping `e`, or a generic {@link RuntimeException}.
      */
-    default <T extends RuntimeException> RuntimeException convertException(final Class<T> exceptionClass, final Exception e) {
+    @NonNull
+    default <T extends RuntimeException> RuntimeException convertException(@NonNull final Class<T> exceptionClass, @NonNull final Exception e) {
         try {
             return exceptionClass.getConstructor(String.class, Throwable.class).newInstance("MeterExecutor.safeCall wrapped exception", e);
         } catch (final NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException |

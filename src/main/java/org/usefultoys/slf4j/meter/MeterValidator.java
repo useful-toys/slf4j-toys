@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Daniel Felix Ferber
+ * Copyright 2026 Daniel Felix Ferber
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,12 @@ import java.util.IllegalFormatException;
  * A utility class responsible for validating the state of a {@link Meter} instance before executing an operation.
  * <p>
  * This class centralizes all validation logic, ensuring that the {@link Meter} class remains clean and focused on its
- * primary responsibility of managing the operation s lifecycle. All methods are and designed to be
+ * primary responsibility of managing the operation's lifecycle. All methods are designed to be
  * non-intrusive, logging warnings for invalid states but never throwing exceptions that could disrupt the application
  * flow.
+ * 
+ * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
  */
 @UtilityClass
 public class MeterValidator {
@@ -40,7 +43,7 @@ public class MeterValidator {
      * @param meter          The Meter instance.
      * @param suboperationName The name of the sub-operation.
      */
-    public void validateSubCallArgument(final Meter meter, final String suboperationName) {
+    void validateSubCallArgument(final Meter meter, final String suboperationName) {
         if (suboperationName == null) {
             logInvalidArgument(meter, "Null argument: suboperation name");
         }
@@ -53,7 +56,7 @@ public class MeterValidator {
      * @param message The descriptive message.
      * @return {@code true} if the message is not null, {@code false} otherwise.
      */
-    public boolean validateMCallArgument(final Meter meter, final String message) {
+    boolean validateMCallArgument(final Meter meter, final String message) {
         if (message == null) {
             logInvalidArgument(meter, "Null argument: message");
             return false;
@@ -69,7 +72,7 @@ public class MeterValidator {
      * @param args   The arguments for the format string.
      * @return The formatted string, or {@code null} if the format is null or invalid.
      */
-    public String validateMCallArgument(final Meter meter, final String format, final Object... args) {
+    String validateMCallArgument(final Meter meter, final String format, final Object... args) {
         if (format == null) {
             logInvalidArgument(meter, "Null argument: format");
             return null;
@@ -90,7 +93,7 @@ public class MeterValidator {
      * @param timeLimit The time limit in milliseconds.
      * @return {@code true} if the time limit is positive, {@code false} otherwise.
      */
-    public boolean validateLimitMillisecondsCallArgument(final Meter meter, final long timeLimit) {
+    boolean validateLimitMillisecondsCallArgument(final Meter meter, final long timeLimit) {
         if (timeLimit <= 0) {
             logInvalidArgument(meter, "Non-positive argument: timeLimit");
             return false;
@@ -106,7 +109,7 @@ public class MeterValidator {
      * @param expectedIterations The total number of expected iterations.
      * @return {@code true} if the expected iterations count is positive, {@code false} otherwise.
      */
-    public boolean validateIterationsCallArgument(final Meter meter, final long expectedIterations) {
+    boolean validateIterationsCallArgument(final Meter meter, final long expectedIterations) {
         if (expectedIterations <= 0) {
             logInvalidArgument(meter, "Non-positive argument: expectedIterations");
             return false;
@@ -122,7 +125,7 @@ public class MeterValidator {
      * @param increment The number of iterations to add.
      * @return {@code true} if the increment is positive, {@code false} otherwise.
      */
-    public boolean validateIncByCallArgument(final Meter meter, final long increment) {
+    boolean validateIncByCallArgument(final Meter meter, final long increment) {
         if (increment <= 0) {
             logInvalidArgument(meter, "Non-positive argument: increment");
             return false;
@@ -138,7 +141,7 @@ public class MeterValidator {
      * @param currentIteration The new total number of iterations.
      * @return {@code true} if the new iteration count is positive and greater than the current count, {@code false} otherwise.
      */
-    public boolean validateIncToCallArgument(final Meter meter, final long currentIteration) {
+    boolean validateIncToCallArgument(final Meter meter, final long currentIteration) {
         if (currentIteration <= 0) {
             logInvalidArgument(meter, "Non-positive argument: currentIteration");
             return false;
@@ -158,7 +161,7 @@ public class MeterValidator {
      * @param pathId The path identifier object.
      * @return {@code true} if the argument is valid, {@code false} otherwise.
      */
-    public boolean validatePathCallArgument(final Meter meter, final Object pathId) {
+    boolean validatePathCallArgument(final Meter meter, final Object pathId) {
         if (pathId == null) {
             logInvalidArgument(meter, "Null argument: pathId");
             return false;
@@ -176,7 +179,7 @@ public class MeterValidator {
      * @param meter The Meter instance to validate.
      * @return {@code true} if the precondition is met, {@code false} otherwise.
      */
-    public boolean validateStartPrecondition(final Meter meter) {
+    boolean validateStartPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
             logInvalidTransition(meter, "Meter already stopped, must use instance only once");
             return false;
@@ -195,7 +198,7 @@ public class MeterValidator {
      * @param meter The Meter instance to validate.
      * @return {@code true} if the precondition is met, {@code false} otherwise.
      */
-    public boolean validateMPrecondition(final Meter meter) {
+    boolean validateMPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
             logInvalidStateAlreadyStopped(meter);
             return false;
@@ -210,7 +213,7 @@ public class MeterValidator {
      * @param meter  The Meter instance to validate.
      * @return {@code true} if the meter can proceed to stop (even with warnings), {@code false} if the meter is already stopped.
      */
-    public boolean validateStopPrecondition(final Meter meter) {
+    boolean validateStopPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
             logInvalidTransition(meter, "Meter already stopped, must call ok/reject/fail/success() only once");
             return false;
@@ -229,7 +232,7 @@ public class MeterValidator {
      * @param meter The Meter instance to validate.
      * @return {@code true} if the precondition is met (not stopped), {@code false} otherwise.
      */
-    public boolean validateContextPrecondition(final Meter meter) {
+    boolean validateContextPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
             logInvalidStateAlreadyStopped(meter);
             return false;
@@ -244,7 +247,7 @@ public class MeterValidator {
      * @param meter The Meter instance to validate.
      * @return {@code true} if the precondition is met (not stopped), {@code false} otherwise.
      */
-    public boolean validateLimitMillisecondsPrecondition(final Meter meter) {
+    boolean validateLimitMillisecondsPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
             logInvalidStateAlreadyStopped(meter);
             return false;
@@ -259,7 +262,7 @@ public class MeterValidator {
      * @param meter The Meter instance to validate.
      * @return {@code true} if the precondition is met (not stopped), {@code false} otherwise.
      */
-    public boolean validateIterationsPrecondition(final Meter meter) {
+    boolean validateIterationsPrecondition(final Meter meter) {
         if (meter.getStopTime() != 0) {
             logInvalidStateAlreadyStopped(meter);
             return false;
@@ -274,7 +277,7 @@ public class MeterValidator {
      * @param meter The Meter instance to validate.
      * @return {@code true} if the precondition is met, {@code false} otherwise.
      */
-    public boolean validateIncPrecondition(final Meter meter) {
+    boolean validateIncPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
             logInvalidStateNotStarted(meter);
             return false;
@@ -293,7 +296,7 @@ public class MeterValidator {
      * @param meter The Meter instance to validate.
      * @return {@code true} if the precondition is met, {@code false} otherwise.
      */
-    public boolean validateProgressPrecondition(final Meter meter) {
+    boolean validateProgressPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
             logInvalidStateNotStarted(meter);
             return false;
@@ -312,7 +315,7 @@ public class MeterValidator {
      * @param meter The Meter instance to validate.
      * @return {@code true} if the precondition is met (started and not stopped), {@code false} otherwise.
      */
-    public boolean validatePathPrecondition(final Meter meter) {
+    boolean validatePathPrecondition(final Meter meter) {
         if (meter.getStartTime() == 0) {
             logInvalidStateNotStarted(meter);
             return false;
@@ -333,7 +336,7 @@ public class MeterValidator {
      *
      * @param meter The Meter instance being finalized.
      */
-    public void validateFinalize(final Meter meter) {
+    void validateFinalize(final Meter meter) {
         if (meter.getStartTime() != 0 && meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
             meter.getMessageLogger().error(Markers.INVALID_ARGUMENT, "{}; id={}", "Meter never stopped, must remember to call ok/reject/fail/success() on each started one", meter.getFullID());
         }
@@ -341,11 +344,11 @@ public class MeterValidator {
 
     /* ========== Utility Methods ========== */
 
-    private void logInvalidStateAlreadyStopped(final Meter meter) {
+    void logInvalidStateAlreadyStopped(final Meter meter) {
         logInvalidState(meter, "Meter already stopped, must call before ok/reject/fail/success()");
     }
 
-    private void logInvalidStateNotStarted(final Meter meter) {
+    void logInvalidStateNotStarted(final Meter meter) {
         logInvalidState(meter, "Meter not yet started, must call start() first");
     }
 
@@ -365,12 +368,12 @@ public class MeterValidator {
      * @param meter   The Meter instance with the illegal precondition.
      * @param message A descriptive message about the illegal precondition.
      */
-    private void logInvalidState(final Meter meter, final String message) {
+    void logInvalidState(final Meter meter, final String message) {
         final CallerStackTraceThrowable throwable = new CallerStackTraceThrowable();
         meter.getMessageLogger().error(Markers.INVALID_STATE, "Meter.{} - {}; id={}", throwable.getApiMethodName(), message, meter.getFullID(), throwable);
     }
 
-     private void logInvalidTransition(final Meter meter, final String message) {
+    void logInvalidTransition(final Meter meter, final String message) {
         final CallerStackTraceThrowable throwable = new CallerStackTraceThrowable();
         meter.getMessageLogger().error(Markers.INVALID_TRANSITION, "Meter.{} - {}; id={}", throwable.getApiMethodName(), message, meter.getFullID(), throwable);
     }
@@ -381,7 +384,7 @@ public class MeterValidator {
      * @param meter The Meter instance where the exception occurred.
      * @param t     The Throwable that was caught.
      */
-    public void logUnexpectedException(final Meter meter, final Throwable t) {
+    void logUnexpectedException(final Meter meter, final Throwable t) {
         final CallerStackTraceThrowable e = new CallerStackTraceThrowable();
         meter.getMessageLogger().error(Markers.UNEXPECTED_EXCEPTION, "Meter.{} - Unexpected exception; id={}", e.getApiMethodName(),  meter.getFullID(), t);
     }

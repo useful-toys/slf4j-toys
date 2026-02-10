@@ -57,7 +57,9 @@ import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvents;
  *   <li><b>Increment Arguments:</b> Validates iteration increment values are positive and forward</li>
  *   <li><b>Progress Precondition:</b> Validates meter is started before progress reporting</li>
  *   <li><b>Path Arguments:</b> Validates path arguments are not null</li>
+ *   <li><b>Path Precondition:</b> Validates meter is started and not stopped before setting path</li>
  *   <li><b>Finalization:</b> Validates finalization checks for started-but-not-stopped meters</li>
+ *   <li><b>Utility Methods:</b> Validates direct logging methods for invalid state, arguments, and transitions</li>
  *   <li><b>Error Logging:</b> Validates proper error logging with markers and stack traces</li>
  * </ul>
  */
@@ -580,6 +582,48 @@ public class MeterValidatorTest {
     }
 
     @Nested
+    @DisplayName("Path Precondition Tests")
+    class PathPreconditionTests {
+
+        @Test
+        @DisplayName("should validate path precondition when meter is started and not stopped")
+        void shouldValidatePathPreconditionWhenOk() {
+            // Given: meter is started and not stopped
+            when(meter.getStartTime()).thenReturn(1L);
+            when(meter.getStopTime()).thenReturn(0L);
+            // When: validatePathPrecondition is called
+            // Then: should return true and not log any events
+            assertTrue(MeterValidator.validatePathPrecondition(meter), "should allow path setting when started and not stopped");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject path precondition when meter is not started")
+        void shouldValidatePathPreconditionWhenNotStarted() {
+            // Given: meter is not started
+            when(meter.getStartTime()).thenReturn(0L);
+            // When: validatePathPrecondition is called
+            // Then: should return false and log error
+            assertFalse(MeterValidator.validatePathPrecondition(meter), "should reject path setting when not started");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.validatePathPrecondition", "Meter not yet started, must call start() first", "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should reject path precondition when meter is already stopped")
+        void shouldValidatePathPreconditionWhenStopped() {
+            // Given: meter is started but already stopped
+            when(meter.getStartTime()).thenReturn(1L);
+            when(meter.getStopTime()).thenReturn(2L);
+            // When: validatePathPrecondition is called
+            // Then: should return false and log error
+            assertFalse(MeterValidator.validatePathPrecondition(meter), "should reject path setting when already stopped");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.validatePathPrecondition", "Meter already stopped, must call before ok/reject/fail/success()", "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+    }
+
+    @Nested
     @DisplayName("Error Logging Tests")
     class ErrorLoggingTests {
 
@@ -839,6 +883,84 @@ public class MeterValidatorTest {
             // Then: should not log any events
             MeterValidator.validateFinalize(meter);
             assertNoEvents(logger);
+        }
+    }
+
+    @Nested
+    @DisplayName("Utility Methods Tests")
+    class UtilityMethodsTests {
+
+        @Test
+        @DisplayName("should log invalid state when meter is already stopped")
+        void shouldLogInvalidStateAlreadyStopped() {
+            // Given: a meter instance
+            // When: logInvalidStateAlreadyStopped is called directly
+            MeterValidator.logInvalidStateAlreadyStopped(meter);
+            // Then: should log invalid state error with specific message
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, 
+                    "Meter.logInvalidStateAlreadyStopped", 
+                    "Meter already stopped, must call before ok/reject/fail/success()", 
+                    "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log invalid state when meter is not started")
+        void shouldLogInvalidStateNotStarted() {
+            // Given: a meter instance
+            // When: logInvalidStateNotStarted is called directly
+            MeterValidator.logInvalidStateNotStarted(meter);
+            // Then: should log invalid state error with specific message
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, 
+                    "Meter.logInvalidStateNotStarted", 
+                    "Meter not yet started, must call start() first", 
+                    "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log invalid argument with custom message")
+        void shouldLogInvalidArgument() {
+            // Given: a custom error message
+            final String customMessage = "Custom validation error message";
+            // When: logInvalidArgument is called directly
+            MeterValidator.logInvalidArgument(meter, customMessage);
+            // Then: should log invalid argument error with custom message
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, 
+                    "Meter.logInvalidArgument", 
+                    customMessage, 
+                    "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log invalid state with custom message")
+        void shouldLogInvalidState() {
+            // Given: a custom state error message
+            final String customMessage = "Custom state validation error";
+            // When: logInvalidState is called directly
+            MeterValidator.logInvalidState(meter, customMessage);
+            // Then: should log invalid state error with custom message
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, 
+                    "Meter.logInvalidState", 
+                    customMessage, 
+                    "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should log invalid transition with custom message")
+        void shouldLogInvalidTransition() {
+            // Given: a custom transition error message
+            final String customMessage = "Custom transition validation error";
+            // When: logInvalidTransition is called directly
+            MeterValidator.logInvalidTransition(meter, customMessage);
+            // Then: should log invalid transition error with custom message
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_TRANSITION, 
+                    "Meter.logInvalidTransition", 
+                    customMessage, 
+                    "test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
     }
 }
