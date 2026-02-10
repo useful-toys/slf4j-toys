@@ -15,8 +15,6 @@
  */
 package org.usefultoys.slf4j;
 
-import lombok.NonNull;
-
 import java.io.PrintStream;
 import java.util.Locale;
 
