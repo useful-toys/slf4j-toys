@@ -600,4 +600,186 @@ public class CallerStackTraceThrowableTest {
     private static CallerStackTraceThrowable outerMethodWithMessageAndCause(final String message, final Exception cause) {
         return middleMethodWithMessageAndCause(message, cause);
     }
+
+    // ========================================
+    // Edge Case Tests for getApiMethodName()
+    // ========================================
+
+    @Test
+    @DisplayName("getApiMethodName should return null when stack trace is empty")
+    public void shouldReturnNullWhenStackTraceIsEmpty() {
+        // Given: a throwable with explicitly set empty stack trace
+        final CallerStackTraceThrowable t = new CallerStackTraceThrowable();
+        t.setStackTrace(CallerStackTraceThrowable.EMPTY_STACK_TRACE);
+
+        // When: getApiMethodName() is called
+        final String apiMethodName = t.getApiMethodName();
+
+        // Then: should return null
+        assertNull(apiMethodName, "getApiMethodName() should return null when stack trace is empty");
+        assertEquals(0, t.getStackTrace().length, "Stack trace should be empty");
+    }
+
+    @Test
+    @DisplayName("getApiMethodName should return null when first frame is not library code")
+    public void shouldReturnNullWhenFirstFrameIsNotLibraryCode() {
+        // Given: a throwable with user code as first frame
+        final CallerStackTraceThrowable t = new CallerStackTraceThrowable();
+        t.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("com.example.UserClass", "userMethod", "UserClass.java", 10),
+            new StackTraceElement("com.example.AnotherClass", "anotherMethod", "AnotherClass.java", 20)
+        });
+
+        // When: getApiMethodName() is called
+        final String apiMethodName = t.getApiMethodName();
+
+        // Then: should return null since first frame is not from library package
+        assertNull(apiMethodName, "getApiMethodName() should return null when first frame is not library code");
+        assertEquals(2, t.getStackTrace().length, "Stack trace should have 2 frames");
+    }
+
+    @Test
+    @DisplayName("getApiMethodName should return method name when first frame is library code")
+    public void shouldReturnMethodNameWhenFirstFrameIsLibraryCode() {
+        // Given: a throwable with library code as first frame
+        final CallerStackTraceThrowable t = new CallerStackTraceThrowable();
+        t.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("org.usefultoys.slf4j.meter.Meter", "start", "Meter.java", 42),
+            new StackTraceElement("com.example.UserClass", "userMethod", "UserClass.java", 10)
+        });
+
+        // When: getApiMethodName() is called
+        final String apiMethodName = t.getApiMethodName();
+
+        // Then: should return the library method name
+        assertEquals("start", apiMethodName, "getApiMethodName() should return 'start'");
+        assertEquals(2, t.getStackTrace().length, "Stack trace should have 2 frames");
+    }
+
+    @Test
+    @DisplayName("getApiMethodName should handle stack trace with single library frame")
+    public void shouldHandleStackTraceWithSingleLibraryFrame() {
+        // Given: a throwable with exactly one frame from library code
+        final CallerStackTraceThrowable t = new CallerStackTraceThrowable();
+        t.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("org.usefultoys.slf4j.LoggerFactory", "getLogger", "LoggerFactory.java", 100)
+        });
+
+        // When: getApiMethodName() is called
+        final String apiMethodName = t.getApiMethodName();
+
+        // Then: should return the library method name
+        assertEquals("getLogger", apiMethodName, "getApiMethodName() should return 'getLogger'");
+        assertEquals(1, t.getStackTrace().length, "Stack trace should have 1 frame");
+    }
+
+    @Test
+    @DisplayName("getApiMethodName should handle stack trace with single non-library frame")
+    public void shouldHandleStackTraceWithSingleNonLibraryFrame() {
+        // Given: a throwable with exactly one frame NOT from library code
+        final CallerStackTraceThrowable t = new CallerStackTraceThrowable();
+        t.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("com.example.UserClass", "userMethod", "UserClass.java", 10)
+        });
+
+        // When: getApiMethodName() is called
+        final String apiMethodName = t.getApiMethodName();
+
+        // Then: should return null
+        assertNull(apiMethodName, "getApiMethodName() should return null when single frame is not library code");
+        assertEquals(1, t.getStackTrace().length, "Stack trace should have 1 frame");
+    }
+
+    @Test
+    @DisplayName("getApiMethodName should work with different library classes")
+    public void shouldWorkWithDifferentLibraryClasses() {
+        // Given: throwables with different library classes as first frame
+        final CallerStackTraceThrowable t1 = new CallerStackTraceThrowable();
+        t1.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("org.usefultoys.slf4j.watcher.Watcher", "watch", "Watcher.java", 50)
+        });
+
+        final CallerStackTraceThrowable t2 = new CallerStackTraceThrowable();
+        t2.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("org.usefultoys.slf4j.reporter.Reporter", "report", "Reporter.java", 30)
+        });
+
+        final CallerStackTraceThrowable t3 = new CallerStackTraceThrowable();
+        t3.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("org.usefultoys.slf4j.CallerStackTraceThrowable", "getApiMethodName", "CallerStackTraceThrowable.java", 85)
+        });
+
+        // When: getApiMethodName() is called on each
+        final String apiMethodName1 = t1.getApiMethodName();
+        final String apiMethodName2 = t2.getApiMethodName();
+        final String apiMethodName3 = t3.getApiMethodName();
+
+        // Then: each should return the correct method name
+        assertEquals("watch", apiMethodName1, "Should return 'watch' for Watcher class");
+        assertEquals("report", apiMethodName2, "Should return 'report' for Reporter class");
+        assertEquals("getApiMethodName", apiMethodName3, "Should return 'getApiMethodName' for CallerStackTraceThrowable class");
+    }
+
+    @Test
+    @DisplayName("getApiMethodName should handle edge case of package boundary")
+    public void shouldHandlePackageBoundaryEdgeCase() {
+        // Given: a throwable with class name that starts with library package but is not actually in it
+        final CallerStackTraceThrowable t = new CallerStackTraceThrowable();
+        t.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("org.usefultoys.slf4j.extended.CustomClass", "customMethod", "CustomClass.java", 15)
+        });
+
+        // When: getApiMethodName() is called
+        final String apiMethodName = t.getApiMethodName();
+
+        // Then: should return the method name since it starts with PACKAGE_NAME
+        assertEquals("customMethod", apiMethodName, "getApiMethodName() should return 'customMethod' for subpackage class");
+    }
+
+    @Test
+    @DisplayName("getApiMethodName should handle null message and cause with custom stack trace")
+    public void shouldHandleNullMessageAndCauseWithCustomStackTrace() {
+        // Given: a throwable with null message and cause, but custom stack trace
+        final CallerStackTraceThrowable t = new CallerStackTraceThrowable((String) null);
+        t.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("org.usefultoys.slf4j.meter.Meter", "ok", "Meter.java", 200)
+        });
+
+        // When: getApiMethodName() is called
+        final String apiMethodName = t.getApiMethodName();
+
+        // Then: should return the method name regardless of null message
+        assertEquals("ok", apiMethodName, "getApiMethodName() should work with null message");
+        assertNull(t.getMessage(), "Message should be null");
+        assertNull(t.getCause(), "Cause should be null");
+    }
+
+    @Test
+    @DisplayName("getApiMethodName should work correctly after fillInStackTrace overwrites custom stack trace")
+    public void shouldWorkCorrectlyAfterFillInStackTraceOverwritesCustomStackTrace() {
+        // Given: a throwable with custom stack trace
+        final CallerStackTraceThrowable t = new CallerStackTraceThrowable();
+        t.setStackTrace(new StackTraceElement[] {
+            new StackTraceElement("org.usefultoys.slf4j.meter.Meter", "reject", "Meter.java", 150)
+        });
+
+        // When: the custom stack trace is verified, then fillInStackTrace() is called
+        final String apiMethodNameBefore = t.getApiMethodName();
+        assertEquals("reject", apiMethodNameBefore, "Initial getApiMethodName() should return 'reject' from custom stack trace");
+
+        // When: fillInStackTrace() is called (recalculates stack trace from current thread context)
+        t.fillInStackTrace();
+        final String apiMethodNameAfter1 = t.getApiMethodName();
+
+        // Then: getApiMethodName() should return null since test method is not library code
+        assertNull(apiMethodNameAfter1, "getApiMethodName() should return null after fillInStackTrace() recalculates from test context");
+
+        // When: fillInStackTrace() is called again
+        t.fillInStackTrace();
+        final String apiMethodNameAfter2 = t.getApiMethodName();
+
+        // Then: should still return null (consistent behavior)
+        assertNull(apiMethodNameAfter2, "getApiMethodName() should remain null after second fillInStackTrace()");
+        assertEquals(apiMethodNameAfter1, apiMethodNameAfter2, "Multiple fillInStackTrace() calls should produce consistent results");
+    }
 }
