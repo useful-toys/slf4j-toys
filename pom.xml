@@ -185,7 +185,7 @@
         <jansi.version>1.18</jansi.version>
 
         <!-- Testing Dependencies Versions -->
-        <junit5.version>5.14.2</junit5.version>
+        <junit5.version>5.14.3</junit5.version>
         <!-- Defaults to 5.x for Java 11+ (can be overridden by JDK profiles) -->
         <mockito.version>5.21.0</mockito.version>
         <awaitility.version>4.3.0</awaitility.version>
