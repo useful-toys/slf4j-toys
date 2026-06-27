@@ -174,8 +174,8 @@
         <!-- Production Dependencies Versions -->
         <slf4j.version>2.0.18</slf4j.version>
         <!-- Logback versions for different SLF4J/Servlet combinations -->
-        <logback.version>1.5.24</logback.version>
-        <logback-javax.version>1.3.14</logback-javax.version>
+        <logback.version>1.5.37</logback.version>
+        <logback-javax.version>1.3.16</logback-javax.version>
         <logback-legacy.version>1.2.13</logback-legacy.version>
         <!-- Servlet API versions -->
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
@@ -567,7 +567,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <logback.version>1.5.23</logback.version>
+                <logback.version>1.5.37</logback.version>
             </properties>
             <dependencies>
                 <dependency>
