@@ -24,7 +24,7 @@
 
     <groupId>org.usefultoys</groupId>
     <artifactId>slf4j-toys</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0-SNAPSHOT</version>
     <name>slf4j-toys</name>
     <packaging>jar</packaging>
 
