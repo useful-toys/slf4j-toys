@@ -61,6 +61,7 @@ class MeterConfigTest {
         assertFalse(MeterConfig.printPosition, "Default value for printPosition should be false");
         assertFalse(MeterConfig.printLoad, "Default value for printLoad should be false");
         assertFalse(MeterConfig.printMemory, "Default value for printMemory should be false");
+        assertTrue(MeterConfig.detectLeaks, "Default value for detectLeaks should be true");
         assertEquals("", MeterConfig.dataPrefix, "Default value for dataPrefix should be an empty string");
         assertEquals("", MeterConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
         assertEquals("", MeterConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
@@ -81,6 +82,7 @@ class MeterConfigTest {
         assertFalse(MeterConfig.printPosition, "Default value for printPosition should be false");
         assertFalse(MeterConfig.printLoad, "Default value for printLoad should be false");
         assertFalse(MeterConfig.printMemory, "Default value for printMemory should be false");
+        assertTrue(MeterConfig.detectLeaks, "Default value for detectLeaks should be true");
         assertEquals("", MeterConfig.dataPrefix, "Default value for dataPrefix should be an empty string");
         assertEquals("", MeterConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
         assertEquals("", MeterConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
@@ -88,6 +90,32 @@ class MeterConfigTest {
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported after reset");
     }
 
+
+    /**
+     * Tests that detectLeaks property is correctly parsed from system property.
+     */
+    @Test
+    @DisplayName("should parse detectLeaks property correctly")
+    void testDetectLeaksProperty() {
+        System.setProperty(MeterConfig.PROP_DETECT_LEAKS, "false");
+        MeterConfig.init();
+        assertFalse(MeterConfig.detectLeaks, "detectLeaks should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid detectLeaks");
+    }
+
+    /**
+     * Tests that invalid detectLeaks property falls back to default and reports error.
+     */
+    @Test
+    @DisplayName("should handle invalid detectLeaks format")
+    void testDetectLeaksInvalidFormat() {
+        System.setProperty(MeterConfig.PROP_DETECT_LEAKS, "invalid");
+        MeterConfig.init();
+        assertTrue(MeterConfig.detectLeaks, "detectLeaks should fall back to default for invalid format");
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid detectLeaks format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_DETECT_LEAKS));
+    }
 
     /**
      * Tests that progressPeriodMilliseconds property is correctly parsed from system property.
