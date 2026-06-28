@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Forward-compatible detector for {@link Meter} instances that were started but never explicitly stopped
@@ -44,10 +45,17 @@ import java.lang.ref.ReferenceQueue;
  * <em>while still registered</em> is, by definition, a meter that was started and never stopped — exactly the
  * predicate the former {@code finalize()} path checked. The {@code UNKNOWN_LOGGER_NAME} exclusion and the
  * {@link MeterConfig#detectLeaks} toggle are enforced by the caller, keeping this class a pure mechanism.
+ * <p>
+ * <b>Tail draining on shutdown:</b> the opportunistic drain only reports meters the garbage collector has already
+ * reclaimed. Meters that are forgotten but never collected during the application's life would otherwise go
+ * unreported. When {@link MeterConfig#reportLeaksOnShutdown} is enabled, a JVM shutdown hook is installed lazily (on
+ * the first registration) that runs {@link #reportRemainingLeaks()}, reporting every meter still registered at
+ * shutdown.
  *
  * @author Daniel Felix Ferber
  * @see Meter
  * @see MeterConfig#detectLeaks
+ * @see MeterConfig#reportLeaksOnShutdown
  */
 final class MeterLeakDetector {
 
@@ -63,6 +71,12 @@ final class MeterLeakDetector {
 
     /** Head of the intrusive doubly-linked list of currently registered references; {@code null} when empty. */
     private static MeterReference head;
+
+    /** Ensures the shutdown hook is installed at most once. */
+    private static final AtomicBoolean shutdownHookInstalled = new AtomicBoolean(false);
+
+    /** The installed shutdown hook thread, retained so tests can remove it. */
+    private static volatile Thread shutdownHook;
 
     /**
      * A {@link PhantomReference} to a started {@link Meter} that doubles as the node of the intrusive linked list.
@@ -104,6 +118,9 @@ final class MeterLeakDetector {
      */
     static MeterReference register(final Meter meter) {
         drain();
+        if (MeterConfig.reportLeaksOnShutdown) {
+            installShutdownHookOnce();
+        }
         final MeterReference ref = new MeterReference(meter, QUEUE);
         synchronized (LOCK) {
             ref.next = head;
@@ -153,6 +170,59 @@ final class MeterLeakDetector {
     }
 
     /**
+     * Reports every meter still registered (started and never stopped) and empties the registry. This is the tail
+     * drain run on JVM shutdown: unlike {@link #drain()}, which only reports meters the garbage collector has already
+     * reclaimed, this reports the complete set of outstanding leaks regardless of collection.
+     * <p>
+     * The list is detached and the references marked unregistered under the lock — so a concurrent {@link #drain()}
+     * will not double-report — while the actual logging happens outside the lock, since {@link MeterReference#reportLeak()}
+     * may be slow or reentrant.
+     */
+    static void reportRemainingLeaks() {
+        final MeterReference chain;
+        synchronized (LOCK) {
+            chain = head;
+            head = null;
+            for (MeterReference ref = chain; ref != null; ref = ref.next) {
+                ref.prev = null;
+                ref.registered = false;
+            }
+        }
+        for (MeterReference ref = chain; ref != null; ) {
+            final MeterReference next = ref.next;
+            ref.next = null;
+            ref.reportLeak();
+            ref.clear();
+            ref = next;
+        }
+    }
+
+    /**
+     * Installs the JVM shutdown hook that runs {@link #reportRemainingLeaks()}, at most once per JVM.
+     */
+    private static void installShutdownHookOnce() {
+        if (shutdownHookInstalled.compareAndSet(false, true)) {
+            final Thread hook = new Thread(MeterLeakDetector::runShutdownReport, "slf4j-toys-MeterLeakDetector-shutdown");
+            shutdownHook = hook;
+            Runtime.getRuntime().addShutdownHook(hook);
+        }
+    }
+
+    /**
+     * Body of the shutdown hook: reports remaining leaks if still enabled, swallowing any error so shutdown is never
+     * disrupted.
+     */
+    private static void runShutdownReport() {
+        try {
+            if (MeterConfig.reportLeaksOnShutdown) {
+                reportRemainingLeaks();
+            }
+        } catch (final Exception ignored) {
+            // A shutdown hook must never throw; a failed leak report is not worth disrupting shutdown.
+        }
+    }
+
+    /**
      * Unlinks a reference from the intrusive list. Caller must hold {@link #LOCK}. Idempotent.
      */
     private static void unlink(final MeterReference ref) {
@@ -183,5 +253,29 @@ final class MeterLeakDetector {
             }
         }
         return count;
+    }
+
+    /**
+     * The installed shutdown hook thread, or {@code null} if none was installed. For tests only.
+     */
+    static Thread shutdownHookForTests() {
+        return shutdownHook;
+    }
+
+    /**
+     * Removes and forgets the installed shutdown hook, allowing it to be reinstalled. For tests only, to avoid
+     * leaking a real JVM shutdown hook across the test suite.
+     */
+    static void resetShutdownHookForTests() {
+        final Thread hook = shutdownHook;
+        if (hook != null) {
+            try {
+                Runtime.getRuntime().removeShutdownHook(hook);
+            } catch (final IllegalStateException ignored) {
+                // JVM already shutting down; nothing to remove.
+            }
+            shutdownHook = null;
+        }
+        shutdownHookInstalled.set(false);
     }
 }

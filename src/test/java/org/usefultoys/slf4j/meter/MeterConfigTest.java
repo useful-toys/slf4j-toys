@@ -62,6 +62,7 @@ class MeterConfigTest {
         assertFalse(MeterConfig.printLoad, "Default value for printLoad should be false");
         assertFalse(MeterConfig.printMemory, "Default value for printMemory should be false");
         assertTrue(MeterConfig.detectLeaks, "Default value for detectLeaks should be true");
+        assertFalse(MeterConfig.reportLeaksOnShutdown, "Default value for reportLeaksOnShutdown should be false");
         assertEquals("", MeterConfig.dataPrefix, "Default value for dataPrefix should be an empty string");
         assertEquals("", MeterConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
         assertEquals("", MeterConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
@@ -83,6 +84,7 @@ class MeterConfigTest {
         assertFalse(MeterConfig.printLoad, "Default value for printLoad should be false");
         assertFalse(MeterConfig.printMemory, "Default value for printMemory should be false");
         assertTrue(MeterConfig.detectLeaks, "Default value for detectLeaks should be true");
+        assertFalse(MeterConfig.reportLeaksOnShutdown, "Default value for reportLeaksOnShutdown should be false");
         assertEquals("", MeterConfig.dataPrefix, "Default value for dataPrefix should be an empty string");
         assertEquals("", MeterConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
         assertEquals("", MeterConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
@@ -115,6 +117,32 @@ class MeterConfigTest {
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid detectLeaks format");
         assertEquals(1, ConfigParser.initializationErrors.size());
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_DETECT_LEAKS));
+    }
+
+    /**
+     * Tests that reportLeaksOnShutdown property is correctly parsed from system property.
+     */
+    @Test
+    @DisplayName("should parse reportLeaksOnShutdown property correctly")
+    void testReportLeaksOnShutdownProperty() {
+        System.setProperty(MeterConfig.PROP_REPORT_LEAKS_ON_SHUTDOWN, "true");
+        MeterConfig.init();
+        assertTrue(MeterConfig.reportLeaksOnShutdown, "reportLeaksOnShutdown should reflect the system property value");
+        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid reportLeaksOnShutdown");
+    }
+
+    /**
+     * Tests that invalid reportLeaksOnShutdown property falls back to default and reports error.
+     */
+    @Test
+    @DisplayName("should handle invalid reportLeaksOnShutdown format")
+    void testReportLeaksOnShutdownInvalidFormat() {
+        System.setProperty(MeterConfig.PROP_REPORT_LEAKS_ON_SHUTDOWN, "invalid");
+        MeterConfig.init();
+        assertFalse(MeterConfig.reportLeaksOnShutdown, "reportLeaksOnShutdown should fall back to default for invalid format");
+        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid reportLeaksOnShutdown format");
+        assertEquals(1, ConfigParser.initializationErrors.size());
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_REPORT_LEAKS_ON_SHUTDOWN));
     }
 
     /**

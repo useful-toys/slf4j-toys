@@ -64,6 +64,8 @@ public class MeterConfig {
     public final String PROP_PRINT_STATUS = "slf4jtoys.meter.print.status";
     /** System property key for enabling/disabling the forgotten-meter leak detector. */
     public final String PROP_DETECT_LEAKS = "slf4jtoys.meter.detect.leaks";
+    /** System property key for enabling/disabling the final leak sweep on JVM shutdown. */
+    public final String PROP_REPORT_LEAKS_ON_SHUTDOWN = "slf4jtoys.meter.report.leaks.on.shutdown";
 
     static {
         init();
@@ -134,6 +136,22 @@ public class MeterConfig {
     public boolean detectLeaks;
 
     /**
+     * Whether the {@link Meter} leak detector performs a final sweep on JVM shutdown.
+     * <p>
+     * The runtime detector ({@link #detectLeaks}) only reports a forgotten {@link Meter} once it has been
+     * garbage-collected and another meter is started. When this flag is {@code true}, a JVM shutdown hook is
+     * installed (lazily, on the first started meter) that reports every meter still started-but-never-stopped at
+     * shutdown — including those the garbage collector never reclaimed during the application's life.
+     * <p>
+     * This is opt-in because it installs a shutdown hook and may report meters that were legitimately still in
+     * progress at shutdown. It has no effect when {@link #detectLeaks} is {@code false}.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.report.leaks.on.shutdown}, defaulting to {@code false}.
+     * Can be assigned a new value at runtime.
+     */
+    public boolean reportLeaksOnShutdown;
+
+    /**
      * A prefix added to the logger name used for machine-parsable data messages.
      * <p>
      * By default, encoded and human-readable messages are written to the same logger. Setting a prefix allows
@@ -197,6 +215,7 @@ public class MeterConfig {
         printLoad = ConfigParser.getProperty(PROP_PRINT_LOAD, false);
         printMemory = ConfigParser.getProperty(PROP_PRINT_MEMORY, false);
         detectLeaks = ConfigParser.getProperty(PROP_DETECT_LEAKS, true);
+        reportLeaksOnShutdown = ConfigParser.getProperty(PROP_REPORT_LEAKS_ON_SHUTDOWN, false);
         dataPrefix = ConfigParser.getProperty(PROP_DATA_PREFIX, "");
         dataSuffix = ConfigParser.getProperty(PROP_DATA_SUFFIX, "");
         messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
@@ -215,6 +234,7 @@ public class MeterConfig {
         System.clearProperty(PROP_PRINT_LOAD);
         System.clearProperty(PROP_PRINT_MEMORY);
         System.clearProperty(PROP_DETECT_LEAKS);
+        System.clearProperty(PROP_REPORT_LEAKS_ON_SHUTDOWN);
         System.clearProperty(PROP_DATA_PREFIX);
         System.clearProperty(PROP_DATA_SUFFIX);
         System.clearProperty(PROP_MESSAGE_PREFIX);

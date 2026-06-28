@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
+import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.meter.MeterLeakDetector.MeterReference;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
@@ -33,6 +34,8 @@ import java.lang.ref.ReferenceQueue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.lenient;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvents;
@@ -145,5 +148,81 @@ class MeterLeakDetectorTest {
         ref.reportLeak();
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
                 "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+    }
+
+    @Test
+    @DisplayName("reportRemainingLeaks should report every still-registered meter and empty the registry")
+    void reportRemainingLeaksReportsAllRegistered() {
+        MeterLeakDetector.register(meter);
+        MeterLeakDetector.register(meter);
+        assertEquals(2, MeterLeakDetector.trackedCount(), "both meters should be tracked before the sweep");
+
+        MeterLeakDetector.reportRemainingLeaks();
+
+        assertEquals(0, MeterLeakDetector.trackedCount(), "the registry must be empty after the sweep");
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+        assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+    }
+
+    @Test
+    @DisplayName("reportRemainingLeaks should be idempotent and not double-report")
+    void reportRemainingLeaksIsIdempotent() {
+        MeterLeakDetector.register(meter);
+        MeterLeakDetector.reportRemainingLeaks();
+        MeterLeakDetector.reportRemainingLeaks();
+        assertEquals(0, MeterLeakDetector.trackedCount(), "registry must stay empty");
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+        assertEquals(1, ((MockLogger) logger).getLoggerEvents().size(),
+                "a forgotten meter must be reported exactly once across repeated sweeps");
+    }
+
+    @Test
+    @DisplayName("reportRemainingLeaks on an empty registry should be a no-op")
+    void reportRemainingLeaksEmptyIsNoOp() {
+        MeterLeakDetector.reportRemainingLeaks();
+        assertEquals(0, MeterLeakDetector.trackedCount());
+        assertNoEvents(logger);
+    }
+
+    @Test
+    @DisplayName("a deregistered meter is not reported by the shutdown sweep")
+    void deregisteredMeterIsNotReportedOnShutdownSweep() {
+        final MeterReference ref = MeterLeakDetector.register(meter);
+        MeterLeakDetector.deregister(ref);
+        MeterLeakDetector.reportRemainingLeaks();
+        assertNoEvents(logger);
+    }
+
+    @Test
+    @DisplayName("enabling reportLeaksOnShutdown installs a shutdown hook at most once")
+    void enablingReportLeaksOnShutdownInstallsHookOnce() {
+        MeterConfig.reportLeaksOnShutdown = true;
+        final MeterReference ref1 = MeterLeakDetector.register(meter);
+        try {
+            final Thread hook = MeterLeakDetector.shutdownHookForTests();
+            assertNotNull(hook, "a shutdown hook must be installed when reportLeaksOnShutdown is enabled");
+            final MeterReference ref2 = MeterLeakDetector.register(meter);
+            assertSame(hook, MeterLeakDetector.shutdownHookForTests(), "the hook must be installed at most once");
+            MeterLeakDetector.deregister(ref2);
+        } finally {
+            MeterLeakDetector.deregister(ref1);
+            MeterLeakDetector.resetShutdownHookForTests();
+        }
+    }
+
+    @Test
+    @DisplayName("no shutdown hook is installed when reportLeaksOnShutdown is disabled")
+    void disabledReportLeaksOnShutdownInstallsNoHook() {
+        // reportLeaksOnShutdown defaults to false (restored by @ResetMeterConfig)
+        final MeterReference ref = MeterLeakDetector.register(meter);
+        try {
+            assertNull(MeterLeakDetector.shutdownHookForTests(),
+                    "no shutdown hook should be installed when the option is disabled");
+        } finally {
+            MeterLeakDetector.deregister(ref);
+        }
     }
 }
