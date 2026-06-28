@@ -62,6 +62,8 @@ public class MeterConfig {
     public final String PROP_PRINT_POSITION = "slf4jtoys.meter.print.position";
     /** System property key for enabling/disabling status printing in readable messages. */
     public final String PROP_PRINT_STATUS = "slf4jtoys.meter.print.status";
+    /** System property key for enabling/disabling the forgotten-meter leak detector. */
+    public final String PROP_DETECT_LEAKS = "slf4jtoys.meter.detect.leaks";
 
     static {
         init();
@@ -115,6 +117,21 @@ public class MeterConfig {
      * Can be assigned a new value at runtime.
      */
     public boolean printMemory;
+
+    /**
+     * Whether the {@link Meter} activates the forgotten-meter leak detector.
+     * <p>
+     * When {@code true}, a {@link Meter} that is started but never explicitly stopped ({@code ok()},
+     * {@code reject()}, {@code fail()}, or {@code close()}) will emit an error log message when it
+     * becomes eligible for garbage collection.
+     * <p>
+     * Disable this flag in test environments where meters are intentionally left open, or when the
+     * overhead of registering each started meter is undesirable.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.detect.leaks}, defaulting to {@code true}.
+     * Can be assigned a new value at runtime.
+     */
+    public boolean detectLeaks;
 
     /**
      * A prefix added to the logger name used for machine-parsable data messages.
@@ -179,6 +196,7 @@ public class MeterConfig {
         printPosition = ConfigParser.getProperty(PROP_PRINT_POSITION, false);
         printLoad = ConfigParser.getProperty(PROP_PRINT_LOAD, false);
         printMemory = ConfigParser.getProperty(PROP_PRINT_MEMORY, false);
+        detectLeaks = ConfigParser.getProperty(PROP_DETECT_LEAKS, true);
         dataPrefix = ConfigParser.getProperty(PROP_DATA_PREFIX, "");
         dataSuffix = ConfigParser.getProperty(PROP_DATA_SUFFIX, "");
         messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
@@ -196,6 +214,7 @@ public class MeterConfig {
         System.clearProperty(PROP_PRINT_POSITION);
         System.clearProperty(PROP_PRINT_LOAD);
         System.clearProperty(PROP_PRINT_MEMORY);
+        System.clearProperty(PROP_DETECT_LEAKS);
         System.clearProperty(PROP_DATA_PREFIX);
         System.clearProperty(PROP_DATA_SUFFIX);
         System.clearProperty(PROP_MESSAGE_PREFIX);
