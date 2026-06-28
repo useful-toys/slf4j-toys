@@ -96,6 +96,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ github.ref_name }} \
-            slf4j-toys/target/slf4j-toys-*.jar --clobber
+            target/slf4j-toys-*.jar --clobber
           echo "✓ JAR artifact uploaded to release ${{ github.ref_name }}"
           echo "✓ Release ${{ github.ref_name }} is now live on Maven Central and GitHub"
