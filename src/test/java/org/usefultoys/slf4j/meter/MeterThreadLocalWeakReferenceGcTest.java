@@ -21,11 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
+import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCleanMeter;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,6 +61,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @author Daniel Felix Ferber
  */
 @ValidateCleanMeter
+@ResetMeterConfig
 @DisplayName("Diagnostic: WeakReference in Meter ThreadLocal loses the started Meter on GC")
 class MeterThreadLocalWeakReferenceGcTest {
 
@@ -92,7 +93,6 @@ class MeterThreadLocalWeakReferenceGcTest {
                 return false;
             }
             System.gc();
-            System.runFinalization();
             // Real allocation pressure: provokes collection even if System.gc() is only a hint.
             final byte[] pressure = new byte[8 * 1024 * 1024];
             blackhole += pressure.length;
@@ -109,6 +109,9 @@ class MeterThreadLocalWeakReferenceGcTest {
     @Test
     @DisplayName("A strongly referenced started Meter survives GC and stays on the stack")
     void stronglyReferencedMeterSurvivesGc() {
+        // This diagnostic targets the thread-local WeakReference stack, not leak detection; disable the
+        // detector to keep the two mechanisms isolated.
+        MeterConfig.detectLeaks = false;
         assertEquals(UNKNOWN, Meter.getCurrentInstance().getCategory(), "Precondition: stack must be clean");
 
         final Meter meter = new Meter(logger).start();
@@ -139,6 +142,9 @@ class MeterThreadLocalWeakReferenceGcTest {
     @Test
     @DisplayName("A non-referenced started Meter is lost from the stack after GC (the flake)")
     void weakReferenceLosesStartedMeterAfterGc() {
+        // This diagnostic targets the thread-local WeakReference stack, not leak detection; disable the
+        // detector so the deliberately forgotten fixture below does not enqueue a real leak report.
+        MeterConfig.detectLeaks = false;
         assertEquals(UNKNOWN, Meter.getCurrentInstance().getCategory(), "Precondition: stack must be clean");
 
         // Start a Meter but keep NO strong reference to it. This mirrors a test/operation that
@@ -165,6 +171,9 @@ class MeterThreadLocalWeakReferenceGcTest {
     @Test
     @DisplayName("An 'expected dirty' stack can appear clean after GC under WeakReference")
     void expectedDirtyStackCanAppearCleanAfterGc() {
+        // This diagnostic targets the thread-local WeakReference stack, not leak detection; disable the
+        // detector so the deliberately forgotten fixture below does not enqueue a real leak report.
+        MeterConfig.detectLeaks = false;
         assertEquals(UNKNOWN, Meter.getCurrentInstance().getCategory(), "Precondition: stack must be clean");
 
         new Meter(logger).start().inc().inc();
@@ -191,9 +200,11 @@ class MeterThreadLocalWeakReferenceGcTest {
      *       message must be emitted so the misuse is visible.</li>
      *   <li><b>Resilience:</b> the thread-local stack must self-heal back to the dummy {@code "???"}.</li>
      * </ol>
-     * This test proves that the current {@code WeakReference}-based design satisfies all three, and
-     * therefore that removing the {@code WeakReference} (which would pin the chain in a pooled thread
-     * and also prevent {@code finalize()} from ever logging) must NOT be done under this requirement.
+     * This test proves that the {@link MeterLeakDetector} (the {@code PhantomReference}-based replacement for the
+     * former {@code finalize()} mechanism) satisfies all three together with the {@code WeakReference}-based stack:
+     * the {@code WeakReference} guarantees (1) and (3), and the detector — drained here synchronously on the test
+     * thread — guarantees (2). Because draining is opportunistic and runs on the caller's thread, the warning is
+     * emitted deterministically rather than by a background finalizer thread.
      */
     @Test
     @DisplayName("REQUIREMENT: a forgotten Meter is reclaimed (no leak), logs a warning, and the stack self-heals")
@@ -206,21 +217,22 @@ class MeterThreadLocalWeakReferenceGcTest {
         messageLogger.clearEvents();
 
         // Start a Meter and "forget" it: keep NO strong reference. A WeakReference lets us observe
-        // whether it becomes collectable without itself preventing collection.
+        // whether it becomes collectable without itself preventing collection. Leak detection is on
+        // by default (restored by @ResetMeterConfig), so start() registers it with the detector.
         final WeakReference<Meter> tracker = new WeakReference<>(new Meter(logger).start());
         assertEquals(CATEGORY, Meter.getCurrentInstance().getCategory(),
                 "Meter must be active immediately after start()");
 
-        // Drive GC + finalization until the Meter is reclaimed AND its finalize() warning is logged.
-        final boolean reclaimedAndWarned = driveReclamationAndFinalization(tracker, messageLogger);
-        assumeTrue(reclaimedAndWarned, "Could not trigger GC/finalization in this environment; skipping");
+        // Drive GC until the Meter is reclaimed and the detector, drained on this thread, logs the warning.
+        final boolean reclaimedAndWarned = driveReclamationAndDrain(tracker, messageLogger);
+        assumeTrue(reclaimedAndWarned, "Could not trigger GC in this environment; skipping");
 
         // (1) NO MEMORY LEAK: nothing retained the forgotten Meter, so the GC reclaimed it.
         assertNull(tracker.get(),
-                "A forgotten started Meter must be garbage-collectable: the WeakReference design "
-                        + "guarantees no unbounded retention in a pooled thread — i.e. no memory leak.");
+                "A forgotten started Meter must be garbage-collectable: neither the WeakReference stack nor "
+                        + "the PhantomReference detector pins it — i.e. no memory leak.");
 
-        // (2) INCONSISTENCY LOGGED: finalize() reported the never-stopped Meter.
+        // (2) INCONSISTENCY LOGGED: the leak detector reported the never-stopped Meter.
         assertTrue(hasNeverStoppedWarning(messageLogger),
                 "Reclaiming a started-but-never-stopped Meter must log an inconsistency warning "
                         + "('Meter never stopped...') so the misuse is visible.");
@@ -231,21 +243,21 @@ class MeterThreadLocalWeakReferenceGcTest {
     }
 
     /**
-     * Drives garbage collection and finalization until the tracked Meter has been reclaimed AND its
-     * {@code finalize()} warning has been logged, or until the time budget expires.
+     * Drives garbage collection until the tracked Meter has been reclaimed and the {@link MeterLeakDetector},
+     * drained synchronously on this thread, has logged the never-stopped warning — or until the time budget expires.
      *
      * @return {@code true} if both reclamation and the warning were observed in time; {@code false}
-     *         if the collector/finalizer could not be driven (the test should then be skipped).
+     *         if the collector could not be driven (the test should then be skipped).
      */
-    @SuppressWarnings({"removal", "deprecation"})
-    private static boolean driveReclamationAndFinalization(
+    private static boolean driveReclamationAndDrain(
             final WeakReference<Meter> tracker, final MockLogger messageLogger) {
         final long deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(15);
         while (System.nanoTime() < deadlineNanos) {
             System.gc();
-            System.runFinalization();
             final byte[] pressure = new byte[8 * 1024 * 1024];
             blackhole += pressure.length;
+            // Drain on this thread: any meter the GC enqueued is reported here, deterministically.
+            MeterLeakDetector.drain();
             if (tracker.get() == null && hasNeverStoppedWarning(messageLogger)) {
                 return true;
             }
@@ -254,21 +266,17 @@ class MeterThreadLocalWeakReferenceGcTest {
     }
 
     /**
-     * Defensively scans the logger for the finalize() inconsistency warning. Tolerates concurrent
-     * writes from the finalizer thread by snapshotting and retrying on the next poll iteration.
+     * Scans the logger for the leak detector's inconsistency warning. Draining happens on the test thread,
+     * so there is no concurrent appender to guard against.
      */
     private static boolean hasNeverStoppedWarning(final MockLogger messageLogger) {
-        try {
-            for (final MockLoggerEvent event : new ArrayList<>(messageLogger.getLoggerEvents())) {
-                final String formatted = event.getFormattedMessage();
-                if (event.getLevel() == MockLoggerEvent.Level.ERROR
-                        && formatted != null
-                        && formatted.contains("Meter never stopped")) {
-                    return true;
-                }
+        for (final MockLoggerEvent event : new ArrayList<>(messageLogger.getLoggerEvents())) {
+            final String formatted = event.getFormattedMessage();
+            if (event.getLevel() == MockLoggerEvent.Level.ERROR
+                    && formatted != null
+                    && formatted.contains("Meter never stopped")) {
+                return true;
             }
-        } catch (final ConcurrentModificationException ignored) {
-            // The finalizer thread is appending concurrently; treat as "not yet" and retry.
         }
         return false;
     }
