@@ -83,13 +83,13 @@ jobs:
       - name: Get current version from latest git tag
         id: current_version
         run: |
-          # Get the latest tag name like v1.2.3 and remove the 'v' prefix
-          LATEST_TAG=$(git describe --tags --match "v*.*.*" `git rev-list --tags --max-count=1` 2>/dev/null || true)
+          # Get the latest tag matching semantic version pattern (e.g., 1.2.3)
+          LATEST_TAG=$(git tag --sort=-v:refname --list "[0-9]*.[0-9]*.[0-9]*" | head -1)
           echo "Latest tag: $LATEST_TAG"
           if [ -z "$LATEST_TAG" ]; then
             VERSION=0.0.0
           else
-            VERSION=${LATEST_TAG#v}
+            VERSION=$LATEST_TAG
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -129,7 +129,7 @@ jobs:
           git commit -am "chore: set version to ${{ steps.release_version.outputs.version }}"
 
       - name: Create tag for release version
-        run: git tag -a "v${{ steps.release_version.outputs.version }}" -m "Version ${{ steps.release_version.outputs.version }}"
+        run: git tag -a "${{ steps.release_version.outputs.version }}" -m "Version ${{ steps.release_version.outputs.version }}"
 
       - name: Update version to ${{ steps.release_version.outputs.next_snapshot }}
         run: sh mvnw versions:set -DnewVersion=${{ steps.release_version.outputs.next_snapshot }} -DgenerateBackupPoms=false
