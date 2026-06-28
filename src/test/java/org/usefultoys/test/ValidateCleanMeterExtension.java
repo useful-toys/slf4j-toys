@@ -19,8 +19,12 @@ package org.usefultoys.test;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 import org.usefultoys.slf4j.meter.Meter;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
@@ -54,6 +58,19 @@ import java.util.Optional;
  * This approach provides both resilience (removes leftover state) and visibility
  * (fails if current test leaves the stack dirty when it shouldn't).
  * <p>
+ * <b>Determinism under garbage collection:</b> the Meter thread-local stack holds each Meter through
+ * a {@link java.lang.ref.WeakReference} (so that a forgotten, never-stopped Meter can be reclaimed in
+ * a server/Java EE environment without leaking memory). For a test annotated with
+ * {@code expectDirtyStack = true}, the started Meter is typically only reachable through a local
+ * variable that dies when the test body returns. JUnit's allocation-heavy post-test machinery could
+ * then trigger a GC that clears the WeakReference before {@code afterEach} inspects the stack, making
+ * the "dirty stack" assertion intermittently fail. To prevent this, this extension also implements
+ * {@link InvocationInterceptor}: immediately after the test body returns — before any allocation that
+ * could trigger a GC — it pins the current top of the stack in a strong reference held by the per-test
+ * {@link ExtensionContext.Store}. That strong reference keeps the WeakReference valid, so the
+ * {@code afterEach} validation observes the real Meter deterministically. This is a test-only
+ * mechanism; the production WeakReference behavior is unchanged.
+ * <p>
  * <b>Usage:</b>
  * <pre>{@code
  * @ExtendWith(ValidateCleanMeterExtension.class)
@@ -70,7 +87,70 @@ import java.util.Optional;
  * @see Meter#UNKNOWN_LOGGER_NAME
  * @author Daniel Felix Ferber
  */
-public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEachCallback {
+public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEachCallback, InvocationInterceptor {
+
+    /** Namespace for storing the per-test strong reference that pins the Meter stack against GC. */
+    private static final Namespace NAMESPACE = Namespace.create(ValidateCleanMeterExtension.class);
+    /** Store key for the pinned top-of-stack Meter (kept strongly reachable through afterEach). */
+    private static final String PINNED_METER_KEY = "pinnedMeter";
+
+    /**
+     * Intercepts a plain {@code @Test} method to pin the Meter stack immediately after the test body
+     * returns. See the class-level Javadoc for the rationale.
+     *
+     * @param invocation        the test method invocation to proceed
+     * @param invocationContext reflective information about the invocation (unused)
+     * @param extensionContext  the current extension context
+     * @throws Throwable if the underlying test invocation throws
+     */
+    @Override
+    public void interceptTestMethod(final Invocation<Void> invocation,
+            final ReflectiveInvocationContext<Method> invocationContext,
+            final ExtensionContext extensionContext) throws Throwable {
+        try {
+            invocation.proceed();
+        } finally {
+            pinCurrentMeterStack(extensionContext);
+        }
+    }
+
+    /**
+     * Intercepts template-based tests ({@code @ParameterizedTest}, {@code @RepeatedTest}) to pin the
+     * Meter stack immediately after the test body returns, for the same reason as plain tests.
+     *
+     * @param invocation        the test method invocation to proceed
+     * @param invocationContext reflective information about the invocation (unused)
+     * @param extensionContext  the current extension context
+     * @throws Throwable if the underlying test invocation throws
+     */
+    @Override
+    public void interceptTestTemplateMethod(final Invocation<Void> invocation,
+            final ReflectiveInvocationContext<Method> invocationContext,
+            final ExtensionContext extensionContext) throws Throwable {
+        try {
+            invocation.proceed();
+        } finally {
+            pinCurrentMeterStack(extensionContext);
+        }
+    }
+
+    /**
+     * Pins the current top of the Meter thread-local stack in a strong reference held by the per-test
+     * {@link ExtensionContext.Store}.
+     * <p>
+     * This runs right after the test body returns and before JUnit's allocation-heavy post-test
+     * machinery. {@link Meter#getCurrentInstance()} performs no allocation when the stack is dirty,
+     * and there is no allocation between the test body returning and this read, so no garbage
+     * collection can clear the underlying {@code WeakReference} before the real Meter is captured.
+     * Holding the strong reference also keeps that {@code WeakReference} valid through {@code afterEach},
+     * which makes the dirty/clean stack validation deterministic. Pinning the dummy "unknown" Meter
+     * (when the stack is clean) is harmless.
+     *
+     * @param context the current extension context whose store retains the strong reference
+     */
+    private static void pinCurrentMeterStack(final ExtensionContext context) {
+        context.getStore(NAMESPACE).put(PINNED_METER_KEY, Meter.getCurrentInstance());
+    }
 
     /**
      * Ensures that the Meter stack is clean before the test starts.
