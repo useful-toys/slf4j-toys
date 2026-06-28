@@ -25,7 +25,6 @@ import org.usefultoys.slf4j.internal.SystemMetrics;
 import org.usefultoys.slf4j.internal.TimeSource;
 
 import java.io.Closeable;
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -89,21 +88,18 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     private transient long lastProgressIteration = 0;
 
     /**
-     * Tracks the `Meter` instance most recently started on the current thread.
+     * Tracks the `Meter` instance most recently started on the current thread. Each entry is a
+     * {@link MeterLeakDetector.MeterReference}, which is a weak reference to the meter that doubles as the
+     * leak-detection handle; the entries are chained via {@code previousInstance} to form the per-thread stack.
      */
-    private static final ThreadLocal<WeakReference<Meter>> localThreadInstance = new ThreadLocal<>();
-    /**
-     * Stores a weak reference to the `Meter` instance that was current before this `Meter` became the current one.
-     * These references form a linked list representing a stack of `Meter` instances.
-     */
-    private WeakReference<Meter> previousInstance;
+    private static final ThreadLocal<MeterLeakDetector.MeterReference> localThreadInstance = new ThreadLocal<>();
 
     /**
-     * Registration handle with the {@link MeterLeakDetector}, obtained on {@link #start()} when leak detection is
-     * enabled ({@link MeterConfig#detectLeaks}) and the category is known. It is {@code null} otherwise. The handle is
-     * passed back to the detector on every explicit termination so that this `Meter` is not reported as a leak.
+     * This `Meter`'s own node in the thread-local stack, created on {@link #start()}. It is also the leak-detection
+     * handle when leak detection is enabled. Held so that termination can pop the stack and untrack the meter. It is
+     * {@code null} before {@code start()} and after termination.
      */
-    private transient MeterLeakDetector.MeterReference leakRef;
+    private transient MeterLeakDetector.MeterReference selfRef;
 
     /**
      * Creates a new `Meter` for an operation belonging to the category derived from the logger's name.
@@ -192,7 +188,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return The current `Meter` instance, or a dummy `Meter` if none is active on the current thread.
      */
     public static Meter getCurrentInstance() {
-        final WeakReference<Meter> ref = localThreadInstance.get();
+        final MeterLeakDetector.MeterReference ref = localThreadInstance.get();
         final Meter current = ref == null ? null : ref.get();
         /* Return dummy meter if no active meter on current thread */
         if (current == null) {
@@ -353,16 +349,12 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 return this;
             }
 
-            previousInstance = localThreadInstance.get();
-            localThreadInstance.set(new WeakReference<>(this));
+            /* Push this Meter onto the thread-local stack. The single reference also serves as the leak-detection
+               handle when enabled; track() applies the detectLeaks / "???" exclusion internally. */
+            selfRef = MeterLeakDetector.track(this, localThreadInstance.get());
+            localThreadInstance.set(selfRef);
 
             lastProgressTime = startTime = collectCurrentTime();
-
-            /* Register with the leak detector so a started-but-never-stopped Meter is reported when garbage-collected.
-               Excludes the dummy "???" Meter, matching the predicate of the former finalize() mechanism. */
-            if (MeterConfig.detectLeaks && !UNKNOWN_LOGGER_NAME.equals(getCategory())) {
-                leakRef = MeterLeakDetector.register(this);
-            }
 
             if (messageLogger.isDebugEnabled()) {
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
@@ -514,9 +506,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             if (pathId != null) {
                 okPath = toPath(pathId, true);
             }
-            localThreadInstance.set(previousInstance);
-            MeterLeakDetector.deregister(leakRef);
-            leakRef = null;
+            localThreadInstance.set(MeterLeakDetector.untrack(selfRef));
+            selfRef = null;
 
             if (messageLogger.isWarnEnabled()) { // Check warn enabled to cover info as well
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
@@ -553,7 +544,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return {@code true} if this `Meter` is not the current instance, {@code false} otherwise.
      */
     boolean checkCurrentInstance() {
-        final WeakReference<Meter> ref = localThreadInstance.get();
+        final MeterLeakDetector.MeterReference ref = localThreadInstance.get();
         /* Returns true if this meter is NOT the current one (inverse logic for validation purposes) */
         return ref == null || ref.get() != this;
     }
@@ -632,9 +623,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failPath = null;
             failMessage = null;
             okPath = null;
-            localThreadInstance.set(previousInstance);
-            MeterLeakDetector.deregister(leakRef);
-            leakRef = null;
+            localThreadInstance.set(MeterLeakDetector.untrack(selfRef));
+            selfRef = null;
             rejectPath = toPath(cause, true);
 
             if (messageLogger.isInfoEnabled()) {
@@ -680,9 +670,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
             rejectPath = null;
             okPath = null;
-            localThreadInstance.set(previousInstance);
-            MeterLeakDetector.deregister(leakRef);
-            leakRef = null;
+            localThreadInstance.set(MeterLeakDetector.untrack(selfRef));
+            selfRef = null;
             failPath = toPath(cause, false);
             /* Extract failure message from Throwable if applicable */
             if (cause instanceof Throwable) {
@@ -733,9 +722,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
             rejectPath = null;
             okPath = null;
-            localThreadInstance.set(previousInstance);
-            MeterLeakDetector.deregister(leakRef);
-            leakRef = null;
+            localThreadInstance.set(MeterLeakDetector.untrack(selfRef));
+            selfRef = null;
             failPath = FAIL_PATH_TRY_WITH_RESOURCES;
 
             if (messageLogger.isErrorEnabled()) {

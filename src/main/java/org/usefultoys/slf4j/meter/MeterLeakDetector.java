@@ -17,9 +17,9 @@ package org.usefultoys.slf4j.meter;
 
 import org.slf4j.Logger;
 
-import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -27,29 +27,37 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * (via {@code ok()}, {@code reject()}, {@code fail()} or {@code close()}).
  * <p>
  * This is the replacement for the deprecated {@link Object#finalize()} mechanism. It relies on
- * {@link PhantomReference} plus a {@link ReferenceQueue} — an API available on every Java version since Java 2 —
+ * {@link WeakReference} plus a {@link ReferenceQueue} — an API available on every Java version since Java 2 —
  * so it keeps working on Java 8 through future releases where finalization is removed.
  * <p>
- * <b>Design — at most one extra object per started meter:</b> each started meter that opts in registers exactly one
- * {@link MeterReference}. That reference <em>is</em> the node of an intrusive doubly-linked list (it carries its own
- * {@code prev}/{@code next} pointers), so no separate container node is allocated — unlike a {@code Set} or
- * {@code Map} backed registry. This mirrors what {@code java.lang.ref.Cleaner} does internally.
+ * <b>Design — a single reference object per started meter:</b> {@link MeterReference} is, at the same time, the
+ * node of the {@link Meter} thread-local stack (its {@link WeakReference#get()} returns the current meter, or
+ * {@code null} once it is collected) and, when leak detection is enabled, the handle the garbage collector enqueues
+ * on collection. It also <em>is</em> the node of the intrusive doubly-linked registry (it carries its own
+ * {@code prev}/{@code next} pointers), so no separate container node is allocated. Unifying the stack reference and
+ * the leak-detection reference keeps allocation at one auxiliary object per started meter — the same cost the
+ * thread-local stack already paid before leak detection existed.
+ * <p>
+ * A {@link WeakReference} (rather than a {@code PhantomReference}) is required because the stack must be able to
+ * retrieve the live meter; it is also a better fit, since the referent is reclaimed as soon as it becomes weakly
+ * reachable and {@code reportLeak()} works from an immutable snapshot rather than the (already cleared) referent.
  * <p>
  * <b>Draining strategy — no background thread:</b> the {@link ReferenceQueue} is drained opportunistically from
- * {@link #register(Meter)}, i.e. on the thread that starts the next meter. A forgotten meter is therefore reported
- * the next time any meter is started, with no library-owned daemon thread and no risk of pinning a web application
- * class loader in a servlet container.
+ * {@link #track(Meter, MeterReference)}, i.e. on the thread that starts the next meter. A forgotten meter is therefore
+ * reported the next time any meter is started, with no library-owned daemon thread and no risk of pinning a web
+ * application class loader in a servlet container.
  * <p>
- * <b>Predicate equivalence:</b> a meter is registered only from {@code start()} (so {@code startTime != 0} is implied)
- * and is deregistered on every explicit termination. Therefore a reference that the garbage collector enqueues
+ * <b>Predicate equivalence:</b> a meter is leak-tracked only from {@code start()} (so {@code startTime != 0} is
+ * implied) and is untracked on every explicit termination. Therefore a reference that the garbage collector enqueues
  * <em>while still registered</em> is, by definition, a meter that was started and never stopped — exactly the
  * predicate the former {@code finalize()} path checked. The {@code UNKNOWN_LOGGER_NAME} exclusion and the
- * {@link MeterConfig#detectLeaks} toggle are enforced by the caller, keeping this class a pure mechanism.
+ * {@link MeterConfig#detectLeaks} toggle are applied in {@link #track(Meter, MeterReference)}; when leak detection is
+ * off, the reference is still created to serve as the stack node, but is neither queued nor registered.
  * <p>
  * <b>Tail draining on shutdown:</b> the opportunistic drain only reports meters the garbage collector has already
  * reclaimed. Meters that are forgotten but never collected during the application's life would otherwise go
  * unreported. When {@link MeterConfig#reportLeaksOnShutdown} is enabled, a JVM shutdown hook is installed lazily (on
- * the first registration) that runs {@link #reportRemainingLeaks()}, reporting every meter still registered at
+ * the first tracked meter) that runs {@link #reportRemainingLeaks()}, reporting every meter still registered at
  * shutdown.
  *
  * @author Daniel Felix Ferber
@@ -79,20 +87,32 @@ final class MeterLeakDetector {
     private static volatile Thread shutdownHook;
 
     /**
-     * A {@link PhantomReference} to a started {@link Meter} that doubles as the node of the intrusive linked list.
-     * It snapshots only the immutable data required to report a leak ({@code fullID}) plus the message logger
-     * (an SLF4J singleton, safe to retain), because the referent {@link Meter} is already collected by the time the
-     * leak is reported.
+     * A {@link WeakReference} to a started {@link Meter} that doubles as both the node of the thread-local stack and,
+     * when leak detection is enabled, the node of the intrusive leak registry. When leak-detecting it snapshots the
+     * immutable data required to report a leak ({@code fullID}) plus the message logger (an SLF4J singleton, safe to
+     * retain), because the referent {@link Meter} is already collected by the time the leak is reported.
      */
-    static final class MeterReference extends PhantomReference<Meter> {
+    static final class MeterReference extends WeakReference<Meter> {
+        /** Leak-report snapshot; {@code null} when this reference is a plain (non-detecting) stack node. */
         private final String fullID;
+        /** Leak-report logger; {@code null} when this reference is a plain (non-detecting) stack node. */
         private final Logger messageLogger;
-        /** Intrusive list links; guarded by {@link MeterLeakDetector#LOCK}. */
+        /** Previous reference on the per-thread stack; accessed only by the owning thread, so no lock is needed. */
+        private MeterReference previousInstance;
+        /** Intrusive registry links; guarded by {@link MeterLeakDetector#LOCK}. */
         private MeterReference prev;
         private MeterReference next;
-        /** {@code true} while this reference is linked in the list; guarded by {@link MeterLeakDetector#LOCK}. */
+        /** {@code true} while this reference is linked in the registry; guarded by {@link MeterLeakDetector#LOCK}. */
         private boolean registered;
 
+        /** Creates a plain stack node that is not leak-detecting (no queue, no snapshot). */
+        MeterReference(final Meter meter) {
+            super(meter);
+            this.fullID = null;
+            this.messageLogger = null;
+        }
+
+        /** Creates a leak-detecting stack node: enqueued on collection and carrying a leak snapshot. */
         MeterReference(final Meter meter, final ReferenceQueue<Meter> queue) {
             super(meter, queue);
             this.fullID = meter.getFullID();
@@ -110,18 +130,28 @@ final class MeterLeakDetector {
     }
 
     /**
-     * Registers a started meter for leak detection and drains any pending leaks first.
-     * The returned reference must be handed back to {@link #deregister(MeterReference)} when the meter is stopped.
+     * Creates the stack-node reference for a meter that has just started, chaining it onto {@code previous}, and — when
+     * {@link MeterConfig#detectLeaks} is enabled and the category is known — also registers it for leak detection and
+     * drains any pending leaks first.
      *
-     * @param meter the meter that has just started; must not be {@code null}.
-     * @return the registration handle to keep on the meter and pass to {@link #deregister(MeterReference)}.
+     * @param meter    the meter that has just started; must not be {@code null}.
+     * @param previous the reference currently on top of the thread-local stack, or {@code null}.
+     * @return the new reference to push onto the stack and keep on the meter for {@link #untrack(MeterReference)}.
      */
-    static MeterReference register(final Meter meter) {
+    static MeterReference track(final Meter meter, final MeterReference previous) {
+        final boolean detect = MeterConfig.detectLeaks
+                && !Meter.UNKNOWN_LOGGER_NAME.equals(meter.getCategory());
+        if (!detect) {
+            final MeterReference ref = new MeterReference(meter);
+            ref.previousInstance = previous;
+            return ref;
+        }
         drain();
         if (MeterConfig.reportLeaksOnShutdown) {
             installShutdownHookOnce();
         }
         final MeterReference ref = new MeterReference(meter, QUEUE);
+        ref.previousInstance = previous;
         synchronized (LOCK) {
             ref.next = head;
             if (head != null) {
@@ -134,25 +164,30 @@ final class MeterLeakDetector {
     }
 
     /**
-     * Deregisters a meter that was stopped explicitly, so its eventual collection is not reported as a leak.
-     * Idempotent and {@code null}-safe. Clearing the reference also prevents the garbage collector from ever
-     * enqueueing it, since at this point the referent meter is still strongly reachable.
+     * Untracks a meter that was stopped explicitly, so its eventual collection is not reported as a leak, and returns
+     * the reference to restore as the new top of the thread-local stack. Idempotent and {@code null}-safe.
+     * <p>
+     * The reference is intentionally <em>not</em> cleared: a stopped reference may still be reachable through the
+     * {@code previousInstance} of a meter that was (mistakenly) started on top of it, and clearing would corrupt that
+     * chain. A stopped-then-collected reference that is later enqueued is harmlessly ignored by {@link #drain()},
+     * because {@link #unlink(MeterReference)} has already marked it unregistered.
      *
-     * @param ref the handle returned by {@link #register(Meter)}, or {@code null}.
+     * @param ref the reference returned by {@link #track(Meter, MeterReference)}, or {@code null}.
+     * @return the previous reference to restore as the stack top, or {@code null}.
      */
-    static void deregister(final MeterReference ref) {
+    static MeterReference untrack(final MeterReference ref) {
         if (ref == null) {
-            return;
+            return null;
         }
         synchronized (LOCK) {
             unlink(ref);
         }
-        ref.clear();
+        return ref.previousInstance;
     }
 
     /**
      * Drains the reference queue, reporting every meter that was collected while still registered.
-     * Safe to call from any thread; invoked opportunistically by {@link #register(Meter)}.
+     * Safe to call from any thread; invoked opportunistically by {@link #track(Meter, MeterReference)}.
      */
     static void drain() {
         Reference<? extends Meter> r;
@@ -192,7 +227,6 @@ final class MeterLeakDetector {
             final MeterReference next = ref.next;
             ref.next = null;
             ref.reportLeak();
-            ref.clear();
             ref = next;
         }
     }
@@ -223,7 +257,8 @@ final class MeterLeakDetector {
     }
 
     /**
-     * Unlinks a reference from the intrusive list. Caller must hold {@link #LOCK}. Idempotent.
+     * Unlinks a reference from the intrusive registry. Caller must hold {@link #LOCK}. Idempotent. Does not touch the
+     * {@code previousInstance} stack link.
      */
     private static void unlink(final MeterReference ref) {
         if (!ref.registered) {
