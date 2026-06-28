@@ -58,18 +58,29 @@ import java.util.Optional;
  * This approach provides both resilience (removes leftover state) and visibility
  * (fails if current test leaves the stack dirty when it shouldn't).
  * <p>
- * <b>Determinism under garbage collection:</b> the Meter thread-local stack holds each Meter through
- * a {@link java.lang.ref.WeakReference} (so that a forgotten, never-stopped Meter can be reclaimed in
- * a server/Java EE environment without leaking memory). For a test annotated with
- * {@code expectDirtyStack = true}, the started Meter is typically only reachable through a local
- * variable that dies when the test body returns. JUnit's allocation-heavy post-test machinery could
- * then trigger a GC that clears the WeakReference before {@code afterEach} inspects the stack, making
- * the "dirty stack" assertion intermittently fail. To prevent this, this extension also implements
- * {@link InvocationInterceptor}: immediately after the test body returns — before any allocation that
- * could trigger a GC — it pins the current top of the stack in a strong reference held by the per-test
- * {@link ExtensionContext.Store}. That strong reference keeps the WeakReference valid, so the
- * {@code afterEach} validation observes the real Meter deterministically. This is a test-only
- * mechanism; the production WeakReference behavior is unchanged.
+ * <b>Shrinking the garbage-collection race for {@code expectDirtyStack = true} tests:</b> the Meter
+ * thread-local stack holds each Meter through a {@link java.lang.ref.WeakReference} (so that a
+ * forgotten, never-stopped Meter can be reclaimed in a server/Java EE environment without leaking
+ * memory). For a test annotated with {@code expectDirtyStack = true}, the started Meter is typically
+ * only reachable through a local variable that dies when the test body returns. JUnit's
+ * allocation-heavy post-test machinery could then trigger a GC that clears the WeakReference before
+ * {@code afterEach} inspects the stack, making the "dirty stack" assertion intermittently fail. To
+ * counter this, this extension also implements {@link InvocationInterceptor}: as soon as the test body
+ * returns — before JUnit's post-test machinery runs — it captures the current top of the stack into a
+ * strong reference held by the per-test {@link ExtensionContext.Store}, which keeps the WeakReference
+ * valid through {@code afterEach}.
+ * <p>
+ * <b>Honest scope of the guarantee:</b> this does <em>not</em> make collection mathematically
+ * impossible. A few instructions still run between the body returning and the capture (interceptor
+ * chain unwinding, safepoints, and the {@code Store} lookup), and a sufficiently aggressive collector
+ * could in theory still reclaim the Meter in that window. What the interceptor does is shrink the race
+ * from the <em>thousands</em> of allocations performed by JUnit's post-test processing down to a
+ * handful, which empirically eliminates the observed flake (it reproduces ~1/3 of runs without this
+ * mechanism under {@code -Xmx64m -XX:+UseSerialGC}, and 0/many with it). A mathematically hard
+ * guarantee would instead require holding a strong reference to the Meter from the moment it is
+ * started (e.g. a per-test field on every such test), which was rejected here for the churn of
+ * touching ~100 tests. This is a test-only mechanism; the production WeakReference behavior is
+ * unchanged.
  * <p>
  * <b>Usage:</b>
  * <pre>{@code
@@ -135,21 +146,29 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
     }
 
     /**
-     * Pins the current top of the Meter thread-local stack in a strong reference held by the per-test
-     * {@link ExtensionContext.Store}.
+     * Captures the current top of the Meter thread-local stack into a strong reference held by the
+     * per-test {@link ExtensionContext.Store}.
      * <p>
-     * This runs right after the test body returns and before JUnit's allocation-heavy post-test
-     * machinery. {@link Meter#getCurrentInstance()} performs no allocation when the stack is dirty,
-     * and there is no allocation between the test body returning and this read, so no garbage
-     * collection can clear the underlying {@code WeakReference} before the real Meter is captured.
-     * Holding the strong reference also keeps that {@code WeakReference} valid through {@code afterEach},
-     * which makes the dirty/clean stack validation deterministic. Pinning the dummy "unknown" Meter
-     * (when the stack is clean) is harmless.
+     * The current Meter is read into a strong local <em>before</em> the {@code Store} is touched, so
+     * that any allocation performed by {@code getStore()}/{@code put()} (e.g. lazily creating the
+     * namespaced store) happens only after a strong reference already protects the Meter — closing the
+     * ordering gap where a GC during the store lookup could otherwise reclaim it.
+     * {@link Meter#getCurrentInstance()} itself performs no allocation when the stack is dirty. Holding
+     * the strong reference keeps the underlying {@code WeakReference} valid through {@code afterEach},
+     * making the dirty/clean validation reliable in practice.
+     * <p>
+     * This shrinks but does not fully close the GC window: a few instructions (interceptor unwinding,
+     * safepoints) still run between the body returning and this capture — see the class Javadoc for the
+     * honest scope of the guarantee. Pinning the dummy "unknown" Meter (when the stack is clean) is
+     * harmless.
      *
      * @param context the current extension context whose store retains the strong reference
      */
     private static void pinCurrentMeterStack(final ExtensionContext context) {
-        context.getStore(NAMESPACE).put(PINNED_METER_KEY, Meter.getCurrentInstance());
+        // Read the strong reference FIRST, then store it: storing may allocate, but by then the Meter
+        // is already protected by the 'current' local.
+        final Meter current = Meter.getCurrentInstance();
+        context.getStore(NAMESPACE).put(PINNED_METER_KEY, current);
     }
 
     /**
