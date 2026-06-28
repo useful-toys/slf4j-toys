@@ -158,29 +158,16 @@ Profiles control which dependencies and code are included in builds. Use `mvnw -
 - Signs artifacts with GPG
 - Deploys to Maven Central via Central Publishing Maven Plugin
 
-**Suitable for:**
-- Creating production releases
-- Publishing to Maven Central
-- Official version releases
+**Used by:** GitHub Actions release workflow (`release-deploy-version.yml`).
+Releases are automated via CI — see [Release Process](#release-process) below.
 
-**Requires:**
-- GPG key configured
-- Maven Central credentials
-- `~/.m2/settings.xml` with `maven-central` server entry
-
-**Command:**
-```powershell
-.\mvnw -P release clean deploy
-```
-
-**Process:**
+**Process (automated by CI):**
 1. Compiles code (Java 8 target)
-2. Runs tests (unit-tests execution)
+2. Runs full test matrix across JDK/SLF4J combinations
 3. Generates source JAR
 4. Generates Javadoc JAR
-5. Signs artifacts with GPG
-6. Deploys to staging repository
-7. Auto-publishes from staging to Maven Central
+5. Signs artifacts with GPG (key from GitHub secrets)
+6. Deploys to Maven Central via Central Publishing Maven Plugin
 
 ---
 
@@ -247,17 +234,13 @@ Profiles control which dependencies and code are included in builds. Use `mvnw -
 
 ---
 
-### Scenario 6: Release to Maven Central
-```powershell
-.\mvnw -P release clean deploy
-```
-- Default slf4j-2.0 profile
-- Compiles, tests, builds JAR
-- Generates `-sources.jar`
-- Generates `-javadoc.jar`
-- Signs all artifacts with GPG
-- Deploys to Maven Central staging
-- Waits for auto-publish
+### Scenario 6: Release to Maven Central (CI Automated)
+Releases are fully automated via GitHub Actions:
+
+1. **Create New Version** — manually triggered workflow that bumps the version and creates a git tag
+2. **Release and Deploy** — automatically triggered by the version tag; runs full test matrix, then deploys to Maven Central
+
+See `.github/workflows/create-new-version.yml` and `.github/workflows/release-deploy-version.yml` for details.
 
 ---
 
@@ -352,35 +335,44 @@ Creates: `target/jacoco.exec`
 
 ## Release Process
 
-### Step 1: Validate Javadoc
+Releases are fully automated via GitHub Actions and follow a three-stage pipeline:
+
+### Stage 1: Validate & Test
+Runs automatically on every push and pull request via `maven-build-test.yml`.
+Compiles and tests across the full JDK/SLF4J compatibility matrix.
+
+### Stage 2: Create New Version
+Manually triggered via **Actions > Create New Version** on GitHub, choosing
+`major`, `minor`, or `patch` increment. This workflow:
+
+1. Validates the current branch is `main` and up-to-date with `origin/main`
+2. Runs the full test suite (`mvnw clean verify -P slf4j-2.0`)
+3. Calculates the next semantic version from the latest `v*.*.*` tag
+4. Commits the release version to `pom.xml`
+5. Creates an annotated git tag `vX.Y.Z`
+6. Commits the next `-SNAPSHOT` version
+7. Pushes commits and the new tag
+
+### Stage 3: Release and Deploy
+Automatically triggered by the push of a `v*.*.*` tag via `release-deploy-version.yml`:
+
+1. Runs the full test matrix (JDK 8/11/17/21 x SLF4J 1.7/2.0) with Logback integration tests
+2. Builds with `-P release,slf4j-2.0`
+3. Generates source JAR and Javadoc JAR
+4. Signs artifacts with GPG (key from GitHub secrets)
+5. Deploys to Maven Central via Central Publishing Maven Plugin
+6. Creates a GitHub Release with auto-generated notes
+7. Uploads JAR artifacts to the GitHub Release
+
+### Pre-Release Validation (local)
+For local validation before triggering a release:
 ```powershell
+# Validate Javadoc
 .\mvnw clean verify -P javadoc-validation
+
+# Run full test suite
+.\mvnw clean verify -P with-logback
 ```
-
-### Step 2: Run Full Test Suite
-```powershell
-.\mvnw clean test
-```
-
-### Step 3: Create Release Artifacts
-```powershell
-.\mvnw -P release clean deploy
-```
-
-**What happens:**
-1. Compiles (Java 8 target)
-2. Runs unit-tests execution
-3. Runs logback-tests execution
-4. Creates JAR
-5. Creates `-sources.jar`
-6. Creates `-javadoc.jar`
-7. Signs all 3 JARs with GPG
-8. Deploys to Maven Central staging repository
-9. Auto-publishes from staging to Maven Central
-
-### Step 4: Verify on Maven Central
-- Check: https://search.maven.org/ after 5-10 minutes
-- Verify version appears in release repository
 
 ---
 
@@ -454,12 +446,16 @@ java -version
 .\mvnw jacoco:report
 ```
 
-### Release
+### Pre-Release Validation
 ```powershell
-# Validation first, then release
+# Validate docs and run full test suite before triggering CI release
 .\mvnw clean verify -P javadoc-validation
-.\mvnw -P release clean deploy
+.\mvnw clean verify -P with-logback
 ```
+
+### Release
+Releases are triggered via GitHub Actions: **Actions > Create New Version**.
+See [Release Process](#release-process) above for the full pipeline.
 
 ---
 
@@ -471,7 +467,7 @@ java -version
 | Test Java 8 | `.\mvnw clean test -P jdk-8` |
 | Test SLF4J 1.7 | `.\mvnw clean test -P slf4j-1.7-javax` |
 | Validate Docs | `.\mvnw clean verify -P javadoc-validation` |
-| Build Release | `.\mvnw -P release clean deploy` |
+| Release | Triggered via GitHub Actions |
 | Package Only | `.\mvnw clean package -DskipTests` |
 | Coverage Report | `.\mvnw clean test jacoco:report` |
 
