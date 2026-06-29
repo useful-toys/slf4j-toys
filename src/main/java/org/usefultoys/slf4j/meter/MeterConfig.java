@@ -124,11 +124,13 @@ public class MeterConfig {
      * Whether the {@link Meter} activates the forgotten-meter leak detector.
      * <p>
      * When {@code true}, a {@link Meter} that is started but never explicitly stopped ({@code ok()},
-     * {@code reject()}, {@code fail()}, or {@code close()}) will emit an error log message when it
+     * {@code reject()}, {@code fail()}, or {@code close()}) will emit an {@code error}-level log message when it
      * becomes eligible for garbage collection.
      * <p>
      * Disable this flag in test environments where meters are intentionally left open, or when the
-     * overhead of registering each started meter is undesirable.
+     * overhead of registering each started meter is undesirable. The flag gates both ends: a meter started while it
+     * is {@code false} is never tracked, and turning it {@code false} at runtime also suppresses reports for meters
+     * already tracked (including the shutdown sweep), so it works as a runtime kill switch.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.detect.leaks}, defaulting to {@code true}.
      * Can be assigned a new value at runtime.

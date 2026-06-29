@@ -182,6 +182,16 @@ class MeterLeakDetectorTest {
     }
 
     @Test
+    @DisplayName("reportRemainingLeaks empties the registry but stays silent when detectLeaks is turned off at runtime")
+    void reportRemainingLeaksSuppressedWhenDetectLeaksDisabled() {
+        MeterLeakDetector.track(meter, null); // registered while detectLeaks is on (default)
+        MeterConfig.detectLeaks = false;      // turned off at runtime, after registration
+        MeterLeakDetector.reportRemainingLeaks();
+        assertEquals(0, MeterLeakDetector.trackedCount(), "the sweep must still empty the registry");
+        assertNoEvents(logger);
+    }
+
+    @Test
     @DisplayName("reportRemainingLeaks on an empty registry should be a no-op")
     void reportRemainingLeaksEmptyIsNoOp() {
         MeterLeakDetector.reportRemainingLeaks();

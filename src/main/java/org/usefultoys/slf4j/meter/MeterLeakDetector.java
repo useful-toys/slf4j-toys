@@ -54,6 +54,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * {@link MeterConfig#detectLeaks} toggle are applied in {@link #track(Meter, MeterReference)}; when leak detection is
  * off, the reference is still created to serve as the stack node, but is neither queued nor registered.
  * <p>
+ * <b>{@code detectLeaks} also gates emission at report time:</b> {@link #drain()} and {@link #reportRemainingLeaks()}
+ * re-read {@link MeterConfig#detectLeaks} and stay silent when it is {@code false}, still cleaning up the registry.
+ * So turning the toggle off at runtime suppresses pending leak reports for meters that were already registered, not
+ * just future ones.
+ * <p>
  * <b>Tail draining on shutdown:</b> the opportunistic drain only reports meters the garbage collector has already
  * reclaimed. Meters that are forgotten but never collected during the application's life would otherwise go
  * unreported. When {@link MeterConfig#reportLeaksOnShutdown} is enabled, a JVM shutdown hook is installed lazily (on
@@ -190,6 +195,9 @@ final class MeterLeakDetector {
      * Safe to call from any thread; invoked opportunistically by {@link #track(Meter, MeterReference)}.
      */
     static void drain() {
+        /* Read the toggle once: it gates emission at report time, so turning detectLeaks off at runtime suppresses
+           pending leaks. The queue is still drained and unlinked to keep the registry from growing unbounded. */
+        final boolean report = MeterConfig.detectLeaks;
         Reference<? extends Meter> r;
         while ((r = QUEUE.poll()) != null) {
             final MeterReference ref = (MeterReference) r;
@@ -198,7 +206,7 @@ final class MeterLeakDetector {
                 wasRegistered = ref.registered;
                 unlink(ref);
             }
-            if (wasRegistered) {
+            if (wasRegistered && report) {
                 ref.reportLeak();
             }
         }
@@ -214,6 +222,9 @@ final class MeterLeakDetector {
      * may be slow or reentrant.
      */
     static void reportRemainingLeaks() {
+        /* Like drain(), detectLeaks gates emission: the sweep always empties the registry, but reports only when
+           leak detection is enabled at the moment it runs. */
+        final boolean report = MeterConfig.detectLeaks;
         final MeterReference chain;
         synchronized (LOCK) {
             chain = head;
@@ -226,7 +237,9 @@ final class MeterLeakDetector {
         for (MeterReference ref = chain; ref != null; ) {
             final MeterReference next = ref.next;
             ref.next = null;
-            ref.reportLeak();
+            if (report) {
+                ref.reportLeak();
+            }
             ref = next;
         }
     }
