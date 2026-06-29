@@ -57,6 +57,33 @@ try {
 }
 ```
 
+## Leak detection (forgotten meters)
+
+A `Meter` that is `start()`-ed but never explicitly terminated (`ok()`, `reject()`, `fail()`, or `close()`) indicates inconsistent API usage. *slf4j-toys* detects such a **forgotten meter** and logs an `ERROR` message (marker `INVALID_ARGUMENT`) when the meter is garbage-collected:
+
+```
+ERROR ... Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=...
+```
+
+Detection is purely garbage-collection driven and allocation-light (it reuses the meter's thread-local stack reference, so a tracked meter costs no extra object). It installs **no JVM shutdown hook and no background thread**, so it is safe inside servlet containers and application servers — a forgotten meter that is never collected before the JVM exits is simply not reported (it does not leak memory, as it is only weakly referenced).
+
+> **Note:** This replaces the previous `Object.finalize()`-based detection, which is deprecated for removal (JEP 421). There is no API change for callers.
+
+### Configuration
+
+| Property | System property | Default | Description |
+|---|---|---|---|
+| `MeterConfig.detectLeaks` | `slf4jtoys.meter.detect.leaks` | `true` | Enables forgotten-meter detection. Acts as a runtime kill switch: set to `false` and meters started afterwards are not tracked, and reports already pending are suppressed. Disable it in tests that intentionally leave meters open, or to remove the (already minimal) tracking overhead. |
+
+```java
+// Disable globally at startup, e.g. in tests:
+MeterConfig.detectLeaks = false;
+```
+```properties
+# Or via system property:
+-Dslf4jtoys.meter.detect.leaks=false
+```
+
 ## Installation
 
 *slf4j-toys* is available from the [Maven Central repository](https://search.maven.org/artifact/org.usefultoys/slf4j-toys/1.9.0/jar).

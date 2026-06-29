@@ -25,7 +25,6 @@ import org.usefultoys.slf4j.internal.SystemMetrics;
 import org.usefultoys.slf4j.internal.TimeSource;
 
 import java.io.Closeable;
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -52,7 +51,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see MeterConfig
  * @see Markers
  */
-@SuppressWarnings({"OverlyBroadCatchBlock", "FinalizeDeclaration"})
+@SuppressWarnings("OverlyBroadCatchBlock")
 public class Meter extends MeterData implements MeterContext<Meter>, MeterExecutor<Meter>, Closeable {
 
     /**
@@ -89,14 +88,18 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     private transient long lastProgressIteration = 0;
 
     /**
-     * Tracks the `Meter` instance most recently started on the current thread.
+     * Tracks the `Meter` instance most recently started on the current thread. Each entry is a
+     * {@link MeterLeakDetector.MeterReference}, which is a weak reference to the meter that doubles as the
+     * leak-detection handle; the entries are chained via {@code previousInstance} to form the per-thread stack.
      */
-    private static final ThreadLocal<WeakReference<Meter>> localThreadInstance = new ThreadLocal<>();
+    private static final ThreadLocal<MeterLeakDetector.MeterReference> localThreadInstance = new ThreadLocal<>();
+
     /**
-     * Stores a weak reference to the `Meter` instance that was current before this `Meter` became the current one.
-     * These references form a linked list representing a stack of `Meter` instances.
+     * This `Meter`'s own node in the thread-local stack, created on {@link #start()}. It is also the leak-detection
+     * handle when leak detection is enabled. Held so that termination can pop the stack and untrack the meter. It is
+     * {@code null} before {@code start()} and after termination.
      */
-    private WeakReference<Meter> previousInstance;
+    private transient MeterLeakDetector.MeterReference selfRef;
 
     /**
      * Creates a new `Meter` for an operation belonging to the category derived from the logger's name.
@@ -185,7 +188,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return The current `Meter` instance, or a dummy `Meter` if none is active on the current thread.
      */
     public static Meter getCurrentInstance() {
-        final WeakReference<Meter> ref = localThreadInstance.get();
+        final MeterLeakDetector.MeterReference ref = localThreadInstance.get();
         final Meter current = ref == null ? null : ref.get();
         /* Return dummy meter if no active meter on current thread */
         if (current == null) {
@@ -346,8 +349,10 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 return this;
             }
 
-            previousInstance = localThreadInstance.get();
-            localThreadInstance.set(new WeakReference<>(this));
+            /* Push this Meter onto the thread-local stack. The single reference also serves as the leak-detection
+               handle when enabled; track() applies the detectLeaks / "???" exclusion internally. */
+            selfRef = MeterLeakDetector.track(this, localThreadInstance.get());
+            localThreadInstance.set(selfRef);
 
             lastProgressTime = startTime = collectCurrentTime();
 
@@ -501,7 +506,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             if (pathId != null) {
                 okPath = toPath(pathId, true);
             }
-            localThreadInstance.set(previousInstance);
+            localThreadInstance.set(MeterLeakDetector.untrack(selfRef));
+            selfRef = null;
 
             if (messageLogger.isWarnEnabled()) { // Check warn enabled to cover info as well
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
@@ -538,7 +544,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * @return {@code true} if this `Meter` is not the current instance, {@code false} otherwise.
      */
     boolean checkCurrentInstance() {
-        final WeakReference<Meter> ref = localThreadInstance.get();
+        final MeterLeakDetector.MeterReference ref = localThreadInstance.get();
         /* Returns true if this meter is NOT the current one (inverse logic for validation purposes) */
         return ref == null || ref.get() != this;
     }
@@ -617,7 +623,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failPath = null;
             failMessage = null;
             okPath = null;
-            localThreadInstance.set(previousInstance);
+            localThreadInstance.set(MeterLeakDetector.untrack(selfRef));
+            selfRef = null;
             rejectPath = toPath(cause, true);
 
             if (messageLogger.isInfoEnabled()) {
@@ -663,7 +670,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
             rejectPath = null;
             okPath = null;
-            localThreadInstance.set(previousInstance);
+            localThreadInstance.set(MeterLeakDetector.untrack(selfRef));
+            selfRef = null;
             failPath = toPath(cause, false);
             /* Extract failure message from Throwable if applicable */
             if (cause instanceof Throwable) {
@@ -693,22 +701,6 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     // ========================================================================
 
     /**
-     * Overrides the default `finalize()` method to detect `Meter` instances that were started but never explicitly
-     * stopped. If an unstopped `Meter` is garbage-collected, an error message is logged to indicate inconsistent API
-     * usage.
-     *
-     * @throws Throwable if an error occurs during finalization.
-     */
-    @SuppressWarnings("removal")
-    @Override
-    protected void finalize() throws Throwable {
-        MeterValidator.validateFinalize(this);
-        super.finalize();
-    }
-
-    // ========================================================================
-
-    /**
      * Implements the {@link Closeable} interface. If the `Meter` has not been explicitly stopped (via `ok()`,
      * `reject()`, or `fail()`), this method automatically marks the operation as {@code FAIL} with the path
      * {@code "try-with-resources"}. This ensures that no operation goes untracked when used in a `try-with-resources`
@@ -730,7 +722,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
             rejectPath = null;
             okPath = null;
-            localThreadInstance.set(previousInstance);
+            localThreadInstance.set(MeterLeakDetector.untrack(selfRef));
+            selfRef = null;
             failPath = FAIL_PATH_TRY_WITH_RESOURCES;
 
             if (messageLogger.isErrorEnabled()) {
