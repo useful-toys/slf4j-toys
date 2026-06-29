@@ -153,89 +153,36 @@ class MeterLeakDetectorTest {
     }
 
     @Test
-    @DisplayName("reportRemainingLeaks should report every still-registered meter and empty the registry")
-    void reportRemainingLeaksReportsAllRegistered() {
-        MeterLeakDetector.track(meter, null);
-        MeterLeakDetector.track(meter, null);
-        assertEquals(2, MeterLeakDetector.trackedCount(), "both meters should be tracked before the sweep");
-
-        MeterLeakDetector.reportRemainingLeaks();
-
-        assertEquals(0, MeterLeakDetector.trackedCount(), "the registry must be empty after the sweep");
+    @DisplayName("drain reports an enqueued meter that is still registered, exactly once, and unlinks it")
+    void drainReportsEnqueuedRegisteredMeter() {
+        final MeterReference ref = MeterLeakDetector.track(meter, null);
+        ref.enqueue(); // simulate the garbage collector enqueueing a forgotten, never-stopped meter
+        MeterLeakDetector.drain();
+        assertEquals(0, MeterLeakDetector.trackedCount(), "the reported reference must be unlinked from the registry");
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
                 "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
-        assertEvent(logger, 1, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+        assertEquals(1, ((MockLogger) logger).getLoggerEvents().size(), "a forgotten meter must be reported exactly once");
     }
 
     @Test
-    @DisplayName("reportRemainingLeaks should be idempotent and not double-report")
-    void reportRemainingLeaksIsIdempotent() {
-        MeterLeakDetector.track(meter, null);
-        MeterLeakDetector.reportRemainingLeaks();
-        MeterLeakDetector.reportRemainingLeaks();
-        assertEquals(0, MeterLeakDetector.trackedCount(), "registry must stay empty");
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
-        assertEquals(1, ((MockLogger) logger).getLoggerEvents().size(),
-                "a forgotten meter must be reported exactly once across repeated sweeps");
-    }
-
-    @Test
-    @DisplayName("reportRemainingLeaks empties the registry but stays silent when detectLeaks is turned off at runtime")
-    void reportRemainingLeaksSuppressedWhenDetectLeaksDisabled() {
-        MeterLeakDetector.track(meter, null); // registered while detectLeaks is on (default)
-        MeterConfig.detectLeaks = false;      // turned off at runtime, after registration
-        MeterLeakDetector.reportRemainingLeaks();
-        assertEquals(0, MeterLeakDetector.trackedCount(), "the sweep must still empty the registry");
+    @DisplayName("drain stays silent when detectLeaks is turned off at runtime, but still cleans up the registry")
+    void drainSuppressedWhenDetectLeaksDisabled() {
+        final MeterReference ref = MeterLeakDetector.track(meter, null); // registered while detectLeaks is on (default)
+        MeterConfig.detectLeaks = false;                                 // turned off at runtime, after registration
+        ref.enqueue();
+        MeterLeakDetector.drain();
+        assertEquals(0, MeterLeakDetector.trackedCount(), "drain must still unlink the reference");
         assertNoEvents(logger);
     }
 
     @Test
-    @DisplayName("reportRemainingLeaks on an empty registry should be a no-op")
-    void reportRemainingLeaksEmptyIsNoOp() {
-        MeterLeakDetector.reportRemainingLeaks();
-        assertEquals(0, MeterLeakDetector.trackedCount());
-        assertNoEvents(logger);
-    }
-
-    @Test
-    @DisplayName("a deregistered meter is not reported by the shutdown sweep")
-    void deregisteredMeterIsNotReportedOnShutdownSweep() {
+    @DisplayName("drain ignores an enqueued meter that was already untracked")
+    void drainIgnoresEnqueuedUntrackedMeter() {
         final MeterReference ref = MeterLeakDetector.track(meter, null);
-        MeterLeakDetector.untrack(ref);
-        MeterLeakDetector.reportRemainingLeaks();
+        MeterLeakDetector.untrack(ref); // meter stopped before it was collected
+        ref.enqueue();
+        MeterLeakDetector.drain();
         assertNoEvents(logger);
-    }
-
-    @Test
-    @DisplayName("enabling reportLeaksOnShutdown installs a shutdown hook at most once")
-    void enablingReportLeaksOnShutdownInstallsHookOnce() {
-        MeterConfig.reportLeaksOnShutdown = true;
-        final MeterReference ref1 = MeterLeakDetector.track(meter, null);
-        try {
-            final Thread hook = MeterLeakDetector.shutdownHookForTests();
-            assertNotNull(hook, "a shutdown hook must be installed when reportLeaksOnShutdown is enabled");
-            final MeterReference ref2 = MeterLeakDetector.track(meter, null);
-            assertSame(hook, MeterLeakDetector.shutdownHookForTests(), "the hook must be installed at most once");
-            MeterLeakDetector.untrack(ref2);
-        } finally {
-            MeterLeakDetector.untrack(ref1);
-            MeterLeakDetector.resetShutdownHookForTests();
-        }
-    }
-
-    @Test
-    @DisplayName("no shutdown hook is installed when reportLeaksOnShutdown is disabled")
-    void disabledReportLeaksOnShutdownInstallsNoHook() {
-        // reportLeaksOnShutdown defaults to false (restored by @ResetMeterConfig)
-        final MeterReference ref = MeterLeakDetector.track(meter, null);
-        try {
-            assertNull(MeterLeakDetector.shutdownHookForTests(),
-                    "no shutdown hook should be installed when the option is disabled");
-        } finally {
-            MeterLeakDetector.untrack(ref);
-        }
     }
 
     @Test
@@ -262,7 +209,6 @@ class MeterLeakDetectorTest {
         assertNotNull(ref, "a stack node must be returned even when leak detection is off");
         assertSame(meter, ref.get(), "the stack node must weakly reference the meter so the stack can resolve it");
         assertEquals(0, MeterLeakDetector.trackedCount(), "a non-detecting node must not be registered");
-        MeterLeakDetector.reportRemainingLeaks();
         assertNoEvents(logger);
     }
 
@@ -273,7 +219,6 @@ class MeterLeakDetectorTest {
         final MeterReference ref = MeterLeakDetector.track(meter, null);
         assertNotNull(ref, "a stack node must still be returned for the dummy meter");
         assertEquals(0, MeterLeakDetector.trackedCount(), "the dummy '???' meter must not be registered for leaks");
-        MeterLeakDetector.reportRemainingLeaks();
         assertNoEvents(logger);
     }
 }
