@@ -257,12 +257,8 @@ public class MeterThreadLocalLegacyTest {
 
         assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should still be no active Meter if m1.start() was not called");
 
-        // Clean up to avoid finalize warnings if m1 is not explicitly stopped
-        // In a real scenario, an unstarted Meter wouldn't cause issues, but for testing, we ensure clean state.
-        // If m1 was started and not stopped, it would log a warning on finalize.
-        // Since it was not started, it won't be in the ThreadLocal stack, so no explicit stop is needed for ThreadLocal.
-        // However, if it were to be started later, it would need to be stopped.
-        // For this specific test, we just ensure it's not active.
+        // m1 was created but never started, so neither in the ThreadLocal stack nor registered with the leak detector.
+        // No explicit stop is needed.
     }
 
     /**
