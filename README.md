@@ -57,6 +57,26 @@ try {
 }
 ```
 
+## Leak detection (forgotten meters)
+
+A `Meter` that is `start()`-ed but never explicitly terminated logs an `ERROR` message
+(marker `INVALID_ARGUMENT`) the next time any meter is started on any thread:
+
+```
+ERROR ... Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=...
+```
+
+Detection is purely garbage-collection driven. There is no background thread, no JVM shutdown hook,
+and no lock on the application's hot path. A started meter registers one `PhantomReference`;
+when the GC collects the meter without an explicit stop, the next `start()` call drains the reference
+queue and emits the error.
+
+> **Note:** This replaces the previous `Object.finalize()`-based detection (JEP 421).
+
+| Field | System property | Default | Description |
+|---|---|---|---|
+| `MeterConfig.detectLeaks` | `slf4jtoys.meter.detect.leaks` | `true` | Enables forgotten-meter detection. Disable in tests that deliberately leave meters open. |
+
 ## Installation
 
 *slf4j-toys* is available from the [Maven Central repository](https://search.maven.org/artifact/org.usefultoys/slf4j-toys/1.9.0/jar).

@@ -328,20 +328,6 @@ public class MeterValidator {
     }
 
 
-    /* ========== Validate Finalize Method ========== */
-
-    /**
-     * Validates the state of a Meter instance during finalization.
-     * Logs an error if a Meter was started but never explicitly stopped.
-     *
-     * @param meter The Meter instance being finalized.
-     */
-    void validateFinalize(final Meter meter) {
-        if (meter.getStartTime() != 0 && meter.getStopTime() == 0 && !meter.getCategory().equals(Meter.UNKNOWN_LOGGER_NAME)) {
-            meter.getMessageLogger().error(Markers.INVALID_ARGUMENT, "{}; id={}", "Meter never stopped, must remember to call ok/reject/fail/success() on each started one", meter.getFullID());
-        }
-    }
-
     /* ========== Utility Methods ========== */
 
     void logInvalidStateAlreadyStopped(final Meter meter) {

@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see MeterConfig
  * @see Markers
  */
-@SuppressWarnings({"OverlyBroadCatchBlock", "FinalizeDeclaration"})
+@SuppressWarnings("OverlyBroadCatchBlock")
 public class Meter extends MeterData implements MeterContext<Meter>, MeterExecutor<Meter>, Closeable {
 
     /**
@@ -97,6 +97,13 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * These references form a linked list representing a stack of `Meter` instances.
      */
     private WeakReference<Meter> previousInstance;
+
+    /**
+     * Registration handle with the {@link MeterLeakDetector}, obtained on {@link #start()} when leak detection is
+     * enabled ({@link MeterConfig#detectLeaks}) and the category is known. {@code null} otherwise. Passed back to
+     * the detector on every explicit termination so this {@code Meter} is not reported as a leak.
+     */
+    private transient MeterLeakDetector.MeterReference leakRef;
 
     /**
      * Creates a new `Meter` for an operation belonging to the category derived from the logger's name.
@@ -351,6 +358,10 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
             lastProgressTime = startTime = collectCurrentTime();
 
+            if (MeterConfig.detectLeaks && !UNKNOWN_LOGGER_NAME.equals(getCategory())) {
+                leakRef = MeterLeakDetector.register(this);
+            }
+
             if (messageLogger.isDebugEnabled()) {
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
                 SystemMetrics.getInstance().collectPlatformStatus(this);
@@ -502,6 +513,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 okPath = toPath(pathId, true);
             }
             localThreadInstance.set(previousInstance);
+            MeterLeakDetector.deregister(leakRef);
+            leakRef = null;
 
             if (messageLogger.isWarnEnabled()) { // Check warn enabled to cover info as well
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
@@ -618,6 +631,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failMessage = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
+            MeterLeakDetector.deregister(leakRef);
+            leakRef = null;
             rejectPath = toPath(cause, true);
 
             if (messageLogger.isInfoEnabled()) {
@@ -664,6 +679,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
+            MeterLeakDetector.deregister(leakRef);
+            leakRef = null;
             failPath = toPath(cause, false);
             /* Extract failure message from Throwable if applicable */
             if (cause instanceof Throwable) {
@@ -693,22 +710,6 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     // ========================================================================
 
     /**
-     * Overrides the default `finalize()` method to detect `Meter` instances that were started but never explicitly
-     * stopped. If an unstopped `Meter` is garbage-collected, an error message is logged to indicate inconsistent API
-     * usage.
-     *
-     * @throws Throwable if an error occurs during finalization.
-     */
-    @SuppressWarnings("removal")
-    @Override
-    protected void finalize() throws Throwable {
-        MeterValidator.validateFinalize(this);
-        super.finalize();
-    }
-
-    // ========================================================================
-
-    /**
      * Implements the {@link Closeable} interface. If the `Meter` has not been explicitly stopped (via `ok()`,
      * `reject()`, or `fail()`), this method automatically marks the operation as {@code FAIL} with the path
      * {@code "try-with-resources"}. This ensures that no operation goes untracked when used in a `try-with-resources`
@@ -731,6 +732,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
+            MeterLeakDetector.deregister(leakRef);
+            leakRef = null;
             failPath = FAIL_PATH_TRY_WITH_RESOURCES;
 
             if (messageLogger.isErrorEnabled()) {
