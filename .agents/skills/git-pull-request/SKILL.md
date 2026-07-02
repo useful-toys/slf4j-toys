@@ -19,8 +19,6 @@ PR titles describe the outcome for a human reviewer scanning a PR list, not a ma
 
 **Bad**: `feat(meter): implement idempotent termination` (Conventional Commits belongs in commits, not titles) · `Fix bug` / `Update tests` / `Changes` (not specific enough to scan)
 
-> If this repo squash-merges PRs with the PR title as the resulting commit subject, reconcile this rule with `trunk-based-development`'s requirement that the squash-commit subject follow Conventional Commits — check which one is authoritative before assuming both hold simultaneously.
-
 ## Closing issues
 
 If the PR resolves one or more issues, reference them at the top of the description using GitHub's closing keywords so the issue closes automatically on merge and reviewers get the linked context:
@@ -49,18 +47,12 @@ Write the sections below in order. Each one answers a question a reviewer will o
 | `## Examples` | Recommended | Concrete before/after usage |
 | `## Relevant Documentation` | If applicable | Links to TDRs, plans, related PRs |
 
-### `## Context`
-
-Orient a reviewer unfamiliar with this component before showing them the problem.
-
-```markdown
-## Context
-
-The Meter class is a core component of slf4j-toys that tracks operation
-lifecycle (start, progress, termination). Currently, termination methods
-(ok, reject, fail) can be called multiple times on an already stopped
-meter, overwriting the state from the first termination.
-```
+- **`## Context`** — one or two sentences orienting a reviewer unfamiliar with this component, before showing them the problem.
+- **`## Solution`** — the approach and key decisions, not a line-by-line diff walkthrough. Bold class/method names so they're scannable; name the pattern applied if there is one (guard clause, factory, etc.).
+- **`## Code Changes`** — production vs. test files, with file and test counts, so a reviewer can judge PR size before opening a single diff.
+- **`## Test Results`** — numbers, not just "tests pass" (e.g. "All 1710 Meter tests pass"). Run the relevant tier from `run-test` first; don't claim results you haven't observed.
+- **`## Examples`** (recommended) — concrete before/after scenarios, faster for a reviewer to check against their mental model than re-reading the diff.
+- **`## Relevant Documentation`** (optional) — links to TDRs, planning docs, or related PRs/issues that carry design context this PR relies on.
 
 ### `## Problem`
 
@@ -80,25 +72,6 @@ meter.reject("error");   // OVERWRITES to rejectPath="error" ❌
 \`\`\`
 
 This violates the principle that the first termination should win.
-```
-
-### `## Solution`
-
-Explain the approach and the key decisions — not a line-by-line diff walkthrough. Bold class/method names so they're scannable; name the pattern applied if there is one (guard clause, factory, etc.).
-
-```markdown
-## Solution
-
-Implemented idempotent termination behavior using guard clauses:
-
-1. **MeterValidator.validateStopPrecondition()** now returns `boolean`:
-   - Returns `false` when meter already stopped (blocks re-termination)
-   - Returns `true` otherwise (allows termination with warnings)
-
-2. **Meter termination methods** check the validation result:
-   - commonOk(), reject(), fail() call validateStopPrecondition()
-   - Early return when meter already stopped
-   - Preserves path and state from first termination
 ```
 
 ### `## API Changes` — omit if there are none
@@ -129,78 +102,17 @@ public static boolean validateStopPrecondition(final Meter meter, final Marker m
 **Backward Compatibility**: Backward compatible — no client-facing change, only internal behavior.
 ```
 
-### `## Code Changes`
-
-Give the scope at a glance: production vs. test files, with counts, so a reviewer can judge PR size before opening a single diff.
-
-```markdown
-## Code Changes
-
-### Production Code (2 files)
-- **MeterValidator.java**: Changed validateStopPrecondition() return type
-- **Meter.java**: Added guard clauses in commonOk(), reject(), fail()
-
-### Test Code (3 files, 86 tests updated)
-- **MeterValidatorTest.java** (4 tests): Capture and assert boolean returns
-- **MeterLogBugTest.java** (6 tests): Fixed mocks for exception handling
-- **MeterLifeCyclePreStartTerminatedPostStopInvalidTerminationTest.java** (28 tests):
-  - Removed "Will be fixed in future" comments
-  - Fixed state assertions and event counts
-```
-
-### `## Test Results`
-
-State that the change actually works, with numbers, not just "tests pass." Run the relevant tier from `run-test` before writing this section — don't claim results you haven't observed.
-
-```markdown
-## Test Results
-
-✅ **All 1710 Meter tests pass**
-
-Comprehensive validation confirms:
-- Idempotent termination works correctly
-- First termination always wins in all scenarios
-- No regression in existing functionality
-- Backward compatibility maintained
-```
-
-### `## Examples` (recommended)
-
-Concrete before/after scenarios help a reviewer confirm the fix matches their mental model of the bug, faster than re-reading the diff.
-
-```markdown
-## Examples
-
-### Scenario 1: Double termination after start
-\`\`\`java
-final Meter meter = new Meter(logger).start();
-meter.ok();              // Terminates with okPath=null
-meter.reject("error");   // REJECTED: okPath preserved ✅
-\`\`\`
-
-### Scenario 2: Termination with path
-\`\`\`java
-final Meter meter = new Meter(logger).start();
-meter.ok("SUCCESS");     // Terminates with okPath="SUCCESS"
-meter.ok("ALTERNATE");   // REJECTED: okPath remains "SUCCESS" ✅
-\`\`\`
-```
-
-### `## Relevant Documentation` (optional)
-
-Link TDRs, planning docs, or related PRs/issues that carry design context this PR relies on.
-
 ## AI attribution
 
-`.github/copilot-instructions.md` overrides AI attribution project-wide for GitHub Copilot: every AI-generated PR description must end with
+Every AI-generated PR description must end with a co-author trailer naming the actual assistant and model that generated it — not a fixed placeholder tool name:
 
 ```markdown
 ---
 
-Co-authored-by: GitHub Copilot using <model name>
+Co-Authored-By: <Assistant Name> <Model> <contact address>
 ```
 
-where `<model name>` is the actual model used (e.g., `Claude Sonnet 4.5`). Apply the same attribution convention consistently to commits authored in the same PR (see `git-commit-push`).
+For Claude Code, that's the harness default: `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`. If the PR is generated by GitHub Copilot specifically, follow `.github/copilot-instructions.md`'s override instead (`Co-authored-by: GitHub Copilot using <model name>`). Apply the same attribution convention consistently to commits authored in the same PR (see `git-commit-push`).
 
 ## Before finishing the draft
 
