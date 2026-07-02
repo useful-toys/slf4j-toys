@@ -1,11 +1,11 @@
 ---
 name: git-pull-request
-description: 'Structure and conventions for Pull Request titles and descriptions in slf4j-toys. Use whenever opening a PR (gh pr create), drafting or updating a PR description, or writing PR/issue-closing text — covers the mandatory body sections (Context, Problem, Solution, Code Changes, Test Results), goal-oriented title format (not Conventional Commits), issue-closing keywords, and AI attribution.'
+description: 'Writing conventions for Pull Request titles and descriptions in slf4j-toys — content only, not the git/gh mechanics of opening or merging one. Use whenever drafting, reviewing, or updating PR title/description text: the mandatory body sections (Context, Problem, Solution, Code Changes, Test Results), goal-oriented title format (not Conventional Commits), issue-closing keywords, and AI attribution phrasing. For the operational side (when to open a PR, how to create/merge it, branch lifecycle), see `trunk-based-development` instead.'
 ---
 
-# Pull Request Guidelines for slf4j-toys
+# Pull Request Writing Guidelines for slf4j-toys
 
-A consistent PR structure lets reviewers who don't know this part of the codebase get oriented, see the problem, and judge the fix without re-deriving context from the diff alone. Follow the structure below for every PR opened in this repository.
+This skill covers only the *content* of a PR — title and description text — not how to create, push, or merge one (that's `trunk-based-development`). A consistent PR structure lets reviewers who don't know this part of the codebase get oriented, see the problem, and judge the fix without re-deriving context from the diff alone. Follow the structure below for every PR description written in this repository.
 
 ## Language
 
@@ -202,43 +202,18 @@ Co-authored-by: GitHub Copilot using <model name>
 
 where `<model name>` is the actual model used (e.g., `Claude Sonnet 4.5`). Apply the same attribution convention consistently to commits authored in the same PR (see `git-commit-push`).
 
-## Creating the PR with GitHub CLI
+## Before finishing the draft
 
-Prefer a body file over an inline `-body` string — PowerShell mangles multi-line strings with embedded code blocks and special characters, a body file doesn't:
-
-```powershell
-$prBody = @'
-Resolves #123
-
-## Context
-
-Your PR description here...
-
----
-
-Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
-'@
-
-$prBody | Out-File -FilePath pr-body.txt -Encoding UTF8
-gh pr create --title "Your descriptive title" --body-file pr-body.txt
-Remove-Item pr-body.txt
-```
-
-For a quick PR without scripting the body, `gh pr create --editor` opens the default editor for title and body instead.
-
-After creating it, open the PR URL `gh pr create` prints and confirm the sections render as intended — code blocks and issue-closing keywords are the two things most likely to look right in the terminal but wrong on GitHub.
-
-## Before opening the PR
-
-- Tests relevant to the change pass locally (see `run-test`) — don't write the `## Test Results` section from assumption.
 - All required sections above are present; `## API Changes` is included only if there's a public-facing change.
-- The PR contains one concern — split unrelated changes into separate PRs (see `trunk-based-development` for branch-size guidance).
+- `## Test Results` states numbers you actually observed (run the relevant tier from `run-test` first) — don't write it from assumption.
 - AI attribution is present at the end of the description.
+
+For turning this draft into an actual PR — when to open one, how to create and merge it — see `trunk-based-development`.
 
 ## Related Documentation
 
 - `git-commit-push` skill — commit message conventions
-- `trunk-based-development` skill — when a PR is opened relative to branch/merge lifecycle
+- `trunk-based-development` skill — PR creation/merge mechanics and branch lifecycle
 - [AGENTS.md](../../../AGENTS.md) — project AI agent guidelines
 - [.github/copilot-instructions.md](../../../.github/copilot-instructions.md) — AI attribution standards
 - [PR #44](https://github.com/useful-toys/slf4j-toys/pull/44) — complete example following this structure
