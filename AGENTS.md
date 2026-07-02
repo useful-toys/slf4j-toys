@@ -33,7 +33,7 @@ You prioritize:
   - **Always use Maven wrapper**: `./mvnw` (Unix/Linux/macOS) or `mvnw.cmd` (Windows)
   - **Never use system Maven**: Avoid `mvn` command to ensure consistent Maven version
   - See [.agents/skills/run-test/SKILL.md](.agents/skills/run-test/SKILL.md) for test execution commands
-  - See [.github/skills/powershell/SKILL.md](.github/skills/powershell/SKILL.md) for Windows-specific considerations
+  - See [.agents/skills/powershell/SKILL.md](.agents/skills/powershell/SKILL.md) for Windows-specific considerations
 - **Testing**: JUnit 5 with custom test extensions and MockLogger
 - **Logging**: SLF4J API
 
