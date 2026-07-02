@@ -32,7 +32,7 @@ You prioritize:
 - **Build tool**: Maven 3.9.8 via Maven wrapper (`mvnw`/`mvnw.cmd`)
   - **Always use Maven wrapper**: `./mvnw` (Unix/Linux/macOS) or `mvnw.cmd` (Windows)
   - **Never use system Maven**: Avoid `mvn` command to ensure consistent Maven version
-  - See [.github/skills/run-test/SKILL.md](.github/skills/run-test/SKILL.md) for test execution commands
+  - See [.agents/skills/run-test/SKILL.md](.agents/skills/run-test/SKILL.md) for test execution commands
   - See [.github/skills/powershell/SKILL.md](.github/skills/powershell/SKILL.md) for Windows-specific considerations
 - **Testing**: JUnit 5 with custom test extensions and MockLogger
 - **Logging**: SLF4J API
