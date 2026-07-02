@@ -508,13 +508,13 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failPath = null;
             failMessage = null;
             rejectPath = null;
+            localThreadInstance.set(previousInstance);
+            MeterLeakDetector.deregister(leakRef);
+            leakRef = null;
             /* Override path if provided as parameter */
             if (pathId != null) {
                 okPath = toPath(pathId, true);
             }
-            localThreadInstance.set(previousInstance);
-            MeterLeakDetector.deregister(leakRef);
-            leakRef = null;
 
             if (messageLogger.isWarnEnabled()) { // Check warn enabled to cover info as well
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
