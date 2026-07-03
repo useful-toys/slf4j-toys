@@ -33,26 +33,19 @@ Use `Fixes` for bug fixes, `Resolves` for features/improvements, `Closes` when n
 
 ## Required body sections
 
-Write the sections below in order. Each one answers a question a reviewer will otherwise have to dig for in the diff.
+Write the sections below in order. Each one answers a question a reviewer will otherwise have to dig for in the diff — `Problem` and `API Changes` get a full worked example further down since their expected format isn't obvious from a description alone.
 
-| Section | Required? | Answers |
-|---|---|---|
-| Issue references | If applicable | Which issue(s) does this close? |
-| `## Context` | Yes | What area of the code is this touching, and why does it exist? |
-| `## Problem` | Yes | What's wrong or missing today? |
-| `## Solution` | Yes | How was it fixed, and what design choices were made? |
-| `## API Changes` | If applicable | What public signatures/behavior changed, and is it backward compatible? |
-| `## Code Changes` | Yes | Which files, how many tests, at a glance? |
-| `## Test Results` | Yes | Proof the change works and doesn't regress anything |
-| `## Examples` | Recommended | Concrete before/after usage |
-| `## Relevant Documentation` | If applicable | Links to TDRs, plans, related PRs |
-
-- **`## Context`** — one or two sentences orienting a reviewer unfamiliar with this component, before showing them the problem.
-- **`## Solution`** — the approach and key decisions, not a line-by-line diff walkthrough. Bold class/method names so they're scannable; name the pattern applied if there is one (guard clause, factory, etc.).
-- **`## Code Changes`** — production vs. test files, with file and test counts, so a reviewer can judge PR size before opening a single diff.
-- **`## Test Results`** — numbers, not just "tests pass" (e.g. "All 1710 Meter tests pass"). Run the relevant tier from `run-test` first; don't claim results you haven't observed.
-- **`## Examples`** (recommended) — concrete before/after scenarios, faster for a reviewer to check against their mental model than re-reading the diff.
-- **`## Relevant Documentation`** (optional) — links to TDRs, planning docs, or related PRs/issues that carry design context this PR relies on.
+| Section | Required? | Answers | Notes |
+|---|---|---|---|
+| Issue references | If applicable | Which issue(s) does this close? | See Closing issues above |
+| `## Context` | Yes | What area of the code is this touching, and why does it exist? | 1–2 sentences before the Problem |
+| `## Problem` | Yes | What's wrong or missing today? | Mark the wrong outcome with ❌ |
+| `## Solution` | Yes | How was it fixed, and what design choices were made? | Not a diff walkthrough — bold class/method names, name the pattern applied |
+| `## API Changes` | If applicable | What public signatures/behavior changed, and is it backward compatible? | State compatibility explicitly |
+| `## Code Changes` | Yes | Which files, how many tests, at a glance? | Split production vs. test, with counts |
+| `## Test Results` | Yes | Proof the change works and doesn't regress anything | Numbers you actually observed, not "tests pass" |
+| `## Examples` | Recommended | Concrete before/after usage | Faster to check than re-reading the diff |
+| `## Relevant Documentation` | If applicable | Links to TDRs, plans, related PRs | — |
 
 ### `## Problem`
 
