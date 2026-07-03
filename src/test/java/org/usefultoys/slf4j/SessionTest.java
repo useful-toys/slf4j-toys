@@ -18,6 +18,8 @@ package org.usefultoys.slf4j;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.usefultoys.test.ResetSessionConfig;
 import org.usefultoys.test.ValidateCharset;
 
@@ -38,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li><b>UUID Format:</b> Validates that generated UUIDs are 32-character hexadecimal strings</li>
  *   <li><b>Short UUID with Default Size:</b> Tests shortSessionUuid() method with default SessionConfig.uuidSize</li>
  *   <li><b>Short UUID with Custom Size:</b> Tests shortSessionUuid() method with custom SessionConfig.uuidSize configuration</li>
+ *   <li><b>Short UUID Boundary Correction:</b> Tests shortSessionUuid() correction of out-of-range uuidSize values</li>
  * </ul>
  */
 @ValidateCharset
@@ -96,5 +99,26 @@ class SessionTest {
         assertNotNull(shortUuid, "shortSessionUuid() should not return null");
         assertTrue(Session.uuid.endsWith(shortUuid), "UUID should end with short UUID");
         assertEquals(10, shortUuid.length(), "shortSessionUuid() should return a string of length 10");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "2, 2",
+            "32, 32",
+            "33, 32",
+            "-1, 2",
+            "1, 2"
+    })
+    @DisplayName("should correct uuidSize and return short UUID within valid bounds")
+    void shouldCorrectUuidSizeAndReturnShortUuidWithinValidBounds(final int input, final int expected) {
+        // Given: SessionConfig with a potentially out-of-range uuidSize
+        SessionConfig.uuidSize = input;
+        // When: shortSessionUuid() is called
+        final String shortUuid = Session.shortSessionUuid();
+        // Then: uuidSize is corrected and the returned string has the expected length
+        assertEquals(expected, SessionConfig.uuidSize, "uuidSize should be corrected to " + expected);
+        assertNotNull(shortUuid, "shortSessionUuid() should not return null");
+        assertTrue(Session.uuid.endsWith(shortUuid), "UUID should end with short UUID");
+        assertEquals(expected, shortUuid.length(), "shortSessionUuid() should return a string of length " + expected);
     }
 }
