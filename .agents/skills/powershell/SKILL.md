@@ -101,4 +101,4 @@ The closing `'@` must start at column 0 on its own line — indenting it is a pa
 ## Related skills
 
 - `run-test` — the Maven commands this skill's quoting rules apply to.
-- `git-commit` — commit messages, which typically need the here-string technique above.
+- `git-commit-message` — commit messages, which typically need the here-string technique above.
