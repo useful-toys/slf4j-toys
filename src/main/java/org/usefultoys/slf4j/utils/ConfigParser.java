@@ -28,6 +28,14 @@ import java.util.List;
  * {@code long}, and include additional logic for parsing time-based values with unit suffixes (e.g., "10s", "5min").
  * <p>
  * This class is not meant to be instantiated.
+ * <p>
+ * <strong>Security note regarding CWE-209 (Information Exposure Through Error Message):</strong>
+ * Error messages recorded in {@link #initializationErrors} include the raw property value to aid debugging.
+ * This is accepted by design and is not considered a CWE-209 vulnerability. This class is used solely to
+ * obtain configuration defined in {@link org.usefultoys.slf4j.SessionConfig},
+ * {@link org.usefultoys.slf4j.report.ReporterConfig}, {@link org.usefultoys.slf4j.watcher.WatcherConfig},
+ * and {@link org.usefultoys.slf4j.SystemConfig}, none of which involve sensitive values. This parser was
+ * not designed for reuse in other purposes.
  *
  * @author Daniel Felix Ferber
  */
