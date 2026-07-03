@@ -61,7 +61,7 @@ public class SessionConfig {
      * The number of UUID characters to include in **machine-parsable data messages** from {@link Watcher} and {@link Meter}.
      * <p>
      * The full UUID (32 hex characters) uniquely identifies the application instance. In most cases, a shorter
-     * prefix (e.g., 5 characters) is sufficient to distinguish between instances.
+     * suffix of rightmost hexadecimal characters (e.g., 6 characters) is sufficient to distinguish between instances.
      * <p>
      * Valid values are in the range {@code [2, UUID_LENGTH]}. Values below {@code 2} are clamped to
      * {@code 2}, and values above {@link #UUID_LENGTH} are clamped to {@link #UUID_LENGTH}.
