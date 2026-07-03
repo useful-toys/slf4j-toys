@@ -1,11 +1,13 @@
 ---
 name: trunk-based-development
-description: 'Operational workflow for Trunk-Based Development in slf4j-toys — git worktrees, branch/worktree naming, commit and push gates, rebase-based sync, opening and merging PRs, cleaning up stale branches, and cutting releases. Use whenever creating a branch or worktree, before committing or pushing, before rebasing onto main, when opening or merging a PR, when asked for repo/branch status or cleanup, or when cutting a release. Content-only concerns (what a commit message or PR description should say) live in `git-commit-message` and `git-pull-request` instead — this skill is the mechanics.'
+description: 'Operational workflow for Trunk-Based Development in slf4j-toys — git worktrees, branch/worktree naming, commit and push gates, rebase-based sync, opening and merging PRs, cleaning up stale branches, and cutting releases. Use at the start of ANY code, test, build-config, or non-exempt documentation change in this repo — before writing the first line — to create the dedicated branch/worktree first (never edit directly on main); do not wait to be asked about git mechanics specifically. Also use before committing or pushing, before rebasing onto main, when opening or merging a PR, when asked for repo/branch status or cleanup, or when cutting a release. Content-only concerns (what a commit message or PR description should say) live in `git-commit-message` and `git-pull-request` instead — this skill is the mechanics.'
 ---
 
 # Trunk-Based Development with Git Worktrees for slf4j-toys
 
 `main` is the trunk. Every change other than the narrow exceptions in section 7 lands via a short-lived branch, developed in its own git worktree, and merged through a Pull Request. Using a dedicated worktree per branch avoids the context-switch cost of `git checkout` — stale `target/` build output and invalidated IDE caches — since each branch gets its own working directory and build state.
+
+**Apply section 1 before starting the change, not after.** When asked to implement, fix, or refactor something, create the branch and worktree first — don't edit files on `main` and only branch once asked about git mechanics specifically.
 
 ## 1. Branches and worktrees
 
