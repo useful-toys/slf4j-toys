@@ -44,9 +44,13 @@ public class Session {
     public final String uuid = UUID.randomUUID().toString().replace("-", "");
 
     /**
-     * Returns a shortened version of the session UUID, as configured by {@link SessionConfig#uuidSize}.
+     * Returns the rightmost {@link SessionConfig#uuidSize} hexadecimal digits of the session UUID.
+     * <p>
+     * If {@link SessionConfig#uuidSize} is outside the valid range {@code [2, SessionConfig#UUID_LENGTH]},
+     * it is corrected to the nearest boundary before the shortened UUID is returned.
      *
-     * @return A shortened UUID string.
+     * @return A shortened UUID string containing the trailing hexadecimal characters of {@link #uuid}.
+     * @see SessionConfig#uuidSize
      * @see SessionConfig#UUID_LENGTH
      */
     public @NonNull String shortSessionUuid() {
