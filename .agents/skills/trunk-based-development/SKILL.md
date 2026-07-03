@@ -13,12 +13,12 @@ description: 'Operational workflow for Trunk-Based Development in slf4j-toys —
 
 Branch names follow `<type>/<short-kebab-description>`, where `<type>` is one of the Conventional Commits types from `git-commit-message` (`feat`, `fix`, `build`, `chore`, `test`, `docs`, `refactor`, `perf`, `ci`, `revert`) — confirmed against this repo's actual merged-PR history (`fix/meter-threadlocal-flaky-dirty-stack`, `feat/guard-clause-meter-start`, `build/update-maven-wrapper`, etc.).
 
-Create the worktree as a sibling directory of the main clone, named `<main-dir-name>_<branch-slug>`, where `<branch-slug>` is the branch name with every `/` replaced by `-` (a literal `/` in the branch name would otherwise nest the worktree inside a subdirectory instead of creating a sibling):
+Create the worktree **inside** the main clone, under `.worktrees/<branch-slug>/` (git-ignored), where `<branch-slug>` is the branch name with every `/` replaced by `-`. Not a sibling directory: several AI tools used in this repo — GitHub Copilot in particular — are sandboxed to the folder they were opened in and cannot reach a directory outside it, so a sibling worktree (`../<repo>_<branch-slug>`) is simply inaccessible to them. Nesting under the repo root keeps every tool able to reach it while still giving the branch its own working directory and `target/` (the isolation this section exists for in the first place):
 
 ```powershell
 # From the main clone, after syncing main (section 3.1)
-git worktree add ../slf4j-toys_fix-meter-x -b fix/meter-x main
-Set-Location ../slf4j-toys_fix-meter-x
+git worktree add .worktrees/fix-meter-x -b fix/meter-x main
+Set-Location .worktrees/fix-meter-x
 ```
 
 ## 2. Local development and quality gates
@@ -72,7 +72,7 @@ git branch -vv | Select-String '\[.*: gone\]'
 Present the matches to the user and ask which to remove. For each one they approve:
 
 ```powershell
-git worktree remove ../slf4j-toys_<branch-slug>
+git worktree remove .worktrees/<branch-slug>
 git branch -D <branch>
 ```
 
