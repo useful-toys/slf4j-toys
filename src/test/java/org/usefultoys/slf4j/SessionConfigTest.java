@@ -106,21 +106,21 @@ class SessionConfigTest {
     }
 
     @Test
-    @DisplayName("should use default when uuidSize is out of bounds")
-    void shouldUseDefaultWhenUuidSizeIsOutOfBounds() {
+    @DisplayName("should clamp uuidSize to bounds when out of range")
+    void shouldClampUuidSizeToBoundsWhenOutOfRange() {
         // Given: system property set below lower bound "-1"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "-1");
         // When: init() is called
         SessionConfig.init();
-        // Then: should fall back to default
-        assertEquals(5, SessionConfig.uuidSize, "should fall back to default for values below range");
+        // Then: should clamp to the lower bound
+        assertEquals(0, SessionConfig.uuidSize, "should clamp to lower bound for values below range");
 
         // Given: system property set above upper bound "33"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "33");
         // When: init() is called again
         SessionConfig.init();
-        // Then: should fall back to default
-        assertEquals(5, SessionConfig.uuidSize, "should fall back to default for values above range");
+        // Then: should clamp to the upper bound
+        assertEquals(32, SessionConfig.uuidSize, "should clamp to upper bound for values above range");
     }
 
     @Test

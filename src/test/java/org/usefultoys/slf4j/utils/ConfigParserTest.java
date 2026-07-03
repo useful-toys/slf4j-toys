@@ -171,27 +171,56 @@ class ConfigParserTest {
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
     }
 
-    @Test
-    @DisplayName("should report error when range property is out of bounds")
-    void shouldReportErrorWhenRangePropertyOutOfBounds() {
-        // Given: system property set to value below minimum
-        System.setProperty("test.property", "4");
+    @ParameterizedTest
+    @CsvSource({
+            "5, 5",
+            "10, 10",
+            "15, 15"
+    })
+    @DisplayName("should accept range property values within bounds")
+    void shouldAcceptRangePropertyValuesWithinBounds(final String input, final int expected) {
+        // Given: system property set to a value within range
+        System.setProperty("test.property", input);
         // When: range property is retrieved (min=5, max=15)
-        int result = ConfigParser.getRangeProperty("test.property", 0, 5, 15);
-        // Then: should return default and report error
-        assertEquals(0, result, "should return default value 0");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("out of range"), "should report out of range error");
+        final int result = ConfigParser.getRangeProperty("test.property", 0, 5, 15);
+        // Then: should return the parsed value without errors
+        assertEquals(expected, result, "should return value " + input);
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors for value " + input);
+    }
 
-        // Given: clear previous error and set property above maximum
-        ConfigParser.clearInitializationErrors();
-        System.setProperty("test.property", "16");
-        // When: range property is retrieved again
-        result = ConfigParser.getRangeProperty("test.property", 0, 5, 15);
-        // Then: should return default and report error
-        assertEquals(0, result, "should return default value 0");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("out of range"), "should report out of range error");
+    @ParameterizedTest
+    @CsvSource({
+            "4, 5",
+            "0, 5",
+            "-100, 5"
+    })
+    @DisplayName("should clamp range property below minimum and report error")
+    void shouldClampRangePropertyBelowMinimumAndReportError(final String input, final int expected) {
+        // Given: system property set to a value below the minimum
+        System.setProperty("test.property", input);
+        // When: range property is retrieved (min=5, max=15)
+        final int result = ConfigParser.getRangeProperty("test.property", 0, 5, 15);
+        // Then: should clamp to the minimum and report an error
+        assertEquals(expected, result, "should clamp value " + input + " to minimum " + expected);
+        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error for value " + input);
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("below minimum"), "should report below-minimum error");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "16, 15",
+            "100, 15"
+    })
+    @DisplayName("should clamp range property above maximum and report error")
+    void shouldClampRangePropertyAboveMaximumAndReportError(final String input, final int expected) {
+        // Given: system property set to a value above the maximum
+        System.setProperty("test.property", input);
+        // When: range property is retrieved (min=5, max=15)
+        final int result = ConfigParser.getRangeProperty("test.property", 0, 5, 15);
+        // Then: should clamp to the maximum and report an error
+        assertEquals(expected, result, "should clamp value " + input + " to maximum " + expected);
+        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error for value " + input);
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("above maximum"), "should report above-maximum error");
     }
 
     @Test
