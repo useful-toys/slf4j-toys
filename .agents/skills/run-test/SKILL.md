@@ -12,50 +12,32 @@ The project splits tests into two tiers so that IDEs keep a clean, conflict-free
 ## Guidelines
 
 - Always invoke Maven through the wrapper (`.\mvnw`), never a system-installed `mvn` — it pins the Maven version the project expects.
-- Never add the `clean` goal (`.\mvnw clean test`). It forces a full recompile and defeats incremental builds; plain `test` is sufficient because Maven already recompiles changed sources.
+- Default to plain `test`, not `clean test` — Maven's incremental compilation already picks up changed sources, so `clean` just costs a full recompile for no benefit. Only add `clean` if a run gives a suspicious result you suspect is stale build state; `doc/build-execution-guide.md` uses `clean` everywhere because it targets guaranteed-fresh CI/release builds, a different goal than this skill's iterative dev-loop runs.
 - Java 21 must be on `PATH` / `JAVA_HOME` before running any `mvnw` command. See `powershell` skill for how to set up JDK 21 in the current terminal session.
 - On PowerShell, wrap any `-D` parameter containing `#` (e.g. `-Dtest=Class#method`) in single quotes — PowerShell treats an unquoted `#` as a comment start and silently truncates the argument. See `powershell` skill for the full escaping rules.
 
 ## Choosing a tier
 
-| Tier | Command prefix | Test count | IDE support (run/debug/coverage) |
+`slf4j-2.0` is `activeByDefault`, so plain `.\mvnw test` already runs under it; name it explicitly only alongside `with-logback`. Default to the **core tier** for everyday development. Reach for **with-logback** only when the change touches `src/logback-main/java`, `src/logback-test/java`, or anything under `**/logback/**` — those sources aren't on the default classpath at all, so core-tier tests can't exercise them.
+
+| Tier | Command | Tests | IDE run/debug/coverage |
 | --- | --- | --- | --- |
 | Core (default) | `.\mvnw test` | ~1441 | Yes |
 | With Logback | `.\mvnw test -P slf4j-2.0,with-logback` | +84 (1525 total) | No — Maven only |
 
-`slf4j-2.0` is `activeByDefault`, so plain `.\mvnw test` already runs under it; naming it explicitly is only needed alongside `with-logback`.
-
-Default to the **core tier** for everyday development — it is what the IDE uses and covers Meter, Watcher, and Reporter with `MockLogger`. Reach for the **with-logback tier** only when the change touches `src/logback-main/java`, `src/logback-test/java`, or anything under `**/logback/**`, since those sources and tests aren't on the default classpath at all.
-
-## Core tier — default build
-
-Tests Meter, Watcher, Reporter, and supporting classes against `MockLogger` (the `slf4j-test-mock` dependency), excluding all Logback integration tests (`**/logback/**/*Test.java`). This is what IDEs import, so run/debug/coverage all work normally here.
-
 ```powershell
-# Run all core tests
+# Core tier
 .\mvnw test
-
-# Run one test class
 .\mvnw test -Dtest=MeterLifeCycleTest
+.\mvnw test '-Dtest=MeterLifeCycleTest#shouldCreateMeterWithLoggerInitialState'   # single quotes protect '#'
 
-# Run one test method (single quotes protect the '#')
-.\mvnw test '-Dtest=MeterLifeCycleTest#shouldCreateMeterWithLoggerInitialState'
-```
-
-## With-Logback tier — full coverage
-
-Activates the `with-logback` Maven profile, which adds the `src/logback-main/java` and `src/logback-test/java` source roots and swaps `MockLogger` for the real `logback-classic` logger. This is how Logback converters and integration tests get compiled and run at all — the IDE never sees these sources, so this tier is Maven-only (no run/debug from the IDE).
-
-```powershell
-# Run everything: core + Logback (1525 tests)
+# With-Logback tier
 .\mvnw test -P slf4j-2.0,with-logback
-
-# Run only the Logback tests
 .\mvnw test -P slf4j-2.0,with-logback -Dtest=MessageHighlightConverterTest
-
-# Run one Logback test method (single quotes protect the '#')
 .\mvnw test -P slf4j-2.0,with-logback '-Dtest=MessageHighlightConverterTest#testMsgStartMarker'
 ```
+
+The with-logback profile adds the `src/logback-main/java` and `src/logback-test/java` source roots and swaps `MockLogger` for real `logback-classic` — the only way Logback converters and integration tests get compiled and run at all, since the IDE never imports those roots.
 
 ## Related skills
 
