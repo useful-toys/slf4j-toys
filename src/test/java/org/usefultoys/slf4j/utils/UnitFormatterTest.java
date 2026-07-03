@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.utils;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.usefultoys.test.ValidateCharset;
@@ -24,6 +25,7 @@ import org.usefultoys.test.WithLocale;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 
 /**
@@ -37,8 +39,9 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  *   <li><b>Custom Units:</b> Tests formatting of long and double values with custom unit arrays</li>
  *   <li><b>Byte Units:</b> Verifies formatting of byte values with appropriate units (B, KB, MB, etc.)</li>
  *   <li><b>Time Units:</b> Covers formatting of time values in nanoseconds, microseconds, milliseconds, seconds</li>
- *   <li><b>Iteration Units:</b> Tests formatting of iteration counts with appropriate units</li>
- *   <li><b>Edge Cases:</b> Ensures correct handling of zero, negative, and large values</li>
+ *   <li><b>Iteration Units:</b> Tests formatting of iteration counts with appropriate units, including G suffix for large values and M-to-G boundary transition</li>
+ *   <li><b>Negative Values:</b> Verifies formatting of negative long and double values, which stay in the first unit</li>
+ *   <li><b>Edge Cases:</b> Ensures correct handling of zero, negative, large values, extreme values (Long.MAX_VALUE, Double.MAX_VALUE, Long.MIN_VALUE), and unit boundary transitions</li>
  * </ul>
  */
 @ValidateCharset
@@ -100,6 +103,28 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format value " + value + " as " + expected);
     }
 
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideLongUnitNegativeTestCases() {
+        return Stream.of(
+            of(-1L, "-1A"),
+            of(-100L, "-100A"),
+            of(-999L, "-999A"),
+            of(-1000L, "-1000A"),
+            of(-1099L, "-1099A"),
+            of(Long.MIN_VALUE, "-9223372036854775808A")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideLongUnitNegativeTestCases")
+    @DisplayName("should format negative long values with first unit suffix")
+    void shouldFormatNegativeLongValuesWithFirstUnitSuffix(final long value, final String expected) {
+        // Given: a negative long value
+        // When: longUnit is called
+        final String result = UnitFormatter.longUnit(value, UNITS, FACTORS);
+        // Then: should return value formatted with first unit, as negative values stay below the limit
+        assertEquals(expected, result, "should format value " + value + " as " + expected);
+    }
+
     static Stream<org.junit.jupiter.params.provider.Arguments> provideLongUnitWithLongParametersTestCases() {
         return Stream.of(
             of(0, "0A"),
@@ -154,8 +179,30 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format value " + value + " as " + expected);
     }
 
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideDoubleUnitNegativeTestCases() {
+        return Stream.of(
+            of(-0.0, "0A"),
+            of(-1.0, "-1.0A"),
+            of(-999.0, "-999.0A"),
+            of(-1000.0, "-1000.0A"),
+            of(-1099.0, "-1099.0A")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDoubleUnitNegativeTestCases")
+    @DisplayName("should format negative double values with first unit suffix")
+    void shouldFormatNegativeDoubleValuesWithFirstUnitSuffix(final double value, final String expected) {
+        // Given: a negative double value
+        // When: doubleUnit is called
+        final String result = UnitFormatter.doubleUnit(value, UNITS, FACTORS);
+        // Then: should return value formatted with first unit, as negative values stay below the limit
+        assertEquals(expected, result, "should format value " + value + " as " + expected);
+    }
+
     static Stream<org.junit.jupiter.params.provider.Arguments> provideBytesTestCases() {
         return Stream.of(
+            of(0, "0B"),
             of(500, "500B"),
             of(1000, "1000B"),
             of(1500, "1.5kB"),
@@ -288,6 +335,130 @@ class UnitFormatterTest {
         final String result = UnitFormatter.iterations(value);
         // Then: should return value formatted with k, M suffixes
         assertEquals(expected, result, "should format " + value + " iterations as " + expected);
+    }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsLargeTestCases() {
+        return Stream.of(
+            of(1_100_000_000L, "1.1G"),
+            of(1_500_000_000L, "1.5G"),
+            of(1_000_000_000_000L, "1000.0G")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIterationsLargeTestCases")
+    @DisplayName("should format large iteration counts with G unit suffix without overflow")
+    void shouldFormatLargeIterationCountsWithGUnitSuffixWithoutOverflow(final long value, final String expected) {
+        // Given: a large iteration count value that exceeds the M unit range
+        // When: iterations formatter is called
+        final String result = UnitFormatter.iterations(value);
+        // Then: should return value formatted with G suffix, not throw ArrayIndexOutOfBoundsException
+        assertEquals(expected, result, "should format " + value + " iterations as " + expected);
+    }
+
+    @Test
+    @DisplayName("should not throw ArrayIndexOutOfBoundsException for Long.MAX_VALUE iterations")
+    void shouldNotThrowForLongMaxValueIterations() {
+        // Given: the maximum possible long iteration count
+        // When: iterations formatter is called
+        final String result = UnitFormatter.iterations(Long.MAX_VALUE);
+        // Then: should return a string ending with G suffix, not throw ArrayIndexOutOfBoundsException
+        assertTrue(result.endsWith("G"), "should end with G suffix, got: " + result);
+    }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsPerSecondLargeTestCases() {
+        return Stream.of(
+            of(1.1E9, "1.1G/s"),
+            of(1.5E9, "1.5G/s"),
+            of(1.0E12, "1000.0G/s")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIterationsPerSecondLargeTestCases")
+    @DisplayName("should format large iterations per second with G/s unit suffix without overflow")
+    void shouldFormatLargeIterationsPerSecondWithGPerSecondUnitSuffixWithoutOverflow(final double value, final String expected) {
+        // Given: a large iterations per second value that exceeds the M/s unit range
+        // When: iterationsPerSecond formatter is called
+        final String result = UnitFormatter.iterationsPerSecond(value);
+        // Then: should return value formatted with G/s suffix, not throw ArrayIndexOutOfBoundsException
+        assertEquals(expected, result, "should format " + value + "/s as " + expected);
+    }
+
+    @Test
+    @DisplayName("should not throw ArrayIndexOutOfBoundsException for Double.MAX_VALUE iterations per second")
+    void shouldNotThrowForDoubleMaxValueIterationsPerSecond() {
+        // Given: the maximum possible double iterations per second value
+        // When: iterationsPerSecond formatter is called
+        final String result = UnitFormatter.iterationsPerSecond(Double.MAX_VALUE);
+        // Then: should return a string ending with G/s suffix, not throw ArrayIndexOutOfBoundsException
+        assertTrue(result.endsWith("G/s"), "should end with G/s suffix, got: " + result);
+    }
+
+    @Test
+    @DisplayName("should format zero iterations per second as 0/s")
+    void shouldFormatZeroIterationsPerSecondAsZero() {
+        // Given: zero iterations per second
+        // When: iterationsPerSecond formatter is called
+        final String result = UnitFormatter.iterationsPerSecond(0.0);
+        // Then: should return "0/s" via the early return for zero
+        assertEquals("0/s", result, "should format 0.0/s as 0/s");
+    }
+
+    @Test
+    @DisplayName("should not throw ArrayIndexOutOfBoundsException for Long.MAX_VALUE bytes")
+    void shouldNotThrowForLongMaxValueBytes() {
+        // Given: the maximum possible long byte count
+        // When: bytes formatter is called
+        final String result = UnitFormatter.bytes(Long.MAX_VALUE);
+        // Then: should return a string ending with GB suffix, not throw ArrayIndexOutOfBoundsException
+        assertTrue(result.endsWith("GB"), "should end with GB suffix, got: " + result);
+    }
+
+    @Test
+    @DisplayName("should not throw ArrayIndexOutOfBoundsException for Long.MAX_VALUE nanoseconds")
+    void shouldNotThrowForLongMaxValueNanoseconds() {
+        // Given: the maximum possible long nanosecond duration
+        // When: nanoseconds formatter is called
+        final String result = UnitFormatter.nanoseconds(Long.MAX_VALUE);
+        // Then: should return a string ending with h suffix, not throw ArrayIndexOutOfBoundsException
+        assertTrue(result.endsWith("h"), "should end with h suffix, got: " + result);
+    }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsMToGBoundaryTestCases() {
+        return Stream.of(
+            of(1_099_000_000L, "1099.0M"),
+            of(1_100_000_000L, "1.1G")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIterationsMToGBoundaryTestCases")
+    @DisplayName("should correctly transition from M to G unit at the boundary")
+    void shouldCorrectlyTransitionFromMToGUnitAtBoundary(final long value, final String expected) {
+        // Given: iteration counts near the M-to-G boundary (limit = 1100M)
+        // When: iterations formatter is called
+        final String result = UnitFormatter.iterations(value);
+        // Then: should return the correct unit based on the boundary threshold
+        assertEquals(expected, result, "should format " + value + " iterations as " + expected);
+    }
+
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsPerSecondMToGBoundaryTestCases() {
+        return Stream.of(
+            of(1_099_000_000.0, "1099.0M/s"),
+            of(1_100_000_000.0, "1.1G/s")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIterationsPerSecondMToGBoundaryTestCases")
+    @DisplayName("should correctly transition from M/s to G/s unit at the boundary")
+    void shouldCorrectlyTransitionFromMPerSecondToGPerSecondUnitAtBoundary(final double value, final String expected) {
+        // Given: iterations per second near the M/s-to-G/s boundary (limit = 1100M/s)
+        // When: iterationsPerSecond formatter is called
+        final String result = UnitFormatter.iterationsPerSecond(value);
+        // Then: should return the correct unit based on the boundary threshold
+        assertEquals(expected, result, "should format " + value + "/s as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideTimeUnitTestCases() {
