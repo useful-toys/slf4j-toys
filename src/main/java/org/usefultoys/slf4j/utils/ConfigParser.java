@@ -192,22 +192,22 @@ public class ConfigParser {
         }
 
         try {
-            int multiplicador = 1;
+            int multiplier = 1;
             int suffixLength = 0;
             if (value.endsWith("ms")) {
                 suffixLength = 2;
             } else if (value.endsWith("s")) {
                 suffixLength = 1;
-                multiplicador = 1000;
+                multiplier = 1000;
             } else if (value.endsWith("min")) {
                 suffixLength = 3;
-                multiplicador = 60 * 1000;
+                multiplier = 60 * 1000;
             } else if (value.endsWith("m")) {
                 suffixLength = 1;
-                multiplicador = 60 * 1000;
+                multiplier = 60 * 1000;
             } else if (value.endsWith("h")) {
                 suffixLength = 1;
-                multiplicador = 60 * 60 * 1000;
+                multiplier = 60 * 60 * 1000;
             }
 
             final String numberPart = value.substring(0, value.length() - suffixLength).trim();
@@ -216,7 +216,7 @@ public class ConfigParser {
                 return defaultValue;
             }
 
-            return Long.parseLong(numberPart) * multiplicador;
+            return Long.parseLong(numberPart) * multiplier;
 
         } catch (final NumberFormatException e) {
             initializationErrors.add("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
