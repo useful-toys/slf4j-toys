@@ -248,6 +248,44 @@ class ConfigParserTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"10", "100", "-5"})
+    @DisplayName("should return default and report error when range is inverted")
+    void shouldReturnDefaultAndReportErrorWhenRangeIsInverted(final String input) {
+        // Given: system property set with inverted range (min > max)
+        System.setProperty("test.property", input);
+        // When: range property is retrieved with inverted range
+        final int result = ConfigParser.getRangeProperty("test.property", 0, 15, 5);
+        // Then: should return default and report error
+        assertEquals(0, result, "should return default value when range is inverted");
+        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error for inverted range");
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid range"), "should report invalid range error");
+    }
+
+    @Test
+    @DisplayName("should return default and report error when range is inverted and property not set")
+    void shouldReturnDefaultAndReportErrorWhenRangeIsInvertedAndPropertyNotSet() {
+        // Given: property not set and inverted range
+        // When: range property is retrieved with inverted range
+        final int result = ConfigParser.getRangeProperty("nonexistent.property", 0, 15, 5);
+        // Then: should return default and report error
+        assertEquals(0, result, "should return default value when range is inverted and property not set");
+        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error for inverted range");
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid range"), "should report invalid range error");
+    }
+
+    @Test
+    @DisplayName("should accept range property when min equals max")
+    void shouldAcceptRangePropertyWhenMinEqualsMax() {
+        // Given: system property set to value equal to min and max
+        System.setProperty("test.property", "10");
+        // When: range property is retrieved with min equals max
+        final int result = ConfigParser.getRangeProperty("test.property", 0, 10, 10);
+        // Then: should return the value without errors
+        assertEquals(10, result, "should return value equal to min and max");
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors when min equals max");
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"123456789", " 123456789", "123456789 ", " 123456789 "})
     @DisplayName("should parse long property correctly")
     void shouldParseLongPropertyCorrectly(final String value) {

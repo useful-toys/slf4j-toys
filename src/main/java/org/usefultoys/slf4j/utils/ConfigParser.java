@@ -38,6 +38,7 @@ import java.util.List;
  * not designed for reuse in other purposes.
  *
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: GitHub Copilot using OpenCode Go / Kimi K2.7 Code
  */
 @UtilityClass
 public class ConfigParser {
@@ -128,17 +129,23 @@ public class ConfigParser {
      * If the property is not set or cannot be parsed as an integer, the default value is returned and an error
      * is recorded. If the property is set to a valid integer that is below the allowed minimum, the minimum value
      * is returned and an error is recorded. If it is above the allowed maximum, the maximum value is returned and
-     * an error is recorded.
+     * an error is recorded. If the minimum value is greater than the maximum value, the default value is returned
+     * and an error is recorded.
      *
      * @param name         the name of the system property
      * @param defaultValue the default value to return if the property is not set or cannot be parsed
      * @param minValue     the minimum value that is allowed
      * @param maxValue     the maximum value that is allowed
-     * @return the property value as an integer; the default value if the property is not set or invalid;
-     *         the minimum or maximum value if the parsed value is out of range
+     * @return the property value as an integer; the default value if the property is not set, invalid, or if the
+     *         range is invalid; the minimum or maximum value if the parsed value is out of range
      */
     public int getRangeProperty(final String name, final int defaultValue,
                                 final int minValue, final int maxValue) {
+        /* Reject invalid ranges to avoid silently confusing clamping behavior */
+        if (minValue > maxValue) {
+            initializationErrors.add("Invalid range for property '" + name + "': minValue (" + minValue + ") is greater than maxValue (" + maxValue + "). Using default value '" + defaultValue + "'.");
+            return defaultValue;
+        }
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
