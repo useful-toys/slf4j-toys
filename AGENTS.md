@@ -102,7 +102,7 @@ The project uses a three-stage CI/CD pipeline:
 
 2. **Version Generation**
    - Creates version artifacts and tags
-   - Triggered only on specific conditions (e.g., merge to main)
+   - Triggered manually only (`workflow_dispatch` on `create-new-version.yml`), never automatically on merge to main — see `trunk-based-development`
 
 3. **Deploy**
    - Publishes artifacts to Maven Central
