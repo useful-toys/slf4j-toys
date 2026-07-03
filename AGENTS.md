@@ -88,10 +88,8 @@ You prioritize:
 - **AI automation**: AI can execute development process steps (create feature branches, generate commits, create PRs with descriptions), but only when explicitly requested by the user, never automatically
 
 ### Git Workflow Details
-- **Linear history**: Prefer a linear commit history without merge commits
-- **Rebase strategy**: Always rebase (prefer rebase over merge for a linear history)
-- **Squash commits**: Can squash commits to organize the branch before submitting a Pull Request
-- **Force push policy**: Never force push to main or any protected branch
+
+The trunk-based development workflow — `main` as the trunk, short-lived `<type>/<name>` branches (matching the Conventional Commits types) in dedicated sibling worktrees, fetch-before-branch, rebase onto main before every push, full local test suite before push, rebase-and-merge via PR (never squash or a merge commit — confirmed by this repo's actual merge history), releases via the `create-new-version.yml` Action (never manual tags), and narrow exceptions for AI-tooling/repo-config/CI-pipeline changes only — is defined in [.agents/skills/trunk-based-development/SKILL.md](.agents/skills/trunk-based-development/SKILL.md), including branch/worktree mechanics. Always follow that skill for branch lifecycle, push, merge, and release decisions.
 
 ### Workflow Stages
 
