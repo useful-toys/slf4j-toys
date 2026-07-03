@@ -50,6 +50,7 @@ public class Session {
      * @see SessionConfig#UUID_LENGTH
      */
     public @NonNull String shortSessionUuid() {
+        SessionConfig.uuidSize = Math.max(2, Math.min(SessionConfig.uuidSize, SessionConfig.UUID_LENGTH));
         return Session.uuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize);
     }
 }

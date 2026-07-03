@@ -90,12 +90,12 @@ class SessionConfigTest {
     @Test
     @DisplayName("should accept uuidSize within bounds")
     void shouldAcceptUuidSizeWithinBounds() {
-        // Given: system property set to lower bound value "0"
-        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "0");
+        // Given: system property set to lower bound value "2"
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "2");
         // When: init() is called
         SessionConfig.init();
         // Then: should accept the value
-        assertEquals(0, SessionConfig.uuidSize, "should accept uuidSize of 0");
+        assertEquals(2, SessionConfig.uuidSize, "should accept uuidSize of 2");
 
         // Given: system property set to upper bound value "32"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "32");
@@ -113,7 +113,14 @@ class SessionConfigTest {
         // When: init() is called
         SessionConfig.init();
         // Then: should clamp to the lower bound
-        assertEquals(0, SessionConfig.uuidSize, "should clamp to lower bound for values below range");
+        assertEquals(2, SessionConfig.uuidSize, "should clamp to lower bound for values below range");
+
+        // Given: system property set to disallowed value "1"
+        System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "1");
+        // When: init() is called again
+        SessionConfig.init();
+        // Then: should clamp to the lower bound
+        assertEquals(2, SessionConfig.uuidSize, "should clamp value 1 to lower bound");
 
         // Given: system property set above upper bound "33"
         System.setProperty(SessionConfig.PROP_PRINT_UUID_SIZE, "33");

@@ -62,10 +62,9 @@ public class SessionConfig {
      * <p>
      * The full UUID (32 hex characters) uniquely identifies the application instance. In most cases, a shorter
      * prefix (e.g., 5 characters) is sufficient to distinguish between instances.
-     * <ul>
-     *   <li>If set to {@code 0}, the UUID will not be included.</li>
-     *   <li>If set to a value greater than {@link #UUID_LENGTH}, it will be truncated.</li>
-     * </ul>
+     * <p>
+     * Valid values are in the range {@code [2, UUID_LENGTH]}. Values below {@code 2} are clamped to
+     * {@code 2}, and values above {@link #UUID_LENGTH} are clamped to {@link #UUID_LENGTH}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.session.print.uuid.size}, defaulting to {@code 6}.
      * <p>
@@ -94,7 +93,7 @@ public class SessionConfig {
      * For consistent behavior, ensure system properties are set before this class is first accessed.
      */
     public void init() {
-        uuidSize = ConfigParser.getRangeProperty(PROP_PRINT_UUID_SIZE, 6, 0, UUID_LENGTH);
+        uuidSize = ConfigParser.getRangeProperty(PROP_PRINT_UUID_SIZE, 6, 2, UUID_LENGTH);
         charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, Charset.defaultCharset().name());
     }
 
