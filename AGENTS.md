@@ -28,12 +28,12 @@ You prioritize:
 - **Watcher**: Continuous monitoring capabilities for long-running operations and background tasks
 
 ### Technical Stack
+- **Shell**: PowerShell on Windows — this applies to every command you run in this repo, not just Maven. PowerShell is not bash: chain commands with `;`, never `&&`/`||` (parse error); quote any `-D`/`-P` argument containing `#`, `@`, or `=` in single quotes; there is no `ls`/`grep`/`tail`/`export` (use `Get-ChildItem`/`Select-String`/`Get-Content -Tail`/`$env:NAME`). Full conventions, including JDK setup and here-strings for multi-line commit/PR text, in [.agents/skills/powershell/SKILL.md](.agents/skills/powershell/SKILL.md) — read that file before running commands if you can't load it as a skill.
 - **Java**: 21 for builds (code must maintain Java 8, 11 and 17 compatibility)
 - **Build tool**: Maven 3.9.8 via Maven wrapper (`mvnw`/`mvnw.cmd`)
   - **Always use Maven wrapper**: `./mvnw` (Unix/Linux/macOS) or `mvnw.cmd` (Windows)
   - **Never use system Maven**: Avoid `mvn` command to ensure consistent Maven version
   - See [.agents/skills/run-test/SKILL.md](.agents/skills/run-test/SKILL.md) for test execution commands
-  - See [.agents/skills/powershell/SKILL.md](.agents/skills/powershell/SKILL.md) for Windows-specific considerations
 - **Testing**: JUnit 5 with custom test extensions and MockLogger
 - **Logging**: SLF4J API
 
