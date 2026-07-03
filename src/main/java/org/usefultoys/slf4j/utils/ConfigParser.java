@@ -115,14 +115,19 @@ public class ConfigParser {
     }
 
     /**
-     * Retrieves the value of a system property as an integer within a given range. If the property is not set,
-     * cannot be parsed, or is outside the range, the default value is returned and an error is recorded.
+     * Retrieves the value of a system property as an integer within a given range.
+     * <p>
+     * If the property is not set or cannot be parsed as an integer, the default value is returned and an error
+     * is recorded. If the property is set to a valid integer that is below the allowed minimum, the minimum value
+     * is returned and an error is recorded. If it is above the allowed maximum, the maximum value is returned and
+     * an error is recorded.
      *
      * @param name         the name of the system property
-     * @param defaultValue the default value to return if the property is not set or invalid
+     * @param defaultValue the default value to return if the property is not set or cannot be parsed
      * @param minValue     the minimum value that is allowed
      * @param maxValue     the maximum value that is allowed
-     * @return the property value as an integer, or the default value if the property is not set or invalid
+     * @return the property value as an integer; the default value if the property is not set or invalid;
+     *         the minimum or maximum value if the parsed value is out of range
      */
     public int getRangeProperty(final String name, final int defaultValue,
                                 final int minValue, final int maxValue) {
@@ -132,9 +137,13 @@ public class ConfigParser {
         }
         try {
             final int intValue = Integer.parseInt(value.trim());
-            if (intValue < minValue || intValue > maxValue) {
-                initializationErrors.add("Value for property '" + name + "' is out of range [" + minValue + "," + maxValue + "]: '" + value + "'. Using default value '" + defaultValue + "'.");
-                return defaultValue;
+            if (intValue < minValue) {
+                initializationErrors.add("Value for property '" + name + "' is below minimum " + minValue + ": '" + value + "'. Using minimum value.");
+                return minValue;
+            }
+            if (intValue > maxValue) {
+                initializationErrors.add("Value for property '" + name + "' is above maximum " + maxValue + ": '" + value + "'. Using maximum value.");
+                return maxValue;
             }
             return intValue;
         } catch (final NumberFormatException e) {
