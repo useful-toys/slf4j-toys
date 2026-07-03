@@ -50,7 +50,7 @@ class SessionConfigTest {
         // When: init() is called
         SessionConfig.init();
         // Then: should have default values
-        assertEquals(5, SessionConfig.uuidSize, "should have default uuidSize of 5");
+        assertEquals(6, SessionConfig.uuidSize, "should have default uuidSize of 6");
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "should have default charset");
     }
 
@@ -61,7 +61,7 @@ class SessionConfigTest {
         // When: reset() is called
         SessionConfig.reset();
         // Then: should return to defaults
-        assertEquals(5, SessionConfig.uuidSize, "should reset uuidSize to default 5");
+        assertEquals(6, SessionConfig.uuidSize, "should reset uuidSize to default 6");
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "should reset charset to default");
     }
 
@@ -131,7 +131,7 @@ class SessionConfigTest {
         // When: init() is called
         SessionConfig.init();
         // Then: should fall back to default
-        assertEquals(5, SessionConfig.uuidSize, "should fall back to default for invalid values");
+        assertEquals(6, SessionConfig.uuidSize, "should fall back to default for invalid values");
     }
 
     @Test

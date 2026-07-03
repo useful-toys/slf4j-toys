@@ -67,12 +67,12 @@ public class SessionConfig {
      *   <li>If set to a value greater than {@link #UUID_LENGTH}, it will be truncated.</li>
      * </ul>
      * <p>
-     * The value is read from the system property {@code slf4jtoys.session.print.uuid.size}, defaulting to {@code 5}.
+     * The value is read from the system property {@code slf4jtoys.session.print.uuid.size}, defaulting to {@code 6}.
      * <p>
      * <strong>Thread Safety:</strong> This field can be modified at runtime, but caution is advised in concurrent
      * environments as changes are not synchronized.
      */
-    public int uuidSize = 5;
+    public int uuidSize = 6;
 
     /**
      * The character encoding used for logging and string operations.
@@ -94,7 +94,7 @@ public class SessionConfig {
      * For consistent behavior, ensure system properties are set before this class is first accessed.
      */
     public void init() {
-        uuidSize = ConfigParser.getRangeProperty(PROP_PRINT_UUID_SIZE, 5, 0, UUID_LENGTH);
+        uuidSize = ConfigParser.getRangeProperty(PROP_PRINT_UUID_SIZE, 6, 0, UUID_LENGTH);
         charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, Charset.defaultCharset().name());
     }
 
