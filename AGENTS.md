@@ -89,7 +89,7 @@ You prioritize:
 
 ### Git Workflow Details
 
-The trunk-based development workflow — `main` as the trunk, short-lived `<type>/<name>` branches (matching the Conventional Commits types) in dedicated sibling worktrees, fetch-before-branch, rebase onto main before every push, full local test suite before push, rebase-and-merge via PR (never squash or a merge commit — confirmed by this repo's actual merge history), releases via the `create-new-version.yml` Action (never manual tags), and narrow exceptions for AI-tooling/repo-config/CI-pipeline changes only — is defined in [.agents/skills/trunk-based-development/SKILL.md](.agents/skills/trunk-based-development/SKILL.md), including branch/worktree mechanics. Always follow that skill for branch lifecycle, push, merge, and release decisions.
+The trunk-based development workflow — `main` as the trunk, short-lived `<type>/<name>` branches (matching the Conventional Commits types) in dedicated sibling worktrees, fetch-before-branch, rebase onto main before every push, full local test suite before push, rebase-and-merge via PR (never squash or a merge commit — confirmed by this repo's actual merge history), releases via the `create-new-version.yml` Action (never manual tags), and narrow exceptions for AI-tooling/repo-config/CI-pipeline/README.md/AGENTS.md changes (never version tags) — is defined in [.agents/skills/trunk-based-development/SKILL.md](.agents/skills/trunk-based-development/SKILL.md), including branch/worktree mechanics. Always follow that skill for branch lifecycle, push, merge, and release decisions.
 
 ### Workflow Stages
 

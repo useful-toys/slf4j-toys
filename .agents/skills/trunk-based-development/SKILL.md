@@ -85,17 +85,18 @@ Releases are cut only from `main`'s HEAD, fully automated — never by hand:
 gh workflow run create-new-version.yml -f version_increment=patch   # or minor / major
 ```
 
-Never create a version tag by hand (`git tag`, `git push --tags`) and never hand-edit the `<version>` in `pom.xml` for a release — the workflow owns both.
+**Never create a version tag by hand** (`git tag`, `git push --tags`) and never hand-edit the `<version>` in `pom.xml` for a release, under any circumstance — including the direct-to-main exceptions in section 7. Creating a version number tag is exclusively `create-new-version.yml`'s job; a manual tag can desync the release automation's version detection from what's actually tagged.
 
 ## 7. Exceptions: direct commits to main
 
-Only for repository/tooling infrastructure — never application code or project documentation:
+Only for repository/tooling infrastructure and the project's own AI-facing/onboarding documentation — never application code:
 
 - AI prompts and skills (`.agents/`, `.claude/`, and equivalent AI-config directories)
 - Repository configuration (`.gitignore`, `.gitattributes`, similar)
 - CI/CD pipeline files (`.github/workflows/*.yml`)
+- `README.md` and `AGENTS.md`
 
-Even for these, still sync `main` first (3.1) and still follow `git-commit-message` conventions — the exception is skipping the branch/worktree/PR ceremony, not skipping commit discipline. If a change also touches application code, `pom.xml`, or non-trivial documentation, treat it as a normal change: branch, worktree, PR.
+Even for these, still sync `main` first (3.1) and still follow `git-commit-message` conventions — the exception is skipping the branch/worktree/PR ceremony, not skipping commit discipline. If a change also touches application code, `pom.xml`, or other documentation (e.g. `doc/`), treat it as a normal change: branch, worktree, PR. This exception never covers version tags or release-version `pom.xml` bumps — see section 6.
 
 ## Related skills
 
