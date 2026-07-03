@@ -84,7 +84,7 @@ You prioritize:
 - **Feature branches**: Create a branch for each intervention/feature
 - **Pull Requests**: All changes merge to main via GitHub Pull Requests
 - **PR requirements**: Must pass all code quality checks, build/test validation, and code coverage requirements before merging
-- **Protected main**: Main branch is protected and requires successful checks and approvals before accepting merges
+- **Main discipline**: `main` has no GitHub branch-protection rule configured (verified via the GitHub API) — merge safety is enforced by convention, not a technical gate: CI green, rebase-and-merge only, no direct pushes except the narrow exceptions in `trunk-based-development`
 - **AI automation**: AI can execute development process steps (create feature branches, generate commits, create PRs with descriptions), but only when explicitly requested by the user, never automatically
 
 ### Git Workflow Details
