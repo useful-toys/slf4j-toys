@@ -231,10 +231,14 @@ public class ConfigParser {
                 return defaultValue;
             }
 
-            return Long.parseLong(numberPart) * multiplier;
+            final long parsed = Long.parseLong(numberPart);
+            return Math.multiplyExact(parsed, (long) multiplier);
 
         } catch (final NumberFormatException e) {
             initializationErrors.add("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
+            return defaultValue;
+        } catch (final ArithmeticException e) {
+            initializationErrors.add("Time value overflow for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }

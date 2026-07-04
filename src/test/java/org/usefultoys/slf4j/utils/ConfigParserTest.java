@@ -360,6 +360,39 @@ class ConfigParserTest {
         assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid time value"), "should report invalid time error");
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "9223372036854775807ms, 9223372036854775807",
+            "9223372036854775s, 9223372036854775000",
+            "153722867280912m, 9223372036854720000",
+            "2562047788015h, 9223372036854000000"
+    })
+    @DisplayName("should parse milliseconds property at boundary values")
+    void shouldParseMillisecondsPropertyAtBoundaryValues(final String input, final long expected) {
+        // Given: system property set with maximum representable time value
+        System.setProperty("test.property", input);
+        // When: milliseconds property is retrieved
+        final long result = ConfigParser.getMillisecondsProperty("test.property", 0L);
+        // Then: should return correct boundary value without errors
+        assertEquals(expected, result, "should return boundary value " + expected);
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"9223372036854776s", "153722867280913m", "2562047788016h", "-9223372036854775808s"})
+    @DisplayName("should report error when milliseconds property overflows")
+    void shouldReportErrorWhenMillisecondsPropertyOverflows(final String value) {
+        // Given: system property set to time value that overflows when converted to milliseconds
+        System.setProperty("test.property", value);
+        // When: milliseconds property is retrieved
+        final long result = ConfigParser.getMillisecondsProperty("test.property", 0L);
+        // Then: should return default and report overflow error
+        assertEquals(0L, result, "should return default value 0");
+        assertFalse(ConfigParser.isInitializationOK(), "should report initialization error");
+        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error");
+        assertTrue(ConfigParser.initializationErrors.get(0).contains("Time value overflow"), "should report overflow error");
+    }
+
     @Test
     @DisplayName("should return default value when milliseconds property is empty")
     void shouldReturnDefaultWhenMillisecondsPropertyEmpty() {
