@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.internal;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -241,6 +242,21 @@ class SystemDataJson5Test {
 
         // Then: round-trip should preserve all data
         assertSystemDataEquals(originalData, newData);
+    }
+
+    @Test
+    @WithLocale("pt-BR")
+    @DisplayName("should always use '.' as decimal separator regardless of configured locale")
+    void shouldAlwaysUseDotAsDecimalSeparatorRegardlessOfLocale() {
+        // Given: a pt-BR locale, which would normally use ',' as decimal separator
+        final TestSystemData data = new TestSystemData("8ae94091", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18.5);
+        final StringBuilder sb = new StringBuilder();
+
+        // When: data is serialized to JSON5
+        SystemDataJson5.write(data, sb);
+
+        // Then: the machine-parsable output must still use '.' (Locale.US), unaffected by SessionConfig.locale
+        assertEquals(",sl:18.5", sb.toString(), "JSON5 output must always use '.' as decimal separator");
     }
 
     static Stream<Arguments> readEdgeCaseScenarios() {

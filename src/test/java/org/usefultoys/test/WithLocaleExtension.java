@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.platform.commons.support.AnnotationSupport;
+import org.usefultoys.slf4j.SessionConfig;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -32,6 +33,11 @@ import java.util.Optional;
  * This extension temporarily changes the default {@link Locale} for tests, ensuring that
  * locale-sensitive operations produce consistent results across different environments.
  * The original locale is saved before each test and restored after each test completes.
+ * <p>
+ * It also synchronizes {@link SessionConfig#locale}, which is what {@code UnitFormatter} and
+ * other human-readable formatters in {@code slf4j-toys} actually read (not the JVM default
+ * locale directly). Without this, tests would only affect {@link Locale#getDefault()} and not
+ * the locale used for actual number formatting.
  * <p>
  * <b>Precedence rules:</b>
  * <ul>
@@ -54,6 +60,9 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
     /** Key used to store the original locale in the extension store */
     private static final String ORIGINAL_LOCALE_KEY = "originalLocale";
 
+    /** Key used to store the original {@link SessionConfig#locale} in the extension store */
+    private static final String ORIGINAL_SESSION_LOCALE_KEY = "originalSessionLocale";
+
     /**
      * Saves the current default locale and sets a new locale based on the {@link WithLocale} annotation.
      * <p>
@@ -67,6 +76,7 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
         // Save the original locale to restore it later
         final Locale original = Locale.getDefault();
         getStore(context).put(ORIGINAL_LOCALE_KEY, original);
+        getStore(context).put(ORIGINAL_SESSION_LOCALE_KEY, SessionConfig.locale);
 
         // Find the desired locale (method annotation takes precedence over class annotation)
         final Optional<WithLocale> withLocale = findWithLocaleAnnotation(context);
@@ -75,6 +85,8 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
             // Parse the BCP 47 language tag and set as default locale
             final Locale newLocale = Locale.forLanguageTag(withLocale.get().value());
             Locale.setDefault(newLocale);
+            // Keep SessionConfig.locale in sync, since that's what human-readable formatters read
+            SessionConfig.locale = newLocale.toLanguageTag();
         } else {
             // Extension is misconfigured - annotation must be present
             throw new IllegalStateException(
@@ -95,10 +107,15 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
         final Store store = getStore(context);
         // Remove and retrieve the saved locale
         final Locale original = store.remove(ORIGINAL_LOCALE_KEY, Locale.class);
+        final String originalSessionLocale = store.remove(ORIGINAL_SESSION_LOCALE_KEY, String.class);
 
         if (original != null) {
             // Restore the original locale
             Locale.setDefault(original);
+        }
+        if (originalSessionLocale != null) {
+            // Restore SessionConfig.locale as well
+            SessionConfig.locale = originalSessionLocale;
         }
     }
 

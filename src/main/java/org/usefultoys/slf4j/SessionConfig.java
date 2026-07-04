@@ -21,6 +21,7 @@ import org.usefultoys.slf4j.utils.ConfigParser;
 import org.usefultoys.slf4j.watcher.Watcher;
 
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 /**
  * Centralized configuration for session-related components like {@link Watcher}, {@link Meter},
@@ -51,6 +52,8 @@ public class SessionConfig {
     public final String PROP_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
     /** System property key for the character encoding used for logging. */
     public final String PROP_PRINT_CHARSET = "slf4jtoys.session.print.charset";
+    /** System property key for the locale used to format human-readable numbers. */
+    public final String PROP_PRINT_LOCALE = "slf4jtoys.session.print.locale";
 
     /**
      * The number of hexadecimal characters in a full UUID, without separators.
@@ -85,6 +88,26 @@ public class SessionConfig {
     public String charset = Charset.defaultCharset().name();
 
     /**
+     * The locale used to format human-readable numbers (e.g., durations, memory sizes, throughput)
+     * in log messages and reports produced by {@link Watcher}, {@link Meter}, and the {@code report} package.
+     * <p>
+     * This setting affects only **human-readable formatting**. It has no effect on
+     * **machine-parsable data messages**, whose numeric fields always use {@link Locale#US}
+     * (a fixed {@code .} decimal separator) so that downstream parsers are not broken by
+     * locale-dependent output.
+     * <p>
+     * The value must be a BCP 47 language tag (e.g., {@code "en-US"}, {@code "de-DE"}), as accepted
+     * by {@link Locale#forLanguageTag(String)}.
+     * <p>
+     * The value is read from the system property {@code slf4jtoys.session.print.locale}, defaulting to the
+     * JVM's default locale.
+     * <p>
+     * <strong>Thread Safety:</strong> This field can be modified at runtime, but caution is advised in concurrent
+     * environments as changes are not synchronized.
+     */
+    public String locale = Locale.getDefault().toLanguageTag();
+
+    /**
      * Initializes the configuration properties by reading values from system properties.
      * <p>
      * This method is automatically called in a static initializer when the class is first loaded.
@@ -95,6 +118,7 @@ public class SessionConfig {
     public void init() {
         uuidSize = ConfigParser.getRangeProperty(PROP_PRINT_UUID_SIZE, 6, 2, UUID_LENGTH);
         charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, Charset.defaultCharset().name());
+        locale = ConfigParser.getProperty(PROP_PRINT_LOCALE, Locale.getDefault().toLanguageTag());
     }
 
     /**
@@ -104,6 +128,7 @@ public class SessionConfig {
     public void reset() {
         System.clearProperty(PROP_PRINT_UUID_SIZE);
         System.clearProperty(PROP_PRINT_CHARSET);
+        System.clearProperty(PROP_PRINT_LOCALE);
         init();
     }
 }
