@@ -26,6 +26,9 @@ import lombok.experimental.UtilityClass;
  *
  * <p>For example, it can convert large numbers into human-readable formats such as "1.2kB" or "3.4ms".
  *
+ * <p>Negative values, {@code NaN} and infinite values are not supported and are rendered as "?"
+ * followed by the base unit (e.g., "?B", "?ns", "?/s").
+ *
  * @author Daniel Felix Ferber
  * @author Co-authored-by: GitHub Copilot using OpenCode Go / Kimi K2.7 Code
  */
@@ -45,13 +48,20 @@ public final class UnitFormatter {
      * Formats a long integer value into a human-readable string with appropriate units.
      * This method is used internally by the public formatting methods.
      *
+     * <p>Negative values are not supported and are rendered as "?" followed by the base unit.
+     *
      * @param value The long integer value to format.
      * @param units An array of unit strings (e.g., "B", "kB", "MB").
      * @param factors An array of factors for unit conversion (e.g., 1000, 1000, 1000).
-     * @return A formatted string representing the value with units.
+     * @return A formatted string representing the value with units, or "?" followed by the base unit
+     *         when the value is negative.
      */
     @SuppressWarnings("AssignmentToMethodParameter")
     String longUnit(long value, @NonNull final String[] units, @NonNull final int[] factors) {
+        if (value < 0) {
+            return "?" + units[0];
+        }
+
         int index = 0;
         final int limit = factors[index] + factors[index] / 10;
         if (value < limit) {
@@ -78,15 +88,22 @@ public final class UnitFormatter {
      * Formats a double-precision floating-point value into a human-readable string with appropriate units.
      * This method is used internally by the public formatting methods.
      *
+     * <p>Negative values, {@code NaN} and infinite values are not supported and are rendered as "?"
+     * followed by the base unit.
+     *
      * @param value The double value to format.
      * @param units An array of unit strings (e.g., "/s", "k/s", "M/s").
      * @param factors An array of factors for unit conversion (e.g., 1000, 1000, 1000).
-     * @return A formatted string representing the value with units.
+     * @return A formatted string representing the value with units, or "?" followed by the base unit
+     *         when the value is negative, {@code NaN} or infinite.
      */
     @SuppressWarnings("AssignmentToMethodParameter")
     String doubleUnit(double value, @NonNull final String[] units, @NonNull final int[] factors) {
         if (value == 0.0) {
             return "0" + units[0];
+        }
+        if (value < 0.0 || Double.isNaN(value) || Double.isInfinite(value)) {
+            return "?" + units[0];
         }
 
         int index = 0;

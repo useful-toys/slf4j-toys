@@ -103,25 +103,25 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format value " + value + " as " + expected);
     }
 
-    static Stream<org.junit.jupiter.params.provider.Arguments> provideLongUnitNegativeTestCases() {
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideLongUnitInvalidTestCases() {
         return Stream.of(
-            of(-1L, "-1A"),
-            of(-100L, "-100A"),
-            of(-999L, "-999A"),
-            of(-1000L, "-1000A"),
-            of(-1099L, "-1099A"),
-            of(Long.MIN_VALUE, "-9223372036854775808A")
+            of(-1L, "?A"),
+            of(-100L, "?A"),
+            of(-999L, "?A"),
+            of(-1000L, "?A"),
+            of(-1099L, "?A"),
+            of(Long.MIN_VALUE, "?A")
         );
     }
 
     @ParameterizedTest
-    @MethodSource("provideLongUnitNegativeTestCases")
-    @DisplayName("should format negative long values with first unit suffix")
-    void shouldFormatNegativeLongValuesWithFirstUnitSuffix(final long value, final String expected) {
+    @MethodSource("provideLongUnitInvalidTestCases")
+    @DisplayName("should format negative long values as invalid marker")
+    void shouldFormatNegativeLongValuesAsInvalidMarker(final long value, final String expected) {
         // Given: a negative long value
         // When: longUnit is called
         final String result = UnitFormatter.longUnit(value, UNITS, FACTORS);
-        // Then: should return value formatted with first unit, as negative values stay below the limit
+        // Then: should return "?" followed by the base unit, as negative values are not supported
         assertEquals(expected, result, "should format value " + value + " as " + expected);
     }
 
@@ -179,24 +179,27 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format value " + value + " as " + expected);
     }
 
-    static Stream<org.junit.jupiter.params.provider.Arguments> provideDoubleUnitNegativeTestCases() {
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideDoubleUnitInvalidTestCases() {
         return Stream.of(
             of(-0.0, "0A"),
-            of(-1.0, "-1.0A"),
-            of(-999.0, "-999.0A"),
-            of(-1000.0, "-1000.0A"),
-            of(-1099.0, "-1099.0A")
+            of(-1.0, "?A"),
+            of(-999.0, "?A"),
+            of(-1000.0, "?A"),
+            of(-1099.0, "?A"),
+            of(Double.NaN, "?A"),
+            of(Double.POSITIVE_INFINITY, "?A"),
+            of(Double.NEGATIVE_INFINITY, "?A")
         );
     }
 
     @ParameterizedTest
-    @MethodSource("provideDoubleUnitNegativeTestCases")
-    @DisplayName("should format negative double values with first unit suffix")
-    void shouldFormatNegativeDoubleValuesWithFirstUnitSuffix(final double value, final String expected) {
-        // Given: a negative double value
+    @MethodSource("provideDoubleUnitInvalidTestCases")
+    @DisplayName("should format invalid double values as invalid marker")
+    void shouldFormatInvalidDoubleValuesAsInvalidMarker(final double value, final String expected) {
+        // Given: an invalid double value (negative, NaN or infinite)
         // When: doubleUnit is called
         final String result = UnitFormatter.doubleUnit(value, UNITS, FACTORS);
-        // Then: should return value formatted with first unit, as negative values stay below the limit
+        // Then: should return "?" followed by the base unit, as invalid values are not supported
         assertEquals(expected, result, "should format value " + value + " as " + expected);
     }
 
