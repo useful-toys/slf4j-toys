@@ -27,31 +27,19 @@ import lombok.experimental.UtilityClass;
  * <p>For example, it can convert large numbers into human-readable formats such as "1.2kB" or "3.4ms".
  *
  * @author Daniel Felix Ferber
- * @author Co-authored-by: GitHub Copilot using OpenCode Go / Glm 5.2
+ * @author Co-authored-by: GitHub Copilot using OpenCode Go / Kimi K2.7 Code
  */
 @UtilityClass
 public final class UnitFormatter {
 
-    private final int[] TIME_FACTORS = {1000, 1000, 1000, 60, 60};
-    private final String[] TIME_UNITS = {"ns", "us", "ms", "s", "m", "h"};
-    private final String[] MEMORY_UNITS = {"B", "kB", "MB", "GB"};
-    private final int[] MEMORY_FACTORS = {1000, 1000, 1000};
-    private final String[] ITERATIONS_PER_TIME_UNITS = {"/s", "k/s", "M/s", "G/s"};
-    private final int[] ITERATIONS_PER_TIME_FACTORS = {1000, 1000, 1000};
-    private final String[] ITERATIONS_UNITS = {"", "k", "M", "G"};
-    private final int[] ITERATIONS_FACTORS = {1000, 1000, 1000};
-
-    /* Validate the invariant: units.length must be factors.length + 1 */
-    static {
-        assert TIME_UNITS.length == TIME_FACTORS.length + 1
-            : "TIME_UNITS.length must be TIME_FACTORS.length + 1";
-        assert MEMORY_UNITS.length == MEMORY_FACTORS.length + 1
-            : "MEMORY_UNITS.length must be MEMORY_FACTORS.length + 1";
-        assert ITERATIONS_UNITS.length == ITERATIONS_FACTORS.length + 1
-            : "ITERATIONS_UNITS.length must be ITERATIONS_FACTORS.length + 1";
-        assert ITERATIONS_PER_TIME_UNITS.length == ITERATIONS_PER_TIME_FACTORS.length + 1
-            : "ITERATIONS_PER_TIME_UNITS.length must be ITERATIONS_PER_TIME_FACTORS.length + 1";
-    }
+    final int[] TIME_FACTORS = {1000, 1000, 1000, 60, 60};
+    final String[] TIME_UNITS = {"ns", "us", "ms", "s", "m", "h"};
+    final String[] MEMORY_UNITS = {"B", "kB", "MB", "GB"};
+    final int[] MEMORY_FACTORS = {1000, 1000, 1000};
+    final String[] ITERATIONS_PER_TIME_UNITS = {"/s", "k/s", "M/s", "G/s"};
+    final int[] ITERATIONS_PER_TIME_FACTORS = {1000, 1000, 1000};
+    final String[] ITERATIONS_UNITS = {"", "k", "M", "G"};
+    final int[] ITERATIONS_FACTORS = {1000, 1000, 1000};
 
     /**
      * Formats a long integer value into a human-readable string with appropriate units.

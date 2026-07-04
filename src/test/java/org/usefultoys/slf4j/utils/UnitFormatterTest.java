@@ -520,5 +520,20 @@ class UnitFormatterTest {
         // Then: should return value formatted with ns, us, ms, s, m, h suffixes
         assertEquals(expected, result, "should format " + value + "ns as " + expected);
     }
+
+    @Test
+    @DisplayName("should maintain unit array length invariant")
+    void shouldMaintainUnitArrayLengthInvariant() {
+        // Given: predefined unit and factor arrays
+        // When/Then: each units array has exactly one more element than its corresponding factors array
+        assertEquals(UnitFormatter.TIME_FACTORS.length + 1, UnitFormatter.TIME_UNITS.length,
+            "TIME_UNITS length should be TIME_FACTORS length + 1");
+        assertEquals(UnitFormatter.MEMORY_FACTORS.length + 1, UnitFormatter.MEMORY_UNITS.length,
+            "MEMORY_UNITS length should be MEMORY_FACTORS length + 1");
+        assertEquals(UnitFormatter.ITERATIONS_FACTORS.length + 1, UnitFormatter.ITERATIONS_UNITS.length,
+            "ITERATIONS_UNITS length should be ITERATIONS_FACTORS length + 1");
+        assertEquals(UnitFormatter.ITERATIONS_PER_TIME_FACTORS.length + 1, UnitFormatter.ITERATIONS_PER_TIME_UNITS.length,
+            "ITERATIONS_PER_TIME_UNITS length should be ITERATIONS_PER_TIME_FACTORS length + 1");
+    }
 }
 
