@@ -116,7 +116,7 @@ class WatcherTest {
         System.setProperty(WatcherConfig.PROP_DATA_SUFFIX, scenario.dataSuffix);
         System.setProperty(WatcherConfig.PROP_DATA_ENABLED, String.valueOf(scenario.dataEnabled));
         WatcherConfig.init();
-        assertTrue(ConfigParser.isInitializationOK(), "ConfigParser should have no errors for scenario: " + scenario.testName + " - " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "ConfigParser should have no errors for scenario: " + scenario.testName + " - " + ConfigParser.getInitializationErrors());
 
         // 2. Get the mock loggers that the Watcher will use
         final String messageLoggerName = scenario.messagePrefix + TEST_WATCHER_NAME + scenario.messageSuffix;

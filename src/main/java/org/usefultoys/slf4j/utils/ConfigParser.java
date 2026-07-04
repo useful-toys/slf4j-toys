@@ -30,7 +30,7 @@ import java.util.List;
  * This class is not meant to be instantiated.
  * <p>
  * <strong>Security note regarding CWE-209 (Information Exposure Through Error Message):</strong>
- * Error messages recorded in {@link #initializationErrors} include the raw property value to aid debugging.
+ * Error messages recorded in {@link #getInitializationErrors()} include the raw property value to aid debugging.
  * This is accepted by design and is not considered a CWE-209 vulnerability. This class is used solely to
  * obtain configuration defined in {@link org.usefultoys.slf4j.SessionConfig},
  * {@link org.usefultoys.slf4j.report.ReporterConfig}, {@link org.usefultoys.slf4j.watcher.WatcherConfig},
@@ -44,10 +44,20 @@ import java.util.List;
 public class ConfigParser {
 
     /**
-     * A list of errors that occurred during property parsing. Applications can inspect this list
-     * after initialization to check for configuration issues.
+     * Maximum number of error messages to retain. Once reached, the oldest error is discarded
+     * when a new error is added to prevent unbounded memory growth.
      */
-    public final List<String> initializationErrors = Collections.synchronizedList(new ArrayList<>());
+    private static final int MAX_ERRORS = 100;
+
+    /**
+     * A list of errors that occurred during property parsing. This list is private and only
+     * modifiable through the methods of this class. Applications can inspect the errors through
+     * {@link #getInitializationErrors()}, which returns an unmodifiable view.
+     * <p>
+     * The list is bounded at {@value #MAX_ERRORS} entries; once full, the oldest entry is
+     * evicted to prevent unbounded memory growth.
+     */
+    private final List<String> initializationErrors = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Checks if any errors occurred during property parsing.
@@ -59,10 +69,33 @@ public class ConfigParser {
     }
 
     /**
+     * Returns an unmodifiable view of the errors that occurred during property parsing.
+     * Applications can inspect this list after initialization to check for configuration issues.
+     *
+     * @return an unmodifiable list of error messages; never {@code null}
+     */
+    public List<String> getInitializationErrors() {
+        return Collections.unmodifiableList(initializationErrors);
+    }
+
+    /**
      * Clears all recorded initialization errors. This is useful for testing or re-initialization.
      */
     public void clearInitializationErrors() {
         initializationErrors.clear();
+    }
+
+    /**
+     * Records an initialization error message, evicting the oldest entry if the list has reached
+     * {@value #MAX_ERRORS} entries.
+     *
+     * @param message the error message to record
+     */
+    private void addInitializationError(final String message) {
+        initializationErrors.add(message);
+        if (initializationErrors.size() > MAX_ERRORS) {
+            initializationErrors.remove(0);
+        }
     }
 
     /**
@@ -98,7 +131,7 @@ public class ConfigParser {
         if (trimmedValue.equalsIgnoreCase("false")) {
             return false;
         }
-        initializationErrors.add("Invalid boolean value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
+        addInitializationError("Invalid boolean value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
         return defaultValue;
     }
 
@@ -118,7 +151,7 @@ public class ConfigParser {
         try {
             return Integer.parseInt(value.trim());
         } catch (final NumberFormatException e) {
-            initializationErrors.add("Invalid integer value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid integer value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
@@ -143,7 +176,7 @@ public class ConfigParser {
                                 final int minValue, final int maxValue) {
         /* Reject invalid ranges to avoid silently confusing clamping behavior */
         if (minValue > maxValue) {
-            initializationErrors.add("Invalid range for property '" + name + "': minValue (" + minValue + ") is greater than maxValue (" + maxValue + "). Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid range for property '" + name + "': minValue (" + minValue + ") is greater than maxValue (" + maxValue + "). Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
         final String value = System.getProperty(name);
@@ -153,16 +186,16 @@ public class ConfigParser {
         try {
             final int intValue = Integer.parseInt(value.trim());
             if (intValue < minValue) {
-                initializationErrors.add("Value for property '" + name + "' is below minimum " + minValue + ": '" + value + "'. Using minimum value.");
+                addInitializationError("Value for property '" + name + "' is below minimum " + minValue + ": '" + value + "'. Using minimum value.");
                 return minValue;
             }
             if (intValue > maxValue) {
-                initializationErrors.add("Value for property '" + name + "' is above maximum " + maxValue + ": '" + value + "'. Using maximum value.");
+                addInitializationError("Value for property '" + name + "' is above maximum " + maxValue + ": '" + value + "'. Using maximum value.");
                 return maxValue;
             }
             return intValue;
         } catch (final NumberFormatException e) {
-            initializationErrors.add("Invalid integer value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid integer value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
@@ -183,7 +216,7 @@ public class ConfigParser {
         try {
             return Long.parseLong(value.trim());
         } catch (final NumberFormatException e) {
-            initializationErrors.add("Invalid long value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid long value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
@@ -227,7 +260,7 @@ public class ConfigParser {
 
             final String numberPart = value.substring(0, value.length() - suffixLength).trim();
             if (numberPart.isEmpty()) {
-                initializationErrors.add("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
+                addInitializationError("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
                 return defaultValue;
             }
 
@@ -235,10 +268,10 @@ public class ConfigParser {
             return Math.multiplyExact(parsed, (long) multiplier);
 
         } catch (final NumberFormatException e) {
-            initializationErrors.add("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         } catch (final ArithmeticException e) {
-            initializationErrors.add("Time value overflow for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Time value overflow for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }

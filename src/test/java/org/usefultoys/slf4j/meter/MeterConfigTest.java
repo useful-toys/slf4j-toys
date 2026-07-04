@@ -111,8 +111,8 @@ class MeterConfigTest {
         MeterConfig.init();
         assertEquals(2000L, MeterConfig.progressPeriodMilliseconds, "progressPeriodMilliseconds should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid progressPeriodMilliseconds format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid time value for property '" + MeterConfig.PROP_PROGRESS_PERIOD));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid time value for property '" + MeterConfig.PROP_PROGRESS_PERIOD));
     }
 
     /**
@@ -137,8 +137,8 @@ class MeterConfigTest {
         MeterConfig.init();
         assertFalse(MeterConfig.printCategory, "printCategory should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printCategory format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_CATEGORY));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_CATEGORY));
     }
 
     /**
@@ -163,8 +163,8 @@ class MeterConfigTest {
         MeterConfig.init();
         assertTrue(MeterConfig.printStatus, "printStatus should fall back to default for invalid format"); // Default is true
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printStatus format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_STATUS));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_STATUS));
     }
 
     /**
@@ -189,8 +189,8 @@ class MeterConfigTest {
         MeterConfig.init();
         assertFalse(MeterConfig.printPosition, "printPosition should fall back to default for invalid format"); // Default is false
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printPosition format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_POSITION));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_POSITION));
     }
 
     /**
@@ -215,8 +215,8 @@ class MeterConfigTest {
         MeterConfig.init();
         assertFalse(MeterConfig.printLoad, "printLoad should fall back to default for invalid format"); // Default is false
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printLoad format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_LOAD));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_LOAD));
     }
 
     /**
@@ -241,8 +241,8 @@ class MeterConfigTest {
         MeterConfig.init();
         assertFalse(MeterConfig.printMemory, "printMemory should fall back to default for invalid format"); // Default is false
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid printMemory format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_MEMORY));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_PRINT_MEMORY));
     }
 
     /**

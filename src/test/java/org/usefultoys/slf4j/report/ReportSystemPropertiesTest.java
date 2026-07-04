@@ -76,7 +76,7 @@ class ReportSystemPropertiesTest {
                 "test.password: ********",
                 "test.secret: ********",
                 "test.normal: normalvalue");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -98,7 +98,7 @@ class ReportSystemPropertiesTest {
         assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "test.custom.key: ********",
                 "test.normal: normalvalue");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -120,7 +120,7 @@ class ReportSystemPropertiesTest {
         assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "test.password: mysecretpassword",
                 "test.secret: anothersecret");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -142,6 +142,6 @@ class ReportSystemPropertiesTest {
         assertEvent(logger, 0, MockLoggerEvent.Level.INFO,
                 "test.password: mysecretpassword",
                 "test.secret: anothersecret");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 }

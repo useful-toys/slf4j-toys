@@ -123,7 +123,7 @@ class ReporterTest {
         // So, 20 - 2 = 18 reports.
         assertEquals(18, executionCount.get(), "All enabled reports should be executed");
         AssertLogger.assertHasEvent(logger, "Physical system");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -150,7 +150,7 @@ class ReporterTest {
         assertEquals(6, executionCount.get(), "Only 6 reports should be executed");
         AssertLogger.assertHasEvent(logger, "Java Virtual Machine");
         AssertLogger.assertHasEvent(logger, "System Properties");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -192,7 +192,7 @@ class ReporterTest {
         assertEquals(0, executionCount.get(), "No reports should be executed");
         AssertLogger.assertNoEvent(logger, "Java Virtual Machine");
         AssertLogger.assertNoEvent(logger, "Physical system");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -213,7 +213,7 @@ class ReporterTest {
 
         // Then: reports should be logged to the test logger
         AssertLogger.assertHasEvent(logger, "Physical system");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -242,7 +242,7 @@ class ReporterTest {
 
         // Then: error message should be logged
         AssertLogger.assertHasEvent(logger, "Cannot report network interfaces");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -334,7 +334,7 @@ class ReporterTest {
         AssertLogger.assertHasEvent(logger, "Network Interface lo:");
         AssertLogger.assertHasEvent(logger, "NET address (IPV4): 192.168.1.10");
         AssertLogger.assertHasEvent(logger, "NET address (IPV4): 127.0.0.1");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -391,7 +391,7 @@ class ReporterTest {
         assertEquals(5, executionCount.get(), "Enabled reports should still be executed");
         AssertLogger.assertNoEvent(logger, "Java Virtual Machine");
         AssertLogger.assertNoEvent(logger, "System Properties");
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test
@@ -410,6 +410,6 @@ class ReporterTest {
 
         // Then: should execute without error and log at least the network interface header
         // Note: The actual network interfaces depend on the machine, but the code path is exercised
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 }
