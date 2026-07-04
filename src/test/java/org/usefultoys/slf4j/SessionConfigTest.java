@@ -22,6 +22,7 @@ import org.usefultoys.test.ResetSessionConfig;
 import org.usefultoys.test.ValidateCharset;
 
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -52,6 +53,7 @@ class SessionConfigTest {
         // Then: should have default values
         assertEquals(6, SessionConfig.uuidSize, "should have default uuidSize of 6");
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "should have default charset");
+        assertEquals(Locale.getDefault().toLanguageTag(), SessionConfig.locale, "should have default locale");
     }
 
     @Test
@@ -63,6 +65,7 @@ class SessionConfigTest {
         // Then: should return to defaults
         assertEquals(6, SessionConfig.uuidSize, "should reset uuidSize to default 6");
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "should reset charset to default");
+        assertEquals(Locale.getDefault().toLanguageTag(), SessionConfig.locale, "should reset locale to default");
     }
 
     @Test
@@ -150,5 +153,16 @@ class SessionConfigTest {
         SessionConfig.init();
         // Then: charset should reflect the system property value
         assertEquals("ISO-8859-1", SessionConfig.charset, "should parse charset from system property");
+    }
+
+    @Test
+    @DisplayName("should parse locale property correctly")
+    void shouldParseLocalePropertyCorrectly() {
+        // Given: system property PROP_PRINT_LOCALE set to "de-DE"
+        System.setProperty(SessionConfig.PROP_PRINT_LOCALE, "de-DE");
+        // When: init() is called
+        SessionConfig.init();
+        // Then: locale should reflect the system property value
+        assertEquals("de-DE", SessionConfig.locale, "should parse locale from system property");
     }
 }

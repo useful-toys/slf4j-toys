@@ -134,7 +134,10 @@ These extensions control test execution environment for consistent results.
 
 #### `@WithLocale`
 
-Temporarily sets the default `Locale` for a test class or method.
+Temporarily sets the default `Locale` for a test class or method. It also synchronizes
+`SessionConfig.locale`, which is what `UnitFormatter` and other human-readable formatters
+actually read, so tests get deterministic number formatting regardless of the JVM's
+environment-provided default locale (e.g., `pt-BR` using `,` as decimal separator).
 
 **Usage:**
 ```java
