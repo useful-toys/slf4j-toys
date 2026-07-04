@@ -105,8 +105,8 @@ class ConfigParserTest {
         // Then: should return default and report error
         assertTrue(result, "should return default value true");
         assertFalse(ConfigParser.isInitializationOK(), "should report initialization error");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value"), "should report invalid boolean error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value"), "should report invalid boolean error");
     }
 
     @Test
@@ -143,8 +143,8 @@ class ConfigParserTest {
         // Then: should return default and report error
         assertEquals(0, result, "should return default value 0");
         assertFalse(ConfigParser.isInitializationOK(), "should report initialization error");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid integer value"), "should report invalid integer error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid integer value"), "should report invalid integer error");
     }
 
     @Test
@@ -202,8 +202,8 @@ class ConfigParserTest {
         final int result = ConfigParser.getRangeProperty("test.property", 0, 5, 15);
         // Then: should clamp to the minimum and report an error
         assertEquals(expected, result, "should clamp value " + input + " to minimum " + expected);
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error for value " + input);
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("below minimum"), "should report below-minimum error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error for value " + input);
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("below minimum"), "should report below-minimum error");
     }
 
     @ParameterizedTest
@@ -219,8 +219,8 @@ class ConfigParserTest {
         final int result = ConfigParser.getRangeProperty("test.property", 0, 5, 15);
         // Then: should clamp to the maximum and report an error
         assertEquals(expected, result, "should clamp value " + input + " to maximum " + expected);
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error for value " + input);
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("above maximum"), "should report above-maximum error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error for value " + input);
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("above maximum"), "should report above-maximum error");
     }
 
     @Test
@@ -232,8 +232,8 @@ class ConfigParserTest {
         final int result = ConfigParser.getRangeProperty("test.property", 0, 5, 15);
         // Then: should return default and report error
         assertEquals(0, result, "should return default value 0");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid integer value"), "should report invalid integer error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid integer value"), "should report invalid integer error");
     }
 
     @Test
@@ -257,8 +257,8 @@ class ConfigParserTest {
         final int result = ConfigParser.getRangeProperty("test.property", 0, 15, 5);
         // Then: should return default and report error
         assertEquals(0, result, "should return default value when range is inverted");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error for inverted range");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid range"), "should report invalid range error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error for inverted range");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid range"), "should report invalid range error");
     }
 
     @Test
@@ -269,8 +269,8 @@ class ConfigParserTest {
         final int result = ConfigParser.getRangeProperty("nonexistent.property", 0, 15, 5);
         // Then: should return default and report error
         assertEquals(0, result, "should return default value when range is inverted and property not set");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error for inverted range");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid range"), "should report invalid range error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error for inverted range");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid range"), "should report invalid range error");
     }
 
     @Test
@@ -307,8 +307,8 @@ class ConfigParserTest {
         final long result = ConfigParser.getProperty("test.property", 0L);
         // Then: should return default and report error
         assertEquals(0L, result, "should return default value 0");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid long value"), "should report invalid long error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid long value"), "should report invalid long error");
     }
 
     @Test
@@ -356,8 +356,8 @@ class ConfigParserTest {
         final long result = ConfigParser.getMillisecondsProperty("test.property", 0L);
         // Then: should return default and report error
         assertEquals(0L, result, "should return default value 0");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid time value"), "should report invalid time error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid time value"), "should report invalid time error");
     }
 
     @ParameterizedTest
@@ -389,8 +389,8 @@ class ConfigParserTest {
         // Then: should return default and report overflow error
         assertEquals(0L, result, "should return default value 0");
         assertFalse(ConfigParser.isInitializationOK(), "should report initialization error");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "should have one error");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Time value overflow"), "should report overflow error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Time value overflow"), "should report overflow error");
     }
 
     @Test
@@ -414,5 +414,21 @@ class ConfigParserTest {
         // Then: should return default value
         assertEquals(0L, result, "should return default value 0");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @Test
+    @DisplayName("should evict oldest error when list exceeds maximum size")
+    void shouldEvictOldestErrorWhenListExceedsMaxSize() {
+        final int totalErrors = 150;
+        final int maxErrors = 100;
+        for (int i = 0; i < totalErrors; i++) {
+            System.setProperty("test.bounded." + i, "not_an_int");
+            ConfigParser.getProperty("test.bounded." + i, 42);
+            System.clearProperty("test.bounded." + i);
+        }
+        assertEquals(maxErrors, ConfigParser.getInitializationErrors().size(), "should be capped at max errors");
+        assertFalse(ConfigParser.getInitializationErrors().get(0).contains("test.bounded.0"),
+                "oldest errors should be evicted");
+        assertFalse(ConfigParser.isInitializationOK(), "should report initialization errors");
     }
 }

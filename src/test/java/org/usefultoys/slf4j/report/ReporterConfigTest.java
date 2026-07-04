@@ -139,8 +139,8 @@ class ReporterConfigTest {
         ReporterConfig.init();
         assertTrue(ReporterConfig.reportVM, "reportVM should fall back to default (true) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_VM), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_VM), "Error message should mention the invalid property");
     }
 
     @Test
@@ -165,8 +165,8 @@ class ReporterConfigTest {
         // Then: reportFileSystem should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportFileSystem, "reportFileSystem should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_FILE_SYSTEM), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_FILE_SYSTEM), "Error message should mention the invalid property");
     }
 
     @Test
@@ -191,8 +191,8 @@ class ReporterConfigTest {
         // Then: reportMemory should fall back to default (true), error should be reported
         assertTrue(ReporterConfig.reportMemory, "reportMemory should fall back to default (true) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_MEMORY), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_MEMORY), "Error message should mention the invalid property");
     }
 
     @Test
@@ -217,8 +217,8 @@ class ReporterConfigTest {
         // Then: reportUser should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportUser, "reportUser should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_USER), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_USER), "Error message should mention the invalid property");
     }
 
     @Test
@@ -243,8 +243,8 @@ class ReporterConfigTest {
         // Then: reportProperties should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportProperties, "reportProperties should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_PROPERTIES), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_PROPERTIES), "Error message should mention the invalid property");
     }
 
     @Test
@@ -269,8 +269,8 @@ class ReporterConfigTest {
         // Then: reportEnvironment should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportEnvironment, "reportEnvironment should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_ENVIRONMENT), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_ENVIRONMENT), "Error message should mention the invalid property");
     }
 
     @Test
@@ -295,8 +295,8 @@ class ReporterConfigTest {
         // Then: reportPhysicalSystem should fall back to default (true), error should be reported
         assertTrue(ReporterConfig.reportPhysicalSystem, "reportPhysicalSystem should fall back to default (true) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_PHYSICAL_SYSTEM), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_PHYSICAL_SYSTEM), "Error message should mention the invalid property");
     }
 
     @Test
@@ -321,8 +321,8 @@ class ReporterConfigTest {
         // Then: reportOperatingSystem should fall back to default (true), error should be reported
         assertTrue(ReporterConfig.reportOperatingSystem, "reportOperatingSystem should fall back to default (true) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_OPERATING_SYSTEM), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_OPERATING_SYSTEM), "Error message should mention the invalid property");
     }
 
     @Test
@@ -347,8 +347,8 @@ class ReporterConfigTest {
         // Then: reportCalendar should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportCalendar, "reportCalendar should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CALENDAR), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CALENDAR), "Error message should mention the invalid property");
     }
 
     @Test
@@ -373,8 +373,8 @@ class ReporterConfigTest {
         // Then: reportLocale should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportLocale, "reportLocale should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_LOCALE), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_LOCALE), "Error message should mention the invalid property");
     }
 
     @Test
@@ -399,8 +399,8 @@ class ReporterConfigTest {
         // Then: reportCharset should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportCharset, "reportCharset should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CHARSET), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CHARSET), "Error message should mention the invalid property");
     }
 
     @Test
@@ -425,8 +425,8 @@ class ReporterConfigTest {
         // Then: reportNetworkInterface should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportNetworkInterface, "reportNetworkInterface should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_NETWORK_INTERFACE), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_NETWORK_INTERFACE), "Error message should mention the invalid property");
     }
 
     @Test
@@ -451,8 +451,8 @@ class ReporterConfigTest {
         // Then: reportSSLContext should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportSSLContext, "reportSSLContext should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_SSL_CONTEXT), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_SSL_CONTEXT), "Error message should mention the invalid property");
     }
 
     @Test
@@ -477,8 +477,8 @@ class ReporterConfigTest {
         // Then: reportDefaultTrustKeyStore should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportDefaultTrustKeyStore, "reportDefaultTrustKeyStore should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE), "Error message should mention the invalid property");
     }
 
     @Test
@@ -503,8 +503,8 @@ class ReporterConfigTest {
         // Then: reportJvmArguments should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportJvmArguments, "reportJvmArguments should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_JVM_ARGUMENTS), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_JVM_ARGUMENTS), "Error message should mention the invalid property");
     }
 
     @Test
@@ -529,8 +529,8 @@ class ReporterConfigTest {
         // Then: reportClasspath should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportClasspath, "reportClasspath should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CLASSPATH), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CLASSPATH), "Error message should mention the invalid property");
     }
 
     @Test
@@ -555,8 +555,8 @@ class ReporterConfigTest {
         // Then: reportGarbageCollector should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportGarbageCollector, "reportGarbageCollector should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_GARBAGE_COLLECTOR), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_GARBAGE_COLLECTOR), "Error message should mention the invalid property");
     }
 
     @Test
@@ -581,8 +581,8 @@ class ReporterConfigTest {
         // Then: reportSecurityProviders should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportSecurityProviders, "reportSecurityProviders should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_SECURITY_PROVIDERS), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_SECURITY_PROVIDERS), "Error message should mention the invalid property");
     }
 
     @Test
@@ -607,8 +607,8 @@ class ReporterConfigTest {
         // Then: reportContainerInfo should fall back to default (false), error should be reported
         assertFalse(ReporterConfig.reportContainerInfo, "reportContainerInfo should fall back to default (false) when value is invalid");
         assertFalse(ConfigParser.isInitializationOK(), "Configuration error should be reported for invalid value");
-        assertEquals(1, ConfigParser.initializationErrors.size(), "Exactly one error should be reported");
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CONTAINER_INFO), "Error message should mention the invalid property");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "Exactly one error should be reported");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + ReporterConfig.PROP_CONTAINER_INFO), "Error message should mention the invalid property");
     }
 
     @Test

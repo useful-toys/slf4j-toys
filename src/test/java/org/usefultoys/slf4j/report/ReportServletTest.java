@@ -293,7 +293,7 @@ class ReportServletTest {
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("Report logged for: networkinterface"));
         // Cannot easily assert specific content without mocking NetworkInterface
-        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.initializationErrors);
+        assertTrue(ConfigParser.isInitializationOK(), "No ConfigParser errors expected: " + ConfigParser.getInitializationErrors());
     }
 
     @Test

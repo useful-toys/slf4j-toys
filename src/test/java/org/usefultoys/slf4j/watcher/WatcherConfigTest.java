@@ -110,8 +110,8 @@ class WatcherConfigTest {
         // Then: delayMilliseconds should use default and report error
         assertEquals(60000L, WatcherConfig.delayMilliseconds, "delayMilliseconds should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid delayMilliseconds format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains(String.format("Invalid time value for property '%s", WatcherConfig.PROP_DELAY)));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains(String.format("Invalid time value for property '%s", WatcherConfig.PROP_DELAY)));
     }
 
     @Test
@@ -140,8 +140,8 @@ class WatcherConfigTest {
         // Then: periodMilliseconds should use default and report error
         assertEquals(600000L, WatcherConfig.periodMilliseconds, "periodMilliseconds should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid periodMilliseconds format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains(String.format("Invalid time value for property '%s", WatcherConfig.PROP_PERIOD)));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains(String.format("Invalid time value for property '%s", WatcherConfig.PROP_PERIOD)));
     }
 
     @Test
@@ -198,8 +198,8 @@ class WatcherConfigTest {
         // Then: dataEnabled should use default and report error
         assertFalse(WatcherConfig.dataEnabled, "dataEnabled should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid dataEnabled format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains(String.format("Invalid boolean value for property '%s", WatcherConfig.PROP_DATA_ENABLED)));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains(String.format("Invalid boolean value for property '%s", WatcherConfig.PROP_DATA_ENABLED)));
     }
 
     @Test

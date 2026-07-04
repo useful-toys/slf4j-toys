@@ -110,8 +110,8 @@ class SystemConfigTest {
         // Then: should use default value and report error
         assertFalse(SystemConfig.useClassLoadingManagedBean, "useClassLoadingManagedBean should fall back to default for invalid format"); // Default is false
         assertFalse(ConfigParser.isInitializationOK());
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_CLASS_LOADING_MANAGED_BEAN));
     }
 
     @Test
@@ -148,8 +148,8 @@ class SystemConfigTest {
         // Then: should use default value and report error
         assertFalse(SystemConfig.useMemoryManagedBean, "useMemoryManagedBean should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK());
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_MEMORY_MANAGED_BEAN));
     }
 
     @Test
@@ -186,8 +186,8 @@ class SystemConfigTest {
         // Then: should use default value and report error
         assertFalse(SystemConfig.useCompilationManagedBean, "useCompilationManagedBean should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK());
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_COMPILATION_MANAGED_BEAN));
     }
 
     @Test
@@ -224,8 +224,8 @@ class SystemConfigTest {
         // Then: should use default value and report error
         assertFalse(SystemConfig.useGarbageCollectionManagedBean, "useGarbageCollectionManagedBean should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK());
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN));
     }
 
     @Test
@@ -262,7 +262,7 @@ class SystemConfigTest {
         // Then: should use default value and report error
         assertFalse(SystemConfig.usePlatformManagedBean, "usePlatformManagedBean should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK());
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + SystemConfig.PROP_USE_PLATFORM_MANAGED_BEAN));
     }
 }
