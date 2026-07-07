@@ -262,4 +262,27 @@ class MeterLeakDetectorTest {
                 "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
     }
 
+    @Test
+    @DisplayName("clearForTests discards anchored refs and pending queue entries without reporting")
+    void clearForTestsDiscardsAnchoredAndQueued() {
+        // Given: two registered references; one is enqueued (pending leak), the other is merely anchored.
+        final MeterReference leaked = MeterLeakDetector.register(meter);
+        final MeterReference anchored = MeterLeakDetector.register(meter);
+        leaked.enqueue();
+
+        // When: the test-cleanup hook clears all detector state.
+        MeterLeakDetector.clearForTests();
+
+        // Then: the queue is empty and the anchor set no longer holds either reference.
+        MeterLeakDetector.drain();
+        assertNoEvents(logger);
+
+        // And: a subsequently enqueued fresh reference reports exactly once — proving the stale ones are gone.
+        final MeterReference fresh = MeterLeakDetector.register(meter);
+        fresh.enqueue();
+        MeterLeakDetector.drain();
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+    }
+
 }

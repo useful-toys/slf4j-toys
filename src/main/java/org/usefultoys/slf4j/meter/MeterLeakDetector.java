@@ -221,6 +221,20 @@ final class MeterLeakDetector {
     }
 
     /**
+     * Discards all leak-detector state without reporting anything. Intended for test isolation only;
+     * it clears the anchor set and drains the reference queue silently, and resets the draining guard.
+     * <p>
+     * Production code must never call this — it would hide real memory leaks from the diagnostic output.
+     */
+    static void clearForTests() {
+        ANCHOR.clear();
+        while (QUEUE.poll() != null) {
+            // discard pending references without reporting
+        }
+        DRAINING.set(false);
+    }
+
+    /**
      * Reports the reference as a forgotten meter if it was still anchored (i.e. never deregistered).
      * The atomic {@link Set#remove(Object)} claims each reference exactly once across concurrent drains.
      */

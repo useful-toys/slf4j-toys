@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 import org.usefultoys.slf4j.meter.Meter;
+import org.usefultoys.slf4j.meter.MeterLeakDetectorTestSupport;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -186,6 +187,7 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
     @Override
     public void beforeEach(final ExtensionContext context) {
         ensureMeterStackIsClean(context);
+        MeterLeakDetectorTestSupport.clear();
     }
 
     /**
@@ -215,7 +217,7 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
         final boolean testFailed = context.getExecutionException().isPresent();
         
         if (testFailed) {
-            // Test failed: clean the stack to prevent cascade failures
+            // Test failed: clean the stack to prevent cascade failures in subsequent tests
             ensureMeterStackIsClean(context);
         } else {
             // Test passed: check if dirty stack is expected
@@ -229,6 +231,10 @@ public class ValidateCleanMeterExtension implements BeforeEachCallback, AfterEac
                 validateMeterStackIsClean("after", context);
             }
         }
+        // Prevent leak-detector state (anchored phantom references / pending queue entries) from
+        // surviving across tests; leftover references would otherwise report into cached MockLoggers
+        // of unrelated tests, producing nondeterministic failures.
+        MeterLeakDetectorTestSupport.clear();
     }
 
     /**
