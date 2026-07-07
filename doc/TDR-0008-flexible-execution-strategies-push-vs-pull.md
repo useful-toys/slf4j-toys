@@ -46,7 +46,7 @@ For managed or probe-based environments, we provide a "Pull" mechanism via Servl
 *   **Security Surface**: The "Pull" strategy (Servlets) introduces a new HTTP endpoint that must be manually secured by the user to prevent information disclosure or DoS.
 
 **Neutral**:
-*   **Static Initialization Dependency**: As noted in [TDR-0005](./TDR-0005-robust-and-minimalist-configuration-mechanism.md), the remaining `WatcherSingleton.getDefaultWatcher()` pull path and `WatcherServlet` rely on the default instance, which captures configuration at class-loading time. The new push controllers capture `WatcherConfig` values when the controller is built, avoiding the static singleton limitation.
+*   **Configuration Snapshot**: Both push controllers and pull servlets capture `WatcherConfig` values at construction/`init(ServletConfig)` time, avoiding the static singleton limitation. The old `WatcherSingleton.getDefaultWatcher()` pull path was removed in [TDR-0037](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md).
 
 ## Alternatives
 
@@ -59,8 +59,8 @@ For managed or probe-based environments, we provide a "Pull" mechanism via Servl
 
 *   `Watcher` and `Reporter` implement `Runnable`, making them compatible with any scheduling or execution mechanism that accepts `Runnable` instances.
 *   `WatcherExecutorController` and `WatcherTimerController` manage instance-based push execution; each owns a dedicated `Watcher` created from `WatcherConfig` at build time.
-*   `WatcherSingleton` is `@Deprecated` and now only provides the default `Watcher` instance for the servlet pull path.
-*   `WatcherServlet` (Jakarta) and `WatcherJavaxServlet` (Legacy) provide the HTTP bridge for Watcher.
+*   `WatcherServlet` (Jakarta) and `WatcherJavaxServlet` (javax) provide the HTTP bridge for Watcher; each creates its own `Watcher` instance during `init(ServletConfig)` and can override the watcher name via the `slf4jtoys.watcher.name` init-param.
+*   `WatcherSingleton` was removed; there is no longer a global default `Watcher` instance.
 *   `ReporterServlet` (Jakarta) and `ReporterJavaxServlet` (Legacy) provide the HTTP bridge for Reporter.
 
 ## References
@@ -68,9 +68,10 @@ For managed or probe-based environments, we provide a "Pull" mechanism via Servl
 *   [Watcher.java](../src/main/java/org/usefultoys/slf4j/watcher/Watcher.java)
 *   [WatcherExecutorController.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherExecutorController.java)
 *   [WatcherTimerController.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherTimerController.java)
-*   [WatcherSingleton.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java)
 *   [WatcherServlet.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java)
+*   [WatcherJavaxServlet.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherJavaxServlet.java)
 *   [Wiki: JavaEE Use Case](../slf4j-toys.wiki/watcher/Watcher-use-case-javaee.md)
 *   [Wiki: Spring Boot Use Case](../slf4j-toys.wiki/watcher/Watcher-use-case-spring-boot.md)
 *   [TDR-0005: Robust and Minimalist Configuration Mechanism](./TDR-0005-robust-and-minimalist-configuration-mechanism.md)
 *   [TDR-0036: Replace WatcherSingleton Push with Instance-Based Controllers](./TDR-0036-replace-watcher-singleton-push-with-controllers.md)
+*   [TDR-0037: Migrate WatcherServlet Pull Path from Singleton](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md)

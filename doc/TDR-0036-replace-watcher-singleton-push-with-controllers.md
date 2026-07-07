@@ -8,7 +8,7 @@
 `WatcherSingleton` (TDR-0012) provided a global default `Watcher` and static methods to start/stop periodic push execution via `ScheduledExecutorService` or `Timer`. This design created well-documented problems:
 
 *   **Configuration rigidity**: the cached `Watcher` instance captured `WatcherConfig` values at first access, ignoring later changes (`.glm-findings/02`).
-*   **Concurrency race**: the same `Watcher` instance could be invoked concurrently by the executor thread, the timer thread and HTTP servlet threads (`.glm-findings/03`).
+*   **Concurrency race (push)**: the same `Watcher` instance could be invoked concurrently by the executor thread and the timer thread (`.glm-findings/03`). The servlet pull path remained shared through `WatcherSingleton.getDefaultWatcher()` and was later resolved in [TDR-0037](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md).
 *   **Lifecycle leaks**: the `Timer` was non-daemon, blocking JVM shutdown if `stopDefaultWatcherTimer()` was not called (`.glm-findings/05`).
 *   **Hidden global state**: callers depended on a static singleton instead of an explicit instance (TDR-0005, TDR-0012).
 
@@ -27,7 +27,7 @@ Each controller:
 *   Implements `AutoCloseable` for safe lifecycle management.
 *   Uses a daemon thread named after the watcher, fixing the shutdown-blocking issue.
 
-`WatcherSingleton` is reduced to the minimum needed by `WatcherServlet`/`WatcherJavaxServlet` (pull): only `getDefaultWatcher()` remains, marked `@Deprecated`.
+The servlet pull path remains on `WatcherSingleton.getDefaultWatcher()` temporarily; it will be migrated to per-servlet `Watcher` instances in [TDR-0037](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md).
 
 ## Consequences
 
@@ -36,12 +36,13 @@ Each controller:
 *   **Explicit lifecycle**: the application owns controller instances, eliminating hidden global-state dependencies.
 *   **Testability**: each test creates independent controllers; there is no shared singleton state to leak.
 *   **Configuration flexibility**: `WatcherConfig` can be changed before building a controller; each controller snapshots the config values it needs.
-*   **Race elimination**: push controllers no longer share a `Watcher` instance with each other or with the servlet pull path.
+*   **Race elimination (push)**: push controllers no longer share a `Watcher` instance with each other. The remaining servlet pull path race was resolved in [TDR-0037](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md).
 *   **Resource safety**: daemon threads and `AutoCloseable` reduce the risk of blocking shutdown or leaking schedulers.
 
 **Negative / Breaking**:
 
 *   Callers of `WatcherSingleton.startDefaultWatcherExecutor()` and `WatcherSingleton.startDefaultWatcherTimer()` must migrate to `WatcherExecutorController.create().start()` / `WatcherTimerController.create().start()`. This is an intentional breaking change for a deprecated API.
+*   `WatcherSingleton.getDefaultWatcher()` was also removed; callers must create their own `Watcher` instance or use `WatcherServlet`/`WatcherJavaxServlet` for the pull path (see [TDR-0037](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md)).
 
 ## Alternatives Considered
 
@@ -52,17 +53,17 @@ Each controller:
 ## Implementation
 
 *   New classes: `src/main/java/org/usefultoys/slf4j/watcher/WatcherExecutorController.java`, `WatcherTimerController.java`.
-*   Reduced class: `src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java`.
 *   New tests: `src/test/java/org/usefultoys/slf4j/watcher/WatcherExecutorControllerTest.java`, `WatcherTimerControllerTest.java`.
-*   Slimmed test: `src/test/java/org/usefultoys/slf4j/watcher/WatcherSingletonTest.java`.
 *   Documentation: updated `README.md` and this TDR.
+
+Note: `WatcherSingleton` and `WatcherSingletonTest` were removed in [TDR-0037](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md).
 
 ## References
 
 *   [src/main/java/org/usefultoys/slf4j/watcher/WatcherExecutorController.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherExecutorController.java)
 *   [src/main/java/org/usefultoys/slf4j/watcher/WatcherTimerController.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherTimerController.java)
-*   [src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java)
 *   [doc/TDR-0012-watcher-singleton-regret.md](./TDR-0012-watcher-singleton-regret.md)
+*   [doc/TDR-0037-migrate-watcher-servlet-pull-from-singleton.md](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md)
 *   [doc/TDR-0008-flexible-execution-strategies-push-vs-pull.md](./TDR-0008-flexible-execution-strategies-push-vs-pull.md)
 *   [doc/TDR-0005-robust-and-minimalist-configuration-mechanism.md](./TDR-0005-robust-and-minimalist-configuration-mechanism.md)
 *   `.glm-findings/02-watcher-caches-dataEnabled.md`
