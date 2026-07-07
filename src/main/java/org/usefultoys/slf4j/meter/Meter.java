@@ -207,16 +207,18 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * <p>
      * Leak detection is driven opportunistically from {@link #start()} and the termination methods
      * ({@code ok()}/{@code reject()}/{@code fail()}/{@code close()}), so a leak normally surfaces on the
-     * next meter activity anywhere in the application, without any library-owned background thread. In an
-     * application that has gone quiet on meter activity, pending leaks would otherwise stay unreported; this
-     * method lets a periodic driver — a scheduled task, a health check, or a {@code Watcher} tick — flush
-     * them on its own cadence.
+     * next meter activity anywhere in the application, without any library-owned background thread. Those
+     * lifecycle-triggered drains are bounded (a few reports per call) so no application thread absorbs
+     * unbounded reporting latency. In an application that has gone quiet on meter activity, pending leaks
+     * would otherwise stay unreported; this method lets a periodic driver — a scheduled task, a health
+     * check, or a {@code Watcher} tick — flush them on its own cadence, and unlike the lifecycle-triggered
+     * drains it is exhaustive: it reports every pending leak before returning.
      * <p>
      * When leak detection is disabled ({@link MeterConfig#detectLeaks} is {@code false}) nothing is
      * registered and this is a cheap no-op. Safe to call from any thread.
      */
     public static void drainLeaks() {
-        MeterLeakDetector.drain();
+        MeterLeakDetector.drainAll();
     }
 
     /**
