@@ -1,7 +1,13 @@
-# Plano: Avoid Watcher Singleton — Controllers de Push com Lombok `@Builder`
+# Plano: Avoid Watcher Singleton — Controllers de Push com Builder
 
 **Branch:** `feature/avoid-watcher-singleton`
 **Fase:** 1 (push) — pull (servlet) fica para fase posterior
+
+> **Nota de implementação:** o plano original previa o uso de Lombok `@Builder`.
+> Na versão 1.18.46 não há `@Builder.Ignore` e não é possível definir defaults em
+> parâmetros de construtor de forma compatível com Java 8. A implementação final
+> usa um `Builder` escrito manualmente, ainda fluente e com defaults de
+> `WatcherConfig`.
 
 ## Contexto
 

@@ -46,7 +46,7 @@ We implemented a centralized configuration mechanism based on **System Propertie
 
 **Negative**:
 *   **Global State**: Configuration is global to the JVM session, which might be a limitation in complex multi-tenant environments (though this is typical for logging libraries).
-*   **Static Initialization Limitation**: Some components (e.g., `WatcherSingleton`, `WatcherServlet`) use static initialization to create singletons based on the initial system property values. Consequently, programmatic changes to configuration classes or calls to `init()`/`reset()` made *after* these singletons are initialized will not be reflected in their behavior. This is a known technical debt that will require refactoring in the future.
+*   **Static Initialization Limitation**: Some components (e.g., `WatcherServlet`, and the remaining `WatcherSingleton.getDefaultWatcher()` pull path) use static initialization to create a singleton based on the initial system property values. Consequently, programmatic changes to configuration classes or calls to `init()`/`reset()` made *after* these singletons are initialized will not be reflected in their behavior. The push side of `WatcherSingleton` was removed in [TDR-0036](./TDR-0036-replace-watcher-singleton-push-with-controllers.md); the remaining pull path is provisional technical debt to be addressed when the servlet is migrated.
 *   **Manual Sync**: Adding a new property requires updating the config class, the `init()` method, and the documentation.
 
 **Neutral**:
