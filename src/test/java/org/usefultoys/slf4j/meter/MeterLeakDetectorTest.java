@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
+import org.slf4j.Marker;
+import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.meter.MeterLeakDetector.MeterReference;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
@@ -31,8 +33,14 @@ import org.usefultoys.test.ValidateCleanMeter;
 
 import java.lang.ref.ReferenceQueue;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertEvent;
 import static org.usefultoys.slf4jtestmock.AssertLogger.assertNoEvents;
 
@@ -184,6 +192,72 @@ class MeterLeakDetectorTest {
 
         new org.usefultoys.slf4j.watcher.Watcher("leak-drain-test").run();
 
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+    }
+
+    @Test
+    @DisplayName("drain should report at most MAX_DRAIN leaks per call, leaving the rest for later calls")
+    void drainCapsReportsAtMaxDrain() {
+        // Given: MAX_DRAIN + 2 leaked meters, all pending in the queue. Register everything before
+        // enqueueing anything: register() itself drains, so interleaving would report early.
+        final int pending = MeterLeakDetector.MAX_DRAIN + 2;
+        final MeterReference[] refs = new MeterReference[pending];
+        for (int i = 0; i < pending; i++) {
+            refs[i] = MeterLeakDetector.register(meter);
+        }
+        for (final MeterReference ref : refs) {
+            ref.enqueue();
+        }
+
+        // When: a single lifecycle-triggered drain runs
+        MeterLeakDetector.drain();
+
+        // Then: it reports exactly MAX_DRAIN leaks; a later drain picks up the remainder
+        assertEquals(MeterLeakDetector.MAX_DRAIN, ((MockLogger) logger).getLoggerEvents().size(),
+                "a lifecycle drain must report at most MAX_DRAIN leaks");
+        MeterLeakDetector.drain();
+        assertEquals(pending, ((MockLogger) logger).getLoggerEvents().size(),
+                "the remaining leaks must survive in the queue and surface on the next drain");
+    }
+
+    @Test
+    @DisplayName("drainAll (Meter.drainLeaks) should be exhaustive, ignoring the MAX_DRAIN cap")
+    void drainAllIsExhaustiveBeyondCap() {
+        final int pending = MeterLeakDetector.MAX_DRAIN + 2;
+        final MeterReference[] refs = new MeterReference[pending];
+        for (int i = 0; i < pending; i++) {
+            refs[i] = MeterLeakDetector.register(meter);
+        }
+        for (final MeterReference ref : refs) {
+            ref.enqueue();
+        }
+
+        Meter.drainLeaks();
+
+        assertEquals(pending, ((MockLogger) logger).getLoggerEvents().size(),
+                "the public periodic-driver entry point must flush every pending leak in one call");
+    }
+
+    @Test
+    @DisplayName("drain should swallow a throwing logger and keep processing the remaining leaks")
+    void drainSwallowsThrowingLoggerAndContinues() {
+        // Given: one leaked meter whose snapshotted logger throws on error(), and one healthy leaked meter
+        final Logger throwingLogger = mock(Logger.class);
+        doThrow(new RuntimeException("boom")).when(throwingLogger)
+                .error(any(Marker.class), anyString(), any(), any());
+        final Meter poisoned = mock(Meter.class);
+        lenient().when(poisoned.getMessageLogger()).thenReturn(throwingLogger);
+        lenient().when(poisoned.getFullID()).thenReturn("poisoned-id");
+
+        final MeterReference poisonedRef = MeterLeakDetector.register(poisoned);
+        final MeterReference healthyRef = MeterLeakDetector.register(meter);
+        poisonedRef.enqueue();
+        healthyRef.enqueue();
+
+        // When/Then: draining neither propagates the exception nor loses the healthy report
+        assertDoesNotThrow(MeterLeakDetector::drain,
+                "a misbehaving logging backend must never disturb the thread that triggered the drain");
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
                 "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
     }

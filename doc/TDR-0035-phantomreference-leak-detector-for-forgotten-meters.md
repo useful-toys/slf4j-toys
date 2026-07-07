@@ -26,11 +26,14 @@ Detect forgotten meters with a `PhantomReference` + `ReferenceQueue`, implemente
 - **On `start()`** (gated by `MeterConfig.detectLeaks` and skipping the `UNKNOWN` category), `register(this)` creates a `MeterReference` — a `PhantomReference<Meter>` that snapshots `fullID` and the message `Logger` — and adds it to a **static anchor set**.
 - **On every explicit termination** (`ok()`/`reject()`/`fail()`/`close()`), `deregister(ref)` removes the reference from the anchor and calls `ref.clear()`.
 - **Draining is opportunistic, on every lifecycle boundary**: both `register()` (start) and `deregister()` (a non-`null` termination) first call `drain()`, on the caller's own thread. Any reference still present in the anchor when the garbage collector enqueues it is — by construction — a meter that was started and never stopped, and is reported with an `ERROR` under the `INVALID_ARGUMENT` marker (byte-for-byte equivalent to the former `finalize()` message).
-- **A public drain entry point for quiet applications**: `Meter.drainLeaks()` exposes the same `drain()` so a periodic driver — a scheduled task, a health check, or a `Watcher` tick (`Watcher.run()` calls it) — can flush pending leaks without any library-owned thread. This restores, on the driver's cadence, the "reported without further meter activity" behavior the GC-driven `finalize()` used to provide.
+- **A public drain entry point for quiet applications**: `Meter.drainLeaks()` exposes the exhaustive `drainAll()` so a periodic driver — a scheduled task, a health check, or a `Watcher` tick (`Watcher.run()` calls it) — can flush pending leaks without any library-owned thread. This restores, on the driver's cadence, the "reported without further meter activity" behavior the GC-driven `finalize()` used to provide.
+- **Lifecycle-triggered drains are bounded**: `drain()` reports at most `MAX_DRAIN` leaks per call and lets at most one thread (an `AtomicBoolean` try-lock) continue past the first pending reference. `ReferenceQueue.poll()` is lock-free only while the queue is empty; when references are pending it takes the JDK's internal per-queue lock per reference, so without the guard, concurrent lifecycle calls would briefly serialize on that lock right after a GC enqueued a batch of leaks — and without the cap, a single application thread would synchronously log every pending `ERROR` (appender I/O included) inside its own `start()`/stop. The guard is placed *after* the first `poll()`, so the empty-queue fast path (the no-leak steady state) performs a single volatile read and never a CAS.
 
 ```java
 private static final ReferenceQueue<Meter> QUEUE = new ReferenceQueue<>();
 private static final Set<MeterReference> ANCHOR = ConcurrentHashMap.newKeySet();
+private static final AtomicBoolean DRAINING = new AtomicBoolean();
+static final int MAX_DRAIN = 8;
 
 static MeterReference register(final Meter meter) {
     drain();
@@ -48,17 +51,42 @@ static void deregister(final MeterReference ref) {
 }
 
 static void drain() {
+    Reference<? extends Meter> r = QUEUE.poll();   // empty queue: one volatile read, no lock, no CAS
+    if (r == null) return;
+    reportIfAnchored(r);                           // already claimed off the queue; report unconditionally
+    if (DRAINING.compareAndSet(false, true)) {     // only one thread continues past the first reference
+        try {
+            for (int i = 1; i < MAX_DRAIN; i++) {
+                r = QUEUE.poll();
+                if (r == null) return;
+                reportIfAnchored(r);
+            }
+        } finally {
+            DRAINING.set(false);
+        }
+    }
+}
+
+static void drainAll() {                           // exhaustive; backs Meter.drainLeaks()
     Reference<? extends Meter> r;
     while ((r = QUEUE.poll()) != null) {
-        final MeterReference ref = (MeterReference) r;
-        if (ANCHOR.remove(ref)) {  // still anchored => never stopped => leak
+        reportIfAnchored(r);
+    }
+}
+
+private static void reportIfAnchored(final Reference<? extends Meter> r) {
+    final MeterReference ref = (MeterReference) r;
+    if (ANCHOR.remove(ref)) {  // still anchored => never stopped => leak
+        try {
             ref.reportLeak();
+        } catch (final Exception ignored) {
+            // a misbehaving logging backend must never disturb the draining thread
         }
     }
 }
 ```
 
-`drain()` is also reachable from outside the package through the public `Meter.drainLeaks()`, which `Watcher.run()` invokes on every tick so a running watcher flushes leaks periodically with no dedicated thread.
+`drainAll()` is reachable from outside the package through the public `Meter.drainLeaks()`, which `Watcher.run()` invokes on every tick so a running watcher flushes leaks periodically with no dedicated thread. The periodic driver volunteers for the full cleanup, so it is deliberately not capped.
 
 **The anchor set is mandatory, not bookkeeping.** The garbage collector only enqueues a `PhantomReference` whose *reference object* is itself reachable through a strong path **independent of its referent**. A `MeterReference` held only by its own `Meter` (for example, through a field on the meter) becomes unreachable at the same instant as the meter and is collected *with* it — never enqueued — so the leak would silently go unreported. The static `ConcurrentHashMap.newKeySet()` keeps every live registration reachable from a GC root independently of the meter, until the meter is either stopped (deregistered) or collected and drained.
 
@@ -69,7 +97,7 @@ The anchor set is a `ConcurrentHashMap`-backed set, so `add`/`remove` are CAS op
 ### Positive ✅
 
 - **Forward-compatible**: no `finalize()` override anywhere; the mechanism relies only on `java.lang.ref`, stable since Java 2 and unaffected by JEP 421.
-- **No lock on the hot path**: `start()`/`stop()` touch a lock-free concurrent set (per-bin CAS), never a monitor. This honors the transparency principle of [TDR-0017](TDR-0017-non-intrusive-validation-and-error-handling.md).
+- **No lock on the hot path in the no-leak steady state**: `start()`/`stop()` touch a lock-free concurrent set (per-bin CAS), never a library-owned monitor, and the drain's empty-queue fast path is a single volatile read. Precision matters here: when references *are* pending (i.e., meters were actually leaked and a GC enqueued them), `ReferenceQueue.poll()` takes the JDK's internal per-queue lock briefly per reference — the `AtomicBoolean` guard confines that window to one draining thread instead of letting lifecycle calls pile up on it. This honors the transparency principle of [TDR-0017](TDR-0017-non-intrusive-validation-and-error-handling.md) for correct usage, and degrades gently under misuse.
 - **No background thread, no shutdown hook**: draining happens synchronously on whichever application thread starts the next meter, so nothing can pin a servlet container's class loader.
 - **No memory leak**: the anchor holds the tiny `MeterReference`, never the `Meter`; a forgotten meter stays collectable, consistent with the weak thread-local stack of [TDR-0015](TDR-0015-threadlocal-stack-for-context-propagation.md).
 - **Cheap in steady state**: for a correctly used meter the cost is two concurrent-set operations plus one small allocation per lifecycle, with **zero retained memory** (added on start, removed on stop). This is dwarfed by the timestamping, log-level checks, and metrics collection `start()`/`stop()` already perform.
@@ -85,6 +113,7 @@ The anchor set is a `ConcurrentHashMap`-backed set, so `add`/`remove` are CAS op
 ### Neutral ⚖️
 
 - **Gated by configuration**: `MeterConfig.detectLeaks` (system property `slf4jtoys.meter.detect.leaks`, default `true`) decides whether registration happens at all. When disabled, nothing is registered and `drain()` processes an empty queue.
+- **Bounded drains spread reports over several calls**: because lifecycle-triggered drains report at most `MAX_DRAIN` leaks and skip when another thread is already draining, a large batch of leaks surfaces across a few lifecycle calls (or one `Meter.drainLeaks()`) instead of all at once. Detection completeness is unaffected — references stay queued until claimed — only the reporting is smoothed.
 - **Message parity**: the emitted message and its `INVALID_ARGUMENT` marker are identical to the former `finalize()` path, so log consumers and existing expectations are unaffected.
 
 ## Alternatives Considered
@@ -127,7 +156,7 @@ The anchor set is a `ConcurrentHashMap`-backed set, so `add`/`remove` are CAS op
 
 ## Implementation
 
-- [src/main/java/org/usefultoys/slf4j/meter/MeterLeakDetector.java](../src/main/java/org/usefultoys/slf4j/meter/MeterLeakDetector.java) — the detector: `QUEUE`, the `ANCHOR` set, `MeterReference`, and `register`/`deregister`/`drain`. Both `register` and `deregister` (non-`null`) drain, so every lifecycle boundary is a drain trigger.
+- [src/main/java/org/usefultoys/slf4j/meter/MeterLeakDetector.java](../src/main/java/org/usefultoys/slf4j/meter/MeterLeakDetector.java) — the detector: `QUEUE`, the `ANCHOR` set, `MeterReference`, and `register`/`deregister`/`drain`/`drainAll`. Both `register` and `deregister` (non-`null`) drain, so every lifecycle boundary is a drain trigger; lifecycle drains are capped at `MAX_DRAIN` and guarded by the `DRAINING` try-lock, while `drainAll` is exhaustive.
 - [src/main/java/org/usefultoys/slf4j/meter/Meter.java](../src/main/java/org/usefultoys/slf4j/meter/Meter.java) — holds the `leakRef` handle; `start()` registers, `commonOk()`/`reject()`/`fail()`/`close()` deregister; the former `finalize()` override was removed. Exposes the public `drainLeaks()` entry point that delegates to `MeterLeakDetector.drain()`.
 - [src/main/java/org/usefultoys/slf4j/watcher/Watcher.java](../src/main/java/org/usefultoys/slf4j/watcher/Watcher.java) — `run()` calls `Meter.drainLeaks()` on each tick, so a scheduled or servlet-driven watcher flushes leaks periodically without a dedicated thread.
 - [src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java](../src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java) — `detectLeaks` flag, system property `slf4jtoys.meter.detect.leaks` (default `true`).

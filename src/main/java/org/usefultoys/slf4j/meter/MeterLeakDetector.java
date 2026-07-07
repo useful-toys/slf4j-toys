@@ -22,6 +22,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Forward-compatible detector for {@link Meter} instances that were started but never explicitly stopped
@@ -51,8 +52,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * on the caller's own thread, from every meter lifecycle boundary — both {@link #register(Meter) start} and
  * {@link #deregister(MeterReference) termination} — so a forgotten meter is reported the next time any meter
  * is started <em>or</em> stopped anywhere in the application, with no library-owned daemon thread and no risk
- * of pinning a web application class loader in a servlet container. For an application that has gone quiet on
- * meter activity, {@link Meter#drainLeaks()} exposes the same drain publicly so a periodic driver (a scheduled
+ * of pinning a web application class loader in a servlet container. Lifecycle-triggered drains are bounded:
+ * they report at most {@link #MAX_DRAIN} leaks per call and let at most one thread continue past the first
+ * pending reference, so an application thread never absorbs unbounded reporting latency (or queue-lock pile-up)
+ * on behalf of the detector. For an application that has gone quiet on meter activity,
+ * {@link Meter#drainLeaks()} exposes the exhaustive {@link #drainAll()} publicly so a periodic driver (a scheduled
  * task, a health check, or a {@code Watcher} tick) can flush pending leaks on its own cadence. The one residual
  * gap — no meter activity and no external driver at all — leaves the last leaks unreported until activity
  * resumes. This is a narrow regression from the former {@code finalize()} path, which the GC drove without any
@@ -82,6 +86,22 @@ final class MeterLeakDetector {
      * and {@link #drain} both use the atomic {@link Set#remove(Object)} to claim a reference exactly once.
      */
     private static final Set<MeterReference> ANCHOR = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Claimed by the thread that continues draining beyond the first pending reference, so concurrent
+     * lifecycle calls do not pile up on the queue's internal lock while a batch of references is pending.
+     * Never touched while the queue is empty — the steady-state fast path performs no shared write.
+     */
+    private static final AtomicBoolean DRAINING = new AtomicBoolean();
+
+    /**
+     * Upper bound of leak reports emitted per opportunistic {@link #drain()} call. The dominant per-reference
+     * cost is the ERROR logging in {@link MeterReference#reportLeak()} (appender I/O), so this bounds the
+     * latency a lifecycle call ({@code start()} or a stop) can absorb on behalf of the detector. Remaining
+     * references are picked up by subsequent lifecycle calls or by {@link #drainAll()}.
+     * Package-private for tests.
+     */
+    static final int MAX_DRAIN = 8;
 
     /**
      * A {@link PhantomReference} to a started {@link Meter} that snapshots the data required to report
@@ -147,16 +167,71 @@ final class MeterLeakDetector {
     }
 
     /**
-     * Drains the reference queue and reports every meter that was collected while still registered.
-     * Lock-free; safe to call from any thread. Invoked opportunistically by {@link #register(Meter)} and
-     * {@link #deregister(MeterReference)}, and exposed to periodic drivers through {@link Meter#drainLeaks()}.
+     * Opportunistically drains the reference queue, reporting at most {@link #MAX_DRAIN} forgotten meters,
+     * and letting at most one thread continue past the first pending reference. Invoked by
+     * {@link #register(Meter)} and {@link #deregister(MeterReference)}; safe to call from any thread.
+     * <p>
+     * <b>Steady-state cost (empty queue, the no-leak case):</b> a single volatile read inside
+     * {@link ReferenceQueue#poll()} — no lock, no CAS, no shared write. This is the hot path and is
+     * intentionally identical to a bare {@code poll()}.
+     * <p>
+     * <b>When references are pending</b> (only possible after the GC collected meters that were never
+     * stopped): {@code poll()} briefly takes the JDK's internal per-queue lock per reference. The
+     * {@link #DRAINING} guard keeps concurrent lifecycle calls from queueing up on that lock — losers of
+     * the CAS return immediately and leave the remainder to the winning thread or a later call — and
+     * {@link #MAX_DRAIN} bounds how much reporting latency a single application thread absorbs. Leaks may
+     * therefore surface across a few lifecycle calls instead of one; {@link #drainAll()} remains exhaustive
+     * for periodic drivers.
      */
     static void drain() {
+        // The first poll doubles as the emptiness check: lock-free volatile read when empty.
+        Reference<? extends Meter> r = QUEUE.poll();
+        if (r == null) {
+            return;
+        }
+        // This reference is already claimed off the queue; report it regardless of who is draining.
+        reportIfAnchored(r);
+        // Only one thread continues past the first reference; others yield instead of
+        // piling up on the queue's internal lock.
+        if (DRAINING.compareAndSet(false, true)) {
+            try {
+                for (int i = 1; i < MAX_DRAIN; i++) {
+                    r = QUEUE.poll();
+                    if (r == null) {
+                        return;
+                    }
+                    reportIfAnchored(r);
+                }
+            } finally {
+                DRAINING.set(false);
+            }
+        }
+    }
+
+    /**
+     * Exhaustively drains the reference queue. Backing implementation of {@link Meter#drainLeaks()}:
+     * meant for periodic drivers (a {@code Watcher} tick, a scheduled task, a health check) that
+     * deliberately volunteer to do the full cleanup, so it is not capped by {@link #MAX_DRAIN}.
+     */
+    static void drainAll() {
         Reference<? extends Meter> r;
         while ((r = QUEUE.poll()) != null) {
-            final MeterReference ref = (MeterReference) r;
-            if (ANCHOR.remove(ref)) {
+            reportIfAnchored(r);
+        }
+    }
+
+    /**
+     * Reports the reference as a forgotten meter if it was still anchored (i.e. never deregistered).
+     * The atomic {@link Set#remove(Object)} claims each reference exactly once across concurrent drains.
+     */
+    private static void reportIfAnchored(final Reference<? extends Meter> r) {
+        final MeterReference ref = (MeterReference) r;
+        if (ANCHOR.remove(ref)) {
+            try {
                 ref.reportLeak();
+            } catch (final Exception ignored) {
+                // Leak reporting is a diagnostic aid; a misbehaving logging backend must never
+                // disturb the application thread that happened to trigger the drain.
             }
         }
     }
