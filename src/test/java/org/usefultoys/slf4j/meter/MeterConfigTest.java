@@ -113,8 +113,8 @@ class MeterConfigTest {
         MeterConfig.init();
         assertTrue(MeterConfig.detectLeaks, "detectLeaks should fall back to default for invalid format");
         assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid detectLeaks format");
-        assertEquals(1, ConfigParser.initializationErrors.size());
-        assertTrue(ConfigParser.initializationErrors.get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_DETECT_LEAKS));
+        assertEquals(1, ConfigParser.getInitializationErrors().size());
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid boolean value for property '" + MeterConfig.PROP_DETECT_LEAKS));
     }
 
     /**
