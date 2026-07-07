@@ -25,7 +25,8 @@ Detect forgotten meters with a `PhantomReference` + `ReferenceQueue`, implemente
 
 - **On `start()`** (gated by `MeterConfig.detectLeaks` and skipping the `UNKNOWN` category), `register(this)` creates a `MeterReference` — a `PhantomReference<Meter>` that snapshots `fullID` and the message `Logger` — and adds it to a **static anchor set**.
 - **On every explicit termination** (`ok()`/`reject()`/`fail()`/`close()`), `deregister(ref)` removes the reference from the anchor and calls `ref.clear()`.
-- **Draining is opportunistic**: `register()` first calls `drain()`, on the caller's own thread. Any reference still present in the anchor when the garbage collector enqueues it is — by construction — a meter that was started and never stopped, and is reported with an `ERROR` under the `INVALID_ARGUMENT` marker (byte-for-byte equivalent to the former `finalize()` message).
+- **Draining is opportunistic, on every lifecycle boundary**: both `register()` (start) and `deregister()` (a non-`null` termination) first call `drain()`, on the caller's own thread. Any reference still present in the anchor when the garbage collector enqueues it is — by construction — a meter that was started and never stopped, and is reported with an `ERROR` under the `INVALID_ARGUMENT` marker (byte-for-byte equivalent to the former `finalize()` message).
+- **A public drain entry point for quiet applications**: `Meter.drainLeaks()` exposes the same `drain()` so a periodic driver — a scheduled task, a health check, or a `Watcher` tick (`Watcher.run()` calls it) — can flush pending leaks without any library-owned thread. This restores, on the driver's cadence, the "reported without further meter activity" behavior the GC-driven `finalize()` used to provide.
 
 ```java
 private static final ReferenceQueue<Meter> QUEUE = new ReferenceQueue<>();
@@ -39,7 +40,8 @@ static MeterReference register(final Meter meter) {
 }
 
 static void deregister(final MeterReference ref) {
-    if (ref == null) return;
+    if (ref == null) return;    // disabled meters never register => no drain cost
+    drain();                    // also drain on stop, not only on start
     if (ANCHOR.remove(ref)) {   // membership IS the "still registered" state
         ref.clear();            // a stopped meter is never enqueued
     }
@@ -55,6 +57,8 @@ static void drain() {
     }
 }
 ```
+
+`drain()` is also reachable from outside the package through the public `Meter.drainLeaks()`, which `Watcher.run()` invokes on every tick so a running watcher flushes leaks periodically with no dedicated thread.
 
 **The anchor set is mandatory, not bookkeeping.** The garbage collector only enqueues a `PhantomReference` whose *reference object* is itself reachable through a strong path **independent of its referent**. A `MeterReference` held only by its own `Meter` (for example, through a field on the meter) becomes unreachable at the same instant as the meter and is collected *with* it — never enqueued — so the leak would silently go unreported. The static `ConcurrentHashMap.newKeySet()` keeps every live registration reachable from a GC root independently of the meter, until the meter is either stopped (deregistered) or collected and drained.
 
@@ -73,7 +77,7 @@ The anchor set is a `ConcurrentHashMap`-backed set, so `add`/`remove` are CAS op
 
 ### Negative ❌
 
-- **Reporting is not immediate**: a leak is reported only after the GC collects the meter *and* some thread subsequently starts another meter to trigger a drain. In an application that stops creating meters entirely, an outstanding leak may go unreported until the next meter starts (bounded, but not real-time).
+- **Reporting is not immediate**: a leak is reported only after the GC collects the meter *and* some thread subsequently reaches a drain trigger — starting or stopping another meter, or a driver calling `Meter.drainLeaks()` (e.g. `Watcher.run()`). Draining on every lifecycle boundary and the public entry point together cover the realistic cases; the one residual gap is an application with *no* further meter activity *and* no periodic driver, where the last leaks stay unreported until activity resumes. This is bounded, not real-time, and the same discretionary-timing trade-off the former `finalize()` path carried (which also depended on the GC deciding to collect and finalize).
 - **Irreducible shared state**: `register`/`deregister` mutate a process-wide set. It is lock-free, but it is not a zero-touch hot path; the transparency guarantee is "no monitor lock," not "no shared write."
 - **Per-registration snapshot cost**: `register()` calls `Meter.getFullID()`, which runs `String.format(...)`, on every `start()` even when no leak ever occurs. This is the largest avoidable cost on the happy path and could be deferred into `reportLeak()` if it ever proves significant.
 - **A subtle correctness footgun**: the design depends on the non-obvious GC reachability rule above. An earlier iteration that stored the reference only on the meter was silently broken; the requirement is now guarded by an assertion in `MeterThreadLocalWeakReferenceGcTest` that *fails* (rather than skips) if the warning is not produced.
@@ -123,8 +127,9 @@ The anchor set is a `ConcurrentHashMap`-backed set, so `add`/`remove` are CAS op
 
 ## Implementation
 
-- [src/main/java/org/usefultoys/slf4j/meter/MeterLeakDetector.java](../src/main/java/org/usefultoys/slf4j/meter/MeterLeakDetector.java) — the detector: `QUEUE`, the `ANCHOR` set, `MeterReference`, and `register`/`deregister`/`drain`.
-- [src/main/java/org/usefultoys/slf4j/meter/Meter.java](../src/main/java/org/usefultoys/slf4j/meter/Meter.java) — holds the `leakRef` handle; `start()` registers, `commonOk()`/`reject()`/`fail()`/`close()` deregister; the former `finalize()` override was removed.
+- [src/main/java/org/usefultoys/slf4j/meter/MeterLeakDetector.java](../src/main/java/org/usefultoys/slf4j/meter/MeterLeakDetector.java) — the detector: `QUEUE`, the `ANCHOR` set, `MeterReference`, and `register`/`deregister`/`drain`. Both `register` and `deregister` (non-`null`) drain, so every lifecycle boundary is a drain trigger.
+- [src/main/java/org/usefultoys/slf4j/meter/Meter.java](../src/main/java/org/usefultoys/slf4j/meter/Meter.java) — holds the `leakRef` handle; `start()` registers, `commonOk()`/`reject()`/`fail()`/`close()` deregister; the former `finalize()` override was removed. Exposes the public `drainLeaks()` entry point that delegates to `MeterLeakDetector.drain()`.
+- [src/main/java/org/usefultoys/slf4j/watcher/Watcher.java](../src/main/java/org/usefultoys/slf4j/watcher/Watcher.java) — `run()` calls `Meter.drainLeaks()` on each tick, so a scheduled or servlet-driven watcher flushes leaks periodically without a dedicated thread.
 - [src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java](../src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java) — `detectLeaks` flag, system property `slf4jtoys.meter.detect.leaks` (default `true`).
 - [src/main/java/org/usefultoys/slf4j/meter/MeterValidator.java](../src/main/java/org/usefultoys/slf4j/meter/MeterValidator.java) — `validateFinalize()` removed.
 - Tests: `MeterLeakDetectorTest` (deterministic register/deregister/drain behavior via `Reference.enqueue()`) and `MeterThreadLocalWeakReferenceGcTest` (end-to-end GC → enqueue → drain → `ERROR`, asserting the warning rather than assuming it).

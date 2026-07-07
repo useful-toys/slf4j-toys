@@ -202,6 +202,24 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     }
 
     /**
+     * Reports every {@link Meter} that was started, never explicitly stopped, and has since been
+     * garbage-collected — the "forgotten meter" leaks detected via {@link MeterConfig#detectLeaks}.
+     * <p>
+     * Leak detection is driven opportunistically from {@link #start()} and the termination methods
+     * ({@code ok()}/{@code reject()}/{@code fail()}/{@code close()}), so a leak normally surfaces on the
+     * next meter activity anywhere in the application, without any library-owned background thread. In an
+     * application that has gone quiet on meter activity, pending leaks would otherwise stay unreported; this
+     * method lets a periodic driver — a scheduled task, a health check, or a {@code Watcher} tick — flush
+     * them on its own cadence.
+     * <p>
+     * When leak detection is disabled ({@link MeterConfig#detectLeaks} is {@code false}) nothing is
+     * registered and this is a cheap no-op. Safe to call from any thread.
+     */
+    public static void drainLeaks() {
+        MeterLeakDetector.drain();
+    }
+
+    /**
      * Converts an object into a string representation suitable for a path identifier.
      *
      * @param o The object to convert.

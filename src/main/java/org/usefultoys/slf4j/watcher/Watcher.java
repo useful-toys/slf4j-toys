@@ -18,6 +18,7 @@ package org.usefultoys.slf4j.watcher;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.internal.SystemMetrics;
+import org.usefultoys.slf4j.meter.Meter;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -88,6 +89,7 @@ public class Watcher extends WatcherData implements Runnable {
      * <li>Collects runtime, platform, and MBean metrics.</li>
      * <li>Logs a human-readable summary at the {@code INFO} level.</li>
      * <li>Logs a machine-parsable data message at the {@code TRACE} level.</li>
+     * <li>Flushes any pending forgotten-meter leaks via {@link Meter#drainLeaks()}.</li>
      * </ol>
      */
     @Override
@@ -107,5 +109,9 @@ public class Watcher extends WatcherData implements Runnable {
         if (dataLogger.isTraceEnabled()) {
             dataLogger.trace(Markers.DATA_WATCHER, json5Message());
         }
+        /* Drive the leak detector's opportunistic drain from the watcher's periodic tick, so forgotten-meter
+           leaks are still reported when the application has otherwise gone quiet on meter activity. Cheap
+           no-op when leak detection is disabled. */
+        Meter.drainLeaks();
     }
 }
