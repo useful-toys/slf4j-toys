@@ -1,6 +1,6 @@
 # TDR-0012: Watcher Singleton Implementation Regret
 
-**Status**: Superseded (push resolved by [TDR-0036](./TDR-0036-replace-watcher-singleton-push-with-controllers.md); pull path still provisional)
+**Status**: Resolved (push resolved by [TDR-0036](./TDR-0036-replace-watcher-singleton-push-with-controllers.md); pull path resolved by [TDR-0037](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md))
 **Date**: 2026-01-03
 **Updated**: 2026-07-07
 
@@ -22,19 +22,21 @@ We originally implemented `WatcherSingleton` as a utility class (using Lombok's 
 *   **Hidden Dependencies**: Classes using `WatcherSingleton` have a hidden dependency on a global state, making the code harder to reason about and refactor.
 
 ## Resolution
-In [TDR-0036](./TDR-0036-replace-watcher-singleton-push-with-controllers.md), the push side of `WatcherSingleton` was removed and replaced by instance-based `WatcherExecutorController` and `WatcherTimerController`. `WatcherSingleton` now only provides the default `Watcher` instance for the servlet pull path (`WatcherServlet` / `WatcherJavaxServlet`) and is marked `@Deprecated`.
+In [TDR-0036](./TDR-0036-replace-watcher-singleton-push-with-controllers.md), the push side of `WatcherSingleton` was removed and replaced by instance-based `WatcherExecutorController` and `WatcherTimerController`. In [TDR-0037](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md), the pull side was migrated: `WatcherServlet` and `WatcherJavaxServlet` now create their own `Watcher` instances during `init(ServletConfig)`. `WatcherSingleton` was removed entirely.
 
-The negative consequences above no longer apply to push execution. They still apply to the remaining `getDefaultWatcher()` pull path until the servlet is migrated to use its own `Watcher` instance.
+The negative consequences above no longer apply. New code should use `WatcherExecutorController`, `WatcherTimerController`, create a dedicated `Watcher` instance, or use `WatcherServlet`/`WatcherJavaxServlet` for pull-mode diagnostics.
 
 ## Alternatives
-*   **Dependency Injection**: Instead of a singleton, the `Watcher` could be injected into components that need it. This would solve the testing and configuration issues but would require a DI framework or more boilerplate code.
-*   **Instance Management**: Allow the creation of multiple `Watcher` instances and let the application manage them. The "default" instance could be managed by the application's lifecycle container rather than a static singleton.
+*   **Dependency Injection**: Instead of a singleton, the `Watcher` could be injected into components that need it. This solves the testing and configuration issues but requires a DI framework or more boilerplate code.
+*   **Instance Management**: Allow the creation of multiple `Watcher` instances and let the application manage them. The "default" instance can be managed by the application's lifecycle container rather than a static singleton.
 
 ## Implementation
-The push implementation was removed from [src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java](src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java). The class now only retains `getDefaultWatcher()` as a temporary compatibility bridge for the servlet pull path. New code should use `WatcherExecutorController`, `WatcherTimerController`, or create a dedicated `Watcher` instance.
+`WatcherSingleton` was removed from [src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java). `WatcherServlet` and `WatcherJavaxServlet` now instantiate their own `Watcher` during `init(ServletConfig)`, optionally overriding the name via the `slf4jtoys.watcher.name` init-param. Concurrent calls to `runWatcher()` are serialized with an internal lock.
 
 ## References
-*   [src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java](src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java)
+*   [src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java)
+*   [src/main/java/org/usefultoys/slf4j/watcher/WatcherJavaxServlet.java](../src/main/java/org/usefultoys/slf4j/watcher/WatcherJavaxServlet.java)
 *   [src/main/java/org/usefultoys/slf4j/watcher/WatcherConfig.java](src/main/java/org/usefultoys/slf4j/watcher/WatcherConfig.java)
 *   [doc/TDR-0005-configuration-mechanism.md](doc/TDR-0005-configuration-mechanism.md)
 *   [doc/TDR-0036-replace-watcher-singleton-push-with-controllers.md](./TDR-0036-replace-watcher-singleton-push-with-controllers.md)
+*   [doc/TDR-0037-migrate-watcher-servlet-pull-from-singleton.md](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md)
