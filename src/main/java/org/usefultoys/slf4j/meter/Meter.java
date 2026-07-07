@@ -45,6 +45,17 @@ import java.util.concurrent.atomic.AtomicLong;
  *     <li>Call {@link #progress()} to log intermediate progress and system status (INFO level, periodically).</li>
  * </ul>
  * All **lifecycle** events also generate a **machine-parsable data message** at TRACE level.
+ * <p>
+ * <b>Threading contract:</b> the lifecycle is single-thread-owned by design — the thread that calls
+ * {@code start()} is expected to call the termination method. Terminating on a different thread is
+ * <em>tolerated, not supported</em>: given safe publication of the {@code Meter} between the threads
+ * (an executor submission, a queue, any normal happens-before edge), the emitted measurement record is
+ * still correct, but {@code MeterValidator} logs an {@code INVALID_TRANSITION} warning and the
+ * thread-local context stack behind {@link #getCurrentInstance()} degrades on both threads (the stopping
+ * thread inherits the starting thread's previous context; the starting thread keeps the stopped meter as
+ * current until it self-heals). Lifecycle fields carry no library-provided synchronization, so an
+ * unsynchronized cross-thread handoff is a data race. See TDR-0037 (single-thread meter lifecycle
+ * contract) and TDR-0015 (thread-local context stack).
  *
  * @author Daniel Felix Ferber
  * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5
