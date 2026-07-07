@@ -54,8 +54,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * of pinning a web application class loader in a servlet container. For an application that has gone quiet on
  * meter activity, {@link Meter#drainLeaks()} exposes the same drain publicly so a periodic driver (a scheduled
  * task, a health check, or a {@code Watcher} tick) can flush pending leaks on its own cadence. The one residual
- * gap — no meter activity and no external driver at all — leaves the last leaks unreported until the next
- * activity, the same discretionary-timing trade-off the former {@code finalize()} path had.
+ * gap — no meter activity and no external driver at all — leaves the last leaks unreported until activity
+ * resumes. This is a narrow regression from the former {@code finalize()} path, which the GC drove without any
+ * application activity; it is accepted because a fully idle state is rare and {@link Meter#drainLeaks()} covers it.
  * <p>
  * <b>Predicate equivalence:</b> a meter is registered only from {@code start()} and is deregistered on
  * every explicit termination. A reference still anchored when it is enqueued is, by definition, a meter that
