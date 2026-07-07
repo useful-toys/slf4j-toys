@@ -80,7 +80,14 @@ class MeterLeakDetectorTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         lenient().when(meter.getMessageLogger()).thenReturn(logger);
-        lenient().when(meter.getFullID()).thenReturn("test-id");
+        // MeterReference snapshots category/operation/position and assembles fullID at report time
+        // (see MeterLeakDetector.MeterReference#reportLeak). The mock below yields fullID "test#0",
+        // matching the assemblage of MeterData.getFullID() for category="test", operation=null,
+        // position=0 — i.e. the same byte-for-byte id the eager-snapshot variant produced via
+        // getFullID().thenReturn("test-id"); only the construction path differs.
+        lenient().when(meter.getCategory()).thenReturn("test");
+        lenient().when(meter.getOperation()).thenReturn(null);
+        lenient().when(meter.getPosition()).thenReturn(0L);
     }
 
     @Test
@@ -133,7 +140,7 @@ class MeterLeakDetectorTest {
         final MeterReference ref = new MeterReference(meter, new ReferenceQueue<Meter>());
         ref.reportLeak();
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test#0");
     }
 
     @Test
@@ -143,7 +150,7 @@ class MeterLeakDetectorTest {
         ref.enqueue();
         MeterLeakDetector.drain();
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test#0");
     }
 
     @Test
@@ -169,7 +176,7 @@ class MeterLeakDetectorTest {
 
         // Then: deregister's drain reports the leaked one, even though start() was not called again
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test#0");
     }
 
     @Test
@@ -181,7 +188,7 @@ class MeterLeakDetectorTest {
         Meter.drainLeaks();
 
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test#0");
     }
 
     @Test
@@ -193,7 +200,7 @@ class MeterLeakDetectorTest {
         new org.usefultoys.slf4j.watcher.Watcher("leak-drain-test").run();
 
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test#0");
     }
 
     @Test
@@ -248,7 +255,12 @@ class MeterLeakDetectorTest {
                 .error(any(Marker.class), anyString(), any(), any());
         final Meter poisoned = mock(Meter.class);
         lenient().when(poisoned.getMessageLogger()).thenReturn(throwingLogger);
-        lenient().when(poisoned.getFullID()).thenReturn("poisoned-id");
+        // Component mirroring setUp's stub on the healthy `meter`; the assembled fullID never
+        // appears in the log because the throwing logger aborts reportLeak() before the event is
+        // captured, and reportIfAnchored() swallows the RuntimeException anyway.
+        lenient().when(poisoned.getCategory()).thenReturn("poisoned");
+        lenient().when(poisoned.getOperation()).thenReturn(null);
+        lenient().when(poisoned.getPosition()).thenReturn(0L);
 
         final MeterReference poisonedRef = MeterLeakDetector.register(poisoned);
         final MeterReference healthyRef = MeterLeakDetector.register(meter);
@@ -259,7 +271,7 @@ class MeterLeakDetectorTest {
         assertDoesNotThrow(MeterLeakDetector::drain,
                 "a misbehaving logging backend must never disturb the thread that triggered the drain");
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test#0");
     }
 
     @Test
@@ -282,7 +294,7 @@ class MeterLeakDetectorTest {
         fresh.enqueue();
         MeterLeakDetector.drain();
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test#0");
     }
 
 }
