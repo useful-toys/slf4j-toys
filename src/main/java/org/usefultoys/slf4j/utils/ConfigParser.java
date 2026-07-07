@@ -20,6 +20,7 @@ import lombok.experimental.UtilityClass;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Collection of utility methods to read system properties, with support for default values and typed conversion.
@@ -196,6 +197,36 @@ public class ConfigParser {
      * @param defaultValue the default value (in milliseconds) to return if the property is not set or invalid
      * @return the parsed duration in milliseconds, or the default value if the property is not set or invalid
      */
+    /**
+     * Retrieves the value of a system property as a {@link Locale}, parsed from a BCP 47 language tag
+     * (e.g., {@code "en-US"}, {@code "de-DE"}) via {@link Locale#forLanguageTag(String)}.
+     * <p>
+     * If the property is not set or is blank, the default value is returned. If the value is present but
+     * cannot be resolved to a locale with a language (as happens for malformed input such as {@code "quatsch"}
+     * or the common underscore mistake {@code "de_DE"}, which {@link Locale#forLanguageTag(String)} silently
+     * reduces to {@link Locale#ROOT}), an error is recorded and the default value is returned.
+     *
+     * @param name         the name of the system property
+     * @param defaultValue the default value to return if the property is not set or invalid
+     * @return the property value as a {@link Locale}, or the default value if the property is not set or invalid
+     */
+    public Locale getLocaleProperty(final String name, final Locale defaultValue) {
+        final String value = System.getProperty(name);
+        if (value == null) {
+            return defaultValue;
+        }
+        final String trimmedValue = value.trim();
+        if (trimmedValue.isEmpty()) {
+            return defaultValue;
+        }
+        final Locale parsed = Locale.forLanguageTag(trimmedValue);
+        if (parsed.getLanguage().isEmpty()) {
+            initializationErrors.add("Invalid locale value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue.toLanguageTag() + "'.");
+            return defaultValue;
+        }
+        return parsed;
+    }
+
     public long getMillisecondsProperty(final String name, final long defaultValue) {
         final String rawValue = System.getProperty(name);
         if (rawValue == null) {

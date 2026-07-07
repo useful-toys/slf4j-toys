@@ -53,7 +53,7 @@ class SessionConfigTest {
         // Then: should have default values
         assertEquals(6, SessionConfig.uuidSize, "should have default uuidSize of 6");
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "should have default charset");
-        assertEquals(Locale.getDefault().toLanguageTag(), SessionConfig.locale, "should have default locale");
+        assertEquals(Locale.getDefault(), SessionConfig.locale, "should have default locale");
     }
 
     @Test
@@ -65,7 +65,7 @@ class SessionConfigTest {
         // Then: should return to defaults
         assertEquals(6, SessionConfig.uuidSize, "should reset uuidSize to default 6");
         assertEquals(Charset.defaultCharset().name(), SessionConfig.charset, "should reset charset to default");
-        assertEquals(Locale.getDefault().toLanguageTag(), SessionConfig.locale, "should reset locale to default");
+        assertEquals(Locale.getDefault(), SessionConfig.locale, "should reset locale to default");
     }
 
     @Test
@@ -163,6 +163,17 @@ class SessionConfigTest {
         // When: init() is called
         SessionConfig.init();
         // Then: locale should reflect the system property value
-        assertEquals("de-DE", SessionConfig.locale, "should parse locale from system property");
+        assertEquals(Locale.forLanguageTag("de-DE"), SessionConfig.locale, "should parse locale from system property");
+    }
+
+    @Test
+    @DisplayName("should use default when locale has invalid format")
+    void shouldUseDefaultWhenLocaleHasInvalidFormat() {
+        // Given: system property set to a malformed tag (underscore instead of hyphen reduces to Locale.ROOT)
+        System.setProperty(SessionConfig.PROP_PRINT_LOCALE, "de_DE");
+        // When: init() is called
+        SessionConfig.init();
+        // Then: should fall back to the default locale
+        assertEquals(Locale.getDefault(), SessionConfig.locale, "should fall back to default for invalid locale tags");
     }
 }

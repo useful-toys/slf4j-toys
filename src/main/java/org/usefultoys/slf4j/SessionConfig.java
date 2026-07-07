@@ -96,16 +96,14 @@ public class SessionConfig {
      * (a fixed {@code .} decimal separator) so that downstream parsers are not broken by
      * locale-dependent output.
      * <p>
-     * The value must be a BCP 47 language tag (e.g., {@code "en-US"}, {@code "de-DE"}), as accepted
-     * by {@link Locale#forLanguageTag(String)}.
-     * <p>
-     * The value is read from the system property {@code slf4jtoys.session.print.locale}, defaulting to the
-     * JVM's default locale.
+     * The value is read from the system property {@code slf4jtoys.session.print.locale}, which must be a
+     * BCP 47 language tag (e.g., {@code "en-US"}, {@code "de-DE"}) as accepted by
+     * {@link Locale#forLanguageTag(String)}, defaulting to the JVM's default locale.
      * <p>
      * <strong>Thread Safety:</strong> This field can be modified at runtime, but caution is advised in concurrent
      * environments as changes are not synchronized.
      */
-    public String locale = Locale.getDefault().toLanguageTag();
+    public Locale locale = Locale.getDefault();
 
     /**
      * Initializes the configuration properties by reading values from system properties.
@@ -118,7 +116,7 @@ public class SessionConfig {
     public void init() {
         uuidSize = ConfigParser.getRangeProperty(PROP_PRINT_UUID_SIZE, 6, 2, UUID_LENGTH);
         charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, Charset.defaultCharset().name());
-        locale = ConfigParser.getProperty(PROP_PRINT_LOCALE, Locale.getDefault().toLanguageTag());
+        locale = ConfigParser.getLocaleProperty(PROP_PRINT_LOCALE, Locale.getDefault());
     }
 
     /**
