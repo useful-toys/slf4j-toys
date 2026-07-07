@@ -86,7 +86,7 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
             final Locale newLocale = Locale.forLanguageTag(withLocale.get().value());
             Locale.setDefault(newLocale);
             // Keep SessionConfig.locale in sync, since that's what human-readable formatters read
-            SessionConfig.locale = newLocale.toLanguageTag();
+            SessionConfig.locale = newLocale;
         } else {
             // Extension is misconfigured - annotation must be present
             throw new IllegalStateException(
@@ -107,7 +107,7 @@ public class WithLocaleExtension implements BeforeEachCallback, AfterEachCallbac
         final Store store = getStore(context);
         // Remove and retrieve the saved locale
         final Locale original = store.remove(ORIGINAL_LOCALE_KEY, Locale.class);
-        final String originalSessionLocale = store.remove(ORIGINAL_SESSION_LOCALE_KEY, String.class);
+        final Locale originalSessionLocale = store.remove(ORIGINAL_SESSION_LOCALE_KEY, Locale.class);
 
         if (original != null) {
             // Restore the original locale

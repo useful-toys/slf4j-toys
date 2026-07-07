@@ -17,7 +17,7 @@ package org.usefultoys.slf4j.utils;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.usefultoys.slf4j.Session;
+import org.usefultoys.slf4j.SessionConfig;
 
 /**
  * Utility class that provides methods to format numbers by rounding them to a unit,
@@ -66,7 +66,7 @@ public final class UnitFormatter {
         int index = 0;
         final int limit = factors[index] + factors[index] / 10;
         if (value < limit) {
-            return String.format(Session.getLocale(), "%d%s", value, units[index]);
+            return String.format(SessionConfig.locale, "%d%s", value, units[index]);
         }
 
         final int length = factors.length;
@@ -77,7 +77,7 @@ public final class UnitFormatter {
             value /= factors[index];
             index++;
         }
-        return String.format(Session.getLocale(), "%.1f%s", doubleValue, units[index]);
+        return String.format(SessionConfig.locale, "%.1f%s", doubleValue, units[index]);
     }
 
     /**
@@ -114,7 +114,7 @@ public final class UnitFormatter {
             value /= factors[index];
             index++;
         }
-        return String.format(Session.getLocale(), "%.1f%s", value, units[index]);
+        return String.format(SessionConfig.locale, "%.1f%s", value, units[index]);
     }
 
     /**

@@ -21,7 +21,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.Session;
+import org.usefultoys.slf4j.SessionConfig;
 import org.usefultoys.slf4j.utils.UnitFormatter;
 
 import java.io.BufferedReader;
@@ -161,7 +161,7 @@ public class ReportContainerInfo implements Runnable {
 
                 if (quota > 0 && period > 0) {
                     final double cpuShares = (double) quota / period;
-                    ps.printf(Session.getLocale(), " - CPU Limit: %.2f cores%n", cpuShares);
+                    ps.printf(SessionConfig.locale, " - CPU Limit: %.2f cores%n", cpuShares);
                 } else {
                     ps.println(" - CPU Limit: No limit set");
                 }

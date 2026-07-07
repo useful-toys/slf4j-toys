@@ -20,7 +20,6 @@ import lombok.experimental.UtilityClass;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.watcher.Watcher;
 
-import java.util.Locale;
 import java.util.UUID;
 
 
@@ -57,18 +56,5 @@ public class Session {
     public @NonNull String shortSessionUuid() {
         SessionConfig.uuidSize = Math.max(2, Math.min(SessionConfig.uuidSize, SessionConfig.UUID_LENGTH));
         return Session.uuid.substring(SessionConfig.UUID_LENGTH - SessionConfig.uuidSize);
-    }
-
-    /**
-     * Returns the {@link Locale} used to format human-readable numbers in log messages and reports.
-     * <p>
-     * This does not affect **machine-parsable data messages**, whose numeric fields always use
-     * {@link Locale#US}.
-     *
-     * @return the {@link Locale} resolved from {@link SessionConfig#locale}.
-     * @see SessionConfig#locale
-     */
-    public @NonNull Locale getLocale() {
-        return Locale.forLanguageTag(SessionConfig.locale);
     }
 }

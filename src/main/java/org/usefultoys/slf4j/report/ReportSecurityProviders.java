@@ -21,7 +21,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.usefultoys.slf4j.LoggerFactory;
-import org.usefultoys.slf4j.Session;
+import org.usefultoys.slf4j.SessionConfig;
 
 import java.io.PrintStream;
 import java.security.Provider;
@@ -63,7 +63,7 @@ public class ReportSecurityProviders implements Runnable {
         } else {
             for (int i = 0; i < providers.length; i++) {
                 final Provider provider = providers[i];
-                ps.printf(Session.getLocale(), " - Provider %d: %s (Version: %f)%n", i + 1, provider.getName(), provider.getVersion());
+                ps.printf(SessionConfig.locale, " - Provider %d: %s (Version: %f)%n", i + 1, provider.getName(), provider.getVersion());
                 ps.printf("   Info: %s%n", provider.getInfo());
 
                 // List services offered by the provider
