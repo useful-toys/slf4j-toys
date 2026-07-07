@@ -251,7 +251,7 @@ public class MeterData extends SystemData implements MeterAnalysis {
         if (operation == null) {
             return category + '#' + getPosition();
         }
-        return String.format("%s/%s#%d", category, operation, getPosition());
+        return category + '/' + operation + '#' + getPosition();
     }
 
     /**
