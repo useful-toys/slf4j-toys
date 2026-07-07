@@ -148,4 +148,44 @@ class MeterLeakDetectorTest {
         assertNoEvents(logger);
     }
 
+    @Test
+    @DisplayName("deregister should drain, reporting a pending leak from another meter")
+    void deregisterDrainsPendingLeaks() {
+        // Given: one leaked meter (enqueued, still anchored) and another that is about to be stopped
+        final MeterReference leaked = MeterLeakDetector.register(meter);
+        final MeterReference other = MeterLeakDetector.register(meter);
+        leaked.enqueue();
+
+        // When: the other meter is deregistered (stopped) — no new meter is ever started
+        MeterLeakDetector.deregister(other);
+
+        // Then: deregister's drain reports the leaked one, even though start() was not called again
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+    }
+
+    @Test
+    @DisplayName("Meter.drainLeaks should drain and report a pending leak (public entry point)")
+    void publicDrainLeaksReportsEnqueuedRegisteredMeter() {
+        final MeterReference ref = MeterLeakDetector.register(meter);
+        ref.enqueue();
+
+        Meter.drainLeaks();
+
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+    }
+
+    @Test
+    @DisplayName("Watcher.run should drain and report a pending leak (periodic-driver wiring)")
+    void watcherRunDrainsPendingLeaks() {
+        final MeterReference ref = MeterLeakDetector.register(meter);
+        ref.enqueue();
+
+        new org.usefultoys.slf4j.watcher.Watcher("leak-drain-test").run();
+
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test-id");
+    }
+
 }

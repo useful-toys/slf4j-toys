@@ -48,9 +48,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * so {@link #drain()} never even sees it.
  * <p>
  * <b>Draining strategy — no background thread:</b> the {@link ReferenceQueue} is drained opportunistically
- * from {@link #register(Meter)}, i.e. on the thread that starts the next meter. A forgotten meter is
- * reported the next time any meter is started, with no library-owned daemon thread and no risk of pinning
- * a web application class loader in a servlet container.
+ * on the caller's own thread, from every meter lifecycle boundary — both {@link #register(Meter) start} and
+ * {@link #deregister(MeterReference) termination} — so a forgotten meter is reported the next time any meter
+ * is started <em>or</em> stopped anywhere in the application, with no library-owned daemon thread and no risk
+ * of pinning a web application class loader in a servlet container. For an application that has gone quiet on
+ * meter activity, {@link Meter#drainLeaks()} exposes the same drain publicly so a periodic driver (a scheduled
+ * task, a health check, or a {@code Watcher} tick) can flush pending leaks on its own cadence. The one residual
+ * gap — no meter activity and no external driver at all — leaves the last leaks unreported until the next
+ * activity, the same discretionary-timing trade-off the former {@code finalize()} path had.
  * <p>
  * <b>Predicate equivalence:</b> a meter is registered only from {@code start()} and is deregistered on
  * every explicit termination. A reference still anchored when it is enqueued is, by definition, a meter that
@@ -121,6 +126,12 @@ final class MeterLeakDetector {
      * Deregisters a meter that was stopped explicitly, so its eventual collection is never reported as a leak.
      * Idempotent and {@code null}-safe. Removing the reference from {@link #ANCHOR} drops the independent
      * strong path, and {@link MeterReference#clear()} prevents the GC from enqueueing it in the first place.
+     * <p>
+     * A non-{@code null} handle also drains the queue (opportunistically), so a leak surfaces on the next
+     * meter <em>termination</em>, not only on the next {@link #register(Meter) start}. This widens the drain
+     * trigger to every lifecycle boundary and keeps {@link #ANCHOR} bounded whenever meters keep being stopped,
+     * while adding no cost when leak detection is disabled (a disabled meter never registers, so {@code ref}
+     * is {@code null} and this returns before draining).
      *
      * @param ref the handle returned by {@link #register(Meter)}, or {@code null}.
      */
@@ -128,6 +139,7 @@ final class MeterLeakDetector {
         if (ref == null) {
             return;
         }
+        drain();
         if (ANCHOR.remove(ref)) {
             ref.clear();
         }
@@ -135,7 +147,8 @@ final class MeterLeakDetector {
 
     /**
      * Drains the reference queue and reports every meter that was collected while still registered.
-     * Lock-free; safe to call from any thread. Invoked opportunistically by {@link #register(Meter)}.
+     * Lock-free; safe to call from any thread. Invoked opportunistically by {@link #register(Meter)} and
+     * {@link #deregister(MeterReference)}, and exposed to periodic drivers through {@link Meter#drainLeaks()}.
      */
     static void drain() {
         Reference<? extends Meter> r;
