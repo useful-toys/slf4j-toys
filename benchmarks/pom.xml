@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Standalone JMH benchmarks module for slf4j-toys.
+
+    This POM is intentionally NOT listed as a <module> in the root pom.xml, so it
+    is never built by the default reactor, never published, and never brings JMH
+    or its annotation processor onto the classpath of the published artifact.
+    It is tooling, not part of the library.
+
+    Prerequisite: install the library SNAPSHOT into the local Maven repository once:
+        .\mvnw -DskipTests install
+
+    Then build and run the benchmarks:
+        .\mvnw -f benchmarks\pom.xml clean package
+        java -jar benchmarks\target\benchmarks.jar -wi 1 -i 1 -f 1 -t 1
+        java -jar benchmarks\target\benchmarks.jar -prof gc -wi 1 -i 1 -f 1
+
+    JDK 21 is required (matches the repository build JDK). Benchmarks are
+    developer tooling and do not need to maintain Java 8 compatibility, since
+    they are never released or published.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.usefultoys</groupId>
+    <artifactId>slf4j-toys-benchmarks</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>slf4j-toys JMH Benchmarks</name>
+    <description>
+        Isolated JMH microbenchmarks measuring the CPU and allocation overhead
+        of the Meter and Watcher components of slf4j-toys. Not part of the
+        published artifact.
+    </description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
+        <jmh.version>1.37</jmh.version>
+        <logback.version>1.5.37</logback.version>
+        <slf4j.version>2.0.18</slf4j.version>
+    </properties>
+
+    <dependencies>
+        <!-- Library under measurement. Resolved from the local Maven repo
+             after `.\mvnw -DskipTests install` on the root project. -->
+        <dependency>
+            <groupId>org.usefultoys</groupId>
+            <artifactId>slf4j-toys</artifactId>
+            <version>2.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Concrete SLF4J binding so that logger-level checks (isInfoEnabled etc.)
+             reflect a real runtime, enabling the "logging disabled" baseline. -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <!-- JMH runtime and annotation processor -->
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>${jmh.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>benchmarks</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.15.0</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.openjdk.jmh</groupId>
+                            <artifactId>jmh-generator-annprocess</artifactId>
+                            <version>${jmh.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>benchmarks</finalName>
+                            <transformers>
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.openjdk.jmh.Main</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

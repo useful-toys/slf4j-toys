@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--
+        Baseline benchmarks use root level OFF, so every isXxxEnabled() check
+        in Meter and Watcher returns false. This isolates the pure
+        instrumentation overhead (System.nanoTime, ThreadLocal, WeakReference,
+        validation) without engaging metric collection or message formatting.
+    -->
+    <root level="OFF"/>
+</configuration>
