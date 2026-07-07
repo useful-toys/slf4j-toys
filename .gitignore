@@ -73,11 +73,17 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
+# Go plugin (IntelliJ) generated imports file
+.idea/go.imports.xml
+
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
 # Git worktrees (see .agents/skills/trunk-based-development/SKILL.md)
 .worktrees/
+
+# AI tooling — junctions to .agents/skills/ (local, not versioned)
+.claude/skills/
 
 # Maven
 target/
