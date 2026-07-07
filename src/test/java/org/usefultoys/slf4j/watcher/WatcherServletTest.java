@@ -16,6 +16,7 @@
 
 package org.usefultoys.slf4j.watcher;
 
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
@@ -61,11 +62,14 @@ class WatcherServletTest {
     private MockLogger mockLogger;
     @Slf4jMock("watcher") // default value of WatcherConfig.name
     private MockLogger watcherLogger;
+    @Slf4jMock("custom-servlet-watcher")
+    private MockLogger customLogger;
 
     @Test
-    void shouldLogSystemStatusSuccessfully() throws IOException {
+    void shouldLogSystemStatusSuccessfully() throws Exception {
         // Given: a WatcherServlet with enabled loggers
         final WatcherServlet servlet = new WatcherServlet();
+        servlet.init(mock(ServletConfig.class));
         final HttpServletRequest request = mock(HttpServletRequest.class);
         final HttpServletResponse response = mock(HttpServletResponse.class);
         final StringWriter responseWriter = new StringWriter();
@@ -78,7 +82,7 @@ class WatcherServletTest {
         verify(response).setContentType("text/plain");
         verify(response).setStatus(HttpServletResponse.SC_OK);
         assertEquals("Runtime state logged successfully.", responseWriter.toString().trim());
-        AssertLogger.assertEvent(mockLogger, 0, MockLoggerEvent.Level.INFO, "WatcherServlet accessed");
+        AssertLogger.assertEvent(mockLogger, 1, MockLoggerEvent.Level.INFO, "WatcherServlet accessed");
         AssertLogger.assertEvent(watcherLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
     }
 
@@ -212,5 +216,65 @@ class WatcherServletTest {
         verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         assertEquals("Failed to log runtime state.", responseWriter.toString().trim());
         AssertLogger.assertEventWithThrowable(mockLogger, 0, IllegalStateException.class, "Estado inválido do watcher");
+    }
+
+    @Test
+    void shouldUseInitParamName() throws Exception {
+        // Given: a servlet configuration that provides a custom watcher name
+        final WatcherServlet servlet = new WatcherServlet();
+        final ServletConfig config = mock(ServletConfig.class);
+        when(config.getInitParameter(WatcherConfig.PROP_NAME)).thenReturn("custom-servlet-watcher");
+        servlet.init(config);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // When: doGet is called
+        servlet.doGet(request, response);
+
+        // Then: the watcher logs to the logger derived from the init-param name
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        AssertLogger.assertEvent(customLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
+    }
+
+    @Test
+    void shouldFallBackToWatcherConfigNameWhenInitParamMissing() throws Exception {
+        // Given: a servlet configuration without the watcher name init-param
+        final WatcherServlet servlet = new WatcherServlet();
+        final ServletConfig config = mock(ServletConfig.class);
+        when(config.getInitParameter(WatcherConfig.PROP_NAME)).thenReturn(null);
+        servlet.init(config);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // When: doGet is called
+        servlet.doGet(request, response);
+
+        // Then: the watcher logs to the default logger name
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        AssertLogger.assertEvent(watcherLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
+    }
+
+    @Test
+    void shouldIgnoreBlankInitParamName() throws Exception {
+        // Given: a servlet configuration with a blank watcher name init-param
+        final WatcherServlet servlet = new WatcherServlet();
+        final ServletConfig config = mock(ServletConfig.class);
+        when(config.getInitParameter(WatcherConfig.PROP_NAME)).thenReturn("   ");
+        servlet.init(config);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // When: doGet is called
+        servlet.doGet(request, response);
+
+        // Then: the blank value is ignored and the default logger name is used
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        AssertLogger.assertEvent(watcherLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
     }
 }
