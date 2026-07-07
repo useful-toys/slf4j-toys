@@ -25,13 +25,12 @@ import java.util.concurrent.TimeUnit;
  * Periodically executes a {@link Watcher} using a {@link ScheduledExecutorService}.
  * <p>
  * Each controller owns its own {@link Watcher} instance, created from the configured {@code name}.
- * By default, the controller reads {@code name}, {@code delayMilliseconds} and {@code periodMilliseconds}
- * from {@link WatcherConfig} at the moment the builder or {@code create()} method is invoked. This allows
- * the application to set configuration before materializing the watcher.
+ * By default, the factory methods read {@code name}, {@code delayMilliseconds} and {@code periodMilliseconds}
+ * from {@link WatcherConfig} at the moment they are called. This allows the application to set
+ * configuration before materializing the controller.
  * <p>
- * The controller exposes {@link #create()} shortcuts for the most common use cases, and a fluent
- * {@link Builder} for full flexibility. The underlying executor uses a daemon thread named after the
- * watcher, so it will not prevent the JVM from shutting down.
+ * The controller exposes {@link #create()} static factory methods for common use cases. The underlying
+ * executor uses a daemon thread named after the watcher, so it will not prevent the JVM from shutting down.
  * <p>
  * {@code start()} and {@code stop()} are idempotent and may be called multiple times.
  *
@@ -50,20 +49,18 @@ public final class WatcherExecutorController implements AutoCloseable {
     private ScheduledExecutorService executor;
     private ScheduledFuture<?> task;
 
-    private WatcherExecutorController(final Builder builder) {
-        this.name = builder.name;
-        this.delayMilliseconds = builder.delayMilliseconds;
-        this.periodMilliseconds = builder.periodMilliseconds;
-        this.watcher = new Watcher(name);
-    }
-
     /**
-     * Returns a builder pre-populated with defaults from {@link WatcherConfig}.
+     * Creates a new controller with the supplied configuration and builds the owned {@link Watcher}.
      *
-     * @return a new builder
+     * @param name                logical watcher name
+     * @param delayMilliseconds   initial delay before the first execution
+     * @param periodMilliseconds  interval between executions
      */
-    public static Builder builder() {
-        return new Builder();
+    private WatcherExecutorController(final String name, final long delayMilliseconds, final long periodMilliseconds) {
+        this.name = name;
+        this.delayMilliseconds = delayMilliseconds;
+        this.periodMilliseconds = periodMilliseconds;
+        this.watcher = new Watcher(name);
     }
 
     /**
@@ -72,7 +69,7 @@ public final class WatcherExecutorController implements AutoCloseable {
      * @return a new, not-yet-started controller
      */
     public static WatcherExecutorController create() {
-        return builder().build();
+        return new WatcherExecutorController(WatcherConfig.name, WatcherConfig.delayMilliseconds, WatcherConfig.periodMilliseconds);
     }
 
     /**
@@ -82,7 +79,7 @@ public final class WatcherExecutorController implements AutoCloseable {
      * @return a new, not-yet-started controller
      */
     public static WatcherExecutorController create(final String name) {
-        return builder().name(name).build();
+        return new WatcherExecutorController(name, WatcherConfig.delayMilliseconds, WatcherConfig.periodMilliseconds);
     }
 
     /**
@@ -94,7 +91,7 @@ public final class WatcherExecutorController implements AutoCloseable {
      * @return a new, not-yet-started controller
      */
     public static WatcherExecutorController create(final String name, final long delayMilliseconds, final long periodMilliseconds) {
-        return builder().name(name).delayMilliseconds(delayMilliseconds).periodMilliseconds(periodMilliseconds).build();
+        return new WatcherExecutorController(name, delayMilliseconds, periodMilliseconds);
     }
 
     /**
@@ -150,61 +147,5 @@ public final class WatcherExecutorController implements AutoCloseable {
     @Override
     public void close() {
         stop();
-    }
-
-    /**
-     * Fluent builder for {@link WatcherExecutorController}. Defaults are read from {@link WatcherConfig}
-     * when the builder is created, allowing the application to configure values before building.
-     */
-    public static final class Builder {
-        private String name = WatcherConfig.name;
-        private long delayMilliseconds = WatcherConfig.delayMilliseconds;
-        private long periodMilliseconds = WatcherConfig.periodMilliseconds;
-
-        private Builder() {
-            // Defaults are set above from WatcherConfig.
-        }
-
-        /**
-         * Sets the logical watcher name (and thread name).
-         *
-         * @param name logical watcher name
-         * @return this builder
-         */
-        public Builder name(final String name) {
-            this.name = name;
-            return this;
-        }
-
-        /**
-         * Sets the initial delay before the first execution.
-         *
-         * @param delayMilliseconds delay in milliseconds
-         * @return this builder
-         */
-        public Builder delayMilliseconds(final long delayMilliseconds) {
-            this.delayMilliseconds = delayMilliseconds;
-            return this;
-        }
-
-        /**
-         * Sets the interval between executions.
-         *
-         * @param periodMilliseconds period in milliseconds
-         * @return this builder
-         */
-        public Builder periodMilliseconds(final long periodMilliseconds) {
-            this.periodMilliseconds = periodMilliseconds;
-            return this;
-        }
-
-        /**
-         * Builds a new controller. The owned {@link Watcher} is created from the configured name.
-         *
-         * @return a new controller
-         */
-        public WatcherExecutorController build() {
-            return new WatcherExecutorController(this);
-        }
     }
 }

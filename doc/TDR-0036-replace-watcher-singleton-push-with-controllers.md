@@ -23,7 +23,7 @@ Each controller:
 
 *   Owns its own `Watcher` instance, created at construction time from the configured `name`.
 *   Reads defaults from `WatcherConfig` (`name`, `delayMilliseconds`, `periodMilliseconds`) when the builder or `create()` is invoked (late creation).
-*   Provides `create()` static shortcuts and a fluent `Builder`.
+*   Provides `create()` static factory methods only.
 *   Implements `AutoCloseable` for safe lifecycle management.
 *   Uses a daemon thread named after the watcher, fixing the shutdown-blocking issue.
 
@@ -47,7 +47,7 @@ Each controller:
 
 *   **Keep `WatcherSingleton` as an adapter delegating to controllers**: rejected because the user requested removing the maximum from `WatcherSingleton`; keeping dead push methods would perpetuate the deprecated API.
 *   **Introduce a common `WatcherController` interface**: rejected; the two controllers are simple enough to remain standalone `AutoCloseable` classes.
-*   **Use Lombok `@Builder`**: attempted. Lombok 1.18.46 cannot cleanly exclude internal lifecycle fields (`executor`, `task`, `timer`, `timerTask`) from the generated builder, nor does it support default values on constructor parameters in this Java-8-compatible codebase. A hand-written `Builder` was chosen instead; it remains fluent and captures `WatcherConfig` defaults at builder-creation time.
+*   **Use Lombok `@Builder`**: rejected. The project style guide (`java.instructions.md`) forbids `@Builder`. A private constructor plus static `create(...)` factory methods provides the same late-binding of `WatcherConfig` defaults with less generated code and no Lombok builders.
 
 ## Implementation
 
