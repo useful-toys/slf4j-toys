@@ -17,130 +17,50 @@ package org.usefultoys.slf4j.watcher;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 /**
- * Manages the default {@link Watcher} singleton and provides methods to execute it periodically.
- * This class is suitable for simple architectures but may not be appropriate for JavaEE environments
- * that manage their own threads.
+ * Provides the default {@link Watcher} instance for pull-mode execution (e.g., {@link WatcherServlet}).
  * <p>
- * The default watcher instance is created at application startup and is named according to the system property
- * {@code slf4jtoys.watcher.name} (defaulting to "watcher"). It cannot be reassigned at runtime.
+ * This class no longer manages periodic "push" execution. For scheduled watchers, use
+ * {@link WatcherExecutorController} or {@link WatcherTimerController} instead.
  * <p>
- * This utility class offers two mechanisms for periodic execution:
- * <ul>
- *   <li>A {@link ScheduledExecutorService}-based executor.</li>
- *   <li>A {@link Timer}-based timer.</li>
- * </ul>
- * <p>
- * Note: Ensure proper lifecycle management when using this class to avoid resource leaks.
+ * The default watcher instance is created lazily upon first access and named using
+ * {@link WatcherConfig#name}. It is intended only as a temporary compatibility bridge for
+ * the servlet pull path; future versions will migrate the servlet away from this global default.
  *
+ * @deprecated Use {@link WatcherExecutorController} or {@link WatcherTimerController} for push,
+ * or create a dedicated {@link Watcher} instance for pull. This class will be removed once
+ * the servlet pull path is migrated.
  * @author Daniel Felix Ferber
  * @see Watcher
  * @see WatcherConfig
+ * @see WatcherExecutorController
+ * @see WatcherTimerController
  */
+@Deprecated
 @UtilityClass
 public final class WatcherSingleton {
 
     /**
-     * The default watcher instance. It is created lazily upon first access and named using the system property
-     * {@code slf4jtoys.watcher.name}, which defaults to "watcher".
+     * The default watcher instance. It is created lazily upon first access and named using
+     * {@link WatcherConfig#name}, which defaults to "watcher".
      */
     private static Watcher DEFAULT_WATCHER_INSTANCE;
 
     /**
      * Returns the default {@link Watcher} instance, creating it if it hasn't been initialized yet.
-     * This method ensures that {@link WatcherConfig} is initialized before the Watcher instance is created.
+     * <p>
+     * This method reads {@link WatcherConfig#name} at the moment of first access. Any runtime
+     * changes to {@link WatcherConfig#name} made after the first call will not be reflected.
      *
      * @return The default Watcher instance.
+     * @deprecated For new code, create a {@link Watcher} or use a {@link WatcherExecutorController}
+     * / {@link WatcherTimerController}.
      */
+    @Deprecated
     public static synchronized Watcher getDefaultWatcher() {
         if (DEFAULT_WATCHER_INSTANCE == null) {
             DEFAULT_WATCHER_INSTANCE = new Watcher(WatcherConfig.name);
         }
         return DEFAULT_WATCHER_INSTANCE;
-    }
-
-    /** Executor service for running the default watcher periodically. */
-    ScheduledExecutorService defaultWatcherExecutor = null;
-    ScheduledFuture<?> scheduledDefaultWatcher = null;
-
-    /** Timer for running the default watcher periodically. */
-    Timer defaultWatcherTimer = null;
-    TimerTask defaultWatcherTask = null;
-
-    /**
-     * Starts the executor that periodically invokes the default watcher to report the runtime state.
-     * This is intended for simple architectures and may not be suitable for JavaEE environments
-     * that manage their own threads.
-     */
-    public synchronized void startDefaultWatcherExecutor() {
-        if (defaultWatcherExecutor == null) {
-            defaultWatcherExecutor = Executors.newSingleThreadScheduledExecutor();
-        }
-        if (scheduledDefaultWatcher == null) {
-            scheduledDefaultWatcher = defaultWatcherExecutor.scheduleAtFixedRate(
-                    getDefaultWatcher(), // Use the getter
-                    WatcherConfig.delayMilliseconds,
-                    WatcherConfig.periodMilliseconds,
-                    TimeUnit.MILLISECONDS
-            );
-        }
-    }
-
-    /**
-     * Stops the executor that periodically invokes the default watcher.
-     */
-    public synchronized void stopDefaultWatcherExecutor() {
-        if (scheduledDefaultWatcher != null) {
-            scheduledDefaultWatcher.cancel(true);
-            scheduledDefaultWatcher = null;
-        }
-        if (defaultWatcherExecutor != null) {
-            defaultWatcherExecutor.shutdownNow();
-            defaultWatcherExecutor = null;
-        }
-    }
-
-    /**
-     * Starts the timer that periodically invokes the default watcher to report the runtime state.
-     * This is intended for simple architectures and may not be suitable for JavaEE environments
-     * that manage their own threads.
-     */
-    public synchronized void startDefaultWatcherTimer() {
-        if (defaultWatcherTimer == null) {
-            defaultWatcherTimer = new Timer("Watcher");
-        }
-        if (defaultWatcherTask == null) {
-            defaultWatcherTask = new TimerTask() {
-                @Override
-                public void run() {
-                    getDefaultWatcher().run(); // Use the getter
-                }
-            };
-            defaultWatcherTimer.schedule(
-                    defaultWatcherTask,
-                    WatcherConfig.delayMilliseconds,
-                    WatcherConfig.periodMilliseconds
-            );
-        }
-    }
-
-    /**
-     * Stops the timer that periodically invokes the default watcher.
-     */
-    public synchronized void stopDefaultWatcherTimer() {
-        if (defaultWatcherTimer != null) {
-            defaultWatcherTimer.cancel();
-            defaultWatcherTimer = null;
-        }
-        if (defaultWatcherTask != null) {
-            defaultWatcherTask = null;
-        }
     }
 }

@@ -16,8 +16,6 @@
 
 package org.usefultoys.slf4j.watcher;
 
-import org.awaitility.Awaitility;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.impl.MockLogger;
@@ -28,149 +26,47 @@ import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ResetWatcherConfig;
 import org.usefultoys.test.ValidateCharset;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Unit tests for {@link WatcherSingleton}.
  * <p>
- * Tests validate that WatcherSingleton correctly starts and stops scheduled watchers
- * using both ExecutorService and Timer approaches, with proper event logging.
- * <p>
- * <b>Coverage:</b>
- * <ul>
- *   <li><b>Executor-based Watchers:</b> Tests starting and stopping watchers using ScheduledExecutorService</li>
- *   <li><b>Timer-based Watchers:</b> Tests starting and stopping watchers using Timer</li>
- *   <li><b>Status Logging:</b> Verifies correct logging of system status during watcher execution</li>
- *   <li><b>Watcher Management:</b> Ensures proper cleanup and singleton behavior</li>
- * </ul>
+ * Since push execution has been migrated to {@link WatcherExecutorController} and
+ * {@link WatcherTimerController}, this class now only verifies the lazy default {@link Watcher}
+ * instance used by the servlet pull path.
  */
 @ValidateCharset
 @ResetWatcherConfig
 @WithMockLogger
 class WatcherSingletonTest {
-    /* Needs to use same logger name was default name in WatcherConfig. */
+
     @Slf4jMock("watcher")
     private MockLogger logger;
 
-    @AfterEach
-    void stopAllWatchers() {
-        // Clean up scheduled tasks after each test
-        WatcherSingleton.stopDefaultWatcherExecutor();
-        WatcherSingleton.stopDefaultWatcherTimer();
+    @Test
+    @DisplayName("should return the same default watcher instance")
+    void shouldReturnSameDefaultWatcherInstance() {
+        // When: the default watcher is requested twice
+        final Watcher first = WatcherSingleton.getDefaultWatcher();
+        final Watcher second = WatcherSingleton.getDefaultWatcher();
+
+        // Then: both references point to the same lazily-created instance
+        assertNotNull(first, "default watcher should be created on first access");
+        assertSame(first, second, "default watcher should be a singleton");
     }
 
     @Test
-    @DisplayName("should log status when using executor")
-    void shouldLogStatusWithExecutor() {
-        // Given: watcher configuration set with specific delays and name
-        WatcherConfig.delayMilliseconds = 200;
-        WatcherConfig.periodMilliseconds = 200;
+    @DisplayName("should run the default watcher using the configured name")
+    void shouldRunDefaultWatcherUsingConfiguredName() {
+        // Given: the default watcher created from WatcherConfig.name ("watcher")
+        final Watcher watcher = WatcherSingleton.getDefaultWatcher();
 
-        // When: executor is not yet started
-        // Then: executor and watcher should be null
-        assertNull(WatcherSingleton.defaultWatcherExecutor, "defaultWatcherExecutor should be null before start");
-        assertNull(WatcherSingleton.scheduledDefaultWatcher, "scheduledDefaultWatcher should be null before start");
+        // When: the watcher is executed
+        watcher.run();
 
-        // When: starting the default watcher executor
-        assertDoesNotThrow(WatcherSingleton::startDefaultWatcherExecutor, "should start executor without throwing");
-
-        // Then: executor and watcher should be initialized
-        assertNotNull(WatcherSingleton.defaultWatcherExecutor, "defaultWatcherExecutor should be initialized");
-        assertNotNull(WatcherSingleton.scheduledDefaultWatcher, "scheduledDefaultWatcher should be initialized");
-
-        final ScheduledExecutorService executor = WatcherSingleton.defaultWatcherExecutor;
-        final ScheduledFuture<?> watcher = WatcherSingleton.scheduledDefaultWatcher;
-
-        // When: starting the executor multiple times
-        assertDoesNotThrow(WatcherSingleton::startDefaultWatcherExecutor, "should support calling start multiple times");
-
-        // Then: same executor and watcher instances should be reused
-        assertEquals(executor, WatcherSingleton.defaultWatcherExecutor, "should reuse same executor instance");
-        assertEquals(watcher, WatcherSingleton.scheduledDefaultWatcher, "should reuse same watcher instance");
-
-        // When: waiting for log messages to be generated by scheduled task
-        Awaitility.await().atMost(2, TimeUnit.SECONDS).until(() ->
-                logger.getEventCount() > 0
-        );
-
-        // Then: one log event should be recorded
+        // Then: it logs to the logger named after WatcherConfig.name
         AssertLogger.assertEventCount(logger, 1);
         AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "Memory:");
-
-        // When: stopping the executor
-        assertDoesNotThrow(WatcherSingleton::stopDefaultWatcherExecutor, "should stop executor without throwing");
-
-        // Then: executor and watcher should be cleared
-        assertNull(WatcherSingleton.defaultWatcherExecutor, "defaultWatcherExecutor should be null after stop");
-        assertNull(WatcherSingleton.scheduledDefaultWatcher, "scheduledDefaultWatcher should be null after stop");
-
-        // When: stopping the executor multiple times
-        assertDoesNotThrow(WatcherSingleton::stopDefaultWatcherExecutor, "should support calling stop multiple times");
-
-        // Then: should remain null
-        assertNull(WatcherSingleton.defaultWatcherExecutor, "defaultWatcherExecutor should remain null");
-        assertNull(WatcherSingleton.scheduledDefaultWatcher, "scheduledDefaultWatcher should remain null");
-    }
-
-    @Test
-    @DisplayName("should log status when using timer")
-    void shouldLogStatusWithTimer() {
-        // Given: watcher configuration set with specific delays and name
-        WatcherConfig.delayMilliseconds = 200;
-        WatcherConfig.periodMilliseconds = 200;
-
-        // When: timer is not yet started
-        // Then: timer and task should be null
-        assertNull(WatcherSingleton.defaultWatcherTimer, "defaultWatcherTimer should be null before start");
-        assertNull(WatcherSingleton.defaultWatcherTask, "defaultWatcherTask should be null before start");
-
-        // When: starting the default watcher timer
-        assertDoesNotThrow(WatcherSingleton::startDefaultWatcherTimer, "should start timer without throwing");
-
-        // Then: timer and task should be initialized
-        assertNotNull(WatcherSingleton.defaultWatcherTimer, "defaultWatcherTimer should be initialized");
-        assertNotNull(WatcherSingleton.defaultWatcherTask, "defaultWatcherTask should be initialized");
-
-        final Timer timer = WatcherSingleton.defaultWatcherTimer;
-        final TimerTask timerTask = WatcherSingleton.defaultWatcherTask;
-
-        // When: starting the timer multiple times
-        assertDoesNotThrow(WatcherSingleton::startDefaultWatcherTimer, "should support calling start multiple times");
-
-        // Then: same timer and task instances should be reused
-        assertEquals(timer, WatcherSingleton.defaultWatcherTimer, "should reuse same timer instance");
-        assertEquals(timerTask, WatcherSingleton.defaultWatcherTask, "should reuse same task instance");
-
-        // When: waiting for log messages to be generated by scheduled task
-        Awaitility.await().atMost(2, TimeUnit.SECONDS).until(() ->
-                logger.getEventCount() > 0
-        );
-
-        // Then: one log event should be recorded
-        AssertLogger.assertEventCount(logger, 1);
-        AssertLogger.assertEvent(logger, 0, MockLoggerEvent.Level.INFO, "Memory:");
-
-        // When: stopping the timer
-        assertDoesNotThrow(WatcherSingleton::stopDefaultWatcherTimer, "should stop timer without throwing");
-
-        // Then: timer and task should be cleared
-        assertNull(WatcherSingleton.defaultWatcherTimer, "defaultWatcherTimer should be null after stop");
-        assertNull(WatcherSingleton.defaultWatcherTask, "defaultWatcherTask should be null after stop");
-
-        // When: stopping the timer multiple times
-        assertDoesNotThrow(WatcherSingleton::stopDefaultWatcherTimer, "should support calling stop multiple times");
-
-        // Then: should remain null
-        assertNull(WatcherSingleton.defaultWatcherTimer, "defaultWatcherTimer should remain null");
-        assertNull(WatcherSingleton.defaultWatcherTask, "defaultWatcherTask should remain null");
     }
 }
