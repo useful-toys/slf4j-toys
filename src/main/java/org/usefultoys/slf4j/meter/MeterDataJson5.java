@@ -18,6 +18,7 @@ package org.usefultoys.slf4j.meter;
 import lombok.experimental.UtilityClass;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -136,22 +137,22 @@ class MeterDataJson5 {
             sb.append(String.format(",%s:%s", EVENT_PARENT, data.parent));
         }
         if (data.createTime != 0) {
-            sb.append(String.format(",%s:%d", PROP_CREATE_TIME, data.createTime));
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_CREATE_TIME, data.createTime));
         }
         if (data.startTime != 0) {
-            sb.append(String.format(",%s:%d", PROP_START_TIME, data.startTime));
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_START_TIME, data.startTime));
         }
         if (data.stopTime != 0) {
-            sb.append(String.format(",%s:%d", PROP_STOP_TIME, data.stopTime));
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_STOP_TIME, data.stopTime));
         }
         if (data.currentIteration != 0) {
-            sb.append(String.format(",%s:%d", PROP_ITERATION, data.currentIteration));
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_ITERATION, data.currentIteration));
         }
         if (data.expectedIterations != 0) {
-            sb.append(String.format(",%s:%d", PROP_EXPECTED_ITERATION, data.expectedIterations));
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_EXPECTED_ITERATION, data.expectedIterations));
         }
         if (data.timeLimit != 0) {
-            sb.append(String.format(",%s:%d", PROP_LIMIT_TIME, data.timeLimit));
+            sb.append(String.format(Locale.US, ",%s:%d", PROP_LIMIT_TIME, data.timeLimit));
         }
         if (data.context != null && !data.context.isEmpty()) {
             sb.append(',');

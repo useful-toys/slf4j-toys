@@ -17,6 +17,7 @@ package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -108,6 +109,22 @@ class MeterDataJson5Test {
         TestMeterData(final String sessionUuid, final long position, final long time, final long heap_commited, final long heap_max, final long heap_used, final long nonHeap_commited, final long nonHeap_max, final long nonHeap_used, final long objectPendingFinalizationCount, final long classLoading_loaded, final long classLoading_total, final long classLoading_unloaded, final long compilationTime, final long garbageCollector_count, final long garbageCollector_time, final long runtime_usedMemory, final long runtime_maxMemory, final long runtime_totalMemory, final double systemLoad, final String category, final String operation, final String parent, final String description, final long createTime, final long startTime, final long stopTime, final long timeLimit, final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage, final Map<String, String> context) {
             super(sessionUuid, position, time, heap_commited, heap_max, heap_used, nonHeap_commited, nonHeap_max, nonHeap_used, objectPendingFinalizationCount, classLoading_loaded, classLoading_total, classLoading_unloaded, compilationTime, garbageCollector_count, garbageCollector_time, runtime_usedMemory, runtime_maxMemory, runtime_totalMemory, systemLoad, category, operation, parent, description, createTime, startTime, stopTime, timeLimit, currentIteration, expectedIterations, okPath, rejectPath, failPath, failMessage, context);
         }
+    }
+
+    @Test
+    @WithLocale("en-US-u-nu-arab")
+    @DisplayName("should always use ASCII digits regardless of the configured locale")
+    void shouldAlwaysUseAsciiDigitsRegardlessOfLocale() {
+        // Given: a locale whose numbering system renders digits as Arabic-Indic (e.g., ١٢٣ instead of 123),
+        // which would corrupt the machine-parsable output if the default locale leaked into formatting.
+        final TestMeterData data = new TestMeterData("8ae94091", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0, null, null, null, null, 12345, 0, 0, 0, 678, 0, null, null, null, null, null);
+        final StringBuilder sb = new StringBuilder();
+
+        // When: data is serialized to JSON5
+        MeterDataJson5.write(data, sb);
+
+        // Then: numeric fields must still use ASCII digits (Locale.US), unaffected by the default locale
+        assertEquals(",t0:12345,i:678", sb.toString(), "JSON5 output must always use ASCII digits");
     }
 
     /**
