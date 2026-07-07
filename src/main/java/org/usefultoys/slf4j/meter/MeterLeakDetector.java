@@ -106,22 +106,49 @@ final class MeterLeakDetector {
     /**
      * A {@link PhantomReference} to a started {@link Meter} that snapshots the data required to report
      * a leak after the referent has been collected.
+     * <p>
+     * The snapshot stores the {@code Meter}'s identifying <em>components</em> ({@code category},
+     * {@code operation}, {@code position}) rather than the pre-rendered {@link Meter#getFullID()
+     * fullID} string. Once the referent has been collected the meter is no longer queryable, so any
+     * data needed to report the leak must be copied eagerly at registration; but the {@code fullID}
+     * {@link String} concatenation itself is deferred to {@link #reportLeak()}, where it only runs
+     * when a leak is actually confirmed. With {@link MeterConfig#detectLeaks} enabled by default,
+     * {@link #register(Meter) register()} runs in the {@code start()} hot path of every meter whose
+     * category is known, and the previous eager concatenation was paid there on every start, only
+     * to be thrown away on {@link #deregister(MeterReference)} for every correctly-stopped meter.
+     * Deferring it removes that string allocation from the start path entirely. The component
+     * fields are the same {@code String}s the {@code Meter} already retains ({@code category},
+     * {@code operation}) plus a primitive {@code long position}, so the retained footprint is
+     * equivalent while the read cost at registration drops to two reference reads and one
+     * primitive read. {@code category}, {@code operation} and {@code position} are stable from
+     * construction onward, so the deferred concatenation still produces the same byte-for-byte
+     * {@code fullID} the eager snapshot did.
      */
     static final class MeterReference extends PhantomReference<Meter> {
-        private final String fullID;
+        private final String category;
+        private final String operation;
+        private final long position;
         private final Logger messageLogger;
 
         MeterReference(final Meter meter, final ReferenceQueue<Meter> queue) {
             super(meter, queue);
-            this.fullID = meter.getFullID();
+            this.category = meter.getCategory();
+            this.operation = meter.getOperation();
+            this.position = meter.getPosition();
             this.messageLogger = meter.getMessageLogger();
         }
 
         /**
          * Emits the forgotten-meter error, byte-for-byte equivalent to the former
-         * {@code MeterValidator.validateFinalize}.
+         * {@code MeterValidator.validateFinalize} message. The {@code fullID} is assembled here
+         * from the snapshotted components, using the same formula as
+         * {@link MeterData#getFullID()}, so it only runs when a leak is actually surfaced —
+         * never on the {@code start()} hot path and never for a correctly stopped meter.
          */
         void reportLeak() {
+            final String fullID = operation == null
+                    ? category + '#' + position
+                    : category + '/' + operation + '#' + position;
             messageLogger.error(Markers.INVALID_ARGUMENT,
                     "{}; id={}",
                     "Meter never stopped, must remember to call ok/reject/fail/success() on each started one",
