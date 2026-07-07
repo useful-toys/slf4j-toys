@@ -16,6 +16,52 @@ The library introduces:
 *   **Watcher**: For reporting the state of the Java runtime and underlying infrastructure.
 *   **Reporter**: For generating diagnostic reports.
 
+## Watcher
+
+The `Watcher` component periodically reports the state of the JVM and the underlying platform. It is designed for **instance-based lifecycle management**: each push mechanism (`ScheduledExecutorService` or `Timer`) is wrapped by its own controller, which owns a dedicated `Watcher` instance.
+
+### Push controllers
+
+Use `WatcherExecutorController` or `WatcherTimerController` to schedule automatic reports. Both read `WatcherConfig` defaults (`name`, `delay`, `period`) when created, and expose `create()` shortcuts plus a fluent `Builder` for customization.
+
+```java
+// Defaults from WatcherConfig (name="watcher", delay=1m, period=10m)
+try (WatcherExecutorController controller = WatcherExecutorController.create()) {
+    controller.start();
+    // runs until the application shuts down or stop()/close() is called
+}
+
+// Custom name and schedule
+WatcherTimerController timer = WatcherTimerController.create("myapp", 30_000, 60_000);
+timer.start();
+
+// Full builder flexibility
+WatcherExecutorController controller = WatcherExecutorController.builder()
+    .name("ops")
+    .delayMilliseconds(5_000)
+    .periodMilliseconds(30_000)
+    .build();
+controller.start();
+```
+
+The controllers use **daemon threads** named after the watcher, so they do not block JVM shutdown.
+
+### Configuration
+
+All defaults are read from `WatcherConfig`, which is populated from system properties at class-load time:
+
+| Property | Default | Description |
+|---|---|---|
+| `slf4jtoys.watcher.name` | `watcher` | Logger/thread name used by the default watcher. |
+| `slf4jtoys.watcher.delay` | `60000` | Initial delay before the first report. |
+| `slf4jtoys.watcher.period` | `600000` | Interval between reports. |
+
+You may also set `WatcherConfig` fields programmatically before creating a controller; values are captured at build time.
+
+### Legacy `WatcherSingleton`
+
+`WatcherSingleton` is **deprecated** and now only provides the default `Watcher` instance for the servlet pull path. Its push methods (`startDefaultWatcherExecutor`, `startDefaultWatcherTimer`) have been removed; migrate to `WatcherExecutorController` or `WatcherTimerController`.
+
 ## How slf4j-toys Solves It with Semantic Logging
 
 *slf4j-toys* fills the gap of ambiguous standard logging by providing a clear **Life Cycle** for every operation, offering tools that create clear, structured, and machine-readable log messages.
