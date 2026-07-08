@@ -44,7 +44,8 @@ Example: `robust-003-media-excecao-encerra-agendamento-silenciosamente-fixed.md`
 ```markdown
 # <PREFIXO>-<NNN>: <Título — uma frase que afirma o defeito>
 
-> **STATUS: ...** (optional blockquote; see "Status blocks" below)
+> **STATUS: ...** (validation blockquotes, newest first — an append-only treatment
+> history; see "Treatment history" below)
 
 | | |
 |---|---|
@@ -131,6 +132,31 @@ Accepted findings can still carry cheap recommendations. When those get applied,
 
 For a negative validation (checked, not fixed yet), record that too — with date and what exactly was checked — so the next session does not redo the work.
 
+### Treatment history — validation entries are append-only
+
+The blockquotes under the H1 title are the finding's **treatment history**: a chronological
+record of every attempt to fix, mitigate, or improve the issue, and of every review of those
+attempts. This history is why a finding file outlives its own resolution — it shows *how* the
+problem was approached, which attempts failed or only partially worked, and why the final state
+is what it is. A reviewer reading the file six months later should be able to reconstruct the
+whole path without digging through git logs of a possibly deleted branch.
+
+Therefore:
+
+- **Never delete or rewrite a previous validation entry.** When reviewing an updated version of
+  the code that supposedly adjusts/fixes/improves the issue, **append a new blockquote above the
+  existing ones** (newest first), with its own date, commit, description of what the change
+  attempts, and verdict. Earlier entries stay untouched — a superseded "NÃO corrigido" entry is
+  not wrong, it is history; the newer entry's date shows it was superseded.
+- Each entry describes the **attempt**, not just the verdict: what the change did (which option
+  from "Opções de correção", or a different approach), and how it affected the finding —
+  resolved, partially resolved (what remains), improved without resolving, or made no
+  difference (why the claim does not hold).
+- Only the **Status** table row and the filename reflect the *current* state; the blockquote
+  stack preserves the trajectory. Small factual corrections to the latest entry (e.g., an
+  "uncommitted" note once the fix lands in a commit) may update that entry in place — that is
+  refining the same event, not erasing an attempt.
+
 ### Revalidating an entire analysis
 
 When asked to verify whether the findings of an analysis were resolved — typically after
@@ -146,9 +172,10 @@ under test, and partial verification cannot refute it.
    the same result in each finding it covers.
 4. Give **every** file a validation blockquote — positive, negative ("NÃO corrigido", with what
    exactly was checked and why the claim does not hold), or partial ("PARCIALMENTE corrigido",
-   naming which part remains). A fix sweep often *introduces* new instances of a documented
-   problem (e.g., new Javadoc referencing a just-removed flag) — record those inside the
-   affected finding instead of silently ignoring them.
+   naming which part remains). Append it on top of any existing entries per the treatment-history
+   rule — do not replace earlier verdicts. A fix sweep often *introduces* new instances of a
+   documented problem (e.g., new Javadoc referencing a just-removed flag) — record those inside
+   the affected finding instead of silently ignoring them.
 5. Apply all renames (`-fixed`, `-accepted`) in the same pass.
 6. Sync `geral.md` completely, in the same pass: add a "última revalidação" note in the header
    (date, tip, one-line verdict on the claim — confirmed or refuted, naming what remains);
