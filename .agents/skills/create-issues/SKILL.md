@@ -1,11 +1,11 @@
 ---
 name: create-issues
-description: 'Create GitHub issues from AI-reported findings stored in the external findings directory (e.g., C:\git\slf4j-toys-findings\<analyzer>\<NN-scope>\). Use whenever converting analysis findings into trackable GitHub issues: reading finding files, extracting metadata into labels, creating issues via `gh issue create`, and closing resolved/accepted findings with resolution comments. Trigger on requests like "crie issues", "converta achados em issues", "abra issues no GitHub", or any request to publish findings as repository issues — even when the word "issue" is not used explicitly.'
+description: 'Create GitHub issues from AI-reported findings stored in the external findings directory (e.g., C:\git\slf4j-toys-findings\<analyzer>\<NN-scope>\). Use whenever converting analysis findings into trackable GitHub issues: reading finding files, extracting metadata into labels, creating issues via `gh issue create`, and closing resolved/accepted findings with resolution comments. Trigger on requests like "create issues", "convert findings to issues", "open GitHub issues", or any request to publish findings as repository issues — even when the word "issue" is not used explicitly.'
 ---
 
 # Creating GitHub Issues from Findings
 
-This skill converts findings produced by code reviews and audits (see `document-findings` and `code-review` skills) into trackable GitHub issues in the `useful-toys/slf4j-toys` repository, using a standardized label taxonomy that mirrors the finding file metadata.
+This skill converts findings produced by code reviews and audits (see `document-findings` and `code-review` skills) into trackable GitHub issues in the `useful-toys/slf4j-toys` repository, using a standardized English label taxonomy that mirrors the finding file metadata. All issue titles, bodies, comments, and labels must be written in English.
 
 ## When to use
 
@@ -16,7 +16,7 @@ This skill converts findings produced by code reviews and audits (see `document-
 ## Prerequisites
 
 - `gh` CLI authenticated with `repo` scope (`gh auth status`).
-- Findings directory at `C:\git\slf4j-toys-findings\<analyzer>\<NN-scope>\` with `geral.md` and per-finding `.md` files.
+- Findings directory at `C:\git\slf4j-toys-findings\<analyzer>\<NN-scope>\` with `general.md` and per-finding `.md` files.
 - Labels created in the repository (see Label Taxonomy below). If labels do not exist yet, create them first.
 
 ## Label Taxonomy
@@ -29,11 +29,11 @@ The label scheme uses `<dimension>:<value>` format with colons, grouped by dimen
 |-----------|--------|-------------------|-------|
 | **analyzer** | `analyzer:fable`, `analyzer:kimi`, `analyzer:sonet`, `analyzer:glm`, `analyzer:qodana`, `analyzer:codeql` | Directory name under `slf4j-toys-findings/` | `#666666` (gray) |
 | **type** | `type:bug`, `type:sec`, `type:design`, `type:style`, `type:robust`, `type:doc`, `type:perf` | Filename prefix (`bug-`, `sec-`, `design-`, etc.) | `#0366d6` (blue) |
-| **severity** | `severity:alta`, `severity:media`, `severity:baixa` | Filename severity segment or metadata table | `#d73a4a` / `#fbca04` / `#96f7d6` |
-| **effort** | `effort:trivial`, `effort:pequeno`, `effort:medio`, `effort:n/a` | Metadata table "Esforço para corrigir" | `#c2e0c6` |
-| **verdict** | `verdict:confirmed`, `verdict:plausible` | Metadata table "Veredito" | `#5319e7` (purple) |
-| **status** | `status:pendente`, `status:resolvido`, `status:aceito` | Metadata table "Status" + filename suffix (`-fixed`, `-accepted`) | `#ffd54f` / `#28a745` / `#6f42c1` |
-| **component** | `component:watcher`, `component:meter`, `component:reporter`, `component:logger`, `component:utils`, `component:config`, `component:build`, `component:docs`, `component:test` | Inferred from the "Onde" field (package/module affected) | `#1d76db` |
+| **severity** | `severity:high`, `severity:medium`, `severity:low` | Filename severity segment or metadata table | `#d73a4a` / `#fbca04` / `#96f7d6` |
+| **effort** | `effort:trivial`, `effort:small`, `effort:medium`, `effort:n/a` | Metadata table "Effort to fix" | `#c2e0c6` |
+| **verdict** | `verdict:confirmed`, `verdict:plausible` | Metadata table "Verdict" | `#5319e7` (purple) |
+| **status** | `status:pending`, `status:resolved`, `status:accepted` | Metadata table "Status" + filename suffix (`-fixed`, `-accepted`) | `#ffd54f` / `#28a745` / `#6f42c1` |
+| **component** | `component:watcher`, `component:meter`, `component:reporter`, `component:logger`, `component:utils`, `component:config`, `component:build`, `component:docs`, `component:test` | Inferred from the "Where" field (package/module affected) | `#1d76db` |
 
 ### Creating labels
 
@@ -42,7 +42,9 @@ If labels do not exist in the repository, create them before creating issues:
 ```powershell
 gh label create "analyzer:fable" --color "666666" --description "Finding produced by Fable analyzer"
 gh label create "type:bug" --color "0366d6" --description "Bug - functional defect"
-gh label create "severity:media" --color "fbca04" --description "Medium severity"
+gh label create "severity:medium" --color "fbca04" --description "Medium severity"
+gh label create "effort:small" --color "c2e0c6" --description "Small effort to fix"
+gh label create "status:pending" --color "ffd54f" --description "Finding pending - not yet addressed"
 # ... etc for all labels in the taxonomy
 ```
 
@@ -55,15 +57,15 @@ Run `gh label list --limit 100` first to check which labels already exist.
 The finding filename encodes type, severity, and status:
 
 ```
-<prefixo>-<numero>-<severidade>-<slug>[-accepted][-fixed].md
+<prefix>-<number>-<severity>-<slug>[-accepted][-fixed].md
 ```
 
-- `prefixo` → `type:<prefixo>` label
-- `severidade` (`alta`, `media`, `baixa`) → `severity:<severidade>` label
-- `-fixed` suffix → `status:resolvido` label (issue will be closed)
-- `-accepted` suffix → `status:aceito` label (issue will be closed)
-- no suffix → `status:pendente` label (issue stays open)
-- `-accepted-fixed` suffix → `status:resolvido` label (issue will be closed; accepted risk with mitigation applied)
+- `prefix` → `type:<prefix>` label
+- `severity` (`high`, `medium`, `low`) → `severity:<severity>` label
+- `-fixed` suffix → `status:resolved` label (issue will be closed)
+- `-accepted` suffix → `status:accepted` label (issue will be closed)
+- no suffix → `status:pending` label (issue stays open)
+- `-accepted-fixed` suffix → `status:resolved` label (issue will be closed; accepted risk with mitigation applied)
 
 ### From metadata table
 
@@ -71,10 +73,10 @@ The finding's metadata table (the `| | |` block) provides:
 
 | Finding field | Label(s) |
 |---------------|----------|
-| Status row | `status:pendente` / `status:resolvido` / `status:aceito` |
-| Veredito row | `verdict:confirmed` / `verdict:plausible` (extract the uppercase word) |
-| Esforço para corrigir row | `effort:trivial` / `effort:pequeno` / `effort:medio` / `effort:n/a` |
-| Severidade row | `severity:alta` / `severity:media` / `severity:baixa` |
+| Status row | `status:pending` / `status:resolved` / `status:accepted` |
+| Verdict row | `verdict:confirmed` / `verdict:plausible` (extract the uppercase word) |
+| Effort to fix row | `effort:trivial` / `effort:small` / `effort:medium` / `effort:n/a` |
+| Severity row | `severity:high` / `severity:medium` / `severity:low` |
 
 ### From directory
 
@@ -88,9 +90,9 @@ C:\git\slf4j-toys-findings\fable\01-watcher\robust-001-...md
 
 ### Component inference
 
-Infer the `component:*` label from the "Onde" field in the metadata table:
+Infer the `component:*` label from the "Where" field in the metadata table:
 
-| Package/path in "Onde" | Component label |
+| Package/path in "Where" | Component label |
 |------------------------|-----------------|
 | `org.usefultoys.slf4j.watcher` | `component:watcher` |
 | `org.usefultoys.slf4j.meter` | `component:meter` |
@@ -106,53 +108,53 @@ If a finding spans multiple components, choose the primary one (the one where th
 
 ## Issue body format
 
-Each issue body should include:
+Each issue body should include (in English):
 
 ```markdown
-## Resumo
+## Summary
 
-<one-paragraph summary from the finding's opening or "Problema" section>
+<one-paragraph summary from the finding's opening or "Problem" section>
 
-## Onde
+## Where
 
 - `<file:lines>` — branch: `<branch>`
-- (list all locations from the "Onde" field)
+- (list all locations from the "Where" field)
 
-## Categoria
-
-<from metadata table>
-
-## Veredito
+## Category
 
 <from metadata table>
 
-## Severidade / Probabilidade
+## Verdict
 
 <from metadata table>
 
-## Esforço
+## Severity / Probability
 
 <from metadata table>
 
-## Problema
+## Effort
 
-<from the finding's "Problema" section — the mechanism description>
+<from metadata table>
 
-## Cenário de falha
+## Problem
 
-<from the finding's "Cenário de falha" section>
+<from the finding's "Problem" section — the mechanism description>
 
-## Correção sugerida
+## Failure scenario
 
-<from the finding's "Correção sugerida" or "Opções de correção" + "Correção recomendada">
+<from the finding's "Failure scenario" section>
 
-## Resolução
+## Suggested fix
+
+<from the finding's "Suggested fix" or "Fix options" + "Recommended fix">
+
+## Resolution
 
 (Only for resolved/accepted findings — from the validation blockquote at the top of the file)
 
-**CORRIGIDO** or **ACEITO** — validated on <date>, commit `<hash>`. <what the fix does>. <test evidence>.
+**FIXED** or **ACCEPTED** — validated on <date>, commit `<hash>`. <what the fix does>. <test evidence>.
 
-## Rastreabilidade
+## Traceability
 
 - Commit(s): `<hash>`
 - TDR(s): TDR-XXXX
@@ -163,7 +165,7 @@ Each issue body should include:
 
 ### 1. Read the findings
 
-Read `geral.md` for the overview and index, then read each finding `.md` file to extract:
+Read `general.md` for the overview and index, then read each finding `.md` file to extract:
 - Title (from the `# ` heading)
 - Metadata table fields
 - Problem description
@@ -190,26 +192,26 @@ Use `gh issue create` with `--body-file` (or `-F`) and multiple `-l` flags:
 
 ```powershell
 gh issue create `
-    -t "DOC-001: Javadoc de WatcherConfig desatualizado apos remocao do singleton" `
+    -t "DOC-001: WatcherConfig Javadoc outdated after singleton removal" `
     -F "$env:LOCALAPPDATA\Temp\opencode\issue-doc-001.md" `
     -l 'analyzer:fable' -l 'type:doc' -l 'verdict:confirmed' `
-    -l 'severity:media' -l 'effort:pequeno' -l 'status:pendente' -l 'component:watcher'
+    -l 'severity:medium' -l 'effort:small' -l 'status:pending' -l 'component:watcher'
 ```
 
 Capture the returned URL/number for each issue.
 
 ### 5. Close resolved and accepted issues
 
-For findings with `status:resolvido` or `status:aceito`, close the issue immediately after creation with a resolution comment:
+For findings with `status:resolved` or `status:accepted`, close the issue immediately after creation with a resolution comment:
 
 ```powershell
-gh issue close <number> -c "Resolvido em commit <hash>. <description>. <N/N testes passam>."
+gh issue close <number> -c "Resolved in commit <hash>. <description>. <N/N tests pass>."
 ```
 
 For accepted findings, the comment should reference the TDR or documentation that records the decision:
 
 ```powershell
-gh issue close <number> -c "Aceito por decisao de projeto (TDR-XXXX). <what was documented>."
+gh issue close <number> -c "Accepted as project decision (TDR-XXXX). <what was documented>."
 ```
 
 ### 6. Verify
@@ -221,7 +223,7 @@ gh issue list --state all --limit 30 --json number,title,labels,state
 ## PowerShell quoting notes
 
 - Use `--body-file` (`-F`) instead of `--body` (`-b`) for multi-line bodies — PowerShell mangles strings with backticks, quotes, and special characters when passed inline.
-- Wrap each `-l` value in single quotes: `-l 'severity:media'`. The colon in label names is safe inside single quotes.
+- Wrap each `-l` value in single quotes: `-l 'severity:medium'`. The colon in label names is safe inside single quotes.
 - Issue titles with special characters (accents, em-dashes) may need to be simplified for `gh` CLI compatibility on PowerShell. Replace accented characters with their ASCII equivalents in titles if `gh` rejects them.
 - Comments passed via `-c` must also avoid characters that PowerShell interprets as argument separators. Keep comments concise and ASCII-safe.
 
@@ -238,3 +240,7 @@ gh issue list --state all --limit 30 --json number,title,labels,state
 - Skills directory: `.agents/skills/`
 - `document-findings` skill: `.agents/skills/document-findings/SKILL.md`
 - `code-review` skill: `.agents/skills/code-review/SKILL.md`
+
+## Language
+
+All issue titles, bodies, comments, and labels must be in English. Translate any Portuguese finding fields (e.g., `Resumo` → `Summary`, `Problema` → `Problem`, `Cenário de falha` → `Failure scenario`) when creating the GitHub issue.
