@@ -151,4 +151,15 @@ public class WatcherJavaxServlet extends HttpServlet {
             watcherLock.unlock();
         }
     }
+
+    /**
+     * Package-private accessor for tests that need to hold {@link #watcherLock} from another
+     * thread to deterministically reproduce concurrent-request scenarios, without resorting to
+     * reflection.
+     *
+     * @return the lock guarding {@link #runWatcher()}
+     */
+    ReentrantLock watcherLockForTesting() {
+        return watcherLock;
+    }
 }

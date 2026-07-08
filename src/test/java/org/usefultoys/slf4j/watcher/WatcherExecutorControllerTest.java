@@ -29,7 +29,6 @@ import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ResetWatcherConfig;
 import org.usefultoys.test.ValidateCharset;
 
-import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -221,10 +220,9 @@ class WatcherExecutorControllerTest {
 
     @Test
     @DisplayName("should keep schedule alive and log error when watcher throws exception")
-    void shouldKeepScheduleAliveAndLogErrorWhenWatcherThrowsException() throws Exception {
+    void shouldKeepScheduleAliveAndLogErrorWhenWatcherThrowsException() {
         // Given: a controller with a watcher that fails once then succeeds
         final String watcherName = "failing-executor-watcher";
-        final WatcherExecutorController controller = WatcherExecutorController.create(watcherName, 0, 200);
         final AtomicInteger executionCount = new AtomicInteger(0);
         final Watcher failingWatcher = new Watcher(watcherName) {
             @Override
@@ -234,9 +232,8 @@ class WatcherExecutorControllerTest {
                 }
             }
         };
-        final Field watcherField = WatcherExecutorController.class.getDeclaredField("watcher");
-        watcherField.setAccessible(true);
-        watcherField.set(controller, failingWatcher);
+        final WatcherExecutorController controller =
+                new WatcherExecutorController(watcherName, 0, 200, failingWatcher);
 
         final MockLogger controllerLogger = (MockLogger) LoggerFactory.getLogger(WatcherExecutorController.class);
         controllerLogger.clearEvents();
