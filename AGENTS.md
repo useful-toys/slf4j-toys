@@ -76,6 +76,10 @@ The project must support both `javax.servlet` and `jakarta.servlet` APIs. When f
   - Bug fixes should include regression tests
   - Follow test standards defined in [.github/instructions/java-test.instructions.md](.github/instructions/java-test.instructions.md)
 
+- **Wiki synchronization**: When functionality behavior changes (new features, modified behavior, architectural changes), check whether the [project wiki](wiki/) needs updating to reflect the new behavior or capabilities.
+
+- **TDR synchronization**: When a change introduces or modifies an architectural decision, design trade-off, or significant implementation approach, create or update the corresponding Technical Decision Record in [doc/](doc/) (e.g., `doc/TDR-XXXX-description.md`). TDRs document *why* decisions were made, not *what* the code does — keep them focused on rationale and trade-offs.
+
 ## CI/CD Standards
 
 ### Code Quality
