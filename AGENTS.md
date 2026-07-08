@@ -76,9 +76,9 @@ The project must support both `javax.servlet` and `jakarta.servlet` APIs. When f
   - Bug fixes should include regression tests
   - Follow test standards defined in [.github/instructions/java-test.instructions.md](.github/instructions/java-test.instructions.md)
 
-- **Wiki synchronization**: When functionality behavior changes (new features, modified behavior, architectural changes), check whether the [project wiki](wiki/) needs updating to reflect the new behavior or capabilities.
+- **Wiki synchronization**: When functionality behavior changes (new features, modified behavior, architectural changes), check whether the [project wiki](wiki/) needs updating to reflect the new behavior or capabilities. Include wiki updates in the planning phase — don't leave them as an afterthought after implementation.
 
-- **TDR synchronization**: When a change introduces or modifies an architectural decision, design trade-off, or significant implementation approach, create or update the corresponding Technical Decision Record in [doc/](doc/) (e.g., `doc/TDR-XXXX-description.md`). TDRs document *why* decisions were made, not *what* the code does — keep them focused on rationale and trade-offs.
+- **TDR synchronization**: When a change introduces or modifies an architectural decision, design trade-off, or significant implementation approach, create or update the corresponding Technical Decision Record in [doc/](doc/) (e.g., `doc/TDR-XXXX-description.md`). TDRs document *why* decisions were made, not *what* the code does — keep them focused on rationale and trade-offs. Before implementing, consult related TDRs to determine whether the change confronts, contradicts, complements, or revises an existing decision; whether a new TDR is required; or whether an existing TDR should be updated or marked obsolete.
 
 ## CI/CD Standards
 
