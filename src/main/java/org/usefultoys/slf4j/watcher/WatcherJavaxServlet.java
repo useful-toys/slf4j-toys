@@ -74,8 +74,7 @@ public class WatcherJavaxServlet extends HttpServlet {
      * <p>
      * If the servlet configuration provides the {@code slf4jtoys.watcher.name} init-param, its value
      * is used as the watcher name; otherwise {@link WatcherConfig#name} is used. The watcher logger
-     * prefixes/suffixes and data logger flag are read from {@link WatcherConfig} at construction
-     * time.
+     * prefixes/suffixes are read from {@link WatcherConfig} at construction time.
      *
      * @param config The servlet configuration.
      * @throws ServletException if initialization fails.
