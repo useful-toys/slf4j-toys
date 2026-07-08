@@ -67,7 +67,17 @@ Example: `robust-003-media-excecao-encerra-agendamento-silenciosamente-fixed.md`
 
 **Cenário de falha:** <concrete inputs/state → wrong outcome; what the user/operator experiences>
 
-**Correção sugerida:** <concrete fix, with code; note Java 8 compatibility when relevant>
+**Opções de correção:**
+
+1. **<Opção A — nome curto>**: <concrete fix, with code when it helps; note Java 8
+   compatibility when relevant>
+   - *Vantagens:* <what it solves, simplicity, cost>
+   - *Desvantagens:* <trade-offs, new risks, effort>
+   - *Consequências:* <API/behavior changes, breaking changes, impact on tests/docs>
+2. **<Opção B>**: ...
+
+**Correção recomendada:** Opção <X> — <why it wins over the alternatives for THIS project:
+alignment with existing patterns/TDRs, cost/benefit, risk profile>.
 
 > **Nota**: <optional caveats — heritage from a previous analysis, why the suffix was applied, etc.>
 ```
@@ -77,6 +87,13 @@ Rules that make findings useful:
 - **Onde must name the branch.** Findings outlive branches; without the branch name it becomes impossible to tell whether the analyzed code is `main`, a feature worktree, or something already merged. When a finding spans branches, say which part lives where (e.g., "branch: `main` (controllers); `feat/x` (servlets)").
 - **Every claim points at code.** File, line numbers, commit hash. If you cannot point at the line, it is not a finding.
 - **Cenário de falha is concrete.** Not "may cause issues" but "a JMX query throws once → monitoring stops forever, silently, while `isRunning()` returns true".
+- **Offer options, then commit to one.** Present one or more fix options, each with
+  advantages, disadvantages, and consequences — the maintainer decides under constraints the
+  analyzer may not see (release timing, API stability, backlog). But do not hide behind a menu:
+  always name the **recommended option** and justify it against the alternatives (consistency
+  with existing patterns/TDRs, cost/benefit, residual risk). A single obvious fix is fine as a
+  one-option list — the recommendation and its rationale are still required. When a fix is later
+  applied, the validation blockquote should say which option (or which variation) was chosen.
 
 ## Status lifecycle
 
