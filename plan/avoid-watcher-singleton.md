@@ -32,7 +32,7 @@
 - Remover `WatcherSingleton` completamente.
 - `WatcherServlet` e `WatcherJavaxServlet` passam a criar sua própria instância de `Watcher` em `init(ServletConfig)`.
 - Permitir override do nome do watcher via init-param `slf4jtoys.watcher.name` no `web.xml`; por padrão usa `WatcherConfig.name`.
-- Serializar chamadas concorrentes a `runWatcher()` com um lock privado por servlet, eliminando a race do caminho pull.
+- Guardar chamadas concorrentes a `runWatcher()` com um `ReentrantLock.tryLock()` privado por servlet: se outra coleta estiver em andamento, a requisição simultânea recebe HTTP 429 e desiste, em vez de enfileirar. Isso evita a race do caminho pull sem amarrar threads do container.
 
 ## Classes novas em `src/main/java/org/usefultoys/slf4j/watcher/`
 

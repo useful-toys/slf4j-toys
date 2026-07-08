@@ -18,7 +18,7 @@ Remove `WatcherSingleton` entirely and make `WatcherServlet`/`WatcherJavaxServle
 *   Each servlet creates its own `Watcher` during `init(ServletConfig)`.
 *   By default the watcher name is read from `WatcherConfig.name`; the optional `slf4jtoys.watcher.name` servlet `<init-param>` overrides it.
 *   Logger prefixes/suffixes and the data logger flag are read from `WatcherConfig` at watcher construction time, matching the snapshot semantics of `WatcherExecutorController` and `WatcherTimerController`.
-*   `runWatcher()` synchronizes on a private instance lock so that concurrent `doGet` invocations do not execute `Watcher.run()` concurrently.
+*   `runWatcher()` guards execution with a non-blocking {@link java.util.concurrent.locks.ReentrantLock#tryLock()} on a private instance lock. Concurrent `doGet` invocations that arrive while a collection is already in progress are skipped and answered with HTTP 429 (`Too Many Requests`) instead of being queued; only one request per servlet instance performs the actual JMX collection at a time.
 
 ## Consequences
 
@@ -28,6 +28,7 @@ Remove `WatcherSingleton` entirely and make `WatcherServlet`/`WatcherJavaxServle
 *   **Predictable configuration**: the watcher is configured once during `init()`, when the servlet configuration is available.
 *   **Cleaner lifecycle**: the watcher is created and owned by the servlet instance, with no static singleton to leak between deployments.
 *   **Consistency**: pull servlets now follow the same "own your watcher" pattern as push controllers.
+*   **Reduced DoS amplification**: the non-blocking lock prevents servlet-container threads from queuing behind a long-running JMX collection.
 
 **Negative / Breaking**:
 
@@ -38,11 +39,12 @@ Remove `WatcherSingleton` entirely and make `WatcherServlet`/`WatcherJavaxServle
 
 *   **Keep `WatcherSingleton` and only add synchronization to `Watcher.run()`**: rejected because it would perpetuate the global singleton and configuration-rigidity problems documented in [TDR-0012](./TDR-0012-watcher-singleton-regret.md).
 *   **Make `Watcher.run()` synchronized**: rejected because it serializes all watcher executions globally for a given instance and still leaves the configuration-rigidity issue. Instance ownership and a private per-servlet lock solve both problems more cleanly.
+*   **Synchronize `runWatcher()` with a blocking monitor (queue concurrent requests)**: rejected because, while it prevents concurrent `Watcher.run()` calls, it ties up servlet-container threads behind the lock, amplifying the DoS surface flagged in SEC-001. A non-blocking `tryLock()` with HTTP 429 skip semantics avoids the queue and keeps the response honest.
 *   **Allow init-params for delay/period in the servlet**: rejected. The servlet is pull-only; scheduling parameters belong to the push controllers (`WatcherExecutorController`, `WatcherTimerController`).
 
 ## Implementation
 
-*   Updated `src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java` to create a private `Watcher` in `init(ServletConfig)`, read the optional `slf4jtoys.watcher.name` init-param, and serialize `runWatcher()` with a private lock.
+*   Updated `src/main/java/org/usefultoys/slf4j/watcher/WatcherServlet.java` to create a private `Watcher` in `init(ServletConfig)`, read the optional `slf4jtoys.watcher.name` init-param, and guard `runWatcher()` with a non-blocking lock (skip-if-busy, HTTP 429).
 *   Updated `src/main/java/org/usefultoys/slf4j/watcher/WatcherJavaxServlet.java` with the same change for the `javax.servlet` API.
 *   Removed `src/main/java/org/usefultoys/slf4j/watcher/WatcherSingleton.java`.
 *   Removed `src/test/java/org/usefultoys/slf4j/watcher/WatcherSingletonTest.java`.
