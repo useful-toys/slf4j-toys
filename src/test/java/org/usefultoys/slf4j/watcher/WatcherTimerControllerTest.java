@@ -29,7 +29,9 @@ import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ResetWatcherConfig;
 import org.usefultoys.test.ValidateCharset;
 
+import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,6 +43,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * Tests validate that the controller correctly starts and stops scheduled watchers
  * using a {@link java.util.Timer}, with proper event logging and idempotent lifecycle operations.
+ * <p>
+ * <b>Coverage:</b>
+ * <ul>
+ *   <li><b>Lifecycle:</b> Verifies start/stop idempotency and resource cleanup</li>
+ *   <li><b>Scheduling:</b> Confirms the watcher runs and produces log events</li>
+ *   <li><b>Failure recovery:</b> Confirms a single watcher exception is logged and does not
+ *       kill the timer thread or change the running state</li>
+ * </ul>
  */
 @ValidateCharset
 @ResetWatcherConfig
@@ -173,5 +183,39 @@ class WatcherTimerControllerTest {
 
         // When/Then: after the block the controller is stopped
         // (cannot query isRunning() because the resource is out of scope, but no exception means success)
+    }
+
+    @Test
+    @DisplayName("should keep schedule alive and log error when watcher throws exception")
+    void shouldKeepScheduleAliveAndLogErrorWhenWatcherThrowsException() throws Exception {
+        // Given: a controller with a watcher that fails once then succeeds
+        final String watcherName = "failing-timer-watcher";
+        final WatcherTimerController controller = WatcherTimerController.create(watcherName, 0, 200);
+        final AtomicInteger executionCount = new AtomicInteger(0);
+        final Watcher failingWatcher = new Watcher(watcherName) {
+            @Override
+            public void run() {
+                if (executionCount.incrementAndGet() == 1) {
+                    throw new RuntimeException("Simulated watcher failure");
+                }
+            }
+        };
+        final Field watcherField = WatcherTimerController.class.getDeclaredField("watcher");
+        watcherField.setAccessible(true);
+        watcherField.set(controller, failingWatcher);
+
+        final MockLogger controllerLogger = (MockLogger) LoggerFactory.getLogger(WatcherTimerController.class);
+        controllerLogger.clearEvents();
+
+        // When: starting the controller
+        controller.start();
+
+        // Then: the schedule survives the failure and runs at least twice
+        Awaitility.await().atMost(2, TimeUnit.SECONDS).until(() -> executionCount.get() >= 2);
+        assertTrue(controller.isRunning(), "controller should still be running after watcher failure");
+        AssertLogger.assertEvent(controllerLogger, 0, MockLoggerEvent.Level.ERROR,
+                "Watcher execution failed; next executions remain scheduled.");
+
+        controller.stop();
     }
 }

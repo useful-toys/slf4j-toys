@@ -15,6 +15,8 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -112,7 +114,25 @@ public final class WatcherExecutorController implements AutoCloseable {
         }
         if (task == null) {
             task = executor.scheduleAtFixedRate(
-                    watcher, delayMilliseconds, periodMilliseconds, TimeUnit.MILLISECONDS);
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            runSafely();
+                        }
+                    }, delayMilliseconds, periodMilliseconds, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    /**
+     * Executes the watcher, logging and swallowing any runtime exception so the
+     * scheduled execution stays alive.
+     */
+    private void runSafely() {
+        try {
+            watcher.run();
+        } catch (final RuntimeException e) {
+            LoggerFactory.getLogger(WatcherExecutorController.class)
+                    .error("Watcher execution failed; next executions remain scheduled.", e);
         }
     }
 

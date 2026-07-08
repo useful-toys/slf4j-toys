@@ -15,6 +15,8 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import org.slf4j.LoggerFactory;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -105,10 +107,23 @@ public final class WatcherTimerController implements AutoCloseable {
             timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    watcher.run();
+                    runSafely();
                 }
             };
             timer.schedule(timerTask, delayMilliseconds, periodMilliseconds);
+        }
+    }
+
+    /**
+     * Executes the watcher, logging and swallowing any runtime exception so the
+     * scheduled execution stays alive.
+     */
+    private void runSafely() {
+        try {
+            watcher.run();
+        } catch (final RuntimeException e) {
+            LoggerFactory.getLogger(WatcherTimerController.class)
+                    .error("Watcher execution failed; next executions remain scheduled.", e);
         }
     }
 
