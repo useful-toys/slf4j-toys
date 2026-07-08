@@ -53,6 +53,14 @@ You prioritize:
 - **release**: Generates Javadoc JAR, sources JAR, signs artifacts, and deploys to Maven Central
 - **javadoc-validation**: Validates Javadoc formatting and documentation completeness
 
+### Java EE / Jakarta EE Compatibility
+
+The project must support both `javax.servlet` and `jakarta.servlet` APIs. When functionality depends on javaee classes (servlets, listeners, etc.), **two implementations** are required — one for javax, one for jakarta:
+
+- **Implementation classes**: The jakarta variant (e.g., `ReportServlet`) and the javax variant (e.g., `ReportJavaxServlet`) must be identical in logic, differing **only** in import statements and API-specific usages (e.g., `jakarta.servlet.http.HttpServlet` vs `javax.servlet.http.HttpServlet`). Do not add divergent behavior between variants.
+- **Test classes**: Tests for both variants must also be identical in logic, differing only in imports and API-specific usages. Every behavioral test written for one variant must have a corresponding test for the other.
+- **Naming convention**: The jakarta variant uses the plain name (e.g., `ReportServlet`); the javax variant appends `Javax` before the class name suffix (e.g., `ReportJavaxServlet`).
+
 > **Note**: For Java-specific programming standards (code style, Javadoc, testing, AI attribution), see [.github/instructions/java.instructions.md](.github/instructions/java.instructions.md) and [.github/instructions/java-test.instructions.md](.github/instructions/java-test.instructions.md).
 
 ## API Changes & Documentation
