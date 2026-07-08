@@ -16,12 +16,6 @@ The library introduces:
 *   **Watcher**: For reporting the state of the Java runtime and underlying infrastructure.
 *   **Reporter**: For generating diagnostic reports.
 
-## Watcher
-
-The `Watcher` component periodically reports the state of the JVM and the underlying platform. For simple standalone applications, use the built-in `WatcherExecutorController` or `WatcherTimerController`; for enterprise applications, integrate the `Watcher` `Runnable` with your framework's scheduler (e.g., Spring `@Scheduled`, EJB `@Schedule`).
-
-`WatcherSingleton` is **deprecated** and its push methods have been removed; new code should use the controllers above. See the [Watcher documentation in the Wiki](https://github.com/useful-toys/slf4j-toys/wiki/Watcher) for details and use cases.
-
 ## How slf4j-toys Solves It with Semantic Logging
 
 *slf4j-toys* fills the gap of ambiguous standard logging by providing a clear **Life Cycle** for every operation, offering tools that create clear, structured, and machine-readable log messages.
@@ -62,6 +56,40 @@ try {
     throw new IllegalStateException(e);
 }
 ```
+
+## Documentation
+
+Detailed usage guides, concepts, and configuration are documented in the [project wiki](https://github.com/useful-toys/slf4j-toys/wiki):
+
+- [**Core Concepts**](https://github.com/useful-toys/slf4j-toys/wiki/core-concepts) — semantic logging lifecycle and design principles
+- [**Configuration**](https://github.com/useful-toys/slf4j-toys/wiki/Configuration) — library-level settings and customization
+
+### Meter
+
+- [**Meter Usage**](https://github.com/useful-toys/slf4j-toys/wiki/Meter-usage) — tracking operation lifecycle with START, OK, REJECT, FAIL
+  - [Success Reporting](https://github.com/useful-toys/slf4j-toys/wiki/Meter-reporting-success)
+  - [Alternative Paths](https://github.com/useful-toys/slf4j-toys/wiki/Meter-reporting-alternative-paths)
+  - [Failure Reporting](https://github.com/useful-toys/slf4j-toys/wiki/Meter-reporting-failure)
+  - [Context Propagation](https://github.com/useful-toys/slf4j-toys/wiki/Meter-reporting-context)
+
+### Watcher
+
+- [**Watcher Overview**](https://github.com/useful-toys/slf4j-toys/wiki/Watcher) — JVM and platform runtime monitoring
+  - [Configuration](https://github.com/useful-toys/slf4j-toys/wiki/Watcher-configuration)
+  - [Logger Configuration](https://github.com/useful-toys/slf4j-toys/wiki/Watcher-logger-configuration)
+  - [Use Case: Controllers](https://github.com/useful-toys/slf4j-toys/wiki/Watcher-use-case-controllers)
+  - [Use Case: Java EE](https://github.com/useful-toys/slf4j-toys/wiki/Watcher-use-case-javaee)
+  - [Use Case: Servlet](https://github.com/useful-toys/slf4j-toys/wiki/Watcher-use-case-servlet)
+  - [Use Case: Spring Boot](https://github.com/useful-toys/slf4j-toys/wiki/Watcher-use-case-spring-boot)
+
+### Other Features
+
+- [**Reporter**](https://github.com/useful-toys/slf4j-toys/wiki/Reporter-usage) — generating diagnostic reports
+- [**LoggerFactory**](https://github.com/useful-toys/slf4j-toys/wiki/LoggerFactory-usage) — enhanced logger creation
+- [**Logging as Stream**](https://github.com/useful-toys/slf4j-toys/wiki/Logging-as-stream) — stream-based log output
+- [**Utilities**](https://github.com/useful-toys/slf4j-toys/wiki/Utilities) — helper utilities
+- [**Logback Extensions**](https://github.com/useful-toys/slf4j-toys/wiki/Logback-extensions) — Logback-specific enhancements
+- [**Alternative Logger Hierarchy**](https://github.com/useful-toys/slf4j-toys/wiki/Alternative-Logger-Hierarchy-Convention) — custom logger naming conventions
 
 ## Installation
 
