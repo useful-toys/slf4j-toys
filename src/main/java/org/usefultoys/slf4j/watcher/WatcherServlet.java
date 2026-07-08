@@ -24,6 +24,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * A simple servlet that reports the runtime state in response to GET requests.
  * This servlet can be mapped to a URL and triggered periodically, for example, by a cron job.
@@ -46,7 +48,9 @@ import jakarta.servlet.http.HttpServletResponse;
  *     are accessible, sensitive information about your application's environment might be exposed.</li>
  *     <li><b>Denial of Service (DoS):</b> Frequent access to this servlet, especially if the Watcher
  *     operation is resource-intensive, could consume excessive CPU or I/O resources, leading to
- *     performance degradation or service unavailability.</li>
+ *     performance degradation or service unavailability. Concurrent requests that arrive while a
+ *     collection is already in progress are rejected with HTTP 429 instead of being queued, which
+ *     limits servlet-container thread contention; see {@link #doGet} and {@link #runWatcher()}.</li>
  * </ul>
  * <p><b>Recommendations:</b>
  * <ul>
@@ -63,6 +67,9 @@ public class WatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 675380685122096016L;
 
+    /** HTTP 429 Too Many Requests, returned when a collection is already in progress on this instance. */
+    private static final int HTTP_TOO_MANY_REQUESTS = 429;
+
     /**
      * The watcher instance owned by this servlet. It is created during {@link #init(ServletConfig)}
      * and captures the effective name and {@link WatcherConfig} settings at that moment.
@@ -71,12 +78,13 @@ public class WatcherServlet extends HttpServlet {
     private transient Watcher watcher;
 
     /**
-     * Private lock used to serialize concurrent calls to {@link #runWatcher()}. The servlet container
-     * may invoke {@code doGet} concurrently on the same instance; this lock ensures that the
-     * underlying {@link Watcher#run()} is not executed concurrently, avoiding the race condition
-     * described in the watcher pull path.
+     * Private lock that guards {@link #runWatcher()} against concurrent execution. The servlet
+     * container may invoke {@code doGet} concurrently on the same instance; {@link #runWatcher()}
+     * uses a non-blocking {@link ReentrantLock#tryLock()} on this lock so that a request arriving
+     * while a collection is in progress is skipped instead of queued, avoiding the race condition
+     * in the watcher pull path without tying up servlet-container threads.
      */
-    private final Object watcherLock = new Object();
+    private final ReentrantLock watcherLock = new ReentrantLock();
 
     /**
      * Initializes the servlet and creates the watcher instance owned by this servlet.
@@ -102,8 +110,10 @@ public class WatcherServlet extends HttpServlet {
     }
 
     /**
-     * Handles GET requests by invoking the watcher to log the current runtime state.
-     * It responds with a success or error message depending on the outcome.
+     * Handles GET requests by invoking the watcher to log the current runtime state. Responds with
+     * {@code 200 OK} when the state was collected, {@code 429 Too Many Requests} when a collection
+     * was already in progress on this servlet instance, or {@code 500 Internal Server Error} on
+     * failure.
      *
      * @param request  The HTTP request.
      * @param response The HTTP response.
@@ -112,11 +122,18 @@ public class WatcherServlet extends HttpServlet {
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
         final Logger logger = LoggerFactory.getLogger(WatcherServlet.class);
         try {
-            runWatcher();
-            logger.info("WatcherServlet accessed. Logging current runtime state.");
-            response.setContentType("text/plain");
-            response.getWriter().write("Runtime state logged successfully.");
-            response.setStatus(HttpServletResponse.SC_OK);
+            final boolean collected = runWatcher();
+            if (collected) {
+                logger.info("WatcherServlet accessed. Logging current runtime state.");
+                response.setContentType("text/plain");
+                response.getWriter().write("Runtime state logged successfully.");
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                logger.info("WatcherServlet accessed while a collection is already in progress. Skipped.");
+                response.setContentType("text/plain");
+                response.getWriter().write("Runtime state already being collected. Try again later.");
+                response.setStatus(HTTP_TOO_MANY_REQUESTS);
+            }
         } catch (final Exception e) {
             logger.error("Failed to log runtime state.", e);
             response.setContentType("text/plain");
@@ -132,13 +149,25 @@ public class WatcherServlet extends HttpServlet {
     /**
      * Invokes the watcher owned by this servlet to collect and report the current runtime state.
      * <p>
-     * Calls are serialized with an internal lock so that concurrent HTTP requests do not execute
-     * {@link Watcher#run()} concurrently on the same instance. Subclasses may override this method,
-     * but should preserve the thread-safety contract if the same {@link Watcher} instance is reused.
+     * Uses a non-blocking try-lock on an internal lock so that concurrent HTTP requests do not
+     * execute {@link Watcher#run()} concurrently on the same instance. If a collection is already
+     * in progress on this servlet instance, this method returns immediately without collecting,
+     * so that the calling servlet-container thread is not queued. Subclasses may override this
+     * method, but should preserve the thread-safety contract if the same {@link Watcher} instance
+     * is reused.
+     *
+     * @return {@code true} if the watcher was executed; {@code false} if a collection was already
+     *         in progress and this call was skipped.
      */
-    protected void runWatcher() {
-        synchronized (watcherLock) {
+    protected boolean runWatcher() {
+        if (!watcherLock.tryLock()) {
+            return false;
+        }
+        try {
             watcher.run();
+            return true;
+        } finally {
+            watcherLock.unlock();
         }
     }
 }
