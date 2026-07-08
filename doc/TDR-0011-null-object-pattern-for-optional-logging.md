@@ -5,7 +5,7 @@
 
 ## Context
 
-The `slf4j-toys` library supports several optional logging features. For example, the `Watcher` can log both human-readable summaries and machine-parsable data. The latter can be disabled via configuration (`slf4jtoys.watcher.data.enabled=false`). 
+The `slf4j-toys` library supports optional logging components that may be disabled at runtime. For example, `LoggerOutputStream` and `LoggerPrintStream` map an `OutputStream` or `PrintStream` to a logger at a specific level; when that level is disabled, the stream must still accept writes without producing output.
 
 Traditionally, optional components are handled by setting their references to `null`. However, this approach has several drawbacks:
 1.  **Code Clutter**: Every usage of the optional component requires an explicit null check (e.g., `if (dataLogger != null) { ... }`).
@@ -24,8 +24,8 @@ We decided to implement the **Null Object Pattern** for optional logging compone
 2.  **`NullOutputStream` and `NullPrintStream` Classes**: We created specialized implementations that discard all output data.
     *   **Usage**: When an `OutputStream` or `PrintStream` is mapped to a logger at a level that won't generate messages (e.g., logger level is higher than the stream's target level), the null object implementations are used instead of actual logging streams.
     *   **Benefit**: Prevents unnecessary overhead from writing to streams that would produce no logging output, while maintaining a consistent API where streams are always available.
-3.  **Initialization**: In classes like `Watcher`, the logger fields are always initialized. If a specific logging channel is disabled, it is assigned the `NullLogger.INSTANCE` instead of `null`. Similarly, OutputStreams and PrintStreams mapped to disabled logging levels use `NullOutputStream.INSTANCE` or `NullPrintStream.INSTANCE`.
-4.  **Usage**: The execution logic (e.g., `Watcher.run()`) interacts with the loggers without any null checks, relying on the `Logger` interface's contract.
+3.  **Initialization**: In classes like `LoggerOutputStream` and `LoggerPrintStream`, the underlying stream is always initialized. If the target logging level is disabled, the stream is assigned `NullOutputStream.INSTANCE` or `NullPrintStream.INSTANCE` instead of `null`. Similarly, any code that conditionally holds a `Logger` reference may use `NullLogger.INSTANCE` when the channel is permanently disabled.
+4.  **Usage**: Client code interacts with the logger or stream without any null checks, relying on the interface contract.
 
 ## Consequences
 
@@ -54,9 +54,8 @@ We decided to implement the **Null Object Pattern** for optional logging compone
 *   `NullLogger` implements `org.slf4j.Logger`.
 *   `NullOutputStream` extends `java.io.OutputStream` and discards all writes.
 *   `NullPrintStream` extends `java.io.PrintStream` and discards all writes.
-*   `Watcher` constructor uses `NullLogger.INSTANCE` when `dataEnabled` is false.
 *   `LoggerOutputStream` and `LoggerPrintStream` use null object implementations when the target logging level is disabled.
-*   `Watcher.run()` performs checks like `if (messageLogger.isInfoEnabled() || dataLogger.isTraceEnabled())` which naturally handle the disabled state via the `NullLogger`'s return values.
+*   Code that conditionally holds a `Logger` reference uses `NullLogger.INSTANCE` when the channel is permanently disabled, so callers can invoke `is...Enabled()` and logging methods without null checks.
 
 ## References
 

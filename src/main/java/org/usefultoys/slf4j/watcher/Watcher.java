@@ -16,7 +16,6 @@
 package org.usefultoys.slf4j.watcher;
 
 import org.slf4j.Logger;
-import org.usefultoys.slf4j.NullLogger;
 import org.usefultoys.slf4j.Session;
 import org.usefultoys.slf4j.internal.SystemMetrics;
 
@@ -37,6 +36,17 @@ import static org.usefultoys.slf4j.watcher.WatcherConfig.*;
  * </ul>
  * As a {@link Runnable}, this class can be easily integrated with scheduling
  * services like {@link ScheduledExecutorService}.
+ * <p>
+ * <b>Thread safety:</b> {@code Watcher} instances are <em>not</em> thread-safe. A single instance must be executed by
+ * at most one thread at a time; {@link #run()} mutates the internal state inherited from {@code EventData} and
+ * {@code SystemData}. When integrating with an external scheduler, either dedicate the instance to a single-threaded
+ * schedule or serialize calls to {@link #run()} externally (as {@link WatcherServlet} does with a private lock). Do not
+ * register the same instance with multiple schedulers or submit it to a thread pool that allows concurrent execution.
+ * <p>
+ * A {@link Watcher} instance maintains its own internal event {@link org.usefultoys.slf4j.internal.EventData#position position}
+ * sequence. Two distinct {@code Watcher} instances that use the same {@code name} will write to the same logger but will
+ * produce interleaved position sequences, because each instance counts independently. If a single ordered sequence per
+ * name is required, the application must ensure that only one {@code Watcher} instance uses that name.
  *
  * @author Daniel Felix Ferber
  * @see WatcherConfig
@@ -65,11 +75,7 @@ public class Watcher extends WatcherData implements Runnable {
     public Watcher(final String name) {
         super(Session.shortSessionUuid());
         messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + name + messageSuffix);
-        if (dataEnabled) {
-            dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + name + dataSuffix);
-        } else {
-            dataLogger = NullLogger.INSTANCE; // Use NullLogger instead of null
-        }
+        dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + name + dataSuffix);
     }
 
     /**

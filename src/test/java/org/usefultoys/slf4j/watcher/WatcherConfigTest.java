@@ -59,7 +59,6 @@ class WatcherConfigTest {
         assertEquals(600000L, WatcherConfig.periodMilliseconds, "Default value for periodMilliseconds should be 600000");
         assertEquals("", WatcherConfig.dataPrefix, "Default value for dataPrefix should be an empty string");
         assertEquals("", WatcherConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
-        assertFalse(WatcherConfig.dataEnabled, "Default value for dataEnabled should be false");
         assertEquals("", WatcherConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
         assertEquals("", WatcherConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for default values");
@@ -78,7 +77,6 @@ class WatcherConfigTest {
         assertEquals(600000L, WatcherConfig.periodMilliseconds, "Default value for periodMilliseconds should be 600000");
         assertEquals("", WatcherConfig.dataPrefix, "Default value for dataPrefix should be an empty string");
         assertEquals("", WatcherConfig.dataSuffix, "Default value for dataSuffix should be an empty string");
-        assertFalse(WatcherConfig.dataEnabled, "Default value for dataEnabled should be false");
         assertEquals("", WatcherConfig.messagePrefix, "Default value for messagePrefix should be an empty string");
         assertEquals("", WatcherConfig.messageSuffix, "Default value for messageSuffix should be an empty string");
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported after reset");
@@ -170,36 +168,6 @@ class WatcherConfigTest {
         // Then: dataSuffix should reflect the property value with no errors
         assertEquals(".data", WatcherConfig.dataSuffix, "dataSuffix should reflect the system property value");
         assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid dataSuffix");
-    }
-
-    @Test
-    @DisplayName("should parse data enabled from system property")
-    void testDataEnabledProperty() {
-        // Given: system property set to enable data
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "true");
-
-        // When: init() is called
-        WatcherConfig.init();
-
-        // Then: dataEnabled should be true with no errors
-        assertTrue(WatcherConfig.dataEnabled, "dataEnabled should reflect the system property value");
-        assertTrue(ConfigParser.isInitializationOK(), "No errors should be reported for valid dataEnabled");
-    }
-
-    @Test
-    @DisplayName("should fall back to default for invalid data enabled format")
-    void testDataEnabledInvalidFormat() {
-        // Given: system property set to invalid boolean format
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, "invalid");
-
-        // When: init() is called
-        WatcherConfig.init();
-
-        // Then: dataEnabled should use default and report error
-        assertFalse(WatcherConfig.dataEnabled, "dataEnabled should fall back to default for invalid format");
-        assertFalse(ConfigParser.isInitializationOK(), "An error should be reported for invalid dataEnabled format");
-        assertEquals(1, ConfigParser.getInitializationErrors().size());
-        assertTrue(ConfigParser.getInitializationErrors().get(0).contains(String.format("Invalid boolean value for property '%s", WatcherConfig.PROP_DATA_ENABLED)));
     }
 
     @Test

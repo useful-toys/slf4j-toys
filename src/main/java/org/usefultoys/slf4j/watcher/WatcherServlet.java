@@ -39,6 +39,11 @@ import java.util.concurrent.locks.ReentrantLock;
  * precedence over {@link WatcherConfig#name} at initialization time. Other watcher settings (logger
  * prefixes/suffixes and data logger enabling) are read from {@link WatcherConfig} when the watcher
  * instance is created.
+ * <p>Because this servlet owns its own watcher, it also maintains its own internal event
+ * {@link org.usefultoys.slf4j.internal.EventData#position position} sequence. If another
+ * {@code Watcher} instance (for example, a {@link WatcherExecutorController} or another servlet)
+ * uses the same name, the same logger will receive interleaved position sequences. Use a unique
+ * name for each watcher instance when consumers depend on a single ordered sequence per name.
  *
  * <p><b>SECURITY WARNING:</b>
  * Exposing this servlet in a production environment without proper security measures

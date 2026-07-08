@@ -31,6 +31,16 @@ import java.util.concurrent.TimeUnit;
  * from {@link WatcherConfig} at the moment they are called. This allows the application to set
  * configuration before materializing the controller.
  * <p>
+ * The controller schedules the watcher on a single daemon thread, so the owned {@link Watcher#run()} is never
+ * invoked concurrently by this controller. Do not share the controller's watcher with another scheduler or thread
+ * pool; {@link Watcher} instances are not thread-safe and must be executed by at most one thread at a time.
+ * <p>
+ * Because each controller owns its own watcher, it also maintains its own internal event
+ * {@link org.usefultoys.slf4j.internal.EventData#position position} sequence. If another
+ * {@code Watcher} instance (for example, another controller or a {@code WatcherServlet}) uses the
+ * same name, the same logger will receive interleaved position sequences. Use a unique name for
+ * each watcher instance when consumers depend on a single ordered sequence per name.
+ * <p>
  * The controller exposes {@link #create()} static factory methods for common use cases. The underlying
  * executor uses a daemon thread named after the watcher, so it will not prevent the JVM from shutting down.
  * <p>

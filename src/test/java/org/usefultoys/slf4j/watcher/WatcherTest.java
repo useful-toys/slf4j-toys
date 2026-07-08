@@ -59,7 +59,6 @@ class WatcherTest {
         final String messageSuffix;
         final String dataPrefix;
         final String dataSuffix;
-        final boolean dataEnabled;
         final boolean messageLoggerEnabled;
         final boolean dataLoggerEnabled;
         final boolean expectMessageLog;
@@ -67,13 +66,12 @@ class WatcherTest {
         final String expectedMessageContent;
         final String expectedDataContent;
 
-        private WatcherTestScenario(final String testName, final String messagePrefix, final String messageSuffix, final String dataPrefix, final String dataSuffix, final boolean dataEnabled, final boolean messageLoggerEnabled, final boolean dataLoggerEnabled, final boolean expectMessageLog, final boolean expectDataLog, final String expectedMessageContent, final String expectedDataContent) {
+        private WatcherTestScenario(final String testName, final String messagePrefix, final String messageSuffix, final String dataPrefix, final String dataSuffix, final boolean messageLoggerEnabled, final boolean dataLoggerEnabled, final boolean expectMessageLog, final boolean expectDataLog, final String expectedMessageContent, final String expectedDataContent) {
             this.testName = testName;
             this.messagePrefix = messagePrefix;
             this.messageSuffix = messageSuffix;
             this.dataPrefix = dataPrefix;
             this.dataSuffix = dataSuffix;
-            this.dataEnabled = dataEnabled;
             this.messageLoggerEnabled = messageLoggerEnabled;
             this.dataLoggerEnabled = dataLoggerEnabled;
             this.expectMessageLog = expectMessageLog;
@@ -90,12 +88,11 @@ class WatcherTest {
 
     private static Stream<WatcherTestScenario> provideWatcherLoggingScenarios() {
         return Stream.of(
-            new WatcherTestScenario("Both loggers enabled", "", ".msg", "", ".data", true, true, true, true, true, "Memory:", "_:"),
-            new WatcherTestScenario("Data logger disabled by config", "", ".msg", "", ".data", false, true, true, true, false, "Memory:", null),
-            new WatcherTestScenario("Message logger level disabled", "", ".msg", "", ".data", true, false, true, false, true, null, "_:"),
-            new WatcherTestScenario("Data logger level disabled", "", ".msg", "", ".data", true, true, false, true, false, "Memory:", null),
-            new WatcherTestScenario("Both loggers level disabled", "", ".msg", "", ".data", true, false, false, false, false, null, null),
-            new WatcherTestScenario("Custom prefixes and suffixes", "p-msg-", ".s-msg", "p-data-", ".s-data", true, true, true, true, true, "Memory:", "_:")
+            new WatcherTestScenario("Both loggers enabled", "", ".msg", "", ".data", true, true, true, true, "Memory:", "_:"),
+            new WatcherTestScenario("Message logger level disabled", "", ".msg", "", ".data", false, true, false, true, null, "_:"),
+            new WatcherTestScenario("Data logger level disabled", "", ".msg", "", ".data", true, false, true, false, "Memory:", null),
+            new WatcherTestScenario("Both loggers level disabled", "", ".msg", "", ".data", false, false, false, false, null, null),
+            new WatcherTestScenario("Custom prefixes and suffixes", "p-msg-", ".s-msg", "p-data-", ".s-data", true, true, true, true, "Memory:", "_:")
         );
     }
 
@@ -114,7 +111,6 @@ class WatcherTest {
         System.setProperty(WatcherConfig.PROP_MESSAGE_SUFFIX, scenario.messageSuffix);
         System.setProperty(WatcherConfig.PROP_DATA_PREFIX, scenario.dataPrefix);
         System.setProperty(WatcherConfig.PROP_DATA_SUFFIX, scenario.dataSuffix);
-        System.setProperty(WatcherConfig.PROP_DATA_ENABLED, String.valueOf(scenario.dataEnabled));
         WatcherConfig.init();
         assertTrue(ConfigParser.isInitializationOK(), "ConfigParser should have no errors for scenario: " + scenario.testName + " - " + ConfigParser.getInitializationErrors());
 

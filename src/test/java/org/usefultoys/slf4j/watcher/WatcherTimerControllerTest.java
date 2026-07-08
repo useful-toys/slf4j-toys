@@ -85,6 +85,7 @@ class WatcherTimerControllerTest {
     void shouldCreateControllerWithOverrides() {
         // Given: a custom name and a logger bound to that name
         final String customName = "custom-watcher";
+        WatcherConfig.dataSuffix = ".data"; // keep data TRACE logs on a separate logger
         final MockLogger customLogger = (MockLogger) LoggerFactory.getLogger(customName);
         customLogger.clearEvents();
 
@@ -104,9 +105,10 @@ class WatcherTimerControllerTest {
     @Test
     @DisplayName("should log status when using timer")
     void shouldLogStatusWithTimer() {
-        // Given: short schedule
+        // Given: short schedule and separate data logger so the mocked logger only receives INFO
         WatcherConfig.delayMilliseconds = 200;
         WatcherConfig.periodMilliseconds = 200;
+        WatcherConfig.dataSuffix = ".data";
 
         // When: creating and starting the controller
         final WatcherTimerController controller = WatcherTimerController.create();

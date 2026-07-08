@@ -49,8 +49,6 @@ public class WatcherConfig {
     public final String PROP_DATA_PREFIX = "slf4jtoys.watcher.data.prefix";
     /** System property key for the data logger name suffix. */
     public final String PROP_DATA_SUFFIX = "slf4jtoys.watcher.data.suffix";
-    /** System property key for enabling/disabling data logging. */
-    public final String PROP_DATA_ENABLED = "slf4jtoys.watcher.data.enabled";
     /** System property key for the message logger name prefix. */
     public final String PROP_MESSAGE_PREFIX = "slf4jtoys.watcher.message.prefix";
     /** System property key for the message logger name suffix. */
@@ -106,14 +104,6 @@ public class WatcherConfig {
     public String dataSuffix;
 
     /**
-     * Determines if the watcher writes machine-parsable data messages to the log.
-     * <p>
-     * Read from the system property {@code slf4jtoys.watcher.data.enabled}, defaulting to {@code false}.
-     * Can be changed at runtime.
-     */
-    public boolean dataEnabled;
-
-    /**
      * A prefix added to the logger name for human-readable messages.
      * <p>
      * This allows directing readable messages to a different logger than machine-parsable ones.
@@ -145,7 +135,6 @@ public class WatcherConfig {
         periodMilliseconds = ConfigParser.getMillisecondsProperty(PROP_PERIOD, 600000L);
         dataPrefix = ConfigParser.getProperty(PROP_DATA_PREFIX, "");
         dataSuffix = ConfigParser.getProperty(PROP_DATA_SUFFIX, "");
-        dataEnabled = ConfigParser.getProperty(PROP_DATA_ENABLED, false);
         messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
         messageSuffix = ConfigParser.getProperty(PROP_MESSAGE_SUFFIX, "");
     }
@@ -160,7 +149,6 @@ public class WatcherConfig {
         System.clearProperty(WatcherConfig.PROP_PERIOD);
         System.clearProperty(WatcherConfig.PROP_DATA_PREFIX);
         System.clearProperty(WatcherConfig.PROP_DATA_SUFFIX);
-        System.clearProperty(WatcherConfig.PROP_DATA_ENABLED);
         System.clearProperty(WatcherConfig.PROP_MESSAGE_PREFIX);
         System.clearProperty(WatcherConfig.PROP_MESSAGE_SUFFIX);
         init();
