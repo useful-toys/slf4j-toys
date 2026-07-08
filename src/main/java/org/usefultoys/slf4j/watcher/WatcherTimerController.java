@@ -47,6 +47,8 @@ import java.util.TimerTask;
  * {@code start()} and {@code stop()} are idempotent and may be called multiple times.
  *
  * @author Daniel Felix Ferber
+ * @author Co-authored-by: OpenCode Kimi k2.7 Code using Kimi k2.7
+ * @author Co-authored-by: GitHub Copilot using Kimi K2.7 Code
  * @see Watcher
  * @see WatcherConfig
  * @see WatcherExecutorController
