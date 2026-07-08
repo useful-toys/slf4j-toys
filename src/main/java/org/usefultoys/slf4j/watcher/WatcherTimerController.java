@@ -71,6 +71,22 @@ public final class WatcherTimerController implements AutoCloseable {
      * @param periodMilliseconds  interval between executions
      */
     private WatcherTimerController(@NonNull final String name, final long delayMilliseconds, final long periodMilliseconds) {
+        this(name, delayMilliseconds, periodMilliseconds, new Watcher(name));
+    }
+
+    /**
+     * Creates a new controller with the supplied configuration and a pre-built {@link Watcher}.
+     * <p>
+     * Package-private: exists so tests in this package can inject a {@link Watcher} stub without
+     * resorting to reflection.
+     *
+     * @param name                logical watcher name
+     * @param delayMilliseconds   initial delay before the first execution
+     * @param periodMilliseconds  interval between executions
+     * @param watcher             the watcher instance to run on schedule
+     */
+    WatcherTimerController(@NonNull final String name, final long delayMilliseconds, final long periodMilliseconds,
+                            final Watcher watcher) {
         if (delayMilliseconds < 0) {
             throw new IllegalArgumentException("delayMilliseconds must be >= 0");
         }
@@ -80,7 +96,7 @@ public final class WatcherTimerController implements AutoCloseable {
         this.name = name;
         this.delayMilliseconds = delayMilliseconds;
         this.periodMilliseconds = periodMilliseconds;
-        this.watcher = new Watcher(name);
+        this.watcher = watcher;
     }
 
     /**

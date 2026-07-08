@@ -32,7 +32,6 @@ import org.usefultoys.test.ValidateCharset;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -307,16 +306,14 @@ class WatcherServletTest {
     }
 
     /**
-     * Reflectively acquires the private {@code watcherLock} of a {@link WatcherServlet} so a test
-     * can hold it from another thread and deterministically reproduce the "collection already in
-     * progress" condition that {@link #runWatcher()} guards with {@link ReentrantLock#tryLock()}.
+     * Acquires the {@code watcherLock} of a {@link WatcherServlet} so a test can hold it from
+     * another thread and deterministically reproduce the "collection already in progress"
+     * condition that {@link #runWatcher()} guards with {@link ReentrantLock#tryLock()}.
      */
-    private static ReentrantLock watcherLockOf(final WatcherServlet servlet) throws Exception {
-        final Field f = WatcherServlet.class.getDeclaredField("watcherLock");
-        f.setAccessible(true);
-        final Object lock = f.get(servlet);
+    private static ReentrantLock watcherLockOf(final WatcherServlet servlet) {
+        final ReentrantLock lock = servlet.watcherLockForTesting();
         assertNotNull(lock, "watcherLock should be initialized");
-        return (ReentrantLock) lock;
+        return lock;
     }
 
     @Test
