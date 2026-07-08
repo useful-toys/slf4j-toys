@@ -69,6 +69,7 @@ The project must support both `javax.servlet` and `jakarta.servlet` APIs. When f
   - Clear explanation of changes
   - Updated examples demonstrating the new/modified functionality
 - Keep README.md synchronized with actual library capabilities
+- **README.md is an overview only**: README.md provides a high-level summary of each feature. It should **not** contain detailed explanations or in-depth usage guides — those belong in the [project wiki](wiki/). Each feature section in README.md should be concise and end with a link to the corresponding wiki page for full documentation.
 
 - **Test synchronization**: When code changes are made, **always update or create corresponding tests**:
   - New features or methods require new test cases
