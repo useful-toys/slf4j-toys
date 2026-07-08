@@ -15,6 +15,7 @@
  */
 package org.usefultoys.slf4j.watcher;
 
+import lombok.NonNull;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executors;
@@ -68,7 +69,13 @@ public final class WatcherExecutorController implements AutoCloseable {
      * @param delayMilliseconds   initial delay before the first execution
      * @param periodMilliseconds  interval between executions
      */
-    private WatcherExecutorController(final String name, final long delayMilliseconds, final long periodMilliseconds) {
+    private WatcherExecutorController(@NonNull final String name, final long delayMilliseconds, final long periodMilliseconds) {
+        if (delayMilliseconds < 0) {
+            throw new IllegalArgumentException("delayMilliseconds must be >= 0");
+        }
+        if (periodMilliseconds <= 0) {
+            throw new IllegalArgumentException("periodMilliseconds must be > 0");
+        }
         this.name = name;
         this.delayMilliseconds = delayMilliseconds;
         this.periodMilliseconds = periodMilliseconds;
