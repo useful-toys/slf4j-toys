@@ -47,6 +47,9 @@ public class WatcherJavaxServlet extends HttpServlet {
 
     private static final long serialVersionUID = 675380685122096016L;
 
+    /** Logger for servlet lifecycle and request handling messages. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(WatcherJavaxServlet.class);
+
     /** HTTP 429 Too Many Requests, returned when a collection is already in progress on this instance. */
     private static final int HTTP_TOO_MANY_REQUESTS = 429;
 
@@ -80,14 +83,13 @@ public class WatcherJavaxServlet extends HttpServlet {
     @Override
     public void init(final ServletConfig config) throws ServletException {
         super.init(config);
-        final Logger logger = LoggerFactory.getLogger(WatcherJavaxServlet.class);
         final String configuredName = config.getInitParameter(WatcherConfig.PROP_NAME);
         final String trimmedName = (configuredName == null) ? null : configuredName.trim();
         final String watcherName = (trimmedName == null || trimmedName.isEmpty())
                 ? WatcherConfig.name
                 : trimmedName;
         this.watcher = new Watcher(watcherName);
-        logger.info("WatcherJavaxServlet initialized with watcher name '{}'.", watcherName);
+        LOGGER.info("WatcherJavaxServlet initialized with watcher name '{}'.", watcherName);
     }
 
     /**
@@ -101,22 +103,21 @@ public class WatcherJavaxServlet extends HttpServlet {
      */
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response) {
-        final Logger logger = LoggerFactory.getLogger(WatcherJavaxServlet.class);
         try {
             final boolean collected = runWatcher();
             if (collected) {
-                logger.info("WatcherJavaxServlet accessed. Logging current runtime state.");
+                LOGGER.info("WatcherJavaxServlet accessed. Logging current runtime state.");
                 response.setContentType("text/plain");
                 response.getWriter().write("Runtime state logged successfully.");
                 response.setStatus(HttpServletResponse.SC_OK);
             } else {
-                logger.info("WatcherJavaxServlet accessed while a collection is already in progress. Skipped.");
+                LOGGER.info("WatcherJavaxServlet accessed while a collection is already in progress. Skipped.");
                 response.setContentType("text/plain");
                 response.getWriter().write("Runtime state already being collected. Try again later.");
                 response.setStatus(HTTP_TOO_MANY_REQUESTS);
             }
         } catch (final Exception e) {
-            logger.error("Failed to log runtime state.", e);
+            LOGGER.error("Failed to log runtime state.", e);
             response.setContentType("text/plain");
             try {
                 response.getWriter().write("Failed to log runtime state.");
