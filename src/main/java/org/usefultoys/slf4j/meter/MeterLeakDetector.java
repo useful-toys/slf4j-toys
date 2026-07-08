@@ -157,13 +157,18 @@ final class MeterLeakDetector {
     }
 
     /**
-     * Registers a started meter for leak detection. Drains pending leaks first (opportunistic).
-     * The returned handle must be passed to {@link #deregister(MeterReference)} when the meter is stopped.
+     * Registers a started meter for leak detection when enabled and the meter's category is known.
+     * Drains pending leaks first (opportunistic). The returned handle must be passed to
+     * {@link #deregister(MeterReference)} when the meter is stopped.
      *
      * @param meter the meter that has just been started; must not be {@code null}.
-     * @return the registration handle to retain and pass to {@link #deregister(MeterReference)}.
+     * @return the registration handle to retain and pass to {@link #deregister(MeterReference)},
+     *         or {@code null} when leak detection is disabled or the category is unknown.
      */
     static MeterReference register(final Meter meter) {
+        if (!MeterConfig.detectLeaks || Meter.UNKNOWN_LOGGER_NAME.equals(meter.getCategory())) {
+            return null;
+        }
         drain();
         final MeterReference ref = new MeterReference(meter, QUEUE);
         ANCHOR.add(ref);
