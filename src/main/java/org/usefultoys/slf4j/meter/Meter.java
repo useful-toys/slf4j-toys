@@ -110,8 +110,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     private WeakReference<Meter> previousInstance;
 
     /**
-     * Registration handle with the {@link MeterLeakDetector}, obtained on {@link #start()} when leak detection is
-     * enabled ({@link MeterConfig#detectLeaks}) and the category is known. {@code null} otherwise. Passed back to
+     * Registration handle with the {@link MeterLeakDetector}, obtained on {@link #start()}.
+     * {@code null} when the detector declines registration (disabled or unknown category). Passed back to
      * the detector on every explicit termination so this {@code Meter} is not reported as a leak.
      */
     private transient MeterLeakDetector.MeterReference leakRef;
@@ -389,9 +389,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
             lastProgressTime = startTime = collectCurrentTime();
 
-            if (MeterConfig.detectLeaks && !UNKNOWN_LOGGER_NAME.equals(getCategory())) {
-                leakRef = MeterLeakDetector.register(this);
-            }
+            leakRef = MeterLeakDetector.register(this);
 
             if (messageLogger.isDebugEnabled()) {
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
@@ -519,6 +517,16 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     }
 
     /**
+     * Deregisters this meter from the leak detector and clears the registration handle.
+     * Called from every explicit termination path so a stopped meter is never reported as a leak.
+     * Null-safe and idempotent via {@link MeterLeakDetector#deregister}.
+     */
+    private void deregisterLeakDetection() {
+        MeterLeakDetector.deregister(leakRef);
+        leakRef = null;
+    }
+
+    /**
      * Notifies the `Meter` that the operation has completed successfully. This method logs a **human-readable summary**
      * (INFO level) and a **machine-parsable data message** (TRACE level) with the current system status. If a time
      * limit was set and exceeded, a WARN level message is logged instead, indicating a slow operation.
@@ -540,8 +548,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failMessage = null;
             rejectPath = null;
             localThreadInstance.set(previousInstance);
-            MeterLeakDetector.deregister(leakRef);
-            leakRef = null;
+            deregisterLeakDetection();
             /* Override path if provided as parameter */
             if (pathId != null) {
                 okPath = toPath(pathId, true);
@@ -662,8 +669,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failMessage = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
-            MeterLeakDetector.deregister(leakRef);
-            leakRef = null;
+            deregisterLeakDetection();
             rejectPath = toPath(cause, true);
 
             if (messageLogger.isInfoEnabled()) {
@@ -710,8 +716,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
-            MeterLeakDetector.deregister(leakRef);
-            leakRef = null;
+            deregisterLeakDetection();
             failPath = toPath(cause, false);
             /* Extract failure message from Throwable if applicable */
             if (cause instanceof Throwable) {
@@ -763,8 +768,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             rejectPath = null;
             okPath = null;
             localThreadInstance.set(previousInstance);
-            MeterLeakDetector.deregister(leakRef);
-            leakRef = null;
+            deregisterLeakDetection();
             failPath = FAIL_PATH_TRY_WITH_RESOURCES;
 
             if (messageLogger.isErrorEnabled()) {
