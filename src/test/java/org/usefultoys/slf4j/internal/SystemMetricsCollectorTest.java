@@ -229,6 +229,23 @@ class SystemMetricsCollectorTest {
     }
 
     @Test
+    @DisplayName("should fall back to loadAverage when getSystemCpuLoad throws")
+    void collect_cpuLoadFallbackOnException() {
+        // Given: getSystemCpuLoad() throws, mirroring the known native-layer flakiness of
+        // com.sun.management.OperatingSystemMXBean on some JDK/OS combinations (JDK-8345684, JDK-8247469)
+        SystemConfig.usePlatformManagedBean = true;
+        when(mockSunOsBean.getSystemCpuLoad()).thenThrow(new ArrayIndexOutOfBoundsException("native glitch"));
+        when(mockSunOsBean.getSystemLoadAverage()).thenReturn(1.6);
+        when(mockSunOsBean.getAvailableProcessors()).thenReturn(8);
+
+        // When: collectPlatformStatus is called
+        collector.collectPlatformStatus(data);
+
+        // Then: the exception is swallowed and the fallback calculation is used (1.6 / 8 = 0.2)
+        assertEquals(0.2, data.getSystemLoad(), 0.001);
+    }
+
+    @Test
     @DisplayName("should use fallback for system load when OSBean is not a Sun bean")
     void collect_cpuLoadFallbackOnNonSunBean() {
         // Given: generic OperatingSystemMXBean (not Sun implementation)

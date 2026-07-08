@@ -84,6 +84,13 @@ public class SystemMetricsCollector {
 
     /**
      * Collects operating system-level metrics, specifically the system CPU load.
+     * <p>
+     * {@code com.sun.management.OperatingSystemMXBean#getSystemCpuLoad()} delegates to a native
+     * implementation that is known to be unreliable under concurrent invocation on some JDK/OS
+     * combinations (e.g. JDK-8345684, JDK-8247469), intermittently throwing {@link RuntimeException}s
+     * such as {@link NullPointerException} or {@link ArrayIndexOutOfBoundsException} instead of
+     * returning a value. Since CPU load is a best-effort metric, such failures are swallowed here
+     * so a native-layer glitch cannot fail the whole {@link #collect(SystemData)} call.
      *
      * @param data The {@link SystemData} object to be populated.
      */
@@ -95,10 +102,14 @@ public class SystemMetricsCollector {
         if (osBean instanceof com.sun.management.OperatingSystemMXBean) {
             final com.sun.management.OperatingSystemMXBean sunOsBean =
                     (com.sun.management.OperatingSystemMXBean) osBean;
-            final double cpuLoad = sunOsBean.getSystemCpuLoad();
-            if (cpuLoad >= 0) {
-                data.systemLoad = cpuLoad;
-                return;
+            try {
+                final double cpuLoad = sunOsBean.getSystemCpuLoad();
+                if (cpuLoad >= 0) {
+                    data.systemLoad = cpuLoad;
+                    return;
+                }
+            } catch (final RuntimeException e) {
+                // Best-effort metric; fall through to the getSystemLoadAverage() fallback below.
             }
         }
 
