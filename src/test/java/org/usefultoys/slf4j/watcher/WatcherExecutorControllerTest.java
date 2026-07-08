@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -79,6 +80,36 @@ class WatcherExecutorControllerTest {
         assertTrue(controller.isRunning(), "controller should be running after start");
         assertDoesNotThrow(controller::stop, "should stop without throwing");
         assertFalse(controller.isRunning(), "controller should not be running after stop");
+    }
+
+    @Test
+    @DisplayName("should reject null name")
+    void shouldRejectNullName() {
+        assertThrows(NullPointerException.class,
+                () -> WatcherExecutorController.create(null),
+                "null name should trigger NullPointerException");
+        assertThrows(NullPointerException.class,
+                () -> WatcherExecutorController.create(null, 100, 100),
+                "null name should trigger NullPointerException");
+    }
+
+    @Test
+    @DisplayName("should reject negative delay")
+    void shouldRejectNegativeDelay() {
+        assertThrows(IllegalArgumentException.class,
+                () -> WatcherExecutorController.create("test", -1, 100),
+                "negative delay should trigger IllegalArgumentException");
+    }
+
+    @Test
+    @DisplayName("should reject non-positive period")
+    void shouldRejectNonPositivePeriod() {
+        assertThrows(IllegalArgumentException.class,
+                () -> WatcherExecutorController.create("test", 0, 0),
+                "zero period should trigger IllegalArgumentException");
+        assertThrows(IllegalArgumentException.class,
+                () -> WatcherExecutorController.create("test", 0, -1),
+                "negative period should trigger IllegalArgumentException");
     }
 
     @Test
