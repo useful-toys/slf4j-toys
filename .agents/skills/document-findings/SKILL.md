@@ -131,6 +131,34 @@ Accepted findings can still carry cheap recommendations. When those get applied,
 
 For a negative validation (checked, not fixed yet), record that too — with date and what exactly was checked — so the next session does not redo the work.
 
+### Revalidating an entire analysis
+
+When asked to verify whether the findings of an analysis were resolved — typically after
+another agent or developer claims to have fixed "all" of them — do not sample: **sweep every
+finding in the directory** and leave no file without a recorded outcome. The claim is the thing
+under test, and partial verification cannot refute it.
+
+1. Pin the state under review once (branch tip hash, worktree clean or not) and reuse it in
+   every blockquote, so all verdicts are comparable.
+2. Read the diff of each claimed fix against the finding's described **mechanism** (not the
+   symptom), and note which fix option was chosen when the finding offered options.
+3. Run the relevant test scope once for the whole sweep (e.g., `-Dtest=Watcher*Test`) and cite
+   the same result in each finding it covers.
+4. Give **every** file a validation blockquote — positive, negative ("NÃO corrigido", with what
+   exactly was checked and why the claim does not hold), or partial ("PARCIALMENTE corrigido",
+   naming which part remains). A fix sweep often *introduces* new instances of a documented
+   problem (e.g., new Javadoc referencing a just-removed flag) — record those inside the
+   affected finding instead of silently ignoring them.
+5. Apply all renames (`-fixed`, `-accepted`) in the same pass.
+6. Sync `geral.md` completely, in the same pass: add a "última revalidação" note in the header
+   (date, tip, one-line verdict on the claim — confirmed or refuted, naming what remains);
+   update every index row annotation; recompute the statistics table; strike through
+   (`~~...~~`) test-coverage gaps that were closed, citing the closing commit; update the
+   traceability section for previous-analysis findings that the sweep resolved or eliminated.
+
+The deliverable of a revalidation is the explicit verdict on the claim ("10 de 13 resolvidos;
+3 permanecem pendentes: ...") — not just updated files. State it in `geral.md` and in the reply.
+
 ## geral.md — overall assessment and index
 
 Every analysis directory has a `geral.md` with:
