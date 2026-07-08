@@ -17,6 +17,7 @@ package org.usefultoys.slf4j.meter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
+import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.meter.MeterLeakDetector.MeterReference;
 import org.usefultoys.slf4jtestmock.Slf4jMock;
 import org.usefultoys.slf4jtestmock.WithMockLogger;
@@ -295,6 +297,49 @@ class MeterLeakDetectorTest {
         MeterLeakDetector.drain();
         assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
                 "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test#0");
+    }
+
+    @Nested
+    @DisplayName("Start gating")
+    class StartGatingTests {
+
+        @Test
+        @DisplayName("should not register a real meter when leak detection is disabled")
+        void shouldNotRegisterMeterWhenLeakDetectionDisabled() {
+            // Given: leak detection is disabled and the anchor set is empty
+            MeterConfig.detectLeaks = false;
+            final Logger categoryLogger = LoggerFactory.getLogger("leak-detector.disabled");
+            final int anchorSizeBefore = MeterLeakDetector.anchorSize();
+
+            // When: a real meter is started through the public API
+            final Meter meter = new Meter(categoryLogger).start();
+
+            // Then: the detector must not have anchored the meter
+            assertEquals(anchorSizeBefore, MeterLeakDetector.anchorSize(),
+                    "Meter.start() should not register the meter when detectLeaks is false");
+
+            // Cleanup: stop the meter so the thread-local stack stays clean
+            meter.ok();
+        }
+
+        @Test
+        @DisplayName("should not register a real meter for an unknown logger category")
+        void shouldNotRegisterMeterForUnknownLoggerCategory() {
+            // Given: leak detection is enabled and the logger category is the unknown placeholder
+            MeterConfig.detectLeaks = true;
+            final Logger unknownLogger = LoggerFactory.getLogger(Meter.UNKNOWN_LOGGER_NAME);
+            final int anchorSizeBefore = MeterLeakDetector.anchorSize();
+
+            // When: a real meter with the unknown category is started through the public API
+            final Meter meter = new Meter(unknownLogger).start();
+
+            // Then: the detector must not have anchored the meter
+            assertEquals(anchorSizeBefore, MeterLeakDetector.anchorSize(),
+                    "Meter.start() should not register the meter when the logger category is unknown");
+
+            // Cleanup: stop the meter so the thread-local stack stays clean
+            meter.ok();
+        }
     }
 
 }

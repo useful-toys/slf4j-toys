@@ -253,6 +253,17 @@ final class MeterLeakDetector {
     }
 
     /**
+     * Returns the current number of anchored references. Intended for test verification only;
+     * production code has no legitimate use for this value.
+     * <p>
+     * Package-private so tests can assert that {@link #register(Meter)} was suppressed by its
+     * gating conditions without relying on garbage collection or reflection.
+     */
+    static int anchorSize() {
+        return ANCHOR.size();
+    }
+
+    /**
      * Discards all leak-detector state without reporting anything. Intended for test isolation only;
      * it clears the anchor set and drains the reference queue silently, and resets the draining guard.
      * <p>
