@@ -43,6 +43,7 @@ The servlet pull path remains on `WatcherSingleton.getDefaultWatcher()` temporar
 
 *   Callers of `WatcherSingleton.startDefaultWatcherExecutor()` and `WatcherSingleton.startDefaultWatcherTimer()` must migrate to `WatcherExecutorController.create().start()` / `WatcherTimerController.create().start()`. This is an intentional breaking change for a deprecated API.
 *   `WatcherSingleton.getDefaultWatcher()` was also removed; callers must create their own `Watcher` instance or use `WatcherServlet`/`WatcherJavaxServlet` for the pull path (see [TDR-0037](./TDR-0037-migrate-watcher-servlet-pull-from-singleton.md)).
+*   Each controller owns its own `Watcher`, so each also maintains its own `EventData.position` sequence. Two instances with the same `name` write interleaved sequences to the same logger. See [TDR-0038](./TDR-0038-accept-per-instance-watcher-position-sequences.md).
 
 ## Alternatives Considered
 

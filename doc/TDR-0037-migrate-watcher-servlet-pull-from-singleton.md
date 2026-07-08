@@ -17,8 +17,9 @@ Remove `WatcherSingleton` entirely and make `WatcherServlet`/`WatcherJavaxServle
 
 *   Each servlet creates its own `Watcher` during `init(ServletConfig)`.
 *   By default the watcher name is read from `WatcherConfig.name`; the optional `slf4jtoys.watcher.name` servlet `<init-param>` overrides it.
-*   Logger prefixes/suffixes and the data logger flag are read from `WatcherConfig` at watcher construction time, matching the snapshot semantics of `WatcherExecutorController` and `WatcherTimerController`.
+*   Logger prefixes and suffixes are read from `WatcherConfig` at watcher construction time, matching the snapshot semantics of `WatcherExecutorController` and `WatcherTimerController`.
 *   `runWatcher()` guards execution with a non-blocking {@link java.util.concurrent.locks.ReentrantLock#tryLock()} on a private instance lock. Concurrent `doGet` invocations that arrive while a collection is already in progress are skipped and answered with HTTP 429 (`Too Many Requests`) instead of being queued; only one request per servlet instance performs the actual JMX collection at a time.
+*   `Watcher.run()` remains non-thread-safe; the servlet itself guarantees that its owned `Watcher` is never invoked concurrently. This same contract applies to `WatcherExecutorController` and `WatcherTimerController`, which schedule their watcher on a single thread.
 
 ## Consequences
 
@@ -34,6 +35,8 @@ Remove `WatcherSingleton` entirely and make `WatcherServlet`/`WatcherJavaxServle
 
 *   `WatcherSingleton` and `WatcherSingleton.getDefaultWatcher()` are removed. Any external caller using them must migrate to `new Watcher(WatcherConfig.name)` or to `WatcherServlet`/`WatcherJavaxServlet` for the pull path.
 *   The servlets now require `init(ServletConfig)` to be invoked by the container before `doGet`. This is standard servlet behavior, but direct unit tests must call `servlet.init(mock(ServletConfig.class))` before exercising `doGet`.
+*   Each servlet owns its own `Watcher`, so each also maintains its own `EventData.position` sequence. If a servlet and a push controller (or two servlets) use the same `name`, the same logger receives interleaved position sequences. See [TDR-0038](./TDR-0038-accept-per-instance-watcher-position-sequences.md).
+*   `Watcher.run()` is not thread-safe. External code that manually calls `run()` on a shared `Watcher` instance must serialize those calls; the servlet and built-in controllers already satisfy this contract internally.
 
 ## Alternatives Considered
 

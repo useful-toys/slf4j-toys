@@ -11,7 +11,7 @@
 
 `WatcherSingleton` (TDR-0012) era dívida técnica assumida: fornecia um `Watcher` default globalmente acessível e métodos `startDefaultWatcherExecutor`/`startDefaultWatcherTimer`/`stop...` para agendamento push. Os defeitos documentados:
 
-- `.glm-findings/02` — `dataEnabled` em runtime sem efeito (instância cached uma vez).
+- `.glm-findings/02` — `dataEnabled` em runtime sem efeito (resolvido removendo a flag; controle passa a ser exclusivo pelo nível TRACE do logger de dados).
 - `.glm-findings/03` — race: scheduler thread e servlet thread chamavam `run()` no mesmo `Watcher`.
 - `.glm-findings/05` — `Timer` non-daemon bloqueia shutdown da JVM.
 - TDR-0005 — "Static Initialization Limitation": config mudada após a criação do singleton não surte efeito.

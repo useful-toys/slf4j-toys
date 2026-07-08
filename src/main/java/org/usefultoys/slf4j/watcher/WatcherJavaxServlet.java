@@ -30,6 +30,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * This class is identical to {@link WatcherServlet} but uses the javax.servlet API
  * instead of the jakarta.servlet API.
  *
+ * <p>Because this servlet owns its own {@link Watcher} instance, it maintains its own internal event
+ * {@link org.usefultoys.slf4j.internal.EventData#position position} sequence. If another
+ * {@code Watcher} instance with the same name writes to the same logger, the sequences will
+ * interleave. Use a unique name for each watcher instance when consumers depend on a single ordered
+ * sequence per name.
+ *
  * @see WatcherServlet
  * @see Watcher
  * @see WatcherConfig

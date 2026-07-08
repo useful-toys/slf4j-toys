@@ -40,7 +40,12 @@ public class EventData implements Serializable {
      */
     String sessionUuid = null; // Changed from protected to package-private
     /**
-     * A time-ordered sequential position for multiple occurrences of the same event within a session.
+     * A time-ordered sequential position for multiple occurrences of the same event produced by the
+     * same instance. The counter is per-instance, not global to the session or to the logical event
+     * name. If two distinct instances (for example, a push controller and a servlet) share the same
+     * name and {@link #sessionUuid}, their position sequences will interleave in the same log
+     * destination. Consumers that need a single ordered sequence per name must ensure only one
+     * instance uses that name.
      */
     long position = 0; // Changed from protected to package-private
     /**
@@ -80,7 +85,7 @@ public class EventData implements Serializable {
      * Constructs an EventData instance with a specified session UUID and position.
      *
      * @param sessionUuid The unique identifier for the JVM session.
-     * @param position The time-ordered sequential position of the event.
+     * @param position The time-ordered sequential position of the event within its producing instance.
      */
     protected EventData(final String sessionUuid, final long position) {
         this.sessionUuid = sessionUuid;
@@ -91,7 +96,7 @@ public class EventData implements Serializable {
      * Constructs an EventData instance with all fields specified (for testing).
      *
      * @param sessionUuid The unique identifier for the JVM session.
-     * @param position The time-ordered sequential position of the event.
+     * @param position The time-ordered sequential position of the event within its producing instance.
      * @param lastCurrentTime The timestamp when the event was collected.
      */
     protected EventData(final String sessionUuid, final long position, final long lastCurrentTime) {
@@ -116,7 +121,7 @@ public class EventData implements Serializable {
 
 
     /**
-     * Increments the event's position. If the position reaches {@code Long.MAX_VALUE},
+     * Increments this instance's event position. If the position reaches {@code Long.MAX_VALUE},
      * it wraps around to 0 to prevent overflow.
      */
     protected final void nextPosition() {
