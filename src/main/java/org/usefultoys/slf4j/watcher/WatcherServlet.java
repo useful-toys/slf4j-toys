@@ -107,9 +107,10 @@ public class WatcherServlet extends HttpServlet {
         super.init(config);
         final Logger logger = LoggerFactory.getLogger(WatcherServlet.class);
         final String configuredName = config.getInitParameter(WatcherConfig.PROP_NAME);
-        final String watcherName = (configuredName == null || configuredName.trim().isEmpty())
+        final String trimmedName = (configuredName == null) ? null : configuredName.trim();
+        final String watcherName = (trimmedName == null || trimmedName.isEmpty())
                 ? WatcherConfig.name
-                : configuredName;
+                : trimmedName;
         this.watcher = new Watcher(watcherName);
         logger.info("WatcherServlet initialized with watcher name '{}'.", watcherName);
     }

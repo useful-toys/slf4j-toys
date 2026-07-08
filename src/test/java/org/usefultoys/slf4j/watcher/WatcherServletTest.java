@@ -286,6 +286,26 @@ class WatcherServletTest {
         AssertLogger.assertEvent(watcherLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
     }
 
+    @Test
+    void shouldTrimInitParamName() throws Exception {
+        // Given: a servlet configuration with a watcher name init-param containing surrounding whitespace
+        final WatcherServlet servlet = new WatcherServlet();
+        final ServletConfig config = mock(ServletConfig.class);
+        when(config.getInitParameter(WatcherConfig.PROP_NAME)).thenReturn("\n   custom-servlet-watcher\n   ");
+        servlet.init(config);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // When: doGet is called
+        servlet.doGet(request, response);
+
+        // Then: the surrounding whitespace is trimmed and the watcher logs to the trimmed logger name
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        AssertLogger.assertEvent(customLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
+    }
+
     /**
      * Reflectively acquires the private {@code watcherLock} of a {@link WatcherServlet} so a test
      * can hold it from another thread and deterministically reproduce the "collection already in
