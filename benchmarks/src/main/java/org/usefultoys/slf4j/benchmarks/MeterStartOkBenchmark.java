@@ -52,17 +52,18 @@ import java.util.concurrent.TimeUnit;
 public class MeterStartOkBenchmark {
 
     private Logger logger;
-    private Meter meter;
 
     @org.openjdk.jmh.annotations.Setup(Level.Iteration)
     public void setup() {
         logger = org.slf4j.LoggerFactory.getLogger("benchmark.meter");
-        meter = new Meter(logger);
     }
 
     @Benchmark
     public void startOk(Blackhole bh) {
-        Meter m = meter.start().ok();
+        /* A Meter is single-use: build a fresh one each invocation so the measured
+         * path is the real start->ok lifecycle, never the "already stopped"
+         * inconsistency branch that reusing one instance would exercise. */
+        Meter m = new Meter(logger).start().ok();
         bh.consume(m);
     }
 }
