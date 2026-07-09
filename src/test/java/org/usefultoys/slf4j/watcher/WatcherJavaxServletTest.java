@@ -29,7 +29,11 @@ import org.usefultoys.test.ValidateCharset;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.CountDownLatch;
@@ -303,6 +307,63 @@ class WatcherJavaxServletTest {
         // Then: the surrounding whitespace is trimmed and the watcher logs to the trimmed logger name
         verify(response).setStatus(HttpServletResponse.SC_OK);
         AssertLogger.assertEvent(customLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T serializeAndDeserialize(final T original) throws IOException, ClassNotFoundException {
+        final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (ObjectOutputStream out = new ObjectOutputStream(bytes)) {
+            out.writeObject(original);
+        }
+        try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            return (T) in.readObject();
+        }
+    }
+
+    @Test
+    void shouldRecreateWatcherAfterDeserializationWithoutReinit() throws Exception {
+        // Given: a servlet initialized with a custom watcher name, then serialized and deserialized
+        // (simulating session replication/passivation) without init() being called again
+        final WatcherJavaxServlet original = new WatcherJavaxServlet();
+        final ServletConfig config = mock(ServletConfig.class);
+        when(config.getInitParameter(WatcherConfig.PROP_NAME)).thenReturn("custom-servlet-watcher");
+        original.init(config);
+
+        final WatcherJavaxServlet deserialized = serializeAndDeserialize(original);
+
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // When: doGet is called on the deserialized instance
+        deserialized.doGet(request, response);
+
+        // Then: the watcher was recreated from the persisted name instead of NPE-ing on a null field
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        assertEquals("Runtime state logged successfully.", responseWriter.toString().trim());
+        AssertLogger.assertEvent(customLogger, 0, MockLoggerEvent.Level.INFO, "Memory:");
+    }
+
+    @Test
+    void shouldLeaveWatcherNullWhenDeserializedWithoutPriorInit() throws Exception {
+        // Given: a servlet that was never init()-ialized, so watcherName was never captured
+        final WatcherJavaxServlet original = new WatcherJavaxServlet();
+
+        final WatcherJavaxServlet deserialized = serializeAndDeserialize(original);
+
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final StringWriter responseWriter = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+        // When: doGet is called on the deserialized instance
+        deserialized.doGet(request, response);
+
+        // Then: readObject has nothing to rebuild from, so the pre-existing null-watcher failure
+        // mode is preserved (caught and reported as 500, not silently ignored)
+        verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        assertEquals("Failed to log runtime state.", responseWriter.toString().trim());
     }
 
     /**

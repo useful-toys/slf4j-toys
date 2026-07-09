@@ -24,6 +24,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -83,9 +85,18 @@ public class WatcherServlet extends HttpServlet {
     /**
      * The watcher instance owned by this servlet. It is created during {@link #init(ServletConfig)}
      * and captures the effective name and {@link WatcherConfig} settings at that moment.
-     * Marked {@code transient} so servlet serialization does not attempt to serialize it.
+     * Marked {@code transient} so servlet serialization does not attempt to serialize it; it is
+     * rebuilt from {@link #watcherName} by {@link #readObject(ObjectInputStream)} if the servlet is
+     * deserialized without {@link #init(ServletConfig)} being called again.
      */
     private transient Watcher watcher;
+
+    /**
+     * The effective watcher name resolved during {@link #init(ServletConfig)}. Not {@code transient},
+     * so it survives serialization and allows {@link #readObject(ObjectInputStream)} to recreate
+     * {@link #watcher} with the same name after deserialization.
+     */
+    private String watcherName;
 
     /**
      * Private lock that guards {@link #runWatcher()} against concurrent execution. The servlet
@@ -102,6 +113,11 @@ public class WatcherServlet extends HttpServlet {
      * If the servlet configuration provides the {@code slf4jtoys.watcher.name} init-param, its value
      * is used as the watcher name; otherwise {@link WatcherConfig#name} is used. The watcher logger
      * prefixes/suffixes are read from {@link WatcherConfig} at construction time.
+     * <p>
+     * The {@link #watcher} field is assigned while holding {@link #watcherLock}, the same lock used
+     * by {@link #runWatcher()} to read it, establishing a happens-before relationship between
+     * initialization and later requests without relying on the servlet container's implicit
+     * publication guarantees.
      *
      * @param config The servlet configuration.
      * @throws ServletException if initialization fails.
@@ -111,11 +127,40 @@ public class WatcherServlet extends HttpServlet {
         super.init(config);
         final String configuredName = config.getInitParameter(WatcherConfig.PROP_NAME);
         final String trimmedName = (configuredName == null) ? null : configuredName.trim();
-        final String watcherName = (trimmedName == null || trimmedName.isEmpty())
+        final String resolvedName = (trimmedName == null || trimmedName.isEmpty())
                 ? WatcherConfig.name
                 : trimmedName;
-        this.watcher = new Watcher(watcherName);
-        LOGGER.info("WatcherServlet initialized with watcher name '{}'.", watcherName);
+        watcherLock.lock();
+        try {
+            this.watcherName = resolvedName;
+            this.watcher = new Watcher(resolvedName);
+        } finally {
+            watcherLock.unlock();
+        }
+        LOGGER.info("WatcherServlet initialized with watcher name '{}'.", resolvedName);
+    }
+
+    /**
+     * Recreates {@link #watcher} after deserialization, since it is {@code transient}. Uses
+     * {@link #watcherName}, captured during {@link #init(ServletConfig)}, so a deserialized instance
+     * remains functional even if the servlet container never calls {@link #init(ServletConfig)}
+     * again on it.
+     *
+     * @param in the stream to read the default serializable fields from.
+     * @throws IOException            if reading the stream fails.
+     * @throws ClassNotFoundException if the class of a serialized object cannot be found.
+     */
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        if (watcherName != null) {
+            watcherLock.lock();
+            try {
+                this.watcher = new Watcher(watcherName);
+            } finally {
+                watcherLock.unlock();
+            }
+            LOGGER.info("WatcherServlet watcher '{}' recreated after deserialization.", watcherName);
+        }
     }
 
     /**
