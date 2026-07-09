@@ -29,7 +29,9 @@ import org.usefultoys.slf4jtestmock.WithMockLogger;
 import org.usefultoys.test.ResetWatcherConfig;
 import org.usefultoys.test.ValidateCharset;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -251,5 +253,52 @@ class WatcherExecutorControllerTest {
                 "Watcher execution failed; next executions remain scheduled.");
 
         controller.stop();
+    }
+
+    @Test
+    @DisplayName("should not run watcher concurrently across a stop()+start() restart")
+    void shouldNotOverlapRunAcrossRestart() throws Exception {
+        // Given: a watcher that flags any concurrent entry into run()
+        final String watcherName = "restart-race-executor-watcher";
+        final AtomicInteger inFlight = new AtomicInteger();
+        final AtomicBoolean overlap = new AtomicBoolean(false);
+        final AtomicInteger executions = new AtomicInteger();
+        final CountDownLatch firstEntered = new CountDownLatch(1);
+        final Watcher racyWatcher = new Watcher(watcherName) {
+            @Override
+            public void run() {
+                if (inFlight.incrementAndGet() > 1) {
+                    overlap.set(true);
+                }
+                firstEntered.countDown();
+                // Busy-wait ignoring interruption, mirroring the real Watcher.run() which performs CPU
+                // work and never checks the interrupt flag; a plain Thread.sleep would be woken by
+                // shutdownNow()'s interrupt and hide the cross-generation overlap window.
+                final long deadline = System.nanoTime() + 150_000_000L;
+                while (System.nanoTime() < deadline) {
+                    // spin
+                }
+                executions.incrementAndGet();
+                inFlight.decrementAndGet();
+            }
+        };
+        // delay 0 so the restarted schedule fires immediately, maximizing the overlap window
+        final WatcherExecutorController controller =
+                new WatcherExecutorController(watcherName, 0, 50, racyWatcher);
+
+        try {
+            // When: the first execution is in flight and the controller is restarted
+            controller.start();
+            assertTrue(firstEntered.await(2, TimeUnit.SECONDS), "first execution should start");
+            controller.stop();
+            controller.start();
+            Awaitility.await().atMost(2, TimeUnit.SECONDS).until(() -> executions.get() >= 2);
+        } finally {
+            controller.stop();
+        }
+
+        // Then: run() was serialized across executor generations and ran before and after the restart
+        assertFalse(overlap.get(), "watcher.run() must never execute concurrently across a restart");
+        assertTrue(executions.get() >= 2, "watcher should have executed before and after the restart");
     }
 }

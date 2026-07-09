@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Periodically executes a {@link Watcher} using a {@link Timer}.
@@ -30,9 +31,11 @@ import java.util.TimerTask;
  * configuration before materializing the controller.
  * <p>
  * The controller schedules the watcher on a single daemon {@link java.util.Timer} thread, so the owned
- * {@link Watcher#run()} is never invoked concurrently by this controller. Do not share the controller's watcher
- * with another scheduler or thread pool; {@link Watcher} instances are not thread-safe and must be executed by
- * at most one thread at a time.
+ * {@link Watcher#run()} is never invoked concurrently by this controller. Executions are additionally serialized by a
+ * private lock, so that even across timer generations — for example a {@link #stop()} followed by {@link #start()}
+ * while a collection is still in flight — {@link Watcher#run()} is never entered by two threads at once. Do not share
+ * the controller's watcher with another scheduler or thread pool; {@link Watcher} instances are not thread-safe and
+ * must be executed by at most one thread at a time.
  * <p>
  * Because each controller owns its own watcher, it also maintains its own internal event
  * {@link org.usefultoys.slf4j.internal.EventData#position position} sequence. If another
@@ -59,6 +62,12 @@ public final class WatcherTimerController implements AutoCloseable {
     private final long delayMilliseconds;
     private final long periodMilliseconds;
     private final Watcher watcher;
+
+    /**
+     * Serializes {@link Watcher#run()} so it is never entered concurrently, including across timer generations
+     * when {@link #stop()} does not wait for an in-flight execution and {@link #start()} schedules a new one.
+     */
+    private final ReentrantLock runLock = new ReentrantLock();
 
     private Timer timer;
     private TimerTask timerTask;
@@ -153,13 +162,20 @@ public final class WatcherTimerController implements AutoCloseable {
     /**
      * Executes the watcher, logging and swallowing any runtime exception so the
      * scheduled execution stays alive.
+     * <p>
+     * Acquires {@link #runLock} for the duration of {@link Watcher#run()} so that an execution scheduled by a new
+     * timer generation (after a {@link #stop()} that did not wait for the previous one to finish) blocks until the
+     * in-flight execution completes, instead of running concurrently on the shared {@link Watcher} instance.
      */
     private void runSafely() {
+        runLock.lock();
         try {
             watcher.run();
         } catch (final RuntimeException e) {
             LoggerFactory.getLogger(WatcherTimerController.class)
                     .error("Watcher execution failed; next executions remain scheduled.", e);
+        } finally {
+            runLock.unlock();
         }
     }
 
