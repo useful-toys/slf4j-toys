@@ -120,9 +120,10 @@ class WatcherExecutorControllerTest {
         final MockLogger customLogger = (MockLogger) LoggerFactory.getLogger(customName);
         customLogger.clearEvents();
 
-        // When: creating with explicit name, delay and period
+        // When: creating with explicit name, short delay and a period long enough that no second
+        // execution fires within the test window (keeps the exact event count deterministic)
         final WatcherExecutorController controller =
-                WatcherExecutorController.create(customName, 200, 200);
+                WatcherExecutorController.create(customName, 200, 60_000);
 
         // Then: it runs the watcher under the requested name
         assertNotNull(controller);
@@ -136,9 +137,11 @@ class WatcherExecutorControllerTest {
     @Test
     @DisplayName("should log status when using executor")
     void shouldLogStatusWithExecutor() {
-        // Given: short schedule and separate data logger so the mocked logger only receives INFO
+        // Given: short initial delay but a period long enough that no second execution fires within
+        // the test window, so the exact event count stays deterministic under load; separate data
+        // logger so the mocked logger only receives INFO
         WatcherConfig.delayMilliseconds = 200;
-        WatcherConfig.periodMilliseconds = 200;
+        WatcherConfig.periodMilliseconds = 60_000;
         WatcherConfig.dataSuffix = ".data";
 
         // When: creating and starting the controller
