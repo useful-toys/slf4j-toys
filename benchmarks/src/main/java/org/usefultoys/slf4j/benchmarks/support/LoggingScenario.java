@@ -20,6 +20,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.meter.MeterConfig;
+import org.usefultoys.slf4j.watcher.WatcherConfig;
 
 /**
  * A logging regime for the benchmarks, expressed as an independent level for the
@@ -31,12 +32,17 @@ import org.usefultoys.slf4j.meter.MeterConfig;
  * {@code "c"} then writes human-readable messages to {@code "c" + messageSuffix} and
  * JSON5 data to {@code "c" + dataSuffix}, so each can be switched on or off on its own.
  * <p>
- * Note on reachability: in the Meter/Watcher source the data statement is nested inside
- * the message-level guard ({@code if (messageLogger.isXxxEnabled()) { ...
- * if (dataLogger.isTraceEnabled()) ... }}). Hence a "data on / message off" combination
- * emits nothing and costs the same as {@link #OFF}; {@link #DATA_ONLY} is provided so that
- * fact can be verified empirically, but the three primary regimes are
- * {@link #OFF}, {@link #MESSAGE} and {@link #MESSAGE_DATA}.
+ * Note on reachability &mdash; and this differs between the two components:
+ * <ul>
+ *   <li><b>Meter</b>: the data statement is nested inside the message-level guard
+ *       ({@code if (messageLogger.isXxxEnabled()) { ... if (dataLogger.isTraceEnabled()) ... }}),
+ *       so {@link #DATA_ONLY} emits nothing and costs the same as {@link #OFF}. The three
+ *       meaningful regimes are {@link #OFF}, {@link #MESSAGE} and {@link #MESSAGE_DATA}
+ *       ({@code DATA_ONLY} is kept only to verify that equivalence empirically).</li>
+ *   <li><b>Watcher</b>: {@code run()} collects when {@code isInfoEnabled() || isTraceEnabled()}
+ *       and emits the message and data lines independently (not nested), so {@link #DATA_ONLY}
+ *       <em>is</em> a distinct, reachable regime. All four apply.</li>
+ * </ul>
  * <p>
  * Enabled loggers are routed to a {@link DiscardAppender} (additivity off) so the measured
  * cost is the string construction inside slf4j-toys, not logback's encoder or I/O.
@@ -63,25 +69,32 @@ public enum LoggingScenario {
     }
 
     /**
-     * Splits the message and data loggers onto distinct names. Call once per trial,
-     * before any Meter/Watcher is constructed, since the suffixes are read at
-     * construction time ({@code Meter} resolves both loggers in its constructor).
+     * Splits the message and data loggers onto distinct names for <em>both</em> the
+     * Meter and the Watcher configuration. Call once per trial, before any
+     * Meter/Watcher is constructed, since the suffixes are read at construction time
+     * (each resolves both loggers in its constructor). Prefixes are left at their
+     * empty defaults, so a base category {@code "c"} yields {@code "c" + MESSAGE_SUFFIX}
+     * and {@code "c" + DATA_SUFFIX} for both components.
      */
     public static void configureSuffixes() {
         MeterConfig.messageSuffix = MESSAGE_SUFFIX;
         MeterConfig.dataSuffix = DATA_SUFFIX;
+        WatcherConfig.messageSuffix = MESSAGE_SUFFIX;
+        WatcherConfig.dataSuffix = DATA_SUFFIX;
     }
 
     /**
-     * Applies this regime to the two loggers derived from the given base category,
-     * using the same prefix/suffix rules the Meter/Watcher use.
+     * Applies this regime to the two loggers derived from the given base category.
+     * Assumes {@link #configureSuffixes()} has run and prefixes are empty, so the
+     * derived names are {@code baseCategory + MESSAGE_SUFFIX} and
+     * {@code baseCategory + DATA_SUFFIX} — shared by Meter and Watcher alike.
      *
      * @param baseCategory the base logger name passed to the Meter/Watcher
      */
     public void apply(final String baseCategory) {
         final LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        configure(context, MeterConfig.messagePrefix + baseCategory + MeterConfig.messageSuffix, messageLevel);
-        configure(context, MeterConfig.dataPrefix + baseCategory + MeterConfig.dataSuffix, dataLevel);
+        configure(context, baseCategory + MESSAGE_SUFFIX, messageLevel);
+        configure(context, baseCategory + DATA_SUFFIX, dataLevel);
     }
 
     private static void configure(final LoggerContext context, final String loggerName, final Level level) {
