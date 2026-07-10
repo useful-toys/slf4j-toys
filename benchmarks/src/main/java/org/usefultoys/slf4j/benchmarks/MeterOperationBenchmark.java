@@ -31,6 +31,7 @@ import org.openjdk.jmh.infra.Blackhole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.benchmarks.support.LoggingScenario;
+import org.usefultoys.slf4j.benchmarks.support.MBeanScenario;
 import org.usefultoys.slf4j.meter.Meter;
 import org.usefultoys.slf4j.meter.MeterFactory;
 
@@ -82,6 +83,17 @@ public class MeterOperationBenchmark {
     @Param({"OFF", "MESSAGE", "DATA_ONLY", "MESSAGE_DATA"})
     public LoggingScenario logging;
 
+    /**
+     * JMX MXBean collection regime. Only {@link MBeanScenario#PLATFORM} matters for the
+     * Meter, which reads just the OS/platform CPU-load bean ({@code collectPlatformStatus});
+     * it never calls {@code collectManagedBeanStatus}, so {@code ALL} would be identical to
+     * {@code PLATFORM} and is omitted here (see {@link org.usefultoys.slf4j.benchmarks.WatcherBenchmark}
+     * for the full sweep). The bean is only read when the message logger is enabled, so this
+     * axis moves the number only in the {@code MESSAGE}/{@code MESSAGE_DATA} regimes.
+     */
+    @Param({"NONE", "PLATFORM"})
+    public MBeanScenario mbeans;
+
     private Logger logger;
 
     @Setup(Level.Trial)
@@ -91,6 +103,7 @@ public class MeterOperationBenchmark {
         LoggingScenario.configureSuffixes();
         logger = LoggerFactory.getLogger(CATEGORY);
         logging.apply(CATEGORY);
+        mbeans.apply();
     }
 
     @Benchmark

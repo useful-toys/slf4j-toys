@@ -29,6 +29,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 import org.usefultoys.slf4j.benchmarks.support.LoggingScenario;
+import org.usefultoys.slf4j.benchmarks.support.MBeanScenario;
 import org.usefultoys.slf4j.watcher.Watcher;
 
 import java.util.concurrent.TimeUnit;
@@ -70,12 +71,23 @@ public class WatcherBenchmark {
     @Param({"OFF", "MESSAGE", "DATA_ONLY", "MESSAGE_DATA"})
     public LoggingScenario logging;
 
+    /**
+     * JMX MXBean collection regime. All three are distinct for the Watcher, whose
+     * {@code run()} calls {@code collectManagedBeanStatus} and therefore reads the memory,
+     * class-loading, compilation and GC beans in addition to the OS/platform bean. Beans are
+     * only read when logging is enabled, so crossed with {@link LoggingScenario#OFF} every
+     * regime collapses to the same cost.
+     */
+    @Param({"NONE", "PLATFORM", "ALL"})
+    public MBeanScenario mbeans;
+
     private Watcher watcher;
 
     @Setup(Level.Trial)
     public void setup() {
         LoggingScenario.configureSuffixes();
         logging.apply(NAME);
+        mbeans.apply();
         /* Prepared instance for the run() benchmark; construct() builds its own. */
         watcher = new Watcher(NAME);
     }
