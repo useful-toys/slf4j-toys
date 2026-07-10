@@ -8,6 +8,9 @@ This module is deliberately **not** part of the Maven reactor. It is developer t
 it is never built by the default build, never published, and never puts JMH on the
 classpath of the released artifact. It targets JDK 21 and does not keep Java 8 compatibility.
 
+Benchmarks run directly through Maven (`exec:java`) — there is no uber/shaded jar to build
+or keep in sync.
+
 ---
 
 ## Part 1 — The short, didactic version
@@ -40,13 +43,10 @@ From the repository root (or the worktree whose library you want to measure):
 # 1. Install the library SNAPSHOT this module measures (redo after any library change).
 .\mvnw -DskipTests install
 
-# 2. Build the runnable benchmark jar.
-.\mvnw -f benchmarks\pom.xml clean package
-
-# 3. Run one benchmark quickly, just to see it work.
-#    Use JDK 21 explicitly: the jar is Java-21 bytecode and your PATH `java` may be older.
-& "$env:JAVA_HOME\bin\java" -jar benchmarks\target\benchmarks.jar `
-    "MeterOperationBenchmark.startOk" -p load=0 -p logging=OFF -f 1 -wi 1 -i 1
+# 2. Run one benchmark quickly, just to see it work.
+#    `compile` (re)generates JMH's benchmark metadata; exec:java then launches it with
+#    Maven's own JDK 21 (from JAVA_HOME) — no package step, no jar to keep track of.
+.\mvnw -f benchmarks\pom.xml compile exec:java "-Dexec.args=MeterOperationBenchmark.startOk -p load=0 -p logging=OFF -f 1 -wi 1 -i 1"
 ```
 
 You will see a table ending with something like:
@@ -84,34 +84,26 @@ forks/iterations, and add the GC profiler (Part 2).
 - The library **SNAPSHOT installed into the local Maven repository**. The benchmark POM
   depends on `org.usefultoys:slf4j-toys:<version>-SNAPSHOT`; it is resolved from `~/.m2`,
   **not** rebuilt automatically. Any time you change library code you want to measure, run
-  `.\mvnw -DskipTests install` again, then repackage the benchmarks. Forgetting this is the
+  `.\mvnw -DskipTests install` again before the next `exec:java` run. Forgetting this is the
   most common way to measure the wrong code.
-
-### Build
-
-```powershell
-.\mvnw -f benchmarks\pom.xml clean package
-```
-
-The Shade plugin produces a self-contained, executable jar at
-`benchmarks\target\benchmarks.jar` (main class `org.openjdk.jmh.Main`).
 
 ### Run: invocation and selectors
 
-Always launch with JDK 21:
+There is no build/package step and no jar: `exec:java` compiles the module on demand and
+runs it with the JDK behind `JAVA_HOME` (must be 21) on the module's own classpath.
 
 ```powershell
-& "$env:JAVA_HOME\bin\java" -jar benchmarks\target\benchmarks.jar [regex] [options]
+.\mvnw -f benchmarks\pom.xml compile exec:java "-Dexec.args=[regex] [options]"
 ```
 
 | Goal | Example |
 |------|---------|
-| List every benchmark | `... benchmarks.jar -l` |
-| JMH help (all options) | `... benchmarks.jar -h` |
-| Run one class | `... benchmarks.jar "WatcherBenchmark"` |
-| Run one method | `... benchmarks.jar "MeterOperationBenchmark.startOk"` |
-| Run several by regex | `... benchmarks.jar "MeterLifecycleBenchmark.(createStartOk\|okWithContext)"` |
-| Pick parameter values | `... benchmarks.jar "MeterOperationBenchmark" -p load=0,500 -p logging=OFF,MESSAGE_DATA` |
+| List every benchmark | `"-Dexec.args=-l"` |
+| JMH help (all options) | `"-Dexec.args=-h"` |
+| Run one class | `"-Dexec.args=WatcherBenchmark"` |
+| Run one method | `"-Dexec.args=MeterOperationBenchmark.startOk"` |
+| Run several by regex | `"-Dexec.args=MeterLifecycleBenchmark.(createStartOk\|okWithContext)"` |
+| Pick parameter values | `"-Dexec.args=MeterOperationBenchmark -p load=0,500 -p logging=OFF,MESSAGE_DATA"` |
 
 If you omit `-p`, JMH runs **all** declared values of that `@Param`, i.e. the full cross
 product. That is thorough but slow — narrow it while iterating.
@@ -136,7 +128,7 @@ false positives; a single fork cannot see them. Never decide on `-f 1`.
 ### Measure memory, not just time
 
 ```powershell
-& "$env:JAVA_HOME\bin\java" -jar benchmarks\target\benchmarks.jar "MeterOperationBenchmark" -prof gc
+.\mvnw -f benchmarks\pom.xml compile exec:java "-Dexec.args=MeterOperationBenchmark -prof gc"
 ```
 
 This adds allocation columns. The important one is **`gc.alloc.rate.norm`** — **bytes
@@ -174,18 +166,12 @@ Goal: prove an optimization to the library is a real improvement.
 ```powershell
 # ---------- ANTES / BEFORE: the library without the change ----------
 .\mvnw -DskipTests install                       # install the "before" library
-.\mvnw -f benchmarks\pom.xml clean package
-& "$env:JAVA_HOME\bin\java" -jar benchmarks\target\benchmarks.jar `
-    "MeterOperationBenchmark|MeterLifecycleBenchmark" `
-    -prof gc -rf json -rff before.json
+.\mvnw -f benchmarks\pom.xml compile exec:java "-Dexec.args=MeterOperationBenchmark|MeterLifecycleBenchmark -prof gc -rf json -rff before.json"
 
 # ---------- apply the optimization to the library, then ----------
 # ---------- DEPOIS / AFTER: the library with the change ----------
 .\mvnw -DskipTests install                       # reinstall the "after" library
-.\mvnw -f benchmarks\pom.xml clean package
-& "$env:JAVA_HOME\bin\java" -jar benchmarks\target\benchmarks.jar `
-    "MeterOperationBenchmark|MeterLifecycleBenchmark" `
-    -prof gc -rf json -rff after.json
+.\mvnw -f benchmarks\pom.xml compile exec:java "-Dexec.args=MeterOperationBenchmark|MeterLifecycleBenchmark -prof gc -rf json -rff after.json"
 ```
 
 `-rf json -rff <file>` writes machine-readable results. Compare `before.json` and
@@ -195,7 +181,7 @@ only when the change exceeds the error margins on both sides.
 **Critical rule:** the benchmark code must be **identical** on both sides — only the
 library may differ. So when comparing an optimization branch (e.g.
 `perf/meter-string-format`) against `main`, put that branch on the same base that carries
-these benchmarks (rebase it), install each state in turn, and reuse this exact jar.
+these benchmarks (rebase it) and install each state in turn before rerunning `exec:java`.
 
 ### Environment hygiene
 
@@ -232,26 +218,34 @@ nanoseconds, but it spans the spectrum you care about:
 Reading Meter overhead as a function of `load` answers "how much does the Meter interfere
 with a real operation" honestly: heavy on tiny operations, negligible on large ones.
 
-### The `logging` axis and a Meter/Watcher asymmetry
+### The `logging` axis
 
-`LoggingScenario` gives message and JSON-data output **separate loggers** (distinct names
-via `MeterConfig`/`WatcherConfig` suffixes) and routes enabled output to a discarding
+Four regimes, so you can measure each combination:
+
+- `OFF` — nothing is logged (not even ok/reject/fail): the instrumentation floor.
+- `MESSAGE` — the human-readable message only; JSON data off.
+- `DATA_ONLY` — the JSON5 data line only; human message off.
+- `MESSAGE_DATA` — both lines logged together.
+
+**An enabled logger fires at every lifecycle point, not just the terminal ones.** The
+message logger is set at DEBUG so `start()` (which logs at DEBUG) is covered alongside
+`ok()`/`reject()` (INFO) and `fail()` (ERROR); the data logger is set at TRACE, which the
+code checks at every point.
+
+`LoggingScenario` models message and JSON-data output as **separate loggers** (distinct
+names via `MeterConfig`/`WatcherConfig` suffixes) and routes enabled output to a discarding
 appender, so the measured cost is the **string construction inside slf4j-toys**, not
-logback's encoder or disk I/O. The regimes:
+logback's encoder or disk I/O.
 
-- `OFF` — both loggers off: the instrumentation floor.
-- `MESSAGE` — human-readable line built and emitted; JSON off.
-- `MESSAGE_DATA` — both the human-readable line and the JSON5 data line built and emitted.
-- `DATA_ONLY` — message off, data on.
+**A reachability caveat that differs between the components:**
 
-Reachability differs between the components:
-
-- **Meter** nests the data statement inside the message-level guard, so `DATA_ONLY` emits
-  nothing and equals `OFF`. Only `OFF` / `MESSAGE` / `MESSAGE_DATA` are meaningful;
-  `DATA_ONLY` exists only to confirm that equivalence.
-- **Watcher** emits the two lines independently (`run()` collects when
-  `isInfoEnabled() || isTraceEnabled()`), so `DATA_ONLY` **is** a distinct, reachable
-  regime. All four apply.
+- **Meter** — every `dataLogger.trace(...)` is nested inside a `messageLogger.isXxxEnabled()`
+  guard, at `start` and at every terminal. So with the message logger off, no data is ever
+  emitted: `DATA_ONLY` produces nothing and measures the same as `OFF`. Making data-only
+  reachable (data emitted while the human message is off) would require a **library change**
+  that un-nests the data statement from the message guard.
+- **Watcher** — `run()` collects when `isInfoEnabled() || isTraceEnabled()` and emits the two
+  lines independently, so `DATA_ONLY` **is** a distinct, reachable regime.
 
 ### Why `MeterColdStartBenchmark` uses SingleShotTime
 

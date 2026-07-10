@@ -49,9 +49,10 @@ import java.util.concurrent.TimeUnit;
  *       overhead; larger values place the Meter around progressively heavier operations.
  *       Compare against {@link OperationBaselineBenchmark#operationOnly} at the same
  *       {@code load} to read off the relative overhead.</li>
- *   <li>{@code logging} &mdash; the {@link LoggingScenario}: {@code OFF} (floor),
- *       {@code MESSAGE} (human-readable line only), {@code MESSAGE_DATA} (adds the JSON5
- *       data line). Message and data go to separate loggers, toggled independently.</li>
+ *   <li>{@code logging} &mdash; the {@link LoggingScenario}: {@code OFF} / {@code MESSAGE} /
+ *       {@code DATA_ONLY} / {@code MESSAGE_DATA}. An enabled logger fires at every lifecycle
+ *       point (start and ok/reject/fail). {@code DATA_ONLY} equals {@code OFF} for the Meter
+ *       (data is nested inside the message guard).</li>
  * </ul>
  * Run with {@code -prof gc} to also capture {@code gc.alloc.rate.norm} (bytes/op), the
  * low-variance signal for spotting allocation regressions or wins.
@@ -72,8 +73,13 @@ public class MeterOperationBenchmark {
     @Param({"0", "50", "500", "5000"})
     public long load;
 
-    /** Human-message and JSON-data logging regime. */
-    @Param({"OFF", "MESSAGE", "MESSAGE_DATA"})
+    /**
+     * Logging regime: {@code OFF} (nothing), {@code MESSAGE} (human message only),
+     * {@code DATA_ONLY} (JSON data only) or {@code MESSAGE_DATA} (both). An enabled logger
+     * fires at every lifecycle point (start and ok/reject/fail). Note {@code DATA_ONLY}
+     * equals {@code OFF} for the Meter, whose data line is nested inside the message guard.
+     */
+    @Param({"OFF", "MESSAGE", "DATA_ONLY", "MESSAGE_DATA"})
     public LoggingScenario logging;
 
     private Logger logger;

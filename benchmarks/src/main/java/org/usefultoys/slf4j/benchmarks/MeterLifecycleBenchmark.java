@@ -67,8 +67,12 @@ public class MeterLifecycleBenchmark {
     private static final String PATH = "SUCCESS";
     private static final String CTX_KEY = "id";
 
-    /** Human-message and JSON-data logging regime (three meaningful ones for Meter). */
-    @Param({"OFF", "MESSAGE", "MESSAGE_DATA"})
+    /**
+     * Logging regime: {@code OFF} / {@code MESSAGE} / {@code DATA_ONLY} / {@code MESSAGE_DATA}.
+     * An enabled logger fires at every lifecycle point (start and ok/reject/fail).
+     * {@code DATA_ONLY} equals {@code OFF} for the Meter (data nested inside the message guard).
+     */
+    @Param({"OFF", "MESSAGE", "DATA_ONLY", "MESSAGE_DATA"})
     public LoggingScenario logging;
 
     private Logger logger;
