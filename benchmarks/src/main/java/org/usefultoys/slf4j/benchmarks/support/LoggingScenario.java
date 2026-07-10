@@ -32,6 +32,11 @@ import org.usefultoys.slf4j.watcher.WatcherConfig;
  * {@code "c"} then writes human-readable messages to {@code "c" + messageSuffix} and
  * JSON5 data to {@code "c" + dataSuffix}, so each can be switched on or off on its own.
  * <p>
+ * When a logger is enabled it is set at a level that covers <em>every</em> lifecycle point,
+ * not only the terminal ones: the message logger uses DEBUG so {@code start()} (DEBUG) logs
+ * alongside {@code ok()}/{@code reject()} (INFO) and {@code fail()} (ERROR); the data logger
+ * uses TRACE, which the code checks at every point.
+ * <p>
  * Note on reachability &mdash; and this differs between the two components:
  * <ul>
  *   <li><b>Meter</b>: the data statement is nested inside the message-level guard
@@ -48,13 +53,27 @@ import org.usefultoys.slf4j.watcher.WatcherConfig;
  * cost is the string construction inside slf4j-toys, not logback's encoder or I/O.
  */
 public enum LoggingScenario {
-    /** Both loggers OFF: pure instrumentation floor. */
+    /** Both loggers OFF: nothing logged, pure instrumentation floor. */
     OFF(Level.OFF, Level.OFF),
-    /** Human-readable messages built and emitted; JSON5 data off. */
-    MESSAGE(Level.INFO, Level.OFF),
-    /** Both human-readable messages and JSON5 data built and emitted. */
-    MESSAGE_DATA(Level.INFO, Level.TRACE),
-    /** Message off, data TRACE: unreachable data path; should match {@link #OFF}. */
+    /**
+     * Human-readable messages only. The message logger is at DEBUG (not INFO) on purpose,
+     * so the activation covers <em>every</em> Meter lifecycle point &mdash; {@code start()}
+     * logs at DEBUG, {@code ok()} at INFO/WARN, {@code reject()} at INFO, {@code fail()} at
+     * ERROR &mdash; not just the terminal ones. JSON5 data off.
+     */
+    MESSAGE(Level.DEBUG, Level.OFF),
+    /**
+     * Both human-readable messages and JSON5 data, at every lifecycle point. Message logger
+     * at DEBUG (covers start + ok/reject/fail); data logger at TRACE.
+     */
+    MESSAGE_DATA(Level.DEBUG, Level.TRACE),
+    /**
+     * JSON5 data only (message logger off). Reachable for the <b>Watcher</b>, which emits its
+     * message and data lines independently. For the <b>Meter</b> this is <em>unreachable</em>
+     * and equals {@link #OFF}: every {@code dataLogger.trace(...)} is nested inside a
+     * {@code messageLogger.isXxxEnabled()} guard, so with the message logger off no data is
+     * ever emitted, at start or at any terminal.
+     */
     DATA_ONLY(Level.OFF, Level.TRACE);
 
     public static final String MESSAGE_SUFFIX = ".msg";

@@ -44,9 +44,9 @@ import java.util.concurrent.TimeUnit;
  *       repeatedly, so one shared instance is reused across invocations.</li>
  * </ul>
  * The {@code logging} axis uses all four {@link LoggingScenario} regimes because the
- * Watcher, unlike the Meter, emits its human-readable and JSON5 data lines
- * independently ({@code run()} collects when {@code isInfoEnabled() || isTraceEnabled()}),
- * so {@link LoggingScenario#DATA_ONLY} is a genuinely distinct, reachable case here.
+ * Watcher, unlike the Meter, emits its human-readable and JSON5 data lines independently
+ * ({@code run()} collects when {@code isInfoEnabled() || isTraceEnabled()}), so
+ * {@link LoggingScenario#DATA_ONLY} is a genuinely distinct, reachable case here.
  * <p>
  * Enabled output is routed to a discarding appender, so the measured cost is the
  * metric collection and string construction inside slf4j-toys, not logback I/O. Run
@@ -62,8 +62,12 @@ public class WatcherBenchmark {
 
     private static final String NAME = "benchmark.watcher";
 
-    /** Human-message and JSON-data logging regime; all four are meaningful for Watcher. */
-    @Param({"OFF", "MESSAGE", "MESSAGE_DATA", "DATA_ONLY"})
+    /**
+     * Logging regime: {@code OFF} / {@code MESSAGE} / {@code DATA_ONLY} / {@code MESSAGE_DATA}.
+     * All four are meaningful for the Watcher, which emits its message and data lines
+     * independently, so {@code DATA_ONLY} is a genuinely distinct, reachable case here.
+     */
+    @Param({"OFF", "MESSAGE", "DATA_ONLY", "MESSAGE_DATA"})
     public LoggingScenario logging;
 
     private Watcher watcher;
