@@ -10,10 +10,11 @@
     Prerequisite: install the library SNAPSHOT into the local Maven repository once:
         .\mvnw -DskipTests install
 
-    Then build and run the benchmarks:
-        .\mvnw -f benchmarks\pom.xml clean package
-        java -jar benchmarks\target\benchmarks.jar -wi 1 -i 1 -f 1 -t 1
-        java -jar benchmarks\target\benchmarks.jar -prof gc -wi 1 -i 1 -f 1
+    Then run the benchmarks directly with Maven (no uber jar is built). The `compile`
+    phase must run first so the JMH annotation processor (re)generates the benchmark
+    metadata `exec:java` needs:
+        .\mvnw -f benchmarks\pom.xml compile exec:java "-Dexec.args=-wi 1 -i 1 -f 1 -t 1"
+        .\mvnw -f benchmarks\pom.xml compile exec:java "-Dexec.args=-prof gc -wi 1 -i 1 -f 1"
 
     JDK 21 is required (matches the repository build JDK). Benchmarks are
     developer tooling and do not need to maintain Java 8 compatibility, since
@@ -106,37 +107,40 @@
             </plugin>
 
             <plugin>
+                <!-- Writes this module's runtime classpath into ${jmh.classpath}, so it can be
+                     republished as the java.class.path system property below. JMH's @Fork
+                     support launches a child "java" process per fork and builds that child's
+                     classpath by reading java.class.path from the current (Maven) JVM; without
+                     this, the child only sees Maven's own classpath and fails to find JMH. -->
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.8.1</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <id>build-classpath</id>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>build-classpath</goal>
                         </goals>
                         <configuration>
-                            <finalName>benchmarks</finalName>
-                            <transformers>
-                                <transformer
-                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.openjdk.jmh.Main</mainClass>
-                                </transformer>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/MANIFEST.MF</exclude>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
+                            <outputProperty>jmh.classpath</outputProperty>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <mainClass>org.openjdk.jmh.Main</mainClass>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>java.class.path</key>
+                            <value>${project.build.outputDirectory}${path.separator}${jmh.classpath}</value>
+                        </systemProperty>
+                    </systemProperties>
+                </configuration>
             </plugin>
         </plugins>
     </build>
