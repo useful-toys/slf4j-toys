@@ -17,7 +17,6 @@ package org.usefultoys.slf4j.internal;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,30 +49,32 @@ class SystemDataJson5 {
     private final Pattern patternGarbageCollector = Pattern.compile(REGEX_START + PROP_GARBAGE_COLLECTOR + REGEX_2_TUPLE);
     private final Pattern patternSystemLoad = Pattern.compile(REGEX_START + PROP_SYSTEM_LOAD + REGEX_WORD_VALUE);
 
+    @SuppressWarnings("MagicCharacter")
     void write(final SystemData data, final StringBuilder sb) {
         if (data.runtime_usedMemory > 0 || data.runtime_totalMemory > 0 || data.runtime_maxMemory > 0) {
-            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_MEMORY, data.runtime_usedMemory, data.runtime_totalMemory, data.runtime_maxMemory));
+            sb.append(',').append(PROP_MEMORY).append(":[").append(data.runtime_usedMemory).append(',').append(data.runtime_totalMemory).append(',').append(data.runtime_maxMemory).append(']');
         }
         if (data.heap_commited > 0 || data.heap_max > 0 || data.heap_used > 0) {
-            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_HEAP, data.heap_used, data.heap_commited, data.heap_max));
+            sb.append(',').append(PROP_HEAP).append(":[").append(data.heap_used).append(',').append(data.heap_commited).append(',').append(data.heap_max).append(']');
         }
         if (data.nonHeap_commited > 0 || data.nonHeap_max > 0 || data.nonHeap_used > 0) {
-            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_NON_HEAP, data.nonHeap_used, data.nonHeap_commited, data.nonHeap_max));
+            sb.append(',').append(PROP_NON_HEAP).append(":[").append(data.nonHeap_used).append(',').append(data.nonHeap_commited).append(',').append(data.nonHeap_max).append(']');
         }
         if (data.objectPendingFinalizationCount > 0) {
-            sb.append(String.format(Locale.US, ",%s:%d", PROP_FINALIZATION_COUNT, data.objectPendingFinalizationCount));
+            sb.append(',').append(PROP_FINALIZATION_COUNT).append(':').append(data.objectPendingFinalizationCount);
         }
         if (data.classLoading_loaded > 0 || data.classLoading_total > 0 || data.classLoading_unloaded > 0) {
-            sb.append(String.format(Locale.US, ",%s:[%d,%d,%d]", PROP_CLASS_LOADING, data.classLoading_total, data.classLoading_loaded, data.classLoading_unloaded));
+            sb.append(',').append(PROP_CLASS_LOADING).append(":[").append(data.classLoading_total).append(',').append(data.classLoading_loaded).append(',').append(data.classLoading_unloaded).append(']');
         }
         if (data.compilationTime > 0) {
-            sb.append(String.format(Locale.US, ",%s:%d", PROP_COMPILATION_TIME, data.compilationTime));
+            sb.append(',').append(PROP_COMPILATION_TIME).append(':').append(data.compilationTime);
         }
         if (data.garbageCollector_count > 0 || data.garbageCollector_time > 0) {
-            sb.append(String.format(Locale.US, ",%s:[%d,%d]", PROP_GARBAGE_COLLECTOR, data.garbageCollector_count, data.garbageCollector_time));
+            sb.append(',').append(PROP_GARBAGE_COLLECTOR).append(":[").append(data.garbageCollector_count).append(',').append(data.garbageCollector_time).append(']');
         }
         if (data.systemLoad > 0) {
-            sb.append(String.format(Locale.US, ",%s:%.1f", PROP_SYSTEM_LOAD, data.systemLoad));
+            final long scaled = Math.round(data.systemLoad * 10);
+            sb.append(',').append(PROP_SYSTEM_LOAD).append(':').append(scaled / 10).append('.').append(scaled % 10);
         }
     }
 
