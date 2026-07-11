@@ -16,6 +16,7 @@
 package org.usefultoys.slf4j.meter;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
@@ -123,19 +124,26 @@ final class MeterLeakDetector {
      * primitive read. {@code category}, {@code operation} and {@code position} are stable from
      * construction onward, so the deferred concatenation still produces the same byte-for-byte
      * {@code fullID} the eager snapshot did.
+     * <p>
+     * The message {@link Logger} is snapshotted by <em>name</em>, not by instance: holding the
+     * {@code Logger} instance itself in the static {@link #ANCHOR} would strongly retain it — and
+     * whatever it in turn retains (backend appenders, and transitively their class loader) — for as
+     * long as the meter stays leaked and undrained. Resolving the logger by name in {@link #reportLeak()}
+     * defers that lookup to report time, keeping the anchor from pinning a logging backend that may have
+     * been torn down (e.g. a servlet container undeploying the web application that owned the logger).
      */
     static final class MeterReference extends PhantomReference<Meter> {
         private final String category;
         private final String operation;
         private final long position;
-        private final Logger messageLogger;
+        private final String messageLoggerName;
 
         MeterReference(final Meter meter, final ReferenceQueue<Meter> queue) {
             super(meter, queue);
             this.category = meter.getCategory();
             this.operation = meter.getOperation();
             this.position = meter.getPosition();
-            this.messageLogger = meter.getMessageLogger();
+            this.messageLoggerName = meter.getMessageLogger().getName();
         }
 
         /**
@@ -143,12 +151,14 @@ final class MeterLeakDetector {
          * {@code MeterValidator.validateFinalize} message. The {@code fullID} is assembled here
          * from the snapshotted components, using the same formula as
          * {@link MeterData#getFullID()}, so it only runs when a leak is actually surfaced —
-         * never on the {@code start()} hot path and never for a correctly stopped meter.
+         * never on the {@code start()} hot path and never for a correctly stopped meter. The message
+         * logger itself is resolved here, by name, rather than held since registration.
          */
         void reportLeak() {
             final String fullID = operation == null
                     ? category + '#' + position
                     : category + '/' + operation + '#' + position;
+            final Logger messageLogger = LoggerFactory.getLogger(messageLoggerName);
             messageLogger.error(Markers.INVALID_ARGUMENT,
                     "{}; id={}",
                     "Meter never stopped, must remember to call ok/reject/fail/success() on each started one",
