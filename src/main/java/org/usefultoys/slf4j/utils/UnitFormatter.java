@@ -66,7 +66,7 @@ public final class UnitFormatter {
         int index = 0;
         final int limit = factors[index] + factors[index] / 10;
         if (value < limit) {
-            return String.format(SessionConfig.locale, "%d%s", value, units[index]);
+            return Long.toString(value).concat(units[index]);
         }
 
         final int length = factors.length;
