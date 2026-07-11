@@ -229,8 +229,10 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * check, or a {@code Watcher} tick — flush them on its own cadence, and unlike the lifecycle-triggered
      * drains it is exhaustive: it reports every pending leak before returning.
      * <p>
-     * When leak detection is disabled ({@link MeterConfig#detectLeaks} is {@code false}) nothing is
-     * registered and this is a cheap no-op. Safe to call from any thread.
+     * When leak detection is disabled ({@link MeterConfig#detectLeaks} is {@code false}) nothing new is
+     * registered, but this call is not necessarily a no-op: it still drains and reports any leak already
+     * pending from a {@link Meter} registered while the flag was previously {@code true}. Safe to call
+     * from any thread.
      */
     public static void drainLeaks() {
         MeterLeakDetector.drainAll();
