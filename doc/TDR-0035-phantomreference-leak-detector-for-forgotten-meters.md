@@ -116,6 +116,7 @@ The anchor set is a `ConcurrentHashMap`-backed set, so `add`/`remove` are CAS op
 - **Gated by configuration**: `MeterConfig.detectLeaks` (system property `slf4jtoys.meter.detect.leaks`, default `true`) decides whether registration happens at all. When disabled, nothing is registered and `drain()` processes an empty queue.
 - **Bounded drains spread reports over several calls**: because lifecycle-triggered drains report at most `MAX_DRAIN` leaks and skip when another thread is already draining, a large batch of leaks surfaces across a few lifecycle calls (or one `Meter.drainLeaks()`) instead of all at once. Detection completeness is unaffected — references stay queued until claimed — only the reporting is smoothed.
 - **Message parity**: the emitted message and its `INVALID_ARGUMENT` marker are identical to the former `finalize()` path, so log consumers and existing expectations are unaffected.
+- **New `watcher` → `meter` package dependency**: wiring `Watcher.run()` to call `Meter.drainLeaks()` (see Implementation) makes the `org.usefultoys.slf4j.watcher` package depend on `org.usefultoys.slf4j.meter`, which it previously did not. Both packages already ship in the same JAR, so this is intra-artifact coupling, not a new external dependency, and it buys periodic draining with no library-owned thread (see the rejected background-thread alternative below). It does mean a `Watcher`-only application now also initializes `Meter`/`MeterConfig`/`MeterLeakDetector` statics and pays a cheap `drainAll()` poll on every tick.
 
 ## Alternatives Considered
 
