@@ -111,7 +111,9 @@ public class Watcher extends WatcherData implements Runnable {
         }
         /* Drive the leak detector's opportunistic drain from the watcher's periodic tick, so forgotten-meter
            leaks are still reported when the application has otherwise gone quiet on meter activity. Cheap
-           no-op when leak detection is disabled. */
+           when no leak is pending (a single volatile poll). Note that disabling MeterConfig.detectLeaks at
+           runtime only stops new registrations -- it does not suppress reports for meters registered while
+           it was still enabled, so this call can still emit reports even right after the flag is toggled off. */
         Meter.drainLeaks();
     }
 }

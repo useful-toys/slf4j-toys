@@ -129,7 +129,10 @@ public class MeterConfig {
      * overhead of registering each started meter is undesirable.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.detect.leaks}, defaulting to {@code true}.
-     * Can be assigned a new value at runtime.
+     * Can be assigned a new value at runtime, but doing so only affects <em>new</em> registrations: a
+     * {@link Meter} started while this flag was {@code true} remains registered and can still be reported
+     * as a leak after the flag is set back to {@code false}, since disabling it does not retroactively
+     * deregister or discard already-pending reports.
      */
     public boolean detectLeaks;
 
