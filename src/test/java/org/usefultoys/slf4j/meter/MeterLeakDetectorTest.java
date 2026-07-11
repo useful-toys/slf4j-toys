@@ -277,6 +277,32 @@ class MeterLeakDetectorTest {
     }
 
     @Test
+    @DisplayName("drain should swallow a logging backend that throws an Error, not just Exception")
+    void drainSwallowsThrowingLoggerErrorAndContinues() {
+        // Given: a torn-down logging backend (e.g. a servlet container undeploy) throws a LinkageError,
+        // which is an Error, not an Exception -- the drain must not let it escape into the caller's
+        // own start()/stop() call, which belongs to a completely unrelated Meter.
+        final Logger throwingLogger = mock(Logger.class);
+        doThrow(new LinkageError("boom")).when(throwingLogger)
+                .error(any(Marker.class), anyString(), any(), any());
+        final Meter poisoned = mock(Meter.class);
+        lenient().when(poisoned.getMessageLogger()).thenReturn(throwingLogger);
+        lenient().when(poisoned.getCategory()).thenReturn("poisoned");
+        lenient().when(poisoned.getOperation()).thenReturn(null);
+        lenient().when(poisoned.getPosition()).thenReturn(0L);
+
+        final MeterReference poisonedRef = MeterLeakDetector.register(poisoned);
+        final MeterReference healthyRef = MeterLeakDetector.register(meter);
+        poisonedRef.enqueue();
+        healthyRef.enqueue();
+
+        assertDoesNotThrow(MeterLeakDetector::drain,
+                "a LinkageError from a misbehaving logging backend must never disturb the thread that triggered the drain");
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
+                "Meter never stopped, must remember to call ok/reject/fail/success() on each started one; id=test#0");
+    }
+
+    @Test
     @DisplayName("clearForTests discards anchored refs and pending queue entries without reporting")
     void clearForTestsDiscardsAnchoredAndQueued() {
         // Given: two registered references; one is enqueued (pending leak), the other is merely anchored.

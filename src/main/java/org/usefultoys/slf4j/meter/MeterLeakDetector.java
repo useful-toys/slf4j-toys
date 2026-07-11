@@ -286,9 +286,13 @@ final class MeterLeakDetector {
         if (ANCHOR.remove(ref)) {
             try {
                 ref.reportLeak();
-            } catch (final Exception ignored) {
+            } catch (final Throwable ignored) {
                 // Leak reporting is a diagnostic aid; a misbehaving logging backend must never
-                // disturb the application thread that happened to trigger the drain.
+                // disturb the application thread that happened to trigger the drain. Catching
+                // Throwable (not just Exception) matters here: this thread is doing work on
+                // behalf of a different, possibly unrelated Meter, so even a LinkageError from
+                // a torn-down logging backend (e.g. a servlet container undeploy) must not
+                // propagate into the caller's own start()/stop() call.
             }
         }
     }
