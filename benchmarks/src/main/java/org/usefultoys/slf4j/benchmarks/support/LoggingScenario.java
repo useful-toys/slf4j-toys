@@ -119,7 +119,7 @@ public enum LoggingScenario {
     private static void configure(final LoggerContext context, final String loggerName, final Level level) {
         final Logger logger = context.getLogger(loggerName);
         logger.detachAndStopAllAppenders();
-        if (level != Level.OFF) {
+        if (!Level.OFF.equals(level)) {
             final DiscardAppender appender = new DiscardAppender();
             appender.setContext(context);
             appender.setName("discard");
