@@ -17,7 +17,6 @@ package org.usefultoys.slf4j.internal;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,10 +61,9 @@ class EventDataJson5 {
      * @param sb   The {@link StringBuilder} to append to.
      */
     void write(final EventData data, final StringBuilder sb) {
-        sb.append(String.format(Locale.US, "%s:%s,%s:%d,%s:%d",
-                SESSION_UUID, data.getSessionUuid(),
-                EVENT_POSITION, data.getPosition(),
-                EVENT_TIME, data.getLastCurrentTime()));
+        sb.append(SESSION_UUID).append(':').append(data.getSessionUuid())
+                .append(',').append(EVENT_POSITION).append(':').append(data.getPosition())
+                .append(',').append(EVENT_TIME).append(':').append(data.getLastCurrentTime());
     }
 
     /**
