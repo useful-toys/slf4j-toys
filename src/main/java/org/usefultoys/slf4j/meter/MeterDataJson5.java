@@ -18,7 +18,6 @@ package org.usefultoys.slf4j.meter;
 import lombok.experimental.UtilityClass;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -113,46 +112,46 @@ class MeterDataJson5 {
     @SuppressWarnings("MagicCharacter")
     void write(final MeterData data, final StringBuilder sb) {
         if (data.description != null) {
-            sb.append(String.format(",%s:'%s'", PROP_DESCRIPTION, data.description));
+            sb.append(',').append(PROP_DESCRIPTION).append(":'").append(data.description).append('\'');
         }
         if (data.rejectPath != null) {
-            sb.append(String.format(",%s:%s", PROP_REJECT_ID, data.rejectPath));
+            sb.append(',').append(PROP_REJECT_ID).append(':').append(data.rejectPath);
         }
         if (data.okPath != null) {
-            sb.append(String.format(",%s:%s", PROP_PATH_ID, data.okPath));
+            sb.append(',').append(PROP_PATH_ID).append(':').append(data.okPath);
         }
         if (data.failPath != null) {
-            sb.append(String.format(",%s:%s", PROP_FAIL_ID, data.failPath));
+            sb.append(',').append(PROP_FAIL_ID).append(':').append(data.failPath);
         }
         if (data.failMessage != null) {
-            sb.append(String.format(",%s:'%s'", PROP_FAIL_MESSAGE, data.failMessage));
+            sb.append(',').append(PROP_FAIL_MESSAGE).append(":'").append(data.failMessage).append('\'');
         }
         if (data.category != null) {
-            sb.append(String.format(",%s:%s", EVENT_CATEGORY, data.category));
+            sb.append(',').append(EVENT_CATEGORY).append(':').append(data.category);
         }
         if (data.operation != null) {
-            sb.append(String.format(",%s:%s", EVENT_NAME, data.operation));
+            sb.append(',').append(EVENT_NAME).append(':').append(data.operation);
         }
         if (data.parent != null) {
-            sb.append(String.format(",%s:%s", EVENT_PARENT, data.parent));
+            sb.append(',').append(EVENT_PARENT).append(':').append(data.parent);
         }
         if (data.createTime != 0) {
-            sb.append(String.format(Locale.US, ",%s:%d", PROP_CREATE_TIME, data.createTime));
+            sb.append(',').append(PROP_CREATE_TIME).append(':').append(data.createTime);
         }
         if (data.startTime != 0) {
-            sb.append(String.format(Locale.US, ",%s:%d", PROP_START_TIME, data.startTime));
+            sb.append(',').append(PROP_START_TIME).append(':').append(data.startTime);
         }
         if (data.stopTime != 0) {
-            sb.append(String.format(Locale.US, ",%s:%d", PROP_STOP_TIME, data.stopTime));
+            sb.append(',').append(PROP_STOP_TIME).append(':').append(data.stopTime);
         }
         if (data.currentIteration != 0) {
-            sb.append(String.format(Locale.US, ",%s:%d", PROP_ITERATION, data.currentIteration));
+            sb.append(',').append(PROP_ITERATION).append(':').append(data.currentIteration);
         }
         if (data.expectedIterations != 0) {
-            sb.append(String.format(Locale.US, ",%s:%d", PROP_EXPECTED_ITERATION, data.expectedIterations));
+            sb.append(',').append(PROP_EXPECTED_ITERATION).append(':').append(data.expectedIterations);
         }
         if (data.timeLimit != 0) {
-            sb.append(String.format(Locale.US, ",%s:%d", PROP_LIMIT_TIME, data.timeLimit));
+            sb.append(',').append(PROP_LIMIT_TIME).append(':').append(data.timeLimit);
         }
         if (data.context != null && !data.context.isEmpty()) {
             sb.append(',');
