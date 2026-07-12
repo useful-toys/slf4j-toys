@@ -152,8 +152,19 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 extractNextPosition(logger.getName(), operation),
                 logger.getName(), operation, parent);
         createTime = collectCurrentTime();
-        messageLogger = org.slf4j.LoggerFactory.getLogger(MeterConfig.messagePrefix + logger.getName() + MeterConfig.messageSuffix);
-        dataLogger = org.slf4j.LoggerFactory.getLogger(MeterConfig.dataPrefix + logger.getName() + MeterConfig.dataSuffix);
+        messageLogger = resolveDecoratedLogger(logger, MeterConfig.messagePrefix, MeterConfig.messageSuffix);
+        dataLogger = resolveDecoratedLogger(logger, MeterConfig.dataPrefix, MeterConfig.dataSuffix);
+    }
+
+    /**
+     * Resolves the logger to use for decorated (prefixed/suffixed) output. Reuses {@code base} directly when both
+     * {@code prefix} and {@code suffix} are empty (the default), avoiding a redundant name concatenation and
+     * backend logger-registry lookup for the common case.
+     */
+    private static Logger resolveDecoratedLogger(final Logger base, final String prefix, final String suffix) {
+        return (prefix.isEmpty() && suffix.isEmpty())
+                ? base
+                : org.slf4j.LoggerFactory.getLogger(prefix + base.getName() + suffix);
     }
 
     /**
