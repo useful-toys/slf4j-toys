@@ -80,6 +80,10 @@ public class MeterValidatorTest {
         MockitoAnnotations.openMocks(this);
         lenient().when(meter.getMessageLogger()).thenReturn(logger);
         lenient().when(meter.getFullID()).thenReturn("test-id");
+        /* Match real Meter's default: always report misuse. Without this stub, the mock's unstubbed
+           boolean method returns false, silently suppressing every logInvalidState/logInvalidTransition
+           call under test (see MeterValidator.shouldReportInvalidUsage() gate, TDR-0042). */
+        lenient().when(meter.shouldReportInvalidUsage()).thenReturn(true);
     }
 
     @Nested
