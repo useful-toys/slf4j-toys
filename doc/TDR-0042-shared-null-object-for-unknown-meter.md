@@ -43,6 +43,30 @@ public static Meter getCurrentInstance() {
 
 **`sub()` becomes absorbing, not delegating.** Previously, `getCurrentInstance().sub("child")` (the implementation of `MeterFactory.getCurrentSubMeter`) built a real, usable `"???/child"` meter even with no active parent — silently manufacturing a meaningless hierarchy entry. `UnknownMeter.sub(...)` now returns `UNKNOWN_INSTANCE` itself and logs the same `INVALID_TRANSITION`, i.e. `UNKNOWN_INSTANCE.sub(x) == UNKNOWN_INSTANCE`. Requesting a sub-operation with no active parent is exactly the same class of misuse as calling `ok()` with no active meter, and is now reported the same way.
 
+### Follow-up: throttling misuse reports against the shared instance
+
+Reporting every misuse unconditionally, as designed above, has a cost concentrated entirely on the shared singleton: a defensive call pattern like `Meter.getCurrentInstance().progress()` in a hot loop with no active meter would log an `ERROR` and allocate a `CallerStackTraceThrowable` (which walks and filters the current stack trace) on *every single call*, flooding the error channel and burning CPU on a cold-path diagnostic that, past the first occurrence, adds no new information.
+
+**Decision:** two package-private hooks on `Meter`, both no-ops for real meters and both overridden by `UnknownMeter`:
+
+```java
+boolean shouldReportInvalidUsage() { return true; }   // real meters: always report
+String invalidUsageDiagnosis() { return null; }        // real meters: keep the caller-supplied message
+```
+
+`MeterValidator.logInvalidTransition`/`logInvalidState` consult `shouldReportInvalidUsage()` (after `getMessageLogger().isErrorEnabled()`, so the throwable allocation is gated by both — real meters pay a trivial `true` check on this already-cold path, never on the hot path of correct usage) and, if the report proceeds, `invalidUsageDiagnosis()` to override the message. `UnknownMeter` implements a time-based rate limit — a static `AtomicLong nextAllowedReportNanos` advanced via a CAS loop on `System.nanoTime()`, and a static `AtomicLong suppressedCount` incremented on every throttled occurrence and drained into the next allowed report's message ("N similar reports suppressed"). The interval is configurable via `MeterConfig.noopReportIntervalMilliseconds` (default 60000 ms; `0` disables throttling; negative disables reporting entirely), following the same system-property convention as every other `MeterConfig` value.
+
+The same `invalidUsageDiagnosis()` override also fixes a latent inaccuracy: `inc()`/`incBy()`/`incTo()`/`progress()`/`path(Object)` are not overridden by `UnknownMeter` (their own preconditions already reject `startTime == 0`, which is permanently true for the singleton), but the message their preconditions produce — *"Meter not yet started, must call start() first"* — is misleading for a meter that was never meant to be started at all. `UnknownMeter.invalidUsageDiagnosis()` replaces it, and any other message routed through these two helpers, with the accurate *"no operation is active on the current thread"*.
+
+#### Alternatives considered for the throttle
+
+- ❌ **Log once, ever.** Simpler, but a single silent misuse pattern early in an application's life would forever suppress evidence of a *different*, later misuse pattern — the throttle needs to keep reporting periodically, not retire permanently after the first occurrence.
+- ❌ **Per-call-site deduplication (keyed by stack trace or caller location).** Would distinguish "many different bugs calling `getCurrentInstance()` unsafely" from "one bug calling it in a loop", which is valuable, but requires capturing and hashing a stack trace (or caller class/method) on every occurrence — reintroducing the exact per-call cost (`CallerStackTraceThrowable` capture) the throttle exists to avoid, just to decide whether to throttle.
+- ❌ **Rely on a backend `DuplicateMessageFilter`** (e.g. Logback's `DuplicateMessageFilter`, or an application-side equivalent). Rejected because it is opt-in, backend-specific configuration external to this library — the whole point of `UnknownMeter` is that the shared instance is *safe by default*, not safe only when the application also configures its logging backend correctly. It also still pays the `CallerStackTraceThrowable` allocation before the backend ever sees the event to decide whether to drop it.
+- ❌ **Downgrade the shared instance's misuse level** (e.g. `WARN` instead of `ERROR`, expecting operators to tune the appLogger threshold down). Rejected: it weakens the diagnostic for every application, including those that never hit the high-frequency pattern this throttle protects against, to work around a problem only some applications have; the throttle solves the actual frequency problem without diluting severity.
+
+The throttle's own runtime state (`nextAllowedReportNanos`, `suppressedCount`) is reset by `MeterConfig.reset()`, alongside the config properties — necessary so that test isolation relying on that reset (e.g. via the existing `@ResetMeterConfig` extension) always observes the first misuse report immediately, regardless of throttle state accumulated by a previous test.
+
 ## Consequences
 
 ### Positive ✅
@@ -55,7 +79,7 @@ public static Meter getCurrentInstance() {
 ### Negative ❌
 
 - **Behavioral change for the sub-meter fallback.** `MeterFactory.getCurrentSubMeter(name)` called with no active parent used to return a distinct, real `"???/name"` meter; it now returns the shared `UNKNOWN_INSTANCE` unchanged (category `"???"`, no operation). Call sites relying on the former fallback's identity or operation name observe different behavior. Verified against the full test suite (2839 tests, both `slf4j-2.0` and `slf4j-2.0,with-logback` profiles); one existing test (`MeterFactoryTest.shouldCreateSubMeterFromFallbackWhenNoCurrentMeterIsStarted`) was updated to assert the new absorbing behavior.
-- **Larger, harder-to-forget override surface.** Every future state-mutating method added to `Meter` must be remembered and added to `UnknownMeter`'s overrides, or it silently mutates the shared singleton again. This risk is bounded by the fact that all current mutators already follow the `if (!MeterValidator.validateXxx(this)) return this;` guard-clause pattern, making the override list mechanically derivable by inspection, and by `MeterUnknownInstanceTest`, which exercises every currently known mutator against the singleton.
+- **Larger, harder-to-forget override surface.** Every future state-mutating method added to `Meter` must be remembered and added to `UnknownMeter`'s overrides, or it silently mutates the shared singleton again. This risk is bounded by the fact that all current mutators already follow the `if (!MeterValidator.validateXxx(this)) return this;` guard-clause pattern, making the override list mechanically derivable by inspection, and by `MeterUnknownInstanceTest`, which exercises every currently known mutator against the singleton. `MeterUnknownInstanceOverrideInvariantTest` closes the remaining gap for *future* additions: it reflectively enumerates every public, `Meter`/`void`-returning method declared on `Meter` and fails loudly if that set drifts from a hand-maintained invoker map, rather than silently missing a newly added method the way a purely hand-listed test would.
 
 ### Neutral ⚖️
 
@@ -90,8 +114,12 @@ public static Meter getCurrentInstance() {
 
 ## Implementation
 
-- [src/main/java/org/usefultoys/slf4j/meter/Meter.java](../src/main/java/org/usefultoys/slf4j/meter/Meter.java) — `UNKNOWN_INSTANCE` field, `getCurrentInstance()` miss path, and the nested `UnknownMeter` class with its overrides.
+- [src/main/java/org/usefultoys/slf4j/meter/Meter.java](../src/main/java/org/usefultoys/slf4j/meter/Meter.java) — `UNKNOWN_INSTANCE` field, `getCurrentInstance()` miss path, the nested `UnknownMeter` class with its overrides, the `shouldReportInvalidUsage()`/`invalidUsageDiagnosis()` hooks, and `UnknownMeter`'s throttle fields/overrides.
+- [src/main/java/org/usefultoys/slf4j/meter/MeterValidator.java](../src/main/java/org/usefultoys/slf4j/meter/MeterValidator.java) — `logInvalidTransition`/`logInvalidState` gate the `CallerStackTraceThrowable` allocation on `isErrorEnabled()` and `shouldReportInvalidUsage()`, and consult `invalidUsageDiagnosis()` to override the message.
+- [src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java](../src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java) — `noopReportIntervalMilliseconds` property; `reset()` also resets the throttle's runtime state via `Meter.resetNoopReportThrottle()`.
 - [src/test/java/org/usefultoys/slf4j/meter/MeterUnknownInstanceTest.java](../src/test/java/org/usefultoys/slf4j/meter/MeterUnknownInstanceTest.java) — asserts single-instance identity (repeated calls and across threads), the unknown category, and that every overridden mutator logs `INVALID_TRANSITION` without changing observable state.
+- [src/test/java/org/usefultoys/slf4j/meter/MeterUnknownInstanceOverrideInvariantTest.java](../src/test/java/org/usefultoys/slf4j/meter/MeterUnknownInstanceOverrideInvariantTest.java) — reflective safety net: enumerates every qualifying method on `Meter` and cross-checks it against a hand-maintained invoker map, then asserts each one leaves `UNKNOWN_INSTANCE`'s observable state unchanged.
+- [src/test/java/org/usefultoys/slf4j/meter/MeterUnknownInstanceThrottleTest.java](../src/test/java/org/usefultoys/slf4j/meter/MeterUnknownInstanceThrottleTest.java) — throttle behavior: immediate first report, suppression within the interval, suppressed-count embedding after the interval elapses, `0`/negative interval edge cases, real meters never throttled, no throwable allocated when `ERROR` is disabled.
 - [src/test/java/org/usefultoys/slf4j/meter/MeterFactoryTest.java](../src/test/java/org/usefultoys/slf4j/meter/MeterFactoryTest.java) — `shouldCreateSubMeterFromFallbackWhenNoCurrentMeterIsStarted` updated for the absorbing `sub()` behavior.
 
 ## References

@@ -351,17 +351,42 @@ public class MeterValidator {
 
     /**
      * Logs an illegal precondition for a Meter operation.
+     * <p>
+     * Gated on {@link org.slf4j.Logger#isErrorEnabled()} and {@link Meter#shouldReportInvalidUsage()},
+     * checked in that order, before allocating the {@link CallerStackTraceThrowable}: real meters always
+     * report (the hook is a trivial {@code true}, only reached on this cold misuse path, so the hot path
+     * of a correctly used {@code Meter} pays nothing extra), while the shared unknown-meter null-object
+     * throttles high-frequency misuse instead of flooding the error channel and paying a stack-trace
+     * capture per call. See TDR-0042.
+     *
      * @param meter   The Meter instance with the illegal precondition.
      * @param message A descriptive message about the illegal precondition.
      */
     void logInvalidState(final Meter meter, final String message) {
+        if (!meter.getMessageLogger().isErrorEnabled() || !meter.shouldReportInvalidUsage()) {
+            return;
+        }
         final CallerStackTraceThrowable throwable = new CallerStackTraceThrowable();
-        meter.getMessageLogger().error(Markers.INVALID_STATE, "Meter.{} - {}; id={}", throwable.getApiMethodName(), message, meter.getFullID(), throwable);
+        final String diagnosis = meter.invalidUsageDiagnosis();
+        meter.getMessageLogger().error(Markers.INVALID_STATE, "Meter.{} - {}; id={}", throwable.getApiMethodName(), diagnosis != null ? diagnosis : message, meter.getFullID(), throwable);
     }
 
+    /**
+     * Logs an illegal state transition for a Meter operation.
+     * <p>
+     * Gated the same way as {@link #logInvalidState(Meter, String)}: see its Javadoc for the ordering
+     * rationale and the throttle behavior of the shared unknown-meter null-object.
+     *
+     * @param meter   The Meter instance with the illegal transition.
+     * @param message A descriptive message about the illegal transition.
+     */
     void logInvalidTransition(final Meter meter, final String message) {
+        if (!meter.getMessageLogger().isErrorEnabled() || !meter.shouldReportInvalidUsage()) {
+            return;
+        }
         final CallerStackTraceThrowable throwable = new CallerStackTraceThrowable();
-        meter.getMessageLogger().error(Markers.INVALID_TRANSITION, "Meter.{} - {}; id={}", throwable.getApiMethodName(), message, meter.getFullID(), throwable);
+        final String diagnosis = meter.invalidUsageDiagnosis();
+        meter.getMessageLogger().error(Markers.INVALID_TRANSITION, "Meter.{} - {}; id={}", throwable.getApiMethodName(), diagnosis != null ? diagnosis : message, meter.getFullID(), throwable);
     }
 
     /**

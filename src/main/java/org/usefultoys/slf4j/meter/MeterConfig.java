@@ -64,6 +64,8 @@ public class MeterConfig {
     public final String PROP_PRINT_STATUS = "slf4jtoys.meter.print.status";
     /** System property key for enabling/disabling the forgotten-meter leak detector. */
     public final String PROP_DETECT_LEAKS = "slf4jtoys.meter.detect.leaks";
+    /** System property key for the shared unknown-meter misuse-report throttle interval. */
+    public final String PROP_NOOP_REPORT_INTERVAL = "slf4jtoys.meter.noop.report.interval";
 
     static {
         init();
@@ -135,6 +137,25 @@ public class MeterConfig {
      * deregister or discard already-pending reports.
      */
     public boolean detectLeaks;
+
+    /**
+     * Minimum time interval (in milliseconds) between consecutive misuse reports logged by the shared
+     * unknown-meter null-object returned by {@link Meter#getCurrentInstance()} when no meter is active on
+     * the current thread (see TDR-0042).
+     * <p>
+     * Defensive call patterns like {@code Meter.getCurrentInstance().progress()} in a hot loop would
+     * otherwise log an {@code ERROR} and capture a stack trace on every single call. Reports are throttled
+     * to at most one per interval; when a throttled report is finally emitted, its message includes the
+     * count of similar reports suppressed since the previous one.
+     * <p>
+     * {@code 0} disables throttling: every occurrence is reported. A negative value disables reporting
+     * entirely: no misuse against the shared instance is ever logged.
+     * <p>
+     * Value is read from system property {@code slf4jtoys.meter.noop.report.interval}, defaulting to
+     * {@code 60000} (1 minute). The value can be suffixed with {@code ms}, {@code s}, {@code m}, or
+     * {@code h}. Can be assigned a new value at runtime.
+     */
+    public long noopReportIntervalMilliseconds;
 
     /**
      * A prefix added to the logger name used for machine-parsable data messages.
@@ -216,6 +237,7 @@ public class MeterConfig {
         printLoad = ConfigParser.getProperty(PROP_PRINT_LOAD, false);
         printMemory = ConfigParser.getProperty(PROP_PRINT_MEMORY, false);
         detectLeaks = ConfigParser.getProperty(PROP_DETECT_LEAKS, true);
+        noopReportIntervalMilliseconds = ConfigParser.getMillisecondsProperty(PROP_NOOP_REPORT_INTERVAL, 60000L);
         dataPrefix = ConfigParser.getProperty(PROP_DATA_PREFIX, "");
         dataSuffix = ConfigParser.getProperty(PROP_DATA_SUFFIX, "");
         messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
@@ -225,6 +247,11 @@ public class MeterConfig {
     /**
      * Resets all configuration properties to their default values.
      * This method is useful for testing purposes or when reinitializing the configuration.
+     * <p>
+     * Also resets the shared unknown-meter misuse-report throttle's runtime state (next-allowed-report
+     * timestamp and suppressed-report count) back to its initial, unthrottled state, so tests relying on
+     * this reset (e.g. via {@code @ResetMeterConfig}) always observe the first misuse report immediately,
+     * regardless of throttle state accumulated by a previous test.
      */
     public void reset() {
         System.clearProperty(PROP_PROGRESS_PERIOD);
@@ -234,10 +261,12 @@ public class MeterConfig {
         System.clearProperty(PROP_PRINT_LOAD);
         System.clearProperty(PROP_PRINT_MEMORY);
         System.clearProperty(PROP_DETECT_LEAKS);
+        System.clearProperty(PROP_NOOP_REPORT_INTERVAL);
         System.clearProperty(PROP_DATA_PREFIX);
         System.clearProperty(PROP_DATA_SUFFIX);
         System.clearProperty(PROP_MESSAGE_PREFIX);
         System.clearProperty(PROP_MESSAGE_SUFFIX);
         init();
+        Meter.resetNoopReportThrottle();
     }
 }

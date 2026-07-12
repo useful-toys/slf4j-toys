@@ -654,6 +654,49 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         return ref == null || ref.get() != this;
     }
 
+    /**
+     * Whether a misuse report ({@code INVALID_ARGUMENT}/{@code INVALID_STATE}/{@code INVALID_TRANSITION})
+     * should actually be logged for this `Meter` right now.
+     * <p>
+     * Real meters always report every misuse: this hook is only consulted on the cold misuse-reporting
+     * path in {@link MeterValidator}, never on the hot path of a correctly used meter, so returning
+     * {@code true} unconditionally costs nothing. {@link UnknownMeter} overrides this to throttle
+     * high-frequency misuse against the shared, process-wide null-object (see TDR-0042), so that a
+     * defensive call pattern like {@code Meter.getCurrentInstance().progress()} in a hot loop cannot flood
+     * the error channel or pay a stack-trace capture on every single call.
+     *
+     * @return {@code true} if this misuse occurrence should be reported now.
+     */
+    boolean shouldReportInvalidUsage() {
+        return true;
+    }
+
+    /**
+     * Diagnosis message that overrides the caller-supplied message when a misuse report is about this
+     * `Meter`'s own identity (e.g. being the shared unknown-meter null-object) rather than a specific
+     * lifecycle-state mismatch. Real meters return {@code null}, leaving the caller-supplied message
+     * intact.
+     * <p>
+     * Called only when {@link #shouldReportInvalidUsage()} allowed the report, so an override may also
+     * use it to embed a suppressed-report count accumulated since the previous allowed report.
+     *
+     * @return the replacement diagnosis message, or {@code null} to keep the caller-supplied message.
+     */
+    String invalidUsageDiagnosis() {
+        return null;
+    }
+
+    /**
+     * Resets the shared unknown-meter misuse-report throttle to its initial, unthrottled state: no
+     * suppressed reports, next report allowed immediately. Package-private: called from
+     * {@link MeterConfig#reset()} so tests relying on that reset always observe the throttle in a clean
+     * state, regardless of activity accumulated by a previous test.
+     */
+    static void resetNoopReportThrottle() {
+        UnknownMeter.nextAllowedReportNanos.set(0L);
+        UnknownMeter.suppressedCount.set(0L);
+    }
+
     public Meter ok() {
         commonOk(null);
         return this;
@@ -853,18 +896,74 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * any number of threads at once. {@code inc()}, {@code incBy()}, {@code incTo()} and
      * {@code progress()} need no override: their preconditions already reject a never-started
      * meter, and this instance can never be started. See TDR-0042.
+     * <p>
+     * Overrides {@link #shouldReportInvalidUsage()} to throttle misuse reports (at most one per
+     * {@link MeterConfig#noopReportIntervalMilliseconds}) and {@link #invalidUsageDiagnosis()} to
+     * report the accurate diagnosis for this shared instance — "no operation is active on the current
+     * thread" rather than the "not yet started" wording a real meter's precondition would otherwise
+     * produce for {@code inc()}/{@code incBy()}/{@code incTo()}/{@code progress()}/{@code path(Object)} —
+     * with the count of reports suppressed since the previous one, if any.
      */
     private static final class UnknownMeter extends Meter {
 
         private static final long serialVersionUID = 1L;
+
+        /** Base diagnosis message for every misuse reported against the shared unknown-meter instance. */
+        private static final String DIAGNOSIS = "no operation is active on the current thread";
+
+        /** Next point in time ({@link System#nanoTime()}) at which a misuse report may be logged again. */
+        private static final AtomicLong nextAllowedReportNanos = new AtomicLong(0L);
+        /** Count of misuse occurrences skipped since the last allowed report. */
+        private static final AtomicLong suppressedCount = new AtomicLong(0L);
 
         UnknownMeter() {
             super(LoggerFactory.getLogger(UNKNOWN_LOGGER_NAME));
         }
 
         private Meter denied() {
-            MeterValidator.logInvalidTransition(this, "no operation is active on the current thread");
+            MeterValidator.logInvalidTransition(this, DIAGNOSIS);
             return this;
+        }
+
+        /**
+         * Throttles misuse reports against the shared instance to at most one per
+         * {@link MeterConfig#noopReportIntervalMilliseconds}, using a CAS loop on a shared "next allowed"
+         * timestamp so concurrent callers from multiple threads never both win the same window. {@code 0}
+         * disables throttling (report every occurrence); a negative interval disables reporting entirely.
+         */
+        @Override
+        boolean shouldReportInvalidUsage() {
+            final long intervalMillis = MeterConfig.noopReportIntervalMilliseconds;
+            if (intervalMillis < 0) {
+                suppressedCount.incrementAndGet();
+                return false;
+            }
+            if (intervalMillis == 0) {
+                return true;
+            }
+            final long intervalNanos = intervalMillis * 1_000_000L;
+            final long now = System.nanoTime();
+            long current = nextAllowedReportNanos.get();
+            while (now - current >= 0) {
+                if (nextAllowedReportNanos.compareAndSet(current, now + intervalNanos)) {
+                    return true;
+                }
+                current = nextAllowedReportNanos.get();
+            }
+            suppressedCount.incrementAndGet();
+            return false;
+        }
+
+        /**
+         * Replaces whatever message the caller supplied with the accurate diagnosis for this shared
+         * instance, embedding the count of reports suppressed since the last allowed one, if any. Called
+         * only when {@link #shouldReportInvalidUsage()} allowed the report, so reading-and-resetting the
+         * counter here is safe: it only ever fires once per actually-emitted report.
+         */
+        @Override
+        String invalidUsageDiagnosis() {
+            final long suppressed = suppressedCount.getAndSet(0L);
+            return suppressed > 0 ? DIAGNOSIS + " (" + suppressed + " similar reports suppressed)" : DIAGNOSIS;
         }
 
         @Override
