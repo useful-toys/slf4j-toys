@@ -352,13 +352,13 @@ class MeterContextTest {
     }
 
     @Nested
-    @DisplayName("Formatted Strings")
+    @DisplayName("Formatted Strings (printf, ctxf)")
     class FormattedStrings {
         @Test
-        @DisplayName("ctx(name, format, args) should add key with formatted string value")
-        void shouldAddKeyWithFormattedStringValueWhenCtxWithKeyAndFormat() {
-            // When: ctx is called with key, format, and arg
-            meterContext.ctx("key9", "formatted %d", 100);
+        @DisplayName("ctxf(name, format, args) should add key with formatted string value")
+        void shouldAddKeyWithFormattedStringValueWhenCtxfWithKeyAndFormat() {
+            // When: ctxf is called with key, format, and arg
+            meterContext.ctxf("key9", "formatted %d", 100);
 
             // Then: the context map should contain the key with the formatted string value
             assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
@@ -367,15 +367,69 @@ class MeterContextTest {
         }
 
         @Test
-        @DisplayName("ctx(name, format, args) with null name should add entry with NULL_VALUE key and formatted value")
-        void shouldAddNullValueKeyWithFormattedValueWhenCtxWithNullNameAndFormat() {
-            // When: ctx is called with null name, format, and arg
-            meterContext.ctx(null, "formatted %d", 100);
+        @DisplayName("ctxf(name, format, args) with null name should add entry with NULL_VALUE key and formatted value")
+        void shouldAddNullValueKeyWithFormattedValueWhenCtxfWithNullNameAndFormat() {
+            // When: ctxf is called with null name, format, and arg
+            meterContext.ctxf(null, "formatted %d", 100);
 
             // Then: the context map should contain NULL_VALUE as key with formatted value
             assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
             assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "should contain NULL_VALUE as key");
             assertEquals("formatted 100", meterContext.getContext().get(NULL_VALUE), "should have formatted value");
+        }
+
+        @Test
+        @DisplayName("ctxf(name, format, args) with null format should add entry with '<null format>' value")
+        void shouldAddNullFormatValueWhenCtxfWithKeyAndNullFormat() {
+            // When: ctxf is called with key and null format
+            meterContext.ctxf("key", null, 100);
+
+            // Then: the context map should contain the key with '<null format>' value
+            assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+            assertTrue(meterContext.getContext().containsKey("key"), "should contain the key");
+            assertEquals("<null format>", meterContext.getContext().get("key"), "should have '<null format>' as value");
+        }
+
+        @Test
+        @DisplayName("ctxf(name, format, args) with illegal format should add entry with exception message")
+        void shouldAddExceptionMessageWhenCtxfWithIllegalFormat() {
+            // When: ctxf is called with illegal format
+            meterContext.ctxf("key", "%d", "not an int");
+
+            // Then: the context map should contain the key with non-null value (exception message)
+            assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+            assertTrue(meterContext.getContext().containsKey("key"), "should contain the key");
+            assertNotNull(meterContext.getContext().get("key"), "should have non-null value");
+            // The exact message can vary by JVM/Locale, so we check for presence and type
+            assertTrue(meterContext.getContext().get("key").contains("java.lang.String"), "Value should contain format exception message");
+        }
+    }
+
+    @Nested
+    @DisplayName("Placeholder Strings ({}, ctx)")
+    class PlaceholderStrings {
+        @Test
+        @DisplayName("ctx(name, format, args) should add key with substituted string value")
+        void shouldAddKeyWithSubstitutedStringValueWhenCtxWithKeyAndFormat() {
+            // When: ctx is called with key, {} pattern, and arg
+            meterContext.ctx("key9", "formatted {}", 100);
+
+            // Then: the context map should contain the key with the substituted string value
+            assertFalse(meterContext.getContext().isEmpty(), "should not be empty after adding key");
+            assertTrue(meterContext.getContext().containsKey("key9"), "should contain the added key");
+            assertEquals("formatted 100", meterContext.getContext().get("key9"), "should have 'formatted 100' as value");
+        }
+
+        @Test
+        @DisplayName("ctx(name, format, args) with null name should add entry with NULL_VALUE key and substituted value")
+        void shouldAddNullValueKeyWithSubstitutedValueWhenCtxWithNullNameAndFormat() {
+            // When: ctx is called with null name, {} pattern, and arg
+            meterContext.ctx(null, "formatted {}", 100);
+
+            // Then: the context map should contain NULL_VALUE as key with substituted value
+            assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
+            assertTrue(meterContext.getContext().containsKey(NULL_VALUE), "should contain NULL_VALUE as key");
+            assertEquals("formatted 100", meterContext.getContext().get(NULL_VALUE), "should have substituted value");
         }
 
         @Test
@@ -391,17 +445,15 @@ class MeterContextTest {
         }
 
         @Test
-        @DisplayName("ctx(name, format, args) with illegal format should add entry with exception message")
-        void shouldAddExceptionMessageWhenCtxWithIllegalFormat() {
-            // When: ctx is called with illegal format
+        @DisplayName("ctx(name, format, args) never throws, unlike printf ctxf(): mismatched pattern is left literal")
+        void shouldLeaveLiteralTextWhenNoPlaceholderPresent() {
+            // When: ctx is called with a pattern containing no {} placeholder
             meterContext.ctx("key", "%d", "not an int");
 
-            // Then: the context map should contain the key with non-null value (exception message)
+            // Then: the context map should contain the key with the literal, unsubstituted pattern
             assertFalse(meterContext.getContext().isEmpty(), "should not be empty");
             assertTrue(meterContext.getContext().containsKey("key"), "should contain the key");
-            assertNotNull(meterContext.getContext().get("key"), "should have non-null value");
-            // The exact message can vary by JVM/Locale, so we check for presence and type
-            assertTrue(meterContext.getContext().get("key").contains("java.lang.String"), "Value should contain format exception message");
+            assertEquals("%d", meterContext.getContext().get("key"), "should leave literal text untouched");
         }
     }
 

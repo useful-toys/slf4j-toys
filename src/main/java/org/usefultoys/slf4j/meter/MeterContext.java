@@ -15,7 +15,10 @@
  */
 package org.usefultoys.slf4j.meter;
 
+import org.slf4j.helpers.MessageFormatter;
+
 import java.util.IllegalFormatException;
+import java.util.Locale;
 
 /**
  * An interface defining methods for managing contextual data within a {@link Meter} operation.
@@ -244,14 +247,17 @@ public interface MeterContext<T extends MeterData> {
         return (T) this;
     }
 
-    
+
     /**
-     * Adds a key-value entry to the context map, where the value is a formatted message.
+     * Adds a key-value entry to the context map, where the value is a message formatted using slf4j-style
+     * {@code {}} placeholders (e.g., {@code ctx("status", "User {} has {} points", user, n)}).
+     * <p>
+     * Formatting is locale-independent and does not allocate a {@link java.util.Formatter}. For
+     * {@code printf}-style formatting (e.g., {@code "%.2f"}), use {@link #ctxf(String, String, Object...)} instead.
      *
      * @param name   The key of the entry to add. Must not be {@code null}.
-     * @param format The message format string (e.g., `String.format(java.lang.String, java.lang.Object...)`). Must not
-     *               be {@code null}.
-     * @param args   The arguments for the format string.
+     * @param format The message pattern using {@code {}} placeholders. Must not be {@code null}.
+     * @param args   The arguments substituted into the placeholders.
      * @return Reference to this `MeterContext` instance, for method chaining.
      */
     default T ctx(final String name, final String format, final Object... args) {
@@ -259,10 +265,32 @@ public interface MeterContext<T extends MeterData> {
             putContext(name, "<null format>");
             return (T) this;
         }
+        putContext(name, MessageFormatter.arrayFormat(format, args).getMessage());
+        return (T) this;
+    }
+
+    /**
+     * Adds a key-value entry to the context map, where the value is a {@code printf}-formatted message.
+     * <p>
+     * This overload is kept as a deliberate tradeoff (see TDR-0042): {@code java.util.Formatter} parses the format
+     * string and allocates on every call, which {@link #ctx(String, String, Object...)} avoids. Formatting is
+     * pinned to {@link Locale#ROOT}, so the result never depends on the JVM's default locale.
+     *
+     * @param name   The key of the entry to add. Must not be {@code null}.
+     * @param format The message format string (e.g., `String.format(java.lang.String, java.lang.Object...)`). Must not
+     *               be {@code null}.
+     * @param args   The arguments for the format string.
+     * @return Reference to this `MeterContext` instance, for method chaining.
+     */
+    default T ctxf(final String name, final String format, final Object... args) {
+        if (format == null) {
+            putContext(name, "<null format>");
+            return (T) this;
+        }
         try {
-            putContext(name, String.format(format, args));
+            putContext(name, String.format(Locale.ROOT, format, args));
         } catch (final IllegalFormatException e) {
-            putContext(name, e.getLocalizedMessage());
+            putContext(name, e.getMessage());
         }
         return (T) this;
     }

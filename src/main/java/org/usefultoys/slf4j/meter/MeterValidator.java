@@ -17,9 +17,11 @@ package org.usefultoys.slf4j.meter;
 
 import lombok.experimental.UtilityClass;
 
+import org.slf4j.helpers.MessageFormatter;
 import org.usefultoys.slf4j.CallerStackTraceThrowable;
 
 import java.util.IllegalFormatException;
+import java.util.Locale;
 
 /**
  * A utility class responsible for validating the state of a {@link Meter} instance before executing an operation.
@@ -65,20 +67,42 @@ public class MeterValidator {
     }
 
     /**
-     * Validates and formats the arguments for the `m` method (message with format) of a Meter.
+     * Validates and formats the arguments for the `m` method (message with slf4j-style {@code {}} placeholders) of a
+     * Meter.
      *
      * @param meter  The Meter instance.
-     * @param format The message format string.
-     * @param args   The arguments for the format string.
-     * @return The formatted string, or {@code null} if the format is null or invalid.
+     * @param format The message pattern using slf4j {@code {}} placeholders.
+     * @param args   The arguments substituted into the placeholders.
+     * @return The formatted string, or {@code null} if the format is null.
      */
     String validateMCallArgument(final Meter meter, final String format, final Object... args) {
         if (format == null) {
             logInvalidArgument(meter, "Null argument: format");
             return null;
         }
+        return MessageFormatter.arrayFormat(format, args).getMessage();
+    }
+
+    /**
+     * Validates and formats the arguments for the `mf` method (message with {@code printf}-style format) of a
+     * Meter.
+     * <p>
+     * This overload is kept as a deliberate tradeoff: {@code java.util.Formatter} parses the format string and
+     * allocates on every call (see TDR-0042), which the {@code {}}-placeholder {@code m} overload avoids. Formatting
+     * is pinned to {@link Locale#ROOT} so the result never depends on the JVM's default locale.
+     *
+     * @param meter  The Meter instance.
+     * @param format The {@code printf}-style format string.
+     * @param args   The arguments for the format string.
+     * @return The formatted string, or {@code null} if the format is null or invalid.
+     */
+    String validateMfCallArgument(final Meter meter, final String format, final Object... args) {
+        if (format == null) {
+            logInvalidArgument(meter, "Null argument: format");
+            return null;
+        }
         try {
-            return String.format(format, args);
+            return String.format(Locale.ROOT, format, args);
         } catch (final IllegalFormatException e) {
             logInvalidArgument(meter, "Illegal format string");
             return null;
