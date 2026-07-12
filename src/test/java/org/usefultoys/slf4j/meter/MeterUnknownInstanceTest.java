@@ -104,7 +104,16 @@ class MeterUnknownInstanceTest {
     @DisplayName("m(String, Object...) logs an invalid transition")
     void mWithFormatLogsInvalidTransition() {
         final Meter unknown = Meter.getCurrentInstance();
-        final Meter result = unknown.m("value=%d", 42);
+        final Meter result = unknown.m("value={}", 42);
+        assertSame(unknown, result);
+        unknownLogger.assertEvent(0, ERROR, INVALID_TRANSITION);
+    }
+
+    @Test
+    @DisplayName("mf(String, Object...) logs an invalid transition")
+    void mfWithFormatLogsInvalidTransition() {
+        final Meter unknown = Meter.getCurrentInstance();
+        final Meter result = unknown.mf("value=%d", 42);
         assertSame(unknown, result);
         unknownLogger.assertEvent(0, ERROR, INVALID_TRANSITION);
     }

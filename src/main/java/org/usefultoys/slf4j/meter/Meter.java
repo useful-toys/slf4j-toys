@@ -379,7 +379,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * Configures the `Meter` with a human-readable message that explains the operation's purpose, using a
      * {@code printf}-style format string.
      * <p>
-     * This overload is kept as a deliberate tradeoff (see TDR-0042): {@code java.util.Formatter} parses the format
+     * This overload is kept as a deliberate tradeoff (see TDR-0043): {@code java.util.Formatter} parses the format
      * string and allocates on every call, which {@link #m(String, Object...)} avoids. Formatting is pinned to
      * {@link java.util.Locale#ROOT}, so the result never depends on the JVM's default locale.
      * <p>
@@ -941,6 +941,11 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
         @Override
         public Meter m(final String format, final Object... args) {
+            return denied();
+        }
+
+        @Override
+        public Meter mf(final String format, final Object... args) {
             return denied();
         }
 

@@ -278,7 +278,7 @@ public interface MeterContext<T extends MeterData> {
     /**
      * Adds a key-value entry to the context map, where the value is a {@code printf}-formatted message.
      * <p>
-     * This overload is kept as a deliberate tradeoff (see TDR-0042): {@code java.util.Formatter} parses the format
+     * This overload is kept as a deliberate tradeoff (see TDR-0043): {@code java.util.Formatter} parses the format
      * string and allocates on every call, which {@link #ctx(String, String, Object...)} avoids. Formatting is
      * pinned to {@link Locale#ROOT}, so the result never depends on the JVM's default locale.
      * <p>
