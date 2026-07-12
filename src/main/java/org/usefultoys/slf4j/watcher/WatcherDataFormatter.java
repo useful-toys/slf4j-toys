@@ -36,11 +36,11 @@ class WatcherDataFormatter {
         boolean hasPrevious = false;
         if (data.getRuntime_usedMemory() > 0 || data.getRuntime_maxMemory() > 0 || data.getRuntime_totalMemory() > 0) {
             builder.append("Memory: ");
-            builder.append(UnitFormatter.bytes(data.getRuntime_usedMemory()));
+            UnitFormatter.appendBytes(builder, data.getRuntime_usedMemory());
             builder.append(" ");
-            builder.append(UnitFormatter.bytes(data.getRuntime_totalMemory()));
+            UnitFormatter.appendBytes(builder, data.getRuntime_totalMemory());
             builder.append(" ");
-            builder.append(UnitFormatter.bytes(data.getRuntime_maxMemory()));
+            UnitFormatter.appendBytes(builder, data.getRuntime_maxMemory());
             hasPrevious = true;
         }
         if (data.getSystemLoad() > 0) {
