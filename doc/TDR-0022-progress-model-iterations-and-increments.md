@@ -73,11 +73,14 @@ The expected total can be refined during execution. This supports cases where th
 
 * `Meter.iterations(long)` sets `expectedIterations`.
 * `Meter.inc()`, `Meter.incBy(long)`, `Meter.incTo(long)` update `currentIteration`.
-* `Meter.progress()` is the method that emits progress logs (and it is throttled by `MeterConfig.progressPeriodMilliseconds`).
+* `Meter.progress()` is the method that emits progress logs. It only emits when both gates pass:
+  * `currentIteration > lastProgressIteration` (work-based gating), and
+  * `(now - lastProgressTime) > MeterConfig.progressPeriodMilliseconds` (time-based throttling).
 * Validation is advisory and logs illegal calls (e.g., non-positive increments) without throwing.
 
 ## References
 
 * [src/main/java/org/usefultoys/slf4j/meter/Meter.java](../src/main/java/org/usefultoys/slf4j/meter/Meter.java)
 * [src/main/java/org/usefultoys/slf4j/meter/MeterValidator.java](../src/main/java/org/usefultoys/slf4j/meter/MeterValidator.java)
-* [TDR-0026: Progress Policy (Throttling and Slowness Signaling)](TDR-0026-progress-policy-throttling-and-slowness.md)
+* [src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java](../src/main/java/org/usefultoys/slf4j/meter/MeterConfig.java)
+* [TDR-0020: Three Outcome Types (OK, REJECT, FAIL)](TDR-0020-three-outcome-types-ok-reject-fail.md) — specifies slowness signaling (`limitMilliseconds`, slow-OK and slow-progress markers).
