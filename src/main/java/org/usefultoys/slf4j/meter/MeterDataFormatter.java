@@ -113,10 +113,10 @@ final class MeterDataFormatter {
         boolean hasPrevious = false;
         if (data.isStarted() && data.getCurrentIteration() > 0) {
             hasPrevious = separator(builder, hasPrevious);
-            builder.append(UnitFormatter.iterations(data.getCurrentIteration()));
+            UnitFormatter.appendIterations(builder, data.getCurrentIteration());
             if (data.getExpectedIterations() > 0) {
                 builder.append('/');
-                builder.append(UnitFormatter.iterations(data.getExpectedIterations()));
+                UnitFormatter.appendIterations(builder, data.getExpectedIterations());
             }
         }
 
@@ -124,23 +124,23 @@ final class MeterDataFormatter {
         if (!data.isStarted()) {
             /* For not-yet-started operations, show waiting time */
             hasPrevious = separator(builder, hasPrevious);
-            builder.append(UnitFormatter.nanoseconds(data.getWaitingTime()));
+            UnitFormatter.appendNanoseconds(builder, data.getWaitingTime());
         } else {
             /* Show execution time for stopped operations or when progress info is required */
             if (data.isStopped() || progressInfoRequired) {
                 hasPrevious = separator(builder, hasPrevious);
-                builder.append(UnitFormatter.nanoseconds(executionTime));
+                UnitFormatter.appendNanoseconds(builder, executionTime);
             }
 
             /* Show throughput metrics for operations with iterations */
             if (data.getCurrentIteration() > 0 && (data.isStopped() || progressInfoRequired)) {
                 hasPrevious = separator(builder, hasPrevious);
                 final double iterationsPerSecond = data.getIterationsPerSecond();
-                builder.append(UnitFormatter.iterationsPerSecond(iterationsPerSecond));
+                UnitFormatter.appendIterationsPerSecond(builder, iterationsPerSecond);
                 builder.append(' ');
                 /* Calculate inverse metric: time per iteration */
                 final double nanoSecondsPerIteration = 1.0F / iterationsPerSecond * 1000000000;
-                builder.append(UnitFormatter.nanoseconds(nanoSecondsPerIteration));
+                UnitFormatter.appendNanoseconds(builder, nanoSecondsPerIteration);
             }
         }
 
@@ -167,7 +167,7 @@ final class MeterDataFormatter {
         /* System Info */
         if (MeterConfig.printMemory && data.getRuntime_maxMemory() > 0) {
             hasPrevious = MeterDataFormatter.separator(builder, hasPrevious);
-            builder.append(UnitFormatter.bytes(data.getRuntime_usedMemory()));
+            UnitFormatter.appendBytes(builder, data.getRuntime_usedMemory());
         }
         if (MeterConfig.printLoad && data.getSystemLoad() > 0) {
             hasPrevious = MeterDataFormatter.separator(builder, hasPrevious);
