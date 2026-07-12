@@ -150,6 +150,34 @@ class MeterLifeCyclePostStopInvalidOperationsOkStateTest {
     }
 
     @Test
+    @DisplayName("should reject mf(String, Object...) after ok() - logs INVALID_ARGUMENT")
+    @ValidateCleanMeter
+    void shouldRejectPrintfDescriptionWithArgsAfterOk() {
+        // Given: a meter that has been stopped with ok()
+        final Meter meter = new Meter(logger).start();
+        final TimeRecord tr = fromStarted(meter);
+        recordStopWithWindow(tr, meter::ok);
+        // Then: meter start and stop time are set correctly
+        assertMeterStopTime(meter, tr);
+
+        // When: mf("step %d", 1) is called after stop
+        meter.mf("step %d", 1);
+
+        // Then: description unchanged (null), state unchanged after invalid operation
+        assertNull(meter.getDescription(), "should not update description after stop");
+        MeterLifeCycleTestHelper.assertMeterState(meter, true, true, null, null, null, null, 0, 0, 0);
+        assertMeterStopTime(meter, tr);
+
+        // Then: logs ok (from setup) + INVALID_ARGUMENT (from invalid operation)
+        AssertLogger.assertEvent(logger, 2, MockLoggerEvent.Level.INFO, Markers.MSG_OK);
+        AssertLogger.assertEvent(logger, 3, MockLoggerEvent.Level.TRACE, Markers.DATA_OK);
+        AssertLogger.assertEvent(logger, 4, MockLoggerEvent.Level.ERROR, Markers.INVALID_STATE, "Meter.mf", "Meter already stopped", meter.getFullID());
+        AssertLogger.assertEventWithThrowable(logger, 4, CallerStackTraceThrowable.class);
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 4, CallerStackTraceThrowable.class, "Meter.mf(");
+        AssertLogger.assertEventCount(logger, 5);
+    }
+
+    @Test
     @DisplayName("should reject m(null) after ok() - logs INVALID_ARGUMENT")
     @ValidateCleanMeter
     void shouldRejectNullDescriptionAfterOk() {
