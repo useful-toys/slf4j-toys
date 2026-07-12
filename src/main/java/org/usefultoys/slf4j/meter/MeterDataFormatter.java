@@ -151,7 +151,7 @@ final class MeterDataFormatter {
             builder.append(data.getDescription());
             builder.append('\'');
         }
-        final Map<String, String> context = data.getContext();
+        final Map<String, String> context = data.context;
         if (context != null && !context.isEmpty()) {
             /* Append all context entries as key=value or key-only for null values */
             for (final Map.Entry<String, String> entry : context.entrySet()) {
