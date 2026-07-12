@@ -254,6 +254,12 @@ public interface MeterContext<T extends MeterData> {
      * <p>
      * Formatting is locale-independent and does not allocate a {@link java.util.Formatter}. For
      * {@code printf}-style formatting (e.g., {@code "%.2f"}), use {@link #ctxf(String, String, Object...)} instead.
+     * <p>
+     * <b>Arguments are substituted immediately, at the moment this method is called</b> — unlike most other
+     * {@code Meter} attributes (e.g., elapsed time, throughput, iteration counts), which are computed later, when
+     * the log message is actually emitted (on {@code start()}/{@code progress()}/{@code ok()}/etc.). The resulting
+     * context value is fixed at call time; if an argument's value changes afterward, the emitted context still
+     * reflects the value as it was when {@code ctx(...)} was called.
      *
      * @param name   The key of the entry to add. Must not be {@code null}.
      * @param format The message pattern using {@code {}} placeholders. Must not be {@code null}.
@@ -275,6 +281,9 @@ public interface MeterContext<T extends MeterData> {
      * This overload is kept as a deliberate tradeoff (see TDR-0042): {@code java.util.Formatter} parses the format
      * string and allocates on every call, which {@link #ctx(String, String, Object...)} avoids. Formatting is
      * pinned to {@link Locale#ROOT}, so the result never depends on the JVM's default locale.
+     * <p>
+     * As with {@link #ctx(String, String, Object...)}, <b>arguments are substituted immediately, at the moment
+     * this method is called</b>, not when the log message is later emitted.
      *
      * @param name   The key of the entry to add. Must not be {@code null}.
      * @param format The message format string (e.g., `String.format(java.lang.String, java.lang.Object...)`). Must not
