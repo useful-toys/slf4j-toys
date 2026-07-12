@@ -351,7 +351,7 @@ class MeterLifeCyclePreStartConfigurationTest {
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m(format, args) is called before start()
-        meter.m("operation %s", "doWork");
+        meter.m("operation {}", "doWork");
 
         // Then: description attribute is formatted and stored correctly and meter remains in Created state
         assertEquals("operation doWork", meter.getDescription(), "should format description correctly");
@@ -370,8 +370,8 @@ class MeterLifeCyclePreStartConfigurationTest {
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
         // When: m(format, args) is called multiple times
-        meter.m("step %d", 1);
-        meter.m("step %d", 2);
+        meter.m("step {}", 1);
+        meter.m("step {}", 2);
 
         // Then: last value wins and meter remains in Created state
         assertEquals("step 2", meter.getDescription(), "should override with last formatted value");
@@ -389,8 +389,8 @@ class MeterLifeCyclePreStartConfigurationTest {
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
-        // When: m("valid: %s", "arg") is called, then m(null, "arg") is attempted
-        meter.m("valid: %s", "arg");
+        // When: m("valid: {}", "arg") is called, then m(null, "arg") is attempted
+        meter.m("valid: {}", "arg");
         meter.m(null, "arg");
 
         // Then: null format is rejected with INVALID_ARGUMENT log, description is reset to null, meter remains in Created state
@@ -406,14 +406,14 @@ class MeterLifeCyclePreStartConfigurationTest {
     }
 
     @Test
-    @DisplayName("should log INVALID_ARGUMENT when invalid format string attempted")
+    @DisplayName("should log INVALID_ARGUMENT when invalid printf format string attempted")
     void shouldLogIllegalWhenInvalidFormatStringAttempted() {
         // Given: a new Meter
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
-        // When: m("invalid format %z", "arg") is called (invalid format specifier)
-        meter.m("invalid format %z", "arg");
+        // When: mf("invalid format %z", "arg") is called (invalid printf format specifier)
+        meter.mf("invalid format %z", "arg");
 
         // Then: meter remains in Created state with no description set
         assertNull(meter.getDescription(), "should remain null when invalid format attempted");
@@ -421,9 +421,9 @@ class MeterLifeCyclePreStartConfigurationTest {
         assertMeterCreateTime(meter, tr);
 
         // Then: INVALID_ARGUMENT event logged
-        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter.m", "Illegal format string", meter.getFullID());
+        assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Meter.mf", "Illegal format string", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
-        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.m(");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 0, CallerStackTraceThrowable.class, "Meter.mf(");
         assertEventCount(logger, 1);
     }
 
@@ -741,8 +741,8 @@ class MeterLifeCyclePreStartConfigurationTest {
         final TimeRecord tr = new TimeRecord();
         final Meter meter = recordCreateWithWindow(tr, () -> new Meter(logger));
 
-        // When: ctx("key", "value %d", 42) is called before start()
-        meter.ctx("key", "value %d", 42);
+        // When: ctx("key", "value {}", 42) is called before start()
+        meter.ctx("key", "value {}", 42);
 
         // Then: context contains the formatted key-value pair and meter remains in Created state
         assertEquals("value 42", meter.getContext().get("key"), "should store formatted value as string");

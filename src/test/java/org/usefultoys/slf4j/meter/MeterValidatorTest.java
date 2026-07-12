@@ -256,23 +256,70 @@ public class MeterValidatorTest {
     }
 
     @Nested
-    @DisplayName("Format and Message Arguments Tests")
+    @DisplayName("Format and Message Arguments Tests (printf, mf)")
     class FormatAndMessageArgumentsTests {
 
         @Test
         @DisplayName("should format message with arguments when format is valid")
-        void shouldValidateAndFormatMCallArgumentWhenOk() {
+        void shouldValidateAndFormatMfCallArgumentWhenOk() {
             // Given: a valid format string and arguments
-            // When: validateMCallArgument is called
+            // When: validateMfCallArgument is called
             // Then: should return formatted message and not log any events
-            assertEquals("message 1", MeterValidator.validateMCallArgument(meter, "message %d", 1), "should format message correctly");
+            assertEquals("message 1", MeterValidator.validateMfCallArgument(meter, "message %d", 1), "should format message correctly");
             assertNoEvents(logger);
         }
 
         @Test
         @DisplayName("should reject format when message is null")
-        void shouldValidateAndFormatMCallArgumentWhenNull() {
+        void shouldValidateAndFormatMfCallArgumentWhenNull() {
             // Given: a null message format string
+            // When: validateMfCallArgument is called
+            // Then: should return null and log illegal argument error
+            assertNull(MeterValidator.validateMfCallArgument(meter, null, 1), "should return null for null format");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Null argument: format; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+
+        @Test
+        @DisplayName("should format message with extra arguments when there are too many args")
+        void shouldValidateAndFormatMfCallArgumentWhenIllegalFormat1() {
+            // Given: format string with fewer specifiers than provided arguments
+            // When: validateMfCallArgument is called
+            // Then: String.format handles it gracefully by returning formatted message
+            assertEquals("message 1", MeterValidator.validateMfCallArgument(meter, "message %s", 1, 2), "should format message with extra args");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject format when argument type does not match specifier")
+        void shouldValidateAndFormatMfCallArgumentWhenIllegalFormat2() {
+            // Given: format string with %d specifier but string argument
+            // When: validateMfCallArgument is called
+            // Then: should return null and log illegal format error
+            assertNull(MeterValidator.validateMfCallArgument(meter, "message %d", "s"), "should return null for mismatched format");
+            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Illegal format string; id=test-id");
+            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("Placeholder Message Arguments Tests ({}, m)")
+    class PlaceholderMessageArgumentsTests {
+
+        @Test
+        @DisplayName("should substitute {} placeholders when format is valid")
+        void shouldValidateAndFormatMCallArgumentWhenOk() {
+            // Given: a valid {} placeholder pattern and arguments
+            // When: validateMCallArgument is called
+            // Then: should return substituted message and not log any events
+            assertEquals("message 1", MeterValidator.validateMCallArgument(meter, "message {}", 1), "should substitute placeholder correctly");
+            assertNoEvents(logger);
+        }
+
+        @Test
+        @DisplayName("should reject when format is null")
+        void shouldValidateAndFormatMCallArgumentWhenNull() {
+            // Given: a null message pattern
             // When: validateMCallArgument is called
             // Then: should return null and log illegal argument error
             assertNull(MeterValidator.validateMCallArgument(meter, null, 1), "should return null for null format");
@@ -281,24 +328,23 @@ public class MeterValidatorTest {
         }
 
         @Test
-        @DisplayName("should format message with extra arguments when there are too many args")
-        void shouldValidateAndFormatMCallArgumentWhenIllegalFormat1() {
-            // Given: format string with fewer specifiers than provided arguments
+        @DisplayName("should ignore extra arguments beyond the number of placeholders")
+        void shouldValidateAndFormatMCallArgumentWithExtraArgs() {
+            // Given: fewer {} placeholders than provided arguments
             // When: validateMCallArgument is called
-            // Then: String.format handles it gracefully by returning formatted message
-            assertEquals("message 1", MeterValidator.validateMCallArgument(meter, "message %s", 1, 2), "should format message with extra args");
+            // Then: MessageFormatter substitutes only the placeholders present, ignoring extra args
+            assertEquals("message 1", MeterValidator.validateMCallArgument(meter, "message {}", 1, 2), "should substitute only present placeholders");
             assertNoEvents(logger);
         }
 
         @Test
-        @DisplayName("should reject format when argument type does not match specifier")
-        void shouldValidateAndFormatMCallArgumentWhenIllegalFormat2() {
-            // Given: format string with %d specifier but string argument
+        @DisplayName("should never log illegal format, unlike printf mf()")
+        void shouldNeverRejectMismatchedArgumentType() {
+            // Given: a pattern whose literal text happens to look like a printf specifier
             // When: validateMCallArgument is called
-            // Then: should return null and log illegal format error
-            assertNull(MeterValidator.validateMCallArgument(meter, "message %d", "s"), "should return null for mismatched format");
-            assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT, "Illegal format string; id=test-id");
-            assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
+            // Then: no substitution occurs (no {} present), no exception, no log event
+            assertEquals("value %d", MeterValidator.validateMCallArgument(meter, "value %d", "non-integer"), "should leave literal text untouched");
+            assertNoEvents(logger);
         }
     }
 
@@ -746,11 +792,11 @@ public class MeterValidatorTest {
         void shouldLogIllegalCallArgumentWithIllegalFormatMessage() {
             // Given: an invalid format string
             final String message = "Illegal format string";
-            // When: validateMCallArgument is called with invalid format
+            // When: validateMfCallArgument is called with invalid format
             // Then: should log illegal argument marker
-            MeterValidator.validateMCallArgument(meter, "value %d", "non-integer");
+            MeterValidator.validateMfCallArgument(meter, "value %d", "non-integer");
             assertEvent(logger, 0, MockLoggerEvent.Level.ERROR, Markers.INVALID_ARGUMENT,
-                    "Meter.validateMCallArgument", message, "test-id");
+                    "Meter.validateMfCallArgument", message, "test-id");
             assertEventWithThrowable(logger, 0, CallerStackTraceThrowable.class);
         }
 

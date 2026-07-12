@@ -130,8 +130,8 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: meter start and stop time are set correctly
         assertMeterStopTime(meter, tr);
 
-        // When: m("step %d", 1) is called after stop
-        meter.m("step %d", 1);
+        // When: m("step {}", 1) is called after stop
+        meter.m("step {}", 1);
 
         // Then: description unchanged (null), state unchanged after invalid operation
         assertNull(meter.getDescription(), "should not update description after stop");
@@ -718,8 +718,8 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: meter start and stop time are set correctly
         assertMeterStopTime(meter, tr);
 
-        // When: ctx("key", "value %d", 42) is called after stop
-        meter.ctx("key", "value %d", 42);
+        // When: ctx("key", "value {}", 42) is called after stop
+        meter.ctx("key", "value {}", 42);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertFalse(meter.getContext().containsKey("key"), "should not add context after stop");
@@ -1173,8 +1173,8 @@ class MeterLifeCyclePostStopInvalidOperationsFailedStateTest {
         // Then: meter start and stop time are set correctly
         assertMeterStopTime(meter, tr);
 
-        // When: ctx(null, "format %d", 42) is called after stop
-        meter.ctx(null, "format %d", 42);
+        // When: ctx(null, "format {}", 42) is called after stop
+        meter.ctx(null, "format {}", 42);
 
         // Then: context unchanged, state unchanged after invalid operation
         assertMeterState(meter, true, true, null, null, "technical_error", null, 0, 0, 0);

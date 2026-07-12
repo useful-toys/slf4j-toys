@@ -351,11 +351,14 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     }
 
     /**
-     * Configures the `Meter` with a human-readable message that explains the operation's purpose, using a format
-     * string.
+     * Configures the `Meter` with a human-readable message that explains the operation's purpose, using an
+     * slf4j-style message pattern with {@code {}} placeholders (e.g., {@code m("User {} has {} points", user, n)}).
+     * <p>
+     * Formatting is locale-independent and does not allocate a {@link java.util.Formatter}. For
+     * {@code printf}-style formatting (e.g., {@code "%.2f"}), use {@link #mf(String, Object...)} instead.
      *
-     * @param format The message format string (e.g., `String.format(java.lang.String, java.lang.Object...)`).
-     * @param args   The arguments for the format string.
+     * @param format The message pattern using {@code {}} placeholders.
+     * @param args   The arguments substituted into the placeholders.
      * @return Reference to this `Meter` instance, for method chaining.
      */
     public Meter m(final String format, final Object... args) {
@@ -363,6 +366,26 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             return this;
         }
         description = MeterValidator.validateMCallArgument(this, format, args);
+        return this;
+    }
+
+    /**
+     * Configures the `Meter` with a human-readable message that explains the operation's purpose, using a
+     * {@code printf}-style format string.
+     * <p>
+     * This overload is kept as a deliberate tradeoff (see TDR-0042): {@code java.util.Formatter} parses the format
+     * string and allocates on every call, which {@link #m(String, Object...)} avoids. Formatting is pinned to
+     * {@link java.util.Locale#ROOT}, so the result never depends on the JVM's default locale.
+     *
+     * @param format The message format string (e.g., `String.format(java.lang.String, java.lang.Object...)`).
+     * @param args   The arguments for the format string.
+     * @return Reference to this `Meter` instance, for method chaining.
+     */
+    public Meter mf(final String format, final Object... args) {
+        if (!MeterValidator.validateMPrecondition(this)) {
+            return this;
+        }
+        description = MeterValidator.validateMfCallArgument(this, format, args);
         return this;
     }
 

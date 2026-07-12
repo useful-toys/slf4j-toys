@@ -159,7 +159,7 @@ class MeterLifeCyclePostStartConfigurationTest {
         final TimeRecord tr = fromStarted(meter);
 
         // When: m(format, args) is called after start()
-        meter.m("step %d", 1);
+        meter.m("step {}", 1);
 
         // Then: description attribute is formatted and stored correctly
         assertEquals("step 1", meter.getDescription());
@@ -179,8 +179,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         final TimeRecord tr = fromStarted(meter);
 
         // When: m(format, args) is called multiple times
-        meter.m("step %d", 1);
-        meter.m("step %d", 2);
+        meter.m("step {}", 1);
+        meter.m("step {}", 2);
 
         // Then: last value wins
         assertEquals("step 2", meter.getDescription());
@@ -199,8 +199,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         final Meter meter = new Meter(logger).start();
         final TimeRecord tr = fromStarted(meter);
 
-        // When: m("valid: %s", "arg") is called, then m(null, "arg") is attempted
-        meter.m("valid: %s", "arg");
+        // When: m("valid: {}", "arg") is called, then m(null, "arg") is attempted
+        meter.m("valid: {}", "arg");
         meter.m(null, "arg");
 
         // Then: null format rejected (logs INVALID_ARGUMENT), previous description is lost
@@ -216,15 +216,15 @@ class MeterLifeCyclePostStartConfigurationTest {
     }
 
     @Test
-    @DisplayName("should log INVALID_ARGUMENT when invalid format string attempted after start()")
+    @DisplayName("should log INVALID_ARGUMENT when invalid printf format string attempted after start()")
     @ValidateCleanMeter(expectDirtyStack = true)
     void shouldLogIllegalWhenInvalidFormatStringAttemptedAfterStart() {
         // Given: a new, started Meter
         final Meter meter = new Meter(logger).start();
         final TimeRecord tr = fromStarted(meter);
 
-        // When: m("invalid format %z", "arg") is called (invalid format specifier)
-        meter.m("invalid format %z", "arg");
+        // When: mf("invalid format %z", "arg") is called (invalid printf format specifier)
+        meter.mf("invalid format %z", "arg");
 
         // Then: description remains null and meter remains in Started state
         assertNull(meter.getDescription());
@@ -232,9 +232,9 @@ class MeterLifeCyclePostStartConfigurationTest {
         MeterLifeCycleTestHelper.assertMeterStartTime(meter, tr);
 
         // Then: logs start + INVALID_ARGUMENT
-        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.m", "Illegal format string", meter.getFullID());
+        AssertLogger.assertEvent(logger, 2, ERROR, INVALID_ARGUMENT, "Meter.mf", "Illegal format string", meter.getFullID());
         AssertLogger.assertEventWithThrowable(logger, 2, CallerStackTraceThrowable.class);
-        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.m(");
+        AssertLogger.assertEventThrowableStackTraceContains(logger, 2, CallerStackTraceThrowable.class, "Meter.mf(");
         AssertLogger.assertEventCount(logger, 3);
     }
 
@@ -1095,8 +1095,8 @@ class MeterLifeCyclePostStartConfigurationTest {
         final Meter meter = new Meter(logger).start();
         final TimeRecord tr = fromStarted(meter);
 
-        // When: ctx("status", "User %s has %d points", "Alice", 150) is called after start()
-        meter.ctx("status", "User %s has %d points", "Alice", 150);
+        // When: ctx("status", "User {} has {} points", "Alice", 150) is called after start()
+        meter.ctx("status", "User {} has {} points", "Alice", 150);
 
         // Then: context contains the formatted message
         assertEquals("User Alice has 150 points", meter.getContext().get("status"));
