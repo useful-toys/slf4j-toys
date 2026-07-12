@@ -1,4 +1,7 @@
-# TDR-0037: Single-Thread Meter Lifecycle Contract
+# TDR-0041: Single-Thread Meter Lifecycle Contract
+
+> **Note**: Originally published as TDR-0037, renumbered to TDR-0041 because the number 0037 was
+> accidentally assigned twice (see [TDR-0037: Migrate WatcherServlet Pull Path from WatcherSingleton](TDR-0037-migrate-watcher-servlet-pull-from-singleton.md)).
 
 **Status**: Accepted  
 **Date**: 2026-07-07

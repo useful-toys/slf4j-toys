@@ -58,7 +58,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * not merely degraded: a stale read of the leak-detector handle ({@code leakRef}) can make the
  * termination call {@link MeterLeakDetector#deregister} with a value it no longer recognizes,
  * leaving the meter anchored so it is later reported as a false "Meter never stopped" leak even
- * though it was correctly terminated. See TDR-0037 (single-thread meter lifecycle
+ * though it was correctly terminated. See TDR-0041 (single-thread meter lifecycle
  * contract) and TDR-0015 (thread-local context stack).
  *
  * @author Daniel Felix Ferber
