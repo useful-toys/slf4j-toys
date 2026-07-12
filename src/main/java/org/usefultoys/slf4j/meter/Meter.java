@@ -193,11 +193,13 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      */
     static long extractNextPosition(final String eventCategory, final String operationName) {
         final String key = operationName == null ? eventCategory : eventCategory + "/" + operationName;
-        EVENT_COUNTER.putIfAbsent(key, new AtomicLong(0));
-        final AtomicLong atomicLong = EVENT_COUNTER.get(key);
+        AtomicLong counter = EVENT_COUNTER.get(key);
+        if (counter == null) {
+            counter = EVENT_COUNTER.computeIfAbsent(key, k -> new AtomicLong());
+        }
         /* Reset counter when it reaches maximum value to prevent overflow */
-        atomicLong.compareAndSet(Long.MAX_VALUE, 0);
-        return atomicLong.incrementAndGet();
+        counter.compareAndSet(Long.MAX_VALUE, 0);
+        return counter.incrementAndGet();
     }
 
     /**
