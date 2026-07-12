@@ -20,8 +20,8 @@ We adopt an **immutable lifecycle transition model** with the following rules:
 
 1.  **States are permanent once reached**: A `Meter` can transition from `Created → Started → Stopped`, but never backwards or sideways. Once `Stopped`, the state is frozen.
 2.  **First termination wins**: The first call to `ok()`, `reject()`, or `fail()` determines the final state. Subsequent termination calls are ignored.
-3.  **Invalid transitions are logged but not enforced**: Attempting invalid transitions (e.g., calling `start()` twice) logs a warning but does not throw exceptions or alter the state.
-4.  **Validation is advisory, not blocking**: The `MeterValidator` class logs inconsistencies but never prevents method execution.
+3.  **Invalid transitions are logged, then either corrected or ignored**: A transition that would move the state *forward* (e.g., `ok()` on a meter that was never started) logs a warning and is applied with auto-correction; a transition that would move the state *backwards* (e.g., `start()` called twice, or a second termination) logs a warning and is ignored. The full runtime classification of these cases is the four-tier model specified in [TDR-0029](TDR-0029-resilient-state-transitions-with-chained-api.md).
+4.  **Validation is advisory, not blocking**: The `MeterValidator` class logs inconsistencies but never throws exceptions.
 
 ### State Machine
 
@@ -39,7 +39,7 @@ Stopped (stopTime!=0) → [OK | Rejected | Failed]
 | Current State | Method Called | Action | Logs Warning? |
 |--------------|---------------|--------|---------------|
 | Created | `start()` | Sets `startTime`, transitions to Started | No |
-| Created | `ok()`/`reject()`/`fail()` | Ignored | Yes (`INCONSISTENT_*`) |
+| Created | `ok()`/`reject()`/`fail()` | Applied with auto-correction: sets `stopTime` and backfills `startTime = stopTime` (Tier 3 of [TDR-0029](TDR-0029-resilient-state-transitions-with-chained-api.md)) | Yes (`INVALID_TRANSITION`) |
 | Created | `progress()` | Ignored | Yes (`INVALID_STATE`) |
 | Started | `start()` | Ignored (already started) | Yes (`INVALID_TRANSITION`) |
 | Started | `ok()` (first) | Sets `stopTime`, transitions to OK | No |
@@ -47,15 +47,15 @@ Stopped (stopTime!=0) → [OK | Rejected | Failed]
 | Started | `fail()` (first) | Sets `stopTime`, transitions to Failed | No |
 | Started | `progress()` | Logs progress, remains Started | No |
 | Stopped | `start()` | Ignored | Yes (`INVALID_TRANSITION`) |
-| Stopped | `ok()`/`reject()`/`fail()` | Ignored (already stopped) | Yes (`INCONSISTENT_*`) |
+| Stopped | `ok()`/`reject()`/`fail()` | Ignored (already stopped) | Yes (`INVALID_TRANSITION`) |
 | Stopped | `progress()` | Ignored | Yes (`INVALID_STATE`) |
 
 ### Implementation Details
 
-*   **`startTime` guard**: Methods like `ok()`, `reject()`, and `fail()` check `if (startTime == 0)` and return early if the meter wasn't started.
-*   **`stopTime` guard**: These same methods also check `if (stopTime != 0)` and return early if the meter is already stopped.
+*   **`stopTime` guard**: Termination methods check `if (stopTime != 0)` (via `MeterValidator.validateStopPrecondition`) and return early if the meter is already stopped.
+*   **`startTime` auto-correction**: If a termination method runs on a meter that was never started (`startTime == 0`), it does **not** return early; it backfills `startTime = stopTime` so the record is still emitted with a zero duration (Tier 3 of [TDR-0029](TDR-0029-resilient-state-transitions-with-chained-api.md)).
 *   **First-write-wins semantics**: Since termination methods set `stopTime` immediately, the first one to execute "wins" and prevents subsequent calls from modifying the state.
-*   **Validation via `MeterValidator`**: All precondition checks are delegated to `MeterValidator`, which logs warnings using markers like `INVALID_TRANSITION`, `INVALID_TRANSITION`, `INVALID_TRANSITION`.
+*   **Validation via `MeterValidator`**: All precondition checks are delegated to `MeterValidator`, which logs warnings using the markers `INVALID_TRANSITION`, `INVALID_STATE`, and `INVALID_ARGUMENT`.
 
 ## Consequences
 
@@ -81,9 +81,7 @@ Stopped (stopTime!=0) → [OK | Rejected | Failed]
 ### 1. **Fail-Fast with Exceptions**
 Throw `IllegalStateException` when invalid transitions are attempted (e.g., `ok()` called twice).
 
-**Rejected because**:
-*   Violates the non-intrusive principle ([TDR-0017](TDR-0017-non-intrusive-validation-and-error-handling.md)): A monitoring library should not crash the application.
-*   In complex control flow (e.g., try-catch-finally), it's easy to accidentally call termination methods multiple times, and an exception would force developers to add boilerplate checks everywhere.
+**Rejected because** it violates the non-intrusive principle — see [TDR-0017](TDR-0017-non-intrusive-validation-and-error-handling.md) for the full rationale.
 
 ### 2. **Last-Call-Wins**
 Allow later calls to `ok()`, `reject()`, or `fail()` to overwrite the previous state.
@@ -104,10 +102,7 @@ Allow transitions but track a "version" counter that increments with each state 
 ### 4. **Explicit State Enum**
 Introduce an explicit `enum State { CREATED, STARTED, STOPPED }` instead of inferring state from `startTime` and `stopTime`.
 
-**Rejected because**:
-*   Redundant with timestamps: The state can already be inferred from `startTime != 0` and `stopTime != 0`.
-*   Adds synchronization complexity: Updating both an enum and timestamps atomically would require locking.
-*   Increases memory footprint slightly (though this is negligible).
+**Rejected because** the state is derived from the data attributes — this decision is documented in full in [TDR-0033](TDR-0033-derived-state-from-attributes.md).
 
 ### 5. **Resettable Meters**
 Provide a `reset()` method to allow reusing a `Meter` for multiple operations.
@@ -127,6 +122,8 @@ Provide a `reset()` method to allow reusing a `Meter` for multiple operations.
 ## References
 
 *   [TDR-0017: Non-Intrusive Validation and Error Handling](TDR-0017-non-intrusive-validation-and-error-handling.md) — Explains why we log instead of throwing exceptions.
+*   [TDR-0029: Resilient State Transitions with Chained API](TDR-0029-resilient-state-transitions-with-chained-api.md) — Classifies every out-of-order call into the four-tier resilience model.
+*   [TDR-0033: Derived State from Attributes](TDR-0033-derived-state-from-attributes.md) — Explains why there is no explicit state enum.
 *   [TDR-0015: ThreadLocal Stack for Context Propagation](TDR-0015-threadlocal-stack-for-context-propagation.md) — Describes how started meters are tracked per thread.
 *   [TDR-0016: Artificial Throwable for Usage Reporting](TDR-0016-artificial-throwable-for-usage-reporting.md) — Explains how stack traces are logged for validation warnings.
 *   [meter-state-diagram.md](meter-state-diagram.md) — Visual diagram of all valid and invalid state transitions.

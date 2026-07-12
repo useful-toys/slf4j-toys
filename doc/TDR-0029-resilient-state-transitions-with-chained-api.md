@@ -58,13 +58,13 @@ We adopt a **four-tier resilience strategy** that gracefully handles both expect
 
 ### Tier 3: ⚠️ State-Correcting (Outside Expected Flow)
 
-**Definition**: A call that violates the expected API contract, but is accepted and applied to correct the state to a valid configuration while maintaining resilience. The call may change the lifecycle state and/or update attributes. An error log entry is emitted (e.g., `INVALID_ARGUMENT` or `INCONSISTENT_*`).
+**Definition**: A call that violates the expected API contract, but is accepted and applied to correct the state to a valid configuration while maintaining resilience. The call may change the lifecycle state and/or update attributes. An error log entry is emitted (e.g., `INVALID_TRANSITION`).
 
 **Behavior**:
 * A warning or error is logged to alert developers that the call violates the API contract.
 * The call is still executed to maintain non-intrusive behavior and correct the state.
 * The state transition or attribute update is applied to restore validity.
-* Example: `start()` called twice (logs `INVALID_TRANSITION` but resets `startTime` to now), or `ok()` called from `Created` (logs `INVALID_TRANSITION` but still terminates the meter as OK).
+* Example: `ok()` called from `Created` (logs `INVALID_TRANSITION`, backfills `startTime = stopTime`, and still terminates the meter as OK).
 
 **Guarantees**:
 * The meter remains in a valid state after the call (first-termination-wins ensures immutability).
@@ -79,12 +79,12 @@ We adopt a **four-tier resilience strategy** that gracefully handles both expect
 
 ### Tier 4: ❌ State-Preserving (Invalid Flow)
 
-**Definition**: A call made when preconditions or arguments are not met. The call is rejected and ignored to preserve the current valid state. An error log entry is emitted (e.g., `INVALID_ARGUMENT` or `INCONSISTENT_*`).
+**Definition**: A call made when preconditions or arguments are not met. The call is rejected and ignored to preserve the current valid state. An error log entry is emitted (e.g., `INVALID_TRANSITION`, `INVALID_STATE`, or `INVALID_ARGUMENT`).
 
 **Behavior**:
 * A warning or error is logged to alert developers that preconditions or arguments are invalid.
 * The call is rejected and has no effect on the state or attributes.
-* Example: `inc()` called from `Created` (logs `INVALID_STATE` but does nothing), or `ok(null)` with a null path argument (logs `INVALID_ARGUMENT` but does not transition).
+* Example: `start()` called twice or after termination (logs `INVALID_TRANSITION` but keeps the original `startTime` and state), `inc()` called from `Created` (logs `INVALID_STATE` but does nothing), or `ok(null)` with a null path argument (logs `INVALID_ARGUMENT` but does not transition).
 
 **Guarantees**:
 * The meter remains in exactly the same state (state is preserved).
@@ -108,30 +108,22 @@ Every state-affecting method implements **precondition checks** to determine whi
 
 ```java
 public void ok() {
-    // Tier 1/2 check: Is the meter Started?
-    if (startTime != 0 && stopTime == 0) {
-        // Valid state-changing: apply the termination
-        stopTime = System.currentTimeMillis();
-        validateStopPrecondition(this, Markers.MSG_OK);
-        // ... logging and data emission ...
+    // Tier 4 check: already Stopped? validateStopPrecondition logs
+    // INVALID_TRANSITION and returns false; the call is ignored.
+    if (!MeterValidator.validateStopPrecondition(this)) {
         return;
     }
-    
-    // Tier 3 check: Is the meter Created?
+
+    // Tier 1 (from Started) or Tier 3 (from Created): apply the termination.
+    stopTime = collectCurrentTime();
+
+    // Tier 3 auto-correction: never started => backfill startTime.
+    // validateStopPrecondition already logged INVALID_TRANSITION for this case.
     if (startTime == 0) {
-        // Outside expected flow: apply the termination anyway
-        stopTime = System.currentTimeMillis();
-        validateStopPrecondition(this, Markers.INVALID_TRANSITION);
-        // ... logging and data emission ...
-        return;
+        startTime = stopTime;
     }
-    
-    // Tier 4 check: Is the meter already Stopped?
-    if (stopTime != 0) {
-        // Ignored: do nothing
-        validateStopPrecondition(this, Markers.INVALID_TRANSITION);
-        // ... log warning but do not change state ...
-    }
+
+    // ... logging and data emission ...
 }
 ```
 
@@ -149,8 +141,8 @@ This ensures that a Meter reported as "OK" cannot later change to "Failed" due t
 ### Logging and Diagnostics
 
 * **Tier 1/2**: No log entry (normal usage).
-* **Tier 3**: Logs with `INCONSISTENT_*` markers to indicate discouraged but tolerated usage.
-* **Tier 4**: Logs with `INVALID_ARGUMENT` or `INCONSISTENT_*` markers to indicate ignored calls.
+* **Tier 3**: Logs with the `INVALID_TRANSITION` marker to indicate discouraged but tolerated usage.
+* **Tier 4**: Logs with the `INVALID_TRANSITION`, `INVALID_STATE`, or `INVALID_ARGUMENT` marker to indicate ignored calls.
 
 All logging uses markers from [src/main/java/org/usefultoys/slf4j/meter/Markers.java](../src/main/java/org/usefultoys/slf4j/meter/Markers.java) for aggregation and filtering.
 
@@ -163,7 +155,7 @@ All logging uses markers from [src/main/java/org/usefultoys/slf4j/meter/Markers.
 * **Non-intrusive**: No exceptions disrupt production applications.
 * **Forgiving but guided**: Incorrect usage is tolerated but flagged in logs.
 * **State invariant**: The `Meter` is always in a valid state, even after misuse.
-* **Debuggable**: Developers can detect their mistakes by monitoring `INCONSISTENT_*` and `INVALID_ARGUMENT` markers.
+* **Debuggable**: Developers can detect their mistakes by monitoring the `INVALID_TRANSITION`, `INVALID_STATE`, and `INVALID_ARGUMENT` markers.
 * **Testable**: Test suites can verify that invalid transitions are logged correctly without throwing exceptions.
 * **Contract preserved**: The recommended usage pattern is clear and works as designed; out-of-order usage is discouraged via logging but not prevented by the API.
 
@@ -187,11 +179,7 @@ All logging uses markers from [src/main/java/org/usefultoys/slf4j/meter/Markers.
 
 Throw `IllegalStateException` for any out-of-order call (Tier 3 and 4 would throw).
 
-**Rejected because**:
-
-* Violates non-intrusive principle ([TDR-0017](TDR-0017-non-intrusive-validation-and-error-handling.md)).
-* Complex control flow (try-catch-finally) would require defensive checks everywhere.
-* Production applications could crash due to accidental misuse.
+**Rejected because** it violates the non-intrusive principle — see [TDR-0017](TDR-0017-non-intrusive-validation-and-error-handling.md) for the full rationale.
 
 ### 2. **No Enforcement (All Calls Succeed)**
 
@@ -207,11 +195,7 @@ Allow any call in any state to modify the state arbitrarily (no Tier 3 or 4 dist
 
 Introduce an explicit `enum State` and check it explicitly in each method.
 
-**Rejected because**:
-
-* Redundant with existing `startTime` and `stopTime` checks.
-* Adds synchronization complexity (must update both enum and timestamps atomically).
-* Increases code verbosity without benefit.
+**Rejected because** the state is derived from the data attributes — this decision is documented in full in [TDR-0033](TDR-0033-derived-state-from-attributes.md).
 
 ### 4. **Tier 2 Only (No Tier 3)**
 
@@ -230,6 +214,7 @@ Allow only Tier 1, 2, and 4. Tier 3 (outside expected flow) is always ignored.
 * [TDR-0017: Non-Intrusive Validation and Error Handling](TDR-0017-non-intrusive-validation-and-error-handling.md) — Explains the non-intrusive principle.
 * [TDR-0019: Immutable Lifecycle Transitions](TDR-0019-immutable-lifecycle-transitions.md) — Explains first-termination-wins and state immutability.
 * [TDR-0020: Three Outcome Types (OK, REJECT, FAIL)](TDR-0020-three-outcome-types-ok-reject-fail.md) — Explains the three terminal states.
+* [TDR-0033: Derived State from Attributes](TDR-0033-derived-state-from-attributes.md) — Explains why there is no explicit state enum.
 * [meter-state-diagram.md](meter-state-diagram.md) — Visual diagram of all valid and invalid state transitions, organized by the four tiers.
 * [src/main/java/org/usefultoys/slf4j/meter/Meter.java](../src/main/java/org/usefultoys/slf4j/meter/Meter.java) — Implementation of lifecycle methods with tier guards.
 * [src/main/java/org/usefultoys/slf4j/meter/MeterValidator.java](../src/main/java/org/usefultoys/slf4j/meter/MeterValidator.java) — Validation logic for each tier.
