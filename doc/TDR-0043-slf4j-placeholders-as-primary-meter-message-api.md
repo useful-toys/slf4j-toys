@@ -1,4 +1,4 @@
-# TDR-0042: slf4j `{}` Placeholders as the Primary Meter Message API
+# TDR-0043: slf4j `{}` Placeholders as the Primary Meter Message API
 
 **Status**: Accepted
 **Date**: 2026-07-12

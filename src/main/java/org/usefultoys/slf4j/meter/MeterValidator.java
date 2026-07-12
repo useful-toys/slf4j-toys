@@ -88,7 +88,7 @@ public class MeterValidator {
      * Meter.
      * <p>
      * This overload is kept as a deliberate tradeoff: {@code java.util.Formatter} parses the format string and
-     * allocates on every call (see TDR-0042), which the {@code {}}-placeholder {@code m} overload avoids. Formatting
+     * allocates on every call (see TDR-0043), which the {@code {}}-placeholder {@code m} overload avoids. Formatting
      * is pinned to {@link Locale#ROOT} so the result never depends on the JVM's default locale.
      *
      * @param meter  The Meter instance.
