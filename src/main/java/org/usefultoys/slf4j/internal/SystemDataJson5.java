@@ -73,6 +73,10 @@ class SystemDataJson5 {
             sb.append(',').append(PROP_GARBAGE_COLLECTOR).append(":[").append(data.garbageCollector_count).append(',').append(data.garbageCollector_time).append(']');
         }
         if (data.systemLoad > 0) {
+            // Scaled-integer formatting accepts tiny rounding-tie differences vs. String.format("%.1f")
+            // (e.g. 0.35 -> "0.4" instead of "0.3") to avoid the cost of format-string parsing on the
+            // hot path. systemLoad is guaranteed to be within [0, 1] by SystemMetricsCollector, so no
+            // overflow guard is needed. See doc/TDR-0039-accept-scaled-integer-rounding-in-json5-serialization.md.
             final long scaled = Math.round(data.systemLoad * 10);
             sb.append(',').append(PROP_SYSTEM_LOAD).append(':').append(scaled / 10).append('.').append(scaled % 10);
         }
