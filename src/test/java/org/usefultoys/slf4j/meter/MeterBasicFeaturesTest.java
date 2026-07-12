@@ -491,6 +491,39 @@ class MeterBasicFeaturesTest {
             assertTrue(sub.getContext() == null || sub.getContext().isEmpty(),
                     "should not have context entries when parent has no context");
         }
+
+        @Test
+        @DisplayName("should not duplicate message/data logger prefix and suffix across nested sub-meters")
+        void shouldNotDuplicatePrefixAndSuffixAcrossNestedSubMeters() {
+            // Given: configured message/data prefixes and suffixes
+            System.setProperty(MeterConfig.PROP_MESSAGE_PREFIX, "msg.");
+            System.setProperty(MeterConfig.PROP_MESSAGE_SUFFIX, ".m");
+            System.setProperty(MeterConfig.PROP_DATA_PREFIX, "data.");
+            System.setProperty(MeterConfig.PROP_DATA_SUFFIX, ".d");
+            MeterConfig.init();
+
+            final Meter parent = new Meter(logger, "parentOp");
+
+            // When: creating a sub-meter, and a sub-sub-meter from it
+            final Meter sub = parent.sub("childOp");
+            final Meter subSub = sub.sub("grandchildOp");
+
+            // Then: category must stay stable across nesting levels
+            assertEquals(logger.getName(), sub.getCategory(), "sub-meter should inherit parent's raw category");
+            assertEquals(logger.getName(), subSub.getCategory(), "sub-sub-meter should inherit the same raw category");
+
+            // Then: message/data logger names must apply the prefix/suffix exactly once, regardless of nesting depth
+            final String expectedMessageLoggerName = MeterConfig.messagePrefix + logger.getName() + MeterConfig.messageSuffix;
+            final String expectedDataLoggerName = MeterConfig.dataPrefix + logger.getName() + MeterConfig.dataSuffix;
+            assertEquals(expectedMessageLoggerName, sub.getMessageLogger().getName(),
+                    "sub-meter's message logger should apply prefix/suffix exactly once");
+            assertEquals(expectedDataLoggerName, sub.getDataLogger().getName(),
+                    "sub-meter's data logger should apply prefix/suffix exactly once");
+            assertEquals(expectedMessageLoggerName, subSub.getMessageLogger().getName(),
+                    "sub-sub-meter's message logger should not accumulate an extra prefix/suffix");
+            assertEquals(expectedDataLoggerName, subSub.getDataLogger().getName(),
+                    "sub-sub-meter's data logger should not accumulate an extra prefix/suffix");
+        }
     }
 
     @Nested

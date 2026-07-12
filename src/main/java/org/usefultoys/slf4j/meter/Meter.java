@@ -86,8 +86,6 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     /** Logger for machine-parsable data. */
     @Getter
     private final transient Logger dataLogger;
-    /** Base logger (without message/data prefix/suffix applied). Used for creating sub-meters. */
-    private final transient Logger baseLogger;
 
     /**
      * Tracks how many times each unique operation (category/operation name pair) has been executed.
@@ -154,9 +152,26 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 extractNextPosition(logger.getName(), operation),
                 logger.getName(), operation, parent);
         createTime = collectCurrentTime();
-        baseLogger = logger;
         messageLogger = resolveDecoratedLogger(logger, MeterConfig.messagePrefix, MeterConfig.messageSuffix);
         dataLogger = resolveDecoratedLogger(logger, MeterConfig.dataPrefix, MeterConfig.dataSuffix);
+    }
+
+    /**
+     * Creates a new `Meter` for an operation directly from its category name, bypassing the `Logger` lookup for the
+     * base logger. Used by {@link #sub(String)} to derive the sub-meter's category from this meter's own
+     * {@code category} field, instead of re-deriving it from an already-decorated logger.
+     *
+     * @param category  The category name of the operation.
+     * @param operation The name of the operation, or {@code null}.
+     * @param parent    The full ID of the parent `Meter`, or {@code null} if this is a top-level operation.
+     */
+    Meter(final String category, final String operation, final String parent) {
+        super(Session.shortSessionUuid(),
+                extractNextPosition(category, operation),
+                category, operation, parent);
+        createTime = collectCurrentTime();
+        messageLogger = org.slf4j.LoggerFactory.getLogger(MeterConfig.messagePrefix + category + MeterConfig.messageSuffix);
+        dataLogger = org.slf4j.LoggerFactory.getLogger(MeterConfig.dataPrefix + category + MeterConfig.dataSuffix);
     }
 
     /**
@@ -297,7 +312,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         } else {
             subOperation = operation + "/" + suboperationName;
         }
-        final Meter m = new Meter(baseLogger, subOperation, getFullID());
+        final Meter m = new Meter(category, subOperation, getFullID());
         if (context != null) {
             /* Inherit parent's context for sub-operation */
             m.context = new HashMap<>(context);
