@@ -116,7 +116,11 @@ public class SystemMetricsCollector {
         final double loadAverage = osBean.getSystemLoadAverage();
         final int availableProcessors = osBean.getAvailableProcessors();
         if (loadAverage >= 0 && availableProcessors > 0) {
-            data.systemLoad = loadAverage / availableProcessors;
+            // Normalize to the [0, 1] range of getSystemCpuLoad(): an oversubscribed CPU
+            // (load average above the processor count) is reported as full load (1.0), keeping
+            // systemLoad semantics consistent across both collection paths and guaranteeing
+            // the invariant relied upon by formatters and serializers. See TDR-0039.
+            data.systemLoad = Math.min(loadAverage / availableProcessors, 1.0);
         }
     }
 
