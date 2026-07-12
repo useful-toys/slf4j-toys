@@ -15,11 +15,7 @@ Java’s functional interfaces (`Runnable`, `Callable`) provide a natural way to
 
 This is especially useful when the operation already exists as a method (or a short sequence of statements) and callers simply want to add metering behavior without rewriting the control flow. Wrapping an existing method call (or method reference) into a lambda provides a minimal, local change that adds `Meter` lifecycle logging and consistent exception classification.
 
-It is also possible to use `try-with-resources` with `Meter` because it implements `Closeable`. However, this pattern only guarantees that *a failure will be reported* when the block exits without an explicit terminal method: `close()` will emit a FAIL with the path `"try-with-resources"`.
-
-This does not make lifecycle usage transparent: developers still need to call `start()` at the beginning (typically in the resource declaration) and still need to explicitly call `ok()`, `reject(...)`, or `fail(...)` inside the `try` block to encode the intended outcome.
-
-In contrast, the lambda wrappers are preferred when the goal is to make `Meter` usage truly transparent at call sites: the wrapper method can perform `start()` and will always perform the appropriate terminal call (OK/REJECT/FAIL) based on the chosen policy.
+`try-with-resources` is the alternative lifecycle-safety mechanism, but it only guarantees a FAIL report on implicit close and still requires explicit `start()` and terminal calls — see [TDR-0024](TDR-0024-try-with-resources-lifecycle-fit-and-limitations.md) for its fit and limitations. The lambda wrappers are preferred when the goal is to make `Meter` usage truly transparent at call sites: the wrapper method performs `start()` and always performs the appropriate terminal call (OK/REJECT/FAIL) based on the chosen policy.
 
 ## Decision
 

@@ -250,7 +250,9 @@ public class TestTimeSource implements TimeSource {
     
     @Override
     public long nanoTime() {
-        return curr
+        return currentNanoTime;
+    }
+}
 ```
 
 ### Precondition Validation
