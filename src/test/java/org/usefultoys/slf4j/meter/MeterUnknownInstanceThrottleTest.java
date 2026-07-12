@@ -151,7 +151,7 @@ class MeterUnknownInstanceThrottleTest {
                    window as possible, maximizing the chance that multiple threads observe the same stale
                    "next allowed" timestamp and must retry the CAS loop against each other. */
                 while (!start.get()) {
-                    Thread.onSpinWait();
+                    Thread.yield();
                 }
                 if (unknown.shouldReportInvalidUsage()) {
                     claimedCount.incrementAndGet();
@@ -161,7 +161,7 @@ class MeterUnknownInstanceThrottleTest {
         }
 
         while (readyCount.get() < threadCount) {
-            Thread.onSpinWait();
+            Thread.yield();
         }
         start.set(true);
         for (final Thread thread : threads) {
