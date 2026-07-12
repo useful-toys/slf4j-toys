@@ -146,6 +146,10 @@ public class MeterConfig {
      * for encoded data.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.data.prefix}, defaulting to an empty string.
+     * <p>
+     * Setting a non-empty prefix or suffix (see also {@link #dataSuffix}) adds a small initialization cost to
+     * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
+     * the category logger as-is.
      */
     public String dataPrefix;
 
@@ -159,6 +163,10 @@ public class MeterConfig {
      * for encoded data.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.data.suffix}, defaulting to an empty string.
+     * <p>
+     * Setting a non-empty prefix (see also {@link #dataPrefix}) or suffix adds a small initialization cost to
+     * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
+     * the category logger as-is.
      */
     public String dataSuffix;
 
@@ -172,6 +180,10 @@ public class MeterConfig {
      * for readable messages.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.message.prefix}, defaulting to an empty string.
+     * <p>
+     * Setting a non-empty prefix or suffix (see also {@link #messageSuffix}) adds a small initialization cost to
+     * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
+     * the category logger as-is.
      */
     public String messagePrefix;
 
@@ -185,6 +197,10 @@ public class MeterConfig {
      * for readable messages.
      * <p>
      * Value is read from system property {@code slf4jtoys.meter.message.suffix}, defaulting to an empty string.
+     * <p>
+     * Setting a non-empty prefix (see also {@link #messagePrefix}) or suffix adds a small initialization cost to
+     * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
+     * the category logger as-is.
      */
     public String messageSuffix;
 
