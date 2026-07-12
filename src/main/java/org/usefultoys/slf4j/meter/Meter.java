@@ -114,6 +114,15 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     private WeakReference<Meter> previousInstance;
 
     /**
+     * Shared, process-wide null-object returned by {@link #getCurrentInstance()} when no meter is
+     * active on the current thread, replacing a fresh throwaway {@code Meter} allocated on every
+     * call. Every operation that would otherwise mutate a fresh {@code Meter} is overridden on
+     * {@link UnknownMeter} to log an {@code INVALID_TRANSITION} instead, so the shared instance is
+     * safe to read and safe to call from multiple threads at once. See TDR-0042.
+     */
+    private static final Meter UNKNOWN_INSTANCE = new UnknownMeter();
+
+    /**
      * Registration handle with the {@link MeterLeakDetector}, obtained on {@link #start()}.
      * {@code null} when the detector declines registration (disabled or unknown category). Passed back to
      * the detector on every explicit termination so this {@code Meter} is not reported as a leak.
@@ -216,15 +225,20 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     /**
      * Returns the `Meter` instance most recently started on the current thread. This is useful for accessing the
      * current operation's context.
+     * <p>
+     * When no meter is active, this returns the shared {@link #UNKNOWN_INSTANCE} null-object rather than allocating
+     * a fresh one. Treat it as read-only: every mutating operation called on it (`start()`, `m()`, `ctx()`, `ok()`,
+     * `reject()`, `fail()`, `close()`, `limitMilliseconds()`, `iterations()`, `sub()`, ...) is a well-defined no-op
+     * that logs an {@code INVALID_TRANSITION} instead of silently mutating shared state. See TDR-0042.
      *
-     * @return The current `Meter` instance, or a dummy `Meter` if none is active on the current thread.
+     * @return The current `Meter` instance, or the shared unknown `Meter` if none is active on the current thread.
      */
     public static Meter getCurrentInstance() {
         final WeakReference<Meter> ref = localThreadInstance.get();
         final Meter current = ref == null ? null : ref.get();
-        /* Return dummy meter if no active meter on current thread */
+        /* Return the shared null-object if no active meter on current thread */
         if (current == null) {
-            return new Meter(LoggerFactory.getLogger(UNKNOWN_LOGGER_NAME));
+            return UNKNOWN_INSTANCE;
         }
         return current;
     }
@@ -810,6 +824,89 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
         } catch (final Exception t) {
             MeterValidator.logUnexpectedException(this, t);
+        }
+    }
+
+    /**
+     * Backing implementation of {@link #UNKNOWN_INSTANCE}: a {@code Meter} whose every
+     * state-mutating operation is overridden to log an {@code INVALID_TRANSITION} and return
+     * {@code this} (or, for {@code void} methods, simply return) instead of mutating shared state.
+     * This makes the single shared instance safe to hand out from {@link #getCurrentInstance()} to
+     * any number of threads at once. {@code inc()}, {@code incBy()}, {@code incTo()} and
+     * {@code progress()} need no override: their preconditions already reject a never-started
+     * meter, and this instance can never be started. See TDR-0042.
+     */
+    private static final class UnknownMeter extends Meter {
+
+        private static final long serialVersionUID = 1L;
+
+        UnknownMeter() {
+            super(LoggerFactory.getLogger(UNKNOWN_LOGGER_NAME));
+        }
+
+        private Meter denied() {
+            MeterValidator.logInvalidTransition(this, "no operation is active on the current thread");
+            return this;
+        }
+
+        @Override
+        public Meter start() {
+            return denied();
+        }
+
+        @Override
+        Meter commonOk(final Object pathId) {
+            return denied();
+        }
+
+        @Override
+        public Meter reject(final Object cause) {
+            return denied();
+        }
+
+        @Override
+        public Meter fail(final Object cause) {
+            return denied();
+        }
+
+        @Override
+        public void close() {
+            denied();
+        }
+
+        @Override
+        public void putContext(final String name, final Object value) {
+            denied();
+        }
+
+        @Override
+        public void putContext(final String name) {
+            denied();
+        }
+
+        @Override
+        public Meter m(final String message) {
+            return denied();
+        }
+
+        @Override
+        public Meter m(final String format, final Object... args) {
+            return denied();
+        }
+
+        @Override
+        public Meter limitMilliseconds(final long timeLimit) {
+            return denied();
+        }
+
+        @Override
+        public Meter iterations(final long expectedIterations) {
+            return denied();
+        }
+
+        @Override
+        public Meter sub(final String suboperationName) {
+            return denied();
         }
     }
 }

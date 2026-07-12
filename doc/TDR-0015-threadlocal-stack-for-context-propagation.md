@@ -51,3 +51,4 @@ We implemented a `ThreadLocal` stack of `Meter` instances to track the "current"
 ## References
 *   [TDR-0011: Null Object Pattern for Optional Logging](TDR-0011-null-object-pattern-for-optional-logging.md)
 *   [TDR-0017: Non-Intrusive Validation and Error Handling](TDR-0017-non-intrusive-validation-and-error-handling.md)
+*   [TDR-0042: Shared Null-Object for the Unknown Meter](TDR-0042-shared-null-object-for-unknown-meter.md) — refines the "dummy instance" mentioned above from a per-call allocation into a shared, immutable-by-rejection singleton.

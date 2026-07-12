@@ -707,17 +707,20 @@ class MeterFactoryTest {
         }
 
         @Test
-        @DisplayName("should create sub meter from fallback when no current meter is started")
+        @DisplayName("should return the shared unknown meter, not a new sub meter, when no current meter is started")
         void shouldCreateSubMeterFromFallbackWhenNoCurrentMeterIsStarted() {
             // Given: no active meter on the current thread
+            final Meter unknown = Meter.getCurrentInstance();
 
             // When: a sub meter is requested
             final Meter sub = MeterFactory.getCurrentSubMeter("child");
 
-            // Then: a sub meter should be created from the fallback meter
-            assertNotNull(sub, "should create non-null sub meter even without current meter");
-            assertEquals(Meter.UNKNOWN_LOGGER_NAME, sub.getCategory(), "should inherit fallback category");
-            assertEquals("child", sub.getOperation(), "should use sub name as operation when parent has no operation");
+            // Then: sub() on the shared unknown meter is a no-op that returns itself (see TDR-0042),
+            // not a freshly allocated "???/child" meter
+            assertNotNull(sub, "should never return null even without current meter");
+            assertSame(unknown, sub, "should return the shared unknown meter itself, not allocate a sub meter");
+            assertEquals(Meter.UNKNOWN_LOGGER_NAME, sub.getCategory(), "should keep the unknown category");
+            assertNull(sub.getOperation(), "should not gain a 'child' operation from the rejected sub() call");
         }
 
         @Test
