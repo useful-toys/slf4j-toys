@@ -196,6 +196,22 @@ class SystemMetricsCollectorTest {
     }
 
     @Test
+    @DisplayName("should clamp fallback system load at 1.0 when load average exceeds processor count")
+    void collect_clampFallbackAtFullLoad() {
+        // Given: load average above the processor count (oversubscribed CPU)
+        SystemConfig.usePlatformManagedBean = true;
+        when(mockSunOsBean.getSystemCpuLoad()).thenReturn(-1.0);
+        when(mockSunOsBean.getSystemLoadAverage()).thenReturn(16.0);
+        when(mockSunOsBean.getAvailableProcessors()).thenReturn(8);
+
+        // When: collectPlatformStatus is called
+        collector.collectPlatformStatus(data);
+
+        // Then: the normalized load is clamped at 1.0 (100%)
+        assertEquals(1.0, data.getSystemLoad(), 0.001);
+    }
+
+    @Test
     @DisplayName("should ignore fallback when loadAverage is negative")
     void collect_ignoreFallbackOnNegativeLoad() {
         // Given: system load average returns -1.0 (invalid)

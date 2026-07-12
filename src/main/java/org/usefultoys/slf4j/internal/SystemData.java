@@ -81,7 +81,7 @@ public abstract class SystemData extends EventData {
      * @param runtime_usedMemory The used memory reported by {@link Runtime}.
      * @param runtime_maxMemory The maximum memory reported by {@link Runtime}.
      * @param runtime_totalMemory The total memory reported by {@link Runtime}.
-     * @param systemLoad The system CPU load average.
+     * @param systemLoad The normalized system CPU load, in the [0, 1] range.
      */
     protected SystemData(final String sessionUuid, final long position, final long lastCurrentTime,
                          final long heap_commited, final long heap_max, final long heap_used,
@@ -143,7 +143,7 @@ public abstract class SystemData extends EventData {
     long runtime_maxMemory = 0;
     /** The total memory reported by {@link Runtime}. */
     long runtime_totalMemory = 0;
-    /** The system CPU load average. */
+    /** The normalized system CPU load, in the [0, 1] range (1.0 = all processors fully loaded). */
     double systemLoad = 0.0;
 
     @Override
