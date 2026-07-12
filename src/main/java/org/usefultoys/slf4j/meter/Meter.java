@@ -927,9 +927,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
 
         /**
          * Throttles misuse reports against the shared instance to at most one per
-         * {@link MeterConfig#noopReportIntervalMilliseconds}, using a CAS loop on a shared "next allowed"
-         * timestamp so concurrent callers from multiple threads never both win the same window. {@code 0}
-         * disables throttling (report every occurrence); a negative interval disables reporting entirely.
+         * {@link MeterConfig#noopReportIntervalMilliseconds}. {@code 0} disables throttling (report every
+         * occurrence); a negative interval disables reporting entirely.
          */
         @Override
         boolean shouldReportInvalidUsage() {
@@ -938,10 +937,21 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 suppressedCount.incrementAndGet();
                 return false;
             }
-            if (intervalMillis == 0) {
+            if (intervalMillis == 0 || tryClaimReportWindow(intervalMillis * 1_000_000L)) {
                 return true;
             }
-            final long intervalNanos = intervalMillis * 1_000_000L;
+            suppressedCount.incrementAndGet();
+            return false;
+        }
+
+        /**
+         * Attempts to claim the next report window via a CAS loop on the shared "next allowed" timestamp,
+         * so concurrent callers from multiple threads never both win the same window.
+         *
+         * @param intervalNanos the throttle interval, in nanoseconds.
+         * @return {@code true} if this call claimed the window and may report now.
+         */
+        private static boolean tryClaimReportWindow(final long intervalNanos) {
             final long now = System.nanoTime();
             long current = nextAllowedReportNanos.get();
             while (now - current >= 0) {
@@ -950,7 +960,6 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 }
                 current = nextAllowedReportNanos.get();
             }
-            suppressedCount.incrementAndGet();
             return false;
         }
 

@@ -27,6 +27,10 @@ import org.usefultoys.slf4jtestmock.AssertLogger;
 import org.usefultoys.test.ResetMeterConfig;
 import org.usefultoys.test.ValidateCleanMeter;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.slf4j.impl.MockLoggerEvent.Level.ERROR;
 import static org.usefultoys.slf4j.meter.Markers.INVALID_STATE;
@@ -116,6 +120,59 @@ class MeterUnknownInstanceThrottleTest {
     }
 
     @Test
+    @DisplayName("misuse routed through logInvalidState (inc/incBy/incTo/progress/path) is also throttled "
+            + "and uses the corrected diagnosis, not the misleading \"not yet started\" message")
+    void misuseViaLogInvalidStateIsThrottledAndUsesCorrectDiagnosis() {
+        MeterConfig.noopReportIntervalMilliseconds = 60_000L;
+        final Meter unknown = Meter.getCurrentInstance();
+
+        unknown.inc(); // not overridden by UnknownMeter; rejected by validateIncPrecondition -> logInvalidState
+        unknown.inc(); // suppressed
+        unknown.inc(); // suppressed
+
+        AssertLogger.assertEventCount(unknownLogger, 1);
+        AssertLogger.assertEvent(unknownLogger, 0, ERROR, INVALID_STATE, "no operation is active on the current thread");
+    }
+
+    @Test
+    @DisplayName("concurrent misuse: exactly one thread claims the report window, the rest retry the CAS loop")
+    void concurrentMisuseOnlyOneThreadClaimsTheWindow() throws InterruptedException {
+        MeterConfig.noopReportIntervalMilliseconds = 60_000L;
+        final int threadCount = 64;
+        final AtomicInteger readyCount = new AtomicInteger(0);
+        final AtomicBoolean start = new AtomicBoolean(false);
+        final AtomicInteger claimedCount = new AtomicInteger(0);
+        final Thread[] threads = new Thread[threadCount];
+        for (int i = 0; i < threadCount; i++) {
+            threads[i] = new Thread(() -> {
+                final Meter unknown = Meter.getCurrentInstance();
+                readyCount.incrementAndGet();
+                /* Busy-spin on a plain flag (no park/unpark) to release all threads within as tight a
+                   window as possible, maximizing the chance that multiple threads observe the same stale
+                   "next allowed" timestamp and must retry the CAS loop against each other. */
+                while (!start.get()) {
+                    Thread.onSpinWait();
+                }
+                if (unknown.shouldReportInvalidUsage()) {
+                    claimedCount.incrementAndGet();
+                }
+            });
+            threads[i].start();
+        }
+
+        while (readyCount.get() < threadCount) {
+            Thread.onSpinWait();
+        }
+        start.set(true);
+        for (final Thread thread : threads) {
+            thread.join();
+        }
+
+        assertEquals(1, claimedCount.get(),
+                "exactly one of " + threadCount + " concurrent misuse occurrences should claim the report window");
+    }
+
+    @Test
     @DisplayName("real (non-singleton) meters are never throttled")
     void realMetersAreNeverThrottled() {
         /* Long enough to throttle the singleton, to prove it has no effect on a real Meter */
@@ -138,11 +195,12 @@ class MeterUnknownInstanceThrottleTest {
     }
 
     @Test
-    @DisplayName("no CallerStackTraceThrowable is allocated when ERROR is disabled")
+    @DisplayName("no CallerStackTraceThrowable is allocated when ERROR is disabled, via logInvalidTransition or logInvalidState")
     void noThrowableAllocatedWhenErrorDisabled() {
         unknownLogger.setErrorEnabled(false);
         try (MockedConstruction<CallerStackTraceThrowable> mocked = Mockito.mockConstruction(CallerStackTraceThrowable.class)) {
-            Meter.getCurrentInstance().start();
+            Meter.getCurrentInstance().start(); // routes through logInvalidTransition
+            Meter.getCurrentInstance().inc();   // routes through logInvalidState
 
             assertTrue(mocked.constructed().isEmpty(),
                     "no CallerStackTraceThrowable should be allocated when ERROR is disabled");
