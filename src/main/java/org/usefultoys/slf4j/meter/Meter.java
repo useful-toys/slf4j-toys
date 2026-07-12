@@ -356,6 +356,12 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * <p>
      * Formatting is locale-independent and does not allocate a {@link java.util.Formatter}. For
      * {@code printf}-style formatting (e.g., {@code "%.2f"}), use {@link #mf(String, Object...)} instead.
+     * <p>
+     * <b>Arguments are substituted immediately, at the moment this method is called</b> — unlike most other
+     * {@code Meter} attributes (e.g., elapsed time, throughput, iteration counts), which are computed later, when
+     * the log message is actually emitted (on {@code start()}/{@code progress()}/{@code ok()}/etc.). The resulting
+     * message is fixed at call time; if an argument's value changes afterward, the emitted message still reflects
+     * the value as it was when {@code m(...)} was called.
      *
      * @param format The message pattern using {@code {}} placeholders.
      * @param args   The arguments substituted into the placeholders.
@@ -376,6 +382,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * This overload is kept as a deliberate tradeoff (see TDR-0042): {@code java.util.Formatter} parses the format
      * string and allocates on every call, which {@link #m(String, Object...)} avoids. Formatting is pinned to
      * {@link java.util.Locale#ROOT}, so the result never depends on the JVM's default locale.
+     * <p>
+     * As with {@link #m(String, Object...)}, <b>arguments are substituted immediately, at the moment this method
+     * is called</b>, not when the log message is later emitted.
      *
      * @param format The message format string (e.g., `String.format(java.lang.String, java.lang.Object...)`).
      * @param args   The arguments for the format string.
