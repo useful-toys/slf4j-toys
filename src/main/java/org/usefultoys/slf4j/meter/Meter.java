@@ -574,24 +574,33 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
 
             if (messageLogger.isWarnEnabled()) { // Check warn enabled to cover info as well
-                SystemMetrics.getInstance().collectRuntimeStatus(this);
-                SystemMetrics.getInstance().collectPlatformStatus(this);
-
                 final boolean warnSlowness = isSlow();
-                final String message1 = readableMessage();
-                /* Log at WARN level for slow operations, INFO level otherwise */
-                if (warnSlowness) {
-                    messageLogger.warn(Markers.MSG_SLOW_OK, message1);
-                } else if (messageLogger.isInfoEnabled()) {
-                    messageLogger.info(Markers.MSG_OK, message1);
-                }
-                if (dataLogger.isTraceEnabled()) {
-                    final String message2 = json5Message();
-                    /* Use different marker for slow operations */
-                    if (warnSlowness) {
-                        dataLogger.trace(Markers.DATA_SLOW_OK, message2);
-                    } else {
-                        dataLogger.trace(Markers.DATA_OK, message2);
+                /* Whether the human-readable message will actually be emitted (WARN for slow, INFO otherwise) */
+                final boolean willLog = warnSlowness || messageLogger.isInfoEnabled();
+                final boolean willTrace = dataLogger.isTraceEnabled();
+
+                /* Skip metric collection and message formatting entirely when neither branch below will consume them */
+                if (willLog || willTrace) {
+                    SystemMetrics.getInstance().collectRuntimeStatus(this);
+                    SystemMetrics.getInstance().collectPlatformStatus(this);
+
+                    if (willLog) {
+                        final String message1 = readableMessage();
+                        /* Log at WARN level for slow operations, INFO level otherwise */
+                        if (warnSlowness) {
+                            messageLogger.warn(Markers.MSG_SLOW_OK, message1);
+                        } else {
+                            messageLogger.info(Markers.MSG_OK, message1);
+                        }
+                    }
+                    if (willTrace) {
+                        final String message2 = json5Message();
+                        /* Use different marker for slow operations */
+                        if (warnSlowness) {
+                            dataLogger.trace(Markers.DATA_SLOW_OK, message2);
+                        } else {
+                            dataLogger.trace(Markers.DATA_OK, message2);
+                        }
                     }
                 }
                 clearContext();
