@@ -86,6 +86,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
     /** Logger for machine-parsable data. */
     @Getter
     private final transient Logger dataLogger;
+    /** Base logger (without message/data prefix/suffix applied). Used for creating sub-meters. */
+    private final transient Logger baseLogger;
 
     /**
      * Tracks how many times each unique operation (category/operation name pair) has been executed.
@@ -152,6 +154,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 extractNextPosition(logger.getName(), operation),
                 logger.getName(), operation, parent);
         createTime = collectCurrentTime();
+        baseLogger = logger;
         messageLogger = resolveDecoratedLogger(logger, MeterConfig.messagePrefix, MeterConfig.messageSuffix);
         dataLogger = resolveDecoratedLogger(logger, MeterConfig.dataPrefix, MeterConfig.dataSuffix);
     }
@@ -294,7 +297,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         } else {
             subOperation = operation + "/" + suboperationName;
         }
-        final Meter m = new Meter(messageLogger, subOperation, getFullID());
+        final Meter m = new Meter(baseLogger, subOperation, getFullID());
         if (context != null) {
             /* Inherit parent's context for sub-operation */
             m.context = new HashMap<>(context);
