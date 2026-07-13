@@ -26,6 +26,8 @@ import org.usefultoys.test.ResetSystemProperty;
 import org.usefultoys.test.ValidateCharset;
 import org.usefultoys.test.WithLocale;
 
+import java.util.Locale;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,8 +42,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <ul>
  *   <li><b>String Properties:</b> Tests parsing of string properties with whitespace handling</li>
  *   <li><b>Boolean Properties:</b> Verifies parsing of boolean values with true/false and invalid formats</li>
- *   <li><b>Numeric Properties:</b> Covers parsing of int, long, and double properties with bounds and invalid formats</li>
- *   <li><b>Default Values:</b> Ensures correct fallback to default values when properties are missing or invalid</li>
+ *   <li><b>Numeric Properties:</b> Covers parsing of int and long properties with bounds and invalid formats</li>
+ *   <li><b>Locale Properties:</b> Verifies parsing of BCP 47 language tags and invalid formats</li>
+ *   <li><b>Default Values:</b> Ensures correct fallback to default values when properties are missing, blank, or invalid</li>
  *   <li><b>Error Handling:</b> Validates error reporting for invalid property values</li>
  * </ul>
  */
@@ -71,6 +74,19 @@ class ConfigParserTest {
         // When: property is retrieved with default
         final String result = ConfigParser.getProperty("nonexistent.property", "default");
         // Then: should return default value
+        assertEquals("default", result, "should return default value");
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @DisplayName("should return default value when string property is blank")
+    void shouldReturnDefaultWhenStringPropertyBlank(final String value) {
+        // Given: system property set to a blank value
+        System.setProperty("test.property", value);
+        // When: property is retrieved with default
+        final String result = ConfigParser.getProperty("test.property", "default");
+        // Then: should return default value without reporting an error
         assertEquals("default", result, "should return default value");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
     }
@@ -121,6 +137,19 @@ class ConfigParserTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @DisplayName("should return default value when boolean property is blank")
+    void shouldReturnDefaultWhenBooleanPropertyBlank(final String value) {
+        // Given: system property set to a blank value
+        System.setProperty("test.property", value);
+        // When: boolean property is retrieved with default
+        final boolean result = ConfigParser.getProperty("test.property", true);
+        // Then: should return default value without reporting an error
+        assertTrue(result, "should return default value true");
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"42", " 42", "42 ", " 42 "})
     @DisplayName("should parse integer property correctly")
     void shouldParseIntegerPropertyCorrectly(final String value) {
@@ -155,6 +184,19 @@ class ConfigParserTest {
         final int result = ConfigParser.getProperty("nonexistent.property", 0);
         // Then: should return default value
         assertEquals(0, result, "should return default value 0");
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @DisplayName("should return default value when integer property is blank")
+    void shouldReturnDefaultWhenIntegerPropertyBlank(final String value) {
+        // Given: system property set to a blank value
+        System.setProperty("test.property", value);
+        // When: integer property is retrieved with default
+        final int result = ConfigParser.getProperty("test.property", 42);
+        // Then: should return default value without reporting an error
+        assertEquals(42, result, "should return default value 42");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
     }
 
@@ -248,6 +290,19 @@ class ConfigParserTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @DisplayName("should return default value when range property is blank")
+    void shouldReturnDefaultWhenRangePropertyBlank(final String value) {
+        // Given: system property set to a blank value
+        System.setProperty("test.property", value);
+        // When: range property is retrieved with default
+        final int result = ConfigParser.getRangeProperty("test.property", 10, 5, 15);
+        // Then: should return default value without reporting an error
+        assertEquals(10, result, "should return default value 10");
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"10", "100", "-5"})
     @DisplayName("should return default and report error when range is inverted")
     void shouldReturnDefaultAndReportErrorWhenRangeIsInverted(final String input) {
@@ -323,6 +378,83 @@ class ConfigParserTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @DisplayName("should return default value when long property is blank")
+    void shouldReturnDefaultWhenLongPropertyBlank(final String value) {
+        // Given: system property set to a blank value
+        System.setProperty("test.property", value);
+        // When: long property is retrieved with default
+        final long result = ConfigParser.getProperty("test.property", 123456789L);
+        // Then: should return default value without reporting an error
+        assertEquals(123456789L, result, "should return default value 123456789");
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"en-US", "de-DE", "pt-BR"})
+    @DisplayName("should parse locale property correctly")
+    void shouldParseLocalePropertyCorrectly(final String value) {
+        // Given: system property set with a valid BCP 47 language tag
+        System.setProperty("test.property", value);
+        // When: locale property is retrieved
+        final Locale result = ConfigParser.getProperty("test.property", Locale.ROOT);
+        // Then: should return the parsed locale
+        assertEquals(Locale.forLanguageTag(value), result, "should return parsed locale for " + value);
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @Test
+    @DisplayName("should return default value when locale property not found")
+    void shouldReturnDefaultWhenLocalePropertyNotFound() {
+        // Given: property not set
+        // When: locale property is retrieved with default
+        final Locale result = ConfigParser.getProperty("nonexistent.property", Locale.GERMANY);
+        // Then: should return default value
+        assertEquals(Locale.GERMANY, result, "should return default locale");
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @DisplayName("should return default value when locale property is blank")
+    void shouldReturnDefaultWhenLocalePropertyBlank(final String value) {
+        // Given: system property set to a blank value
+        System.setProperty("test.property", value);
+        // When: locale property is retrieved with default
+        final Locale result = ConfigParser.getProperty("test.property", Locale.GERMANY);
+        // Then: should return default value without reporting an error
+        assertEquals(Locale.GERMANY, result, "should return default locale");
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"12345", "de_DE"})
+    @DisplayName("should report error when locale property has invalid format")
+    void shouldReportErrorWhenLocalePropertyInvalid(final String value) {
+        // Given: system property set to a value that cannot resolve to a locale with a language
+        System.setProperty("test.property", value);
+        // When: locale property is retrieved
+        final Locale result = ConfigParser.getProperty("test.property", Locale.GERMANY);
+        // Then: should return default and report error
+        assertEquals(Locale.GERMANY, result, "should return default locale");
+        assertFalse(ConfigParser.isInitializationOK(), "should report initialization error");
+        assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Invalid locale value"), "should report invalid locale error");
+    }
+
+    @Test
+    @DisplayName("should parse locale property even for a made-up but syntactically valid language subtag")
+    void shouldParseLocalePropertyForMadeUpButSyntacticallyValidSubtag() {
+        // Given: system property set to a value that is not a real language but is syntactically valid
+        System.setProperty("test.property", "quatsch");
+        // When: locale property is retrieved
+        final Locale result = ConfigParser.getProperty("test.property", Locale.GERMANY);
+        // Then: should parse it as a locale rather than falling back to the default
+        assertEquals(Locale.forLanguageTag("quatsch"), result, "should parse made-up subtag as a locale");
+        assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
+    }
+
+    @ParameterizedTest
     @CsvSource({
             "10, 10",
             "10ms, 10",
@@ -390,17 +522,18 @@ class ConfigParserTest {
         assertEquals(0L, result, "should return default value 0");
         assertFalse(ConfigParser.isInitializationOK(), "should report initialization error");
         assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error");
-        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("Time value overflow"), "should report overflow error");
+        assertTrue(ConfigParser.getInitializationErrors().get(0).contains("overflows when converted to milliseconds"), "should report overflow error");
     }
 
-    @Test
-    @DisplayName("should return default value when milliseconds property is empty")
-    void shouldReturnDefaultWhenMillisecondsPropertyEmpty() {
-        // Given: system property set to empty string
-        System.setProperty("test.property", "");
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @DisplayName("should return default value when milliseconds property is blank")
+    void shouldReturnDefaultWhenMillisecondsPropertyBlank(final String value) {
+        // Given: system property set to a blank value
+        System.setProperty("test.property", value);
         // When: milliseconds property is retrieved
         final long result = ConfigParser.getMillisecondsProperty("test.property", 0L);
-        // Then: should return default value
+        // Then: should return default value without reporting an error
         assertEquals(0L, result, "should return default value 0");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
     }
@@ -430,5 +563,88 @@ class ConfigParserTest {
         assertFalse(ConfigParser.getInitializationErrors().get(0).contains("test.bounded.0"),
                 "oldest errors should be evicted");
         assertFalse(ConfigParser.isInitializationOK(), "should report initialization errors");
+    }
+
+    @Test
+    @DisplayName("should format invalid long error message using the standard template")
+    void shouldFormatInvalidLongErrorMessageUsingStandardTemplate() {
+        // Given: system property set to an unparsable long value
+        System.setProperty("test.property", "invalid");
+        // When: long property is retrieved
+        ConfigParser.getProperty("test.property", 0L);
+        // Then: the recorded error must match the standard template exactly
+        assertEquals(
+                "Invalid long value for property 'test.property': 'invalid' is not a number. Using default value '0'.",
+                ConfigParser.getInitializationErrors().get(0),
+                "should format the exact error message");
+    }
+
+    @Test
+    @DisplayName("should format below-minimum error message using the standard template")
+    void shouldFormatBelowMinimumErrorMessageUsingStandardTemplate() {
+        // Given: system property set below the allowed minimum
+        System.setProperty("test.property", "4");
+        // When: range property is retrieved (min=5, max=15)
+        ConfigParser.getRangeProperty("test.property", 0, 5, 15);
+        // Then: the recorded error must match the standard template exactly
+        assertEquals(
+                "Invalid integer value for property 'test.property': '4' is below minimum '5'. Using minimum value '5'.",
+                ConfigParser.getInitializationErrors().get(0),
+                "should format the exact error message");
+    }
+
+    @Test
+    @DisplayName("should format above-maximum error message using the standard template")
+    void shouldFormatAboveMaximumErrorMessageUsingStandardTemplate() {
+        // Given: system property set above the allowed maximum
+        System.setProperty("test.property", "16");
+        // When: range property is retrieved (min=5, max=15)
+        ConfigParser.getRangeProperty("test.property", 0, 5, 15);
+        // Then: the recorded error must match the standard template exactly
+        assertEquals(
+                "Invalid integer value for property 'test.property': '16' is above maximum '15'. Using maximum value '15'.",
+                ConfigParser.getInitializationErrors().get(0),
+                "should format the exact error message");
+    }
+
+    @Test
+    @DisplayName("should format inverted-range error message using the standard template")
+    void shouldFormatInvertedRangeErrorMessageUsingStandardTemplate() {
+        // Given: range retrieved with minValue greater than maxValue
+        // When: range property is retrieved with an inverted range
+        ConfigParser.getRangeProperty("nonexistent.property", 0, 15, 5);
+        // Then: the recorded error must match the standard template exactly
+        assertEquals(
+                "Invalid range for property 'nonexistent.property': minValue '15' is greater than maxValue '5'. Using default value '0'.",
+                ConfigParser.getInitializationErrors().get(0),
+                "should format the exact error message");
+    }
+
+    @Test
+    @DisplayName("should format time-overflow error message using the standard template")
+    void shouldFormatTimeOverflowErrorMessageUsingStandardTemplate() {
+        // Given: system property set to a time value that overflows when converted to milliseconds
+        System.setProperty("test.property", "9223372036854776s");
+        // When: milliseconds property is retrieved
+        ConfigParser.getMillisecondsProperty("test.property", 0L);
+        // Then: the recorded error must match the standard template exactly
+        assertEquals(
+                "Invalid time value for property 'test.property': '9223372036854776s' overflows when converted to milliseconds. Using default value '0'.",
+                ConfigParser.getInitializationErrors().get(0),
+                "should format the exact error message");
+    }
+
+    @Test
+    @DisplayName("should format invalid locale error message using the standard template")
+    void shouldFormatInvalidLocaleErrorMessageUsingStandardTemplate() {
+        // Given: system property set to a value that cannot resolve to a locale with a language
+        System.setProperty("test.property", "12345");
+        // When: locale property is retrieved
+        ConfigParser.getProperty("test.property", Locale.GERMANY);
+        // Then: the recorded error must match the standard template exactly, using the BCP 47 tag for the default
+        assertEquals(
+                "Invalid locale value for property 'test.property': '12345' cannot be resolved to a locale with a language. Using default value 'de-DE'.",
+                ConfigParser.getInitializationErrors().get(0),
+                "should format the exact error message");
     }
 }
