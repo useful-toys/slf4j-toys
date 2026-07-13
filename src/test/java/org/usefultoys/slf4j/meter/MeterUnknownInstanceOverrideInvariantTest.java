@@ -38,11 +38,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * be provably safe as-is because its own precondition already rejects a never-started meter.
  * <p>
  * This invariant is currently unenforced by the compiler: a new method added to {@code Meter} that writes
- * a field directly (as {@link Meter#mf(String, Object...)} does on branch
- * {@code feat/meter-slf4j-message-placeholders}, which writes {@code description} while its only guard,
- * {@code validateMPrecondition}, checks {@code stopTime} rather than identity) would silently start
- * mutating the shared, process-wide {@code UNKNOWN_INSTANCE} the moment both branches are merged, unless
- * {@code UnknownMeter} is updated to override it too.
+ * a field directly (as {@link Meter#mf(String, Object...)} does, which writes {@code description} while
+ * its only guard, {@code validateMPrecondition}, checks {@code stopTime} rather than identity) would
+ * silently start mutating the shared, process-wide {@code UNKNOWN_INSTANCE} unless {@code UnknownMeter}
+ * is updated to override it too — and unless this test's {@code INVOKERS} map is updated alongside it,
+ * as happened here: {@code mf(String, Object...)} was overridden on {@code UnknownMeter} but the map
+ * lagged behind, leaving the override itself unexercised by {@link #everyRegisteredMethodIsANoOpOnUnknownInstance()}.
  * <p>
  * Rather than hand-listing "the methods we remembered to check" (which cannot catch a method nobody
  * remembered to add), this test reflectively enumerates every qualifying method on {@link Meter} and
@@ -68,6 +69,7 @@ class MeterUnknownInstanceOverrideInvariantTest {
         INVOKERS.put("sub(java.lang.String)", m -> m.sub("child"));
         INVOKERS.put("m(java.lang.String)", m -> m.m("message"));
         INVOKERS.put("m(java.lang.String,[Ljava.lang.Object;)", m -> m.m("message {}", 1));
+        INVOKERS.put("mf(java.lang.String,[Ljava.lang.Object;)", m -> m.mf("value=%d", 42));
         INVOKERS.put("limitMilliseconds(long)", m -> m.limitMilliseconds(1000L));
         INVOKERS.put("iterations(long)", m -> m.iterations(10L));
         INVOKERS.put("putContext(java.lang.String,java.lang.Object)", m -> {
