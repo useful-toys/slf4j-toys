@@ -144,6 +144,23 @@ class MeterConfigTest {
     }
 
     /**
+     * Tests that progressPeriodNanoseconds() converts progressPeriodMilliseconds to nanoseconds,
+     * matching the unit expected by MeterData.getExecutionTime() (see MeterDataFormatter and
+     * Meter.progress(), both of which compare execution time against this value).
+     */
+    @Test
+    @DisplayName("should convert progressPeriodMilliseconds to nanoseconds")
+    void testProgressPeriodNanoseconds() {
+        MeterConfig.progressPeriodMilliseconds = 2000L;
+        assertEquals(2_000_000_000L, MeterConfig.progressPeriodNanoseconds(),
+                "progressPeriodNanoseconds() should convert milliseconds to nanoseconds (factor 1,000,000)");
+
+        MeterConfig.progressPeriodMilliseconds = 0L;
+        assertEquals(0L, MeterConfig.progressPeriodNanoseconds(),
+                "progressPeriodNanoseconds() should be 0 when progressPeriodMilliseconds is 0");
+    }
+
+    /**
      * Tests that printCategory property is correctly parsed from system property.
      */
     @Test

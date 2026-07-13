@@ -550,9 +550,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
 
             final long now = collectCurrentTime();
-            final long meterProgressPeriodNanoseconds = MeterConfig.progressPeriodMilliseconds * 1000 * 1000;
             /* Report progress only if iterations advanced and minimum period elapsed */
-            if (currentIteration > lastProgressIteration && (now - lastProgressTime) > meterProgressPeriodNanoseconds) {
+            if (currentIteration > lastProgressIteration && (now - lastProgressTime) > MeterConfig.progressPeriodNanoseconds()) {
                 lastProgressIteration = currentIteration;
                 lastProgressTime = now;
 
