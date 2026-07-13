@@ -188,4 +188,25 @@ class MeterUnknownInstanceTest {
         assertSame(unknown, result, "sub() on the unknown meter must not allocate a new sub-meter");
         unknownLogger.assertEvent(0, ERROR, INVALID_TRANSITION);
     }
+
+    @Test
+    @DisplayName("reset() logs an invalid transition and does not clear the shared instance's state")
+    void resetLogsInvalidTransitionAndDoesNotClearState() {
+        final Meter unknown = Meter.getCurrentInstance();
+        unknown.reset();
+        unknownLogger.assertEvent(0, ERROR, INVALID_TRANSITION);
+        assertEquals(Meter.UNKNOWN_LOGGER_NAME, unknown.getCategory(),
+                "reset() must not null out the shared instance's category");
+    }
+
+    @Test
+    @DisplayName("readJson5(String) logs an invalid transition and does not repopulate the shared instance")
+    void readJson5LogsInvalidTransitionAndDoesNotMutateState() {
+        final Meter unknown = Meter.getCurrentInstance();
+        unknown.readJson5("{category:'hijacked',startTime:123}");
+        unknownLogger.assertEvent(0, ERROR, INVALID_TRANSITION);
+        assertEquals(Meter.UNKNOWN_LOGGER_NAME, unknown.getCategory(),
+                "readJson5() must not overwrite the shared instance's category");
+        assertEquals(0, unknown.getStartTime(), "readJson5() must not populate the shared instance's startTime");
+    }
 }
