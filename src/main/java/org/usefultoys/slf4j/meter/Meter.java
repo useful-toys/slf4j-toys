@@ -117,8 +117,10 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
      * Shared, process-wide null-object returned by {@link #getCurrentInstance()} when no meter is
      * active on the current thread, replacing a fresh throwaway {@code Meter} allocated on every
      * call. Every operation that would otherwise mutate a fresh {@code Meter} is overridden on
-     * {@link UnknownMeter} to log an {@code INVALID_TRANSITION} instead, so the shared instance is
-     * safe to read and safe to call from multiple threads at once. See TDR-0042.
+     * {@link UnknownMeter} to log an {@code INVALID_TRANSITION} instead — including the data
+     * mutators {@link MeterData#reset()} and {@link MeterData#readJson5(String)} inherited from the
+     * data hierarchy, not just the lifecycle API declared directly on {@code Meter} — so the shared
+     * instance is safe to read and safe to call from multiple threads at once. See TDR-0042.
      */
     private static final Meter UNKNOWN_INSTANCE = new UnknownMeter();
 
@@ -1086,6 +1088,28 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         @Override
         public Meter sub(final String suboperationName) {
             return denied();
+        }
+
+        /**
+         * Overridden so the shared, process-wide instance can never be zeroed out from under other
+         * threads: {@link MeterData#reset()} is a public, unguarded mutator inherited from the data
+         * hierarchy, not a lifecycle method covered by {@link MeterValidator}'s preconditions (see
+         * TDR-0042).
+         */
+        @Override
+        public void reset() {
+            denied();
+        }
+
+        /**
+         * Overridden so the shared, process-wide instance can never be repopulated with arbitrary
+         * deserialized data from under other threads: {@link MeterData#readJson5(String)} is a public,
+         * unguarded mutator inherited from the data hierarchy, not a lifecycle method covered by
+         * {@link MeterValidator}'s preconditions (see TDR-0042).
+         */
+        @Override
+        public void readJson5(final String json5) {
+            denied();
         }
     }
 }
