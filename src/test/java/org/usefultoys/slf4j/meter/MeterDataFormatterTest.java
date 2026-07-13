@@ -149,12 +149,12 @@ class MeterDataFormatterTest {
                 Arguments.of(
                         "PROGRESS with iterations below threshold",
                         createMeterData(now, null, now, now - 500_000_000L, 0, 5, 10, null, null, null, null, null, null, null, 0.0),
-                        "PROGRESS: 5/10; 500.0ms; 10.0/s 100.0ms",
-                        "PROGRESS: TestCategory 5/10; 500.0ms; 10.0/s 100.0ms",
-                        "5/10; 500.0ms; 10.0/s 100.0ms",
-                        "PROGRESS: #1 5/10; 500.0ms; 10.0/s 100.0ms",
-                        "PROGRESS: 5/10; 500.0ms; 10.0/s 100.0ms",
-                        "PROGRESS: 5/10; 500.0ms; 10.0/s 100.0ms"
+                        "PROGRESS: 5/10",
+                        "PROGRESS: TestCategory 5/10",
+                        "5/10",
+                        "PROGRESS: #1 5/10",
+                        "PROGRESS: 5/10",
+                        "PROGRESS: 5/10"
                 ),
                 Arguments.of(
                         "PROGRESS with iterations above threshold",
@@ -428,14 +428,14 @@ class MeterDataFormatterTest {
                         "STARTED: 5.0s"
                 ),
                 Arguments.of(
-                        "STARTED fast",
+                        "STARTED fast (below progress period, no timing shown)",
                         createMeterData(now, null, now, now - 100_000_000L, 0, 0, 0, null, "okPath", null, null, null, null, null, 0.0),
-                        "STARTED: [okPath] 100.0ms",
-                        "STARTED: TestCategory[okPath] 100.0ms",
-                        "[okPath] 100.0ms",
-                        "STARTED: #1[okPath] 100.0ms",
-                        "STARTED: [okPath] 100.0ms",
-                        "STARTED: [okPath] 100.0ms"
+                        "STARTED: [okPath] ",
+                        "STARTED: TestCategory[okPath] ",
+                        "[okPath] ",
+                        "STARTED: #1[okPath] ",
+                        "STARTED: [okPath] ",
+                        "STARTED: [okPath] "
                 ),
                 Arguments.of(
                         "OK with only current iterations (no expected)",

@@ -43,7 +43,7 @@ final class MeterDataFormatter {
     public static void readableStringBuilder(final MeterData data, final StringBuilder builder) {
         final long executionTime = data.getExecutionTime();
         final boolean slow = data.isSlow();
-        final boolean progressInfoRequired = executionTime > MeterConfig.progressPeriodMilliseconds;
+        final boolean progressInfoRequired = executionTime > MeterConfig.progressPeriodNanoseconds();
 
         if (MeterConfig.printStatus) {
             if (data.isStopped()) {

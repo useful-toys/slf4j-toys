@@ -245,6 +245,18 @@ public class MeterConfig {
     }
 
     /**
+     * {@link #progressPeriodMilliseconds}, converted to nanoseconds. {@link MeterData#getExecutionTime()}
+     * (against which the progress period is compared, both in {@link Meter#progress()} and in
+     * {@link MeterDataFormatter}) is nanosecond-based; centralizing the conversion here keeps the two
+     * call sites from drifting out of sync with each other.
+     *
+     * @return the progress period, in nanoseconds.
+     */
+    public long progressPeriodNanoseconds() {
+        return progressPeriodMilliseconds * 1_000_000L;
+    }
+
+    /**
      * Resets all configuration properties to their default values.
      * This method is useful for testing purposes or when reinitializing the configuration.
      * <p>
