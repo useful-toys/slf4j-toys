@@ -111,11 +111,13 @@ class ReportSystemEnvironmentTest {
     }
 
     @Test
-    @DisplayName("should not censor when regex is empty")
-    void shouldNotCensorWhenRegexIsEmpty() {
-        // Given: empty forbidden regex and environment variables
-        System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "");
-        ReporterConfig.init(); // Reinitialize to apply empty regex
+    @DisplayName("should not censor when regex never matches")
+    void shouldNotCensorWhenRegexNeverMatches() {
+        // Given: a forbidden regex that never matches, and environment variables that would otherwise be censored.
+        // Blank values are treated as "not set" by ConfigParser, so an empty string here would just fall back to
+        // the default censoring regex; "(?!)" is a regex that never matches anything and disables censoring instead.
+        System.setProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?!)");
+        ReporterConfig.init(); // Reinitialize to apply the never-matching regex
 
         final Map<String, String> testEnv = new HashMap<>();
         testEnv.put("TEST_PASSWORD", "mysecretpassword");

@@ -123,7 +123,7 @@ public class SessionConfig {
     public void init() {
         uuidSize = ConfigParser.getRangeProperty(PROP_PRINT_UUID_SIZE, 6, 2, UUID_LENGTH);
         charset = ConfigParser.getProperty(PROP_PRINT_CHARSET, Charset.defaultCharset().name());
-        locale = ConfigParser.getLocaleProperty(PROP_PRINT_LOCALE, Locale.getDefault());
+        locale = ConfigParser.getProperty(PROP_PRINT_LOCALE, Locale.getDefault());
     }
 
     /**

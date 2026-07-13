@@ -19,6 +19,7 @@ import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +42,7 @@ import java.util.Locale;
  * @author Daniel Felix Ferber
  * @author Co-authored-by: GitHub Copilot using OpenCode Go / Kimi K2.7 Code
  */
+@SuppressWarnings("StringConcatenation")
 @UtilityClass
 public class ConfigParser {
 
@@ -56,9 +58,10 @@ public class ConfigParser {
      * {@link #getInitializationErrors()}, which returns an unmodifiable view.
      * <p>
      * The list is bounded at {@value #MAX_ERRORS} entries; once full, the oldest entry is
-     * evicted to prevent unbounded memory growth.
+     * evicted to prevent unbounded memory growth. A LinkedList is used for efficient removal
+     * of the oldest (first) element when the limit is reached.
      */
-    private final List<String> initializationErrors = Collections.synchronizedList(new ArrayList<>());
+    private final List<String> initializationErrors = Collections.synchronizedList(new LinkedList<>());
 
     /**
      * Checks if any errors occurred during property parsing.
@@ -100,25 +103,30 @@ public class ConfigParser {
     }
 
     /**
-     * Retrieves the value of a system property as a string. If the property is not set, the default value is returned.
-     *
-     * @param name         the name of the system property
-     * @param defaultValue the default value to return if the property is not set
-     * @return the property value as a string, or the default value if the property is not set
-     */
-    public String getProperty(final String name, final String defaultValue) {
-        final String value = System.getProperty(name);
-        return value == null ? defaultValue : value.trim();
-    }
-
-    /**
-     * Retrieves the value of a system property as a boolean. If the property is not set, the default value is
-     * returned. If the value is not "true" or "false" (case-insensitive), an error is recorded and the default
+     * Retrieves the value of a system property as a string. If the property is not set or is blank, the default
      * value is returned.
      *
      * @param name         the name of the system property
-     * @param defaultValue the default value to return if the property is not set or invalid
-     * @return the property value as a boolean, or the default value if the property is not set or invalid
+     * @param defaultValue the default value to return if the property is not set or blank
+     * @return the property value as a string, or the default value if the property is not set or blank
+     */
+    public String getProperty(final String name, final String defaultValue) {
+        final String value = System.getProperty(name);
+        if (value == null) {
+            return defaultValue;
+        }
+        final String trimmedValue = value.trim();
+        return trimmedValue.isEmpty() ? defaultValue : trimmedValue;
+    }
+
+    /**
+     * Retrieves the value of a system property as a boolean. If the property is not set or is blank, the default
+     * value is returned. If the value is set but is not "true" or "false" (case-insensitive), the default value
+     * is returned and an error is recorded.
+     *
+     * @param name         the name of the system property
+     * @param defaultValue the default value to return if the property is not set, blank, or invalid
+     * @return the property value as a boolean, or the default value if the property is not set, blank, or invalid
      */
     public boolean getProperty(final String name, final boolean defaultValue) {
         final String value = System.getProperty(name);
@@ -126,33 +134,41 @@ public class ConfigParser {
             return defaultValue;
         }
         final String trimmedValue = value.trim();
+        if (trimmedValue.isEmpty()) {
+            return defaultValue;
+        }
         if (trimmedValue.equalsIgnoreCase("true")) {
             return true;
         }
         if (trimmedValue.equalsIgnoreCase("false")) {
             return false;
         }
-        addInitializationError("Invalid boolean value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
+        addInitializationError("Invalid boolean value for property '" + name + "': '" + value + "' is not 'true' or 'false'. Using default value '" + defaultValue + "'.");
         return defaultValue;
     }
 
     /**
-     * Retrieves the value of a system property as an integer. If the property is not set or cannot be parsed as an
-     * integer, the default value is returned and an error is recorded.
+     * Retrieves the value of a system property as an integer. If the property is not set or is blank, the default
+     * value is returned. If the value is set but cannot be parsed as an integer, the default value is returned and
+     * an error is recorded.
      *
      * @param name         the name of the system property
-     * @param defaultValue the default value to return if the property is not set or invalid
-     * @return the property value as an integer, or the default value if the property is not set or invalid
+     * @param defaultValue the default value to return if the property is not set, blank, or invalid
+     * @return the property value as an integer, or the default value if the property is not set, blank, or invalid
      */
     public int getProperty(final String name, final int defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
         }
+        final String trimmedValue = value.trim();
+        if (trimmedValue.isEmpty()) {
+            return defaultValue;
+        }
         try {
-            return Integer.parseInt(value.trim());
+            return Integer.parseInt(trimmedValue);
         } catch (final NumberFormatException e) {
-            addInitializationError("Invalid integer value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid integer value for property '" + name + "': '" + value + "' is not a number. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
@@ -160,90 +176,96 @@ public class ConfigParser {
     /**
      * Retrieves the value of a system property as an integer within a given range.
      * <p>
-     * If the property is not set or cannot be parsed as an integer, the default value is returned and an error
-     * is recorded. If the property is set to a valid integer that is below the allowed minimum, the minimum value
-     * is returned and an error is recorded. If it is above the allowed maximum, the maximum value is returned and
-     * an error is recorded. If the minimum value is greater than the maximum value, the default value is returned
-     * and an error is recorded.
+     * If the property is not set or is blank, the default value is returned. If the value is set but cannot be
+     * parsed as an integer, the default value is returned and an error is recorded. If the property is set to a
+     * valid integer that is below the allowed minimum, the minimum value is returned and an error is recorded. If
+     * it is above the allowed maximum, the maximum value is returned and an error is recorded. If the minimum
+     * value is greater than the maximum value, the default value is returned and an error is recorded.
      *
      * @param name         the name of the system property
-     * @param defaultValue the default value to return if the property is not set or cannot be parsed
+     * @param defaultValue the default value to return if the property is not set, blank, or invalid
      * @param minValue     the minimum value that is allowed
      * @param maxValue     the maximum value that is allowed
-     * @return the property value as an integer; the default value if the property is not set, invalid, or if the
-     *         range is invalid; the minimum or maximum value if the parsed value is out of range
+     * @return the property value as an integer; the default value if the property is not set, blank, invalid, or
+     *         the range itself is invalid; the minimum or maximum value if the parsed value is out of range
      */
     public int getRangeProperty(final String name, final int defaultValue,
                                 final int minValue, final int maxValue) {
         /* Reject invalid ranges to avoid silently confusing clamping behavior */
         if (minValue > maxValue) {
-            addInitializationError("Invalid range for property '" + name + "': minValue (" + minValue + ") is greater than maxValue (" + maxValue + "). Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid range for property '" + name + "': minValue '" + minValue + "' is greater than maxValue '" + maxValue + "'. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
         }
+        final String trimmedValue = value.trim();
+        if (trimmedValue.isEmpty()) {
+            return defaultValue;
+        }
         try {
-            final int intValue = Integer.parseInt(value.trim());
+            final int intValue = Integer.parseInt(trimmedValue);
             if (intValue < minValue) {
-                addInitializationError("Value for property '" + name + "' is below minimum " + minValue + ": '" + value + "'. Using minimum value.");
+                addInitializationError("Invalid integer value for property '" + name + "': '" + value + "' is below minimum '" + minValue + "'. Using minimum value '" + minValue + "'.");
                 return minValue;
             }
             if (intValue > maxValue) {
-                addInitializationError("Value for property '" + name + "' is above maximum " + maxValue + ": '" + value + "'. Using maximum value.");
+                addInitializationError("Invalid integer value for property '" + name + "': '" + value + "' is above maximum '" + maxValue + "'. Using maximum value '" + maxValue + "'.");
                 return maxValue;
             }
             return intValue;
         } catch (final NumberFormatException e) {
-            addInitializationError("Invalid integer value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid integer value for property '" + name + "': '" + value + "' is not a number. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
 
     /**
-     * Retrieves the value of a system property as a long integer. If the property is not set or cannot be parsed as a
-     * long, the default value is returned and an error is recorded.
+     * Retrieves the value of a system property as a long integer. If the property is not set or is blank, the
+     * default value is returned. If the value is set but cannot be parsed as a long, the default value is
+     * returned and an error is recorded.
      *
      * @param name         the name of the system property
-     * @param defaultValue the default value to return if the property is not set or invalid
-     * @return the property value as a long, or the default value if the property is not set or invalid
+     * @param defaultValue the default value to return if the property is not set, blank, or invalid
+     * @return the property value as a long, or the default value if the property is not set, blank, or invalid
      */
     public long getProperty(final String name, final long defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
         }
+        final String trimmedValue = value.trim();
+        if (trimmedValue.isEmpty()) {
+            return defaultValue;
+        }
         try {
-            return Long.parseLong(value.trim());
+            return Long.parseLong(trimmedValue);
         } catch (final NumberFormatException e) {
-            addInitializationError("Invalid long value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid long value for property '" + name + "': '" + value + "' is not a number. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
 
     /**
-     * Retrieves the value of a system property as a duration in milliseconds. If the property is not set or cannot be
-     * parsed, the default value is returned and an error is recorded.
-     *
-     * @param name         the name of the system property
-     * @param defaultValue the default value (in milliseconds) to return if the property is not set or invalid
-     * @return the parsed duration in milliseconds, or the default value if the property is not set or invalid
-     */
-    /**
      * Retrieves the value of a system property as a {@link Locale}, parsed from a BCP 47 language tag
      * (e.g., {@code "en-US"}, {@code "de-DE"}) via {@link Locale#forLanguageTag(String)}.
      * <p>
      * If the property is not set or is blank, the default value is returned. If the value is present but
-     * cannot be resolved to a locale with a language (as happens for malformed input such as {@code "quatsch"}
+     * cannot be resolved to a locale with a language (as happens for malformed input such as {@code "12345"}
      * or the common underscore mistake {@code "de_DE"}, which {@link Locale#forLanguageTag(String)} silently
-     * reduces to {@link Locale#ROOT}), an error is recorded and the default value is returned.
+     * reduces to {@link Locale#ROOT}), the default value is returned and an error is recorded.
+     * <p>
+     * Note that {@link Locale#forLanguageTag(String)} accepts any syntactically valid BCP 47 language subtag
+     * (2-8 alphabetic characters) even if it does not name a real language, so values such as {@code "quatsch"}
+     * are parsed successfully rather than treated as invalid.
      *
      * @param name         the name of the system property
-     * @param defaultValue the default value to return if the property is not set or invalid
-     * @return the property value as a {@link Locale}, or the default value if the property is not set or invalid
+     * @param defaultValue the default value to return if the property is not set, blank, or invalid
+     * @return the property value as a {@link Locale}, or the default value if the property is not set, blank, or
+     *         invalid
      */
-    public Locale getLocaleProperty(final String name, final Locale defaultValue) {
+    public Locale getProperty(final String name, final Locale defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
@@ -254,12 +276,32 @@ public class ConfigParser {
         }
         final Locale parsed = Locale.forLanguageTag(trimmedValue);
         if (parsed.getLanguage().isEmpty()) {
-            initializationErrors.add("Invalid locale value for property '" + name + "': '" + value + "'. Using default value '" + defaultValue.toLanguageTag() + "'.");
+            addInitializationError("Invalid locale value for property '" + name + "': '" + value + "' cannot be resolved to a locale with a language. Using default value '" + defaultValue.toLanguageTag() + "'.");
             return defaultValue;
         }
         return parsed;
     }
 
+    /**
+     * Retrieves the value of a system property as a duration in milliseconds. If the property is not set or is
+     * blank, the default value is returned. If the value is set but cannot be parsed, the default value is
+     * returned and an error is recorded.
+     * <p>
+     * The value is expected to be a number optionally followed by a time unit suffix (case-insensitive):
+     * <ul>
+     *   <li>{@code ms} - milliseconds (default if no suffix)</li>
+     *   <li>{@code s} - seconds</li>
+     *   <li>{@code m} or {@code min} - minutes</li>
+     *   <li>{@code h} - hours</li>
+     * </ul>
+     * Examples: {@code "100ms"}, {@code "5s"}, {@code "2min"}, {@code "1h"}
+     *
+     * @param name         the name of the system property
+     * @param defaultValue the default value (in milliseconds) to return if the property is not set, blank, or
+     *                     invalid
+     * @return the property value as a duration in milliseconds, or the default value if the property is not set,
+     *         blank, or invalid
+     */
     public long getMillisecondsProperty(final String name, final long defaultValue) {
         final String rawValue = System.getProperty(name);
         if (rawValue == null) {
@@ -291,7 +333,7 @@ public class ConfigParser {
 
             final String numberPart = value.substring(0, value.length() - suffixLength).trim();
             if (numberPart.isEmpty()) {
-                addInitializationError("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
+                addInitializationError("Invalid time value for property '" + name + "': '" + rawValue + "' is not a valid duration. Using default value '" + defaultValue + "'.");
                 return defaultValue;
             }
 
@@ -299,10 +341,10 @@ public class ConfigParser {
             return Math.multiplyExact(parsed, (long) multiplier);
 
         } catch (final NumberFormatException e) {
-            addInitializationError("Invalid time value for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid time value for property '" + name + "': '" + rawValue + "' is not a valid duration. Using default value '" + defaultValue + "'.");
             return defaultValue;
         } catch (final ArithmeticException e) {
-            addInitializationError("Time value overflow for property '" + name + "': '" + rawValue + "'. Using default value '" + defaultValue + "'.");
+            addInitializationError("Invalid time value for property '" + name + "': '" + rawValue + "' overflows when converted to milliseconds. Using default value '" + defaultValue + "'.");
             return defaultValue;
         }
     }
