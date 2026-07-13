@@ -130,13 +130,13 @@ public class WatcherConfig {
      * consistent behavior.
      */
     public void init() {
-        name = ConfigParser.getProperty(PROP_NAME, "watcher");
+        name = ConfigParser.getStringProperty(PROP_NAME, "watcher");
         delayMilliseconds = ConfigParser.getMillisecondsProperty(PROP_DELAY, 60000L);
         periodMilliseconds = ConfigParser.getMillisecondsProperty(PROP_PERIOD, 600000L);
-        dataPrefix = ConfigParser.getProperty(PROP_DATA_PREFIX, "");
-        dataSuffix = ConfigParser.getProperty(PROP_DATA_SUFFIX, "");
-        messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
-        messageSuffix = ConfigParser.getProperty(PROP_MESSAGE_SUFFIX, "");
+        dataPrefix = ConfigParser.getStringProperty(PROP_DATA_PREFIX, "");
+        dataSuffix = ConfigParser.getStringProperty(PROP_DATA_SUFFIX, "");
+        messagePrefix = ConfigParser.getStringProperty(PROP_MESSAGE_PREFIX, "");
+        messageSuffix = ConfigParser.getStringProperty(PROP_MESSAGE_SUFFIX, "");
     }
 
     /**

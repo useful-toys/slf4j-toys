@@ -61,7 +61,7 @@ class ConfigParserTest {
         // Given: system property set with whitespace
         System.setProperty("test.property", value);
         // When: property is retrieved
-        final String result = ConfigParser.getProperty("test.property", "default");
+        final String result = ConfigParser.getStringProperty("test.property", "default");
         // Then: should return trimmed value
         assertEquals("value", result, "should return trimmed value");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -72,7 +72,7 @@ class ConfigParserTest {
     void shouldReturnDefaultWhenStringPropertyNotFound() {
         // Given: property not set
         // When: property is retrieved with default
-        final String result = ConfigParser.getProperty("nonexistent.property", "default");
+        final String result = ConfigParser.getStringProperty("nonexistent.property", "default");
         // Then: should return default value
         assertEquals("default", result, "should return default value");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -85,7 +85,7 @@ class ConfigParserTest {
         // Given: system property set to a blank value
         System.setProperty("test.property", value);
         // When: property is retrieved with default
-        final String result = ConfigParser.getProperty("test.property", "default");
+        final String result = ConfigParser.getStringProperty("test.property", "default");
         // Then: should return default value without reporting an error
         assertEquals("default", result, "should return default value");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -105,7 +105,7 @@ class ConfigParserTest {
         // Given: system property set with boolean value
         System.setProperty("test.property", input);
         // When: boolean property is retrieved
-        final boolean result = ConfigParser.getProperty("test.property", !expected);
+        final boolean result = ConfigParser.getBooleanProperty("test.property", !expected);
         // Then: should return correct boolean value
         assertEquals(expected, result, "should return correct boolean value");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -117,7 +117,7 @@ class ConfigParserTest {
         // Given: system property set to invalid boolean value
         System.setProperty("test.property", "abc");
         // When: boolean property is retrieved
-        final boolean result = ConfigParser.getProperty("test.property", true);
+        final boolean result = ConfigParser.getBooleanProperty("test.property", true);
         // Then: should return default and report error
         assertTrue(result, "should return default value true");
         assertFalse(ConfigParser.isInitializationOK(), "should report initialization error");
@@ -130,7 +130,7 @@ class ConfigParserTest {
     void shouldReturnDefaultWhenBooleanPropertyNotFound() {
         // Given: property not set
         // When: boolean property is retrieved with default
-        final boolean result = ConfigParser.getProperty("nonexistent.property", false);
+        final boolean result = ConfigParser.getBooleanProperty("nonexistent.property", false);
         // Then: should return default value
         assertFalse(result, "should return default value false");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -143,7 +143,7 @@ class ConfigParserTest {
         // Given: system property set to a blank value
         System.setProperty("test.property", value);
         // When: boolean property is retrieved with default
-        final boolean result = ConfigParser.getProperty("test.property", true);
+        final boolean result = ConfigParser.getBooleanProperty("test.property", true);
         // Then: should return default value without reporting an error
         assertTrue(result, "should return default value true");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -156,7 +156,7 @@ class ConfigParserTest {
         // Given: system property set with integer value
         System.setProperty("test.property", value);
         // When: integer property is retrieved
-        final int result = ConfigParser.getProperty("test.property", 0);
+        final int result = ConfigParser.getIntegerProperty("test.property", 0);
         // Then: should return correct integer value
         assertEquals(42, result, "should return integer value 42");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -168,7 +168,7 @@ class ConfigParserTest {
         // Given: system property set to invalid integer value
         System.setProperty("test.property", "invalid");
         // When: integer property is retrieved
-        final int result = ConfigParser.getProperty("test.property", 0);
+        final int result = ConfigParser.getIntegerProperty("test.property", 0);
         // Then: should return default and report error
         assertEquals(0, result, "should return default value 0");
         assertFalse(ConfigParser.isInitializationOK(), "should report initialization error");
@@ -181,7 +181,7 @@ class ConfigParserTest {
     void shouldReturnDefaultWhenIntegerPropertyNotFound() {
         // Given: property not set
         // When: integer property is retrieved with default
-        final int result = ConfigParser.getProperty("nonexistent.property", 0);
+        final int result = ConfigParser.getIntegerProperty("nonexistent.property", 0);
         // Then: should return default value
         assertEquals(0, result, "should return default value 0");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -194,7 +194,7 @@ class ConfigParserTest {
         // Given: system property set to a blank value
         System.setProperty("test.property", value);
         // When: integer property is retrieved with default
-        final int result = ConfigParser.getProperty("test.property", 42);
+        final int result = ConfigParser.getIntegerProperty("test.property", 42);
         // Then: should return default value without reporting an error
         assertEquals(42, result, "should return default value 42");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -347,7 +347,7 @@ class ConfigParserTest {
         // Given: system property set with long value
         System.setProperty("test.property", value);
         // When: long property is retrieved
-        final long result = ConfigParser.getProperty("test.property", 0L);
+        final long result = ConfigParser.getLongProperty("test.property", 0L);
         // Then: should return correct long value
         assertEquals(123456789L, result, "should return long value 123456789");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -359,7 +359,7 @@ class ConfigParserTest {
         // Given: system property set to invalid long value
         System.setProperty("test.property", "invalid");
         // When: long property is retrieved
-        final long result = ConfigParser.getProperty("test.property", 0L);
+        final long result = ConfigParser.getLongProperty("test.property", 0L);
         // Then: should return default and report error
         assertEquals(0L, result, "should return default value 0");
         assertEquals(1, ConfigParser.getInitializationErrors().size(), "should have one error");
@@ -371,7 +371,7 @@ class ConfigParserTest {
     void shouldReturnDefaultWhenLongPropertyNotFound() {
         // Given: property not set
         // When: long property is retrieved with default
-        final long result = ConfigParser.getProperty("nonexistent.property", 0L);
+        final long result = ConfigParser.getLongProperty("nonexistent.property", 0L);
         // Then: should return default value
         assertEquals(0L, result, "should return default value 0");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -384,7 +384,7 @@ class ConfigParserTest {
         // Given: system property set to a blank value
         System.setProperty("test.property", value);
         // When: long property is retrieved with default
-        final long result = ConfigParser.getProperty("test.property", 123456789L);
+        final long result = ConfigParser.getLongProperty("test.property", 123456789L);
         // Then: should return default value without reporting an error
         assertEquals(123456789L, result, "should return default value 123456789");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -397,7 +397,7 @@ class ConfigParserTest {
         // Given: system property set with a valid BCP 47 language tag
         System.setProperty("test.property", value);
         // When: locale property is retrieved
-        final Locale result = ConfigParser.getProperty("test.property", Locale.ROOT);
+        final Locale result = ConfigParser.getLocaleProperty("test.property", Locale.ROOT);
         // Then: should return the parsed locale
         assertEquals(Locale.forLanguageTag(value), result, "should return parsed locale for " + value);
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -408,7 +408,7 @@ class ConfigParserTest {
     void shouldReturnDefaultWhenLocalePropertyNotFound() {
         // Given: property not set
         // When: locale property is retrieved with default
-        final Locale result = ConfigParser.getProperty("nonexistent.property", Locale.GERMANY);
+        final Locale result = ConfigParser.getLocaleProperty("nonexistent.property", Locale.GERMANY);
         // Then: should return default value
         assertEquals(Locale.GERMANY, result, "should return default locale");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -421,7 +421,7 @@ class ConfigParserTest {
         // Given: system property set to a blank value
         System.setProperty("test.property", value);
         // When: locale property is retrieved with default
-        final Locale result = ConfigParser.getProperty("test.property", Locale.GERMANY);
+        final Locale result = ConfigParser.getLocaleProperty("test.property", Locale.GERMANY);
         // Then: should return default value without reporting an error
         assertEquals(Locale.GERMANY, result, "should return default locale");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -434,7 +434,7 @@ class ConfigParserTest {
         // Given: system property set to a value that cannot resolve to a locale with a language
         System.setProperty("test.property", value);
         // When: locale property is retrieved
-        final Locale result = ConfigParser.getProperty("test.property", Locale.GERMANY);
+        final Locale result = ConfigParser.getLocaleProperty("test.property", Locale.GERMANY);
         // Then: should return default and report error
         assertEquals(Locale.GERMANY, result, "should return default locale");
         assertFalse(ConfigParser.isInitializationOK(), "should report initialization error");
@@ -448,7 +448,7 @@ class ConfigParserTest {
         // Given: system property set to a value that is not a real language but is syntactically valid
         System.setProperty("test.property", "quatsch");
         // When: locale property is retrieved
-        final Locale result = ConfigParser.getProperty("test.property", Locale.GERMANY);
+        final Locale result = ConfigParser.getLocaleProperty("test.property", Locale.GERMANY);
         // Then: should parse it as a locale rather than falling back to the default
         assertEquals(Locale.forLanguageTag("quatsch"), result, "should parse made-up subtag as a locale");
         assertTrue(ConfigParser.isInitializationOK(), "should have no initialization errors");
@@ -556,7 +556,7 @@ class ConfigParserTest {
         final int maxErrors = 100;
         for (int i = 0; i < totalErrors; i++) {
             System.setProperty("test.bounded." + i, "not_an_int");
-            ConfigParser.getProperty("test.bounded." + i, 42);
+            ConfigParser.getIntegerProperty("test.bounded." + i, 42);
             System.clearProperty("test.bounded." + i);
         }
         assertEquals(maxErrors, ConfigParser.getInitializationErrors().size(), "should be capped at max errors");
@@ -571,7 +571,7 @@ class ConfigParserTest {
         // Given: system property set to an unparsable long value
         System.setProperty("test.property", "invalid");
         // When: long property is retrieved
-        ConfigParser.getProperty("test.property", 0L);
+        ConfigParser.getLongProperty("test.property", 0L);
         // Then: the recorded error must match the standard template exactly
         assertEquals(
                 "Invalid long value for property 'test.property': 'invalid' is not a number. Using default value '0'.",
@@ -640,7 +640,7 @@ class ConfigParserTest {
         // Given: system property set to a value that cannot resolve to a locale with a language
         System.setProperty("test.property", "12345");
         // When: locale property is retrieved
-        ConfigParser.getProperty("test.property", Locale.GERMANY);
+        ConfigParser.getLocaleProperty("test.property", Locale.GERMANY);
         // Then: the recorded error must match the standard template exactly, using the BCP 47 tag for the default
         assertEquals(
                 "Invalid locale value for property 'test.property': '12345' cannot be resolved to a locale with a language. Using default value 'de-DE'.",

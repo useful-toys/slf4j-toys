@@ -231,17 +231,17 @@ public class MeterConfig {
      */
     public void init() {
         progressPeriodMilliseconds = ConfigParser.getMillisecondsProperty(PROP_PROGRESS_PERIOD, 2000L);
-        printCategory = ConfigParser.getProperty(PROP_PRINT_CATEGORY, false);
-        printStatus = ConfigParser.getProperty(PROP_PRINT_STATUS, true);
-        printPosition = ConfigParser.getProperty(PROP_PRINT_POSITION, false);
-        printLoad = ConfigParser.getProperty(PROP_PRINT_LOAD, false);
-        printMemory = ConfigParser.getProperty(PROP_PRINT_MEMORY, false);
-        detectLeaks = ConfigParser.getProperty(PROP_DETECT_LEAKS, true);
+        printCategory = ConfigParser.getBooleanProperty(PROP_PRINT_CATEGORY, false);
+        printStatus = ConfigParser.getBooleanProperty(PROP_PRINT_STATUS, true);
+        printPosition = ConfigParser.getBooleanProperty(PROP_PRINT_POSITION, false);
+        printLoad = ConfigParser.getBooleanProperty(PROP_PRINT_LOAD, false);
+        printMemory = ConfigParser.getBooleanProperty(PROP_PRINT_MEMORY, false);
+        detectLeaks = ConfigParser.getBooleanProperty(PROP_DETECT_LEAKS, true);
         noopReportIntervalMilliseconds = ConfigParser.getMillisecondsProperty(PROP_NOOP_REPORT_INTERVAL, 60000L);
-        dataPrefix = ConfigParser.getProperty(PROP_DATA_PREFIX, "");
-        dataSuffix = ConfigParser.getProperty(PROP_DATA_SUFFIX, "");
-        messagePrefix = ConfigParser.getProperty(PROP_MESSAGE_PREFIX, "");
-        messageSuffix = ConfigParser.getProperty(PROP_MESSAGE_SUFFIX, "");
+        dataPrefix = ConfigParser.getStringProperty(PROP_DATA_PREFIX, "");
+        dataSuffix = ConfigParser.getStringProperty(PROP_DATA_SUFFIX, "");
+        messagePrefix = ConfigParser.getStringProperty(PROP_MESSAGE_PREFIX, "");
+        messageSuffix = ConfigParser.getStringProperty(PROP_MESSAGE_SUFFIX, "");
     }
 
     /**

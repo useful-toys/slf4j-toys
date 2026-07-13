@@ -92,11 +92,11 @@ public class SystemConfig {
      * consistent behavior.
      */
     public void init() {
-        useMemoryManagedBean = ConfigParser.getProperty(PROP_USE_MEMORY_MANAGED_BEAN, false);
-        useClassLoadingManagedBean = ConfigParser.getProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN, false);
-        useCompilationManagedBean = ConfigParser.getProperty(PROP_USE_COMPILATION_MANAGED_BEAN, false);
-        useGarbageCollectionManagedBean = ConfigParser.getProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, false);
-        usePlatformManagedBean = ConfigParser.getProperty(PROP_USE_PLATFORM_MANAGED_BEAN, false);
+        useMemoryManagedBean = ConfigParser.getBooleanProperty(PROP_USE_MEMORY_MANAGED_BEAN, false);
+        useClassLoadingManagedBean = ConfigParser.getBooleanProperty(PROP_USE_CLASS_LOADING_MANAGED_BEAN, false);
+        useCompilationManagedBean = ConfigParser.getBooleanProperty(PROP_USE_COMPILATION_MANAGED_BEAN, false);
+        useGarbageCollectionManagedBean = ConfigParser.getBooleanProperty(PROP_USE_GARBAGE_COLLECTION_MANAGED_BEAN, false);
+        usePlatformManagedBean = ConfigParser.getBooleanProperty(PROP_USE_PLATFORM_MANAGED_BEAN, false);
     }
 
     /**

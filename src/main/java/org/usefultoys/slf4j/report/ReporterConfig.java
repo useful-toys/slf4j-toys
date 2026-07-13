@@ -267,27 +267,27 @@ public class ReporterConfig {
      * This method should be called at application startup to ensure they are properly initialized.
      */
     public void init() {
-        reportVM = ConfigParser.getProperty(PROP_VM, true);
-        reportFileSystem = ConfigParser.getProperty(PROP_FILE_SYSTEM, false);
-        reportMemory = ConfigParser.getProperty(PROP_MEMORY, true);
-        reportUser = ConfigParser.getProperty(PROP_USER, false);
-        reportProperties = ConfigParser.getProperty(PROP_PROPERTIES, false);
-        reportEnvironment = ConfigParser.getProperty(PROP_ENVIRONMENT, false);
-        reportPhysicalSystem = ConfigParser.getProperty(PROP_PHYSICAL_SYSTEM, true);
-        reportOperatingSystem = ConfigParser.getProperty(PROP_OPERATING_SYSTEM, true);
-        reportCalendar = ConfigParser.getProperty(PROP_CALENDAR, false);
-        reportLocale = ConfigParser.getProperty(PROP_LOCALE, false);
-        reportCharset = ConfigParser.getProperty(PROP_CHARSET, false);
-        reportNetworkInterface = ConfigParser.getProperty(PROP_NETWORK_INTERFACE, false);
-        reportSSLContext = ConfigParser.getProperty(PROP_SSL_CONTEXT, false);
-        reportDefaultTrustKeyStore = ConfigParser.getProperty(PROP_DEFAULT_TRUST_KEYSTORE, false);
-        reportJvmArguments = ConfigParser.getProperty(PROP_JVM_ARGUMENTS, false);
-        reportClasspath = ConfigParser.getProperty(PROP_CLASSPATH, false);
-        reportGarbageCollector = ConfigParser.getProperty(PROP_GARBAGE_COLLECTOR, false);
-        reportSecurityProviders = ConfigParser.getProperty(PROP_SECURITY_PROVIDERS, false);
-        reportContainerInfo = ConfigParser.getProperty(PROP_CONTAINER_INFO, false);
-        name = ConfigParser.getProperty(PROP_NAME, "report");
-        forbiddenPropertyNamesRegex = ConfigParser.getProperty(PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*password.*|.*secret.*|.*key.*|.*token.*");
+        reportVM = ConfigParser.getBooleanProperty(PROP_VM, true);
+        reportFileSystem = ConfigParser.getBooleanProperty(PROP_FILE_SYSTEM, false);
+        reportMemory = ConfigParser.getBooleanProperty(PROP_MEMORY, true);
+        reportUser = ConfigParser.getBooleanProperty(PROP_USER, false);
+        reportProperties = ConfigParser.getBooleanProperty(PROP_PROPERTIES, false);
+        reportEnvironment = ConfigParser.getBooleanProperty(PROP_ENVIRONMENT, false);
+        reportPhysicalSystem = ConfigParser.getBooleanProperty(PROP_PHYSICAL_SYSTEM, true);
+        reportOperatingSystem = ConfigParser.getBooleanProperty(PROP_OPERATING_SYSTEM, true);
+        reportCalendar = ConfigParser.getBooleanProperty(PROP_CALENDAR, false);
+        reportLocale = ConfigParser.getBooleanProperty(PROP_LOCALE, false);
+        reportCharset = ConfigParser.getBooleanProperty(PROP_CHARSET, false);
+        reportNetworkInterface = ConfigParser.getBooleanProperty(PROP_NETWORK_INTERFACE, false);
+        reportSSLContext = ConfigParser.getBooleanProperty(PROP_SSL_CONTEXT, false);
+        reportDefaultTrustKeyStore = ConfigParser.getBooleanProperty(PROP_DEFAULT_TRUST_KEYSTORE, false);
+        reportJvmArguments = ConfigParser.getBooleanProperty(PROP_JVM_ARGUMENTS, false);
+        reportClasspath = ConfigParser.getBooleanProperty(PROP_CLASSPATH, false);
+        reportGarbageCollector = ConfigParser.getBooleanProperty(PROP_GARBAGE_COLLECTOR, false);
+        reportSecurityProviders = ConfigParser.getBooleanProperty(PROP_SECURITY_PROVIDERS, false);
+        reportContainerInfo = ConfigParser.getBooleanProperty(PROP_CONTAINER_INFO, false);
+        name = ConfigParser.getStringProperty(PROP_NAME, "report");
+        forbiddenPropertyNamesRegex = ConfigParser.getStringProperty(PROP_FORBIDDEN_PROPERTY_NAMES_REGEX, "(?i).*password.*|.*secret.*|.*key.*|.*token.*");
     }
 
     /**
