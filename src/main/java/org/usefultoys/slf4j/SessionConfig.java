@@ -52,7 +52,11 @@ public class SessionConfig {
     public final String PROP_PRINT_UUID_SIZE = "slf4jtoys.session.print.uuid.size";
     /** System property key for the character encoding used for logging. */
     public final String PROP_PRINT_CHARSET = "slf4jtoys.session.print.charset";
-    /** System property key for the locale used to format human-readable numbers. */
+    /**
+     * System property key for the locale consulted by the {@code report} package's {@code printf}-based
+     * output. Since TDR-0040, {@link Watcher} and {@link Meter} human-readable messages are
+     * locale-independent by design and never consult this property; see {@link #locale}.
+     */
     public final String PROP_PRINT_LOCALE = "slf4jtoys.session.print.locale";
 
     /**
@@ -88,13 +92,16 @@ public class SessionConfig {
     public String charset = Charset.defaultCharset().name();
 
     /**
-     * The locale used to format human-readable numbers (e.g., durations, memory sizes, throughput)
-     * in log messages and reports produced by {@link Watcher}, {@link Meter}, and the {@code report} package.
+     * The locale consulted by the {@code report} package's {@code printf}-based output (e.g.
+     * {@code ReportContainerInfo}, {@code ReportSecurityProviders}).
      * <p>
-     * This setting affects only **human-readable formatting**. It has no effect on
-     * **machine-parsable data messages**, whose numeric fields always use {@link Locale#US}
-     * (a fixed {@code .} decimal separator) so that downstream parsers are not broken by
-     * locale-dependent output.
+     * <strong>Since TDR-0040, this field does <em>not</em> affect {@link Watcher} or {@link Meter}
+     * human-readable messages</strong>: their number formatting ({@code UnitFormatter}) is
+     * locale-independent by design (fixed, US-style output) and never consults this field. It also has
+     * no effect on **machine-parsable data messages**, whose numeric fields always use {@link Locale#US}
+     * so that downstream parsers are not broken by locale-dependent output. See
+     * {@code doc/TDR-0040-locale-independent-readable-messages.md} for the rationale; the field is
+     * retained only for the {@code report} package's remaining {@code printf} consumers.
      * <p>
      * The value is read from the system property {@code slf4jtoys.session.print.locale}, which must be a
      * BCP 47 language tag (e.g., {@code "en-US"}, {@code "de-DE"}) as accepted by
