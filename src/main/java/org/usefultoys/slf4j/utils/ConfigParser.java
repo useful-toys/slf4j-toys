@@ -110,7 +110,7 @@ public class ConfigParser {
      * @param defaultValue the default value to return if the property is not set or blank
      * @return the property value as a string, or the default value if the property is not set or blank
      */
-    public String getProperty(final String name, final String defaultValue) {
+    public String getStringProperty(final String name, final String defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
@@ -128,7 +128,7 @@ public class ConfigParser {
      * @param defaultValue the default value to return if the property is not set, blank, or invalid
      * @return the property value as a boolean, or the default value if the property is not set, blank, or invalid
      */
-    public boolean getProperty(final String name, final boolean defaultValue) {
+    public boolean getBooleanProperty(final String name, final boolean defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
@@ -156,7 +156,7 @@ public class ConfigParser {
      * @param defaultValue the default value to return if the property is not set, blank, or invalid
      * @return the property value as an integer, or the default value if the property is not set, blank, or invalid
      */
-    public int getProperty(final String name, final int defaultValue) {
+    public int getIntegerProperty(final String name, final int defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
@@ -230,7 +230,7 @@ public class ConfigParser {
      * @param defaultValue the default value to return if the property is not set, blank, or invalid
      * @return the property value as a long, or the default value if the property is not set, blank, or invalid
      */
-    public long getProperty(final String name, final long defaultValue) {
+    public long getLongProperty(final String name, final long defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
@@ -265,7 +265,7 @@ public class ConfigParser {
      * @return the property value as a {@link Locale}, or the default value if the property is not set, blank, or
      *         invalid
      */
-    public Locale getProperty(final String name, final Locale defaultValue) {
+    public Locale getLocaleProperty(final String name, final Locale defaultValue) {
         final String value = System.getProperty(name);
         if (value == null) {
             return defaultValue;
