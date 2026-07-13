@@ -90,12 +90,34 @@ public class ReadableMessageLegacyTest {
         sampleContext.put("b", "c");
     }
 
+    /**
+     * Derives the {@code MeterConfig.progressPeriodMilliseconds} value each fixture below needs applied
+     * at invocation time so that {@code readableMessage()} shows timing/throughput for an ongoing
+     * (not-yet-stopped) operation exactly when the fixture's {@code expected} string says it should.
+     * <p>
+     * These fixtures were originally authored (and their {@code expected} strings recorded) back when
+     * {@code MeterDataFormatter} compared execution time in nanoseconds directly against
+     * {@code progressPeriodMilliseconds} in milliseconds (see BUG-003) -- i.e. against the literal
+     * number {@code 2000}, not against 2000ms converted to nanoseconds. This replicates that exact
+     * historical comparison to recover, from the already-recorded {@code expected} strings, whether
+     * timing was meant to show; it maps that decision onto the real (now nanosecond-correct) comparison
+     * via {@code 0} (always shows: any positive elapsed time clears a zero period) or the untouched
+     * default {@code 2000} (always hides: every elapsed time used here is nanosecond/microsecond-scale,
+     * far below a real 2-second period). Stopped operations ({@code stopTime != 0}) always show timing
+     * regardless of this value, so the exact number returned for them doesn't matter.
+     */
+    private static long progressPeriodMillisecondsFor(final long stopTime, final long startTime, final long currentTime) {
+        final boolean ongoing = startTime != 0 && stopTime == 0;
+        final boolean shownUnderHistoricalComparison = ongoing && (currentTime - startTime) > 2000L;
+        return shownUnderHistoricalComparison ? 0L : 2000L;
+    }
+
     private static Arguments example(final String expected, final String operation,
                                      final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit,
                                      final long currentIteration, final long expectedIterations) {
         return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, null,
                 createTime, startTime, stopTime, currentTime, timeLimit, currentIteration, expectedIterations,
-                null, null, null, null, nullContext), expected);
+                null, null, null, null, nullContext), expected, progressPeriodMillisecondsFor(stopTime, startTime, currentTime));
     }
 
     private static Arguments example(final String expected, final String operation,
@@ -103,14 +125,14 @@ public class ReadableMessageLegacyTest {
                                      final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage) {
         return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, null,
                 createTime, startTime,stopTime,currentTime,timeLimit,currentIteration,expectedIterations,
-                okPath,rejectPath,failPath,failMessage, voidContext), expected);
+                okPath,rejectPath,failPath,failMessage, voidContext), expected, progressPeriodMillisecondsFor(stopTime, startTime, currentTime));
     }
     private static Arguments exampleWithContext(final String expected, final String operation,
                                                 final long createTime, final long startTime, final long stopTime, final int currentTime, final long timeLimit,
                                                 final long currentIteration, final long expectedIterations) {
         return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, null,
                 createTime, startTime, stopTime, currentTime, timeLimit, currentIteration, expectedIterations,
-                null, null, null, null, sampleContext), expected);
+                null, null, null, null, sampleContext), expected, progressPeriodMillisecondsFor(stopTime, startTime, currentTime));
     }
 
     private static Arguments exampleWithContext(final String expected, final String operation,
@@ -118,7 +140,7 @@ public class ReadableMessageLegacyTest {
                                                 final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage) {
         return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, null,
                 createTime, startTime,stopTime,currentTime,timeLimit,currentIteration,expectedIterations,
-                okPath,rejectPath,failPath,failMessage, sampleContext), expected);
+                okPath,rejectPath,failPath,failMessage, sampleContext), expected, progressPeriodMillisecondsFor(stopTime, startTime, currentTime));
     }
 
     private static Arguments exampleWithDescription(final String expected, final String operation,
@@ -126,7 +148,7 @@ public class ReadableMessageLegacyTest {
                                                     final long currentIteration, final long expectedIterations) {
         return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, "desc",
                 createTime, startTime, stopTime, currentTime, timeLimit, currentIteration, expectedIterations,
-                null, null, null, null, voidContext), expected);
+                null, null, null, null, voidContext), expected, progressPeriodMillisecondsFor(stopTime, startTime, currentTime));
     }
 
     private static Arguments exampleWithDescription(final String expected, final String operation,
@@ -134,7 +156,7 @@ public class ReadableMessageLegacyTest {
                                                     final long currentIteration, final long expectedIterations, final String okPath, final String rejectPath, final String failPath, final String failMessage) {
         return Arguments.of(new MockMeterData("uuid", 1, "cat", operation, null, "desc",
                 createTime, startTime,stopTime,currentTime,timeLimit,currentIteration,expectedIterations,
-                okPath,rejectPath,failPath,failMessage, nullContext), expected);
+                okPath,rejectPath,failPath,failMessage, nullContext), expected, progressPeriodMillisecondsFor(stopTime, startTime, currentTime));
     }
 
     static Stream<Arguments> provideTimeStatusTestCasesNoCategoryNoPosition() {
@@ -804,35 +826,40 @@ public class ReadableMessageLegacyTest {
 
     @ParameterizedTest
     @MethodSource("provideTimeStatusTestCasesNoCategoryNoPosition")
-    void testReadableMessageTimeStatusNoCategoryNoPosition(final MockMeterData value, final String expected) {
+    void testReadableMessageTimeStatusNoCategoryNoPosition(final MockMeterData value, final String expected, final long progressPeriodMilliseconds) {
+        MeterConfig.progressPeriodMilliseconds = progressPeriodMilliseconds;
         assertEquals(expected, value.readableMessage());
     }
 
     @ParameterizedTest
     @MethodSource("provideTimeStatusTestCasesNoCategoryNoPositionWithDescription")
-    void testReadableMessageTimeStatusNoCategoryNoPositionWithDescription(final MockMeterData value, final String expected) {
+    void testReadableMessageTimeStatusNoCategoryNoPositionWithDescription(final MockMeterData value, final String expected, final long progressPeriodMilliseconds) {
+        MeterConfig.progressPeriodMilliseconds = progressPeriodMilliseconds;
         assertEquals(expected, value.readableMessage());
     }
 
     @ParameterizedTest
     @MethodSource("provideTimeStatusTestCasesNoCategoryNoPositionWithContext")
-    void testReadableMessageTimeStatusNoCategoryNoPositionWithContext(final MockMeterData value, final String expected) {
+    void testReadableMessageTimeStatusNoCategoryNoPositionWithContext(final MockMeterData value, final String expected, final long progressPeriodMilliseconds) {
+        MeterConfig.progressPeriodMilliseconds = progressPeriodMilliseconds;
         assertEquals(expected, value.readableMessage());
     }
 
     @ParameterizedTest
     @MethodSource("provideTimeStatusTestCasesNoCategory")
-    void testReadableMessageTimeStatusNoCategory(final MockMeterData value, final String expected) {
+    void testReadableMessageTimeStatusNoCategory(final MockMeterData value, final String expected, final long progressPeriodMilliseconds) {
         MeterConfig.printPosition = true;
+        MeterConfig.progressPeriodMilliseconds = progressPeriodMilliseconds;
         assertEquals(expected, value.readableMessage());
     }
 
     @ParameterizedTest
     @MethodSource("provideTimeStatusTestCasesNoStatus")
-    void testReadableMessageTimeStatusNoStatus(final MockMeterData value, final String expected) {
+    void testReadableMessageTimeStatusNoStatus(final MockMeterData value, final String expected, final long progressPeriodMilliseconds) {
         MeterConfig.printPosition = true;
         MeterConfig.printCategory = true;
         MeterConfig.printStatus = false;
+        MeterConfig.progressPeriodMilliseconds = progressPeriodMilliseconds;
         assertEquals(expected, value.readableMessage());
     }
 }
