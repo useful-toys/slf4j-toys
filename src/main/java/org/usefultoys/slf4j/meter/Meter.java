@@ -622,6 +622,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 return this;
             }
 
+            /* Only a meter that actually pushed itself in start() may pop the thread-local stack. */
+            final boolean wasStarted = startTime != 0;
             stopTime = collectCurrentTime();
             /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
             if (startTime == 0) {
@@ -630,7 +632,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failPath = null;
             failMessage = null;
             rejectPath = null;
-            localThreadInstance.set(previousInstance);
+            if (wasStarted) {
+                localThreadInstance.set(previousInstance);
+            }
             deregisterLeakDetection();
             /* Override path if provided as parameter */
             if (pathId != null) {
@@ -795,6 +799,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 return this;
             }
 
+            /* Only a meter that actually pushed itself in start() may pop the thread-local stack. */
+            final boolean wasStarted = startTime != 0;
             stopTime = collectCurrentTime();
             /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
             if (startTime == 0) {
@@ -803,7 +809,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             failPath = null;
             failMessage = null;
             okPath = null;
-            localThreadInstance.set(previousInstance);
+            if (wasStarted) {
+                localThreadInstance.set(previousInstance);
+            }
             deregisterLeakDetection();
             rejectPath = toPath(cause, true);
 
@@ -843,6 +851,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
                 return this;
             }
 
+            /* Only a meter that actually pushed itself in start() may pop the thread-local stack. */
+            final boolean wasStarted = startTime != 0;
             stopTime = collectCurrentTime();
             /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
             if (startTime == 0) {
@@ -850,7 +860,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
             rejectPath = null;
             okPath = null;
-            localThreadInstance.set(previousInstance);
+            if (wasStarted) {
+                localThreadInstance.set(previousInstance);
+            }
             deregisterLeakDetection();
             failPath = toPath(cause, false);
             /* Extract failure message from Throwable if applicable */
@@ -895,6 +907,8 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
             MeterValidator.validateStopPrecondition(this);
 
+            /* Only a meter that actually pushed itself in start() may pop the thread-local stack. */
+            final boolean wasStarted = startTime != 0;
             stopTime = collectCurrentTime();
             /* Auto-correct: if never started, use stopTime as startTime (Tier 3) */
             if (startTime == 0) {
@@ -902,7 +916,9 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             }
             rejectPath = null;
             okPath = null;
-            localThreadInstance.set(previousInstance);
+            if (wasStarted) {
+                localThreadInstance.set(previousInstance);
+            }
             deregisterLeakDetection();
             failPath = FAIL_PATH_TRY_WITH_RESOURCES;
 
