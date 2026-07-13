@@ -22,6 +22,7 @@ import org.slf4j.impl.MockLogger;
 import org.slf4j.impl.MockLoggerEvent;
 import org.usefultoys.slf4j.LoggerFactory;
 import org.usefultoys.slf4j.SessionConfig;
+import org.usefultoys.slf4j.internal.TestTimeSource;
 import org.usefultoys.test.ValidateCleanMeter;
 
 import java.nio.charset.Charset;
@@ -474,7 +475,8 @@ public class MeterMessageLegacyTest {
         logger2.setInfoEnabled(true);
         logger2.setWarnEnabled(true);
         logger2.setErrorEnabled(true);
-        final Meter m = new Meter(logger2).m(title).limitMilliseconds(200);
+        final TestTimeSource timeSource = new TestTimeSource(TestTimeSource.DAY1);
+        final Meter m = new Meter(logger2).withTimeSource(timeSource).m(title).limitMilliseconds(200);
         final String inputValue = "for example, an value received as input";
         final String outputValue = "for example, an value produced as output";
         final String causeValue = "for example, an identifier for the failure cause";
@@ -494,7 +496,7 @@ public class MeterMessageLegacyTest {
             /* Run stuff. */
             m.unctx("other");
             /* Run stuff. */
-            Thread.sleep(1);
+            timeSource.advanceMiliseconds(1);
             m.ctx("output", outputValue).ok();
         } catch (final Exception e) {
             m.ctx("cause", causeValue).fail(e);
