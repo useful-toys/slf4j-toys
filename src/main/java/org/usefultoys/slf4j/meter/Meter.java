@@ -926,7 +926,7 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
             if (messageLogger.isErrorEnabled()) {
                 SystemMetrics.getInstance().collectRuntimeStatus(this);
                 SystemMetrics.getInstance().collectPlatformStatus(this);
-                messageLogger.error(Markers.MSG_FAIL, readableMessage(), failPath);
+                messageLogger.error(Markers.MSG_FAIL, readableMessage());
                 if (dataLogger.isTraceEnabled()) {
                     dataLogger.trace(Markers.DATA_FAIL, json5Message());
                 }
