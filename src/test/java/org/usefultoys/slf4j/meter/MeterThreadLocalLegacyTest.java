@@ -298,6 +298,86 @@ public class MeterThreadLocalLegacyTest {
     }
 
     /**
+     * Tests a misuse case where an outer Meter is active and a sibling Meter that was never
+     * started is completed. Since the sibling never pushed itself onto the ThreadLocal stack in
+     * {@code start()}, completing it must not pop the stack and must not disturb the outer Meter.
+     * <p>
+     * Flow:
+     * 1. `m1` is created and started. It becomes the active Meter.
+     * 2. `m2` is created but `start()` is *not* called.
+     * 3. `m2` is completed (`ok()`, `reject()`, `fail()`, `close()` in each variant below). This is a
+     *    misuse (reported as an error) but `m1` must remain the active Meter afterward.
+     * 4. `m1` completes normally.
+     */
+    @Test
+    @DisplayName("Should not corrupt ThreadLocal stack when ok() completes an unstarted Meter while another is active")
+    public void shouldNotCorruptStackWhenOkCompletesUnstartedMeterWhileAnotherActive() {
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active");
+
+        final Meter m2 = MeterFactory.getMeter(loggerOther);
+        // m2.start() is intentionally not called
+
+        m2.ok(); // m2 never pushed itself onto the stack; must not pop m1
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 must remain active after ok() on unstarted m2");
+
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after m1.ok()");
+    }
+
+    @Test
+    @DisplayName("Should not corrupt ThreadLocal stack when reject() completes an unstarted Meter while another is active")
+    public void shouldNotCorruptStackWhenRejectCompletesUnstartedMeterWhileAnotherActive() {
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active");
+
+        final Meter m2 = MeterFactory.getMeter(loggerOther);
+        // m2.start() is intentionally not called
+
+        m2.reject("reason"); // m2 never pushed itself onto the stack; must not pop m1
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 must remain active after reject() on unstarted m2");
+
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after m1.ok()");
+    }
+
+    @Test
+    @DisplayName("Should not corrupt ThreadLocal stack when fail() completes an unstarted Meter while another is active")
+    public void shouldNotCorruptStackWhenFailCompletesUnstartedMeterWhileAnotherActive() {
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active");
+
+        final Meter m2 = MeterFactory.getMeter(loggerOther);
+        // m2.start() is intentionally not called
+
+        m2.fail(new IllegalStateException("error")); // m2 never pushed itself onto the stack; must not pop m1
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 must remain active after fail() on unstarted m2");
+
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after m1.ok()");
+    }
+
+    @Test
+    @DisplayName("Should not corrupt ThreadLocal stack when close() completes an unstarted Meter while another is active")
+    public void shouldNotCorruptStackWhenCloseCompletesUnstartedMeterWhileAnotherActive() {
+        final Meter m1 = MeterFactory.getMeter(loggerName);
+        m1.start();
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 should be active");
+
+        final Meter m2 = MeterFactory.getMeter(loggerOther);
+        // m2.start() is intentionally not called
+
+        m2.close(); // m2 never pushed itself onto the stack; must not pop m1
+        assertEquals(meterName, Meter.getCurrentInstance().getCategory(), "m1 must remain active after close() on unstarted m2");
+
+        m1.ok();
+        assertEquals("???", Meter.getCurrentInstance().getCategory(), "Should be no active Meter after m1.ok()");
+    }
+
+    /**
      * Tests a misuse case where an inner Meter is started but not completed,
      * and an outer Meter is completed, which should report an error.
      * <p>
