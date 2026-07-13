@@ -162,7 +162,6 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         super(Session.shortSessionUuid(),
                 extractNextPosition(logger.getName(), operation),
                 logger.getName(), operation, parent);
-        createTime = collectCurrentTime();
         messageLogger = resolveDecoratedLogger(logger, MeterConfig.messagePrefix, MeterConfig.messageSuffix);
         dataLogger = resolveDecoratedLogger(logger, MeterConfig.dataPrefix, MeterConfig.dataSuffix);
     }
@@ -180,7 +179,6 @@ public class Meter extends MeterData implements MeterContext<Meter>, MeterExecut
         super(Session.shortSessionUuid(),
                 extractNextPosition(category, operation),
                 category, operation, parent);
-        createTime = collectCurrentTime();
         messageLogger = org.slf4j.LoggerFactory.getLogger(MeterConfig.messagePrefix + category + MeterConfig.messageSuffix);
         dataLogger = org.slf4j.LoggerFactory.getLogger(MeterConfig.dataPrefix + category + MeterConfig.dataSuffix);
     }
