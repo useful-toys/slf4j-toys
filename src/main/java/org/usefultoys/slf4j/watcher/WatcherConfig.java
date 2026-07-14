@@ -58,6 +58,7 @@ public class WatcherConfig {
      * The logger name used by watchers to write messages.
      * <p>
      * The value is read from the system property {@code slf4jtoys.watcher.name}, defaulting to {@code "watcher"}.
+     * Can be changed at runtime, but restarting scheduled watchers is required for the change to take effect.
      */
     public String name;
 
@@ -89,6 +90,7 @@ public class WatcherConfig {
      * Example: With prefix {@code "data."}, a logger named {@code "a.b.c.MyClass"} becomes {@code "data.a.b.c.MyClass"}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.watcher.data.prefix}, defaulting to an empty string.
+     * Can be changed at runtime, but restarting scheduled watchers is required for the change to take effect.
      */
     public String dataPrefix;
 
@@ -100,6 +102,7 @@ public class WatcherConfig {
      * Example: With suffix {@code ".data"}, a logger named {@code "a.b.c.MyClass"} becomes {@code "a.b.c.MyClass.data"}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.watcher.data.suffix}, defaulting to an empty string.
+     * Can be changed at runtime, but restarting scheduled watchers is required for the change to take effect.
      */
     public String dataSuffix;
 
@@ -111,6 +114,7 @@ public class WatcherConfig {
      * Example: With prefix {@code "message."}, a logger named {@code "a.b.c.MyClass"} becomes {@code "message.a.b.c.MyClass"}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.watcher.message.prefix}, defaulting to an empty string.
+     * Can be changed at runtime, but restarting scheduled watchers is required for the change to take effect.
      */
     public String messagePrefix;
 
@@ -122,6 +126,7 @@ public class WatcherConfig {
      * Example: With suffix {@code ".message"}, a logger named {@code "a.b.c.MyClass"} becomes {@code "a.b.c.MyClass.message"}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.watcher.message.suffix}, defaulting to an empty string.
+     * Can be changed at runtime, but restarting scheduled watchers is required for the change to take effect.
      */
     public String messageSuffix;
 
