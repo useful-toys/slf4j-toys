@@ -27,7 +27,7 @@ import org.slf4j.MarkerFactory;
  * @see Watcher
  */
 @UtilityClass
-public final class Markers {
+public class Markers {
     /** Marker for human-readable {@link Watcher} log messages. */
     public final Marker MSG_WATCHER = MarkerFactory.getMarker("WATCHER");
     /** Marker for machine-parsable {@link Watcher} data log messages. */
