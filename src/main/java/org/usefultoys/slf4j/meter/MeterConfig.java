@@ -32,7 +32,7 @@ import org.usefultoys.slf4j.utils.ConfigParser;
  * **Performance Note:** Some properties, such as progress reporting intervals, may impact performance
  * if configured with very low values.
  * <p>
- * This is a utility class and should not be instantiated.
+ * This is a utility class and is not meant to be instantiated.
  *
  * @author Daniel Felix Ferber
  * @author Co-authored-by: GitHub Copilot using Claude Sonnet 4.5

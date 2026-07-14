@@ -33,7 +33,7 @@ import org.usefultoys.slf4j.utils.ConfigParser;
  * **Security Note:** Some values retrieved from the environment (e.g., system properties, user information)
  * may contain sensitive data. Consider sanitizing reports if logs are shared externally.
  * <p>
- * This is a utility class and should not be instantiated.
+ * This is a utility class and is not meant to be instantiated.
  *
  * @author Daniel Felix Ferber
  * @see Reporter
