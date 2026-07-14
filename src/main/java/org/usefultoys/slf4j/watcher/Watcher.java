@@ -75,8 +75,20 @@ public class Watcher extends WatcherData implements Runnable {
      */
     public Watcher(final String name) {
         super(Session.shortSessionUuid());
-        messageLogger = org.slf4j.LoggerFactory.getLogger(messagePrefix + name + messageSuffix);
-        dataLogger = org.slf4j.LoggerFactory.getLogger(dataPrefix + name + dataSuffix);
+        final Logger base = org.slf4j.LoggerFactory.getLogger(name);
+        messageLogger = resolveDecoratedLogger(base, messagePrefix, messageSuffix);
+        dataLogger = resolveDecoratedLogger(base, dataPrefix, dataSuffix);
+    }
+
+    /**
+     * Resolves the logger to use for decorated (prefixed/suffixed) output. Reuses {@code base} directly when both
+     * {@code prefix} and {@code suffix} are empty (the default), avoiding a redundant name concatenation and
+     * backend logger-registry lookup for the common case.
+     */
+    private static Logger resolveDecoratedLogger(final Logger base, final String prefix, final String suffix) {
+        return (prefix.isEmpty() && suffix.isEmpty())
+                ? base
+                : org.slf4j.LoggerFactory.getLogger(prefix + base.getName() + suffix);
     }
 
     /**
