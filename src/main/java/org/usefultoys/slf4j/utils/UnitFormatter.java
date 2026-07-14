@@ -62,7 +62,9 @@ public final class UnitFormatter {
      * <p>Negative values are not supported and are rendered as "?" followed by the base unit.
      *
      * @param value The long integer value to format.
-     * @param units An array of unit strings (e.g., "B", "kB", "MB").
+     * @param units An array of unit strings (e.g., "B", "kB", "MB"). Must have exactly one more element
+     *              than {@code factors}, i.e. {@code units.length == factors.length + 1}: the extra
+     *              element is the top tier reached once the value has been scaled down by every factor.
      * @param factors An array of factors for unit conversion (e.g., 1000, 1000, 1000).
      * @return A formatted string representing the value with units, or "?" followed by the base unit
      *         when the value is negative.
@@ -82,7 +84,9 @@ public final class UnitFormatter {
      *
      * @param sb The StringBuilder that receives the formatted representation.
      * @param value The long integer value to format.
-     * @param units An array of unit strings (e.g., "B", "kB", "MB").
+     * @param units An array of unit strings (e.g., "B", "kB", "MB"). Must have exactly one more element
+     *              than {@code factors}, i.e. {@code units.length == factors.length + 1}: the extra
+     *              element is the top tier reached once the value has been scaled down by every factor.
      * @param factors An array of factors for unit conversion (e.g., 1000, 1000, 1000).
      */
     @SuppressWarnings("AssignmentToMethodParameter")
@@ -124,7 +128,9 @@ public final class UnitFormatter {
      *
      * @param sb The StringBuilder that receives the formatted representation.
      * @param value The double value to format.
-     * @param units An array of unit strings (e.g., "/s", "k/s", "M/s").
+     * @param units An array of unit strings (e.g., "/s", "k/s", "M/s"). Must have exactly one more element
+     *              than {@code factors}, i.e. {@code units.length == factors.length + 1}: the extra
+     *              element is the top tier reached once the value has been scaled down by every factor.
      * @param factors An array of factors for unit conversion (e.g., 1000, 1000, 1000).
      */
     @SuppressWarnings("AssignmentToMethodParameter")
