@@ -208,6 +208,7 @@
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
         <central-publishing-maven-plugin.version>0.11.0</central-publishing-maven-plugin.version>
         <maven-antrun-plugin.version>3.2.0</maven-antrun-plugin.version>
+        <properties-maven-plugin.version>1.3.0</properties-maven-plugin.version>
 
         <!-- Build Configuration -->
         <!-- Enforcer defaults to enabled for JDK 21, skipped for other JDKs -->
@@ -355,7 +356,6 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <exportAntProperties>true</exportAntProperties>
                             <target>
                                 <exec executable="git" dir="${project.basedir}" outputproperty="git.branch" failonerror="false" failifexecutionfails="false">
                                     <arg value="rev-parse"/>
@@ -447,6 +447,40 @@ git.remote.origin.url=${git.remote.origin.url}
 git.build.version=${project.version}
 </echo>
                             </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+                Load the nine git.* values written above into real Maven properties, so
+                maven-jar-plugin's manifestEntries (package phase) can read them via "${...}".
+
+                Reads only META-INF/git.properties instead of using maven-antrun-plugin's
+                own <exportAntProperties>true</exportAntProperties>: that flag re-exports
+                every property Ant inherited from the Maven model - not just the nine set
+                in the target above - and each one that comes back unchanged (every plugin
+                version, dependency version, etc. already in <properties>) triggers a
+                "clashes with an existing Maven property, SKIPPING" WARNING. Scoping the
+                load to this one file avoids that noise entirely.
+
+                Runs in "process-resources" - after antrun's "initialize" execution has
+                written the file, and well before "package" needs the values.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>${properties-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>load-git-provenance</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${project.build.outputDirectory}/META-INF/git.properties</file>
+                            </files>
                         </configuration>
                     </execution>
                 </executions>
