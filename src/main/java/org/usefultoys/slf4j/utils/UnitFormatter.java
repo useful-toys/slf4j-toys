@@ -46,6 +46,10 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class UnitFormatter {
 
+    // Package-visible only so unit tests can assert their lengths (see UnitFormatterTest). Element
+    // mutation is not defensively prevented: wrapping these in an immutable collection would require
+    // boxing the primitive int[] factors, defeating the allocation-free hot-path goal documented above.
+    // Do not mutate array contents at runtime; treat them as if declared immutable.
     final int[] TIME_FACTORS = {1000, 1000, 1000, 60, 60};
     final String[] TIME_UNITS = {"ns", "us", "ms", "s", "m", "h"};
     final String[] MEMORY_UNITS = {"B", "kB", "MB", "GB"};
