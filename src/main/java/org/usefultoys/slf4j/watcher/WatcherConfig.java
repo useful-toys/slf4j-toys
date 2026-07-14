@@ -154,13 +154,13 @@ public class WatcherConfig {
      * This method is useful for testing or re-initializing the configuration.
      */
     public void reset() {
-        System.clearProperty(WatcherConfig.PROP_NAME);
-        System.clearProperty(WatcherConfig.PROP_DELAY);
-        System.clearProperty(WatcherConfig.PROP_PERIOD);
-        System.clearProperty(WatcherConfig.PROP_DATA_PREFIX);
-        System.clearProperty(WatcherConfig.PROP_DATA_SUFFIX);
-        System.clearProperty(WatcherConfig.PROP_MESSAGE_PREFIX);
-        System.clearProperty(WatcherConfig.PROP_MESSAGE_SUFFIX);
+        System.clearProperty(PROP_NAME);
+        System.clearProperty(PROP_DELAY);
+        System.clearProperty(PROP_PERIOD);
+        System.clearProperty(PROP_DATA_PREFIX);
+        System.clearProperty(PROP_DATA_SUFFIX);
+        System.clearProperty(PROP_MESSAGE_PREFIX);
+        System.clearProperty(PROP_MESSAGE_SUFFIX);
         init();
     }
 }

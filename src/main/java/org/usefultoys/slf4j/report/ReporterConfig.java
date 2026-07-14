@@ -313,27 +313,27 @@ public class ReporterConfig {
      * This method is useful for testing or re-initializing the configuration.
      */
     public void reset() {
-        System.clearProperty(ReporterConfig.PROP_VM);
-        System.clearProperty(ReporterConfig.PROP_FILE_SYSTEM);
-        System.clearProperty(ReporterConfig.PROP_MEMORY);
-        System.clearProperty(ReporterConfig.PROP_USER);
-        System.clearProperty(ReporterConfig.PROP_PROPERTIES);
-        System.clearProperty(ReporterConfig.PROP_ENVIRONMENT);
-        System.clearProperty(ReporterConfig.PROP_PHYSICAL_SYSTEM);
-        System.clearProperty(ReporterConfig.PROP_OPERATING_SYSTEM);
-        System.clearProperty(ReporterConfig.PROP_CALENDAR);
-        System.clearProperty(ReporterConfig.PROP_LOCALE);
-        System.clearProperty(ReporterConfig.PROP_CHARSET);
-        System.clearProperty(ReporterConfig.PROP_NETWORK_INTERFACE);
-        System.clearProperty(ReporterConfig.PROP_SSL_CONTEXT);
-        System.clearProperty(ReporterConfig.PROP_DEFAULT_TRUST_KEYSTORE);
-        System.clearProperty(ReporterConfig.PROP_JVM_ARGUMENTS);
-        System.clearProperty(ReporterConfig.PROP_CLASSPATH);
-        System.clearProperty(ReporterConfig.PROP_GARBAGE_COLLECTOR);
-        System.clearProperty(ReporterConfig.PROP_SECURITY_PROVIDERS);
-        System.clearProperty(ReporterConfig.PROP_CONTAINER_INFO);
-        System.clearProperty(ReporterConfig.PROP_NAME);
-        System.clearProperty(ReporterConfig.PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
+        System.clearProperty(PROP_VM);
+        System.clearProperty(PROP_FILE_SYSTEM);
+        System.clearProperty(PROP_MEMORY);
+        System.clearProperty(PROP_USER);
+        System.clearProperty(PROP_PROPERTIES);
+        System.clearProperty(PROP_ENVIRONMENT);
+        System.clearProperty(PROP_PHYSICAL_SYSTEM);
+        System.clearProperty(PROP_OPERATING_SYSTEM);
+        System.clearProperty(PROP_CALENDAR);
+        System.clearProperty(PROP_LOCALE);
+        System.clearProperty(PROP_CHARSET);
+        System.clearProperty(PROP_NETWORK_INTERFACE);
+        System.clearProperty(PROP_SSL_CONTEXT);
+        System.clearProperty(PROP_DEFAULT_TRUST_KEYSTORE);
+        System.clearProperty(PROP_JVM_ARGUMENTS);
+        System.clearProperty(PROP_CLASSPATH);
+        System.clearProperty(PROP_GARBAGE_COLLECTOR);
+        System.clearProperty(PROP_SECURITY_PROVIDERS);
+        System.clearProperty(PROP_CONTAINER_INFO);
+        System.clearProperty(PROP_NAME);
+        System.clearProperty(PROP_FORBIDDEN_PROPERTY_NAMES_REGEX);
         init();
     }
 }
