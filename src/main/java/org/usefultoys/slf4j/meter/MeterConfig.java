@@ -171,6 +171,8 @@ public class MeterConfig {
      * Setting a non-empty prefix or suffix (see also {@link #dataSuffix}) adds a small initialization cost to
      * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
      * the category logger as-is.
+     * <p>
+     * Can be changed at runtime.
      */
     public String dataPrefix;
 
@@ -188,6 +190,8 @@ public class MeterConfig {
      * Setting a non-empty prefix (see also {@link #dataPrefix}) or suffix adds a small initialization cost to
      * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
      * the category logger as-is.
+     * <p>
+     * Can be changed at runtime.
      */
     public String dataSuffix;
 
@@ -205,6 +209,8 @@ public class MeterConfig {
      * Setting a non-empty prefix or suffix (see also {@link #messageSuffix}) adds a small initialization cost to
      * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
      * the category logger as-is.
+     * <p>
+     * Can be changed at runtime.
      */
     public String messagePrefix;
 
@@ -222,6 +228,8 @@ public class MeterConfig {
      * Setting a non-empty prefix (see also {@link #messagePrefix}) or suffix adds a small initialization cost to
      * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
      * the category logger as-is.
+     * <p>
+     * Can be changed at runtime.
      */
     public String messageSuffix;
 
