@@ -309,8 +309,8 @@ public class ReporterConfig {
     }
 
     /**
-     * Resets all configuration properties to their default values.
-     * This method is useful for testing purposes or when reinitializing the configuration.
+     * Resets the configuration properties to their default values.
+     * This method is useful for testing or re-initializing the configuration.
      */
     public void reset() {
         System.clearProperty(ReporterConfig.PROP_VM);
