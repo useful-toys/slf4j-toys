@@ -116,28 +116,8 @@ public final class UnitFormatter {
     final double EPSILON = 0.001;
 
     /**
-     * Formats a double-precision floating-point value into a human-readable string with appropriate units.
-     * This method is used internally by the public formatting methods and by unit tests.
-     *
-     * <p>Negative values, {@code NaN} and infinite values are not supported and are rendered as "?"
-     * followed by the base unit.
-     *
-     * @param value The double value to format.
-     * @param units An array of unit strings (e.g., "/s", "k/s", "M/s").
-     * @param factors An array of factors for unit conversion (e.g., 1000, 1000, 1000).
-     * @return A formatted string representing the value with units, or "?" followed by the base unit
-     *         when the value is negative, {@code NaN} or infinite.
-     */
-    String doubleUnit(final double value, @NonNull final String[] units, @NonNull final int[] factors) {
-        final StringBuilder sb = new StringBuilder(12);
-        doubleUnit(sb, value, units, factors);
-        return sb.toString();
-    }
-
-    /**
      * Appends a human-readable representation of a double-precision value with appropriate units directly
-     * into the provided {@link StringBuilder}, avoiding the intermediate {@link String} allocation of
-     * {@link #doubleUnit(double, String[], int[])}.
+     * into the provided {@link StringBuilder}.
      *
      * <p>Negative values, {@code NaN} and infinite values are not supported and are rendered as "?"
      * followed by the base unit.
@@ -212,18 +192,7 @@ public final class UnitFormatter {
     }
 
     /**
-     * Formats a duration in nanoseconds into a human-readable string with appropriate time units.
-     *
-     * @param value The duration in nanoseconds.
-     * @return A formatted string representing the value in nanoseconds, microseconds, milliseconds, seconds, minutes, or hours.
-     */
-    public String nanoseconds(final long value) {
-        return longUnit(value, TIME_UNITS, TIME_FACTORS);
-    }
-
-    /**
-     * Appends a human-readable duration (ns, us, ms, s, m, h) directly into the provided {@link StringBuilder},
-     * avoiding the intermediate {@link String} of {@link #nanoseconds(long)}.
+     * Appends a human-readable duration (ns, us, ms, s, m, h) directly into the provided {@link StringBuilder}.
      *
      * @param sb The StringBuilder that receives the formatted value.
      * @param value The duration in nanoseconds.
@@ -233,18 +202,7 @@ public final class UnitFormatter {
     }
 
     /**
-     * Formats a duration in nanoseconds (as a double) into a human-readable string with appropriate time units.
-     *
-     * @param value The duration in nanoseconds.
-     * @return A formatted string representing the value in nanoseconds, microseconds, milliseconds, seconds, minutes, or hours.
-     */
-    public String nanoseconds(final double value) {
-        return doubleUnit(value, TIME_UNITS, TIME_FACTORS);
-    }
-
-    /**
-     * Appends a human-readable duration (ns, us, ms, s, m, h) directly into the provided {@link StringBuilder},
-     * avoiding the intermediate {@link String} of {@link #nanoseconds(double)}.
+     * Appends a human-readable duration (ns, us, ms, s, m, h) directly into the provided {@link StringBuilder}.
      *
      * @param sb The StringBuilder that receives the formatted value.
      * @param value The duration in nanoseconds.
@@ -254,18 +212,7 @@ public final class UnitFormatter {
     }
 
     /**
-     * Formats a number of iterations into a human-readable string with appropriate units.
-     *
-     * @param value The number of iterations.
-     * @return A formatted string representing the value in iterations, thousands, or millions.
-     */
-    public String iterations(final long value) {
-        return longUnit(value, ITERATIONS_UNITS, ITERATIONS_FACTORS);
-    }
-
-    /**
-     * Appends a human-readable iteration count (plain, k, M, G) directly into the provided {@link StringBuilder},
-     * avoiding the intermediate {@link String} of {@link #iterations(long)}.
+     * Appends a human-readable iteration count (plain, k, M, G) directly into the provided {@link StringBuilder}.
      *
      * @param sb The StringBuilder that receives the formatted value.
      * @param value The number of iterations.
@@ -275,18 +222,7 @@ public final class UnitFormatter {
     }
 
     /**
-     * Formats a number of iterations per second (as a double) into a human-readable string with appropriate units.
-     *
-     * @param value The number of iterations per second.
-     * @return A formatted string representing the value in iterations per second, thousands per second, or millions per second.
-     */
-    public String iterationsPerSecond(final double value) {
-        return doubleUnit(value, ITERATIONS_PER_TIME_UNITS, ITERATIONS_PER_TIME_FACTORS);
-    }
-
-    /**
-     * Appends a human-readable throughput (/s, k/s, M/s, G/s) directly into the provided {@link StringBuilder},
-     * avoiding the intermediate {@link String} of {@link #iterationsPerSecond(double)}.
+     * Appends a human-readable throughput (/s, k/s, M/s, G/s) directly into the provided {@link StringBuilder}.
      *
      * @param sb The StringBuilder that receives the formatted value.
      * @param value The number of iterations per second.
