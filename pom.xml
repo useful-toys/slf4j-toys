@@ -207,11 +207,26 @@
 
         <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
         <central-publishing-maven-plugin.version>0.11.0</central-publishing-maven-plugin.version>
+        <maven-antrun-plugin.version>3.2.0</maven-antrun-plugin.version>
 
         <!-- Build Configuration -->
         <!-- Enforcer defaults to enabled for JDK 21, skipped for other JDKs -->
         <maven.enforcer.skip>false</maven.enforcer.skip>
         <slf4j-legacy.version>1.7.36</slf4j-legacy.version>
+
+        <!--
+            git.branch, git.commit.id.abbrev, git.commit.id.full, git.commit.id.describe,
+            git.dirty, git.commit.time, git.closest.tag.name, git.total.commit.count and
+            git.remote.origin.url are deliberately NOT pre-declared here, even though the
+            maven-antrun-plugin execution below (initialize phase) sets them as defaults
+            when git is unavailable. Maven interpolates "${...}" expressions found in
+            plugin <configuration> (e.g. maven-jar-plugin's manifestEntries below) eagerly
+            at POM-model-read time, using whatever value a same-named <properties> entry
+            already has at that point - a literal fallback here would permanently bake in
+            "unknown" and never see the real value injected afterwards. Leaving them
+            undeclared defers resolution to the PluginParameterExpressionEvaluator at each
+            plugin's execution time, which does pick up the runtime-injected values.
+        -->
     </properties>
 
     <dependencies>
@@ -290,6 +305,153 @@
     <build>
         <plugins>
             <!--
+                Git Provenance Configuration
+                =============================
+                Extracts commit/branch/dirty/describe info and exposes it two ways
+                inside the built jar:
+                  1. META-INF/git.properties (readable at runtime by any tool/code)
+                  2. MANIFEST.MF entries (see maven-jar-plugin below)
+
+                Runs in the "initialize" phase, shelling out directly to the native
+                "git" binary in ${project.basedir}, so the git.* properties are
+                populated before the manifest is assembled at "package".
+
+                WHY NOT git-commit-id-maven-plugin: that plugin's repository-directory
+                autodetection does not follow the ".git" file (as opposed to directory)
+                that a linked git worktree uses to point at its real gitdir. Since this
+                repo's own workflow (see the trunk-based-development skill) develops
+                every branch in its own worktree under .worktrees/, that plugin
+                silently reported the *primary clone's* branch and commit instead of
+                the worktree's - confirmed by testing (a real commit made inside a
+                worktree was not reflected; git.branch stayed "main" and the commit
+                hash stayed pinned to the primary clone's HEAD). Calling the native
+                git binary with exec dir set to project.basedir has none of that
+                autodetection and resolves correctly per-worktree, matching what
+                native git itself reports when run directly in the worktree.
+
+                Each git invocation is best-effort (failonerror/failifexecutionfails
+                both false); a following <property> with a literal default only takes
+                effect if the exec did not already set that property (Ant's "first
+                assignment wins" semantics), so a machine without git - or a source
+                tree without .git - still produces a valid jar with "unknown" placeholders
+                instead of failing the build.
+
+                NOTE ON BUILD CACHE: the maven-build-cache-extension declared in
+                .mvn/extensions.xml is currently disabled (see .mvn/maven-build-cache-config.xml),
+                so a stale cache entry cannot serve a jar stamped with an outdated commit.
+                If the cache is ever re-enabled, either register .git/HEAD and refs as
+                cache inputs, or mark git.properties/the manifest as volatile outputs -
+                otherwise a cache hit could serve a jar carrying a previous commit's provenance.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven-antrun-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>capture-git-provenance</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <target>
+                                <exec executable="git" dir="${project.basedir}" outputproperty="git.branch" failonerror="false" failifexecutionfails="false">
+                                    <arg value="rev-parse"/>
+                                    <arg value="--abbrev-ref"/>
+                                    <arg value="HEAD"/>
+                                </exec>
+                                <property name="git.branch" value="unknown"/>
+
+                                <exec executable="git" dir="${project.basedir}" outputproperty="git.commit.id.full" failonerror="false" failifexecutionfails="false">
+                                    <arg value="rev-parse"/>
+                                    <arg value="HEAD"/>
+                                </exec>
+                                <property name="git.commit.id.full" value="unknown"/>
+
+                                <exec executable="git" dir="${project.basedir}" outputproperty="git.commit.id.abbrev" failonerror="false" failifexecutionfails="false">
+                                    <arg value="rev-parse"/>
+                                    <arg value="--short"/>
+                                    <arg value="HEAD"/>
+                                </exec>
+                                <property name="git.commit.id.abbrev" value="unknown"/>
+
+                                <exec executable="git" dir="${project.basedir}" outputproperty="git.commit.id.describe" failonerror="false" failifexecutionfails="false">
+                                    <arg value="describe"/>
+                                    <arg value="--tags"/>
+                                    <arg value="--always"/>
+                                </exec>
+                                <property name="git.commit.id.describe" value="unknown"/>
+
+                                <exec executable="git" dir="${project.basedir}" outputproperty="git.closest.tag.name" failonerror="false" failifexecutionfails="false">
+                                    <arg value="describe"/>
+                                    <arg value="--tags"/>
+                                    <arg value="--abbrev=0"/>
+                                </exec>
+                                <property name="git.closest.tag.name" value="unknown"/>
+
+                                <exec executable="git" dir="${project.basedir}" outputproperty="git.total.commit.count" failonerror="false" failifexecutionfails="false">
+                                    <arg value="rev-list"/>
+                                    <arg value="--count"/>
+                                    <arg value="HEAD"/>
+                                </exec>
+                                <property name="git.total.commit.count" value="0"/>
+
+                                <exec executable="git" dir="${project.basedir}" outputproperty="git.remote.origin.url" failonerror="false" failifexecutionfails="false">
+                                    <arg value="config"/>
+                                    <arg value="--get"/>
+                                    <arg value="remote.origin.url"/>
+                                </exec>
+                                <property name="git.remote.origin.url" value="unknown"/>
+
+                                <!--
+                                    "%cI" always renders using the offset recorded with the commit, ignoring TZ.
+                                    The date=iso-strict-local option honors the TZ env var instead, so forcing
+                                    TZ=UTC here renders a "...Z" UTC timestamp - reproducible regardless of the
+                                    building machine's local timezone.
+                                -->
+                                <exec executable="git" dir="${project.basedir}" outputproperty="git.commit.time" failonerror="false" failifexecutionfails="false">
+                                    <env key="TZ" value="UTC"/>
+                                    <arg value="log"/>
+                                    <arg value="-1"/>
+                                    <arg value="--date=iso-strict-local"/>
+                                    <arg value="--format=%cd"/>
+                                </exec>
+                                <property name="git.commit.time" value=""/>
+
+                                <exec executable="git" dir="${project.basedir}" outputproperty="git.status.porcelain" failonerror="false" failifexecutionfails="false">
+                                    <arg value="status"/>
+                                    <arg value="--porcelain"/>
+                                </exec>
+                                <condition property="git.dirty" value="true" else="false">
+                                    <and>
+                                        <isset property="git.status.porcelain"/>
+                                        <not>
+                                            <equals arg1="${git.status.porcelain}" arg2="" trim="true"/>
+                                        </not>
+                                    </and>
+                                </condition>
+
+                                <mkdir dir="${project.build.outputDirectory}/META-INF"/>
+                                <echo file="${project.build.outputDirectory}/META-INF/git.properties">#Generated by maven-antrun-plugin (native git)
+git.branch=${git.branch}
+git.commit.id.full=${git.commit.id.full}
+git.commit.id.abbrev=${git.commit.id.abbrev}
+git.commit.id.describe=${git.commit.id.describe}
+git.commit.time=${git.commit.time}
+git.dirty=${git.dirty}
+git.closest.tag.name=${git.closest.tag.name}
+git.total.commit.count=${git.total.commit.count}
+git.remote.origin.url=${git.remote.origin.url}
+git.build.version=${project.version}
+</echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
                 Surefire Test Execution Configuration
                 ======================================
                 See detailed explanation at the top of this POM file.
@@ -333,6 +495,26 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <!-- Stable JPMS module name for Java 9+ consumers -->
+                            <Automatic-Module-Name>org.usefultoys.slf4j</Automatic-Module-Name>
+                            <!-- Git provenance, populated by git-commit-id-maven-plugin above -->
+                            <SCM-Revision>${git.commit.id.abbrev}</SCM-Revision>
+                            <SCM-Branch>${git.branch}</SCM-Branch>
+                            <SCM-Dirty>${git.dirty}</SCM-Dirty>
+                            <SCM-Describe>${git.commit.id.describe}</SCM-Describe>
+                            <SCM-URL>${project.scm.url}</SCM-URL>
+                            <!-- Commit time, not build time: keeps the jar reproducible per commit -->
+                            <SCM-Build-Time>${git.commit.time}</SCM-Build-Time>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
