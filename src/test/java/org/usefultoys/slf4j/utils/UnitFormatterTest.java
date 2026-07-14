@@ -42,6 +42,7 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  *   <li><b>Iteration Units:</b> Tests formatting of iteration counts with appropriate units, including G suffix for large values and M-to-G boundary transition</li>
  *   <li><b>Negative Values:</b> Verifies formatting of negative long and double values, which stay in the first unit</li>
  *   <li><b>Edge Cases:</b> Ensures correct handling of zero, negative, large values, extreme values (Long.MAX_VALUE, Double.MAX_VALUE, Long.MIN_VALUE), and unit boundary transitions</li>
+ *   <li><b>Append Variants:</b> Mirrors every {@code String}-returning scenario above for its {@code append*(StringBuilder, ...)} counterpart, plus a dedicated check that append preserves pre-existing buffer content</li>
  * </ul>
  */
 @ValidateCharset
@@ -227,6 +228,18 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format " + value + " bytes as " + expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideBytesTestCases")
+    @DisplayName("should append byte sizes with correct unit suffixes")
+    void shouldAppendByteSizesWithCorrectUnitSuffixes(final long value, final String expected) {
+        // Given: a byte value and a StringBuilder
+        // When: appendBytes is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendBytes(sb, value);
+        // Then: should append value formatted with B, kB, MB suffixes
+        assertEquals(expected, sb.toString(), "should append " + value + " bytes as " + expected);
+    }
+
     static Stream<org.junit.jupiter.params.provider.Arguments> provideNanosecondsLongTestCases() {
         return Stream.of(
             of(500, "500ns"),
@@ -257,6 +270,18 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format " + value + "ns as " + expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideNanosecondsLongTestCases")
+    @DisplayName("should append nanoseconds (long) with correct time unit suffixes")
+    void shouldAppendNanosecondsLongWithCorrectTimeUnitSuffixes(final long value, final String expected) {
+        // Given: a nanosecond value as long and a StringBuilder
+        // When: appendNanoseconds is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendNanoseconds(sb, value);
+        // Then: should append value formatted with ns, us, ms suffixes
+        assertEquals(expected, sb.toString(), "should append " + value + "ns as " + expected);
+    }
+
     static Stream<org.junit.jupiter.params.provider.Arguments> provideNanosecondsDoubleTestCases() {
         return Stream.of(
             of(500.0, "500.0ns"),
@@ -276,6 +301,18 @@ class UnitFormatterTest {
         final String result = UnitFormatter.nanoseconds(value);
         // Then: should return value formatted with ns, us, ms suffixes
         assertEquals(expected, result, "should format " + value + "ns as " + expected);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideNanosecondsDoubleTestCases")
+    @DisplayName("should append nanoseconds (double) with correct time unit suffixes")
+    void shouldAppendNanosecondsDoubleWithCorrectTimeUnitSuffixes(final double value, final String expected) {
+        // Given: a nanosecond value as double and a StringBuilder
+        // When: appendNanoseconds is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendNanoseconds(sb, value);
+        // Then: should append value formatted with ns, us, ms suffixes
+        assertEquals(expected, sb.toString(), "should append " + value + "ns as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsPerSecondTestCases() {
@@ -314,6 +351,18 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format " + value + "/s as " + expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideIterationsPerSecondTestCases")
+    @DisplayName("should append iterations per second with correct unit suffixes")
+    void shouldAppendIterationsPerSecondWithCorrectUnitSuffixes(final double value, final String expected) {
+        // Given: an iterations per second value and a StringBuilder
+        // When: appendIterationsPerSecond is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendIterationsPerSecond(sb, value);
+        // Then: should append value formatted with /s, k/s, M/s suffixes
+        assertEquals(expected, sb.toString(), "should append " + value + "/s as " + expected);
+    }
+
     static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsTestCases() {
         return Stream.of(
             of(0, "0"),
@@ -340,6 +389,18 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format " + value + " iterations as " + expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideIterationsTestCases")
+    @DisplayName("should append iteration counts with correct unit suffixes")
+    void shouldAppendIterationCountsWithCorrectUnitSuffixes(final long value, final String expected) {
+        // Given: an iteration count value and a StringBuilder
+        // When: appendIterations is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendIterations(sb, value);
+        // Then: should append value formatted with k, M suffixes
+        assertEquals(expected, sb.toString(), "should append " + value + " iterations as " + expected);
+    }
+
     static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsLargeTestCases() {
         return Stream.of(
             of(1_100_000_000L, "1.1G"),
@@ -359,6 +420,18 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format " + value + " iterations as " + expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideIterationsLargeTestCases")
+    @DisplayName("should append large iteration counts with G unit suffix without overflow")
+    void shouldAppendLargeIterationCountsWithGUnitSuffixWithoutOverflow(final long value, final String expected) {
+        // Given: a large iteration count value that exceeds the M unit range, and a StringBuilder
+        // When: appendIterations is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendIterations(sb, value);
+        // Then: should append value formatted with G suffix, not throw ArrayIndexOutOfBoundsException
+        assertEquals(expected, sb.toString(), "should append " + value + " iterations as " + expected);
+    }
+
     @Test
     @DisplayName("should not throw ArrayIndexOutOfBoundsException for Long.MAX_VALUE iterations")
     void shouldNotThrowForLongMaxValueIterations() {
@@ -367,6 +440,17 @@ class UnitFormatterTest {
         final String result = UnitFormatter.iterations(Long.MAX_VALUE);
         // Then: should return a string ending with G suffix, not throw ArrayIndexOutOfBoundsException
         assertTrue(result.endsWith("G"), "should end with G suffix, got: " + result);
+    }
+
+    @Test
+    @DisplayName("should not throw ArrayIndexOutOfBoundsException for Long.MAX_VALUE iterations via appendIterations")
+    void shouldNotThrowForLongMaxValueIterationsViaAppend() {
+        // Given: the maximum possible long iteration count and a StringBuilder
+        // When: appendIterations is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendIterations(sb, Long.MAX_VALUE);
+        // Then: should append a string ending with G suffix, not throw ArrayIndexOutOfBoundsException
+        assertTrue(sb.toString().endsWith("G"), "should end with G suffix, got: " + sb);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsPerSecondLargeTestCases() {
@@ -388,6 +472,18 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format " + value + "/s as " + expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideIterationsPerSecondLargeTestCases")
+    @DisplayName("should append large iterations per second with G/s unit suffix without overflow")
+    void shouldAppendLargeIterationsPerSecondWithGPerSecondUnitSuffixWithoutOverflow(final double value, final String expected) {
+        // Given: a large iterations per second value that exceeds the M/s unit range, and a StringBuilder
+        // When: appendIterationsPerSecond is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendIterationsPerSecond(sb, value);
+        // Then: should append value formatted with G/s suffix, not throw ArrayIndexOutOfBoundsException
+        assertEquals(expected, sb.toString(), "should append " + value + "/s as " + expected);
+    }
+
     @Test
     @DisplayName("should not throw ArrayIndexOutOfBoundsException for Double.MAX_VALUE iterations per second")
     void shouldNotThrowForDoubleMaxValueIterationsPerSecond() {
@@ -396,6 +492,17 @@ class UnitFormatterTest {
         final String result = UnitFormatter.iterationsPerSecond(Double.MAX_VALUE);
         // Then: should return a string ending with G/s suffix, not throw ArrayIndexOutOfBoundsException
         assertTrue(result.endsWith("G/s"), "should end with G/s suffix, got: " + result);
+    }
+
+    @Test
+    @DisplayName("should not throw ArrayIndexOutOfBoundsException for Double.MAX_VALUE iterations per second via appendIterationsPerSecond")
+    void shouldNotThrowForDoubleMaxValueIterationsPerSecondViaAppend() {
+        // Given: the maximum possible double iterations per second value and a StringBuilder
+        // When: appendIterationsPerSecond is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendIterationsPerSecond(sb, Double.MAX_VALUE);
+        // Then: should append a string ending with G/s suffix, not throw ArrayIndexOutOfBoundsException
+        assertTrue(sb.toString().endsWith("G/s"), "should end with G/s suffix, got: " + sb);
     }
 
     @Test
@@ -409,6 +516,17 @@ class UnitFormatterTest {
     }
 
     @Test
+    @DisplayName("should append zero iterations per second as 0/s")
+    void shouldAppendZeroIterationsPerSecondAsZero() {
+        // Given: zero iterations per second and a StringBuilder
+        // When: appendIterationsPerSecond is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendIterationsPerSecond(sb, 0.0);
+        // Then: should append "0/s" via the early return for zero
+        assertEquals("0/s", sb.toString(), "should append 0.0/s as 0/s");
+    }
+
+    @Test
     @DisplayName("should not throw ArrayIndexOutOfBoundsException for Long.MAX_VALUE bytes")
     void shouldNotThrowForLongMaxValueBytes() {
         // Given: the maximum possible long byte count
@@ -419,6 +537,17 @@ class UnitFormatterTest {
     }
 
     @Test
+    @DisplayName("should not throw ArrayIndexOutOfBoundsException for Long.MAX_VALUE bytes via appendBytes")
+    void shouldNotThrowForLongMaxValueBytesViaAppend() {
+        // Given: the maximum possible long byte count and a StringBuilder
+        // When: appendBytes is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendBytes(sb, Long.MAX_VALUE);
+        // Then: should append a string ending with GB suffix, not throw ArrayIndexOutOfBoundsException
+        assertTrue(sb.toString().endsWith("GB"), "should end with GB suffix, got: " + sb);
+    }
+
+    @Test
     @DisplayName("should not throw ArrayIndexOutOfBoundsException for Long.MAX_VALUE nanoseconds")
     void shouldNotThrowForLongMaxValueNanoseconds() {
         // Given: the maximum possible long nanosecond duration
@@ -426,6 +555,17 @@ class UnitFormatterTest {
         final String result = UnitFormatter.nanoseconds(Long.MAX_VALUE);
         // Then: should return a string ending with h suffix, not throw ArrayIndexOutOfBoundsException
         assertTrue(result.endsWith("h"), "should end with h suffix, got: " + result);
+    }
+
+    @Test
+    @DisplayName("should not throw ArrayIndexOutOfBoundsException for Long.MAX_VALUE nanoseconds via appendNanoseconds")
+    void shouldNotThrowForLongMaxValueNanosecondsViaAppend() {
+        // Given: the maximum possible long nanosecond duration and a StringBuilder
+        // When: appendNanoseconds is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendNanoseconds(sb, Long.MAX_VALUE);
+        // Then: should append a string ending with h suffix, not throw ArrayIndexOutOfBoundsException
+        assertTrue(sb.toString().endsWith("h"), "should end with h suffix, got: " + sb);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsMToGBoundaryTestCases() {
@@ -446,6 +586,18 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format " + value + " iterations as " + expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideIterationsMToGBoundaryTestCases")
+    @DisplayName("should correctly transition from M to G unit at the boundary via appendIterations")
+    void shouldCorrectlyTransitionFromMToGUnitAtBoundaryViaAppend(final long value, final String expected) {
+        // Given: iteration counts near the M-to-G boundary (limit = 1100M) and a StringBuilder
+        // When: appendIterations is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendIterations(sb, value);
+        // Then: should append the correct unit based on the boundary threshold
+        assertEquals(expected, sb.toString(), "should append " + value + " iterations as " + expected);
+    }
+
     static Stream<org.junit.jupiter.params.provider.Arguments> provideIterationsPerSecondMToGBoundaryTestCases() {
         return Stream.of(
             of(1_099_000_000.0, "1099.0M/s"),
@@ -462,6 +614,18 @@ class UnitFormatterTest {
         final String result = UnitFormatter.iterationsPerSecond(value);
         // Then: should return the correct unit based on the boundary threshold
         assertEquals(expected, result, "should format " + value + "/s as " + expected);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIterationsPerSecondMToGBoundaryTestCases")
+    @DisplayName("should correctly transition from M/s to G/s unit at the boundary via appendIterationsPerSecond")
+    void shouldCorrectlyTransitionFromMPerSecondToGPerSecondUnitAtBoundaryViaAppend(final double value, final String expected) {
+        // Given: iterations per second near the M/s-to-G/s boundary (limit = 1100M/s) and a StringBuilder
+        // When: appendIterationsPerSecond is called
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendIterationsPerSecond(sb, value);
+        // Then: should append the correct unit based on the boundary threshold
+        assertEquals(expected, sb.toString(), "should append " + value + "/s as " + expected);
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideTimeUnitTestCases() {
@@ -494,6 +658,18 @@ class UnitFormatterTest {
         assertEquals(expected, result, "should format " + value + "ns as " + expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideTimeUnitTestCases")
+    @DisplayName("should append time duration with comprehensive time unit conversion")
+    void shouldAppendTimeDurationWithComprehensiveTimeUnitConversion(final long value, final String expected) {
+        // Given: a time duration in nanoseconds and a StringBuilder
+        // When: appendNanoseconds is called for comprehensive time conversion
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendNanoseconds(sb, value);
+        // Then: should append value formatted with ns, us, ms, s, m, h suffixes
+        assertEquals(expected, sb.toString(), "should append " + value + "ns as " + expected);
+    }
+
     static Stream<org.junit.jupiter.params.provider.Arguments> provideDoubleTimeUnitTestCases() {
         return Stream.of(
             of(0.0f, "0ns"),
@@ -522,6 +698,37 @@ class UnitFormatterTest {
         final String result = UnitFormatter.nanoseconds(value);
         // Then: should return value formatted with ns, us, ms, s, m, h suffixes
         assertEquals(expected, result, "should format " + value + "ns as " + expected);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDoubleTimeUnitTestCases")
+    @DisplayName("should append time duration (double) with comprehensive time unit conversion")
+    void shouldAppendTimeDurationDoubleWithComprehensiveTimeUnitConversion(final float value, final String expected) {
+        // Given: a time duration in nanoseconds as double and a StringBuilder
+        // When: appendNanoseconds is called for comprehensive time conversion
+        final StringBuilder sb = new StringBuilder();
+        UnitFormatter.appendNanoseconds(sb, value);
+        // Then: should append value formatted with ns, us, ms, s, m, h suffixes
+        assertEquals(expected, sb.toString(), "should append " + value + "ns as " + expected);
+    }
+
+    @Test
+    @DisplayName("should append to existing StringBuilder content instead of replacing it")
+    void shouldAppendToExistingStringBuilderContent() {
+        // Given: a StringBuilder pre-filled with unrelated content
+        final StringBuilder sb = new StringBuilder("prefix-");
+        // When: each append* method is called in sequence
+        UnitFormatter.appendBytes(sb, 1500);
+        sb.append(' ');
+        UnitFormatter.appendNanoseconds(sb, 1500L);
+        sb.append(' ');
+        UnitFormatter.appendNanoseconds(sb, 1500.0);
+        sb.append(' ');
+        UnitFormatter.appendIterations(sb, 1_200L);
+        sb.append(' ');
+        UnitFormatter.appendIterationsPerSecond(sb, 1_200.0);
+        // Then: the pre-existing content is preserved and each result is appended, not replacing the buffer
+        assertEquals("prefix-1.5kB 1.5us 1.5us 1.2k 1.2k/s", sb.toString());
     }
 
     @Test
