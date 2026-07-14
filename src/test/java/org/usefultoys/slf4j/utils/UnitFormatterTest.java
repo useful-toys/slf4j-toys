@@ -36,7 +36,10 @@ import static org.junit.jupiter.params.provider.Arguments.of;
  * <p>
  * <b>Coverage:</b>
  * <ul>
- *   <li><b>Custom Units:</b> Tests formatting of long and double values with custom unit arrays</li>
+ *   <li><b>Custom Units:</b> Tests formatting of long and double values with custom unit arrays. The local
+ *       {@code UNITS}/{@code FACTORS} fixture follows the same {@code units.length == factors.length + 1}
+ *       invariant as the production arrays (see {@code shouldMaintainUnitArrayLengthInvariant}), and includes
+ *       a case that reaches the top unit tier ("D") to exercise that invariant</li>
  *   <li><b>Byte Units:</b> Verifies formatting of byte values with appropriate units (B, KB, MB, etc.)</li>
  *   <li><b>Time Units:</b> Covers formatting of time values in nanoseconds, microseconds, milliseconds, seconds</li>
  *   <li><b>Iteration Units:</b> Tests formatting of iteration counts with appropriate units, including G suffix for large values and M-to-G boundary transition</li>
@@ -53,7 +56,7 @@ import static org.junit.jupiter.params.provider.Arguments.of;
 class UnitFormatterTest {
 
     private static final int[] FACTORS = {1000, 1000, 1000};
-    private static final String[] UNITS = {"A", "B", "C"};
+    private static final String[] UNITS = {"A", "B", "C", "D"};
 
     static Stream<org.junit.jupiter.params.provider.Arguments> provideLongUnitTestCases() {
         return Stream.of(
@@ -92,7 +95,9 @@ class UnitFormatterTest {
             of(5050L, "5.1B"),
             of(999900L, "999.9B"),
             of(1000000L, "1000.0B"),
-            of(1100000L, "1.1C")
+            of(1100000L, "1.1C"),
+            of(1099000000L, "1099.0C"),
+            of(1100000000L, "1.1D")
         );
     }
 
@@ -168,7 +173,9 @@ class UnitFormatterTest {
             of(5050L, "5.1B"),
             of(999900L, "999.9B"),
             of(1000000L, "1000.0B"),
-            of(1100000L, "1.1C")
+            of(1100000L, "1.1C"),
+            of(1099000000L, "1099.0C"),
+            of(1100000000L, "1.1D")
         );
     }
 
