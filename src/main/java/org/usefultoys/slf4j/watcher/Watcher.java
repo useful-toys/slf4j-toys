@@ -84,6 +84,12 @@ public class Watcher extends WatcherData implements Runnable {
      * Resolves the logger to use for decorated (prefixed/suffixed) output. Reuses {@code base} directly when both
      * {@code prefix} and {@code suffix} are empty (the default), avoiding a redundant name concatenation and
      * backend logger-registry lookup for the common case.
+     *
+     * @param base   the undecorated logger, as looked up by name.
+     * @param prefix the prefix to prepend to {@code base}'s name, or empty for none.
+     * @param suffix the suffix to append to {@code base}'s name, or empty for none.
+     * @return {@code base} unchanged if both {@code prefix} and {@code suffix} are empty; otherwise a logger
+     *         looked up under the decorated name.
      */
     private static Logger resolveDecoratedLogger(final Logger base, final String prefix, final String suffix) {
         return (prefix.isEmpty() && suffix.isEmpty())

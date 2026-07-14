@@ -23,6 +23,8 @@ import org.usefultoys.slf4j.utils.UnitFormatter;
  * This class centralizes the logic for building log messages for {@link Watcher} events.
  *
  * @author Daniel Felix Ferber
+ * @see Watcher
+ * @see WatcherData
  */
 @UtilityClass
 class WatcherDataFormatter {

@@ -39,8 +39,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * sequence per name.
  *
  * @author Daniel Felix Ferber
- * @author Co-authored-by: Claude Sonnet 5 using claude-sonnet-5
- * @author Co-authored-by: GitHub Copilot using Kimi K2.7 Code
  * @see WatcherServlet
  * @see Watcher
  * @see WatcherConfig

@@ -67,10 +67,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * </ul>
  *
  * @author Daniel Felix Ferber
- * @author Co-authored-by: Claude Sonnet 5 using claude-sonnet-5
- * @author Co-authored-by: GitHub Copilot using Kimi K2.7 Code
  * @see Watcher
  * @see WatcherConfig
+ * @see WatcherJavaxServlet
  */
 public class WatcherServlet extends HttpServlet {
 
