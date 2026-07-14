@@ -41,7 +41,11 @@ import org.usefultoys.slf4j.utils.ConfigParser;
  */
 @UtilityClass
 public class MeterConfig {
+    static {
+        init();
+    }
 
+    // System property keys
     /** System property key for the message logger name suffix. */
     public final String PROP_MESSAGE_SUFFIX = "slf4jtoys.meter.message.suffix";
     /** System property key for the message logger name prefix. */
@@ -66,10 +70,6 @@ public class MeterConfig {
     public final String PROP_DETECT_LEAKS = "slf4jtoys.meter.detect.leaks";
     /** System property key for the shared unknown-meter misuse-report throttle interval. */
     public final String PROP_NOOP_REPORT_INTERVAL = "slf4jtoys.meter.noop.report.interval";
-
-    static {
-        init();
-    }
 
     /**
      * The minimum time interval (in milliseconds) between consecutive progress status reports.
