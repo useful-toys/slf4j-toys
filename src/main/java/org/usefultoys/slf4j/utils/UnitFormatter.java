@@ -86,6 +86,13 @@ public final class UnitFormatter {
      *
      * <p>Negative values are not supported and are rendered as "?" followed by the base unit.
      *
+     * <p>Unlike {@link #doubleUnit}, a value that fits in the base unit is rendered as a plain integer
+     * with no decimal point (e.g. {@code "500ns"}), because an integer count of the base unit is exact
+     * and a trailing {@code ".0"} would add noise without adding information. {@code doubleUnit} cannot
+     * take the same shortcut since a double is never known to be an exact integer count. This asymmetry
+     * is intentional and covered by tests in {@code UnitFormatterTest}; do not "simplify" by merging the
+     * two methods into one shared implementation without preserving it.
+     *
      * @param sb The StringBuilder that receives the formatted representation.
      * @param value The long integer value to format.
      * @param units An array of unit strings (e.g., "B", "kB", "MB"). Must have exactly one more element
@@ -100,6 +107,9 @@ public final class UnitFormatter {
             return;
         }
 
+        // Fast path: below the first factor's rounding threshold, render as a plain integer. This is not
+        // just a perf shortcut - skipping it would route base-unit values through appendScaledDecimal and
+        // print a spurious ".0" (see class-level asymmetry note above).
         int index = 0;
         final int limit = factors[index] + factors[index] / 10;
         if (value < limit) {
@@ -129,6 +139,11 @@ public final class UnitFormatter {
      *
      * <p>Negative values, {@code NaN} and infinite values are not supported and are rendered as "?"
      * followed by the base unit.
+     *
+     * <p>Unlike {@link #longUnit(StringBuilder, long, String[], int[])}, values that fit in the base unit
+     * are still rendered with a decimal point (e.g. {@code "500.0ns"}): a {@code double} is never known
+     * to represent an exact integer count, so there is no equivalent fast path here. This asymmetry is
+     * intentional and covered by tests in {@code UnitFormatterTest}.
      *
      * @param sb The StringBuilder that receives the formatted representation.
      * @param value The double value to format.
