@@ -269,8 +269,8 @@ public class MeterConfig {
     }
 
     /**
-     * Resets all configuration properties to their default values.
-     * This method is useful for testing purposes or when reinitializing the configuration.
+     * Resets the configuration properties to their default values.
+     * This method is useful for testing or re-initializing the configuration.
      * <p>
      * Also resets the shared unknown-meter misuse-report throttle's runtime state (next-allowed-report
      * timestamp and suppressed-report count) back to its initial, unthrottled state, so tests relying on
