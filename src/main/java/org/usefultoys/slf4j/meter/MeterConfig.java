@@ -74,49 +74,49 @@ public class MeterConfig {
     /**
      * The minimum time interval (in milliseconds) between consecutive progress status reports.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.progress.period}, defaulting to {@code 2000} (2 seconds).
+     * The value is read from the system property {@code slf4jtoys.meter.progress.period}, defaulting to {@code 2000} (2 seconds).
      * The value can be suffixed with {@code ms}, {@code s}, {@code m}, or {@code h}.
-     * Can be assigned a new value at runtime.
+     * Can be changed at runtime.
      */
     public long progressPeriodMilliseconds;
 
     /**
      * Whether the {@link Meter} includes the category in its human-readable messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.print.category}, defaulting to {@code false}.
-     * Can be assigned a new value at runtime.
+     * The value is read from the system property {@code slf4jtoys.meter.print.category}, defaulting to {@code false}.
+     * Can be changed at runtime.
      */
     public boolean printCategory;
 
     /**
      * Whether the {@link Meter} includes the operation's status (e.g., OK, FAIL) in its human-readable messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.print.status}, defaulting to {@code true}.
-     * Can be assigned a new value at runtime.
+     * The value is read from the system property {@code slf4jtoys.meter.print.status}, defaulting to {@code true}.
+     * Can be changed at runtime.
      */
     public boolean printStatus;
 
     /**
      * Whether the {@link Meter} includes the operation's position (event counter) in its human-readable messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.print.position}, defaulting to {@code false}.
-     * Can be assigned a new value at runtime.
+     * The value is read from the system property {@code slf4jtoys.meter.print.position}, defaulting to {@code false}.
+     * Can be changed at runtime.
      */
     public boolean printPosition;
 
     /**
      * Whether the {@link Meter} includes the system CPU load in its human-readable messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.print.load}, defaulting to {@code false}.
-     * Can be assigned a new value at runtime.
+     * The value is read from the system property {@code slf4jtoys.meter.print.load}, defaulting to {@code false}.
+     * Can be changed at runtime.
      */
     public boolean printLoad;
 
     /**
      * Whether the {@link Meter} includes memory usage information in its human-readable messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.print.memory}, defaulting to {@code false}.
-     * Can be assigned a new value at runtime.
+     * The value is read from the system property {@code slf4jtoys.meter.print.memory}, defaulting to {@code false}.
+     * Can be changed at runtime.
      */
     public boolean printMemory;
 
@@ -130,8 +130,8 @@ public class MeterConfig {
      * Disable this flag in test environments where meters are intentionally left open, or when the
      * overhead of registering each started meter is undesirable.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.detect.leaks}, defaulting to {@code true}.
-     * Can be assigned a new value at runtime, but doing so only affects <em>new</em> registrations: a
+     * The value is read from the system property {@code slf4jtoys.meter.detect.leaks}, defaulting to {@code true}.
+     * Can be changed at runtime, but doing so only affects <em>new</em> registrations: a
      * {@link Meter} started while this flag was {@code true} remains registered and can still be reported
      * as a leak after the flag is set back to {@code false}, since disabling it does not retroactively
      * deregister or discard already-pending reports.
@@ -151,9 +151,9 @@ public class MeterConfig {
      * {@code 0} disables throttling: every occurrence is reported. A negative value disables reporting
      * entirely: no misuse against the shared instance is ever logged.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.noop.report.interval}, defaulting to
+     * The value is read from the system property {@code slf4jtoys.meter.noop.report.interval}, defaulting to
      * {@code 60000} (1 minute). The value can be suffixed with {@code ms}, {@code s}, {@code m}, or
-     * {@code h}. Can be assigned a new value at runtime.
+     * {@code h}. Can be changed at runtime.
      */
     public long noopReportIntervalMilliseconds;
 
@@ -166,7 +166,7 @@ public class MeterConfig {
      * Example: With prefix {@code "data."}, a logger {@code "a.b.c.MyClass"} becomes {@code "data.a.b.c.MyClass"}
      * for encoded data.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.data.prefix}, defaulting to an empty string.
+     * The value is read from the system property {@code slf4jtoys.meter.data.prefix}, defaulting to an empty string.
      * <p>
      * Setting a non-empty prefix or suffix (see also {@link #dataSuffix}) adds a small initialization cost to
      * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
@@ -183,7 +183,7 @@ public class MeterConfig {
      * Example: With suffix {@code ".data"}, a logger {@code "a.b.c.MyClass"} becomes {@code "a.b.c.MyClass.data"}
      * for encoded data.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.data.suffix}, defaulting to an empty string.
+     * The value is read from the system property {@code slf4jtoys.meter.data.suffix}, defaulting to an empty string.
      * <p>
      * Setting a non-empty prefix (see also {@link #dataPrefix}) or suffix adds a small initialization cost to
      * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
@@ -200,7 +200,7 @@ public class MeterConfig {
      * Example: With prefix {@code "message."}, a logger {@code "a.b.c.MyClass"} becomes {@code "message.a.b.c.MyClass"}
      * for readable messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.message.prefix}, defaulting to an empty string.
+     * The value is read from the system property {@code slf4jtoys.meter.message.prefix}, defaulting to an empty string.
      * <p>
      * Setting a non-empty prefix or suffix (see also {@link #messageSuffix}) adds a small initialization cost to
      * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing
@@ -217,7 +217,7 @@ public class MeterConfig {
      * Example: With suffix {@code ".message"}, a logger {@code "a.b.c.MyClass"} becomes {@code "a.b.c.MyClass.message"}
      * for readable messages.
      * <p>
-     * Value is read from system property {@code slf4jtoys.meter.message.suffix}, defaulting to an empty string.
+     * The value is read from the system property {@code slf4jtoys.meter.message.suffix}, defaulting to an empty string.
      * <p>
      * Setting a non-empty prefix (see also {@link #messagePrefix}) or suffix adds a small initialization cost to
      * every new {@link Meter}, since the decorated logger name must be built and looked up instead of reusing

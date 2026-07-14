@@ -57,27 +57,27 @@ public class WatcherConfig {
     /**
      * The logger name used by watchers to write messages.
      * <p>
-     * Read from the system property {@code slf4jtoys.watcher.name}, defaulting to {@code "watcher"}.
+     * The value is read from the system property {@code slf4jtoys.watcher.name}, defaulting to {@code "watcher"}.
      */
     public String name;
 
     /**
      * The initial delay before the first status report by a scheduled watcher, in milliseconds.
      * <p>
-     * Read from the system property {@code slf4jtoys.watcher.delay}, defaulting to {@code 60000} (1 minute).
+     * The value is read from the system property {@code slf4jtoys.watcher.delay}, defaulting to {@code 60000} (1 minute).
      * The value can be suffixed with {@code ms}, {@code s}, {@code m}, or {@code h}.
      * <p>
-     * A new value can be assigned at runtime, but restarting scheduled watchers is required for the change to take effect.
+     * Can be changed at runtime, but restarting scheduled watchers is required for the change to take effect.
      */
     public long delayMilliseconds;
 
     /**
      * The interval between subsequent status reports by a scheduled watcher, in milliseconds.
      * <p>
-     * Read from the system property {@code slf4jtoys.watcher.period}, defaulting to {@code 600000} (10 minutes).
+     * The value is read from the system property {@code slf4jtoys.watcher.period}, defaulting to {@code 600000} (10 minutes).
      * The value can be suffixed with {@code ms}, {@code s}, {@code m}, or {@code h}.
      * <p>
-     * A new value can be assigned at runtime, but restarting scheduled watchers is required for the change to take effect.
+     * Can be changed at runtime, but restarting scheduled watchers is required for the change to take effect.
      */
     public long periodMilliseconds;
 
@@ -88,7 +88,7 @@ public class WatcherConfig {
      * <p>
      * Example: With prefix {@code "data."}, a logger named {@code "a.b.c.MyClass"} becomes {@code "data.a.b.c.MyClass"}.
      * <p>
-     * Read from the system property {@code slf4jtoys.watcher.data.prefix}, defaulting to an empty string.
+     * The value is read from the system property {@code slf4jtoys.watcher.data.prefix}, defaulting to an empty string.
      */
     public String dataPrefix;
 
@@ -99,7 +99,7 @@ public class WatcherConfig {
      * <p>
      * Example: With suffix {@code ".data"}, a logger named {@code "a.b.c.MyClass"} becomes {@code "a.b.c.MyClass.data"}.
      * <p>
-     * Read from the system property {@code slf4jtoys.watcher.data.suffix}, defaulting to an empty string.
+     * The value is read from the system property {@code slf4jtoys.watcher.data.suffix}, defaulting to an empty string.
      */
     public String dataSuffix;
 
@@ -110,7 +110,7 @@ public class WatcherConfig {
      * <p>
      * Example: With prefix {@code "message."}, a logger named {@code "a.b.c.MyClass"} becomes {@code "message.a.b.c.MyClass"}.
      * <p>
-     * Read from the system property {@code slf4jtoys.watcher.message.prefix}, defaulting to an empty string.
+     * The value is read from the system property {@code slf4jtoys.watcher.message.prefix}, defaulting to an empty string.
      */
     public String messagePrefix;
 
@@ -121,7 +121,7 @@ public class WatcherConfig {
      * <p>
      * Example: With suffix {@code ".message"}, a logger named {@code "a.b.c.MyClass"} becomes {@code "a.b.c.MyClass.message"}.
      * <p>
-     * Read from the system property {@code slf4jtoys.watcher.message.suffix}, defaulting to an empty string.
+     * The value is read from the system property {@code slf4jtoys.watcher.message.suffix}, defaulting to an empty string.
      */
     public String messageSuffix;
 

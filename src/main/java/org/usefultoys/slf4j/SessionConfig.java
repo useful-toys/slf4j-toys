@@ -74,9 +74,7 @@ public class SessionConfig {
      * {@code 2}, and values above {@link #UUID_LENGTH} are clamped to {@link #UUID_LENGTH}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.session.print.uuid.size}, defaulting to {@code 6}.
-     * <p>
-     * <strong>Thread Safety:</strong> This field can be modified at runtime, but caution is advised in concurrent
-     * environments as changes are not synchronized.
+     * Can be changed at runtime.
      */
     public int uuidSize = 6;
 
@@ -84,10 +82,7 @@ public class SessionConfig {
      * The character encoding used for logging and string operations.
      * <p>
      * The value is read from the system property {@code slf4jtoys.session.print.charset}, defaulting to the
-     * JVM's default charset.
-     * <p>
-     * <strong>Thread Safety:</strong> This field can be modified at runtime, but caution is advised in concurrent
-     * environments as changes are not synchronized.
+     * JVM's default charset. Can be changed at runtime.
      */
     public String charset = Charset.defaultCharset().name();
 
@@ -105,10 +100,7 @@ public class SessionConfig {
      * <p>
      * The value is read from the system property {@code slf4jtoys.session.print.locale}, which must be a
      * BCP 47 language tag (e.g., {@code "en-US"}, {@code "de-DE"}) as accepted by
-     * {@link Locale#forLanguageTag(String)}, defaulting to the JVM's default locale.
-     * <p>
-     * <strong>Thread Safety:</strong> This field can be modified at runtime, but caution is advised in concurrent
-     * environments as changes are not synchronized.
+     * {@link Locale#forLanguageTag(String)}, defaulting to the JVM's default locale. Can be changed at runtime.
      */
     public Locale locale = Locale.getDefault();
 
