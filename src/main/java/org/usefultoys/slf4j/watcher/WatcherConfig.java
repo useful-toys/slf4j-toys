@@ -126,8 +126,12 @@ public class WatcherConfig {
     public String messageSuffix;
 
     /**
-     * Initializes the configuration properties. This method should be called at application startup to ensure
-     * consistent behavior.
+     * Initializes the configuration properties by reading values from system properties.
+     * <p>
+     * This method is automatically called in a static initializer when the class is first loaded.
+     * It can also be called manually to reload configuration from system properties after they have been modified.
+     * <p>
+     * For consistent behavior, ensure system properties are set before this class is first accessed.
      */
     public void init() {
         name = ConfigParser.getStringProperty(PROP_NAME, "watcher");
