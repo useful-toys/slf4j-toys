@@ -44,7 +44,7 @@ import static org.usefultoys.slf4j.watcher.WatcherConfig.*;
  * schedule or serialize calls to {@link #run()} externally (as {@link WatcherServlet} does with a private lock). Do not
  * register the same instance with multiple schedulers or submit it to a thread pool that allows concurrent execution.
  * <p>
- * A {@link Watcher} instance maintains its own internal event {@link org.usefultoys.slf4j.internal.EventData#position position}
+ * A {@link Watcher} instance maintains its own internal event {@code position}
  * sequence. Two distinct {@code Watcher} instances that use the same {@code name} will write to the same logger but will
  * produce interleaved position sequences, because each instance counts independently. If a single ordered sequence per
  * name is required, the application must ensure that only one {@code Watcher} instance uses that name.
