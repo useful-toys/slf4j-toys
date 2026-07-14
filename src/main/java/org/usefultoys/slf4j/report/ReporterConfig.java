@@ -92,7 +92,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes Java Virtual Machine (JVM) information.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.vm}. Defaults to {@code true}.
+     * The value is read from the system property {@code slf4jtoys.report.vm}, defaulting to {@code true}.
      * Can be changed at runtime.
      */
     public boolean reportVM;
@@ -100,7 +100,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes information about available and used disk space for file system roots.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.fileSystem}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.fileSystem}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportFileSystem;
@@ -108,7 +108,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes memory usage information (heap, non-heap, etc.).
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.memory}. Defaults to {@code true}.
+     * The value is read from the system property {@code slf4jtoys.report.memory}, defaulting to {@code true}.
      * Can be changed at runtime.
      */
     public boolean reportMemory;
@@ -116,7 +116,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes current user information (name, home directory).
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.user}. Defaults to {@code true}.
+     * The value is read from the system property {@code slf4jtoys.report.user}, defaulting to {@code true}.
      * Can be changed at runtime.
      */
     public boolean reportUser;
@@ -124,7 +124,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes all Java system properties.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.properties}. Defaults to {@code true}.
+     * The value is read from the system property {@code slf4jtoys.report.properties}, defaulting to {@code true}.
      * Can be changed at runtime.
      */
     public boolean reportProperties;
@@ -132,7 +132,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes all environment variables.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.environment}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.environment}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportEnvironment;
@@ -140,7 +140,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes physical machine information (e.g., number of processors).
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.physicalSystem}. Defaults to {@code true}.
+     * The value is read from the system property {@code slf4jtoys.report.physicalSystem}, defaulting to {@code true}.
      * Can be changed at runtime.
      */
     public boolean reportPhysicalSystem;
@@ -148,7 +148,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes operating system information (name, version, architecture).
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.operatingSystem}. Defaults to {@code true}.
+     * The value is read from the system property {@code slf4jtoys.report.operatingSystem}, defaulting to {@code true}.
      * Can be changed at runtime.
      */
     public boolean reportOperatingSystem;
@@ -156,7 +156,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes calendar, date, time, and timezone information.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.calendar}. Defaults to {@code true}.
+     * The value is read from the system property {@code slf4jtoys.report.calendar}, defaulting to {@code true}.
      * Can be changed at runtime.
      */
     public boolean reportCalendar;
@@ -164,7 +164,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes current and available locales.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.locale}. Defaults to {@code true}.
+     * The value is read from the system property {@code slf4jtoys.report.locale}, defaulting to {@code true}.
      * Can be changed at runtime.
      */
     public boolean reportLocale;
@@ -172,7 +172,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes current and available character sets.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.charset}. Defaults to {@code true}.
+     * The value is read from the system property {@code slf4jtoys.report.charset}, defaulting to {@code true}.
      * Can be changed at runtime.
      */
     public boolean reportCharset;
@@ -181,7 +181,7 @@ public class ReporterConfig {
      * Whether the default report includes network interface information.
      * <p>
      * This operation may block the thread for a significant amount of time.
-     * Controlled by the system property {@code slf4jtoys.report.networkInterface}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.networkInterface}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportNetworkInterface;
@@ -189,7 +189,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes SSL context information (e.g., protocols, cipher suites).
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.SSLContext}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.SSLContext}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportSSLContext;
@@ -197,7 +197,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes information about the default trusted keystore.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.defaultTrustKeyStore}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.defaultTrustKeyStore}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportDefaultTrustKeyStore;
@@ -205,7 +205,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes JVM arguments.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.jvmArguments}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.jvmArguments}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportJvmArguments;
@@ -213,7 +213,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes classpath information.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.classpath}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.classpath}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportClasspath;
@@ -221,7 +221,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes garbage collector information.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.garbageCollector}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.garbageCollector}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportGarbageCollector;
@@ -229,7 +229,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes security providers information.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.securityProviders}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.securityProviders}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportSecurityProviders;
@@ -237,7 +237,7 @@ public class ReporterConfig {
     /**
      * Whether the default report includes container information.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.containerInfo}. Defaults to {@code false}.
+     * The value is read from the system property {@code slf4jtoys.report.containerInfo}, defaulting to {@code false}.
      * Can be changed at runtime.
      */
     public boolean reportContainerInfo;
@@ -245,7 +245,7 @@ public class ReporterConfig {
     /**
      * Defines the default name used for the logger that prints reports.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.name}. Defaults to {@code "report"}.
+     * The value is read from the system property {@code slf4jtoys.report.name}, defaulting to {@code "report"}.
      * Can be changed at runtime.
      */
     public String name;
@@ -254,8 +254,8 @@ public class ReporterConfig {
      * A regular expression used to identify sensitive property names (system properties or environment variables)
      * whose values should be censored in reports.
      * <p>
-     * Controlled by the system property {@code slf4jtoys.report.forbiddenPropertyNamesRegex}.
-     * Defaults to {@code "(?i).*password.*|.*secret.*|.*key.*|.*token.*"}.
+     * The value is read from the system property {@code slf4jtoys.report.forbiddenPropertyNamesRegex}, defaulting
+     * to {@code "(?i).*password.*|.*secret.*|.*key.*|.*token.*"}.
      * The {@code (?i)} flag makes the regex case-insensitive.
      * Can be changed at runtime.
      */

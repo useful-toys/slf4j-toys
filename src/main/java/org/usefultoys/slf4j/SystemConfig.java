@@ -55,35 +55,35 @@ public class SystemConfig {
      * Determines whether memory usage metrics are retrieved from the {@link java.lang.management.MemoryMXBean}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.useMemoryManagedBean}, defaulting to {@code false}.
-     * It can be changed at runtime.
+     * Can be changed at runtime.
      */
     public boolean useMemoryManagedBean;
     /**
      * Determines whether class loading metrics are retrieved from the {@link java.lang.management.ClassLoadingMXBean}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.useClassLoadingManagedBean}, defaulting to {@code false}.
-     * It can be changed at runtime.
+     * Can be changed at runtime.
      */
     public boolean useClassLoadingManagedBean;
     /**
      * Determines whether JIT compiler metrics are retrieved from the {@link java.lang.management.CompilationMXBean}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.useCompilationManagedBean}, defaulting to {@code false}.
-     * It can be changed at runtime.
+     * Can be changed at runtime.
      */
     public boolean useCompilationManagedBean;
     /**
      * Determines whether garbage collection metrics are retrieved from the {@link java.lang.management.GarbageCollectorMXBean}s.
      * <p>
      * The value is read from the system property {@code slf4jtoys.useGarbageCollectionManagedBean}, defaulting to {@code false}.
-     * It can be changed at runtime.
+     * Can be changed at runtime.
      */
     public boolean useGarbageCollectionManagedBean;
     /**
      * Determines whether operating system metrics are retrieved from the {@link java.lang.management.OperatingSystemMXBean}.
      * <p>
      * The value is read from the system property {@code slf4jtoys.usePlatformManagedBean}, defaulting to {@code false}.
-     * It can be changed at runtime.
+     * Can be changed at runtime.
      */
     public boolean usePlatformManagedBean;
 
