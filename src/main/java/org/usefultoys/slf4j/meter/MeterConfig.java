@@ -46,30 +46,30 @@ public class MeterConfig {
     }
 
     // System property keys
-    /** System property key for the message logger name suffix. */
-    public final String PROP_MESSAGE_SUFFIX = "slf4jtoys.meter.message.suffix";
-    /** System property key for the message logger name prefix. */
-    public final String PROP_MESSAGE_PREFIX = "slf4jtoys.meter.message.prefix";
-    /** System property key for the data logger name suffix. */
-    public final String PROP_DATA_SUFFIX = "slf4jtoys.meter.data.suffix";
-    /** System property key for the data logger name prefix. */
-    public final String PROP_DATA_PREFIX = "slf4jtoys.meter.data.prefix";
-    /** System property key for enabling/disabling memory printing in readable messages. */
-    public final String PROP_PRINT_MEMORY = "slf4jtoys.meter.print.memory";
-    /** System property key for enabling/disabling category printing in readable messages. */
-    public final String PROP_PRINT_CATEGORY = "slf4jtoys.meter.print.category";
-    /** System property key for enabling/disabling CPU load printing in readable messages. */
-    public final String PROP_PRINT_LOAD = "slf4jtoys.meter.print.load";
     /** System property key for the progress reporting period. */
     public final String PROP_PROGRESS_PERIOD = "slf4jtoys.meter.progress.period";
-    /** System property key for enabling/disabling position printing in readable messages. */
-    public final String PROP_PRINT_POSITION = "slf4jtoys.meter.print.position";
+    /** System property key for enabling/disabling category printing in readable messages. */
+    public final String PROP_PRINT_CATEGORY = "slf4jtoys.meter.print.category";
     /** System property key for enabling/disabling status printing in readable messages. */
     public final String PROP_PRINT_STATUS = "slf4jtoys.meter.print.status";
+    /** System property key for enabling/disabling position printing in readable messages. */
+    public final String PROP_PRINT_POSITION = "slf4jtoys.meter.print.position";
+    /** System property key for enabling/disabling CPU load printing in readable messages. */
+    public final String PROP_PRINT_LOAD = "slf4jtoys.meter.print.load";
+    /** System property key for enabling/disabling memory printing in readable messages. */
+    public final String PROP_PRINT_MEMORY = "slf4jtoys.meter.print.memory";
     /** System property key for enabling/disabling the forgotten-meter leak detector. */
     public final String PROP_DETECT_LEAKS = "slf4jtoys.meter.detect.leaks";
     /** System property key for the shared unknown-meter misuse-report throttle interval. */
     public final String PROP_NOOP_REPORT_INTERVAL = "slf4jtoys.meter.noop.report.interval";
+    /** System property key for the data logger name prefix. */
+    public final String PROP_DATA_PREFIX = "slf4jtoys.meter.data.prefix";
+    /** System property key for the data logger name suffix. */
+    public final String PROP_DATA_SUFFIX = "slf4jtoys.meter.data.suffix";
+    /** System property key for the message logger name prefix. */
+    public final String PROP_MESSAGE_PREFIX = "slf4jtoys.meter.message.prefix";
+    /** System property key for the message logger name suffix. */
+    public final String PROP_MESSAGE_SUFFIX = "slf4jtoys.meter.message.suffix";
 
     /**
      * The minimum time interval (in milliseconds) between consecutive progress status reports.
