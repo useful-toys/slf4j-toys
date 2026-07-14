@@ -167,16 +167,63 @@ Goal: prove an optimization to the library is a real improvement.
 # ---------- ANTES / BEFORE: the library without the change ----------
 .\mvnw -DskipTests install                       # install the "before" library
 .\mvnw -f benchmarks\pom.xml compile exec:java "-Dexec.args=MeterOperationBenchmark|MeterLifecycleBenchmark -prof gc -rf json -rff before.json"
+.\benchmarks\stamp-provenance.ps1 before.json    # record which library commit this measured
 
 # ---------- apply the optimization to the library, then ----------
 # ---------- DEPOIS / AFTER: the library with the change ----------
 .\mvnw -DskipTests install                       # reinstall the "after" library
 .\mvnw -f benchmarks\pom.xml compile exec:java "-Dexec.args=MeterOperationBenchmark|MeterLifecycleBenchmark -prof gc -rf json -rff after.json"
+.\benchmarks\stamp-provenance.ps1 after.json     # record which library commit this measured
 ```
 
 `-rf json -rff <file>` writes machine-readable results. Compare `before.json` and
 `after.json` method by method, on both `Score` and `gc.alloc.rate.norm`. Declare a win
 only when the change exceeds the error margins on both sides.
+
+### Recording which commit a result measured (provenance)
+
+A stored baseline is only useful later if you know **which library commit it measured**.
+`stamp-provenance.ps1` reads the Git provenance the build stamps into the measured jar
+(`META-INF/git.properties`, backed by the `SCM-*` manifest entries — see the root
+`pom.xml`) and wraps the JMH result file so the commit travels with the numbers:
+
+```powershell
+.\benchmarks\stamp-provenance.ps1 after.json
+```
+
+turns JMH's plain top-level array into
+
+```json
+{
+  "provenance": {
+    "available": true,
+    "source": "slf4j-toys-2.1.0-SNAPSHOT.jar (META-INF/git.properties)",
+    "git.commit.id.abbrev": "9926b411",
+    "git.branch": "main",
+    "git.dirty": false,
+    "git.commit.id.describe": "2.0.0-145-g9926b411",
+    "...": "..."
+  },
+  "results": [ /* the original JMH array, unchanged */ ]
+}
+```
+
+Notes:
+
+- The provenance is that of the **installed library the benchmark loaded**, not of this
+  benchmark module's checkout — that is the commit the measurement is actually about.
+  Run `.\mvnw -DskipTests install` before each run (as always) so the stamped commit
+  matches the code you measured.
+- `git.dirty: true` means the measured jar was built from a working tree with uncommitted
+  changes, so the commit hash alone does not fully identify the code — treat such a
+  baseline as provisional.
+- The step is idempotent (re-stamping refreshes the provenance and keeps the results) and
+  fails loudly if the jar carries no provenance; pass `-AllowMissing` to stamp anyway with
+  `available: false`. See the script header (`Get-Help .\benchmarks\stamp-provenance.ps1`)
+  for all options.
+- **Consumers must read the results under the `results` key** now (e.g. a comparison
+  script does `json.load(...)["results"]`), since the top level is an object rather than a
+  bare array.
 
 **Critical rule:** the benchmark code must be **identical** on both sides — only the
 library may differ. So when comparing an optimization branch (e.g.
