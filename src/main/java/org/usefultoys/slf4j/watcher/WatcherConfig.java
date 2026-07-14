@@ -31,6 +31,7 @@ import org.usefultoys.slf4j.utils.ConfigParser;
  *
  * @author Daniel Felix Ferber
  * @see Watcher
+ * @see WatcherData
  */
 @UtilityClass
 public class WatcherConfig {
